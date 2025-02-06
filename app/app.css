@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import './index.css'
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -12,4 +12,31 @@ body {
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
   }
+}
+
+/* 
+  1) The container that wraps everything
+  2) Ensures the entire page occupies the full viewport height
+  3) Uses a column flex layout
+*/
+.root-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+/* 
+  Allows the main content area to grow and fill remaining space 
+  (pushing the footer to the bottom if there's not enough content)
+*/
+.content {
+  flex: 1;
+}
+
+/* Simple styling examples for header/footer */
+.header,
+.footer {
+ height: 56px;
+ background: var(--dark1);
+
 }

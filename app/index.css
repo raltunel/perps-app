@@ -1,0 +1,81 @@
+/* Default Theme */
+:root {
+    /* Dark Shades */
+    --dark1: #06060C;
+    --dark2: #0E0E14;
+    --dark3: #16161C;
+    --dark4: #1E1E24;
+    --dark5: #23232A;
+    --dark6: #27272F;
+  
+    /* Text Colors */
+    --text1: #F0F0F8;
+    --text2: #6A6A6D;
+    --text3: #424246;
+  
+    /* Accent Colors */
+    --accent1: #7371FC;
+    --accent2: #E480FF;
+    --accent3: #5FFFF2;
+    --accent4: #71B5FC;
+    --accent5: #CDC1FF;
+  
+    /* Other Colors */
+    --green: #26A69A;
+    --red: #EF5350;
+    --orange: #E78A56;
+  }
+  
+
+
+
+/* Custom Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans, sans-serif);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
