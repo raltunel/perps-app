@@ -20,8 +20,8 @@ body {
   3) Uses a column flex layout
 */
 .root-container {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 56px 1fr 56px;
   min-height: 100svh;
 }
 
@@ -31,6 +31,7 @@ body {
 */
 .content {
   flex: 1;
+  background: var(--dark3)
 }
 
 /* Simple styling examples for header/footer */
