@@ -27,5 +27,13 @@
 .header,
 .footer {
  height: 56px;
+ display: flex;
+ flex-direction: row;
+ align-items: center;
+ gap: 16px;
 
+}
+
+.header a{
+  color: var(--accent1)
 }

@@ -11,8 +11,6 @@ export default defineConfig(({ isSsrBuild }) => ({
         }
       : undefined,
   },
-  css: {
-    postcss: './postcss.config.cjs'
-  },
+ 
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 }));
