@@ -1,0 +1,11 @@
+/* Media Queries for Tablets (including iPads) */
+@custom-media --tablet-portrait (min-width: 600px) and (max-width: 1366px) and (orientation: portrait);
+@custom-media --tablet-landscape (min-width: 600px) and (max-width: 1366px) and (orientation: landscape);
+
+/* Media Queries for Mobile Devices */
+@custom-media --mobile-portrait (max-width: 599px) and (orientation: portrait);
+@custom-media --mobile-landscape (max-width: 599px) and (orientation: landscape);
+
+/* Media Queries for Desktop Devices */
+@custom-media --desktop (min-width: 1367px);
+@custom-media --desktop-large (min-width: 1920px); /* Optional for ultra-wide monitors */

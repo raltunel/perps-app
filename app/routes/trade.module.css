@@ -1,0 +1,68 @@
+.container {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 281px;
+  gap: var(--main-gap);
+}
+.containerTop,
+.containerBottom {
+  display: grid;
+  height: 100%;
+  border-radius: var(--main-border-radius);
+
+  justify-content: center;
+  align-items: center;
+}
+
+.containerTop {
+  grid-template-columns: 1fr var(--order-book-width-desktop-small) var(
+      --trade-module-width-desktop-small
+    );
+  gap: var(--main-gap);
+  /* background: var(--dark2); */
+}
+/* .containerTop div{
+    background: var(--dark2);
+    height: 100%;
+    border-radius: var(--main-border-radius);
+} */
+
+.containerBottom {
+  background: var(--dark2);
+}
+
+.containerTopLeft {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 40px 56px 1fr;
+  width: 100%;
+  gap: var(--main-gap);
+}
+.containerTopLeft div {
+  background: var(--dark2);
+  height: 100%;
+  border-radius: var(--main-border-radius);
+}
+
+.watchlist,
+.chart,
+.symbolInfo,
+.orderBook,
+.tradeModules {
+  background: var(--dark2);
+  height: 100%;
+  border-radius: var(--main-border-radius);
+
+  /*  */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media only screen and (min-width: 1920px) {
+  .containerTop {
+    grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
+        --trade-module-width-desktop-large
+      );
+  }
+}
