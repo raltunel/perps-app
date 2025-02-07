@@ -3,7 +3,7 @@ import { type RouteConfig, index, route } from "@react-router/dev/routes";
 
 export default [
   // Renders "routes/home.tsx" at "/"
-  index("routes/home.tsx"),
+  index("routes/home/home.tsx"),
 
   // Renders "routes/trade.tsx" at "/trade", then nested routes at e.g. "/trade/market"
   route("trade", "routes/trade.tsx", [

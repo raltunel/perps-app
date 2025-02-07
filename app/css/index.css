@@ -28,7 +28,15 @@
     /* gaps */
     --main-gap: 8px;
 
-    --main-border: 16px;
+    --main-border-radius: 16px;
+
+    /* widths */
+    --order-book-width-desktop-large: 280px;
+    --order-book-width-desktop-small: 220px;
+
+
+    --trade-module-width-desktop-large: 350px;
+    --trade-module-width-desktop-small: 280px;
   }
   
 
@@ -53,6 +61,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--dark1);
 }
 
 img,

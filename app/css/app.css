@@ -1,18 +1,5 @@
 @import "tailwindcss";
-@import './index.css'
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-html,
-body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
-}
+@import './index.css';
 
 /* 
   1) The container that wraps everything
@@ -23,6 +10,7 @@ body {
   display: grid;
   grid-template-rows: 56px 1fr 56px;
   height: 100vh;
+  color: white;
 }
 
 /* 
@@ -31,7 +19,7 @@ body {
 */
 .content {
  height: 100%;
-  background: var(--dark3);
+  /* background: var(--dark3); */
   padding: var(--main-gap);
 }
 
@@ -39,6 +27,5 @@ body {
 .header,
 .footer {
  height: 56px;
- background: var(--dark1);
 
 }
