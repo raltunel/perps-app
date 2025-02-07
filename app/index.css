@@ -24,6 +24,11 @@
     --green: #26A69A;
     --red: #EF5350;
     --orange: #E78A56;
+
+    /* gaps */
+    --main-gap: 8px;
+
+    --main-border: 16px;
   }
   
 

@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router';
 import type { Route } from './+types/home';
-
+import styles from './trade.module.css';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'New React Router App' },
@@ -13,35 +13,27 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
+  // const nav = (
+  //      {/* Example nav links to each child route */}
+  //   <nav style={{ marginBottom: '1rem' }}>
+  //   <Link to='market' style={{ marginRight: '1rem' }}>
+  //     Market
+  //   </Link>
+  //   <Link to='limit' style={{ marginRight: '1rem' }}>
+  //     Limit
+  //   </Link>
+  //   <Link to='pro' style={{ marginRight: '1rem' }}>
+  //     Pro
+  //   </Link>
+  // </nav>
+
+  // )
   return (
-    <div
-      style={{
-        border: '1px solid gray',
-        padding: '1rem',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'spaceBetween',
-      }}
-    >
-      {/* <h2>Trade Layout</h2> */}
-
-      {/* Example nav links to each child route */}
-      <nav style={{ marginBottom: '1rem' }}>
-        <Link to='market' style={{ marginRight: '1rem' }}>
-          Market
-        </Link>
-        <Link to='limit' style={{ marginRight: '1rem' }}>
-          Limit
-        </Link>
-        <Link to='pro' style={{ marginRight: '1rem' }}>
-          Pro
-        </Link>
-      </nav>
-
-          
-      {/* Child routes (market, limit, pro) appear here */}
-      <Outlet />
+    <div className={styles.container}>
+          {/* Child routes (market, limit, pro) appear here */}
+          <section className={styles.containerTop}>Chart goes here</section>
+          <section className={styles.containerBottom}>Table goes here</section>
+      {/* <Outlet /> */}
     </div>
   );
 }
