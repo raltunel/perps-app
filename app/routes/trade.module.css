@@ -66,3 +66,14 @@
       );
   }
 }
+
+
+@media only screen and (max-width: 1080px){
+    .containerTop, .containerTopLeft{
+        grid-template-columns: 1fr;
+    }
+
+    .orderBook, .tradeModules{
+        display: none;
+    }
+}
