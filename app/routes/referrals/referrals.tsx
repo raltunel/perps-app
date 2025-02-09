@@ -1,8 +1,9 @@
+import Welcome from '~/components/Welcome/Welcome';
 import type { Route } from '../+types/home';
-import styles from './home.module.css'
+import styles from './referrals.module.css'
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: 'New React Router App' },
+    { title: 'Perps - Referrals' },
     { name: 'description', content: 'Welcome to React Router!' },
   ];
 }
@@ -11,6 +12,6 @@ export function loader({ context }: Route.LoaderArgs) {
   return { message: context.VALUE_FROM_NETLIFY };
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
-  return <div className={styles.container}>HOMEPAGE</div>;
+export default function Referrals({ loaderData }: Route.ComponentProps) {
+  return <Welcome title='Referrals' />;
 }

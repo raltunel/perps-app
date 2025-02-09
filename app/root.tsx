@@ -10,6 +10,7 @@ import {
 import type { Route } from './+types/root';
 import './css/app.css';
 import './css/index.css';
+import Navbar from './components/navbar/navbar';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,10 +35,7 @@ export default function App() {
     <Layout>
       <div className='root-container'>
         <header className='header'>
-          <h1>Header</h1>
-          <Link to='trade' style={{ marginRight: '1rem' }}>
-            trade
-          </Link>
+          <Navbar/>
         </header>
 
         <main className='content'>
