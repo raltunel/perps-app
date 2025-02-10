@@ -1,8 +1,13 @@
-import { Link, NavLink } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import type { Route } from '../+types/home';
 import styles from './navbar.module.css';
 import { useState } from 'react';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
+import Button from '../Button/Button';
+import DropdownMenu from './DropdownMenu/DropdownMenu';
+import { LuMenu, LuWallet } from 'react-icons/lu';
+import useOutsideClick from '~/hooks/useOutsideClick';
+
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'New React Router App' },
@@ -16,6 +21,9 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Navbar({ loaderData }: Route.ComponentProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
+  const [isUserConnected, setIsUserConnected] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
     { name: 'Trade', path: '/trade' },
@@ -26,35 +34,87 @@ export default function Navbar({ loaderData }: Route.ComponentProps) {
     { name: 'Leaderboard', path: '/leaderboard' },
     { name: 'More', path: '/more' },
   ];
-  return (
-    <header className={styles.container}>
-      <Link to='/'>
-        <img src='/images/perpsLogo.svg' alt='Perps Logo' />
-      </Link>
-      <nav className={`${styles.nav} ${isMenuOpen ? styles.showMenu : ''}`}>
-        <button onClick={ () => setIsMenuOpen(false)} className={styles.mobileNavCloseButton}>
-          <MdOutlineClose size={20} color='var(--text1)' />
-        </button>
-        {navLinks.map((link) => (
-          <NavLink
-            key={link.name}
-            to={link.path}
-            className={({ isActive }) =>
-              isActive ? styles.activeNavLink : styles.navLink
-            }
-            onClick={isMenuOpen ? () => setIsMenuOpen(false) : undefined} 
 
+  const dropdownMenuRef = useOutsideClick<HTMLDivElement>(() => {
+    setIsDropdownMenuOpen(false);
+  }, isDropdownMenuOpen);
+  const mobileNavbarRef = useOutsideClick<HTMLDivElement>(() => {
+    setIsMenuOpen(false);
+  }, isMenuOpen);
+
+  return (
+    <>
+      <header className={styles.container}>
+        <Link to='/'>
+          <img src='/images/perpsLogo.svg' alt='Perps Logo' />
+        </Link>
+        <nav
+          className={`${styles.nav} ${isMenuOpen ? styles.showMenu : ''}`}
+          ref={isMenuOpen ? mobileNavbarRef : null}
+        >
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className={styles.mobileNavCloseButton}
           >
-            {link.name}
-          </NavLink>
-        ))}
-      </nav>
-      <button
-        className={styles.menuButton}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      >
-        <MdOutlineMoreHoriz size={20} color='var(--text2)' />
-      </button>
-    </header>
+            <MdOutlineClose size={20} color='var(--text1)' />
+          </button>
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              to={link.path}
+              className={
+                location.pathname.includes(link.path)
+                  ? styles.activeNavLink
+                  : styles.navLink
+              }
+              onClick={isMenuOpen ? () => setIsMenuOpen(false) : undefined}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </nav>
+        <div className={styles.rightSide}>
+          {!isUserConnected ? (
+            <Button
+              size='medium'
+              selected
+              onClick={() => setIsUserConnected(true)}
+            >
+              Connect
+            </Button>
+          ) : (
+            <button
+              className={styles.walletButton}
+              onClick={() => setIsUserConnected(false)}
+            >
+              <LuWallet color='var(--accent1)' size={18} /> Miyuki.eth
+            </button>
+          )}
+
+          <button
+            className={styles.menuButton}
+            onClick={() => setIsDropdownMenuOpen(!isDropdownMenuOpen)}
+          >
+            <MdOutlineMoreHoriz size={20} color='var(--text2)' />
+          </button>
+          <button
+            className={styles.menuButtonMobile}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <LuMenu size={20} color='var(--text2)' />
+          </button>
+        </div>
+      </header>
+      {isDropdownMenuOpen && (
+        <div
+          className={`${styles.dropdownMenu} ${
+            isDropdownMenuOpen ? styles.open : ''
+          }`}
+          ref={dropdownMenuRef}
+        >
+          <DropdownMenu />
+        </div>
+      )}
+    </>
   );
 }

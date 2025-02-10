@@ -10,7 +10,7 @@ import {
 import type { Route } from './+types/root';
 import './css/app.css';
 import './css/index.css';
-import Navbar from './components/navbar/navbar';
+import Navbar from './components/Navbar/Navbar';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
