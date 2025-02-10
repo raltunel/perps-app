@@ -1,46 +1,51 @@
-/* Default Theme */
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100;300;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
 :root {
-    /* Dark Shades */
-    --dark1: #06060C;
-    --dark2: #0E0E14;
-    --dark3: #16161C;
-    --dark4: #1E1E24;
-    --dark5: #23232A;
-    --dark6: #27272F;
-  
-    /* Text Colors */
-    --text1: #F0F0F8;
-    --text2: #6A6A6D;
-    --text3: #424246;
-  
-    /* Accent Colors */
-    --accent1: #7371FC;
-    --accent2: #E480FF;
-    --accent3: #5FFFF2;
-    --accent4: #71B5FC;
-    --accent5: #CDC1FF;
-  
-    /* Other Colors */
-    --green: #26A69A;
-    --red: #EF5350;
-    --orange: #E78A56;
+  /* Dark Shades */
+  --dark1: #06060c;
+  --dark2: #0e0e14;
+  --dark3: #16161c;
+  --dark4: #1e1e24;
+  --dark5: #23232a;
+  --dark6: #27272f;
 
-    /* gaps */
-    --main-gap: 8px;
+  /* Text Colors */
+  --text1: #f0f0f8;
+  --text2: #6a6a6d;
+  --text3: #424246;
 
-    --main-border-radius: 16px;
+  /* Accent Colors */
+  --accent1: #7371fc;
+  --accent2: #e480ff;
+  --accent3: #5ffff2;
+  --accent4: #71b5fc;
+  --accent5: #cdc1ff;
 
-    /* widths */
-    --order-book-width-desktop-large: 280px;
-    --order-book-width-desktop-small: 220px;
+  /* Other Colors */
+  --green: #26a69a;
+  --red: #ef5350;
+  --orange: #e78a56;
 
+  /* gaps */
+  --main-gap: 8px;
+  --header-link-gap: 32px;
+  --main-padding: 8px;
 
-    --trade-module-width-desktop-large: 350px;
-    --trade-module-width-desktop-small: 280px;
-  }
-  
+  --main-border-radius: 16px;
 
+  /* widths */
+  --order-book-width-desktop-large: 280px;
+  --order-book-width-desktop-small: 220px;
 
+  --trade-module-width-desktop-large: 350px;
+  --trade-module-width-desktop-small: 280px;
+
+  /* fonts */
+  --font-family-main: 'Lexend Deca';
+
+  --font-size-m: 18px;
+}
 
 /* Custom Reset */
 *,
@@ -89,7 +94,7 @@ button {
   cursor: pointer;
 }
 
-ul[role="list"],
-ol[role="list"] {
+ul[role='list'],
+ol[role='list'] {
   list-style: none;
 }

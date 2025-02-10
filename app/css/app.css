@@ -19,7 +19,8 @@
 .content {
  height: 100%;
   /* background: var(--dark3); */
-  padding: var(--main-gap);
+  padding: 0px var(--main-padding, 8px) var(--main-padding, 8px) var(--main-padding, 8px);
+
 }
 
 /* Simple styling examples for header/footer */
@@ -30,6 +31,7 @@
  flex-direction: row;
  align-items: center;
  gap: 16px;
+ padding: 0px var(--main-padding) 
 
 }
 
