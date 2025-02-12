@@ -125,6 +125,8 @@ line-height: normal;
 .walletButton:hover{
 background: var(--dark3, #16161C);
 }
+
+
 @keyframes bounce {
   0% {
     transform: translateY(0);
@@ -169,6 +171,10 @@ background: var(--dark3, #16161C);
     display: flex;
   }
 
+  .menuButton{
+    display: none;
+  }
+
   .mobileNavCloseButton {
     display: flex;
     justify-content: end;
@@ -178,4 +184,6 @@ background: var(--dark3, #16161C);
     padding: var(--main-padding);
     border-radius: var(--main-border-radius);
   }
+
+  
 }

@@ -46,7 +46,7 @@ export default function Navbar({ loaderData }: Route.ComponentProps) {
     <>
       <header className={styles.container}>
         <Link to='/'>
-          <img src='/images/perpsLogo.svg' alt='Perps Logo' />
+          <img src='/images/perpsLogo.svg' alt='Perps Logo' width='240px' />
         </Link>
         <nav
           className={`${styles.nav} ${isMenuOpen ? styles.showMenu : ''}`}

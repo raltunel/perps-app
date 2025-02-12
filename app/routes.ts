@@ -30,5 +30,9 @@ export default [
 
   // Renders "routes/referrals/referrals.tsx" at "/referrals"
   route("referrals", "routes/referrals/referrals.tsx"),
+  // Renders "routes/more/more.tsx" at "/more"
+  route("more", "routes/more/more.tsx"),
+
+
 
 ] satisfies RouteConfig;
