@@ -1,15 +1,15 @@
-import { Link, useLocation } from 'react-router';
-import styles from './navbar.module.css';
 import { useState } from 'react';
+import { LuMenu, LuWallet } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
+import { Link, useLocation } from 'react-router';
+import useOutsideClick from '~/hooks/useOutsideClick';
 import Button from '../Button/Button';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-import { LuMenu, LuWallet } from 'react-icons/lu';
-import useOutsideClick from '~/hooks/useOutsideClick';
+import styles from './PageHeader.module.css';
 
 
 
-export default function Navbar() {
+export default function PageHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
   const [isUserConnected, setIsUserConnected] = useState(false);
