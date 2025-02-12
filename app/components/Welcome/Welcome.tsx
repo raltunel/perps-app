@@ -1,6 +1,6 @@
 import { Link, NavLink } from 'react-router';
 import type { Route } from '../+types/home';
-import styles from './welcome.module.css';
+import styles from './Welcome.module.css';
 import { useState } from 'react';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import type { FC } from 'react';
