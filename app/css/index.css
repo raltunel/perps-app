@@ -33,6 +33,7 @@
   --main-padding: 8px;
 
   --main-border-radius: 16px;
+  --half-border-radius: 8px;
 
   /* widths */
   --order-book-width-desktop-large: 280px;
@@ -44,7 +45,10 @@
   /* fonts */
   --font-family-main: 'Lexend Deca';
 
+  --font-size-l: 24px;
   --font-size-m: 18px;
+  --font-size-s: 12px;
+  --font-size-xxl: 64px;
 }
 
 /* Custom Reset */

@@ -1,16 +1,15 @@
 import {
   isRouteErrorResponse,
-  Link,
   Links,
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  ScrollRestoration
 } from 'react-router';
 import type { Route } from './+types/root';
+import PageHeader from './components/PageHeader/PageHeader';
 import './css/app.css';
 import './css/index.css';
-import Navbar from './components/navbar/navbar';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -35,7 +34,7 @@ export default function App() {
     <Layout>
       <div className='root-container'>
         <header className='header'>
-          <Navbar/>
+          <PageHeader/>
         </header>
 
         <main className='content'>

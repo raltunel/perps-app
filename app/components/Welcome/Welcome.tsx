@@ -1,8 +1,5 @@
-import { Link, NavLink } from 'react-router';
-import type { Route } from '../+types/home';
-import styles from './welcome.module.css';
-import { useState } from 'react';
-import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
+import type { Route } from '../../+types/root';
+import styles from './Welcome.module.css';
 import type { FC } from 'react';
 
 export function meta({}: Route.MetaArgs) {

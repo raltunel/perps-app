@@ -1,6 +1,5 @@
 import Welcome from '~/components/Welcome/Welcome';
-import type { Route } from '../+types/home';
-import styles from './points.module.css'
+import type { Route } from '../../+types/root';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'Perps - Points' },

@@ -1,5 +1,4 @@
-import { Link, Outlet } from 'react-router';
-import type { Route } from '../+types/home';
+import type { Route } from '../../+types/root';
 
 export function meta({}: Route.MetaArgs) {
   return [

@@ -1,5 +1,6 @@
-import type { Route } from '../+types/home';
-import styles from './home.module.css'
+import type { Route } from '../../+types/root';
+import styles from './home.module.css';
+import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'New React Router App' },
@@ -12,5 +13,10 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  return <div className={styles.container}>HOMEPAGE</div>;
+  return (
+    <div className={styles.container}>
+      <ButtonShowcase/>
+      
+    </div>
+  );
 }
