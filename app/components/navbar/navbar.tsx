@@ -1,5 +1,4 @@
 import { Link, useLocation } from 'react-router';
-import type { Route } from '../+types/home';
 import styles from './navbar.module.css';
 import { useState } from 'react';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
@@ -8,18 +7,9 @@ import DropdownMenu from './DropdownMenu/DropdownMenu';
 import { LuMenu, LuWallet } from 'react-icons/lu';
 import useOutsideClick from '~/hooks/useOutsideClick';
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: 'New React Router App' },
-    { name: 'description', content: 'Welcome to React Router!' },
-  ];
-}
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_NETLIFY };
-}
 
-export default function Navbar({ loaderData }: Route.ComponentProps) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
   const [isUserConnected, setIsUserConnected] = useState(false);

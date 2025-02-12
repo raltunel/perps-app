@@ -1,4 +1,4 @@
-import type { Route } from '../+types/home';
+import type { Route } from '../../+types/root';
 import styles from './Welcome.module.css';
 import type { FC } from 'react';
 

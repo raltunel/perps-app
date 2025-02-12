@@ -1,6 +1,6 @@
 import Welcome from '~/components/Welcome/Welcome';
-import type { Route } from '../+types/home';
-import styles from './referrals.module.css'
+import type { Route } from '../../+types/root';
+// import styles from './referrals.module.css'
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'Perps - Referrals' },

@@ -1,5 +1,5 @@
 import Button from '~/components/Button/Button';
-import type { Route } from '../+types/home';
+import type { Route } from '../../../+types/root';
 import styles from './ButtonShowcase.module.css';
 export function meta({}: Route.MetaArgs) {
   return [
