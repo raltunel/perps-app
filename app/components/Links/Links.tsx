@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './Links.module.css';
 import { FaTwitter, FaDiscord, FaGithub, FaFileAlt, FaCog, FaPaperPlane, FaClipboardList, FaBook, FaShapes } from 'react-icons/fa';
 

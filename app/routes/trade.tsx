@@ -1,4 +1,3 @@
-import { Link, Outlet } from 'react-router';
 import type { Route } from './+types/home';
 import styles from './trade.module.css';
 export function meta({}: Route.MetaArgs) {
