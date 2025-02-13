@@ -1,5 +1,6 @@
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
+import TradingViewChart from "./chart/chart";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -33,7 +34,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         <div className={styles.containerTopLeft}>
           <div className={styles.watchlist}>watchlist</div>
           <div className={styles.symbolInfo}>symbol info</div>
-          <div className={styles.chart}>chart</div>
+          <div className={styles.chart}>
+            <TradingViewChart />
+          </div>
         </div>
 
         <div className={styles.orderBook}>order book goes here</div>
