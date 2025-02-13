@@ -24,6 +24,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script src="tradingview/datafeeds/udf/dist/bundle.js"></script>
       </body>
     </html>
   );
