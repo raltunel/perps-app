@@ -5,9 +5,10 @@ import {
   type ResolutionString,
 } from "../../../public/tradingview/charting_library";
 import { createDataFeed } from "./data/customDataFeed";
+import { fetchCandleSeriesCroc } from "./data/fetchCandleData";
 
 export interface ChartContainerProps {
-  symbolName:string,
+  symbolName: string;
   interval: ResolutionString;
   libraryPath: string;
   chartsStorageUrl: string;
@@ -25,7 +26,7 @@ const TradingViewChart = () => {
   const [priceData, setPriceData] = useState<any[]>([]);
 
   const defaultProps: Omit<ChartContainerProps, "container"> = {
-    symbolName:"SOLANA",
+    symbolName: "ETH/USDC",
     interval: "D" as ResolutionString,
     libraryPath: "/tradingview/charting_library/",
     chartsStorageUrl: "https://saveload.tradingview.com",
@@ -37,6 +38,33 @@ const TradingViewChart = () => {
     studiesOverrides: {},
   };
 
+  // useEffect(() => {
+  //   const chainId = "0x1";
+  //   const poolIndex = 420;
+  //   const period = 86400;
+  //   const baseTokenAddress = "0x0000000000000000000000000000000000000000";
+  //   const quoteTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+
+  //   const nCandles = 201;
+  //   const endTime = Math.floor(Date.now() / 1000);
+
+  //   console.log("new Date(endTime)", new Date(endTime * 1000));
+
+  //   fetchCandleSeriesCroc(
+  //     chainId,
+  //     poolIndex,
+  //     period,
+  //     baseTokenAddress,
+  //     quoteTokenAddress,
+  //     endTime,
+  //     nCandles
+  //   ).then((result) => {
+  //     if (result) {
+  //       setPriceData(result);
+  //     }
+  //   });
+  // }, []);
+
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
@@ -44,20 +72,20 @@ const TradingViewChart = () => {
       container: chartContainerRef.current,
       library_path: defaultProps.libraryPath,
       timezone: "Etc/UTC",
-      symbol:defaultProps.symbolName,
+      symbol: defaultProps.symbolName,
       fullscreen: false,
       autosize: true,
       datafeed: createDataFeed(priceData) as any,
       interval: defaultProps.interval,
       locale: "en",
-      
       theme: "dark",
-      overrides: {
-        "paneProperties.background": "#0e0e14",
-        "paneProperties.backgroundType": "solid",
-      },
+      // overrides: {
+      //   "paneProperties.background": "#0e0e14",
+      //   "paneProperties.backgroundType": "solid",
+      // },
       custom_css_url: "./../tradingview-chart-custom.css",
       loading_screen: { backgroundColor: "#0e0e14" },
+      load_last_chart:false,
     });
 
     return () => {
