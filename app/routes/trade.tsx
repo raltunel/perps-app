@@ -1,5 +1,7 @@
+import { WebSocketProvider } from '~/contexts/WebSocketContext';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
+import OrderBook from './trade/orderbook/orderbook';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -25,9 +27,10 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   //     Pro
   //   </Link>
   // </nav>
-
+ 
   // )
   return (
+    <WebSocketProvider url='wss://api.hyperliquid.xyz/ws'>
     <div className={styles.container}>
       <section className={styles.containerTop}>
         <div className={styles.containerTopLeft}>
@@ -36,7 +39,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.chart}>chart</div>
         </div>
 
-        <div className={styles.orderBook}>order book goes here</div>
+        <div className={styles.orderBook}><OrderBook symbol="BTCUSDT" /></div>
 
         <div className={styles.tradeModules}>trade module goes here</div>
       </section>
@@ -44,5 +47,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
       {/* Child routes (market, limit, pro) appear here */}
       {/* <Outlet /> */}
     </div>
+    </WebSocketProvider>
   );
 }

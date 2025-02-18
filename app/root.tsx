@@ -10,6 +10,7 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 import './css/app.css';
 import './css/index.css';
+import { WebSocketProvider } from './contexts/WebSocketContext';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -66,14 +67,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className='content error-boundary'>
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre>
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+      <main className='content error-boundary'>
+        <h1>{message}</h1>
+        <p>{details}</p>
+        {stack && (
+          <pre>
+            <code>{stack}</code>
+          </pre>
+        )}
+      </main>
   );
 }
