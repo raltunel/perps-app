@@ -6,12 +6,12 @@ import useOutsideClick from '~/hooks/useOutsideClick';
 import Button from '../Button/Button';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import styles from './PageHeader.module.css';
-
-
+import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(true);
   const [isUserConnected, setIsUserConnected] = useState(false);
   const location = useLocation();
 
@@ -31,6 +31,35 @@ export default function PageHeader() {
   const mobileNavbarRef = useOutsideClick<HTMLDivElement>(() => {
     setIsMenuOpen(false);
   }, isMenuOpen);
+  const walletMenuRef = useOutsideClick<HTMLDivElement>(() => {
+    setIsWalletMenuOpen(false);
+  }, isWalletMenuOpen);
+
+  const walletDisplay = (
+    <section
+      style={{
+        position: 'relative',
+      }}
+      ref={walletMenuRef}
+    >
+      {isUserConnected && (
+        <button
+          className={styles.walletButton}
+          onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)}
+        >
+          <LuWallet color='var(--accent1)' size={18} /> Miyuki.eth
+        </button>
+      )}
+
+      {isWalletMenuOpen && isUserConnected && (
+        <WalletDropdown
+          isWalletMenuOpen={isWalletMenuOpen}
+          setIsWalletMenuOpen={setIsWalletMenuOpen}
+          setIsUserConnected={setIsUserConnected}
+        />
+      )}
+    </section>
+  );
 
   return (
     <>
@@ -64,7 +93,8 @@ export default function PageHeader() {
           ))}
         </nav>
         <div className={styles.rightSide}>
-          {!isUserConnected ? (
+          {walletDisplay}
+          {!isUserConnected && (
             <Button
               size='medium'
               selected
@@ -72,21 +102,14 @@ export default function PageHeader() {
             >
               Connect
             </Button>
-          ) : (
-            <button
-              className={styles.walletButton}
-              onClick={() => setIsUserConnected(false)}
-            >
-              <LuWallet color='var(--accent1)' size={18} /> Miyuki.eth
-            </button>
           )}
-
           <button
             className={styles.menuButton}
             onClick={() => setIsDropdownMenuOpen(!isDropdownMenuOpen)}
           >
             <MdOutlineMoreHoriz size={20} color='var(--text2)' />
           </button>
+
           <button
             className={styles.menuButtonMobile}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -105,6 +128,12 @@ export default function PageHeader() {
           <DropdownMenu />
         </div>
       )}
+      {/* {isWalletMenuOpen && (
+        <WalletDropdown
+          isWalletMenuOpen={isWalletMenuOpen}
+          setIsWalletMenuOpen={setIsWalletMenuOpen}
+        />
+      )} */}
     </>
   );
 }
