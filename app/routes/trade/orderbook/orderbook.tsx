@@ -22,7 +22,6 @@ const formatNum = (val : string | number) => {
 }
 
 
-
 const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
     const { sendMessage, lastMessage, readyState } = useWebSocketContext();
@@ -30,6 +29,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
     const [buyOrders, setBuyOrders] = useState<OrderRowIF[]>([]);
     const [sellOrders, setSellOrders] = useState<OrderRowIF[]>([]);
+
     
     useEffect(() => {
         if(readyState === 1) {
@@ -103,11 +103,27 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
   return (
     <div className={styles.orderBookContainer}>
 
+<div className={styles.orderBookHeader}>
+
+<div>Price</div>
+<div>Size</div>
+<div>Total</div>
+
+</div>
 
 <div className={styles.orderBookBlock}>
       {sellOrders.slice(0, 10).reverse().map((order, index) => (
         <OrderRow key={order.px + order.sz} order={order} />
       ))}
+</div>
+
+
+<div className={styles.orderBookBlockMid}>
+
+      <div>Spread</div>
+      <div>0.1</div>
+      <div>0.01%</div>
+
 </div>
 
 <div className={styles.orderBookBlock}>

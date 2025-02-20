@@ -16,22 +16,32 @@
         opacity: 0;
     }
 }
+
+@keyframes orderRowEffect{
+    0%{
+        opacity: 0;
+    }
+    30%{
+        opacity: .15;
+    }
+    100%{
+        opacity: 0;
+    }
+}
 .orderRow {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    width: 90%;
     font-family: var(--font-family-main);
+    width: 100%;
     position: relative;
     font-size: .8rem;
     animation: fadeIn 0.1s ease-in-out;
+    padding: 0 .5rem;
 }
 
 
-.orderRowPrice {
-    font-weight: 600;
-}
 
 .orderRow.buy .orderRowPrice {
     color: var(--green);
@@ -47,7 +57,19 @@
     left: 0;
     width: 100%;
     height: 100%;
-    opacity: .1;
+    opacity: .2;
+}
+
+.orderRowPrice, .orderRowSize, .orderRowTotal{
+    flex: 1 1;
+}
+
+.orderRowTotal{
+    text-align: right;
+}
+
+.orderRowSize{
+    text-align: center;
 }
 
 .orderRow.buy .ratio {
@@ -66,7 +88,7 @@
     height: 100%;
     opacity: 0;
     display: block;
-    animation: fadeOut .3s ease-in-out;
+    animation: orderRowEffect .5s ease-in-out;
 }
 
 .orderRow.buy .fadeOverlay {

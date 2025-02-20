@@ -5,6 +5,7 @@ type WebSocketContextType = {
   sendMessage: (msg: string) => void;
   lastMessage: string | null;
   readyState: number;
+  addSubscription: (type: string, payload: any) => void;
 };
 
 enum WebSocketReadyState {
@@ -71,9 +72,21 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
       socketRef.current.send(msg);
     }
   };
+  
+
+  const addSubscription = (type: string, payload: any) => {
+        sendMessage(JSON.stringify(
+          {method: "subscribe", 
+            subscription: 
+            {
+              type: type,
+              ...payload
+            }}
+        ))
+  };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState }}>
+    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, addSubscription}}>
       {children}
     </WebSocketContext.Provider>
     
