@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
+import { useWsObserver } from '~/hooks/useWsObserver';
 
 interface OrderBookProps {
   symbol: string;
@@ -26,9 +27,20 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
     const { sendMessage, lastMessage, readyState } = useWebSocketContext();
 
+    const { subscribe, unsubscribe, notify } = useWsObserver();
+
 
     const [buyOrders, setBuyOrders] = useState<OrderRowIF[]>([]);
     const [sellOrders, setSellOrders] = useState<OrderRowIF[]>([]);
+
+
+
+
+    useEffect(() => {
+        subscribe('l2Book', (payload) => {
+            console.log('>>> payload', payload)
+        }, )
+    }, [])
 
     
     useEffect(() => {
@@ -43,6 +55,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
             }))
         }
     }, [readyState])
+
+
+    
 
     useEffect(() => {
       if(lastMessage) {
