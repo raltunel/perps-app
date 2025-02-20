@@ -5,8 +5,7 @@ import {
   type ResolutionString,
 } from "../../../public/tradingview/charting_library";
 import { createDataFeed } from "./data/customDataFeed";
-import { fetchCandleSeriesCroc } from "./data/fetchCandleData";
-
+import { useWebSocketContext } from "~/contexts/WebSocketContext";
 export interface ChartContainerProps {
   symbolName: string;
   interval: ResolutionString;
@@ -37,34 +36,6 @@ const TradingViewChart = () => {
     autosize: true,
     studiesOverrides: {},
   };
-
-  // useEffect(() => {
-  //   const chainId = "0x1";
-  //   const poolIndex = 420;
-  //   const period = 86400;
-  //   const baseTokenAddress = "0x0000000000000000000000000000000000000000";
-  //   const quoteTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
-
-  //   const nCandles = 201;
-  //   const endTime = Math.floor(Date.now() / 1000);
-
-  //   console.log("new Date(endTime)", new Date(endTime * 1000));
-
-  //   fetchCandleSeriesCroc(
-  //     chainId,
-  //     poolIndex,
-  //     period,
-  //     baseTokenAddress,
-  //     quoteTokenAddress,
-  //     endTime,
-  //     nCandles
-  //   ).then((result) => {
-  //     if (result) {
-  //       setPriceData(result);
-  //     }
-  //   });
-  // }, []);
-
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
@@ -86,6 +57,15 @@ const TradingViewChart = () => {
       custom_css_url: "./../tradingview-chart-custom.css",
       loading_screen: { backgroundColor: "#0e0e14" },
       load_last_chart:false,
+      time_frames: [
+        { text: "1m", resolution: "1" as ResolutionString},   
+        { text: "5m", resolution: "5" as ResolutionString},   
+        { text: "15m", resolution: "15" as ResolutionString}, 
+        { text: "1H", resolution: "60" as ResolutionString},  
+        { text: "4H", resolution: "240" as ResolutionString}, 
+        { text: "1D", resolution: "1D" as ResolutionString },  
+
+    ],
     });
 
     return () => {

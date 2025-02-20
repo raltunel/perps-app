@@ -1,58 +1,34 @@
-export const GCGO_TESTNET_URL = "https://ambindexer.net/gcgo-testnet";
+const hyperLiquidURL = "https://api.hyperliquid.xyz/info";
 
-export const GCGO_MAINNET = "https://ambindexer.net/gcgo";
+export const fetchCandles = async (resolution:string, from: number, to: number) => {
+  const coin = "BTC";
+  const interval = resolution;
 
-function capNumDurations(numDurations: number): number {
-  const MAX_NUM_DURATIONS = 5000;
-  const MIN_NUM_DURATIONS = 1;
+  const requestBody = {
+    type: "candleSnapshot",
+    req: {
+      coin,
+      interval,
+      startTime: from * 1000,
+      endTime: to * 1000,
+    },
+  };
 
-  // Avoid rounding off last candle
-  numDurations = numDurations + 1;
-
-  if (numDurations > MAX_NUM_DURATIONS) {
-    console.warn(`Candle fetch n=${numDurations} exceeds max cap.`);
-    return MAX_NUM_DURATIONS;
-  } else if (numDurations < MIN_NUM_DURATIONS) {
-    console.warn(`Candle fetch n=${numDurations} non-positive.`);
-    return MIN_NUM_DURATIONS;
-  }
-  return numDurations;
-}
-export async function fetchCandleSeriesCroc(
-  chainId: string,
-  poolIndex: number,
-  period: number,
-  baseTokenAddress: string,
-  quoteTokenAddress: string,
-  endTime: number,
-  nCandles: number
-): Promise<any | undefined> {
-  const candleSeriesEndpoint = GCGO_MAINNET + "/pool_candles";
-
-  const startTimeRough = endTime - nCandles * period;
-  const startTime = Math.ceil(startTimeRough / period) * period;
-
-  const reqOptions = new URLSearchParams({
-    base: baseTokenAddress,
-    quote: quoteTokenAddress,
-    poolIdx: poolIndex.toString(),
-    period: period.toString(),
-    n: capNumDurations(nCandles).toString(),
-    time: startTime.toString(),
-    chainId: chainId,
-  });
-
-  return fetch(candleSeriesEndpoint + "?" + reqOptions)
-    .then((response) => response?.json())
-    .then(async (json) => {
-      if (!json?.data) {
-        return undefined;
-      }
-      const payload = json?.data;
-
-      return payload;
-    })
-    .catch((e) => {
-      return undefined;
+  try {
+    const response = await fetch(hyperLiquidURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
     });
-}
+
+    const json = await response.json();
+
+    if (!json) {
+      return undefined;
+    }
+
+    return json;
+  } catch (error) {
+    return undefined;
+  }
+};
