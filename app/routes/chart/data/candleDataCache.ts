@@ -1,3 +1,4 @@
+import { mapResolutionToInterval, resolutionToSeconds } from "../utils";
 import { fetchCandles } from "./fetchCandleData";
 
 const dataCache = new Map<string, any[]>();
@@ -6,30 +7,27 @@ export async function getHistoricalData(
   symbol: string,
   resolution: string,
   from: number,
-  to: number,
+  to: number
 ) {
   const key = `${symbol}-${resolution}`;
-
   let cachedData = dataCache.get(key) || [];
-  const hasDataForRange = cachedData.some(
-    (bar) => bar.time >= from * 1000 && bar.time <= to * 1000
-  );
+
+  const candleCount = (to - from) / resolutionToSeconds(resolution);  
+  const hasDataForRange =
+    cachedData.filter((bar) => bar.time >= from * 1000 && bar.time <= to * 1000)
+      .length >= candleCount;
 
   if (hasDataForRange) {
+    
     return cachedData.filter(
       (bar) => bar.time >= from * 1000 && bar.time <= to * 1000
     );
-  }  
+  }
   let mergedData = undefined;
 
-  return fetchCandles(
-    resolution,
-    from,
-    to,
-  ).then((res: any) => {
-   
+  const period = mapResolutionToInterval(resolution);
+  return await fetchCandles(period, from, to).then((res: any) => {
     if (res) {
-                
       const formattedData = res.map((item: any) => ({
         time: item.t,
         open: Number(item.o),

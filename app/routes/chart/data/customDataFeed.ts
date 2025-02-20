@@ -8,7 +8,7 @@ import { getHistoricalData } from "./candleDataCache";
 import { mapResolutionToInterval } from "../utils";
 
 
-export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
+export const createDataFeed = (): IDatafeedChartApi =>
   ({
     searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
       onResult([
@@ -21,8 +21,18 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
       ]);
     },
 
-    onReady: (cb: any) =>
-      setTimeout(() => cb({ supported_resolutions: ["1D"] }), 0),
+    onReady: (cb: any) => {
+      cb({ supported_resolutions: ["1m","5m","15m","1h","1d"] }),
+      
+    //   exchanges: [
+    //     { value: "BINANCE", name: "Binance", desc: "Binance Exchange" },
+    //     { value: "NASDAQ", name: "NASDAQ", desc: "NASDAQ Exchange" },
+    // ],
+    // supports_marks: false, 
+    // supports_time: true, 
+      
+      0
+    },
 
     resolveSymbol: (symbolName, onResolve, onError) => {
       const symbolInfo: LibrarySymbolInfo = {
@@ -65,14 +75,13 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
 
       if (symbol) {
         try {
-          const period = mapResolutionToInterval(resolution);          
           const bars = await getHistoricalData(
             symbol,
-            period,
+            resolution,
             from,
             to,
           );
-
+          
           bars && onResult(bars, { noData: bars.length === 0 });
         } catch (error) {
           console.error("Error loading historical data:", error);

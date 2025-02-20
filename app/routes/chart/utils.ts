@@ -11,3 +11,12 @@ export const mapResolutionToInterval = (resolution: string): string => {
     return mapping[resolution] || "1d";
   };
   
+
+
+  export function resolutionToSeconds(resolution: string): number {
+    if (resolution === "1D") return 86400;
+    if (resolution === "W") return 604800;
+    if (resolution === "M") return 2592000;
+
+    return Number(resolution);
+  }

@@ -22,10 +22,9 @@ export interface ChartContainerProps {
 
 const TradingViewChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const [priceData, setPriceData] = useState<any[]>([]);
 
   const defaultProps: Omit<ChartContainerProps, "container"> = {
-    symbolName: "ETH/USDC",
+    symbolName: "BTC",
     interval: "D" as ResolutionString,
     libraryPath: "/tradingview/charting_library/",
     chartsStorageUrl: "https://saveload.tradingview.com",
@@ -46,7 +45,7 @@ const TradingViewChart = () => {
       symbol: defaultProps.symbolName,
       fullscreen: false,
       autosize: true,
-      datafeed: createDataFeed(priceData) as any,
+      datafeed: createDataFeed() as any,
       interval: defaultProps.interval,
       locale: "en",
       theme: "dark",
@@ -56,7 +55,7 @@ const TradingViewChart = () => {
       // },
       custom_css_url: "./../tradingview-chart-custom.css",
       loading_screen: { backgroundColor: "#0e0e14" },
-      load_last_chart:false,
+      // load_last_chart:false,
       time_frames: [
         { text: "1m", resolution: "1" as ResolutionString},   
         { text: "5m", resolution: "5" as ResolutionString},   
@@ -68,12 +67,29 @@ const TradingViewChart = () => {
     ],
     });
 
+    /**
+     * for change domain
+     */
+/*     if (tvWidget) {
+
+      tvWidget.onChartReady(() => {
+
+        tvWidget.chart().setTimeFrame({val: {type: 'period-back' as any, value: '12M'}, res: '1d' as any});
+
+        tvWidget.chart().setVisibleRange({
+            from: Date.now() / 1000 - 3600 * 100, 
+            to: Date.now() / 1000, 
+        });
+    });
+    
+    } */
+
     return () => {
       if (tvWidget) {
         tvWidget.remove();
       }
     };
-  }, [priceData]);
+  }, []);
 
   return (
     <div
