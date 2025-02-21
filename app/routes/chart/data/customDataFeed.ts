@@ -3,13 +3,18 @@ import type {
   IDatafeedChartApi,
   LibrarySymbolInfo,
   ResolutionString,
+  SubscribeBarsCallback,
 } from "public/tradingview/charting_library/charting_library";
 import { fetchCandleSeriesCroc } from "./fetchCandleData";
+import { useWebSocketContext } from "~/contexts/WebSocketContext";
 
 // Sembol bazlı önbellek (cache)
 const priceDataCache: Record<string, any[]> = {};
 
-export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
+export const createDataFeed = (
+  priceData: any[],
+  socketRef: WebSocket | null
+): IDatafeedChartApi =>
   ({
     searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
       onResult([
@@ -62,7 +67,7 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
        * for fetching historical data
        */
       const { from, to } = periodParams;
-      
+
       const symbol = symbolInfo.ticker;
 
       if (symbol) {
@@ -73,6 +78,7 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
         const quoteTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
         const nCandles = Math.floor((to - from) / period);
         const endTime = to;
+
         const response = fetchCandleSeriesCroc(
           chainId,
           poolIndex,
@@ -152,21 +158,7 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
       listenerGuid,
       onResetCacheNeededCallback
     ) => {
-      /**
-       * for live candles
-       */
-      // const interval = setInterval(() => {
-      //   const price = Math.random() * 100 + 100;
-      //   onTick({
-      //     time: Date.now(),
-      //     open: price,
-      //     high: price + 5,
-      //     low: price - 5,
-      //     close: price,
-      //     volume: Math.floor(Math.random() * 1000),
-      //   });
-      // }, 1000);
-      // (window as any)[listenerGuid] = interval;
+      subscribeOnStream(symbolInfo, resolution, onTick, socketRef);
     },
 
     unsubscribeBars: (listenerGuid) => {
@@ -174,3 +166,30 @@ export const createDataFeed = (priceData: any[]): IDatafeedChartApi =>
       delete (window as any)[listenerGuid];
     },
   } as IDatafeedChartApi);
+
+const subscribeOnStream = (
+  symbolInfo: LibrarySymbolInfo,
+  resolution: ResolutionString,
+  onTick: SubscribeBarsCallback,
+  socketRef: WebSocket | null
+) => {
+
+  if (socketRef) {
+    socketRef.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (msg.channel === "candle") {
+
+        const bar = {
+          time: msg.data.T,
+          open: Number(msg.data.o),
+          high: Number(msg.data.h),
+          low: Number(msg.data.l),
+          close: Number(msg.data.c),
+          volume: Number(msg.data.v),
+        }
+
+        onTick(bar);
+      }
+    };
+  }
+};

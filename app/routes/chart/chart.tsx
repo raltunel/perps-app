@@ -6,6 +6,7 @@ import {
 } from "../../../public/tradingview/charting_library";
 import { createDataFeed } from "./data/customDataFeed";
 import { fetchCandleSeriesCroc } from "./data/fetchCandleData";
+import { useWebSocketContext } from "~/contexts/WebSocketContext";
 
 export interface ChartContainerProps {
   symbolName: string;
@@ -25,6 +26,8 @@ const TradingViewChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [priceData, setPriceData] = useState<any[]>([]);
 
+  const { readyState, addSubscription, socketRef } = useWebSocketContext();
+
   const defaultProps: Omit<ChartContainerProps, "container"> = {
     symbolName: "ETH/USDC",
     interval: "D" as ResolutionString,
@@ -37,6 +40,19 @@ const TradingViewChart = () => {
     autosize: true,
     studiesOverrides: {},
   };
+
+ useEffect(() => {
+   if (readyState === 1) {
+     const payload = {
+       coin: "BTC",
+       interval: "1D",
+     };
+
+     addSubscription("candle", payload);
+   }
+ }, [readyState]);
+
+  // }, [lastMessage]);
 
   // useEffect(() => {
   //   const chainId = "0x1";
@@ -75,7 +91,7 @@ const TradingViewChart = () => {
       symbol: defaultProps.symbolName,
       fullscreen: false,
       autosize: true,
-      datafeed: createDataFeed(priceData) as any,
+      datafeed: createDataFeed(priceData, socketRef.current) as any,
       interval: defaultProps.interval,
       locale: "en",
       theme: "dark",
@@ -85,7 +101,7 @@ const TradingViewChart = () => {
       // },
       custom_css_url: "./../tradingview-chart-custom.css",
       loading_screen: { backgroundColor: "#0e0e14" },
-      load_last_chart:false,
+      load_last_chart: false,
     });
 
     return () => {
@@ -93,7 +109,7 @@ const TradingViewChart = () => {
         tvWidget.remove();
       }
     };
-  }, [priceData]);
+  }, [priceData, socketRef.current]);
 
   return (
     <div
