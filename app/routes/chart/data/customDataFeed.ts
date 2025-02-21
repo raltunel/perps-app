@@ -125,9 +125,7 @@ const subscribeOnStream = (
           close: Number(msg.data.c),
           volume: Number(msg.data.v),
         }
-
-        console.log('bar', bar)
-
+        
         onTick(bar);
       }
     };
