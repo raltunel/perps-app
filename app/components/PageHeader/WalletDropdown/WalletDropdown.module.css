@@ -9,7 +9,6 @@
   position: absolute;
   top: 56px;
   right: 0;
-  width: 347px;
   padding: 16px 8px;
   border-radius: var(--main-border-radius, 16px);
   background: var(--dark3, #16161c);
@@ -27,6 +26,8 @@
   height: auto;
   visibility: visible;
   pointer-events: auto;
+  z-index: var(--navbar-dropdown-zindex);
+  
 }
 
 .walletMenu.open {

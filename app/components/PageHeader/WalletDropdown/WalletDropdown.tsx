@@ -7,6 +7,7 @@ interface PropsIF {
   isWalletMenuOpen: boolean;
   setIsWalletMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
+  isDropdown?: boolean;
 }
 
 const tokenImg = 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png';
@@ -29,10 +30,10 @@ const TokenDisplay = () => {
 };
 
 export default function WalletDropdown(props: PropsIF) {
-  const { isWalletMenuOpen, setIsWalletMenuOpen, setIsUserConnected } = props;
+  const {  setIsUserConnected, isDropdown } = props;
 
   return (
-    <div className={`${styles.container}`}>
+    <div className={`${styles.container}`} style={{width: isDropdown ? '347px' : 'auto'}}>
       <section className={styles.profileContainer}>
         <div className={styles.imgContainer}>
           <img src='' alt='' />

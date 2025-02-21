@@ -48,30 +48,62 @@
   gap: var(--main-gap);
 }
 .menuButtonMobile {
-  outline: none;
-  background: transparent;
-  border: none;
-  width: 22px;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   display: none;
-}
-.menuButton{
-  outline: none;
-  background: transparent;
-  border: none;
-  width: 22px !important;
-  height: 100%;
-  display: flex;
+  width: 25px;
+  height: 25px;
+  padding: 4.5px;
   justify-content: center;
   align-items: center;
+
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+  outline: none;
+  border: none;
+}
+.menuButton {
+  display: flex;
+  width: 25px;
+  height: 25px;
+  padding: 4.5px;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+  outline: none;
+  border: none;
 }
 
-.menuButtonMobile svg:hover {
+.menuButton svg,
+.menuButtonMobile svg ,
+.walletButton svg{
+  color: var(--text2);
+}
+.menuButtonMobile:hover > svg,
+.menuButton:hover svg,
+.walletButton:hover svg {
   color: var(--text1) !important;
 }
+.internationalButton {
+  display: flex;
+  width: 25px;
+  height: 25px;
+  padding: 4.5px;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+  outline: none;
+  border: none;
+}
+
+.internationalButton svg {
+  stroke: var(--text2);
+}
+.internationalButton:hover svg {
+  stroke: var(--text1) !important;
+}
+
 .mobileNavCloseButton {
   display: none;
   outline: none;
@@ -93,58 +125,88 @@
   opacity: 0;
 
   transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-.walletMenu {
-  position: absolute;
-  top: 56px;
-  right: 50px;
-  width: 347px;
-  padding: 16px 8px;
-  border-radius: var(--main-border-radius, 16px);
-  background: var(--dark3, #16161c);
-  box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+  z-index: var(--navbar-dropdown-zindex);
 
-  height: auto;
-  opacity: 0;
-
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
+
 
 .dropdownMenu.open {
   height: 320px;
   opacity: 1;
 }
 
-.walletMenu.open{
+.walletMenu.open {
   opacity: 1;
   height: 350px;
 }
-.walletButton{
+.walletButton {
   outline: none;
   border: none;
-  display:flex;
+  display: flex;
   flex-direction: row;
-height: 25px;
-padding: 4px;
-align-items: center;
-gap: 10px;
-flex-shrink: 0;
+  height: 25px;
+  padding: 4px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 
-border-radius: var(--half-border-radius, 8px);
-background: var(--dark2, #0E0E14);
-color: var(--accent1, #7371FC);
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+  color: var(--accent1, #7371fc);
 
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-s, 12px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-s, 12px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
-.walletButton:hover{
-background: var(--dark3, #16161C);
+.walletButton:hover {
+  background: var(--dark3, #16161c);
 }
 
+.rpcButton {
+  outline: none;
+  border: none;
+  width: 45px;
+  display: flex;
+  height: 25px;
+  padding: 4px;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+
+  color: var(--text1, #f0f0f8);
+
+  /* Main/S */
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-s, 12px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.networkButton {
+  min-width: 120px;
+  text-align: center;
+  outline: none;
+  border: none;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  height: 25px;
+  padding: 4px;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark2, #0e0e14);
+
+  color: var(--text2);
+}
+.networkButton:hover {
+  color: var(--text1, #f0f0f8);
+}
 
 @keyframes bounce {
   0% {
@@ -190,10 +252,6 @@ background: var(--dark3, #16161C);
     display: flex;
   }
 
-  .menuButton{
-    display: none;
-  }
-
   .mobileNavCloseButton {
     display: flex;
     justify-content: end;
@@ -203,6 +261,4 @@ background: var(--dark3, #16161C);
     padding: var(--main-padding);
     border-radius: var(--main-border-radius);
   }
-
-  
 }

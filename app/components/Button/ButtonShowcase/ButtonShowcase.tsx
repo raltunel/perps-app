@@ -8,11 +8,7 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_NETLIFY };
-}
-
-export default function ButtonShowcase({ loaderData }: Route.ComponentProps) {
+export default function ButtonShowcase() {
   return (
     <div className={styles.container}>
       <h1>Button Showcase</h1>
