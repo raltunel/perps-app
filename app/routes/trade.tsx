@@ -39,7 +39,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.chart}>chart</div>
         </div>
 
-        <div className={styles.orderBook}><OrderBook symbol="BTCUSDT" /></div>
+        <div className={styles.orderBook}><OrderBook symbol="BTC" /></div>
 
         <div className={styles.tradeModules}>trade module goes here</div>
       </section>

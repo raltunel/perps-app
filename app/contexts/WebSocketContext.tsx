@@ -5,7 +5,7 @@ type WebSocketContextType = {
   sendMessage: (msg: string) => void;
   lastMessage: string | null;
   readyState: number;
-  addSubscription: (type: string, payload: any) => void;
+  enableWsSubscription: (type: string, payload: any) => void;
 };
 
 enum WebSocketReadyState {
@@ -26,32 +26,35 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   const reconnectDelay = 3000; // Auto-reconnect delay
 
   const connectWebSocket = () => {
+    console.log('>>> connectWebSocket')
     if (!isClient) return; // ✅ Ensure WebSocket only runs on client side
 
     if (socketRef.current) {
       socketRef.current.close();
     }
-
+ 
     const socket = new WebSocket(url);
     socketRef.current = socket;
+    console.log('>>> socketRef.current', socketRef.current)
 
     socket.onopen = () => {
-      console.log("WebSocket Connected");
+      console.log(">>> WebSocket Connected");
       setReadyState(WebSocketReadyState.OPEN);
     };
 
     socket.onmessage = (event) => {
+      console.log('>>> onmessage', event.data)
       setMessage(event.data);
     };
 
     socket.onclose = () => {
-      console.log("WebSocket Disconnected. Reconnecting...");
+      console.log(">>> WebSocket Disconnected. Reconnecting...");
       setReadyState(WebSocketReadyState.CLOSED);
       reconnectTimeout.current = setTimeout(connectWebSocket, reconnectDelay);
     };
 
     socket.onerror = (error) => {
-      console.error("WebSocket Error:", error);
+      console.error(">>> WebSocket Error:", error);
       socket.close();
     };
   };
@@ -74,20 +77,20 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   };
   
 
-  const addSubscription = (type: string, payload: any) => {
+  const enableWsSubscription = (type: string, payload: any) => {
         sendMessage(JSON.stringify(
           {method: "subscribe", 
             subscription: 
             {
               type: type,
               ...payload
-            }}
+            }}  
         ))
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, addSubscription}}>
-      {children}
+    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, enableWsSubscription}}>
+      {children} 
     </WebSocketContext.Provider>
     
   );
