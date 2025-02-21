@@ -3,6 +3,7 @@ import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import TradingViewChart from "./chart/chart";
 import OrderBook from './trade/orderbook/orderbook';
+import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -38,7 +39,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.watchlist}>watchlist</div>
           <div className={styles.symbolInfo}>symbol info</div>
           <div className={styles.chart}>
-            <TradingViewChart />
+            <TradingViewWrapper />
           </div>
         </div>
 
