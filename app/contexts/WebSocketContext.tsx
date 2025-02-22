@@ -43,7 +43,6 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     };
 
     socket.onmessage = (event) => {
-      console.log('>>> onmessage', event.data)
       setMessage(event.data);
     };
 

@@ -26,30 +26,44 @@ export function useWsObserver() {
   const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(new Map());
   const [, forceUpdate] = useState(0); // Used to force re-render when needed
 
-  
   useEffect(() => {
-    console.log('>>> readyState', readyState)
+    if(readyState === 1){
+      subscriptions.current.forEach((configs, key) => { 
+        configs.forEach(config => {
+          enableWsSubscription(key, config.payload || {});
+        });
+      });
+    }
   }, [readyState])
 
   useEffect(() => {
-    
     if(lastMessage) {
       const msg = JSON.parse(lastMessage);
-      switch(msg.type) {
-        case 'l2Book':
-          const {sells, buys} = processOrderBookMessage(msg.data);
-          setOrderBook(buys, sells);
-          break;
+      if(subscriptions.current.has(msg.channel)){
+        subscriptions.current.get(msg.channel)?.forEach(config => {
+          config.handler(msg.data);
+        });
       }
     }
 
   }, [lastMessage]);
 
   const subscribe = (key: string, config: WsSubscriptionConfig) => {
-    
     // add subscripton in hook
     if (!subscriptions.current.has(key)) {
       subscriptions.current.set(key, []);
+    }
+    else{
+      const subs = subscriptions.current.get(key)!;
+      let found = false;
+      subs.forEach(sub => {
+        if(JSON.stringify(sub.payload) === JSON.stringify(config.payload) ){
+          console.log('>>> already subscribed');
+          found = true;
+          return;
+        }
+      });
+      if(found) return;
     }
     subscriptions.current.get(key)!.push(config);
 

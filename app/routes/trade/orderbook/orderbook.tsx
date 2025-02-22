@@ -29,88 +29,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
 
-
-
-    // useEffect(() => {
-         
-    //     subscribe('l2Book', (payload) => {
-    //         const {sells, buys} = processOrderBookMessage(payload);
-    //         setOrderBook(buys, sells);
-    //     }, {coin: symbol})
-    // }, [symbol])
-
-    
-    // useEffect(() => {
-    //     if(readyState === 1) {
-    //         console.log('>>> send msg')
-    //         sendMessage(JSON.stringify({
-    //             "method": "subscribe",
-    //             "subscription": {
-    //                 "coin": "BTC",
-    //                 "type": "l2Book"
-    //             } 
-    //         }))
-    //     }
-    // }, [readyState])
-
-
-    
-
-//     useEffect(() => {
-//       if(lastMessage) {
-//           const msg = JSON.parse(lastMessage);
-//           if(msg.channel === 'l2Book') {
-//               const data = msg.data;
-
-//               const buysRaw = data.levels[0].slice(0, 11);
-//               const sellsRaw = data.levels[1].slice(0, 11);
-
-//               let buyTotal = 0;
-//               let sellTotal = 0;
-//               let buysProcessed: OrderRowIF[] = buysRaw.map((e: any) => {
-//                 buyTotal += parseFloat(e.sz);
-//                 return {
-//                   px: formatNum(e.px),
-//                   sz: formatNum(e.sz),
-//                   n: parseInt(e.n),
-//                   type: 'buy',
-//                   total: formatNum(buyTotal)
-//                 }
-//               });
-//               let sellsProcessed: OrderRowIF[] = sellsRaw.map((e: any) => {
-//                 sellTotal += parseFloat(e.sz);
-//                 return {
-//                   px: formatNum(e.px),
-//                   sz: formatNum(e.sz),
-//                   n: parseInt(e.n),
-//                   type: 'sell',
-//                   total: formatNum(sellTotal)
-//                 }
-//               });
-//               const ratioPivot = sellTotal > buyTotal ? sellTotal : buyTotal;
-//               // const ratioPivot = buyTotal + sellTotal;
-              
-//               buysProcessed = buysProcessed.map((e, index) => {
-//                 e.ratio = e.total / ratioPivot;
-//                 return e;
-//               });
-
-//               sellsProcessed = sellsProcessed.map((e, index) => {
-//                 e.ratio = e.total / ratioPivot;
-//                 return e;
-//               });
-
-//               setBuyOrders(buysProcessed);
-//               setSellOrders(sellsProcessed);
-//           }
-//       }
-//   }, [lastMessage])
-
-//   useEffect(() => {
-//     console.log('>>> buyOrders', buyOrders)
-//     console.log('>>> sellOrders', sellOrders)
-// }, [buyOrders, sellOrders])
-
+    useEffect(() => {
+      subscribe('l2Book', 
+        {payload: {coin: symbol},
+        handler: (payload) => {
+          const {sells, buys} = processOrderBookMessage(payload);
+          setOrderBook(buys, sells);
+        }
+      })
+    }, [symbol])
 
   return (
     <div className={styles.orderBookContainer}>
@@ -125,7 +52,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
 <div className={styles.orderBookBlock}>
       {sells.slice(0, 10).reverse().map((order, index) => (
-        <OrderRow key={order.px + order.sz} order={order} />
+        <OrderRow key={order.px} order={order} />
       ))}
 </div>
 
@@ -140,7 +67,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
 <div className={styles.orderBookBlock}>
       {buys.slice(0, 10).map((order) => (
-        <OrderRow key={order.px + order.sz} order={order} />
+        <OrderRow key={order.px} order={order} />
       ))}
 </div>
 
