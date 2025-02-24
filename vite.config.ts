@@ -12,7 +12,4 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
  
   plugins: [ reactRouter(), tsconfigPaths()],
-  // optimizeDeps: {
-  //   include: ["react-use-websocket"],
-  // },
 }));

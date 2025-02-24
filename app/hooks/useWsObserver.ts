@@ -59,7 +59,6 @@ export function useWsObserver() {
       let found = false;
       subs.forEach(sub => {
         if(JSON.stringify(sub.payload) === JSON.stringify(config.payload) ){
-          console.log('>>> already subscribed');
           found = true;
           return;
         }

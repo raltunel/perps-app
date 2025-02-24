@@ -61,29 +61,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
     }
   }, [buys])
 
-  useEffect(() => {
-    console.log('>>> resolutions', resolutions)
-  }, [resolutions])
-
   return (
     <div className={styles.orderBookContainer}>
-
-{/* {
-  resolutions.length > 0 && (
-    <select onChange={(e) => {
-      const resolution = resolutions.find((resolution) => resolution.val === Number(e.target.value));
-      if(resolution) {
-        setSelectedResolution(resolution);
-      }
-    }}>
-      {resolutions.map((resolution) => (
-        <option key={resolution.val} value={resolution.val}>
-          {resolution.val}
-        </option>
-      ))}
-    </select>
-  )
-} */}
 
 <div className={styles.orderBookHeader}>
 {

@@ -26,7 +26,6 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   const reconnectDelay = 3000; // Auto-reconnect delay
 
   const connectWebSocket = () => {
-    console.log('>>> connectWebSocket')
     if (!isClient) return; // ✅ Ensure WebSocket only runs on client side
 
     if (socketRef.current) {
@@ -35,10 +34,8 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
  
     const socket = new WebSocket(url);
     socketRef.current = socket;
-    console.log('>>> socketRef.current', socketRef.current)
 
     socket.onopen = () => {
-      console.log(">>> WebSocket Connected");
       setReadyState(WebSocketReadyState.OPEN);
     };
 
@@ -47,13 +44,11 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     };
 
     socket.onclose = () => {
-      console.log(">>> WebSocket Disconnected. Reconnecting...");
       setReadyState(WebSocketReadyState.CLOSED);
       reconnectTimeout.current = setTimeout(connectWebSocket, reconnectDelay);
     };
 
     socket.onerror = (error) => {
-      console.error(">>> WebSocket Error:", error);
       socket.close();
     };
   };
@@ -77,7 +72,6 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   
 
   const registerWsSubscription = (type: string, payload: any, unsubscribe: boolean = false) => {
-    console.log('>>> registerWsSubscription', type, payload, unsubscribe)
         sendMessage(JSON.stringify(
           {method: unsubscribe ? "unsubscribe" : "subscribe", 
             subscription: 
