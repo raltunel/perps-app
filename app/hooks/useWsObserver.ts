@@ -18,12 +18,6 @@ export function useWsObserver() {
 
   const {setOrderBook} = useOrderBookStore();
 
-  //   https://chatgpt.com/c/67b5c9ce-e4fc-8011-9f7e-3af5af3810c9
-  // const [subscriptions, setSubscriptions] = useState<Map<string, (payload: any)=>void[]>>();
-
-
-
-
   const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(new Map());
   const [, forceUpdate] = useState(0); // Used to force re-render when needed
 

@@ -39,11 +39,9 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
 
   export const formatNum = (num: number | string, precision?: number) => {
 
-        // If the number is a whole number, format without fraction digits.
         if (Number.isInteger(num)) {
           return num.toLocaleString('de-DE');
         } else {
-          // Otherwise, display exactly two fraction digits.
           return num.toLocaleString('de-DE', {
             minimumFractionDigits: getDefaultPrecision(num),
             maximumFractionDigits: getDefaultPrecision(num)
