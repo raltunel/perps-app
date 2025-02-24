@@ -5,7 +5,7 @@ type WebSocketContextType = {
   sendMessage: (msg: string) => void;
   lastMessage: string | null;
   readyState: number;
-  enableWsSubscription: (type: string, payload: any) => void;
+  registerWsSubscription: (type: string, payload: any, unsubscribe?: boolean) => void;
 };
 
 enum WebSocketReadyState {
@@ -76,9 +76,10 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   };
   
 
-  const enableWsSubscription = (type: string, payload: any) => {
+  const registerWsSubscription = (type: string, payload: any, unsubscribe: boolean = false) => {
+    console.log('>>> registerWsSubscription', type, payload, unsubscribe)
         sendMessage(JSON.stringify(
-          {method: "subscribe", 
+          {method: unsubscribe ? "unsubscribe" : "subscribe", 
             subscription: 
             {
               type: type,
@@ -88,7 +89,7 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, enableWsSubscription}}>
+    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, registerWsSubscription}}>
       {children} 
     </WebSocketContext.Provider>
     

@@ -1,11 +1,7 @@
-import type { OrderRowIF } from "~/routes/trade/orderbook/orderbook";
+import type { OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
+import { parseNum } from "~/utils/orderbook/OrderBookUtils";
 
 
-
-
-const formatNum = (val : string | number) => {
-  return parseFloat(val.toString()).toFixed(2);
-}
 
 
 export function processOrderBookMessage(data: any): {sells: OrderRowIF[], buys: OrderRowIF[]} {
@@ -17,21 +13,23 @@ export function processOrderBookMessage(data: any): {sells: OrderRowIF[], buys: 
     let buysProcessed: OrderRowIF[] = buysRaw.map((e: any) => {
       buyTotal += parseFloat(e.sz);
       return {
-        px: formatNum(e.px),
-        sz: formatNum(e.sz),
+        coin: data.coin,
+        px: parseNum(e.px),
+        sz: parseNum(e.sz),
         n: parseInt(e.n),
         type: 'buy',
-        total: formatNum(buyTotal)
+        total: parseNum(buyTotal)
       }
     });
     let sellsProcessed: OrderRowIF[] = sellsRaw.map((e: any) => {
       sellTotal += parseFloat(e.sz);
       return {
-        px: formatNum(e.px),
-        sz: formatNum(e.sz),
+        coin: data.coin,
+        px: parseNum(e.px),
+        sz: parseNum(e.sz),
         n: parseInt(e.n),
         type: 'sell',
-        total: formatNum(sellTotal)
+        total: parseNum(sellTotal)
       }
     });
     const ratioPivot = sellTotal > buyTotal ? sellTotal : buyTotal;

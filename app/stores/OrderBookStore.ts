@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import type { OrderRowIF } from '~/routes/trade/orderbook/orderbook';
+import type { OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
 
 interface OrderBookStore {
     buys: OrderRowIF[];

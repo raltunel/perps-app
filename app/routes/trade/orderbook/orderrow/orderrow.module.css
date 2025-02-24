@@ -88,7 +88,7 @@
     height: 100%;
     opacity: 0;
     display: block;
-    animation: orderRowEffect .5s ease-in-out;
+    animation: orderRowEffect .5s ease-in-out forwards;
 }
 
 .orderRow.buy .fadeOverlay {

@@ -7,13 +7,14 @@ import { useOrderBookStore } from "~/stores/OrderBookStore";
 export type WsSubscriptionConfig = {
   handler: (payload: any) => void;
   payload?: any;
+  single?: boolean;
 }
 
 
 export function useWsObserver() {
   
 
-  const {sendMessage, lastMessage, readyState, enableWsSubscription} = useWebSocketContext(); 
+  const {sendMessage, lastMessage, readyState, registerWsSubscription} = useWebSocketContext(); 
 
   const {setOrderBook} = useOrderBookStore();
 
@@ -30,7 +31,7 @@ export function useWsObserver() {
     if(readyState === 1){
       subscriptions.current.forEach((configs, key) => { 
         configs.forEach(config => {
-          enableWsSubscription(key, config.payload || {});
+          registerWsSubscription(key, config.payload || {});
         });
       });
     }
@@ -65,10 +66,19 @@ export function useWsObserver() {
       });
       if(found) return;
     }
-    subscriptions.current.get(key)!.push(config);
+    if(config.single){
+      const currentSubs = subscriptions.current.get(key) || [];
+      currentSubs.forEach(sub => {
+        registerWsSubscription(key, sub.payload || {}, true);
+      });
+      subscriptions.current.set(key, [config]);
+    }
+    else{
+      subscriptions.current.get(key)!.push(config);
+    }
 
     // add subscription through websocket context
-    enableWsSubscription(key, config.payload || {});
+    registerWsSubscription(key, config.payload || {});
   };
 
   const unsubscribe = (key: string, config: WsSubscriptionConfig) => {
