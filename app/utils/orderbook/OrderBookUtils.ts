@@ -3,9 +3,7 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
 
   export const calculateResolutionValue = (price: number, nsigfigs = 2, mantissa?: number) => {
     const magnitude = Math.floor(Math.log10(price));
-    // Compute the exponent: order of magnitude minus (nsigfigs - 1)
     const exponent = magnitude - (nsigfigs - 1);
-    // Calculate the tick size as 10 raised to the computed exponent
     const tickSize = Math.pow(10, exponent);
     return tickSize * (mantissa || 1);
   }

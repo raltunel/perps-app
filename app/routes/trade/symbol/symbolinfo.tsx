@@ -13,7 +13,6 @@ const symbolList = [
   'XRP',
   'ADA',
   'DOGE',
-  'SHIB',
 ]
 
 const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
