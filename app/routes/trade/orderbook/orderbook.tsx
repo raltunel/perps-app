@@ -17,7 +17,7 @@ interface OrderBookProps {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
-    const { subscribe} = useWsObserver();
+    const { subscribe, unsubscribeAllByChannel} = useWsObserver();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const resolutionsShouldReset = useRef(true);
     const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
@@ -36,6 +36,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         single: true
       })
     }
+
+    useEffect(() => {
+      return () => {
+        unsubscribeAllByChannel('l2Book');
+      }
+    }, [])
 
     useEffect(() => {
       changeSubscription({coin: symbol});

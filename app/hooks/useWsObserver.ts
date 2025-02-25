@@ -74,6 +74,16 @@ export function useWsObserver() {
     registerWsSubscription(key, config.payload || {});
   };
 
+  // unsubscribe all subscriptions by channel
+  const unsubscribeAllByChannel = (channel: string) => {
+    if(subscriptions.current.has(channel)){
+      subscriptions.current.get(channel)!.forEach(config => {
+        registerWsSubscription(channel, config.payload || {}, true);
+      });
+    }
+  }
+
+
   const unsubscribe = (key: string, config: WsSubscriptionConfig) => {
     if (subscriptions.current.has(key)) {
       const configs = subscriptions.current.get(key)!.filter((c) => c !== config);
@@ -85,5 +95,5 @@ export function useWsObserver() {
     }
   };
 
-  return { subscribe, unsubscribe};
+  return { subscribe, unsubscribe, unsubscribeAllByChannel};
 }
