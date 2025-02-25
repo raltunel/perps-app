@@ -11,9 +11,10 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 
 interface OrderBookProps {
   symbol: string;
+  orderCount: number;
 }
 
-const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
+const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
     const { subscribe} = useWsObserver();
@@ -100,7 +101,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 </div>
 
 <div className={styles.orderBookBlock}>
-      {sells.slice(0, 10).reverse().map((order) => (
+      {sells.slice(0, orderCount).reverse().map((order) => (
         <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
       ))}
 </div>
@@ -115,7 +116,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 </div>
 
 <div className={styles.orderBookBlock}>
-      {buys.slice(0, 10).map((order) => (
+      {buys.slice(0, orderCount).map((order) => (
         <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
       ))} 
 </div>
