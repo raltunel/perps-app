@@ -4,6 +4,7 @@ import styles from './trade.module.css';
 import OrderBook from './trade/orderbook/orderbook';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolInfo from './trade/symbol/symbolinfo';
+import OrderBookSection from './trade/orderbook/orderbooksection';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -49,7 +50,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.chart}>chart</div>
         </div>
 
-        <div className={styles.orderBook}><OrderBook symbol={symbol} /></div>
+        <div className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
 
         <div className={styles.tradeModules}>trade module goes here</div>
       </section>

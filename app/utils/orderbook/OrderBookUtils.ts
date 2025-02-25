@@ -32,6 +32,9 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
     if(numVal > 1000000){
         return 0;
     }
+    else if(numVal < 10){
+        return 4;
+    }
     return 2;
   }
 
