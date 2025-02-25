@@ -2,6 +2,7 @@ import { widget, type IChartingLibraryWidget, type ResolutionString } from "publ
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createDataFeed } from "~/routes/chart/data/customDataFeed";
 import { useWebSocketContext } from "./WebSocketContext";
+import { useWsObserver } from "~/hooks/useWsObserver";
 
 interface TradingViewContextType {
   chart: IChartingLibraryWidget | null;
@@ -26,19 +27,8 @@ export interface ChartContainerProps {
 export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-  const { readyState, addSubscription, socketRef } = useWebSocketContext();
+     const { subscribe} = useWsObserver();
 
-  useEffect(() => {
-    if (readyState === 1) {
-      const payload = {
-        coin: "BTC",
-        interval: "1m",
-      };
- 
-      addSubscription("candle", payload);
-    }
-  }, [readyState]);
-  
   const defaultProps: Omit<ChartContainerProps, "container"> = {
     symbolName: "BTC",
     interval: "D" as ResolutionString,
@@ -52,6 +42,21 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
     studiesOverrides: {},
   };
 
+      const changeSubscription = (payload: any) => {
+        subscribe('candle', 
+          {payload: payload,
+          handler: (payload) => {console.log('subs', payload)},
+          single: true
+        })
+      }
+  
+      useEffect(() => {
+        changeSubscription({
+          coin: defaultProps.symbolName,
+          interval: defaultProps.interval,
+        });
+      }, [defaultProps.symbolName])
+
   useEffect(() => {
     const tvWidget = new widget({
       container: "tv_chart",
@@ -60,7 +65,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
       symbol: defaultProps.symbolName,
       fullscreen: false,
       autosize: true,
-      datafeed: createDataFeed(socketRef.current) as any,
+      datafeed: createDataFeed() as any,
       interval: defaultProps.interval,
       locale: "en",
       theme: "dark",
@@ -80,15 +85,12 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
         { text: "1D", resolution: "1D" as ResolutionString },  
 
     ],
-    });
-
-    console.log({tvWidget});
-    
+    });    
 
     setChart(tvWidget);
 
     return () => tvWidget.remove();
-  }, [socketRef.current]);
+  }, []);
 
   return <TradingViewContext.Provider value={{ chart }}>{children}</TradingViewContext.Provider>;
 };

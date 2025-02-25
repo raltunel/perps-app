@@ -9,7 +9,7 @@ import { getHistoricalData } from "./candleDataCache";
 import { mapResolutionToInterval } from "../utils";
 
 
-export const createDataFeed = (socketRef: WebSocket | null): IDatafeedChartApi =>
+export const createDataFeed = (): IDatafeedChartApi =>
   ({
     searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
       onResult([
@@ -96,7 +96,7 @@ export const createDataFeed = (socketRef: WebSocket | null): IDatafeedChartApi =
       resolution,
       onTick,
     ) => {
-      subscribeOnStream(symbolInfo, resolution, onTick, socketRef);
+      subscribeOnStream(symbolInfo, resolution, onTick);
     },
 
     unsubscribeBars: (listenerGuid) => {
@@ -109,25 +109,25 @@ const subscribeOnStream = (
   symbolInfo: LibrarySymbolInfo,
   resolution: ResolutionString,
   onTick: SubscribeBarsCallback,
-  socketRef: WebSocket | null
+  // socketRef: WebSocket | null
 ) => {
 
-  if (socketRef) {
-    socketRef.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (msg.channel === "candle") {
+  // if (socketRef) {
+  //   socketRef.onmessage = (event) => {
+  //     const msg = JSON.parse(event.data);
+  //     if (msg.channel === "candle") {
 
-        const bar = {
-          time: msg.data.T,
-          open: Number(msg.data.o),
-          high: Number(msg.data.h),
-          low: Number(msg.data.l),
-          close: Number(msg.data.c),
-          volume: Number(msg.data.v),
-        }
+  //       const bar = {
+  //         time: msg.data.T,
+  //         open: Number(msg.data.o),
+  //         high: Number(msg.data.h),
+  //         low: Number(msg.data.l),
+  //         close: Number(msg.data.c),
+  //         volume: Number(msg.data.v),
+  //       }
         
-        onTick(bar);
-      }
-    };
-  }
+  //       onTick(bar);
+  //     }
+  //   };
+  // }
 };

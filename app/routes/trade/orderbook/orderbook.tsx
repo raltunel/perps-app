@@ -1,119 +1,107 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
+import { useWsObserver } from '~/hooks/useWsObserver';
+import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
+import { getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 
 interface OrderBookProps {
   symbol: string;
 }
 
-
-export interface OrderRowIF{
-  px: number;
-  sz: number;
-  n: number;
-  type: 'buy' | 'sell';
-  total: number;
-  ratio: number;
-}
-
-const formatNum = (val : string | number) => {
-  return parseFloat(val.toString()).toFixed(2);
-}
-
-
 const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 
-    const { sendMessage, lastMessage, readyState } = useWebSocketContext();
 
+    const { subscribe} = useWsObserver();
+    const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
+    const resolutionsShouldReset = useRef(true);
+    const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
+    const assetPrice = useRef<number>(0);
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
-    const [buyOrders, setBuyOrders] = useState<OrderRowIF[]>([]);
-    const [sellOrders, setSellOrders] = useState<OrderRowIF[]>([]);
+    const {buys, sells, setOrderBook} = useOrderBookStore();
 
-    
+    const changeSubscription = (payload: any) => {
+      subscribe('l2Book', 
+        {payload: payload,
+        handler: (payload) => {
+          const {sells, buys} = processOrderBookMessage(payload);
+          setOrderBook(buys, sells);
+        },
+        single: true
+      })
+    }
+
     useEffect(() => {
-        if(readyState === 1) {
-            console.log('>>> send msg')
-            sendMessage(JSON.stringify({
-                "method": "subscribe",
-                "subscription": {
-                    "coin": "BTC",
-                    "type": "l2Book"
-                } 
-            }))
-        }
-    }, [readyState])
+      changeSubscription({coin: symbol});
+      resolutionsShouldReset.current = true;
+    }, [symbol])
 
     useEffect(() => {
-      if(lastMessage) {
-          const msg = JSON.parse(lastMessage);
-          if(msg.channel === 'l2Book') {
-              const data = msg.data;
-
-              const buysRaw = data.levels[0].slice(0, 11);
-              const sellsRaw = data.levels[1].slice(0, 11);
-
-              let buyTotal = 0;
-              let sellTotal = 0;
-              let buysProcessed: OrderRowIF[] = buysRaw.map((e: any) => {
-                buyTotal += parseFloat(e.sz);
-                return {
-                  px: formatNum(e.px),
-                  sz: formatNum(e.sz),
-                  n: parseInt(e.n),
-                  type: 'buy',
-                  total: formatNum(buyTotal)
-                }
-              });
-              let sellsProcessed: OrderRowIF[] = sellsRaw.map((e: any) => {
-                sellTotal += parseFloat(e.sz);
-                return {
-                  px: formatNum(e.px),
-                  sz: formatNum(e.sz),
-                  n: parseInt(e.n),
-                  type: 'sell',
-                  total: formatNum(sellTotal)
-                }
-              });
-              const ratioPivot = sellTotal > buyTotal ? sellTotal : buyTotal;
-              // const ratioPivot = buyTotal + sellTotal;
-              
-              buysProcessed = buysProcessed.map((e, index) => {
-                e.ratio = e.total / ratioPivot;
-                return e;
-              });
-
-              sellsProcessed = sellsProcessed.map((e, index) => {
-                e.ratio = e.total / ratioPivot;
-                return e;
-              });
-
-              setBuyOrders(buysProcessed);
-              setSellOrders(sellsProcessed);
-          }
+      if(selectedResolution){
+        changeSubscription({coin: symbol, 
+          nSigFigs: selectedResolution.nsigfigs,
+          mantissa: selectedResolution.mantissa
+        });
       }
-  }, [lastMessage])
+    }, [selectedResolution])
 
-//   useEffect(() => {
-//     console.log('>>> buyOrders', buyOrders)
-//     console.log('>>> sellOrders', sellOrders)
-// }, [buyOrders, sellOrders])
 
+  useEffect(() => {
+    if(resolutionsShouldReset.current && buys.length > 0 && buys[0].coin === symbol) {
+      const resolutions = getResolutionListForPrice(buys[0].px);
+      assetPrice.current = buys[0].px;
+      setResolutions(resolutions);
+      setSelectedResolution(resolutions[0]);
+      resolutionsShouldReset.current = false;
+    }
+  }, [buys])
 
   return (
     <div className={styles.orderBookContainer}>
 
 <div className={styles.orderBookHeader}>
+{
+  <ComboBox
+    value={selectedResolution?.val}
+    options={resolutions}
+    fieldName="val"
+    onChange={(value) => {
+      const resolution = resolutions.find((resolution) => resolution.val === Number(value));
+      if(resolution) {
+        setSelectedResolution(resolution);
+      }
+    }}
+  />
+}
+
+{
+  <ComboBox
+    value={selectedMode === 'symbol' ? symbol.toUpperCase() : 'USD'}
+    options={[symbol.toUpperCase(), 'USD']}
+    onChange={(value) => setSelectedMode(value === symbol.toUpperCase() ? 'symbol' : 'usd')}
+  />
+}
+
+
+</div>
+
+
+<div className={styles.orderBookHeader}>
 
 <div>Price</div>
-<div>Size</div>
-<div>Total</div>
+<div>Size {selectedMode === 'symbol' ? `(${symbol.toUpperCase()})` : '(USD)'}</div>
+<div>Total {selectedMode === 'symbol' ? `(${symbol.toUpperCase()})` : '(USD)'}</div>
 
 </div>
 
 <div className={styles.orderBookBlock}>
-      {sellOrders.slice(0, 10).reverse().map((order, index) => (
-        <OrderRow key={order.px + order.sz} order={order} />
+      {sells.slice(0, 10).reverse().map((order) => (
+        <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
       ))}
 </div>
 
@@ -121,15 +109,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol }) => {
 <div className={styles.orderBookBlockMid}>
 
       <div>Spread</div>
-      <div>0.1</div>
-      <div>0.01%</div>
+      <div>{selectedResolution?.val}</div>
+      <div>{(assetPrice.current && selectedResolution?.val) && (selectedResolution?.val / assetPrice.current * 100).toFixed(3)}%</div>
 
 </div>
 
 <div className={styles.orderBookBlock}>
-      {buyOrders.slice(0, 10).map((order) => (
-        <OrderRow key={order.px + order.sz} order={order} />
-      ))}
+      {buys.slice(0, 10).map((order) => (
+        <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
+      ))} 
 </div>
 
      
