@@ -30,7 +30,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       subscribe('l2Book', 
         {payload: payload,
         handler: (payload) => {
-          const {sells, buys} = processOrderBookMessage(payload);
+          const {sells, buys} = processOrderBookMessage(payload, orderCount);
           setOrderBook(buys, sells);
         },
         single: true

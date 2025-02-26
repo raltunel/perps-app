@@ -4,9 +4,9 @@ import { parseNum } from "~/utils/orderbook/OrderBookUtils";
 
 
 
-export function processOrderBookMessage(data: any): {sells: OrderRowIF[], buys: OrderRowIF[]} {
-    const buysRaw = data.levels[0].slice(0, 11);
-    const sellsRaw = data.levels[1].slice(0, 11);
+export function processOrderBookMessage(data: any, slice?:number): {sells: OrderRowIF[], buys: OrderRowIF[]} {
+    const buysRaw = data.levels[0].slice(0, slice || 11);
+    const sellsRaw = data.levels[1].slice(0, slice || 11);
 
     let buyTotal = 0;
     let sellTotal = 0;
