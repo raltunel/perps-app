@@ -1,6 +1,6 @@
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
-import OrderTradeHistory from './ordertradehistory';
+import OrderBookTrades from './orderbooktrades';
 import Tabs from '~/components/Tabs/Tabs';
 interface OrderBookSectionProps {
   symbol: string;
@@ -10,7 +10,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
   
 
     const orderBookComponent = <OrderBook symbol={symbol} orderCount={9} />
-    const orderTradeHistoryComponent = <OrderTradeHistory symbol={symbol} />
+    const orderBookTrades = <OrderBookTrades symbol={symbol} />
 
     const tabs = [
         {
@@ -19,7 +19,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         },
         {
             label: 'Trades',
-            content: orderTradeHistoryComponent
+            content: orderBookTrades
         }
         
     ]
