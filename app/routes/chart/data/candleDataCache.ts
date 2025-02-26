@@ -26,7 +26,7 @@ export async function getHistoricalData(
   let mergedData = undefined;
 
   const period = mapResolutionToInterval(resolution);
-  return await fetchCandles(period, from, to).then((res: any) => {
+  return await fetchCandles(symbol, period, from, to).then((res: any) => {
     if (res) {
       const formattedData = res.map((item: any) => ({
         time: item.t,

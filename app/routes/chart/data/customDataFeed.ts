@@ -7,9 +7,10 @@ import type {
 } from "public/tradingview/charting_library/charting_library";
 import { getHistoricalData } from "./candleDataCache";
 import { mapResolutionToInterval } from "../utils";
+import { useWsObserver } from "~/hooks/useWsObserver";
+import { processWSCandleMessage } from "./processChartData";
 
-
-export const createDataFeed = (): IDatafeedChartApi =>
+export const createDataFeed = (subscribe: (channel: string, payload: any) => void): IDatafeedChartApi =>
   ({
     searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
       onResult([
@@ -96,7 +97,23 @@ export const createDataFeed = (): IDatafeedChartApi =>
       resolution,
       onTick,
     ) => {
-      subscribeOnStream(symbolInfo, resolution, onTick);
+      console.log('>>>subscribeBars', symbolInfo, resolution);
+      subscribe(
+        'candle',
+        {
+          payload: {
+            coin: symbolInfo.ticker,
+            interval: mapResolutionToInterval(resolution),
+          },
+          handler: (payload: any) => {
+            if(payload.s === symbolInfo.ticker){
+              onTick(processWSCandleMessage(payload));
+            }
+          },
+          single: true
+        }
+      )
+      // subscribeOnStream(symbolInfo, resolution, onTick);
     },
 
     unsubscribeBars: (listenerGuid) => {
@@ -105,29 +122,3 @@ export const createDataFeed = (): IDatafeedChartApi =>
     },
   } as IDatafeedChartApi);
 
-const subscribeOnStream = (
-  symbolInfo: LibrarySymbolInfo,
-  resolution: ResolutionString,
-  onTick: SubscribeBarsCallback,
-  // socketRef: WebSocket | null
-) => {
-
-  // if (socketRef) {
-  //   socketRef.onmessage = (event) => {
-  //     const msg = JSON.parse(event.data);
-  //     if (msg.channel === "candle") {
-
-  //       const bar = {
-  //         time: msg.data.T,
-  //         open: Number(msg.data.o),
-  //         high: Number(msg.data.h),
-  //         low: Number(msg.data.l),
-  //         close: Number(msg.data.c),
-  //         volume: Number(msg.data.v),
-  //       }
-        
-  //       onTick(bar);
-  //     }
-  //   };
-  // }
-};

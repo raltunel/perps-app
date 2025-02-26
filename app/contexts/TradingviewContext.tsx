@@ -1,8 +1,10 @@
-import { widget, type IChartingLibraryWidget, type ResolutionString } from "public/tradingview/charting_library";
+import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "public/tradingview/charting_library";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createDataFeed } from "~/routes/chart/data/customDataFeed";
 import { useWebSocketContext } from "./WebSocketContext";
 import { useWsObserver } from "~/hooks/useWsObserver";
+import { processWSCandleMessage } from "~/routes/chart/data/processChartData";
+import { useTradeDataStore } from "~/stores/TradeDataStore";
 
 interface TradingViewContextType {
   chart: IChartingLibraryWidget | null;
@@ -27,7 +29,9 @@ export interface ChartContainerProps {
 export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-     const { subscribe} = useWsObserver();
+  const { subscribe} = useWsObserver();
+  const {symbol} = useTradeDataStore();
+
 
   const defaultProps: Omit<ChartContainerProps, "container"> = {
     symbolName: "BTC",
@@ -42,30 +46,31 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
     studiesOverrides: {},
   };
 
-      const changeSubscription = (payload: any) => {
-        subscribe('candle', 
-          {payload: payload,
-          handler: (payload) => {console.log('subs', payload)},
-          single: true
-        })
-      }
+      // const changeSubscription = (payload: any) => {
+      //   subscribe('candle', 
+      //     {payload: payload,
+      //     handler: candleDataHandler,
+      //     single: true
+      //   })
+      // }
   
-      useEffect(() => {
-        changeSubscription({
-          coin: defaultProps.symbolName,
-          interval: defaultProps.interval,
-        });
-      }, [defaultProps.symbolName])
+      // useEffect(() => {
+      //   changeSubscription({
+      //     coin: defaultProps.symbolName,
+      //     // interval: defaultProps.interval,
+      //     interval: "1d",
+      //   });
+      // }, [defaultProps.symbolName])
 
   useEffect(() => {
     const tvWidget = new widget({
       container: "tv_chart",
       library_path: defaultProps.libraryPath,
       timezone: "Etc/UTC",
-      symbol: defaultProps.symbolName,
+      symbol: symbol,
       fullscreen: false,
       autosize: true,
-      datafeed: createDataFeed() as any,
+      datafeed: createDataFeed(subscribe) as any,
       interval: defaultProps.interval,
       locale: "en",
       theme: "dark",
@@ -90,7 +95,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setChart(tvWidget);
 
     return () => tvWidget.remove();
-  }, []);
+  }, [symbol]);
 
   return <TradingViewContext.Provider value={{ chart }}>{children}</TradingViewContext.Provider>;
 };

@@ -1,7 +1,6 @@
 const hyperLiquidURL = "https://api.hyperliquid.xyz/info";
 
-export const fetchCandles = async (resolution:string, from: number, to: number) => {
-  const coin = "BTC";
+export const fetchCandles = async (coin:string, resolution:string, from: number, to: number) => {
   const interval = resolution;
 
   const requestBody = {

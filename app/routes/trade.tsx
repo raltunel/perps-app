@@ -5,6 +5,8 @@ import OrderBook from './trade/orderbook/orderbook';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import OrderBookSection from './trade/orderbook/orderbooksection';
+import TradingViewChart from './chart/chart';
+import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -47,7 +49,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
 
           </div>
-          <div className={styles.chart}>chart</div>
+          <div className={styles.chart}><TradingViewWrapper /></div>
         </div>
 
         <div className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
