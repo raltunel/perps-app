@@ -1,3 +1,4 @@
+import { BsThreeDots } from 'react-icons/bs';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
@@ -28,7 +29,13 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
   return (
     <>
     <div className={styles.orderBookSection}>
-            <Tabs tabs={tabs} />
+            <Tabs tabs={tabs} 
+              headerRightContent={
+              <div className={styles.sectionModesBtn}>
+                <BsThreeDots />
+              </div>
+              }
+            />
     </div>
     </>
   );

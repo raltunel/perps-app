@@ -12,3 +12,12 @@
     align-items: center;
     justify-content: center;
 }
+
+.sectionModesBtn{
+    cursor: pointer;
+    padding: 0 .7rem;
+}
+
+.sectionModesBtn svg{
+    font-size: 2rem;
+}
