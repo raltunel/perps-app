@@ -38,12 +38,8 @@ const Tabs: React.FC<TabsProps> = ({ tabs, headerRightContent}) => {
 
         const tabsHeaderElement = tabsHeaderRef.current;
 
-        console.log('>>>', tabsHeaderElement);
-        console.log('>>>', activeTabIndex);
-        console.log('>>>', `.${styles.tab}:nth-child(${activeTabIndex + 1})`);
         if(tabsHeaderElement){
             const selectedTabElement = tabsHeaderElement.querySelectorAll(`.${styles.tab}`)[activeTabIndex];
-            console.log('>>>', selectedTabElement);
             if(tabIndicatorRef.current && selectedTabElement) {
                 tabIndicatorRef.current.style.left = `${(selectedTabElement as HTMLDivElement)?.offsetLeft}px`;
                 tabIndicatorRef.current.style.width = `${(selectedTabElement as HTMLDivElement)?.offsetWidth}px`;
