@@ -1,0 +1,3 @@
+[submodule "app/tradingview"]
+	path = app/tradingview
+	url = https://github.com/raltunel/perps-tv
