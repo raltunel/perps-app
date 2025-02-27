@@ -1,5 +1,5 @@
 [build]
-command = "git config --global url."https://raltunel:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/" && git submodule update --init --recursive && pnpm run build"
+command = "./force-clone.sh"
 publish = "build/client"
 
 [dev]
