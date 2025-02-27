@@ -1,5 +1,10 @@
+[build.environment]
+  GIT_CONFIG_NOSYSTEM = "1"
+  NETLIFY_USE_YARN = "false"
+  NETLIFY_USE_PNPM = "true"
+
 [build]
-command = "./force-clone.sh"
+command = "git submodule deinit -f . && rm -rf .git/modules && git config --global url.\"https://raltunel:${GITHUB_TOKEN}@github.com/\".insteadOf \"https://github.com/\" && git submodule update --init --recursive && pnpm run build"
 publish = "build/client"
 
 [dev]
