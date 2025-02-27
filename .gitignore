@@ -7,3 +7,8 @@
 
 # Netlify
 .netlify
+
+
+# Tradingview
+/public/tradingview/charting_library
+/public/tradingview/datafeeds

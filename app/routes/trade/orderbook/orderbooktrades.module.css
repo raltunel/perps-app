@@ -1,0 +1,10 @@
+.orderTradesHeader{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: .25rem;
+    margin: .25rem 0;
+    padding: 0 .5rem;
+    color: var(--text3);
+}
