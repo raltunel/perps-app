@@ -21,21 +21,21 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             label: 'Tab',
             listener: () => {
                 console.log('>>>Tab mode');
-                // setMode('tab');
+                setMode('tab');
             }
         },
         {
             label: 'Stacked',
             listener: () => {
                 console.log('Stacked mode');
-                // setMode('stacked');
+                setMode('stacked');
             }
         },
         {
             label: 'Large',
             listener: () => {
                 console.log('Large mode');
-                // setMode('large');
+                setMode('large');
             }
         }
     ]
@@ -64,7 +64,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
       )}
       {mode === 'stacked' && (
         <div className={styles.stackedContainer}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Order Book</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
           {orderBookComponent}
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Trades</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
           {orderBookTrades}
         </div>
       )}
