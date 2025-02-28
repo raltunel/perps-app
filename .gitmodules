@@ -1,4 +1,4 @@
 [submodule "app/tradingview"]
 	path = app/tradingview
     # url = https://raltunel@github.com/raltunel/perps-tv.git
-	url = https://raltunel:${GITHUB_TOKEN}@github.com/raltunel/perps-tv.git
+	url = https://oauth2:${GITHUB_TOKEN}@github.com/raltunel/perps-tv.git
