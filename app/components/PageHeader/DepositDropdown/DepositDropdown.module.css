@@ -73,7 +73,7 @@
 
   color: var(--text1, #f0f0f8);
 
-  /* Main/M */
+  
   font-family: var(--font-family-main, 'Lexend Deca');
   font-size: var(--font-size-m, 18px);
   font-style: normal;
@@ -90,7 +90,7 @@
   color: var(--text1, #f0f0f8);
   text-align: center;
 
-  /* Main/S */
+
   font-family: var(--font-family-main, 'Lexend Deca');
   font-size: var(--font-size-s, 12px);
   font-style: normal;
