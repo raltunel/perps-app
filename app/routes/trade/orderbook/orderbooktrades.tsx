@@ -1,7 +1,7 @@
 
 import { useWsObserver } from '~/hooks/useWsObserver';
 import styles from './orderbooktrades.module.css';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import { processOrderBookTrades } from '~/processors/processOrderBook';
@@ -11,9 +11,10 @@ import { useUIStore } from '~/stores/UIStore';
 
 interface OrderBookTradesProps {
   symbol: string;
+  tradesCount: number;
 }
 
-const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
+const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol, tradesCount }) => {
 
   const { subscribe, unsubscribeAllByChannel} = useWsObserver();
   const { trades, setTrades } = useOrderBookStore();
@@ -23,8 +24,8 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
   const tradesRef = useRef<OrderBookTradeIF[]>([]);
   tradesRef.current = trades;
 
-  const tradesCount = 25;
-
+  const tradesCountRef = useRef(tradesCount);
+  tradesCountRef.current = tradesCount;
 
   useEffect(() => {
     return () => {
@@ -33,15 +34,16 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
   }, [])
 
 
-  const mergeTrades = (wsTrades: OrderBookTradeIF[]) => {
+  const mergeTrades = useCallback((wsTrades: OrderBookTradeIF[]) => {
     if(wsTrades && wsTrades.length > 0 && wsTrades[0].coin === symbol) {
       if(tradesRef.current.length > 0 && tradesRef.current[0].coin === symbol) {
-        setTrades([...wsTrades, ...tradesRef.current].slice(0, tradesCount));
+        const newTrades = wsTrades.filter((trade) => trade.coin === symbol && !tradesRef.current.some(e => e.tid === trade.tid) );
+        setTrades([...newTrades, ...tradesRef.current].slice(0, tradesCountRef.current));
       } else {
-        setTrades(wsTrades.slice(0, tradesCount));
+        setTrades(wsTrades.slice(0, tradesCountRef.current));
       }
     }
-  }
+  }, [symbol, tradesCount])
 
   useEffect(() => {
     subscribe('trades', {

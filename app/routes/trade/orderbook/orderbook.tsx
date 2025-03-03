@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
@@ -47,7 +47,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     useEffect(() => {
       changeSubscription({coin: symbol});
       resolutionsShouldReset.current = true;
-    }, [symbol])
+    }, [symbol, orderCount])
+
 
     useEffect(() => {
       if(selectedResolution){
@@ -56,7 +57,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           mantissa: selectedResolution.mantissa
         });
       }
-    }, [selectedResolution])
+    }, [selectedResolution, orderCount])
 
 
   useEffect(() => {

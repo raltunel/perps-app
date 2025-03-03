@@ -35,3 +35,9 @@
     overflow-y: auto;
 }
 
+@media only screen and (min-height: 1080px){
+    .orderTradesListStacked{
+        max-height: 22vh;
+    }
+}
+

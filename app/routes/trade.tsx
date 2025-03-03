@@ -54,7 +54,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.chart}><TradingViewWrapper /></div>
         </div>
 
-        <div className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
+        <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
 
         <div className={styles.tradeModules}>trade module goes here</div>
       </section>
