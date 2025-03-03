@@ -1,4 +1,0 @@
-[submodule "app/tradingview"]
-	path = app/tradingview
-	url = git@github.com:benwolski/charting_library.git
-	
