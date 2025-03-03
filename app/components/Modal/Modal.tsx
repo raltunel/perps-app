@@ -2,16 +2,15 @@ import styles from './Modal.module.css';
 
 interface propsIF {
     idForDOM: string;
-    close: () => void;
+    children: React.ReactNode;
 }
 
 export default function Modal(props: propsIF) {
-    const { idForDOM, close } = props;
+    const { idForDOM, children } = props;
 
     return (
-        <dialog className={styles.modal} id={idForDOM}>
-            This is my modal!
-            <button onClick={close}>Close Modal</button>
-        </dialog>
+        <div className={styles.modal} id={idForDOM}>
+            {children}
+        </div>
     );
 }

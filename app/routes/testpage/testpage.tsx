@@ -1,4 +1,5 @@
 import Modal from "~/components/Modal/Modal";
+import { type useModalIF, useModal } from "~/hooks/useModal";
 
 interface propsIF {
 
@@ -10,22 +11,18 @@ export default function testpage(props: propsIF) {
 
     const MODAL_ID = 'my_modal';
 
-    function toggleModal(): void {
-        const dialog = document.getElementById(MODAL_ID) as HTMLDialogElement;
-        if (dialog?.open) {
-            dialog.close();
-        } else {
-            dialog.showModal();
-        }
-    }
+    const modalControl: useModalIF = useModal('closed');
 
     return (
         <div>
-            <button onClick={() => toggleModal()}>Open Modal</button>
-            <Modal
+            <button onClick={() => modalControl.open()}>Open Modal</button>
+            {modalControl.isOpen && <Modal
                 idForDOM={MODAL_ID}
-                close={toggleModal}
-            />
+            >
+                <p>hi there!!</p>
+                <button onClick={modalControl.close}>Close Me</button>
+            </Modal>
+            }
         </div>
     );
 }
