@@ -4,7 +4,7 @@ import type {
   LibrarySymbolInfo,
   ResolutionString,
   SubscribeBarsCallback,
-} from "public/tradingview/charting_library/charting_library";
+} from "~/tv/charting_library/charting_library";
 import { getHistoricalData } from "./candleDataCache";
 import { mapResolutionToInterval } from "../utils";
 import { useWsObserver } from "~/hooks/useWsObserver";
