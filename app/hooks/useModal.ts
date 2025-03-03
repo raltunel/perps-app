@@ -5,6 +5,7 @@ export interface useModalIF {
     isOpen: boolean;
     open: () => void;
     close: () => void;
+    toggle: () => void;
 }
 
 // main fn body for hook
@@ -29,15 +30,10 @@ export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
     // state value to track if modal is currently open
     const [isOpen, setIsOpen] = useState<boolean>(isOpenAtRender);
 
-    // fn to open the modal
-    function openModal(): void {
-        setIsOpen(true);
-    }
-
-    // fn to close the modal
-    function closeModal(): void {
-        setIsOpen(false);
-    }
+    // modal control functions
+    const openModal = () => setIsOpen(true);
+    const closeModal = () => setIsOpen(false);
+    const toggleModal = () => setIsOpen(!isOpen);
 
     // logic to open the modal after a delay
     useEffect(() => {
@@ -57,5 +53,6 @@ export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
         isOpen,
         open: openModal,
         close: closeModal,
+        toggle: toggleModal,
     };
 }

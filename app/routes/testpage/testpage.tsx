@@ -15,6 +15,7 @@ export default function testpage(props: propsIF) {
         <div>
             <button onClick={modalControl.open}>Open Modal</button>
             <button onClick={modalControl.close}>Close Modal</button>
+            <button onClick={modalControl.toggle}>Toggle Modal</button>
             <h3>Modal is: {modalControl.isOpen.toString()}</h3>
         </div>
     );
