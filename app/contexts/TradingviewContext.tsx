@@ -1,5 +1,5 @@
 // import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "public/tradingview/charting_library";
-import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "~/tradingview/charting_library";
+import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "~/tv/charting_library";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createDataFeed } from "~/routes/chart/data/customDataFeed";
 import { useWebSocketContext } from "./WebSocketContext";
@@ -39,7 +39,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const defaultProps: Omit<ChartContainerProps, "container"> = {
     symbolName: "BTC",
     interval: "D" as ResolutionString,
-    libraryPath: "/tradingview/charting_library/",
+    libraryPath: "/tv/charting_library/",
     chartsStorageUrl: "https://saveload.tradingview.com",
     chartsStorageApiVersion: "1.1",
     clientId: "tradingview.com",
