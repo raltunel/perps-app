@@ -9,7 +9,7 @@ interface propsIF {
 export default function testpage(props: propsIF) {
     false && props;
 
-    const [isModalOpen, open, close] = useModal();
+    const [isModalOpen, open, close] = useModal(true);
 
     return (
         <div>
