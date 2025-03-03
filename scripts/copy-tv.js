@@ -14,12 +14,12 @@ const PUBLIC_DIR = path.resolve(__dirname, '../public');
 // Define specific paths to copy
 const COPY_PATHS = [
   {
-    source: path.join(SUBMODULE_ROOT, 'tradingview/charting_library/bundles'),
-    dest: path.join(PUBLIC_DIR, 'tradingview/charting_library/bundles')
+    source: path.join(SUBMODULE_ROOT, 'tv/charting_library/bundles'),
+    dest: path.join(PUBLIC_DIR, 'tv/charting_library/bundles')
   },
   {
-    source: path.join(SUBMODULE_ROOT, 'tradingview/datafeeds/udf/dist/bundle.js'),
-    dest: path.join(PUBLIC_DIR, 'tradingview/datafeeds/udf/dist/bundle.js')
+    source: path.join(SUBMODULE_ROOT, 'tv/datafeeds/udf/dist/bundle.js'),
+    dest: path.join(PUBLIC_DIR, 'tv/datafeeds/udf/dist/bundle.js')
   }
 ];
 
