@@ -1,3 +1,4 @@
 [submodule "app/tradingview"]
 	path = app/tradingview
-	url = git@github.com:raltunel/perps-tv.git
+	url = git@github.com:benwolski/charting_library.git
+	
