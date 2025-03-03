@@ -48,7 +48,6 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
 
   return (
     <div className={styles.symbolInfoContainer}>
-      asdasd
       <ComboBox
         value={symbol}
         options={symbolList}
