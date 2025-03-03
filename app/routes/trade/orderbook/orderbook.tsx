@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
@@ -8,6 +8,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import { getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import BasicDivider from '~/components/Dividers/BasicDivider';
 
 interface OrderBookProps {
   symbol: string;
@@ -46,7 +47,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     useEffect(() => {
       changeSubscription({coin: symbol});
       resolutionsShouldReset.current = true;
-    }, [symbol])
+    }, [symbol, orderCount])
+
 
     useEffect(() => {
       if(selectedResolution){
@@ -55,7 +57,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           mantissa: selectedResolution.mantissa
         });
       }
-    }, [selectedResolution])
+    }, [selectedResolution, orderCount])
 
 
   useEffect(() => {
@@ -105,6 +107,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 <div>Total {selectedMode === 'symbol' ? `(${symbol.toUpperCase()})` : '(USD)'}</div>
 
 </div>
+
+<BasicDivider />
 
 <div className={styles.orderBookBlock}>
       {sells.slice(0, orderCount).reverse().map((order) => (

@@ -5,6 +5,9 @@ import OrderBook from './trade/orderbook/orderbook';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import OrderBookSection from './trade/orderbook/orderbooksection';
+import TradingViewChart from './chart/chart';
+import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+import { useUIStore } from '~/stores/UIStore';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -19,6 +22,7 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const {symbol} = useTradeDataStore();
+  const { orderBookMode } = useUIStore();
 
   // const nav = (
   //      {/* Example nav links to each child route */}
@@ -38,7 +42,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   return (
     <WebSocketProvider url='wss://api.hyperliquid.xyz/ws'>
     <div className={styles.container}>
-      <section className={styles.containerTop}>
+      <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>
           <div className={styles.watchlist}>watchlist</div>
           <div className={styles.symbolInfo}>
@@ -47,10 +51,10 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
 
           </div>
-          <div className={styles.chart}>chart</div>
+          <div className={styles.chart}><TradingViewWrapper /></div>
         </div>
 
-        <div className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
+        <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
 
         <div className={styles.tradeModules}>trade module goes here</div>
       </section>

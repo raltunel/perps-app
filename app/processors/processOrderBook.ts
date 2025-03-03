@@ -1,4 +1,4 @@
-import type { OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
+import type { OrderBookTradeIF, OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
 import { parseNum } from "~/utils/orderbook/OrderBookUtils";
 
 
@@ -47,3 +47,19 @@ export function processOrderBookMessage(data: any, slice?:number): {sells: Order
 
   return {sells: sellsProcessed, buys: buysProcessed}
 } 
+
+
+export function processOrderBookTrades(data: any): OrderBookTradeIF[] {
+  return data.map((e: any) => {
+    return {
+      coin: e.coin,
+      side: e.side === 'A' ? 'sell' : 'buy',
+      px: parseNum(e.px),
+      sz: parseNum(e.sz),
+      hash: e.hash,
+      time: e.time,
+      tid: e.tid,
+      users: e.users
+    }
+  })
+}

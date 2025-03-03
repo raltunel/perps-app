@@ -7,6 +7,17 @@ export interface OrderRowIF{
     total: number;
     ratio: number;
   }
+
+export interface OrderBookTradeIF {
+  coin: string;
+  side: 'buy' | 'sell';
+  px: number;
+  sz: number;
+  hash: string;
+  time: number;
+  tid: number; // ID unique across all assets
+  users: [string, string]
+}
   
 export interface OrderRowResolutionIF {
 val: number;

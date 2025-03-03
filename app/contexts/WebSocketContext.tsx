@@ -63,7 +63,6 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     };
   }, [url, isClient]); // ✅ Only runs when client-side is ready
 
-
   const sendMessage = (msg: string) => {
     if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
       socketRef.current.send(msg);

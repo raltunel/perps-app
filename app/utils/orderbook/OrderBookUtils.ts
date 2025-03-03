@@ -50,6 +50,10 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
         }
   }
 
+  export const formatDateToTime = (date: Date) => {
+    return date.toLocaleTimeString('en-GB', {hour12: false});
+  }
+
   
   export const getResolutionListForPrice = (price: number | string): OrderRowResolutionIF[] => {
   
