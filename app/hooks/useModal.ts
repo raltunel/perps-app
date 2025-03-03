@@ -1,38 +1,60 @@
 import { useEffect, useState } from "react";
 
-export type useModalMethods = [boolean, () => void, () => void,];
+// type for return tuple
+export type useModalMethods = [
+    // whether or not modal is currently open
+    boolean,
+    // fn to open modal
+    () => void,
+    // fn to close modal
+    () => void,
+];
 
+// main fn body for hook
 export function useModal(dfltState?: 'open'|'closed'|number): useModalMethods {
+    // variable to track if modal is open on initial render
     let isOpenAtRender: boolean;
 
+    // logic tree to determine if modal is open on initial render
     switch (dfltState) {
+        // open if hook is instantiated that way
         case 'open':
             isOpenAtRender = true;
             break;
+        // closed if hook is called that way, with number, or with
+        // ... no explicit state provided
         case 'closed':
         default:    
             isOpenAtRender = false;
             break;
     }
 
+    // state value to track if modal is currently open
     const [isOpen, setIsOpen] = useState<boolean>(isOpenAtRender);
 
+    // fn to open the modal
     function openModal(): void {
         setIsOpen(true);
     }
 
+    // fn to close the modal
     function closeModal(): void {
         setIsOpen(false);
     }
 
+    // logic to open the modal after a delay
     useEffect(() => {
+        // do not execute unless hook instantiated with a number
         if (typeof dfltState !== 'number') return;
+        // timeout to open modal after time set in parameter
         const openAfterDelay = setTimeout(
             () => openModal(),
             dfltState
         );
+        // clear the effect from the DOM when elem dismounts
         return () => clearTimeout(openAfterDelay);
     }, []);
 
+    // return array
     return [isOpen, openModal, closeModal];
 }
