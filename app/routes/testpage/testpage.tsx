@@ -1,5 +1,5 @@
 // import styles from './testpage.module.css';
-import { useModal } from '../../hooks/useModal';
+import { useModal, type useModalMethods } from '../../hooks/useModal';
 
 interface propsIF {
 
@@ -9,7 +9,7 @@ interface propsIF {
 export default function testpage(props: propsIF) {
     false && props;
 
-    const [isModalOpen, open, close] = useModal(true);
+    const [isModalOpen, open, close]: useModalMethods = useModal(3500);
 
     return (
         <div>

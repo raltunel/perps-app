@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type useModalMethods = [boolean, () => void, () => void,];
 
-const DEFAULT_MODAL_STATE = false;
+export function useModal(dfltState: 'open'|'closed'|number): useModalMethods {
+    let isOpenAtRender: boolean;
 
-export function useModal(def: boolean = DEFAULT_MODAL_STATE): useModalMethods {
-    const [isOpen, setIsOpen] = useState<boolean>(def);
+    switch (dfltState) {
+        case 'open':
+            isOpenAtRender = true;
+            break;
+        case 'closed':
+        default:    
+            isOpenAtRender = false;
+            break;
+    }
+
+    const [isOpen, setIsOpen] = useState<boolean>(isOpenAtRender);
 
     function openModal(): void {
         setIsOpen(true);
@@ -14,6 +24,15 @@ export function useModal(def: boolean = DEFAULT_MODAL_STATE): useModalMethods {
     function closeModal(): void {
         setIsOpen(false);
     }
+
+    useEffect(() => {
+        if (typeof dfltState !== 'number') return;
+        const openAfterDelay = setTimeout(
+            () => openModal(),
+            dfltState
+        );
+        return () => clearTimeout(openAfterDelay);
+    }, []);
 
     return [isOpen, openModal, closeModal];
 }
