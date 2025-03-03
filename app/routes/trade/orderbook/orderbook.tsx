@@ -8,6 +8,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import { getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import BasicDivider from '~/components/Dividers/BasicDivider';
 
 interface OrderBookProps {
   symbol: string;
@@ -105,6 +106,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 <div>Total {selectedMode === 'symbol' ? `(${symbol.toUpperCase()})` : '(USD)'}</div>
 
 </div>
+
+<BasicDivider />
 
 <div className={styles.orderBookBlock}>
       {sells.slice(0, orderCount).reverse().map((order) => (

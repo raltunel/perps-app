@@ -39,6 +39,11 @@
   --order-book-width-desktop-large: 280px;
   --order-book-width-desktop-small: 220px;
 
+  
+  --order-book-width-desktop-large-doubled:  calc(var(--order-book-width-desktop-large) * 2);
+  --order-book-width-desktop-small-doubled:  calc(var(--order-book-width-desktop-small) * 2);
+
+
   --trade-module-width-desktop-large: 350px;
   --trade-module-width-desktop-small: 280px;
 

@@ -15,7 +15,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    font-family: var(--font-family-main);
     width: 100%;
     position: relative;
     font-size: .8rem;

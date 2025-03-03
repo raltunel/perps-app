@@ -6,6 +6,8 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import { processOrderBookTrades } from '~/processors/processOrderBook';
 import OrderTradeRow from './ordertraderow/ordertraderow';
+import BasicDivider from '~/components/Dividers/BasicDivider';
+import { useUIStore } from '~/stores/UIStore';
 
 interface OrderBookTradesProps {
   symbol: string;
@@ -15,6 +17,8 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
 
   const { subscribe, unsubscribeAllByChannel} = useWsObserver();
   const { trades, setTrades } = useOrderBookStore();
+
+  const { orderBookMode } = useUIStore();
   
   const tradesRef = useRef<OrderBookTradeIF[]>([]);
   tradesRef.current = trades;
@@ -52,7 +56,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
   }, [symbol])
 
   return (
-    <div>
+    <div className={styles.orderTradesContainer}>
 
 
 
@@ -65,9 +69,13 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol }) => {
 
 </div>  
 
+<BasicDivider />
+
+<div className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}>
 {trades.map((trade) => (
 <OrderTradeRow key={trade.tid} trade={trade} />
 ))}
+</div>
     </div>
   );
 }

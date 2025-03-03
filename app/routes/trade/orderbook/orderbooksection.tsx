@@ -5,6 +5,7 @@ import OrderBookTrades from './orderbooktrades';
 import Tabs from '~/components/Tabs/Tabs';
 import BasicMenu from '~/components/BasicMenu/BasicMenu';
 import { useState } from 'react';
+import { useUIStore } from '~/stores/UIStore';
 interface OrderBookSectionProps {
   symbol: string;
 }
@@ -14,28 +15,25 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
 
     const orderBookComponent = <OrderBook symbol={symbol} orderCount={9} />
     const orderBookTrades = <OrderBookTrades symbol={symbol} />
-    const [mode, setMode] = useState<'tab' | 'stacked' | 'large'>('tab');
+    const { orderBookMode, setOrderBookMode } = useUIStore();
 
     const menuItems = [
         {
             label: 'Tab',
             listener: () => {
-                console.log('>>>Tab mode');
-                setMode('tab');
+                setOrderBookMode('tab');
             }
         },
         {
             label: 'Stacked',
             listener: () => {
-                console.log('Stacked mode');
-                setMode('stacked');
+                setOrderBookMode('stacked');
             }
         },
         {
             label: 'Large',
             listener: () => {
-                console.log('Large mode');
-                setMode('large');
+                setOrderBookMode('large');
             }
         }
     ]
@@ -55,25 +53,42 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
   return (
     <>
     <div className={styles.orderBookSection}>
-      {mode === 'tab' && (
+      {orderBookMode === 'tab' && (
         <Tabs tabs={tabs} 
           headerRightContent={
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
           }
             />
       )}
-      {mode === 'stacked' && (
+      {orderBookMode === 'stacked' && (
         <div className={styles.stackedContainer}>
           <div className={styles.sectionHeader}>
             <div className={styles.sectionHeaderTitle}>Order Book</div>
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
           </div>
-          {orderBookComponent}
+          <OrderBook symbol={symbol} orderCount={5} />
           <div className={styles.sectionHeader}>
             <div className={styles.sectionHeaderTitle}>Trades</div>
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
           </div>
           {orderBookTrades}
+        </div>
+      )}
+      {orderBookMode === 'large' && (
+        <div className={styles.largeContainer}>
+          <div className={styles.childOfLargeContainer}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Order Book</div>
+          </div>
+            <OrderBook symbol={symbol} orderCount={9} />
+          </div>
+          <div className={styles.childOfLargeContainer}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Trades</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
+            {orderBookTrades}
+          </div>
         </div>
       )}
     </div>

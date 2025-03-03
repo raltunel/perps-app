@@ -1,3 +1,4 @@
+
 .orderTradesHeader{
     display: flex;
     justify-content: space-between;
@@ -8,3 +9,29 @@
     padding: 0 .5rem;
     color: var(--text3);
 }
+
+.orderTradesContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.orderTradesList{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+
+.orderTradesListStacked::-webkit-scrollbar{
+    display: none;
+}
+
+
+.orderTradesListStacked{
+    max-height: 16vh;
+    overflow-y: auto;
+}
+
