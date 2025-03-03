@@ -20,7 +20,7 @@
   gap: var(--header-link-gap);
 }
 
-.container nav a {
+.container nav a, .moreButton {
   color: var(--text2, #6a6a6d);
 
   font-family: var(--font-family-main, 'Lexend Deca');
@@ -30,7 +30,15 @@
   line-height: normal;
 }
 
-.container nav a:hover {
+.moreButton{
+  outline: none;
+  background: transparent;
+  border: none;
+  text-transform: capitalize;
+}
+
+
+.container nav a:hover, .moreButton:hover {
   animation: bounce 0.5s ease;
   color: var(--text1);
 }

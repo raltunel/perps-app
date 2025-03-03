@@ -49,7 +49,7 @@
   gap: 10px;
   flex-shrink: 0;
   border-radius: var(--half-border-radius, 8px);
-  background: var(--dark2, #0E0E14);
+  background: var(--dark3, #0E0E14);
   color: var(--accent1, #7371FC);
   font-family: var(--font-family-main, "Lexend Deca");
   font-size: var(--font-size-s, 12px);
@@ -80,7 +80,7 @@
 .profileRight {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  /* gap: 8px; */
 }
 
 .profileRightTop {

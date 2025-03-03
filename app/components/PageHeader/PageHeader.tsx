@@ -11,7 +11,7 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import InternarionalSettingsDropdown from './InternarionalSettingsDropdown/InternarionalSettingsDropdown';
-
+import MoreDropdown from './MoreDropdown/MoreDropdown'
 export default function PageHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
@@ -22,6 +22,7 @@ export default function PageHeader() {
   const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
   const [isInternationalDropdownOpen, setIsInternationalDropdownOpen] =
     useState(false);
+  const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
   const location = useLocation();
 
   const navLinks = [
@@ -31,7 +32,6 @@ export default function PageHeader() {
     { name: 'Referrals', path: '/referrals' },
     { name: 'Points', path: '/points' },
     { name: 'Leaderboard', path: '/leaderboard' },
-    { name: 'More', path: '/more' },
   ];
 
   const dropdownMenuRef = useOutsideClick<HTMLDivElement>(() => {
@@ -55,6 +55,9 @@ export default function PageHeader() {
   const internationalMenuRef = useOutsideClick<HTMLDivElement>(() => {
     setIsInternationalDropdownOpen(false);
   }, isInternationalDropdownOpen);
+  const moreDropdownRef = useOutsideClick<HTMLDivElement>(() => {
+    setIsMoreDropdownOpen(false);
+  }, isMoreDropdownOpen);
 
   const walletDisplay = (
     <section
@@ -68,7 +71,7 @@ export default function PageHeader() {
           className={styles.walletButton}
           onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)}
         >
-          <LuWallet  size={18} /> Miyuki.eth
+          <LuWallet size={18} /> Miyuki.eth
         </button>
       )}
 
@@ -122,7 +125,7 @@ export default function PageHeader() {
       <Button
         size='medium'
         selected
-        onClick={() => setIsDepositDropdownOpen(true)}
+        onClick={() => setIsDepositDropdownOpen(!isDepositDropdownOpen)}
       >
         Deposit
       </Button>
@@ -170,7 +173,23 @@ export default function PageHeader() {
         {internationalButtonSvg}
       </button>
 
-      {isInternationalDropdownOpen && <InternarionalSettingsDropdown/>}
+      {isInternationalDropdownOpen && <InternarionalSettingsDropdown />}
+    </section>
+  );
+  const moreDropdownDisplay = (
+    <section
+      style={{
+        position: 'relative',
+      }}
+      ref={moreDropdownRef}
+    >
+      <button
+        className={styles.moreButton}
+        onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
+      >
+        more
+      </button>
+      {isMoreDropdownOpen && <MoreDropdown/>}
     </section>
   );
   return (
@@ -203,12 +222,12 @@ export default function PageHeader() {
               {link.name}
             </Link>
           ))}
+          {moreDropdownDisplay}
         </nav>
         <div className={styles.rightSide}>
-          {isUserConnected && networksDisplay}
           {isUserConnected && depositDisplay}
+          {isUserConnected && networksDisplay}
           {isUserConnected && rpcDisplay}
-          {isUserConnected && walletDisplay}
           {!isUserConnected && (
             <Button
               size='medium'
@@ -218,20 +237,21 @@ export default function PageHeader() {
               Connect
             </Button>
           )}
+          {isUserConnected && walletDisplay}
           {internationalDropdownDisplay}
 
           <button
             className={styles.menuButton}
             onClick={() => setIsDropdownMenuOpen(!isDropdownMenuOpen)}
           >
-            <MdOutlineMoreHoriz size={20}  />
+            <MdOutlineMoreHoriz size={20} />
           </button>
 
           <button
             className={styles.menuButtonMobile}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <LuMenu size={20}  />
+            <LuMenu size={20} />
           </button>
         </div>
       </header>
