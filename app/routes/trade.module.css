@@ -64,6 +64,12 @@
   align-items: center;
 }
 
+.chart{
+  max-height: 61vh;
+}
+
+
+
 .orderBook{
   align-items: flex-start;
   overflow: hidden;
