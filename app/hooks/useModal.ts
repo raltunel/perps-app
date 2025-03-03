@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 export type useModalMethods = [boolean, () => void, () => void,];
 
-export function useModal(dfltState: 'open'|'closed'|number): useModalMethods {
+export function useModal(dfltState?: 'open'|'closed'|number): useModalMethods {
     let isOpenAtRender: boolean;
 
     switch (dfltState) {
