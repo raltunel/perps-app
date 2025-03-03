@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 
-// type for return tuple
-export type useModalMethods = [
-    // whether or not modal is currently open
-    boolean,
-    // fn to open modal
-    () => void,
-    // fn to close modal
-    () => void,
-];
+// interface for return value of hook
+export interface useModalIF {
+    isOpen: boolean;
+    open: () => void;
+    close: () => void;
+}
 
 // main fn body for hook
-export function useModal(dfltState?: 'open'|'closed'|number): useModalMethods {
+export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
     // variable to track if modal is open on initial render
     let isOpenAtRender: boolean;
 
@@ -55,6 +52,10 @@ export function useModal(dfltState?: 'open'|'closed'|number): useModalMethods {
         return () => clearTimeout(openAfterDelay);
     }, []);
 
-    // return array
-    return [isOpen, openModal, closeModal];
+    // return obj
+    return {
+        isOpen,
+        open: openModal,
+        close: closeModal,
+    };
 }
