@@ -1,4 +1,5 @@
-import styles from './testpage.module.css';
+// import styles from './testpage.module.css';
+import { useModal } from '../../hooks/useModal';
 
 interface propsIF {
 
@@ -7,7 +8,14 @@ interface propsIF {
 // main react fn
 export default function testpage(props: propsIF) {
     false && props;
+
+    const [isModalOpen, open, close] = useModal();
+
     return (
-        <h2 className={styles.testpage}>Hi there!</h2>
+        <div>
+            <button onClick={open}>Open Modal</button>
+            <button onClick={close}>Close Modal</button>
+            <h3>Modal is: {isModalOpen.toString()}</h3>
+        </div>
     );
 }
