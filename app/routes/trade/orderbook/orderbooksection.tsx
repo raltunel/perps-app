@@ -4,7 +4,8 @@ import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
 import Tabs from '~/components/Tabs/Tabs';
 import BasicMenu from '~/components/BasicMenu/BasicMenu';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useUIStore } from '~/stores/UIStore';
 interface OrderBookSectionProps {
   symbol: string;
 }
@@ -12,34 +13,72 @@ interface OrderBookSectionProps {
 const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
   
 
-    const orderBookComponent = <OrderBook symbol={symbol} orderCount={9} />
-    const orderBookTrades = <OrderBookTrades symbol={symbol} />
-    const [mode, setMode] = useState<'tab' | 'stacked' | 'large'>('tab');
+    const [orderCount, setOrderCount] = useState(9);
+    const [tradesCount, setTradesCount] = useState(25);
+    const orderCountForStacked = useMemo(() => {
+        return Math.ceil(orderCount / 2);
+    }, [orderCount]);
+
+    const orderBookComponent = useMemo(() => <OrderBook symbol={symbol} orderCount={orderCount} />, [orderCount]);
+    const orderBookTrades = useMemo(() => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />, [tradesCount]);
+    const { orderBookMode, setOrderBookMode } = useUIStore();
+    const orderBookModeRef = useRef(orderBookMode);
+    
+
+    const calculateOrderCount = () => {
+      const orderBookSection = document.getElementById('orderBookSection');
+      if(orderBookSection) {
+        const wrapperHeight = orderBookSection.getBoundingClientRect().height;
+        if(orderBookModeRef.current !== 'stacked') {
+        const orderCount = Math.floor(wrapperHeight / 60);
+        setOrderCount(orderCount);
+        setTradesCount(Math.floor(wrapperHeight / 23));
+      }else {
+        const orderCount = Math.floor(wrapperHeight / 1000);
+        setOrderCount(orderCount);
+      }
+    }
+  }
+
+
+
+    useEffect(() => {
+        
+        window.addEventListener('resize', () => {
+            calculateOrderCount();
+        });
+
+        calculateOrderCount();
+      
+    }, []);
+
+    // useEffect(() => {
+    //   calculateOrderCount();
+    // }, [orderBookMode])
 
     const menuItems = [
         {
             label: 'Tab',
             listener: () => {
-                console.log('>>>Tab mode');
-                // setMode('tab');
+                setOrderBookMode('tab');
             }
         },
         {
             label: 'Stacked',
             listener: () => {
-                console.log('Stacked mode');
-                // setMode('stacked');
+                setOrderBookMode('stacked');
             }
         },
         {
             label: 'Large',
             listener: () => {
-                console.log('Large mode');
-                // setMode('large');
+                setOrderBookMode('large');
             }
         }
     ]
-    const tabs = [
+    const tabs = useMemo(() => {
+      console.log('tabs is changing')
+      return [
         {
             label: 'Order Book',
             content: orderBookComponent
@@ -49,23 +88,48 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             content: orderBookTrades
         }
         
-    ]
+    ]}, [orderBookComponent, orderBookTrades]);
 
 
   return (
     <>
     <div className={styles.orderBookSection}>
-      {mode === 'tab' && (
+      {orderBookMode === 'tab' && (
         <Tabs tabs={tabs} 
           headerRightContent={
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
           }
             />
       )}
-      {mode === 'stacked' && (
+      {orderBookMode === 'stacked' && (
         <div className={styles.stackedContainer}>
-          {orderBookComponent}
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Order Book</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
+          <OrderBook symbol={symbol} orderCount={orderCountForStacked} />
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Trades</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
           {orderBookTrades}
+        </div>
+      )}
+      {orderBookMode === 'large' && (
+        <div className={styles.largeContainer}>
+          <div className={styles.childOfLargeContainer}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Order Book</div>
+          </div>
+            <OrderBook symbol={symbol} orderCount={orderCount} />
+          </div>
+          <div className={styles.childOfLargeContainer}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionHeaderTitle}>Trades</div>
+            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+          </div>
+            {orderBookTrades}
+          </div>
         </div>
       )}
     </div>
