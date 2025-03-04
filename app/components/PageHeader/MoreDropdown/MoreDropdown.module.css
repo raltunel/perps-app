@@ -1,0 +1,41 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: absolute;
+    top: 56px;
+    right: 0;
+    width: 197px;
+    height: auto;
+    display: flex;
+    padding: 4px 8px ;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark4, #0e0e14);
+    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  
+    /* ---------------------------- */
+  
+    opacity: 1;
+    height: auto;
+    visibility: visible;
+    pointer-events: auto;
+    height: auto;
+  
+    z-index: var(--navbar-dropdown-zindex);
+  
+  }
+  
+  .container a{
+    color: var(--text2, #6A6A6D);
+
+/* Main/M */
+font-family: var(--font-family-main, "Lexend Deca");
+font-size: var(--font-size-m, 18px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+  }

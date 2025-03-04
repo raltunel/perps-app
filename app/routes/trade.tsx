@@ -1,6 +1,7 @@
 import { WebSocketProvider } from '~/contexts/WebSocketContext';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
+import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderBook from './trade/orderbook/orderbook';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolInfo from './trade/symbol/symbolinfo';
@@ -59,9 +60,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
 
-        <div className={styles.tradeModules}>trade module goes here</div>
+        <div className={styles.tradeModules}></div>
       </section>
-      <section className={styles.containerBottom}>Table goes here</section>
+      <section className={styles.containerBottom}>
+        <div className={styles.table}>table</div>
+        <div className={styles.wallet}>
+          <DepositDropdown
+            isUserConnected={false}
+            setIsUserConnected={() => console.log('connected')}
+          />
+        </div>
+      </section>
       {/* Child routes (market, limit, pro) appear here */}
       {/* <Outlet /> */}
     </div>
