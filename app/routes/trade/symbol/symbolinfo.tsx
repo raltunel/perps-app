@@ -78,7 +78,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
             <SymbolInfoField label="24h Change" value={get24hChangeString().str} type={get24hChangeString().usdChange > 0 ? 'positive' : get24hChangeString().usdChange < 0 ? 'negative' : undefined} />
             <SymbolInfoField label="24h Volume" value={'$'+formatNum(symbolInfo?.dayNtlVlm)} />
             <SymbolInfoField label="Open Interest" value={'$'+formatNum(symbolInfo?.openInterest * symbolInfo?.oraclePx)} />
-            <SymbolInfoField label="Funding Rate" value={(symbolInfo?.funding * 100).toString()+'%'} type={symbolInfo?.funding > 0 ? 'positive' : symbolInfo?.funding < 0 ? 'negative' : undefined} />
+            <SymbolInfoField label="Funding Rate" value={(symbolInfo?.funding * 100).toString().substring(0, 7)+'%'} type={symbolInfo?.funding > 0 ? 'positive' : symbolInfo?.funding < 0 ? 'negative' : undefined} />
             <SymbolInfoField label="Funding Countdown" value={getTimeUntilNextHour()} />
 
           </div>
