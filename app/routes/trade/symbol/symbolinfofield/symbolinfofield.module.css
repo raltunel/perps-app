@@ -41,3 +41,11 @@
     animation: changeNegative 1s ease-in-out;
 }
 
+.symbolInfoFieldValue.positive {
+    color: var(--green);
+}
+
+.symbolInfoFieldValue.negative {
+    color: var(--red);
+}
+
