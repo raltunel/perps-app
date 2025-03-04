@@ -17,7 +17,6 @@ interface OrderBookProps {
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
-
     const { subscribe, unsubscribeAllByChannel} = useWsObserver();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const resolutionsShouldReset = useRef(true);

@@ -19,6 +19,9 @@ export function loader({ context }: Route.LoaderArgs) {
   return { message: context.VALUE_FROM_NETLIFY };
 }
 
+const wsUrl = 'wss://api.hyperliquid.xyz/ws';
+// const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
+
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const {symbol} = useTradeDataStore();
@@ -40,7 +43,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
  
   // )
   return (
-    <WebSocketProvider url='wss://api.hyperliquid.xyz/ws'>
+    <WebSocketProvider url={wsUrl}>
     <div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>

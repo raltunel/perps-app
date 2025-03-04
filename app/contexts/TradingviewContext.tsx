@@ -78,10 +78,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
       locale: "en",
       theme: "dark",
       // overrides: {
-      //   "paneProperties.background": "#0e0e14",
+      //   "paneProperties.background": "rgba(14,14,20, 1)",
       //   "paneProperties.backgroundType": "solid",
       // },
-      // custom_css_url: "./../tradingview-chart-custom.css",
+      custom_css_url: "./../tradingview-overrides.css",
       loading_screen: { backgroundColor: "#0e0e14" },
       // load_last_chart:false,
       time_frames: [
@@ -94,6 +94,16 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     ],
     });    
+
+
+
+    tvWidget.onChartReady(() => {
+      tvWidget.applyOverrides({
+        "paneProperties.background": "#0e0e14",
+        "paneProperties.backgroundType": "solid",
+        // "paneProperties.gridLinesMode": "none"
+      });
+    });
 
     setChart(tvWidget);
 

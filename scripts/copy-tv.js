@@ -8,18 +8,23 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Root paths
-const SUBMODULE_ROOT = path.resolve(__dirname, '../app');
+const APP_ROOT = path.resolve(__dirname, '../app');
+const SUBMODULE_ROOT = path.join(APP_ROOT, 'tv');
 const PUBLIC_DIR = path.resolve(__dirname, '../public');
 
 // Define specific paths to copy
 const COPY_PATHS = [
   {
-    source: path.join(SUBMODULE_ROOT, 'tv/charting_library/bundles'),
+    source: path.join(SUBMODULE_ROOT, 'charting_library/bundles'),
     dest: path.join(PUBLIC_DIR, 'tv/charting_library/bundles')
   },
   {
-    source: path.join(SUBMODULE_ROOT, 'tv/datafeeds/udf/dist/bundle.js'),
+    source: path.join(SUBMODULE_ROOT, 'datafeeds/udf/dist/bundle.js'),
     dest: path.join(PUBLIC_DIR, 'tv/datafeeds/udf/dist/bundle.js')
+  },
+  {
+    source: path.join(APP_ROOT, 'css/tradingview-overrides.css'),
+    dest: path.join(PUBLIC_DIR, 'tv/tradingview-overrides.css')
   }
 ];
 

@@ -19,12 +19,11 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         return Math.ceil(orderCount / 2);
     }, [orderCount]);
 
-    const orderBookComponent = useMemo(() => <OrderBook symbol={symbol} orderCount={orderCount} />, [orderCount]);
-    const orderBookTrades = useMemo(() => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />, [tradesCount]);
+    const orderBookComponent = useMemo(() => <OrderBook symbol={symbol} orderCount={orderCount} />, [orderCount, symbol]);
+    const orderBookTrades = useMemo(() => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />, [tradesCount, symbol]);
     const { orderBookMode, setOrderBookMode } = useUIStore();
     const orderBookModeRef = useRef(orderBookMode);
     
-
     const calculateOrderCount = () => {
       const orderBookSection = document.getElementById('orderBookSection');
       if(orderBookSection) {
@@ -77,7 +76,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         }
     ]
     const tabs = useMemo(() => {
-      console.log('tabs is changing')
       return [
         {
             label: 'Order Book',
