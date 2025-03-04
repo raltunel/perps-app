@@ -48,7 +48,11 @@
   --font-size-l: 24px;
   --font-size-m: 18px;
   --font-size-s: 12px;
+  --font-size-xs: 10px;
   --font-size-xxl: 64px;
+
+  /* z indexes */
+  --navbar-dropdown-zindex: 99
 }
 
 /* Custom Reset */

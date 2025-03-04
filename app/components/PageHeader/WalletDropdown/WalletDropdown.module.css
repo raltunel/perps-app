@@ -1,0 +1,242 @@
+
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--main-gap);
+  position: absolute;
+  top: 56px;
+  right: 0;
+  padding: 16px 8px;
+  border-radius: var(--main-border-radius, 16px);
+  background: var(--dark3, #16161c);
+  box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+  
+  height: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+
+  /* ---------------------------- */
+
+  opacity: 1;
+  height: auto;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: var(--navbar-dropdown-zindex);
+  
+}
+
+.walletMenu.open {
+  opacity: 1;
+  height: auto;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.walletButton {
+  width: 87px;
+  outline: none;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  height: 25px;
+  padding: 4px;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark3, #0E0E14);
+  color: var(--accent1, #7371FC);
+  font-family: var(--font-family-main, "Lexend Deca");
+  font-size: var(--font-size-s, 12px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.walletButton:hover {
+  background: var(--dark3, #16161C);
+}
+
+.profileContainer {
+  display: flex;
+  justify-content: center;
+  gap: var(--main-border-radius);
+  align-items: center;
+}
+
+.imgContainer {
+  display: flex;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: red;
+}
+
+.profileRight {
+  display: flex;
+  flex-direction: column;
+  /* gap: 8px; */
+}
+
+.profileRightTop {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--main-border-radius);
+  color: var(--text1, #f0f0f8);
+  text-align: center;
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-m, 18px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.profileRightTop svg{
+  color: var(--text2);
+  cursor: pointer;
+}
+.profileRightTop svg:hover{
+  color: var(--text1)
+}
+.actionButtons{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.actionButtons button{
+  height: 25px;
+  display: flex;
+padding: 1px 8px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+flex: 1 0 0;
+outline: none;
+border: none;
+cursor: pointer;
+
+
+/* Main/M */
+font-family: var(--font-family-main, "Lexend Deca");
+font-size: var(--font-size-m, 18px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+
+color: var(--text1, #F0F0F8);
+
+/* Main/M */
+font-family: var(--font-family-main, "Lexend Deca");
+font-size: var(--font-size-m, 18px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.accountButton{
+  border-radius: var(--half-border-radius, 8px);
+background: var(--dark4, #1E1E24);
+}
+.logoutButton{
+  border-radius: var(--half-border-radius, 8px);
+background: var(--accent1, #7371FC);
+}
+
+.profileRightBottom {
+  display: flex;
+  gap: var(--main-border-radius);
+  align-items: center;
+  color: var(--text2, #6a6a6d);
+  text-align: center;
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-font, 12px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.tokensContainer {
+  display: flex;
+  padding: 0px 4px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  align-self: stretch;
+  border-radius: 4px;
+  background: var(--dark4, #1e1e24);
+}
+
+.tokenDisplayContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 8px 4px 8px;
+  align-items: center;
+  gap: 4px;
+  align-self: stretch;
+  border-bottom: 1px solid var(--dark3, #16161c);
+  height: 38px;
+}
+
+.tokenDisplayLeft {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+}
+
+.tokenDisplayImg {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  padding: 3.75px;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+}
+
+.tokenDisplayName {
+  color: var(--text1, #f0f0f8);
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-m, 18px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  flex: 1 1 0;
+}
+
+.tokenDisplayRight {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  text-align: end;
+  justify-content: space-between;
+}
+
+.tokenDisplayRight h3 {
+  color: var(--text1, #f0f0f8);
+  text-align: right;
+  font-family: var(--font-family-main, 'Lexend Deca');
+  font-size: var(--font-size-m, 18px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.tokenDisplayRight p {
+  color: var(--text2, #6A6A6D);
+  text-align: right;
+  font-family: var(--font-family-main, "Lexend Deca");
+  font-size: var(--font-size-s, 12px);
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
