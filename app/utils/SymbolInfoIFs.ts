@@ -10,4 +10,5 @@ export interface SymbolInfoIF {
     oraclePx: number;
     premium: number;
     prevDayPx: number;
+    lastPriceChange: number; // price change since last ws update
 }
