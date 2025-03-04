@@ -1,3 +1,4 @@
+import Tooltip from '~/components/Tooltip/Tooltip';
 import type { Route } from '../../+types/root';
 import styles from './home.module.css';
 import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
@@ -15,7 +16,10 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   return (
     <div className={styles.container}>
-      <ButtonShowcase/>
+      <ButtonShowcase />
+      <div style={{ padding: '100px' }}>
+     
+    </div>
       
     </div>
   );

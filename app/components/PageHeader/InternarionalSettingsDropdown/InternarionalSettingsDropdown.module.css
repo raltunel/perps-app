@@ -1,0 +1,32 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: absolute;
+  top: 56px;
+  right: 0;
+  width: 112px;
+  height: auto;
+  display: flex;
+  padding: 4px 0px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: var(--half-border-radius, 8px);
+  background: var(--dark4, #0e0e14);
+  box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+
+
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+
+  /* ---------------------------- */
+
+  opacity: 1;
+  height: auto;
+  visibility: visible;
+  pointer-events: auto;
+  height: 257px;
+
+  z-index: var(--navbar-dropdown-zindex);
+
+}
