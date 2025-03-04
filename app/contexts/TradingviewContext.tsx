@@ -101,7 +101,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({ c
       tvWidget.applyOverrides({
         "paneProperties.background": "#0e0e14",
         "paneProperties.backgroundType": "solid",
-        "paneProperties.gridLinesMode": "none"
+        // "paneProperties.gridLinesMode": "none"
       });
     });
 

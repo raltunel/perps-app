@@ -4,7 +4,6 @@ import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
 
 export const processSymbolInfo = (payload: any): SymbolInfoIF => {
-  console.log(payload);
   try{
       return {
         coin: payload.coin,
