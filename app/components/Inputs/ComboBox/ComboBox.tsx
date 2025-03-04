@@ -7,9 +7,12 @@ interface ComboBoxProps {
   options: any[];
   fieldName?: string;
   onChange: (value: any) => void;
+  modifyOptions?: (value: any) => string;
+  modifyValue?: (value: any) => string;
+  type?: 'big-val';
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange }) => {
+const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange, modifyOptions, modifyValue, type }) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,11 +21,20 @@ const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange
     setIsOpen(false);
   }
 
+  const getClassName = () => {
+    switch(type){
+      case 'big-val':
+        return styles.bigVal;
+      default:
+        return '';
+    }
+  }
+
   return (
 <>
-<div className={styles.comboBoxContainer}>  
+<div className={`${styles.comboBoxContainer} ${getClassName()}`}>  
   <div className={styles.comboBoxValueContainer} onClick={() => setIsOpen(!isOpen)}>
-<div className={styles.comboBoxValue} >{value} </div>
+<div className={styles.comboBoxValue} >{modifyValue ? modifyValue(value) : value} </div>
 <FaChevronDown className={`${styles.comboBoxIcon} ${isOpen ? styles.comboBoxIconOpen : ''}`} />
 </div>
 
@@ -32,7 +44,9 @@ const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange
       
       {
         options.map((option) => (
-          <div key={fieldName ? option[fieldName] : option} className={fieldName ? (option[fieldName] === value ? styles.comboBoxOptionSelected : '') : (option === value ? styles.comboBoxOptionSelected : '')} onClick={() => optionOnClick(option)}>{fieldName ? option[fieldName] : option}</div>
+          <div key={fieldName ? option[fieldName] : option} className={fieldName ? (option[fieldName] === value ? styles.comboBoxOptionSelected : '') : (option === value ? styles.comboBoxOptionSelected : '')} onClick={() => optionOnClick(option)}>
+            {fieldName ? modifyOptions ? modifyOptions(option[fieldName]) : option[fieldName] : modifyOptions ? modifyOptions(option) : option}
+            </div>
         ))
       }
     </div>

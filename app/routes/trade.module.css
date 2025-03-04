@@ -104,6 +104,7 @@
 /* -----------------------END OF TEMP CSS CODE */
 .chart{
   max-height: 61vh;
+  overflow: hidden;
 }
 
 
