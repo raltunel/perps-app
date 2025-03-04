@@ -66,6 +66,7 @@
 
 .chart{
   max-height: 61vh;
+  overflow: hidden;
 }
 
 

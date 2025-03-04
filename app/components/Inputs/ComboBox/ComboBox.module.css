@@ -25,6 +25,7 @@
 }
 
 .comboBoxValue {
+  white-space: nowrap;
   min-width: 2rem;
   text-align: center;
   color: var(--text1);
@@ -67,3 +68,10 @@
 .comboBoxOptionSelected {
   color: var(--text1);
 }
+
+
+.bigVal .comboBoxValue{
+  font-size: 1.2rem;
+}
+
+
