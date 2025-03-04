@@ -71,7 +71,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
       />
       </div>
       {
-        symbolInfo && (
+        symbolInfo && symbolInfo.coin === symbol && (
           <div className={styles.symbolInfoFieldsWrapper}>
             <SymbolInfoField label="Mark" value={'$'+formatNum(symbolInfo?.markPx)} lastWsChange={symbolInfo?.lastPriceChange} />
             <SymbolInfoField label="Oracle" value={'$'+formatNum(symbolInfo?.oraclePx)} />
