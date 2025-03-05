@@ -9,7 +9,7 @@ export default function Modal(props: propsIF) {
     const { idForDOM, children } = props;
 
     return (
-        <div className={styles.modal} id={idForDOM}>
+        <div className={styles.outside_modal} id={idForDOM}>
             {children}
         </div>
     );
