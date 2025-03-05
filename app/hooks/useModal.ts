@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // interface for return value of hook
 export interface useModalIF {
@@ -11,24 +11,31 @@ export interface useModalIF {
 // main fn body for hook
 export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
     // variable to track if modal is open on initial render
-    let isOpenAtRender: boolean;
+    let shouldOpenAtRender: boolean;
+
+    // track whether the modal has already auto-opened, gatekeeping prevents
+    // ... multiple auto-opens while parent is mounted to DOM
+    const isFirstOpening = useRef<boolean>(true);
 
     // logic tree to determine if modal is open on initial render
     switch (dfltState) {
         // open if hook is instantiated that way
         case 'open':
-            isOpenAtRender = true;
+            // check if an auto-open has already occurred
+            shouldOpenAtRender = isFirstOpening.current;
+            // update state value to prevent more auto openings
+            isFirstOpening.current = false;
             break;
         // closed if hook is called that way, with number, or with
         // ... no explicit state provided
         case 'closed':
         default:    
-            isOpenAtRender = false;
+            shouldOpenAtRender = false;
             break;
     }
 
     // state value to track if modal is currently open
-    const [isOpen, setIsOpen] = useState<boolean>(isOpenAtRender);
+    const [isOpen, setIsOpen] = useState<boolean>(shouldOpenAtRender);
 
     // modal control functions
     const openModal = () => setIsOpen(true);
