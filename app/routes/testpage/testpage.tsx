@@ -10,19 +10,16 @@ interface propsIF {
 export default function testpage(props: propsIF) {
     false && props;
 
-    const MODAL_ID = 'my_modal';
-
     const modalControl: useModalIF = useModal('closed');
 
     return (
         <div>
             <button onClick={() => modalControl.open()}>Open Modal</button>
-            {modalControl.isOpen && <Modal
-                idForDOM={MODAL_ID}
-            >
-                <Options modalControl={modalControl} />
-            </Modal>
-            }
+            {modalControl.isOpen && (
+                <Modal close={modalControl.close}>
+                    <Options modalControl={modalControl} />
+                </Modal>
+            )}
         </div>
     );
 }
