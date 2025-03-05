@@ -6,7 +6,10 @@ interface TradeDataStore {
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
     setSymbolInfo: (symbolInfo: SymbolInfoIF) => void;
-}
+    favs: string[];
+    setFavs: (favs:string[]) => void;
+    addToFavs: (coin: string) => void;
+} 
 
 export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
     symbol: 'BTC',
@@ -20,4 +23,11 @@ export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
         }
         set({ symbolInfo })
     },
+    favs: [],
+    setFavs: (favs: string[]) => set({favs}),
+    addToFavs: (coin: string) => {
+        if(get().favs.filter(e=> e==coin).length === 0){
+            set({favs: [...get().favs, coin]});
+        }
+    }
 }));

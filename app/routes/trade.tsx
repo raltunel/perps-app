@@ -9,6 +9,7 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import TradingViewChart from './chart/chart';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useUIStore } from '~/stores/UIStore';
+import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -48,7 +49,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     <div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>
-          <div className={styles.watchlist}>watchlist</div>
+          <div className={styles.watchlist}><WatchList/></div>
           <div className={styles.symbolInfo}>
 
             <SymbolInfo />

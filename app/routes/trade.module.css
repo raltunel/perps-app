@@ -86,13 +86,7 @@
 }
 
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
-.watchlist {
-  background: url('./tempImages/watchlist.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px);
-}
+
 .tradeModules {
   background: url('./tempImages/orderInput.png') !important;
   background-size: 100% 100%;
