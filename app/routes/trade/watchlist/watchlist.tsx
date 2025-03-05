@@ -37,6 +37,9 @@ const WatchList: React.FC<WatchListProps> = ({ }) => {
       const favs = JSON.parse(lsVal);
       setFavs(favs);
     }
+    else{
+      setFavs(['BTC', 'ETH', 'SOL'])
+    }
 
     return () => {
       unsubscribeAllByChannel('webData2')
