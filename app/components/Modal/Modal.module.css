@@ -8,5 +8,5 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(30px);
+    backdrop-filter: blur(10px);
 }
