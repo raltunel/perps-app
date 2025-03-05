@@ -1,4 +1,3 @@
-// import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "public/tradingview/charting_library";
 import { widget, type Bar, type IChartingLibraryWidget, type ResolutionString } from "~/tv/charting_library";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { createDataFeed } from "~/routes/chart/data/customDataFeed";
