@@ -1,5 +1,4 @@
 import Modal from "~/components/Modal/Modal";
-import Options from "~/components/Options/Options";
 import { type useModalIF, useModal } from "~/hooks/useModal";
 
 interface propsIF {
@@ -19,7 +18,17 @@ export default function testpage(props: propsIF) {
             {/* format to insantiate modal in the DOM */}
             {modalControl.isOpen && (
                 <Modal close={modalControl.close}>
-                    <Options modalControl={modalControl} />
+                    <section
+                        style={{
+                            backgroundColor: 'orange',
+                            height: '500px',
+                            width: '300px',
+                            outline: '3px solid green',
+                        }}
+                    >
+                        <button onClick={modalControl.close}>Close</button>
+                        <h2>Options Menu!</h2>
+                    </section>
                 </Modal>
             )}
         </div>
