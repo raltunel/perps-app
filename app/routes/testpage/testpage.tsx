@@ -1,4 +1,5 @@
 import Modal from "~/components/Modal/Modal";
+import Options from "~/components/Options/Options";
 import { type useModalIF, useModal } from "~/hooks/useModal";
 
 interface propsIF {
@@ -19,8 +20,7 @@ export default function testpage(props: propsIF) {
             {modalControl.isOpen && <Modal
                 idForDOM={MODAL_ID}
             >
-                <p>hi there!!</p>
-                <button onClick={modalControl.close}>Close Me</button>
+                <Options modalControl={modalControl} />
             </Modal>
             }
         </div>
