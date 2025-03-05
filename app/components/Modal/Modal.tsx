@@ -1,8 +1,9 @@
+import { type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
 interface propsIF {
     close: () => void;
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 export default function Modal(props: propsIF) {
