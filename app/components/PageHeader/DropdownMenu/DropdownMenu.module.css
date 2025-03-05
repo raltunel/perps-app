@@ -3,6 +3,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  z-index: var(--navbar-dropdown-zindex);
+
 }
 
 .open {
