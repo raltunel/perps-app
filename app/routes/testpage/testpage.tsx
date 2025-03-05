@@ -14,7 +14,9 @@ export default function testpage(props: propsIF) {
 
     return (
         <div>
+            {/* interactable to open modal on user action */}
             <button onClick={() => modalControl.open()}>Open Modal</button>
+            {/* format to insantiate modal in the DOM */}
             {modalControl.isOpen && (
                 <Modal close={modalControl.close}>
                     <Options modalControl={modalControl} />
