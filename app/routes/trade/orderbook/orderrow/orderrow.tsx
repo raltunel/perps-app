@@ -17,7 +17,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef }) => {
       <div className={styles.orderRowSize}>{formatNum(order.sz * coef)}</div>
       <div className={styles.orderRowTotal}>{formatNum(order.total * coef)}</div>
       <div className={styles.ratio} style={{ width: `${order.ratio * 100}%` }}></div>
-      <div className={styles.fadeOverlay}></div>
+      {/* <div className={styles.fadeOverlay}></div> */}
     </div>
   );
 }
