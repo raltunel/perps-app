@@ -37,11 +37,11 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
         if(showMode === 'dollar'){
             return formatNum(symbol.markPx);
         }else{
-            return formatNum((symbol.markPx - symbol.prevDayPx) / symbol.prevDayPx * 100, 2) + '%'
+            return (change > 0 ? '+' : '' ) + formatNum((symbol.markPx - symbol.prevDayPx) / symbol.prevDayPx * 100, 2) + '%'
         }
 
 
-    }, [showMode])
+    }, [showMode, change])
 
 
   return (
