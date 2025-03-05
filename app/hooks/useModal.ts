@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 // interface for return value of hook
 export interface useModalIF {
@@ -8,8 +8,14 @@ export interface useModalIF {
     toggle: () => void;
 }
 
+// default states for modal
+//      'open' → modal is open on initial render
+//      'closed' → modal is closed on initial render
+//      number → modal will auto-open after X milliseconds
+type modalDefaultStates = 'open'|'closed'|number;
+
 // main fn body for hook
-export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
+export function useModal(dfltState?: modalDefaultStates): useModalIF {
     // variable to track if modal is open on initial render
     let shouldOpenAtRender: boolean;
 
@@ -38,16 +44,16 @@ export function useModal(dfltState?: 'open'|'closed'|number): useModalIF {
     const [isOpen, setIsOpen] = useState<boolean>(shouldOpenAtRender);
 
     // modal control functions
-    const openModal = () => setIsOpen(true);
-    const closeModal = () => setIsOpen(false);
-    const toggleModal = () => setIsOpen(!isOpen);
+    const openModal = (): void => setIsOpen(true);
+    const closeModal = (): void => setIsOpen(false);
+    const toggleModal = (): void => setIsOpen(!isOpen);
 
     // logic to open the modal after a delay
     useEffect(() => {
         // do not execute unless hook instantiated with a number
         if (typeof dfltState !== 'number') return;
         // timeout to open modal after time set in parameter
-        const openAfterDelay = setTimeout(
+        const openAfterDelay: NodeJS.Timeout = setTimeout(
             () => openModal(),
             dfltState
         );
