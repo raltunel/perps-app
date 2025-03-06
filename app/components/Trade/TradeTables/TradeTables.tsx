@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import styles from './TradeTable.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
+import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 
 export interface FilterOption {
   id: string;
@@ -46,9 +47,12 @@ export default function TradeTable(props: TradeTableProps) {
     // }
   };
 
-  const handleToggleSmallBalances = (hideSmall: boolean) => {
-    setHideSmallBalances(hideSmall);
-    console.log('Hide small balances:', hideSmall);
+  const handleToggleSmallBalances = (newState?: boolean) => {
+    const newValue = newState !== undefined ? newState : !hideSmallBalances;
+    setHideSmallBalances(newValue);
+    // if (onToggleSmallBalances) {
+    //   onToggleSmallBalances(newValue);
+    // }
   };
 
   const rightAlignedContent = (
@@ -58,6 +62,10 @@ export default function TradeTable(props: TradeTableProps) {
         options={filterOptions}
         selectedOption={selectedFilter}
         onChange={handleFilterChange}
+          />
+           <ToggleSwitch 
+        isOn={hideSmallBalances}
+        onToggle={handleToggleSmallBalances}
       />
     </div>
   );

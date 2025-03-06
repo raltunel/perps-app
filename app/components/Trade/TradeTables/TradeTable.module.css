@@ -9,3 +9,8 @@ background: var(--dark2, #0E0E14);
     padding: 8px 9px 0px 9px;
  
 }
+.tableControls{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
