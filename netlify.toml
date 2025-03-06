@@ -19,6 +19,11 @@ for = "/assets/*"
   status = 200
 
 [[redirects]]
-  from = "/(?!v2).*"
+  from = "/"
+  to = "/"
+  status = 200
+
+[[redirects]]
+  from = "/*"
   to = "https://ambient-finance.netlify.app/:splat"
   status = 301
