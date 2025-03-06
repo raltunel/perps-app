@@ -1,14 +1,12 @@
-import Welcome from '~/components/Welcome/Welcome';
-import type { Route } from '../../+types/root';
-import styles from './vaults.module.css';
-import Button from '~/components/Button/Button';
 import { useState } from 'react';
-import { FiSearch } from 'react-icons/fi';
 import { AiOutlineClose } from 'react-icons/ai';
-import VaultTimeframe from '~/components/Vault/VaultTimeframe/VaultTimeframe';
-import { protocolVaults, userVaults } from './data';
+import { FiSearch } from 'react-icons/fi';
 import VaultRow from '~/components/Vault/VaultRow/VaultRow';
 import VaultRowHeader from '~/components/Vault/VaultRowHeader/VaultRowHeader';
+import VaultTimeframe from '~/components/Vault/VaultTimeframe/VaultTimeframe';
+import type { Route } from '../../+types/root';
+import { protocolVaults } from './data';
+import styles from './vaults.module.css';
 // import styles from './vaults.module.css'
 export function meta({}: Route.MetaArgs) {
   return [
@@ -101,14 +99,14 @@ export default function Vaults({ loaderData }: Route.ComponentProps) {
           ))}
 
         </section>
-        <section className={styles.vaultSectionContainer}>
+        {/* <section className={styles.vaultSectionContainer}>
           <h3 className={styles.sectionTitle}>User Vaults</h3>
           <VaultRowHeader/>
           {userVaults.map((vault, idx) => (
             <VaultRow vault={vault} />
           ))}
 
-        </section>
+        </section> */}
       </section>
     </div>
   );
