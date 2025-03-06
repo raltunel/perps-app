@@ -14,7 +14,11 @@ for = "/assets/*"
 "Cache-Control" = "public, max-age=31560000, immutable"
 
 [[redirects]]
-  from = "/v1/*"
+  from = "/*"
   to = "https://ambient-finance.netlify.app/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/v2/*"
+  to = "/v2/:splat"
   status = 200
-  force = true
