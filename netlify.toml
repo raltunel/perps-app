@@ -15,6 +15,6 @@ for = "/assets/*"
 
 [[redirects]]
   from = "/v1/*"
-  to = "https://ambient.finance/:splat"
+  to = "https://ambient-finance.netlify.app/:splat"
   status = 200
   force = true
