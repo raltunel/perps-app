@@ -1,4 +1,6 @@
 import {create} from 'zustand';
+import { NumFormatTypes } from '~/utils/Constants';
+import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 interface TradeDataStore {
@@ -9,6 +11,8 @@ interface TradeDataStore {
     favs: string[];
     setFavs: (favs:string[]) => void;
     addToFavs: (coin: string) => void;
+    numFormat: NumFormat;
+    setNumFormat: (numFormat: NumFormat) => void;
 } 
 
 export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
@@ -29,5 +33,7 @@ export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
         if(get().favs.filter(e=> e==coin).length === 0){
             set({favs: [...get().favs, coin]});
         }
-    }
+    },
+    numFormat: NumFormatTypes[0],
+    setNumFormat: (numFormat: NumFormat) => set({numFormat})
 }));
