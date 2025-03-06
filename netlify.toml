@@ -17,6 +17,7 @@ for = "/assets/*"
   from = "/*"
   to = "https://ambient-finance.netlify.app/:splat"
   status = 301
+  conditions = { Not = { Path = "/" } }
 
 [[redirects]]
   from = "/v2/*"
