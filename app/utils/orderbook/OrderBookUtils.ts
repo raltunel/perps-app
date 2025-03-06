@@ -44,8 +44,8 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
           return num.toLocaleString('de-DE');
         } else {
           return num.toLocaleString('de-DE', {
-            minimumFractionDigits: getDefaultPrecision(num),
-            maximumFractionDigits: getDefaultPrecision(num)
+            minimumFractionDigits: precision || getDefaultPrecision(num),
+            maximumFractionDigits: precision || getDefaultPrecision(num)
           });
         }
   }
@@ -70,3 +70,16 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
     
     return ret;
   }
+
+
+ export const getTimeUntilNextHour = () => {
+    const now = new Date();
+    const nextHour = new Date(now);
+    nextHour.setHours(now.getHours() + 1, 0, 0, 0);
+
+    const diff = Math.floor((nextHour.getTime() - now.getTime()) / 1000);
+    const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+    const seconds = (diff % 60).toString().padStart(2, '0');
+
+    return `00:${minutes}:${seconds}`;
+}

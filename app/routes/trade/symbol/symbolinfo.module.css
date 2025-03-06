@@ -12,10 +12,11 @@
 
 .symbolSelector {
     display: inline-block;
+    margin-left: 2rem !important;
 }
 
 .symbolInfoFieldsWrapper {
     display: inline-block;
+    /* white-space: nowrap;
+    overflow: hidden; */
 }
-
-

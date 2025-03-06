@@ -1,6 +1,7 @@
 import { WebSocketProvider } from '~/contexts/WebSocketContext';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
+import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderBook from './trade/orderbook/orderbook';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolInfo from './trade/symbol/symbolinfo';
@@ -8,6 +9,7 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import TradingViewChart from './chart/chart';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useUIStore } from '~/stores/UIStore';
+import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -47,7 +49,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     <div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>
-          <div className={styles.watchlist}>watchlist</div>
+          <div className={styles.watchlist}><WatchList/></div>
           <div className={styles.symbolInfo}>
 
             <SymbolInfo />
@@ -59,9 +61,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
 
-        <div className={styles.tradeModules}>trade module goes here</div>
+        <div className={styles.tradeModules}></div>
       </section>
-      <section className={styles.containerBottom}>Table goes here</section>
+      <section className={styles.containerBottom}>
+        <div className={styles.table}>table</div>
+        <div className={styles.wallet}>
+          <DepositDropdown
+            isUserConnected={false}
+            setIsUserConnected={() => console.log('connected')}
+          />
+        </div>
+      </section>
       {/* Child routes (market, limit, pro) appear here */}
       {/* <Outlet /> */}
     </div>
