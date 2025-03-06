@@ -8,7 +8,7 @@ import SymbolInfo from './trade/symbol/symbolinfo';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import TradingViewChart from './chart/chart';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
-import { useUIStore } from '~/stores/UIStore';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,8 +27,8 @@ const wsUrl = 'wss://api.hyperliquid.xyz/ws';
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const {symbol} = useTradeDataStore();
-  const { orderBookMode } = useUIStore();
-
+  const { orderBookMode } = useAppSettings();
+  
   // const nav = (
   //      {/* Example nav links to each child route */}
   //   <nav style={{ marginBottom: '1rem' }}>

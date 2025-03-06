@@ -11,8 +11,6 @@ interface TradeDataStore {
     favs: string[];
     setFavs: (favs:string[]) => void;
     addToFavs: (coin: string) => void;
-    numFormat: NumFormat;
-    setNumFormat: (numFormat: NumFormat) => void;
 } 
 
 export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
@@ -34,6 +32,4 @@ export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
             set({favs: [...get().favs, coin]});
         }
     },
-    numFormat: NumFormatTypes[0],
-    setNumFormat: (numFormat: NumFormat) => set({numFormat})
 }));

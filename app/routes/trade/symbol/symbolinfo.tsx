@@ -5,7 +5,8 @@ import { useWsObserver } from '~/hooks/useWsObserver';
 import { useEffect } from 'react';
 import { processSymbolInfo } from '~/processors/processSymbolInfo';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
-import { formatNum, getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
+import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface SymbolInfoProps {
 }
@@ -29,7 +30,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
 
   const {symbol, setSymbol, setSymbolInfo, symbolInfo} = useTradeDataStore();
 
-  
+  const { formatNum } = useNumFormatter();
+
   useEffect(() => {
     return () => {
       unsubscribeAllByChannel('activeAssetCtx');
