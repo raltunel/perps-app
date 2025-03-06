@@ -1,5 +1,7 @@
 import Welcome from '~/components/Welcome/Welcome';
 import type { Route } from '../../+types/root';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import styles from './portfolio.module.css'
 // import styles from './portfolio.module.css'
 export function meta({}: Route.MetaArgs) {
   return [
@@ -13,5 +15,12 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Portfolio({ loaderData }: Route.ComponentProps) {
-  return <Welcome title='Portfolio' />;
+  return (
+    // <Welcome title='Portfolio' />
+    <div className={styles.container}>
+
+    <TradeTable initialTab="Balances" />
+    </div>
+
+  );
 }
