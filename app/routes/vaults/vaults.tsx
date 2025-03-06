@@ -50,9 +50,9 @@ export default function Vaults({ loaderData }: Route.ComponentProps) {
             </a>
           </p>
         </div>
-        <Button size='medium' selected>
+        {/* <Button size='medium' selected>
           Text
-        </Button>
+        </Button> */}
       </section>
 
       <section className={styles.tableContainer}>

@@ -1,3 +1,4 @@
+import SortIcon from '../SortIcon';
 import styles from '../VaultRow/VaultRow.module.css';
 
 export default function VaultRowHeader() {
@@ -65,6 +66,7 @@ export default function VaultRowHeader() {
           className={`${styles.cell} ${styles.headerCell} ${styles[header.className]}`}
         >
           {header.name}{' '}
+          {header.sortable && <SortIcon/>}
         </div>
       ))}
       {/* <div className={styles.cell}>{vault.name}</div>
