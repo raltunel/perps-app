@@ -19,7 +19,6 @@ for = "/assets/*"
   status = 200
 
 [[redirects]]
-  from = "/*"
+  from = "/(?!v2).*"
   to = "https://ambient-finance.netlify.app/:splat"
   status = 301
-
