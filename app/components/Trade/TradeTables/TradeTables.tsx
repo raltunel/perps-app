@@ -2,32 +2,64 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import styles from './TradeTable.module.css';
 import Tabs from '~/components/Tabs/Tabs';
+import FilterDropdown from '../FilterDropdown/FilterDropdown';
 
+export interface FilterOption {
+  id: string;
+  label: string;
+}
 interface TradeTableProps {
   initialTab?: string;
 }
 
+const availableTabs = [
+  'Balances',
+  'Positions',
+  'Open Orders',
+  'TWAP',
+  'Trade History',
+  'Funding History',
+  'Order History',
+  'Deposits and Withdrawals',
+];
+
+const filterOptions: FilterOption[] = [
+  { id: 'all', label: 'All' },
+  { id: 'active', label: 'Active' },
+  { id: 'long', label: 'Long' },
+  { id: 'short', label: 'Short' },
+];
 export default function TradeTable(props: TradeTableProps) {
   const { initialTab = 'Balances' } = props;
   const [activeTab, setActiveTab] = useState(initialTab);
-
-  const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
-    'Funding History',
-    'Order History',
-    'Deposits and Withdrawals',
-  ];
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
   };
 
+  const handleFilterChange = (selectedId: string) => {
+    setSelectedFilter(selectedId);
+    // if (onFilterChange) {
+    //   onFilterChange([selectedId]);
+    // }
+  };
+
+  const handleToggleSmallBalances = (hideSmall: boolean) => {
+    setHideSmallBalances(hideSmall);
+    console.log('Hide small balances:', hideSmall);
+  };
+
   const rightAlignedContent = (
-    <div className={styles.tableControls}>Right side content</div>
+    <div className={styles.tableControls}>
+      {' '}
+      <FilterDropdown
+        options={filterOptions}
+        selectedOption={selectedFilter}
+        onChange={handleFilterChange}
+      />
+    </div>
   );
 
   const renderTabContent = () => {
@@ -94,8 +126,8 @@ export default function TradeTable(props: TradeTableProps) {
         onTabChange={handleTabChange}
         rightContent={rightAlignedContent}
       />
-          <motion.div
-              className={styles.tableContent}
+      <motion.div
+        className={styles.tableContent}
         key={activeTab}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
