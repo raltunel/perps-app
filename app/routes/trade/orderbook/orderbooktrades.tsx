@@ -7,7 +7,7 @@ import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import { processOrderBookTrades } from '~/processors/processOrderBook';
 import OrderTradeRow from './ordertraderow/ordertraderow';
 import BasicDivider from '~/components/Dividers/BasicDivider';
-import { useUIStore } from '~/stores/UIStore';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface OrderBookTradesProps {
   symbol: string;
@@ -19,7 +19,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol, tradesCount }
   const { subscribe, unsubscribeAllByChannel} = useWsObserver();
   const { trades, setTrades } = useOrderBookStore();
 
-  const { orderBookMode } = useUIStore();
+  const { orderBookMode } = useAppSettings();
   
   const tradesRef = useRef<OrderBookTradeIF[]>([]);
   tradesRef.current = trades;

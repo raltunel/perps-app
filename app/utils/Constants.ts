@@ -10,6 +10,10 @@ export type NumFormat = {
     value: FormatTypes;
 }
 
+export type LangType = {
+    label: string;
+}
+
 export const NumFormatTypes: NumFormat[] = [
     {
         label: '1,234.56',
@@ -29,3 +33,21 @@ export const NumFormatTypes: NumFormat[] = [
     }
 
 ]
+
+
+export const Langs: LangType[] = [
+    {
+        label: 'English',
+    },
+    {
+        label: 'Français',
+    },
+    {
+        label: '한국어',
+    },
+    {
+        label: '简体中文',
+    },
+    
+]
+

@@ -27,29 +27,6 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
     return Number(val);
   }
 
-  const getDefaultPrecision = (num: number | string) => {
-    const numVal = parseNum(num);
-    if(numVal > 1000000){
-        return 0;
-    }
-    else if(numVal < 10){
-        return 4;
-    }
-    return 2;
-  }
-
-  export const formatNum = (num: number | string, precision?: number) => {
-
-        if (Number.isInteger(num)) {
-          return num.toLocaleString('de-DE');
-        } else {
-          return num.toLocaleString('de-DE', {
-            minimumFractionDigits: precision || getDefaultPrecision(num),
-            maximumFractionDigits: precision || getDefaultPrecision(num)
-          });
-        }
-  }
-
   export const formatDateToTime = (date: Date) => {
     return date.toLocaleTimeString('en-GB', {hour12: false});
   }

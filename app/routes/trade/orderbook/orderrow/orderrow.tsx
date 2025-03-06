@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import type { OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderrow.module.css';
-import { formatNum } from '~/utils/orderbook/OrderBookUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface OrderRowProps {
   order: OrderRowIF;
@@ -10,6 +10,8 @@ interface OrderRowProps {
 }
 
 const OrderRow: React.FC<OrderRowProps> = ({ order, coef }) => {
+
+  const { formatNum } = useNumFormatter();
 
   return (
     <div className={`${styles.orderRow} ${order.type === 'buy' ? styles.buy : styles.sell}`} >

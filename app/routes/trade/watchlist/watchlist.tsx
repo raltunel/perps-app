@@ -4,7 +4,6 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useEffect, useRef, useState } from 'react';
 import { processSymbolInfo } from '~/processors/processSymbolInfo';
-import { formatNum, getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import { TbHeartFilled } from 'react-icons/tb';
 import { FiDollarSign, FiPercent } from 'react-icons/fi';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';

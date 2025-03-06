@@ -5,7 +5,7 @@ import OrderBookTrades from './orderbooktrades';
 import Tabs from '~/components/Tabs/Tabs';
 import BasicMenu from '~/components/BasicMenu/BasicMenu';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useUIStore } from '~/stores/UIStore';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 interface OrderBookSectionProps {
   symbol: string;
 }
@@ -21,7 +21,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
 
     const orderBookComponent = useMemo(() => <OrderBook symbol={symbol} orderCount={orderCount} />, [orderCount, symbol]);
     const orderBookTrades = useMemo(() => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />, [tradesCount, symbol]);
-    const { orderBookMode, setOrderBookMode } = useUIStore();
+    const { orderBookMode, setOrderBookMode } = useAppSettings();
     const orderBookModeRef = useRef(orderBookMode);
     
     const calculateOrderCount = () => {

@@ -1,14 +1,9 @@
 
+import { useMemo } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './watchlistnode.module.css';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver } from '~/hooks/useWsObserver';
-import { useEffect, useMemo, useState } from 'react';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
-import { formatNum, getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
-import { TbHeartFilled } from 'react-icons/tb';
-import { FiDollarSign, FiPercent } from 'react-icons/fi';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import styles from './watchlistnode.module.css';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface WatchListNodeProps {
     symbol: SymbolInfoIF;
@@ -19,6 +14,7 @@ interface WatchListNodeProps {
 const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
 
+    const { formatNum } = useNumFormatter();
 
     const {symbol: storeSymbol, setSymbol: setStoreSymbol} = useTradeDataStore();
 
@@ -41,7 +37,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
         }
 
 
-    }, [showMode, change])
+    }, [showMode, change, formatNum])
 
 
   return (
