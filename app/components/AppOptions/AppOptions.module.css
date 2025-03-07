@@ -1,4 +1,5 @@
 .app_options {
+    user-select: none;
     background-color: aqua;
 }
 
