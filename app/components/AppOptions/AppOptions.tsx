@@ -1,7 +1,8 @@
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
+import OptionLine from './OptionLine';
 
-interface appOptionDataIF {
+export interface appOptionDataIF {
     text: string;
 }
 
@@ -65,7 +66,10 @@ export default function AppOptions(props: propsIF) {
                 {
                     optionsTop.map(
                         (option: appOptionDataIF) => (
-                            <li key={JSON.stringify(option)}>{option.text}</li>
+                            <OptionLine
+                                key={JSON.stringify(option)}
+                                option={option}
+                            />
                         )
                     )
                 }
@@ -75,7 +79,10 @@ export default function AppOptions(props: propsIF) {
                 {
                     optionsBottom.map(
                         (option: appOptionDataIF) => (
-                            <li key={JSON.stringify(option)}>{option.text}</li>
+                            <OptionLine
+                                key={JSON.stringify(option)}
+                                option={option}
+                            />
                         )
                     )
                 }
