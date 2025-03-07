@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import { Langs, NumFormatTypes, type LangType, type NumFormat } from '~/utils/Constants';
+import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 import type { OrderBookTradeIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
 
 interface AppSettingsStore {
@@ -9,6 +9,8 @@ interface AppSettingsStore {
     setNumFormat: (numFormat: NumFormat) => void;
     lang: LangType;
     setLang: (lang: LangType) => void;
+    buySellColor: BuySellColor;
+    setBuySellColor: (buySellColor: BuySellColor) => void;
 }
 
 export const useAppSettings = create<AppSettingsStore>((set) => ({
@@ -17,5 +19,7 @@ export const useAppSettings = create<AppSettingsStore>((set) => ({
     numFormat: NumFormatTypes[0],
     setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
     lang: Langs[0],
-    setLang: (lang: LangType) => set({ lang })
+    setLang: (lang: LangType) => set({ lang }),
+    buySellColor: buySellColors[0],
+    setBuySellColor: (buySellColor: BuySellColor) => set({ buySellColor })
 }));

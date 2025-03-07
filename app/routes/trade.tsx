@@ -61,7 +61,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 </div>
     
     <WebSocketProvider url={wsUrl}>
-    <div className={'inverse' + ' ' + styles.container}>
+    <div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>
           <div className={styles.watchlist}><WatchList/></div>

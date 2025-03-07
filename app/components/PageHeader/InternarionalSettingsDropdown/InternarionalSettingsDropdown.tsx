@@ -1,10 +1,10 @@
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './InternarionalSettingsDropdown.module.css'
-import { Langs, NumFormatTypes, type LangType, type NumFormat } from '~/utils/Constants';
+import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 
 export default function InternarionalSettingsDropdown() {
     
-    const { numFormat, setNumFormat, lang, setLang } = useAppSettings();
+    const { numFormat, setNumFormat, lang, setLang, buySellColor, setBuySellColor } = useAppSettings();
 
 
 
@@ -31,6 +31,13 @@ export default function InternarionalSettingsDropdown() {
                     ))
                 }   
                 <div className={styles.internationalSettingHeader}>Color</div>
+                {
+                    buySellColors.map((e: BuySellColor) => (
+                        <div key={e.type} className={`${styles.intSettingItem} ${buySellColor.type === e.type ? styles.selected : ''}`} onClick={() => setBuySellColor(e)}>
+                            <span style={{color: e.buy}}>Buy</span>&nbsp;/&nbsp;<span style={{color: e.sell}}>Sell</span>
+                        </div>
+                    ))
+                }
 
         </div>
     )

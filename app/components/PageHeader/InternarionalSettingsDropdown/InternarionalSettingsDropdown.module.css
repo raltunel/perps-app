@@ -25,7 +25,7 @@
   height: auto;
   visibility: visible;
   pointer-events: auto;
-  height: 257px;
+  /* height: 257px; */
 
   z-index: var(--navbar-dropdown-zindex);
   font-family: var(--font-family-main);
