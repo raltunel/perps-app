@@ -9,6 +9,72 @@ export interface appOptionDataIF {
     isDefault: boolean;
 }
 
+const optionsTop: appOptionDataIF[] = [
+    {
+        slug: 'skipOpenOrderConfirm',
+        text: 'Skip Open Order Confirmations',
+        isDefault: false,
+    },
+    {
+        slug: 'skipClosePositionConfirm',
+        text: 'Skip Close Position Confirmations',
+        isDefault: false,
+    },
+    {
+        slug: 'optOutOfSpotDusting',
+        text: 'Opt Out of Spot Dusting',
+        isDefault: false,
+    },
+    {
+        slug: 'persistTradingConnection',
+        text: 'Persist Trading Connection',
+        isDefault: false,
+    },
+];
+
+const optionsBottom: appOptionDataIF[] = [
+    {
+        slug: 'displayVerboseErrors',
+        text: 'Display Verbose Errors',
+        isDefault: false,
+    },
+    {
+        slug: 'disableBackgroundFillNotif',
+        text: 'Disable Background Fill Notifications',
+        isDefault: false,
+    },
+    {
+        slug: 'disableFillSound',
+        text: 'Disable Playing Sound for Fills',
+        isDefault: true,
+    },
+    {
+        slug: 'animateOrderBook',
+        text: 'Animate Order Book',
+        isDefault: true,
+    },
+    {
+        slug: 'orderBookSetSizeOnClk',
+        text: 'Order Book Set Size on Click',
+        isDefault: true,
+    },
+    {
+        slug: 'showBuysSellsOnChart',
+        text: 'Show Buys and Sells on Chart',
+        isDefault: true,
+    },
+    {
+        slug: 'hidePnL',
+        text: 'Hide PnL',
+        isDefault: false,
+    },
+    {
+        slug: 'showAllWarnings',
+        text: 'Show All Warnings',
+        isDefault: true,
+    },
+];
+
 interface propsIF {
     modalControl: useModalIF;
 }
@@ -16,7 +82,7 @@ interface propsIF {
 export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
-    const [checked, setChecked] = useState<string[]>([]);
+    const [checked, setChecked] = useState<string[]>(initializeData());
     function toggleChecked(item: string) {
         const updated: string[] = checked.includes(item)
             ? checked.filter((c: string) => c !== item)
@@ -25,71 +91,18 @@ export default function AppOptions(props: propsIF) {
         setChecked(updated);
     }
 
-    const optionsTop: appOptionDataIF[] = [
-        {
-            slug: 'skipOpenOrderConfirm',
-            text: 'Skip Open Order Confirmations',
-            isDefault: false,
-        },
-        {
-            slug: 'skipClosePositionConfirm',
-            text: 'Skip Close Position Confirmations',
-            isDefault: false,
-        },
-        {
-            slug: 'optOutOfSpotDusting',
-            text: 'Opt Out of Spot Dusting',
-            isDefault: false,
-        },
-        {
-            slug: 'persistTradingConnection',
-            text: 'Persist Trading Connection',
-            isDefault: false,
-        },
-    ];
-
-    const optionsBottom: appOptionDataIF[] = [
-        {
-            slug: 'displayVerboseErrors',
-            text: 'Display Verbose Errors',
-            isDefault: false,
-        },
-        {
-            slug: 'disableBackgroundFillNotif',
-            text: 'Disable Background Fill Notifications',
-            isDefault: false,
-        },
-        {
-            slug: 'disableFillSound',
-            text: 'Disable Playing Sound for Fills',
-            isDefault: true,
-        },
-        {
-            slug: 'animateOrderBook',
-            text: 'Animate Order Book',
-            isDefault: true,
-        },
-        {
-            slug: 'orderBookSetSizeOnClk',
-            text: 'Order Book Set Size on Click',
-            isDefault: true,
-        },
-        {
-            slug: 'showBuysSellsOnChart',
-            text: 'Show Buys and Sells on Chart',
-            isDefault: true,
-        },
-        {
-            slug: 'hidePnL',
-            text: 'Hide PnL',
-            isDefault: false,
-        },
-        {
-            slug: 'showAllWarnings',
-            text: 'Show All Warnings',
-            isDefault: true,
-        },
-    ];
+    function initializeData(): string[] {
+        let initialData: string[];
+        const persisted: string|null = localStorage.getItem('APP_OPTIONS');
+        if (persisted) {
+            initialData = JSON.parse(persisted);
+        } else {
+            initialData = optionsTop.concat(optionsBottom)
+                .filter((opt: appOptionDataIF) => opt.isDefault)
+                .flatMap((opt: appOptionDataIF) => opt.slug);
+        }
+        return initialData;
+    }
 
     function clickConfirm(): void {
         localStorage.setItem('APP_OPTIONS', JSON.stringify(checked));
