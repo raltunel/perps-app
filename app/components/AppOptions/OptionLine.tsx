@@ -5,15 +5,21 @@ import { useState } from 'react';
 
 interface propsIF {
     option: appOptionDataIF;
+    toggle: (item: string) => void;
 }
 
 export default function OptionLine(props: propsIF) {
-    const { option } = props;
+    const { option, toggle } = props;
 
     const [isOn, setIsOn] = useState<boolean>(option.isDefault);
 
+    function handleClick(): void {
+        setIsOn(!isOn);
+        toggle(option.slug);
+    }
+
     return (
-        <li className={styles.option_line} onClick={() => setIsOn(!isOn)}>
+        <li className={styles.option_line} onClick={() => handleClick()}>
             { isOn ? <MdOutlineCheckBox /> : <MdOutlineCheckBoxOutlineBlank /> }
             {option.text}
         </li>

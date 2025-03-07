@@ -1,7 +1,7 @@
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface appOptionDataIF {
     slug: string;
@@ -15,7 +15,15 @@ interface propsIF {
 
 export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
-    
+
+    const [checked, setChecked] = useState<string[]>([]);
+    function toggleChecked(item: string) {
+        const updated: string[] = checked.includes(item)
+            ? checked.filter((c: string) => c !== item)
+            : [...checked, item];
+            console.log(updated);
+        setChecked(updated);
+    }
 
     const optionsTop: appOptionDataIF[] = [
         {
@@ -97,6 +105,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
+                                toggle={toggleChecked}
                             />
                         )
                     )
@@ -110,6 +119,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
+                                toggle={toggleChecked}
                             />
                         )
                     )
