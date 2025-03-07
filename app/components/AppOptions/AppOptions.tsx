@@ -91,6 +91,11 @@ export default function AppOptions(props: propsIF) {
         },
     ];
 
+    function clickConfirm(): void {
+        localStorage.setItem('APP_OPTIONS', JSON.stringify(checked));
+        modalControl.close();
+    }
+
     return (
         <section className={styles.app_options}>
             <header>
@@ -127,7 +132,7 @@ export default function AppOptions(props: propsIF) {
             </ul>
             <footer>
                 <button onClick={modalControl.close}>Cancel</button>
-                <button>Confirm</button>
+                <button onClick={clickConfirm}>Confirm</button>
             </footer>
         </section>
     );
