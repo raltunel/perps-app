@@ -1,3 +1,14 @@
 .app_options {
     background-color: aqua;
 }
+
+.app_options > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app_options > ul {
+    list-style-type: none;
+}
