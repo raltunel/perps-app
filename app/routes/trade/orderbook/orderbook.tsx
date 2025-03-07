@@ -109,26 +109,34 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 <BasicDivider />
 
-<div className={styles.orderBookBlock}>
-      {sells.slice(0, orderCount).reverse().map((order) => (
-        <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
-      ))}
-</div>
+{
+  buys.length > 0 && sells.length > 0 && buys[0].coin === symbol && sells[0].coin === symbol &&
+  (
+    <>
+    <div className={styles.orderBookBlock}>
+          {sells.slice(0, orderCount).reverse().map((order) => (
+            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
+          ))}
+    </div>
+    
+    
+    <div className={styles.orderBookBlockMid}>
+    
+          <div>Spread</div>
+          <div>{selectedResolution?.val}</div>
+          <div>{(assetPrice.current && selectedResolution?.val) && (selectedResolution?.val / assetPrice.current * 100).toFixed(3)}%</div>
+    
+    </div>
+    
+    <div className={styles.orderBookBlock}>
+          {buys.slice(0, orderCount).map((order) => (
+            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
+          ))} 
+    </div>
+    </>
+  )
+}
 
-
-<div className={styles.orderBookBlockMid}>
-
-      <div>Spread</div>
-      <div>{selectedResolution?.val}</div>
-      <div>{(assetPrice.current && selectedResolution?.val) && (selectedResolution?.val / assetPrice.current * 100).toFixed(3)}%</div>
-
-</div>
-
-<div className={styles.orderBookBlock}>
-      {buys.slice(0, orderCount).map((order) => (
-        <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
-      ))} 
-</div>
 
      
     </div>
