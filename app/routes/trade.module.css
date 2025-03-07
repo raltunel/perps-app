@@ -139,8 +139,11 @@
   font-size: .8rem;
   z-index: 2;
   font-family: var(--font-family-main);
-  background-color: red;
   background-color: var(--dark2);
+  border-radius: .4rem;
+  border: 1px solid rgba(255, 255, 255, .2);
+  padding: 0 1.2rem;
+  right: 1rem;
 }
 
 
