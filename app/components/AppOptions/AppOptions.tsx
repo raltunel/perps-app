@@ -123,6 +123,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
+                                isChecked={checked.includes(option.slug)}
                                 toggle={toggleChecked}
                             />
                         )
@@ -137,6 +138,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
+                                isChecked={checked.includes(option.slug)}
                                 toggle={toggleChecked}
                             />
                         )
