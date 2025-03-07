@@ -45,3 +45,12 @@
 .sell .orderTradePrice{
     color: var(--red);
 }
+
+
+div[class*="inverse"] .buy .orderTradePrice{
+    color: var(--red);
+}
+
+div[class*="inverse"] .sell .orderTradePrice{
+    color: var(--green);
+}
