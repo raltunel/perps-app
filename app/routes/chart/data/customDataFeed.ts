@@ -41,7 +41,7 @@ export const createDataFeed = (subscribe: (channel: string, payload: any) => voi
         ticker: symbolName,
         name: symbolName,
         minmov: 1,
-        pricescale: 100,
+        pricescale: 1,
         timezone: "Etc/UTC",
         session: "24x7",
         has_intraday: true,
@@ -57,7 +57,7 @@ export const createDataFeed = (subscribe: (channel: string, payload: any) => voi
         type: "",
         exchange: "",
         listed_exchange: "",
-        format: "volume",
+        format: "price",
       };
       onResolve(symbolInfo);
     },
