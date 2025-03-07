@@ -49,24 +49,16 @@ const WatchList: React.FC<WatchListProps> = ({ }) => {
 
     const newFavCoins:SymbolInfoIF[] = [];
 
-    console.log('>>> payload', payload);
-
     if(payload && payload.meta && payload.meta.universe && payload.assetCtxs){
-
-      console.log('>>>', payload)
-
 
       if(favsRef.current){
         favsRef.current.map(coin => {
 
-          console.log('>>>favsRef')
           const indexOfCoin = payload.meta.universe.findIndex((item:any) => item.name === coin);
           if(indexOfCoin !== undefined){
             const ctxVal = payload.assetCtxs[indexOfCoin];
-            console.log('>>> ctx val', ctxVal)
             
             const coinObject = processSymbolInfo({coin, ctx: ctxVal});
-            console.log('>>> coin obj', coinObject)
             newFavCoins.push(coinObject);
 
           }
@@ -89,11 +81,6 @@ const WatchList: React.FC<WatchListProps> = ({ }) => {
     )
 
   }, [favs])
-
-
-  useEffect(()=>{
-    console.log('>>> fav coins', favCoins);
-  }, [favCoins])
 
 
   return (
