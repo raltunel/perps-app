@@ -10,7 +10,7 @@ interface propsIF {
 export default function OptionLine(props: propsIF) {
     const { option } = props;
 
-    const [isOn, setIsOn] = useState<boolean>(true);
+    const [isOn, setIsOn] = useState<boolean>(option.isDefault);
 
     return (
         <li className={styles.option_line} onClick={() => setIsOn(!isOn)}>

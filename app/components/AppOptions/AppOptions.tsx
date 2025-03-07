@@ -4,6 +4,7 @@ import OptionLine from './OptionLine';
 
 export interface appOptionDataIF {
     text: string;
+    isDefault: boolean;
 }
 
 interface propsIF {
@@ -16,42 +17,54 @@ export default function AppOptions(props: propsIF) {
     const optionsTop: appOptionDataIF[] = [
         {
             text: 'Skip Open Order Confirmations',
+            isDefault: false,
         },
         {
             text: 'Skip Close Position Confirmations',
+            isDefault: false,
         },
         {
             text: 'Opt Out of Spot Dusting',
+            isDefault: false,
         },
         {
             text: 'Persist Trading Connection',
+            isDefault: false,
         },
     ];
 
     const optionsBottom: appOptionDataIF[] = [
         {
             text: 'Display Verbose Errors',
+            isDefault: false,
         },
         {
             text: 'Disable Background Fill Notifications',
+            isDefault: false,
         },
         {
             text: 'Disable Playing Sound for Fills',
+            isDefault: true,
         },
         {
             text: 'Animate Order Book',
+            isDefault: true,
         },
         {
             text: 'Order Book Set Size on Click',
+            isDefault: true,
         },
         {
             text: 'Show Buys and Sells on Chart',
+            isDefault: true,
         },
         {
             text: 'Hide PnL',
+            isDefault: false,
         },
         {
             text: 'Show All Warnings',
+            isDefault: true,
         },
     ];
 
