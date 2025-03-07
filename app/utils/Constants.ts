@@ -51,3 +51,9 @@ export const Langs: LangType[] = [
     
 ]
 
+
+
+export const wsUrls = [
+    'wss://api.hyperliquid.xyz/ws',
+    'wss://pulse-api-mock.liquidity.tools/ws'
+]

@@ -130,3 +130,17 @@
     display: none;
   }
 }
+
+
+.wsUrlSelector{
+  position: fixed;
+  top: 3rem;
+  right: 2rem;
+  font-size: .8rem;
+  z-index: 2;
+  font-family: var(--font-family-main);
+  background-color: red;
+  background-color: var(--dark2);
+}
+
+

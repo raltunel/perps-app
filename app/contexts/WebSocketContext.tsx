@@ -22,16 +22,19 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
   const [message, setMessage] = useState<string | null>(null);
   const [readyState, setReadyState] = useState<number>(WebSocketReadyState.CLOSED);
   const socketRef = useRef<WebSocket | null>(null);
-  const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
-  const reconnectDelay = 3000; // Auto-reconnect delay
 
-  const connectWebSocket = () => {
+  const connectWebSocket = () => { 
+
+    console.log('>>> connectWebSocket', url);
+
     if (!isClient) return; // ✅ Ensure WebSocket only runs on client side
 
+    // Close the previous WebSocket if it exists
     if (socketRef.current) {
       socketRef.current.close();
     }
- 
+
+    // Create a new WebSocket connection
     const socket = new WebSocket(url);
     socketRef.current = socket;
 
@@ -44,11 +47,12 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     };
 
     socket.onclose = () => {
+      console.log('>>> socket closed');
       setReadyState(WebSocketReadyState.CLOSED);
-      reconnectTimeout.current = setTimeout(connectWebSocket, reconnectDelay);
     };
 
     socket.onerror = (error) => {
+      console.error('>>> WebSocket error:', error);
       socket.close();
     };
   };
@@ -57,8 +61,8 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     if (isClient) {
       connectWebSocket();
     }
+
     return () => {
-      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
       socketRef.current?.close();
     };
   }, [url, isClient]); // ✅ Only runs when client-side is ready
@@ -68,27 +72,31 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
       socketRef.current.send(msg);
     }
   };
-  
 
-  const registerWsSubscription = (type: string, payload: any, unsubscribe: boolean = false) => {
-        sendMessage(JSON.stringify(
-          {method: unsubscribe ? "unsubscribe" : "subscribe", 
-            subscription: 
-            {
-              type: type,
-              ...payload
-            }}  
-        ))
+  const registerWsSubscription = (
+    type: string,
+    payload: any,
+    unsubscribe: boolean = false
+  ) => {
+    sendMessage(
+      JSON.stringify({
+        method: unsubscribe ? 'unsubscribe' : 'subscribe',
+        subscription: {
+          type: type,
+          ...payload,
+        },
+      })
+    );
   };
 
   return (
-    <WebSocketContext.Provider value={{ sendMessage, lastMessage: message, readyState, registerWsSubscription}}>
-      {children} 
+    <WebSocketContext.Provider
+      value={{ sendMessage, lastMessage: message, readyState, registerWsSubscription }}
+    >
+      {children}
     </WebSocketContext.Provider>
-    
   );
 };
-
 // Custom Hook to use WebSocket Context
 export const useWebSocketContext = () => {
   const context = useContext(WebSocketContext);

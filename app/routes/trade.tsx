@@ -10,6 +10,9 @@ import TradingViewChart from './chart/chart';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import WatchList from './trade/watchlist/watchlist';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { useDebugStore } from '~/stores/DebugStore';
+import { wsUrls } from '~/utils/Constants';
 export function meta({}: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -21,13 +24,16 @@ export function loader({ context }: Route.LoaderArgs) {
   return { message: context.VALUE_FROM_NETLIFY };
 }
 
-const wsUrl = 'wss://api.hyperliquid.xyz/ws';
+// const wsUrl = 'wss://api.hyperliquid.xyz/ws';
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const {symbol} = useTradeDataStore();
   const { orderBookMode } = useAppSettings();
+
+  const { wsUrl, setWsUrl } = useDebugStore();
+
   
   // const nav = (
   //      {/* Example nav links to each child route */}
@@ -45,6 +51,15 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
  
   // )
   return (
+<>
+<div className={styles.wsUrlSelector}>
+<ComboBox
+  value={wsUrl}
+  options={wsUrls}
+  onChange={(value) => setWsUrl(value)}
+/>
+</div>
+    
     <WebSocketProvider url={wsUrl}>
     <div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
@@ -76,5 +91,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
       {/* <Outlet /> */}
     </div>
     </WebSocketProvider>
+    </>
   );
 }
