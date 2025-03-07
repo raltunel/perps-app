@@ -1,10 +1,16 @@
+import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 
 interface appOptionDataIF {
     text: string;
 }
 
-export default function AppOptions() {
+interface propsIF {
+    modalControl: useModalIF;
+}
+
+export default function AppOptions(props: propsIF) {
+    const { modalControl } = props;
 
     const optionsTop: appOptionDataIF[] = [
         {
@@ -53,7 +59,7 @@ export default function AppOptions() {
             <header>
                 <div />
                 <h2>Options</h2>
-                <button>×</button>
+                <button onClick={modalControl.close}>×</button>
             </header>
             <ul>
                 {
@@ -75,7 +81,7 @@ export default function AppOptions() {
                 }
             </ul>
             <footer>
-                <button>Cancel</button>
+                <button onClick={modalControl.close}>Cancel</button>
                 <button>Confirm</button>
             </footer>
         </section>
