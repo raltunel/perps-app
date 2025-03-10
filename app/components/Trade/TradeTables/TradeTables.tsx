@@ -4,6 +4,7 @@ import styles from './TradeTable.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import BalancesTable from '../BalancesTable/BalancesTable';
 
 export interface FilterOption {
   id: string;
@@ -74,9 +75,7 @@ export default function TradeTable(props: TradeTableProps) {
     switch (activeTab) {
       case 'Balances':
         return (
-          <div className={styles.emptyState}>
-            Balances data will appear here
-          </div>
+          <BalancesTable/>
         );
 
       case 'Positions':
