@@ -4,6 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "build": "react-router build && node netlify/prepare.js",
         "dev": "cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
         "perp": "cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
         "perps": "cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
