@@ -28,6 +28,8 @@ export function useNumFormatter() {
   }, [parseNum]);
 
 
+
+
   const formatNum = useCallback((num: number | string, precision?: number) => {
 
     const formatType = numFormat.value;
@@ -43,10 +45,14 @@ export function useNumFormatter() {
 
   }, [numFormat, parseNum, getDefaultPrecision]);
 
+  const formatPriceForChart = useCallback((num: number | string) => {
+    const precision = Math.max(5 - Math.floor(Math.log10(Math.abs(parseInt(num.toString())) + 1)), 0) - 1;
+    return formatNum(num, precision >= 0 ? precision : 0);
+  }, [formatNum]);
+  
 
 
-
-  return { formatNum };
+  return { formatNum, formatPriceForChart };
 }
 
 export default useNumFormatter;
