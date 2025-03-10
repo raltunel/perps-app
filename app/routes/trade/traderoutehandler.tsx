@@ -19,7 +19,9 @@ export default function TradeRouteHandler() {
     const activeSymbol = getLS('activeCoin');
     if(activeSymbol){
       setSymbol(activeSymbol);
-    } 
+    } else{
+       setSymbol('BTC');
+    }
   }, []);
 
   const checkSymbol = async () => {
