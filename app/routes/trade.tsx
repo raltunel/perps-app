@@ -18,6 +18,7 @@ import { wsUrls } from '~/utils/Constants';
 import { getLS } from '~/utils/AppUtils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
+import TradeModules from './trade/trademodules/trademodules';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -91,7 +92,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}></div>
+              <div className={styles.tradeModules}><TradeModules /></div>
             </section>
             <section className={styles.containerBottom}>
                 <div className={styles.table}>table</div>

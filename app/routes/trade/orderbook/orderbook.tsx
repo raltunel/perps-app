@@ -26,12 +26,41 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
 
+    const [userBuyIndices, setUserBuyIndices] = useState<number[]>([]);
+    const [userSellIndices, setUserSellIndices] = useState<number[]>([]);
+
+    const addFakeBuySellsToOrderBook = () => {
+      const buysIndices:number[] = [];
+      const sellsIndices:number[] = [];
+      for (let i = 0; i < 2; i++) {
+        const tempIndex = Math.floor(Math.random() * orderCount);
+        if(buysIndices.includes(tempIndex)){
+          i--;
+          continue;
+        }
+        buysIndices.push(tempIndex);
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const tempIndex = Math.floor(Math.random() * orderCount);
+        if(sellsIndices.includes(tempIndex)){
+          i--;
+          continue;
+        }
+        sellsIndices.push(tempIndex);
+      }
+
+      setUserBuyIndices(buysIndices);
+      setUserSellIndices(sellsIndices);
+    }
+
     const changeSubscription = (payload: any) => {
       subscribe('l2Book', 
         {payload: payload,
         handler: (payload) => {
           const {sells, buys} = processOrderBookMessage(payload, orderCount);
           setOrderBook(buys, sells);
+          addFakeBuySellsToOrderBook();
         },
         single: true
       })
@@ -114,8 +143,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
   (
     <>
     <div className={styles.orderBookBlock}>
-          {sells.slice(0, orderCount).reverse().map((order) => (
-            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
+          {sells.slice(0, orderCount).reverse().map((order, index) => (
+            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
+            hasUserOrder={userSellIndices.includes(index)} />
           ))}
     </div>
     
@@ -129,8 +159,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     </div>
     
     <div className={styles.orderBookBlock}>
-          {buys.slice(0, orderCount).map((order) => (
-            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} />
+          {buys.slice(0, orderCount).map((order, index) => (
+            <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
+            hasUserOrder={userBuyIndices.includes(index)} />
           ))} 
     </div>
     </>

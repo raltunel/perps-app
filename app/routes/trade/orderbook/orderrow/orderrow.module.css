@@ -38,6 +38,7 @@
     font-size: .8rem;
     /* animation: fadeIn 0.1s ease-in-out; */
     padding: 0 .5rem;
+    cursor: pointer;
 }
 
 
@@ -96,4 +97,15 @@
 
 .orderRow.sell .fadeOverlay{
     background-color: var(--red);
+}
+
+.userOrderIndicator{
+    position: absolute;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 100%;
+    background-color: white;
 }
