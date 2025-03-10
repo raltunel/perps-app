@@ -7,9 +7,10 @@
 */
 .root-container {
   display: grid;
-  grid-template-rows: 56px 1fr 56px;
+  grid-template-rows: 56px 1fr;
   height: 100vh;
   color: white;
+  /* overflow-y: hidden; */
 }
 
 /* 
@@ -18,14 +19,15 @@
 */
 .content {
  height: 100%;
+ overflow-y: auto;
   /* background: var(--dark3); */
   padding: 0px var(--main-padding, 8px) var(--main-padding, 8px) var(--main-padding, 8px);
+ 
 
 }
 
 /* Simple styling examples for header/footer */
-.header,
-.footer {
+.header {
  height: 56px;
  display: flex;
  flex-direction: row;

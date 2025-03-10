@@ -1,5 +1,5 @@
-import React from 'react';
 import styles from './BalancesTable.module.css';
+import SortIcon from '~/components/Vault/SortIcon';
 // import SortIcon from './SortIcon';
 
 export interface HeaderCell {
@@ -13,7 +13,7 @@ export interface HeaderCell {
 export default function BalancesTableHeader() {
   const handleSort = (key: string) => {
     console.log(`Sorting by: ${key}`);
-    // Implement your sorting logic here
+    
   };
 
   const tableHeaders: HeaderCell[] = [
@@ -67,7 +67,7 @@ export default function BalancesTableHeader() {
       className: 'contractCell',
     },
     {
-      name: '', // Empty header for action column
+      name: '', 
       key: 'action',
       sortable: false,
       onClick: undefined,
@@ -85,8 +85,8 @@ export default function BalancesTableHeader() {
         >
           {header.name}
               {header.sortable &&
-                  //   <SortIcon />
-                  <p>*</p>
+                    <SortIcon />
+              
               }
         </div>
       ))}

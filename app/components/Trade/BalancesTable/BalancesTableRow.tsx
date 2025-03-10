@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './BalancesTable.module.css';
 
 export interface BalanceData {

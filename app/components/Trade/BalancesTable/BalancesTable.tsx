@@ -10,6 +10,8 @@ export default function BalancesTable() {
   return (
     <div className={styles.tableWrapper}>
       <BalancesTableHeader />
+      <div className={styles.tableBody}>
+
       
       {balanceData.map((balance, index) => (
         <BalancesTableRow key={`balance-${index}`} balance={balance} />
@@ -20,6 +22,7 @@ export default function BalancesTable() {
           No data to display
         </div>
       )}
+      </div>
     </div>
   );
 }
