@@ -42,9 +42,7 @@ export default function App() {
           <Outlet />
         </main>
 
-        <footer className='footer'>
-          <p>Footer</p>
-        </footer>
+       
       </div>
     </Layout>
   );

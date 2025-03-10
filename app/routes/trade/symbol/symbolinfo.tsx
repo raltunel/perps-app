@@ -7,6 +7,7 @@ import { processSymbolInfo } from '~/processors/processSymbolInfo';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useNavigate } from 'react-router';
 
 interface SymbolInfoProps {
 }
@@ -29,6 +30,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   const {subscribe, unsubscribeAllByChannel} = useWsObserver();
 
   const {symbol, setSymbol, setSymbolInfo, symbolInfo} = useTradeDataStore();
+
+  const navigate = useNavigate();
 
   const { formatNum } = useNumFormatter();
 
@@ -69,7 +72,9 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
         <ComboBox
           value={symbol}
           options={symbolList}
-          onChange={(value) => setSymbol(value)}
+          onChange={(value) => {
+            navigate(`/trade/${value}`);
+          }}
           modifyOptions={(value) => value += '-USD'}
           modifyValue={(value) => value += '-USD'}
           type={'big-val'}
