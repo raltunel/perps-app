@@ -1,7 +1,7 @@
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAppOptions, type appOptions } from '~/stores/AppOptionsStore';
 
 export interface appOptionDataIF {
@@ -92,13 +92,24 @@ export default function AppOptions(props: propsIF) {
         return initialData;
     }
 
-    function clickConfirm(): void {
-        localStorage.setItem('APP_OPTIONS', JSON.stringify(checked));
-        modalControl.close();
-    }
-
     const activeOptions = useAppOptions();
     console.log(activeOptions);
+
+    const shouldToggleOnClose = useRef<appOptions[]>([]);
+    function markForUpdate(o: appOptions): void {
+        let output: appOptions[];
+        shouldToggleOnClose.current.includes(o)
+            ? output = shouldToggleOnClose.current.filter((e) => e !== o)
+            : output = [...shouldToggleOnClose.current, o];
+        shouldToggleOnClose.current = output;
+    }
+
+    function clickConfirm(): void {
+        // localStorage.setItem('APP_OPTIONS', JSON.stringify(checked));
+        console.log(shouldToggleOnClose.current);
+        shouldToggleOnClose.current.forEach((elem: appOptions) => activeOptions.toggle(elem));
+        modalControl.close();
+    }
 
     return (
         <section className={styles.app_options}>
@@ -114,8 +125,8 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isChecked={activeOptions[option.slug]}
-                                toggle={toggleChecked}
+                                isEnabled={activeOptions[option.slug] === true}
+                                markForUpdate={() => markForUpdate(option.slug)}
                             />
                         )
                     )
@@ -129,8 +140,8 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isChecked={activeOptions[option.slug]}
-                                toggle={toggleChecked}
+                                isEnabled={activeOptions[option.slug]}
+                                markForUpdate={() => markForUpdate(option.slug)}
                             />
                         )
                     )
