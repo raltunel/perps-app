@@ -31,6 +31,7 @@ export interface useAppOptionsIF {
     enable: (o: appOptions) => void;
     disable: (o: appOptions) => void;
     toggle: (o: appOptions|appOptions[]) => void;
+    applyDefaults: () => void;
 }
 
 const LS_KEY = 'APP_OPTIONS';
@@ -66,6 +67,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
                     set(changes);
                 }
             },
+            applyDefaults: (): void => set(DEFAULTS),
         }),
         {
             name: LS_KEY,

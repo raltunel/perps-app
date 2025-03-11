@@ -117,6 +117,9 @@ export default function AppOptions(props: propsIF) {
                     )
                 }
             </ul>
+            <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
+                Apply Defaults
+            </div>
         </section>
     );
 }

@@ -1,4 +1,6 @@
 .app_options {
+    display: flex;
+    flex-direction: column;
     user-select: none;
     background-color: aqua;
 }
@@ -12,4 +14,10 @@
 
 .app_options > ul {
     list-style-type: none;
+}
+
+.apply_defaults {
+    align-self: center;
+    cursor: pointer;
+    background-color: pink;
 }
