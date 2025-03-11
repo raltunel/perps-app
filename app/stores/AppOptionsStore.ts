@@ -15,7 +15,7 @@ export type appOptions =
     | 'showPnL'
     | 'showAllWarnings';
 
-type useAppOptionsIF = {
+export interface useAppOptionsIF {
     skipOpenOrderConfirm: boolean;
     skipClosePositionConfirm: boolean;
     optOutSpotDusting: boolean;

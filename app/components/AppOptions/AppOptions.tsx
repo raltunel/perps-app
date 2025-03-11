@@ -1,8 +1,8 @@
+import { useRef } from 'react';
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
-import { useEffect, useRef, useState } from 'react';
-import { useAppOptions, type appOptions } from '~/stores/AppOptionsStore';
+import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -70,30 +70,7 @@ interface propsIF {
 export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
-    const [checked, setChecked] = useState<string[]>(initializeData());
-    function toggleChecked(item: string) {
-        const updated: string[] = checked.includes(item)
-            ? checked.filter((c: string) => c !== item)
-            : [...checked, item];
-            console.log(updated);
-        setChecked(updated);
-    }
-
-    function initializeData(): string[] {
-        let initialData: string[];
-        const persisted: string|null = localStorage.getItem('APP_OPTIONS');
-        if (persisted) {
-            initialData = JSON.parse(persisted);
-        } else {
-            initialData = optionsTop.concat(optionsBottom)
-                .filter((opt: appOptionDataIF) => opt.isDefault)
-                .flatMap((opt: appOptionDataIF) => opt.slug);
-        }
-        return initialData;
-    }
-
-    const activeOptions = useAppOptions();
-    console.log(activeOptions);
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const shouldToggleOnClose = useRef<appOptions[]>([]);
     function markForUpdate(o: appOptions): void {
@@ -105,8 +82,6 @@ export default function AppOptions(props: propsIF) {
     }
 
     function clickConfirm(): void {
-        // localStorage.setItem('APP_OPTIONS', JSON.stringify(checked));
-        console.log(shouldToggleOnClose.current);
         shouldToggleOnClose.current.forEach((elem: appOptions) => activeOptions.toggle(elem));
         modalControl.close();
     }
