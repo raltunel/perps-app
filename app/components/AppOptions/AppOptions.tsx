@@ -2,33 +2,29 @@ import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import { useEffect, useState } from 'react';
+import { useAppOptions, type appOptions } from '~/stores/AppOptionsStore';
 
 export interface appOptionDataIF {
-    slug: string;
+    slug: appOptions;
     text: string;
-    isDefault: boolean;
 }
 
 const optionsTop: appOptionDataIF[] = [
     {
         slug: 'skipOpenOrderConfirm',
         text: 'Skip Open Order Confirmations',
-        isDefault: false,
     },
     {
         slug: 'skipClosePositionConfirm',
         text: 'Skip Close Position Confirmations',
-        isDefault: false,
     },
     {
-        slug: 'optOutOfSpotDusting',
+        slug: 'optOutSpotDusting',
         text: 'Opt Out of Spot Dusting',
-        isDefault: false,
     },
     {
         slug: 'persistTradingConnection',
         text: 'Persist Trading Connection',
-        isDefault: false,
     },
 ];
 
@@ -36,42 +32,34 @@ const optionsBottom: appOptionDataIF[] = [
     {
         slug: 'displayVerboseErrors',
         text: 'Display Verbose Errors',
-        isDefault: false,
     },
     {
-        slug: 'disableBackgroundFillNotif',
-        text: 'Disable Background Fill Notifications',
-        isDefault: false,
+        slug: 'enableBackgroundFillNotif',
+        text: 'Enable Background Fill Notifications',
     },
     {
-        slug: 'disableFillSound',
-        text: 'Disable Playing Sound for Fills',
-        isDefault: true,
+        slug: 'playFillSound',
+        text: 'Play Sound for Fills',
     },
     {
         slug: 'animateOrderBook',
         text: 'Animate Order Book',
-        isDefault: true,
     },
     {
-        slug: 'orderBookSetSizeOnClk',
+        slug: 'clickToSetOrderBookSize',
         text: 'Order Book Set Size on Click',
-        isDefault: true,
     },
     {
         slug: 'showBuysSellsOnChart',
         text: 'Show Buys and Sells on Chart',
-        isDefault: true,
     },
     {
-        slug: 'hidePnL',
-        text: 'Hide PnL',
-        isDefault: false,
+        slug: 'showPnL',
+        text: 'Show PnL',
     },
     {
         slug: 'showAllWarnings',
         text: 'Show All Warnings',
-        isDefault: true,
     },
 ];
 
@@ -109,6 +97,9 @@ export default function AppOptions(props: propsIF) {
         modalControl.close();
     }
 
+    const activeOptions = useAppOptions();
+    console.log(activeOptions);
+
     return (
         <section className={styles.app_options}>
             <header>
@@ -123,7 +114,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isChecked={checked.includes(option.slug)}
+                                isChecked={activeOptions[option.slug]}
                                 toggle={toggleChecked}
                             />
                         )
@@ -138,7 +129,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isChecked={checked.includes(option.slug)}
+                                isChecked={activeOptions[option.slug]}
                                 toggle={toggleChecked}
                             />
                         )

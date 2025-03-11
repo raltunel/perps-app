@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-type options = 
+export type appOptions = 
     | 'skipOpenOrderConfirm'
     | 'skipClosePositionConfirm'
     | 'optOutSpotDusting'
@@ -28,9 +28,9 @@ type useAppOptionsIF = {
     showBuysSellsOnChart: boolean;
     showPnL: boolean;
     showAllWarnings: boolean;
-    enable: (o: options) => void;
-    disable: (o: options) => void;
-    toggle: (o: options) => void;
+    enable: (o: appOptions) => void;
+    disable: (o: appOptions) => void;
+    toggle: (o: appOptions) => void;
 }
 
 const LS_KEY = 'APP_OPTIONS';
@@ -50,7 +50,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
             showBuysSellsOnChart: true,
             showPnL: true,
             showAllWarnings: true,
-            enable: (o: options) => {
+            enable: (o: appOptions) => {
                 o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: true});
                 o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: true});
                 o === 'optOutSpotDusting' && set({optOutSpotDusting: true});
@@ -64,7 +64,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
                 o === 'showPnL' && set({showPnL: true});
                 o === 'showAllWarnings' && set({showAllWarnings: true});
             },
-            disable: (o: options) => {
+            disable: (o: appOptions) => {
                 o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: false});
                 o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: false});
                 o === 'optOutSpotDusting' && set({optOutSpotDusting: false});
@@ -78,7 +78,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
                 o === 'showPnL' && set({showPnL: false});
                 o === 'showAllWarnings' && set({showAllWarnings: false});
             },
-            toggle: (o: options) => {
+            toggle: (o: appOptions) => {
                 o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: !get()[o]});
                 o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: !get()[o]});
                 o === 'optOutSpotDusting' && set({optOutSpotDusting: !get()[o]});
