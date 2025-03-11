@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from './BasicMenu.module.css';
 import { FaChevronDown } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
+import useOutsideClick from "~/hooks/useOutsideClick";
 
 
 export interface BasicMenuItemIF {
@@ -19,14 +20,19 @@ interface BasicMenuProps {
 
 const BasicMenu: React.FC<BasicMenuProps> = ({ items, positionVertical = 'bottom', positionHorizontal = 'right', icon = <BsThreeDots />}) => {
 
-
     const [isOpen, setIsOpen] = useState(false);
+
+
+
+    const basicMenuRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsOpen(false);
+    }, isOpen);
 
 
   return (
 <>
 
-<div className={styles.basicMenuWrapper}>
+<div className={styles.basicMenuWrapper} ref={basicMenuRef}>
 
     <div className={`${styles.triggerWrapper} ${isOpen ? styles.active : ''}`} onClick={() => setIsOpen(!isOpen)}>
         {icon}
