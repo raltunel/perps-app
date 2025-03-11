@@ -63,7 +63,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
                 if (Array.isArray(o)) {
                     const changes: Partial<Record<appOptions, boolean>> = {};
                     o.forEach((opt: appOptions) => changes[opt] = !get()[opt]);
-                    set({...changes});
+                    set(changes);
                 }
             },
         }),
