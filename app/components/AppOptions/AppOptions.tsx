@@ -81,11 +81,6 @@ export default function AppOptions(props: propsIF) {
         shouldToggleOnClose.current = output;
     }
 
-    function clickConfirm(): void {
-        activeOptions.toggle(shouldToggleOnClose.current);
-        modalControl.close();
-    }
-
     return (
         <section className={styles.app_options}>
             <header>
@@ -100,8 +95,8 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isEnabled={activeOptions[option.slug]}
-                                markForUpdate={() => markForUpdate(option.slug)}
+                                isChecked={activeOptions[option.slug]}
+                                toggle={() => activeOptions.toggle(option.slug)}
                             />
                         )
                     )
@@ -115,17 +110,13 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isEnabled={activeOptions[option.slug]}
-                                markForUpdate={() => markForUpdate(option.slug)}
+                                isChecked={activeOptions[option.slug] === true}
+                                toggle={() => activeOptions.toggle(option.slug)}
                             />
                         )
                     )
                 }
             </ul>
-            <footer>
-                <button onClick={modalControl.close}>Cancel</button>
-                <button onClick={clickConfirm}>Confirm</button>
-            </footer>
         </section>
     );
 }
