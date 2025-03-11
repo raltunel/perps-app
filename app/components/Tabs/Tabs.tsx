@@ -29,8 +29,9 @@ export function Tab(props: TabProps) {
   );
 }
 
+// Modified interface to accept both simple strings and objects with id/label
 export interface TabsProps {
-  tabs: string[];
+  tabs: Array<string | { id: string; label: string }>;
   defaultTab?: string;
   onTabChange?: (tab: string) => void;
   rightContent?: React.ReactNode;
@@ -38,17 +39,31 @@ export interface TabsProps {
 
 export default function Tabs(props: TabsProps) {
   const { tabs, defaultTab, onTabChange, rightContent } = props;
-  const [activeTab, setActiveTab] = useState<string>(defaultTab || tabs[0]);
+  
+  // Function to get tab ID (either the string itself or the id property)
+  const getTabId = (tab: string | { id: string; label: string }): string => {
+    return typeof tab === 'string' ? tab : tab.id;
+  };
+  
+  // Function to get tab label (either the string itself or the label property)
+  const getTabLabel = (tab: string | { id: string; label: string }): string => {
+    return typeof tab === 'string' ? tab : tab.label;
+  };
+  
+  // Set default active tab
+  const defaultTabId = defaultTab || getTabId(tabs[0]);
+  const [activeTab, setActiveTab] = useState<string>(defaultTabId);
+  
   const tabsListRef = useRef<HTMLDivElement>(null);
   const tabsWrapperRef = useRef<HTMLDivElement>(null);
   
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
     if (onTabChange) {
-      onTabChange(tab);
+      onTabChange(tabId);
     }
   };
   
@@ -159,14 +174,19 @@ export default function Tabs(props: TabsProps) {
           ref={tabsListRef}
           onScroll={checkScroll}
         >
-          {tabs.map((tab) => (
-            <Tab
-              key={tab}
-              label={tab}
-              isActive={activeTab === tab}
-              onClick={() => handleTabClick(tab)}
-            />
-          ))}
+          {tabs.map((tab) => {
+            const tabId = getTabId(tab);
+            const tabLabel = getTabLabel(tab);
+            
+            return (
+              <Tab
+                key={tabId} // Ensure unique key
+                label={tabLabel}
+                isActive={activeTab === tabId}
+                onClick={() => handleTabClick(tabId)}
+              />
+            );
+          })}
         </div>
         
         {/* Right scroll arrow */}
