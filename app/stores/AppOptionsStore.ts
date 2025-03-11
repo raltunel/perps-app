@@ -35,21 +35,25 @@ export interface useAppOptionsIF {
 
 const LS_KEY = 'APP_OPTIONS';
 
+const DEFAULTS: Record<appOptions, boolean> = {
+    skipOpenOrderConfirm: false,
+    skipClosePositionConfirm: false,
+    optOutSpotDusting: false,
+    persistTradingConnection: false,
+    displayVerboseErrors: false,
+    enableBackgroundFillNotif: true,
+    playFillSound: false,
+    animateOrderBook: true,
+    clickToSetOrderBookSize: true,
+    showBuysSellsOnChart: true,
+    showPnL: true,
+    showAllWarnings: true,
+}
+
 export const useAppOptions = create<useAppOptionsIF>()(
     persist(
         (set, get) => ({
-            skipOpenOrderConfirm: false,
-            skipClosePositionConfirm: false,
-            optOutSpotDusting: false,
-            persistTradingConnection: false,
-            displayVerboseErrors: false,
-            enableBackgroundFillNotif: true,
-            playFillSound: false,
-            animateOrderBook: true,
-            clickToSetOrderBookSize: true,
-            showBuysSellsOnChart: true,
-            showPnL: true,
-            showAllWarnings: true,
+            ...DEFAULTS,
             enable: (o: appOptions): void => set({[o]: true}),
             disable: (o: appOptions): void => set({[o]: false}),
             toggle: (o: appOptions|appOptions[]): void => {
@@ -61,7 +65,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
                     o.forEach((opt: appOptions) => changes[opt] = !get()[opt]);
                     set({...changes});
                 }
-            }
+            },
         }),
         {
             name: LS_KEY,
