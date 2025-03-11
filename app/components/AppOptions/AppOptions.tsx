@@ -82,7 +82,8 @@ export default function AppOptions(props: propsIF) {
     }
 
     function clickConfirm(): void {
-        shouldToggleOnClose.current.forEach((elem: appOptions) => activeOptions.toggle(elem));
+        // shouldToggleOnClose.current.forEach((elem: appOptions) => activeOptions.toggle(elem));
+        activeOptions.multiToggle(shouldToggleOnClose.current);
         modalControl.close();
     }
 
