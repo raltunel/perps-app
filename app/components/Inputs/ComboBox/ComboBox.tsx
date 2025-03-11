@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from './ComboBox.module.css';
 import { FaChevronDown } from "react-icons/fa";
+import useOutsideClick from "~/hooks/useOutsideClick";
 
 interface ComboBoxProps {
   value: any;
@@ -15,6 +16,9 @@ interface ComboBoxProps {
 const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange, modifyOptions, modifyValue, type }) => {
 
   const [isOpen, setIsOpen] = useState(false);
+  const comboBoxRef = useOutsideClick<HTMLDivElement>(() => {
+    setIsOpen(false);
+  }, isOpen);
 
   const optionOnClick = (option: any) => {
     onChange(fieldName ? option[fieldName] : option);
@@ -32,7 +36,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({ value, options, fieldName, onChange
 
   return (
 <>
-<div className={`${styles.comboBoxContainer} ${getClassName()}`}>  
+<div className={`${styles.comboBoxContainer} ${getClassName()}`} ref={comboBoxRef}>  
   <div className={styles.comboBoxValueContainer} onClick={() => setIsOpen(!isOpen)}>
 <div className={styles.comboBoxValue} >{modifyValue ? modifyValue(value) : value} </div>
 <FaChevronDown className={`${styles.comboBoxIcon} ${isOpen ? styles.comboBoxIconOpen : ''}`} />
