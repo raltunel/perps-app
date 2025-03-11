@@ -50,48 +50,9 @@ export const useAppOptions = create<useAppOptionsIF>()(
             showBuysSellsOnChart: true,
             showPnL: true,
             showAllWarnings: true,
-            enable: (o: appOptions) => {
-                o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: true});
-                o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: true});
-                o === 'optOutSpotDusting' && set({optOutSpotDusting: true});
-                o === 'persistTradingConnection' && set({persistTradingConnection: true});
-                o === 'displayVerboseErrors' && set({displayVerboseErrors: true});
-                o === 'enableBackgroundFillNotif' && set({enableBackgroundFillNotif: true});
-                o === 'playFillSound' && set({playFillSound: true});
-                o === 'animateOrderBook' && set({animateOrderBook: true});
-                o === 'clickToSetOrderBookSize' && set({clickToSetOrderBookSize: true});
-                o === 'showBuysSellsOnChart' && set({showBuysSellsOnChart: true});
-                o === 'showPnL' && set({showPnL: true});
-                o === 'showAllWarnings' && set({showAllWarnings: true});
-            },
-            disable: (o: appOptions) => {
-                o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: false});
-                o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: false});
-                o === 'optOutSpotDusting' && set({optOutSpotDusting: false});
-                o === 'persistTradingConnection' && set({persistTradingConnection: false});
-                o === 'displayVerboseErrors' && set({displayVerboseErrors: false});
-                o === 'enableBackgroundFillNotif' && set({enableBackgroundFillNotif: false});
-                o === 'playFillSound' && set({playFillSound: false});
-                o === 'animateOrderBook' && set({animateOrderBook: false});
-                o === 'clickToSetOrderBookSize' && set({clickToSetOrderBookSize: false});
-                o === 'showBuysSellsOnChart' && set({showBuysSellsOnChart: false});
-                o === 'showPnL' && set({showPnL: false});
-                o === 'showAllWarnings' && set({showAllWarnings: false});
-            },
-            toggle: (o: appOptions) => {
-                o === 'skipOpenOrderConfirm' && set({skipOpenOrderConfirm: !get()[o]});
-                o === 'skipClosePositionConfirm' && set({skipClosePositionConfirm: !get()[o]});
-                o === 'optOutSpotDusting' && set({optOutSpotDusting: !get()[o]});
-                o === 'persistTradingConnection' && set({persistTradingConnection: !get()[o]});
-                o === 'displayVerboseErrors' && set({displayVerboseErrors: !get()[o]});
-                o === 'enableBackgroundFillNotif' && set({enableBackgroundFillNotif: !get()[o]});
-                o === 'playFillSound' && set({playFillSound: !get()[o]});
-                o === 'animateOrderBook' && set({animateOrderBook: !get()[o]});
-                o === 'clickToSetOrderBookSize' && set({clickToSetOrderBookSize: !get()[o]});
-                o === 'showBuysSellsOnChart' && set({showBuysSellsOnChart: !get()[o]});
-                o === 'showPnL' && set({showPnL: !get()[o]});
-                o === 'showAllWarnings' && set({showAllWarnings: !get()[o]});
-            },
+            enable: (o: appOptions) => set({[o]: true}),
+            disable: (o: appOptions) => set({[o]: false}),
+            toggle: (o: appOptions) => set({[o]: !get()[o]}),
         }),
         {
             name: LS_KEY,
