@@ -174,13 +174,13 @@ export default function Tabs(props: TabsProps) {
           ref={tabsListRef}
           onScroll={checkScroll}
         >
-          {tabs.map((tab) => {
+          {tabs.map((tab, idx) => {
             const tabId = getTabId(tab);
             const tabLabel = getTabLabel(tab);
             
             return (
               <Tab
-                key={tabId} // Ensure unique key
+                key={tabId + tabLabel + idx} // Ensure unique key
                 label={tabLabel}
                 isActive={activeTab === tabId}
                 onClick={() => handleTabClick(tabId)}
