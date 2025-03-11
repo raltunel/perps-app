@@ -30,8 +30,7 @@ export interface useAppOptionsIF {
     showAllWarnings: boolean;
     enable: (o: appOptions) => void;
     disable: (o: appOptions) => void;
-    toggle: (o: appOptions) => void;
-    multiToggle: (o: appOptions[]) => void;
+    toggle: (o: appOptions|appOptions[]) => void;
 }
 
 const LS_KEY = 'APP_OPTIONS';
@@ -53,16 +52,15 @@ export const useAppOptions = create<useAppOptionsIF>()(
             showAllWarnings: true,
             enable: (o: appOptions): void => set({[o]: true}),
             disable: (o: appOptions): void => set({[o]: false}),
-            toggle: (o: appOptions): void => {
-                console.log('updating: ' + o);
-                console.log(typeof o);
-                set({[o]: !get()[o]});
-            },
-            multiToggle: (o: appOptions[]): void => {
-                console.log('multi-toggle!');
-                const changes: Partial<Record<appOptions, boolean>> = {};
-                o.forEach((opt: appOptions) => changes[opt] = !get()[opt])
-                set({...changes});
+            toggle: (o: appOptions|appOptions[]): void => {
+                if (typeof o === 'string') {
+                    set({[o]: !get()[o]});
+                }
+                if (Array.isArray(o)) {
+                    const changes: Partial<Record<appOptions, boolean>> = {};
+                    o.forEach((opt: appOptions) => changes[opt] = !get()[opt]);
+                    set({...changes});
+                }
             }
         }),
         {

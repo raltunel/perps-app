@@ -82,8 +82,7 @@ export default function AppOptions(props: propsIF) {
     }
 
     function clickConfirm(): void {
-        // shouldToggleOnClose.current.forEach((elem: appOptions) => activeOptions.toggle(elem));
-        activeOptions.multiToggle(shouldToggleOnClose.current);
+        activeOptions.toggle(shouldToggleOnClose.current);
         modalControl.close();
     }
 
@@ -101,7 +100,7 @@ export default function AppOptions(props: propsIF) {
                             <OptionLine
                                 key={JSON.stringify(option)}
                                 option={option}
-                                isEnabled={activeOptions[option.slug] === true}
+                                isEnabled={activeOptions[option.slug]}
                                 markForUpdate={() => markForUpdate(option.slug)}
                             />
                         )
