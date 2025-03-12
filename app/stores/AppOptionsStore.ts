@@ -21,7 +21,7 @@ export type appOptions = keyof typeof DEFAULTS;
 export interface useAppOptionsIF extends Record<appOptions, boolean> {
     enable: (o: appOptions) => void;
     disable: (o: appOptions) => void;
-    toggle: (o: appOptions|appOptions[]) => void;
+    toggle: (o: appOptions) => void;
     applyDefaults: () => void;
 }
 
@@ -33,16 +33,7 @@ export const useAppOptions = create<useAppOptionsIF>()(
             ...DEFAULTS,
             enable: (o: appOptions): void => set({[o]: true}),
             disable: (o: appOptions): void => set({[o]: false}),
-            toggle: (o: appOptions|appOptions[]): void => {
-                if (typeof o === 'string') {
-                    set({[o]: !get()[o]});
-                }
-                if (Array.isArray(o)) {
-                    const changes: Partial<Record<appOptions, boolean>> = {};
-                    o.forEach((opt: appOptions) => changes[opt] = !get()[opt]);
-                    set(changes);
-                }
-            },
+            toggle: (o: appOptions): void => set({[o]: !get()[o]}),
             applyDefaults: (): void => set(DEFAULTS),
         }),
         {
