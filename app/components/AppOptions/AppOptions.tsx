@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
@@ -71,15 +70,6 @@ export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
     const activeOptions: useAppOptionsIF = useAppOptions();
-
-    const shouldToggleOnClose = useRef<appOptions[]>([]);
-    function markForUpdate(o: appOptions): void {
-        let output: appOptions[];
-        shouldToggleOnClose.current.includes(o)
-            ? output = shouldToggleOnClose.current.filter((e) => e !== o)
-            : output = [...shouldToggleOnClose.current, o];
-        shouldToggleOnClose.current = output;
-    }
 
     return (
         <section className={styles.app_options}>
