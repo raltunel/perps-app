@@ -1,4 +1,4 @@
-import styles from './OptionLIne.module.css';
+import styles from './OptionLine.module.css';
 import type { appOptionDataIF } from './AppOptions';
 import { FaCheck } from 'react-icons/fa';
 
