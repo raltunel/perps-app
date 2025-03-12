@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
 interface propsIF {
@@ -17,6 +17,15 @@ export default function Modal(props: propsIF) {
         // close the modal if area outside the body was clicked directly
         target.id === OUTSIDE_MODAL_DOM_ID && close();
     }
+
+    useEffect(() => {
+        const EVENT_TYPE = 'keydown';
+        function handleEscape(evt: KeyboardEvent) {
+            evt.key === 'Escape' && close();
+        }
+        document.addEventListener(EVENT_TYPE, handleEscape);
+        return (() => document.removeEventListener(EVENT_TYPE, handleEscape));
+    }, []);
 
     return (
         <div
