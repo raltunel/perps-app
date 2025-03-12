@@ -13,7 +13,7 @@ export default function Modal(props: propsIF) {
     const OUTSIDE_MODAL_DOM_ID = 'outside_modal';
 
     // fn to handle a click outside the modal body
-    function handleOutsideClick(target: HTMLElement): void {
+    function handleOutsideClick(target: HTMLDivElement): void {
         // close the modal if area outside the body was clicked directly
         target.id === OUTSIDE_MODAL_DOM_ID && close();
     }
