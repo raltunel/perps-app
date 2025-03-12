@@ -18,12 +18,17 @@ export default function Modal(props: propsIF) {
         target.id === OUTSIDE_MODAL_DOM_ID && close();
     }
 
+    // event listener to close modal on `Escape` keydown event
     useEffect(() => {
+        // type of event
         const EVENT_TYPE = 'keydown';
-        function handleEscape(evt: KeyboardEvent) {
+        // fn to close modal when the `Escape` key is pressed
+        function handleEscape(evt: KeyboardEvent): void {
             evt.key === 'Escape' && close();
         }
+        // add the event listener to the DOM
         document.addEventListener(EVENT_TYPE, handleEscape);
+        // remove event listener from the DOM when component unmounts
         return (() => document.removeEventListener(EVENT_TYPE, handleEscape));
     }, []);
 
