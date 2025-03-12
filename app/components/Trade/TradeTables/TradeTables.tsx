@@ -6,6 +6,7 @@ import FilterDropdown from '../FilterDropdown/FilterDropdown';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
+import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
 
 export interface FilterOption {
     id: string;
@@ -83,9 +84,7 @@ export default function TradeTable(props: TradeTableProps) {
                 return <PositionsTable />;
             case 'Open Orders':
                 return (
-                    <div className={styles.emptyState}>
-                        Open Orders data will appear here
-                    </div>
+                    <OpenOrdersTable/>
                 );
             case 'TWAP':
                 return (
