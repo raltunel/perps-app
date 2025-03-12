@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './OpenOrdersTable.module.css';
 
 export interface OpenOrderData {

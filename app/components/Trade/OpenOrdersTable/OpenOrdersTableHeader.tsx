@@ -1,5 +1,5 @@
-import React from 'react';
 import styles from './OpenOrdersTable.module.css';
+import SortIcon from '~/components/Vault/SortIcon';
 
 export interface HeaderCell {
   name: string;
@@ -12,7 +12,6 @@ export interface HeaderCell {
 export default function OpenOrdersTableHeader() {
   const handleSort = (key: string) => {
     console.log(`Sorting by: ${key}`);
-    // Implement your sorting logic here
   };
 
   const tableHeaders: HeaderCell[] = [
@@ -112,7 +111,7 @@ export default function OpenOrdersTableHeader() {
         >
           {header.name}
           {header.sortable && (
-            <p>*</p> // Replace with your SortIcon
+           <SortIcon/>
           )}
         </div>
       ))}
