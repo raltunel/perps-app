@@ -34,10 +34,19 @@ export const priceFormatterFactory = (
   symbolInfo: LibrarySymbolInfo | null,
   minTick: string
 ) => {
-  return {
-    format: (price: number) => {
-      const precision = calculatePrecision(price);
-      return price.toFixed(precision > 0 ? precision : 0);
-    },
-  };
+  if (minTick === "default") {
+    return {
+      format: (price: number) => {
+        const precision = calculatePrecision(price);
+        return price.toFixed(precision > 0 ? precision : 0);
+      },
+    };
+  } else {
+    const userPrecision = minTick.split(",")[0];
+
+    return {
+      format: (price: number) =>
+        price.toFixed(Math.log10(Number(userPrecision))),
+    };
+  }
 };
