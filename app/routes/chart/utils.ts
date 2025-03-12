@@ -21,6 +21,7 @@ export function resolutionToSeconds(resolution: string): number {
   return Number(resolution);
 }
 
+
 const calculatePrecision = (price: number) => {
   return (
     Math.max(

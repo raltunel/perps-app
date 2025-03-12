@@ -88,11 +88,11 @@
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
 
 .tradeModules {
-  background: url('./tempImages/orderInput.png') !important;
+  /* background: url('./tempImages/orderInput.png') !important;
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(2px);
+  filter: blur(2px); */
 }
 
 /* -----------------------END OF TEMP CSS CODE */
@@ -130,3 +130,20 @@
     display: none;
   }
 }
+
+
+.wsUrlSelector{
+  position: fixed;
+  top: 3rem;
+  right: 2rem;
+  font-size: .8rem;
+  z-index: 2;
+  font-family: var(--font-family-main);
+  background-color: var(--dark2);
+  border-radius: .4rem;
+  border: 1px solid rgba(255, 255, 255, .2);
+  padding: 0 1.2rem;
+  right: 1rem;
+}
+
+

@@ -72,12 +72,18 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol, tradesCount }
 </div>  
 
 <BasicDivider />
-
-<div className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}>
+{
+  trades.length > 0 && trades[0].coin === symbol &&(
+    <>
+    <div className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}>
 {trades.map((trade) => (
 <OrderTradeRow key={trade.tid} trade={trade} />
 ))}
 </div>
+    </>
+  )
+}
+
     </div>
   );
 }

@@ -98,7 +98,6 @@ export const createDataFeed = (subscribe: (channel: string, payload: any) => voi
       resolution,
       onTick,
     ) => {
-      console.log('>>>subscribeBars', symbolInfo, resolution);
       subscribe(
         'candle',
         {

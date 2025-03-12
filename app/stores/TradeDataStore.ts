@@ -1,7 +1,10 @@
 import {create} from 'zustand';
+import { setLS } from '~/utils/AppUtils';
 import { NumFormatTypes } from '~/utils/Constants';
 import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+
+
 
 interface TradeDataStore {
     symbol: string;
@@ -14,8 +17,11 @@ interface TradeDataStore {
 } 
 
 export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
-    symbol: 'BTC',
-    setSymbol: (symbol: string) => set({ symbol }),
+    symbol: '',
+    setSymbol: (symbol: string) => {
+        setLS('activeCoin', symbol);
+        set({ symbol });
+    },
     symbolInfo: null,
     setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
         const prevSymbolInfo = get().symbolInfo;

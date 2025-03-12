@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useParams } from 'react-router';
 import { WebSocketProvider } from '~/contexts/WebSocketContext';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
@@ -10,24 +12,37 @@ import TradingViewChart from './chart/chart';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import WatchList from './trade/watchlist/watchlist';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { useDebugStore } from '~/stores/DebugStore';
+import { wsUrls } from '~/utils/Constants';
+import { getLS } from '~/utils/AppUtils';
+import { useWsObserver } from '~/hooks/useWsObserver';
+import TradeRouteHandler from './trade/traderoutehandler';
+import TradeModules from './trade/trademodules/trademodules';
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: 'TRADE' },
-    { name: 'description', content: 'Welcome to React Router!' },
-  ];
+    return [
+        { title: 'TRADE' },
+        { name: 'description', content: 'Welcome to React Router!' },
+    ];
 }
 
 export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_NETLIFY };
+    return { message: context.VALUE_FROM_NETLIFY };
 }
 
-const wsUrl = 'wss://api.hyperliquid.xyz/ws';
+// const wsUrl = 'wss://api.hyperliquid.xyz/ws';
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const {symbol} = useTradeDataStore();
   const { orderBookMode } = useAppSettings();
+
+
+  const { wsUrl, setWsUrl } = useDebugStore();
+
+
+    
   
   // const nav = (
   //      {/* Example nav links to each child route */}
@@ -44,9 +59,26 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   // </nav>
  
   // )
+
+
   return (
+<>
+<div className={styles.wsUrlSelector}>
+<ComboBox
+  value={wsUrl}
+  options={wsUrls}
+  onChange={(value) => setWsUrl(value)}
+/>
+</div>
+    
     <WebSocketProvider url={wsUrl}>
-    <div className={styles.container}>
+
+      <TradeRouteHandler />
+
+      {
+        symbol && symbol.length > 0 && (
+
+<div className={styles.container}>
       <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
         <div className={styles.containerTopLeft}>
           <div className={styles.watchlist}><WatchList/></div>
@@ -60,21 +92,25 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-
-        <div className={styles.tradeModules}></div>
-      </section>
-      <section className={styles.containerBottom}>
-        <div className={styles.table}>table</div>
-        <div className={styles.wallet}>
-          <DepositDropdown
-            isUserConnected={false}
-            setIsUserConnected={() => console.log('connected')}
-          />
-        </div>
-      </section>
+              <div className={styles.tradeModules}><TradeModules /></div>
+            </section>
+            <section className={styles.containerBottom}>
+                <div className={styles.table}>table</div>
+                <div className={styles.wallet}>
+                    <DepositDropdown
+                        isUserConnected={false}
+                        setIsUserConnected={() => console.log('connected')}
+                    />
+                </div>
+             </section>
       {/* Child routes (market, limit, pro) appear here */}
       {/* <Outlet /> */}
     </div>
+          
+        )
+      }
+    
     </WebSocketProvider>
+    </>
   );
 }

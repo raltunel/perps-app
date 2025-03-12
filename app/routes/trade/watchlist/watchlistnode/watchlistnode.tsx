@@ -4,6 +4,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './watchlistnode.module.css';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useNavigate } from 'react-router';
 
 interface WatchListNodeProps {
     symbol: SymbolInfoIF;
@@ -13,6 +14,7 @@ interface WatchListNodeProps {
 
 const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
+    const navigate = useNavigate();
 
     const { formatNum } = useNumFormatter();
 
@@ -25,7 +27,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
     const nodeClickListener = () => {
         if(symbol.coin === storeSymbol) return;
-        setStoreSymbol(symbol.coin);
+        navigate(`/trade/${symbol.coin}`);
     }
 
     const shownVal = useMemo( () => {
