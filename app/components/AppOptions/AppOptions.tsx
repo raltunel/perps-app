@@ -2,6 +2,7 @@ import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { MdOutlineClose } from 'react-icons/md';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -76,7 +77,11 @@ export default function AppOptions(props: propsIF) {
             <header>
                 <div />
                 <h2>Options</h2>
-                <button onClick={modalControl.close}>×</button>
+                <MdOutlineClose
+                    size={20}
+                    onClick={modalControl.close}
+                    style={{ cursor: 'pointer' }}
+                />
             </header>
             <ul>
                 {
@@ -92,7 +97,7 @@ export default function AppOptions(props: propsIF) {
                     )
                 }
             </ul>
-            <hr />
+            <div className={styles.horizontal_divider} />
             <ul>
                 {
                     optionsBottom.map(

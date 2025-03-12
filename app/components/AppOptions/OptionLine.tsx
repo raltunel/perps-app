@@ -1,6 +1,6 @@
 import styles from './OptionLIne.module.css';
 import type { appOptionDataIF } from './AppOptions';
-import { MdOutlineCheckBox, MdOutlineCheckBoxOutlineBlank } from 'react-icons/md';
+import { FaCheck } from 'react-icons/fa';
 
 interface propsIF {
     option: appOptionDataIF;
@@ -13,7 +13,12 @@ export default function OptionLine(props: propsIF) {
 
     return (
         <li className={styles.option_line} onClick={toggle}>
-            { isChecked ? <MdOutlineCheckBox /> : <MdOutlineCheckBoxOutlineBlank /> }
+            <div
+                className={styles.checkbox}
+                style={{ borderColor: `var(${isChecked ? '--accent1' : '--text3'})` }}
+            >
+                {isChecked && <FaCheck size={10} color={'var(--accent1)'} />}
+            </div>
             {option.text}
         </li>
     );
