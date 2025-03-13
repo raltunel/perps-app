@@ -1,0 +1,38 @@
+.app_options {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 16px 16px;
+    gap: 8px;
+    min-width: 400px;
+    user-select: none;
+    font-family: var(--font-family-main);
+    background-color: var(--dark3);
+    border-radius: 20px;
+}
+
+.app_options > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: var(--font-size-l);
+}
+
+.app_options > ul {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    gap: 6px;
+}
+
+.horizontal_divider {
+    height: 2px;
+    background-color: var(--dark6);
+}
+
+.apply_defaults {
+    align-self: center;
+    cursor: pointer;
+    font-size: var(--font-size-m);
+    color: var(--accent1);
+}
