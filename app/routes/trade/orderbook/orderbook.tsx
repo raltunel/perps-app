@@ -9,6 +9,7 @@ import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/Orde
 import { getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import BasicDivider from '~/components/Dividers/BasicDivider';
+import { useInfoApi } from '~/hooks/useInfoApi';
 
 interface OrderBookProps {
   symbol: string;
@@ -18,6 +19,7 @@ interface OrderBookProps {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { subscribe, unsubscribeAllByChannel} = useWsObserver();
+    const {fetchInfo} = useInfoApi();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const resolutionsShouldReset = useRef(true);
     const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
@@ -67,6 +69,18 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }
 
     useEffect(() => {
+
+      fetchInfo({
+        type: 'frontendOpenOrders',
+        payload: {
+          user: '0xecb63caa47c7c4e77f60f1ce858cf28dc2b82b00'
+        },
+        handler: (payload) => {
+          console.log(payload);
+        }
+      })
+
+
       return () => {
         unsubscribeAllByChannel('l2Book');
       }

@@ -1,8 +1,10 @@
+import { use } from 'react';
 import {create} from 'zustand';
 import { setLS } from '~/utils/AppUtils';
 import { NumFormatTypes } from '~/utils/Constants';
 import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import { useUserOrderStore } from './UserOrderStore';
 
 
 
@@ -15,8 +17,7 @@ interface TradeDataStore {
     setFavs: (favs:string[]) => void;
     addToFavs: (coin: string) => void;
 } 
-
-export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
+ const useTradeDataStore = create<TradeDataStore>((set, get) => ({
     symbol: '',
     setSymbol: (symbol: string) => {
         setLS('activeCoin', symbol);
@@ -39,3 +40,15 @@ export const useTradeDataStore = create<TradeDataStore>((set, get) => ({
         }
     },
 }));
+
+
+
+useTradeDataStore.subscribe(async (state) => {
+    const symbol = state.symbol;
+    const {userOrders, setUserSymbolOrders} = useUserOrderStore();
+    const filteredOrders = userOrders.filter(order => order.coin === symbol);
+    setUserSymbolOrders(filteredOrders);
+})
+
+
+export default useTradeDataStore;

@@ -25,4 +25,24 @@ nsigfigs: number;
 mantissa?: number | null;
 }
 
+export interface OrderDataIF {
+  cloid: string;
+  coin: string;
+  isPositionTpsl?: boolean;
+  isTrigger?: boolean;
+  limitPx: number;
+  oid: number;
+  orderType?: string;
+  origSz: number;
+  reduceOnly? :boolean;
+  side: string;
+  sz: number;
+  tif?: string;
+  timestamp: number;
+  triggerCondition?: string;
+  triggerPx?: number;
+  status: number;
+
+}
+
 export type OrderBookMode = 'symbol' | 'usd';
