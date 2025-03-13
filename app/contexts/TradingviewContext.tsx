@@ -81,7 +81,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             datafeed: createDataFeed(subscribe) as any,
             interval: defaultProps.interval,
             disabled_features: [
-                'volume_force_overlay' /* "use_localstorage_for_settings" */,
+                'volume_force_overlay','header_symbol_search','header_compare',
             ],
             locale: 'en',
             theme: 'dark',
