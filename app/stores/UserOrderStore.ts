@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 import type { OrderBookTradeIF, OrderDataIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
-import useTradeDataStore from './TradeDataStore';
+import { useTradeDataStore } from './TradeDataStore';
 
 interface UserOrderStore {
     userOrders: OrderDataIF[];
@@ -20,10 +20,12 @@ const useUserOrderStore = create<UserOrderStore>((set) => ({
 
 useUserOrderStore.subscribe(async (state) => {
     const userOrders = state.userOrders;
-
     const {symbol} = useTradeDataStore();
+    const filteredOrders = userOrders.filter(order => order.coin === symbol);
+
+    state.setUserSymbolOrders(filteredOrders);
     
 })  
 
 
-export default useUserOrderStore;
+export {useUserOrderStore};

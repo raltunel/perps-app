@@ -42,13 +42,19 @@ interface TradeDataStore {
 }));
 
 
+let prevSymbol:string;
 
 useTradeDataStore.subscribe(async (state) => {
     const symbol = state.symbol;
-    const {userOrders, setUserSymbolOrders} = useUserOrderStore();
-    const filteredOrders = userOrders.filter(order => order.coin === symbol);
-    setUserSymbolOrders(filteredOrders);
+    if(prevSymbol !== symbol){
+        console.log('>>> symbol has been changed', symbol);
+        const {userOrders, setUserSymbolOrders} = useUserOrderStore();
+        const filteredOrders = userOrders.filter(order => order.coin === symbol);
+        setUserSymbolOrders(filteredOrders);
+    }
+
+    prevSymbol = symbol;
 })
 
 
-export default useTradeDataStore;
+export {useTradeDataStore};
