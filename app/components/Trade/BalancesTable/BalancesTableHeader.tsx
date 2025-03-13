@@ -1,6 +1,5 @@
 import styles from './BalancesTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
-// import SortIcon from './SortIcon';
 
 export interface HeaderCell {
   name: string;

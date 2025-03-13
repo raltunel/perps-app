@@ -7,6 +7,7 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
+import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 
 export interface FilterOption {
     id: string;
@@ -94,9 +95,7 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             case 'Trade History':
                 return (
-                    <div className={styles.emptyState}>
-                        Trade History data will appear here
-                    </div>
+                    <TradeHistoryTable/>
                 );
             case 'Funding History':
                 return (
