@@ -8,6 +8,7 @@ import BalancesTable from '../BalancesTable/BalancesTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
+import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 
 export interface FilterOption {
     id: string;
@@ -99,9 +100,7 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             case 'Funding History':
                 return (
-                    <div className={styles.emptyState}>
-                        Funding History data will appear here
-                    </div>
+                    <FundingHistoryTable/>
                 );
             case 'Order History':
                 return (
