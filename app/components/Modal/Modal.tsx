@@ -2,12 +2,16 @@ import { type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
 interface propsIF {
-    close: () => void;
+    close?: () => void;
     children: ReactNode;
 }
 
 export default function Modal(props: propsIF) {
     const { close, children } = props;
+
+    // return children without creating curtain behind modal
+    // this allows us to make multiple non-exclusive modals at once
+    if (!close) return children;
 
     // DOM id for the area outside modal body
     const OUTSIDE_MODAL_DOM_ID = 'outside_modal';
@@ -15,7 +19,7 @@ export default function Modal(props: propsIF) {
     // fn to handle a click outside the modal body
     function handleOutsideClick(target: HTMLElement): void {
         // close the modal if area outside the body was clicked directly
-        target.id === OUTSIDE_MODAL_DOM_ID && close();
+        target.id === OUTSIDE_MODAL_DOM_ID && close && close();
     }
 
     return (
