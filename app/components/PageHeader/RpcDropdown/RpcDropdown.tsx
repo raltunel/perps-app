@@ -46,7 +46,7 @@ const rpcSvg = (
     viewBox='0 0 16 16'
     fill='none'
   >
-    <g clip-path='url(#clip0_3877_8036)'>
+    <g clipPath='url(#clip0_3877_8036)'>
       <circle cx='8' cy='8' r='6' fill='#26A69A' />
     </g>
     <defs>
