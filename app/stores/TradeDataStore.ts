@@ -4,11 +4,12 @@ import { setLS } from '~/utils/AppUtils';
 import { NumFormatTypes } from '~/utils/Constants';
 import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { useUserOrderStore } from './UserOrderStore';
+import { createUserTradesSlice, type UserTradeStore} from './UserOrderStore';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 
 
-interface TradeDataStore {
+type TradeDataStore = UserTradeStore & {
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
@@ -17,11 +18,14 @@ interface TradeDataStore {
     setFavs: (favs:string[]) => void;
     addToFavs: (coin: string) => void;
 } 
+
  const useTradeDataStore = create<TradeDataStore>((set, get) => ({
-    symbol: '',
+     ...createUserTradesSlice(set, get),
+     symbol: '',
     setSymbol: (symbol: string) => {
         setLS('activeCoin', symbol);
         set({ symbol });
+        get().setUserSymbolOrders(get().userOrders.filter(e=> e.coin === symbol));
     },
     symbolInfo: null,
     setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
@@ -41,20 +45,6 @@ interface TradeDataStore {
     },
 }));
 
-
-let prevSymbol:string;
-
-useTradeDataStore.subscribe(async (state) => {
-    const symbol = state.symbol;
-    if(prevSymbol !== symbol){
-        console.log('>>> symbol has been changed', symbol);
-        const {userOrders, setUserSymbolOrders} = useUserOrderStore();
-        const filteredOrders = userOrders.filter(order => order.coin === symbol);
-        setUserSymbolOrders(filteredOrders);
-    }
-
-    prevSymbol = symbol;
-})
 
 
 export {useTradeDataStore};

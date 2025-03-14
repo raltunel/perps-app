@@ -3,13 +3,14 @@ import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
 import { useWsObserver } from '~/hooks/useWsObserver';
-import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { processOrderBookMessage, processUserOrders } from '~/processors/processOrderBook';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import { getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import { useInfoApi } from '~/hooks/useInfoApi';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface OrderBookProps {
   symbol: string;
@@ -27,6 +28,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
+    const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
 
     const [userBuyIndices, setUserBuyIndices] = useState<number[]>([]);
     const [userSellIndices, setUserSellIndices] = useState<number[]>([]);
@@ -56,6 +58,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       setUserSellIndices(sellsIndices);
     }
 
+    useEffect(() => {
+
+      console.log('>>> user orders', userOrders);
+    }, [userOrders])
+
+    useEffect(() => {
+
+      console.log('>>> user symbol orders', userSymbolOrders);
+    }, [userSymbolOrders])
+
     const changeSubscription = (payload: any) => {
       subscribe('l2Book', 
         {payload: payload,
@@ -76,7 +88,11 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           user: '0xecb63caa47c7c4e77f60f1ce858cf28dc2b82b00'
         },
         handler: (payload) => {
-          console.log(payload);
+
+          if(payload && payload.length > 0){
+            const userOrders = processUserOrders(payload, 'open');
+            setUserOrders(userOrders);
+          }
         }
       })
 

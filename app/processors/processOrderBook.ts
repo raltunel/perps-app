@@ -1,4 +1,4 @@
-import type { OrderBookTradeIF, OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
+import type { OrderBookTradeIF, OrderDataIF, OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
 import { parseNum } from "~/utils/orderbook/OrderBookUtils";
 
 
@@ -60,6 +60,30 @@ export function processOrderBookTrades(data: any): OrderBookTradeIF[] {
       time: e.time,
       tid: e.tid,
       users: e.users
+    }
+  })
+}
+
+
+export function processUserOrders(data: any, status: string): OrderDataIF[] {
+  return data.map((e: any) => {
+    return {
+      coin: e.coin,
+      cloid: e.cloid,
+      oid: parseNum(e.oid),
+      // side: e.side,
+      side: e.side === 'A' ? 'sell' : 'buy',
+      sz: parseNum(e.sz),
+      tif: e.tif,
+      timestamp: e.timestamp,
+      status: status,
+      limitPx: parseNum(e.limitPx),
+      origSz: parseNum(e.origSz),
+      reduceOnly: e.reduceOnly,
+      isPositionTpsl: e.isPositionTpsl,
+      isTrigger: e.isTrigger,
+      triggerPx: parseNum(e.triggerPx),
+      triggerCondition: e.triggerCondition
     }
   })
 }

@@ -1,31 +1,21 @@
-import {create} from 'zustand';
-import type { OrderBookTradeIF, OrderDataIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
-import { useTradeDataStore } from './TradeDataStore';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
-interface UserOrderStore {
+export interface UserTradeStore {
     userOrders: OrderDataIF[];
     userSymbolOrders: OrderDataIF[];
     setUserOrders: (userOrders: OrderDataIF[]) => void;
     setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => void;
-
 }
 
-const useUserOrderStore = create<UserOrderStore>((set) => ({
+export const createUserTradesSlice = (set:any, get:any) => ({
     userOrders: [],
     userSymbolOrders: [],
-    setUserOrders: (userOrders: OrderDataIF[]) => set({ userOrders }),
-    setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => set({ userSymbolOrders })
-}));
+    setUserOrders: (userOrders: OrderDataIF[]) => {
+        set({ userOrders })
+        get().setUserSymbolOrders(userOrders.filter(e=> e.coin === get().symbol))
+    },
+    setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => {
+        set({ userSymbolOrders })
+    }
+});
 
-
-useUserOrderStore.subscribe(async (state) => {
-    const userOrders = state.userOrders;
-    const {symbol} = useTradeDataStore();
-    const filteredOrders = userOrders.filter(order => order.coin === symbol);
-
-    state.setUserSymbolOrders(filteredOrders);
-    
-})  
-
-
-export {useUserOrderStore};
