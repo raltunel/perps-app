@@ -1,88 +1,213 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import styles from './Tabs.module.css';
-import { FaChevronDown } from "react-icons/fa";
 
-
-export interface TabIF {
-    label: string;
-    content: React.ReactNode;
-    icon?: React.ReactNode;
-    initial?: boolean;
-    initialMethod?: () => void;
+interface TabProps {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
 }
 
-interface TabsProps {
-    tabs: TabIF[];
-    headerRightContent?: React.ReactNode;
-}
-
-const Tabs: React.FC<TabsProps> = ({ tabs, headerRightContent}) => {
-
-
-    const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-    const tabsHeaderRef = useRef<HTMLDivElement>(null);
-    const tabIndicatorRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {  
-        if(tabs.length > 0) {
-            tabs.forEach((tab, index) => {
-                if(tab.initial) {
-                    tab.initialMethod?.();
-                    setActiveTabIndex(index);
-                }
-            })
-        }
-    }, [])
-
-    useEffect(() => {
-
-        const tabsHeaderElement = tabsHeaderRef.current;
-
-        if(tabsHeaderElement){
-            const selectedTabElement = tabsHeaderElement.querySelectorAll(`.${styles.tab}`)[activeTabIndex];
-            if(tabIndicatorRef.current && selectedTabElement) {
-                tabIndicatorRef.current.style.left = `${(selectedTabElement as HTMLDivElement)?.offsetLeft}px`;
-                tabIndicatorRef.current.style.width = `${(selectedTabElement as HTMLDivElement)?.offsetWidth}px`;
-                // tabIndicatorRef.current.style.left = `calc(${activeTabIndex * (100 / tabs.length)}%)`;
-            }
-        }
-
-
-    }, [activeTabIndex])
-
-
-
-
+export function Tab(props: TabProps) {
+  const { label, isActive, onClick } = props;
+  
   return (
-<>
-
-<div className={styles.tabsContainer}>
-
-    <div ref={tabsHeaderRef} className={styles.tabsHeader}>
-        <div className={styles.tabIndicator} 
-        // style={{width: `calc(${100 / tabs.length }%)`}} 
-        ref={tabIndicatorRef}></div>
-        {
-            tabs.map((tab, index) => (
-                <div key={index} 
-                className={`${styles.tab} ${activeTabIndex === index ? styles.activeTab : ''}`} 
-                onClick={() => setActiveTabIndex(index)}>
-                    {tab.label}
-                </div>
-            ))
-
-        }
-        {headerRightContent}
-
-    </div>
-    <div className={styles.tabsContent}>    
-        {tabs[activeTabIndex].content}
-    </div>
-
-</div>
-  </>
-
+    <button
+      className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
+      onClick={onClick}
+    >
+      {label}
+      {isActive && (
+        <motion.div
+          className={styles.activeIndicator}
+          layoutId="activeIndicator"
+          initial={false}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      )}
+    </button>
   );
 }
 
-export default Tabs;
+// Modified interface to accept both simple strings and objects with id/label
+export interface TabsProps {
+  tabs: Array<string | { id: string; label: string }>;
+  defaultTab?: string;
+  onTabChange?: (tab: string) => void;
+  rightContent?: React.ReactNode;
+}
+
+export default function Tabs(props: TabsProps) {
+  const { tabs, defaultTab, onTabChange, rightContent } = props;
+  
+  // Function to get tab ID (either the string itself or the id property)
+  const getTabId = (tab: string | { id: string; label: string }): string => {
+    return typeof tab === 'string' ? tab : tab.id;
+  };
+  
+  // Function to get tab label (either the string itself or the label property)
+  const getTabLabel = (tab: string | { id: string; label: string }): string => {
+    return typeof tab === 'string' ? tab : tab.label;
+  };
+  
+  // Set default active tab
+  const defaultTabId = defaultTab || getTabId(tabs[0]);
+  const [activeTab, setActiveTab] = useState<string>(defaultTabId);
+  
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const tabsWrapperRef = useRef<HTMLDivElement>(null);
+  
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    if (onTabChange) {
+      onTabChange(tabId);
+    }
+  };
+  
+  // Check if the tabs can be scrolled
+  const checkScroll = () => {
+    if (tabsListRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
+      
+      // Can scroll left if we're not at the beginning
+      setCanScrollLeft(scrollLeft > 1);
+      
+      // Can scroll right if we're not at the end
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
+    }
+  };
+  
+  // Scroll the active tab into view when active tab changes
+  useEffect(() => {
+    if (tabsListRef.current) {
+      const activeTabElement = tabsListRef.current.querySelector(`.${styles.activeTab}`);
+      if (activeTabElement) {
+        // Calculate the scroll position to center the tab
+        const tabsList = tabsListRef.current;
+        const tabsListWidth = tabsList.offsetWidth;
+        const activeTabWidth = (activeTabElement as HTMLElement).offsetWidth;
+        const activeTabLeft = (activeTabElement as HTMLElement).offsetLeft;
+        
+        const scrollPosition = activeTabLeft - (tabsListWidth / 2) + (activeTabWidth / 2);
+        
+        tabsList.scrollTo({
+          left: Math.max(0, scrollPosition),
+          behavior: 'smooth'
+        });
+        
+        // Check scroll state after scrolling
+        setTimeout(checkScroll, 350); // Delay for smooth scroll animation
+      }
+    }
+  }, [activeTab]);
+  
+  // Check scroll state on mount and when window resizes
+  useEffect(() => {
+    checkScroll();
+    
+    const handleResize = () => {
+      checkScroll();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Initialize scroll state
+    if (tabsListRef.current) {
+      tabsListRef.current.addEventListener('scroll', checkScroll);
+    }
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (tabsListRef.current) {
+        tabsListRef.current.removeEventListener('scroll', checkScroll);
+      }
+    };
+  }, []);
+  
+  const scrollLeft = () => {
+    if (tabsListRef.current) {
+      const { clientWidth } = tabsListRef.current;
+      // Scroll half the width of the container
+      tabsListRef.current.scrollBy({
+        left: -clientWidth / 2,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
+  const scrollRight = () => {
+    if (tabsListRef.current) {
+      const { clientWidth } = tabsListRef.current;
+      // Scroll half the width of the container
+      tabsListRef.current.scrollBy({
+        left: clientWidth / 2,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  return (
+    <div className={styles.tabsContainer}>
+      <div 
+        className={`${styles.tabsWrapper} ${canScrollLeft ? styles.showLeftFade : ''} ${canScrollRight ? styles.showRightFade : ''}`}
+        ref={tabsWrapperRef}
+      >
+        {/* Left scroll arrow */}
+        {canScrollLeft && (
+          <button 
+            className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`}
+            onClick={scrollLeft}
+            aria-label="Scroll tabs left"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+          </button>
+        )}
+        
+        {/* Tabs list */}
+        <div 
+          className={styles.tabsList} 
+          ref={tabsListRef}
+          onScroll={checkScroll}
+        >
+          {tabs.map((tab, idx) => {
+            const tabId = getTabId(tab);
+            const tabLabel = getTabLabel(tab);
+            
+            return (
+              <Tab
+                key={tabId + tabLabel + idx} // Ensure unique key
+                label={tabLabel}
+                isActive={activeTab === tabId}
+                onClick={() => handleTabClick(tabId)}
+              />
+            );
+          })}
+        </div>
+        
+        {/* Right scroll arrow */}
+        {canScrollRight && (
+          <button 
+            className={`${styles.scrollArrow} ${styles.scrollArrowRight}`}
+            onClick={scrollRight}
+            aria-label="Scroll tabs right"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+            </svg>
+          </button>
+        )}
+      </div>
+      
+      {rightContent && (
+        <div className={styles.rightContent}>
+          {rightContent}
+        </div>
+      )}
+    </div>
+  );
+}
