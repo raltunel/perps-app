@@ -1,6 +1,5 @@
 import {create} from 'zustand';
 import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
-import type { OrderBookTradeIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
 
 interface AppSettingsStore {
     orderBookMode: 'tab' | 'stacked' | 'large';

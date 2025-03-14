@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LuMenu, LuWallet } from 'react-icons/lu';
+import { LuMenu, LuSettings, LuWallet } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import useOutsideClick from '~/hooks/useOutsideClick';
@@ -12,6 +12,9 @@ import DepositDropdown from './DepositDropdown/DepositDropdown';
 import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import InternarionalSettingsDropdown from './InternarionalSettingsDropdown/InternarionalSettingsDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown'
+import { type useModalIF, useModal } from '~/hooks/useModal';
+import AppOptions from '../AppOptions/AppOptions';
+import Modal from '../Modal/Modal';
 export default function PageHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
@@ -192,6 +195,9 @@ export default function PageHeader() {
       {isMoreDropdownOpen && <MoreDropdown/>}
     </section>
   );
+
+  const appSettingsModal: useModalIF = useModal('closed');
+
   return (
     <>
       <header className={styles.container}>
@@ -241,6 +247,13 @@ export default function PageHeader() {
           {internationalDropdownDisplay}
 
           <button
+            className={styles.internationalButton}
+            onClick={appSettingsModal.open}
+          >
+            <LuSettings size={20} />
+          </button>
+
+          <button
             className={styles.menuButton}
             onClick={() => setIsDropdownMenuOpen(!isDropdownMenuOpen)}
           >
@@ -264,6 +277,11 @@ export default function PageHeader() {
         >
           <DropdownMenu />
         </div>
+      )}
+      {appSettingsModal.isOpen && (
+          <Modal close={appSettingsModal.close}>
+              <AppOptions modalControl={appSettingsModal} />
+          </Modal>
       )}
     </>
   );
