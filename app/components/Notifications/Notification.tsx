@@ -1,12 +1,28 @@
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
 import styles from './Notification.module.css';
+import { ImSpinner8 } from 'react-icons/im';
 
-export default function Notification() {
+type statuses = 'pending'|'complete';
+
+interface propsIF {
+    status: statuses;
+}
+
+export default function Notification(props: propsIF) {
+    const { status } = props;
+
     return (
         <section className={styles.notification}>
             <header>
                 <div className={styles.header_content}>
-                    <IoCheckmarkCircleOutline size={24} color={'var(--accent1)'} />
+                    {
+                        status === 'pending' &&
+                        <ImSpinner8 size={24} color={'var(--accent1)'} />
+                    }
+                    {
+                        status === 'complete' &&
+                        <IoCheckmarkCircleOutline size={24} color={'var(--accent1)'} />
+                    }
                     <h2>Leverage Mode Changed</h2>
                 </div>
                 <IoClose className={styles.close} />

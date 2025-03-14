@@ -19,7 +19,7 @@ export default function testpage(props: propsIF) {
             {/* format to insantiate modal in the DOM */}
             {modalControl.isOpen && (
                 <Modal close={modalControl.close}>
-                    <Notification />
+                    <Notification status={'pending'} />
                 </Modal>
             )}
         </div>
