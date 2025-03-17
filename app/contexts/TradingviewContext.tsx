@@ -2,7 +2,8 @@ import {
     widget,
     type Bar,
     type IChartingLibraryWidget,
-    type ResolutionString,
+    type LibrarySymbolInfo,
+  type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -10,6 +11,7 @@ import { useWebSocketContext } from './WebSocketContext';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from '~/routes/chart/data/processChartData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { priceFormatterFactory } from "~/routes/chart/utils";
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -106,7 +108,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 { text: '4H', resolution: '240' as ResolutionString },
                 { text: '1D', resolution: '1D' as ResolutionString },
             ],
-        });
+          custom_formatters: {
+        priceFormatterFactory: priceFormatterFactory,
+      },
+    });
 
         tvWidget.onChartReady(() => {
             tvWidget.applyOverrides({

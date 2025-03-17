@@ -119,29 +119,7 @@
   background: transparent;
 }
 
-.dropdownMenu {
-  position: absolute;
-  top: 56px;
-  right: 0;
-  width: 210px;
-  border-radius: var(--main-border-radius, 16px);
-  padding: 8px;
-  background: var(--dark3, #16161c);
-  box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
-  height: auto;
-  opacity: 0;
-
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  z-index: var(--navbar-dropdown-zindex);
-
-}
-
-
-.dropdownMenu.open {
-  height: 320px;
-  opacity: 1;
-}
 
 .walletMenu.open {
   opacity: 1;

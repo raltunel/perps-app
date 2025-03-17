@@ -1,0 +1,215 @@
+.rowContainer {
+    width: 100%;
+    height: 25px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    align-items: center;
+}
+
+.headerContainer {
+    background: var(--dark2);
+    width: 100%;
+    height: 24px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+}
+
+.tableWrapper {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    padding-bottom: 8px;
+
+    display: flex;
+    flex-direction: column;
+
+    display: flex;
+    
+}
+
+.tableBody {
+    height: 100%;
+    overflow-y: scroll;
+    padding-bottom: 1rem;
+}
+.tableBody::-webkit-scrollbar {
+  display: none;
+}
+
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+}
+
+.sortable {
+    cursor: pointer;
+}
+
+.pnlPositive {
+    color: var(--green, #4CD471);
+}
+
+.badge {
+    background: var(--dark3);
+    border-radius: 2px;
+    padding: 2px 4px;
+    display: inline-block;
+    font-size: var(--font-size-xs, 10px);
+}
+
+.actionButton {
+    background-color: transparent;
+    color: var(--accent1, #7371fc);
+    border: none;
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+    margin-right: 8px;
+}
+
+.actionButton:hover {
+    color: var(--text1, #f0f0f8);
+}
+
+.actionContainer {
+    display: flex;
+}
+
+/* Specific cell classes */
+.coinCell {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sizeCell {}
+.positionValueCell {}
+.entryPriceCell {}
+.markPriceCell {}
+.pnlCell {}
+.liqPriceCell {}
+.marginCell {}
+.fundingCell {}
+.tpslCell {}
+.closeCell {
+    text-align: right;
+    justify-self: end;
+
+    
+    
+}
+
+.headerContainer .closeCell {
+   
+    text-align: end;
+    justify-self: end;
+    padding-right: 8px;
+   
+   
+}
+@media (max-width: 1400px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .fundingCell {
+        display: none;
+    }
+}
+
+@media (max-width: 1200px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .markPriceCell {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .entryPriceCell {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .sizeCell, .marginCell {
+        display: none;
+    }
+}
+
+@media (max-width: 650px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 1fr 0.8fr 1.2fr;
+    }
+
+    .tpslCell, .liqPriceCell {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.8fr 1fr 1.2fr;
+        padding: 0 4px;
+    }
+
+    .positionValueCell {
+        display: none;
+    }
+
+    .headerCell {
+        font-size: 9px;
+    }
+
+    .cell {
+        font-size: 11px;
+    }
+
+    .actionButton {
+        font-size: 11px;
+        margin-right: 4px;
+    }
+}

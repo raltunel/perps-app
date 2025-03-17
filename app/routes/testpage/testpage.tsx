@@ -1,11 +1,14 @@
 import styles from './testpage.module.css';
-import Modal from "~/components/Modal/Modal";
 import { type useModalIF, useModal } from "~/hooks/useModal";
 import Notification from '~/components/Notifications/Notification';
 
 interface propsIF {
 
 }
+
+const notificationTexts = [
+    
+];
 
 // main react fn
 export default function testpage(props: propsIF) {
