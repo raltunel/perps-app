@@ -17,16 +17,16 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
 
   const { formatNum } = useNumFormatter();
 
-  const { buySellColor } = useAppSettings();
+  const { isInverseColor} = useAppSettings();
 
   const { setTradeSlot } = useTradeModuleStore();
 
   const type = useMemo(() => {
-    if (order.type === 'buy' && buySellColor.type === 'normal') return styles.buy;
-    if (order.type === 'sell' && buySellColor.type === 'normal') return styles.sell;
-    if (order.type === 'buy' && buySellColor.type === 'inverse') return styles.sell;
-    if (order.type === 'sell' && buySellColor.type === 'inverse') return styles.buy;
-  }, [order.type, buySellColor.type]);
+    if (order.type === 'buy' && !isInverseColor) return styles.buy;
+    if (order.type === 'sell' && !isInverseColor) return styles.sell;
+    if (order.type === 'buy' && isInverseColor) return styles.sell;
+    if (order.type === 'sell' && isInverseColor) return styles.buy;
+  }, [order.type, isInverseColor]);
 
   const formattedPrice = useMemo(() => {
     return formatNum(order.px, resolution);

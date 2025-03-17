@@ -1,3 +1,4 @@
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './symbolinfofield.module.css';
 
 
@@ -13,11 +14,11 @@ interface SymbolInfoFieldProps {
 const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type }) => {
 
 
-  
+  const {isInverseColor} = useAppSettings();
 
 
   return (
-    <div className={styles.symbolInfoField}>
+    <div className={`${styles.symbolInfoField} ${isInverseColor ? styles.inverseColor : ''}`}>
       <div className={styles.symbolInfoFieldLabel}>{label}</div>
       <div className={`${styles.symbolInfoFieldValue} 
       ${lastWsChange && lastWsChange > 0 ? styles.positiveAnimation : 

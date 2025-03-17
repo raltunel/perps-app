@@ -10,6 +10,7 @@ interface AppSettingsStore {
     setLang: (lang: LangType) => void;
     buySellColor: BuySellColor;
     setBuySellColor: (buySellColor: BuySellColor) => void;
+    isInverseColor: boolean;
 }
 
 export const useAppSettings = create<AppSettingsStore>((set) => ({
@@ -20,5 +21,6 @@ export const useAppSettings = create<AppSettingsStore>((set) => ({
     lang: Langs[0],
     setLang: (lang: LangType) => set({ lang }),
     buySellColor: buySellColors[0],
-    setBuySellColor: (buySellColor: BuySellColor) => set({ buySellColor })
+    setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
+    isInverseColor: false,
 }));

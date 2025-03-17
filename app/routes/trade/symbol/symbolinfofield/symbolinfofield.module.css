@@ -59,3 +59,19 @@
     color: var(--red);
 }
 
+
+.inverseColor .symbolInfoFieldValue.positive {
+    color: var(--red);
+}
+
+.inverseColor .symbolInfoFieldValue.negative {
+    color: var(--green);
+}
+
+.inverseColor .symbolInfoFieldValue.positiveAnimation {
+    animation: changeNegative 1s ease-in-out;
+}
+
+.inverseColor .symbolInfoFieldValue.negativeAnimation {
+    animation: changePositive 1s ease-in-out;
+}

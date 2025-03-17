@@ -2,6 +2,7 @@ import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export interface OpenOrderData {
   time: string;
@@ -26,6 +27,16 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
   const { order, onCancel } = props;
 
   const {formatNum} = useNumFormatter();
+  const {isInverseColor} = useAppSettings();
+
+
+  const getDirectionClass = (side: string) => {
+    if(side === 'buy' && !isInverseColor) return styles.longDirection;
+    if(side === 'buy' && isInverseColor) return styles.shortDirection;
+    if(side === 'sell' && !isInverseColor) return styles.shortDirection;
+    if(side === 'sell' && isInverseColor) return styles.longDirection;
+  }
+
 
   const handleCancel = () => {
     if (onCancel) {
@@ -38,7 +49,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
       <div className={`${styles.cell} ${styles.timeCell}`}>{formatTimestamp(order.timestamp)}</div>
       <div className={`${styles.cell} ${styles.typeCell}`}>{order.orderType}</div>
       <div className={`${styles.cell} ${styles.coinCell}`}>{order.coin}</div>
-      <div className={`${styles.cell} ${styles.directionCell} ${order.side === 'buy' ? styles.longDirection : styles.shortDirection}`}>
+      <div className={`${styles.cell} ${styles.directionCell} ${getDirectionClass(order.side)}`}>
         {order.side === 'buy' ? 'Long' : 'Short'}
       </div>
       <div className={`${styles.cell} ${styles.sizeCell}`}>{formatNum(order.sz)}</div>

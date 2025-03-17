@@ -5,6 +5,7 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './watchlistnode.module.css';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNavigate } from 'react-router';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface WatchListNodeProps {
     symbol: SymbolInfoIF;
@@ -19,6 +20,8 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
     const { formatNum } = useNumFormatter();
 
     const {symbol: storeSymbol, setSymbol: setStoreSymbol} = useTradeDataStore();
+
+    const {isInverseColor} = useAppSettings();
 
     const change = useMemo(() => {
         return symbol.markPx - symbol.prevDayPx;
@@ -43,7 +46,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
 
   return (
-    <div className={styles.watchListNodeContainer} onClick={nodeClickListener}>
+    <div className={`${styles.watchListNodeContainer} ${isInverseColor ? styles.inverseColor : ''}`} onClick={nodeClickListener}>
       <div className={styles.symbolName}>{symbol.coin}-USD</div>
       <div className={`${styles.symbolValue} ${change > 0 ? styles.positive : change < 0 ? styles.negative : ''}` }>{shownVal}</div>
     </div>
