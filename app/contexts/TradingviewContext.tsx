@@ -3,7 +3,7 @@ import {
     type Bar,
     type IChartingLibraryWidget,
     type LibrarySymbolInfo,
-  type ResolutionString,
+    type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -11,7 +11,7 @@ import { useWebSocketContext } from './WebSocketContext';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from '~/routes/chart/data/processChartData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { priceFormatterFactory } from "~/routes/chart/utils";
+import { priceFormatterFactory } from '~/routes/chart/utils';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -106,18 +106,18 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             loading_screen: { backgroundColor: '#0e0e14' },
             // load_last_chart:false,
             time_frames: [
-                { text: '1m', resolution: '1' as ResolutionString },
-                { text: '3m', resolution: '3' as ResolutionString },
-                { text: '5d', resolution: 'D' as ResolutionString },
-                { text: '1d', resolution: 'D' as ResolutionString },
-                { text: '6m', resolution: '6M' as ResolutionString },
-                { text: '1y', resolution: '12M' as ResolutionString },
-                { text: '5y', resolution: '60M' as ResolutionString },
+                { text: '5y', resolution: '1w' as ResolutionString },
+                { text: '1y', resolution: '1w' as ResolutionString },
+                { text: '6m', resolution: '120' as ResolutionString },
+                { text: '3m', resolution: '60' as ResolutionString },
+                { text: '1m', resolution: '30' as ResolutionString },
+                { text: '5d', resolution: '5' as ResolutionString },
+                { text: '1d', resolution: '1' as ResolutionString },
             ],
-          custom_formatters: {
-        priceFormatterFactory: priceFormatterFactory,
-      },
-    });
+            custom_formatters: {
+                priceFormatterFactory: priceFormatterFactory,
+            },
+        });
 
         tvWidget.onChartReady(() => {
             tvWidget.applyOverrides({
