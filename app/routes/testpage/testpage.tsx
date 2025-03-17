@@ -64,10 +64,6 @@ export default function testpage(props: propsIF) {
         ]);
     }
 
-    useEffect(() => {
-        console.log(notifications);
-    }, [notifications]);
-
     return (
         <div className={styles.testpage}>
             <button onClick={() => addNotification()}>
