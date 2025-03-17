@@ -83,7 +83,7 @@ export default function Notifications() {
         return () => {
             document.removeEventListener("keydown", addNotificationOnKeypress);
         };
-    }, []);
+    }, [addNotificationOnKeypress]);
 
 
     return (
