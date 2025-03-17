@@ -28,7 +28,7 @@ export default function Modal(props: propsIF) {
         const EVENT_TYPE = 'keydown';
         // fn to close modal when the `Escape` key is pressed
         function handleEscape(evt: KeyboardEvent): void {
-            evt.key === 'Escape' && close();
+            evt.key === 'Escape' && close && close();
         }
         // add the event listener to the DOM
         document.addEventListener(EVENT_TYPE, handleEscape);
