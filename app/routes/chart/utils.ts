@@ -32,4 +32,4 @@ export const mapResolutionToInterval = (resolution: string): string => {
 
   
 
-  export const supportedResolutions = ["1m","5m","15m","1h","1d"] as ResolutionString[];
+  export const supportedResolutions = ["1","3","5","15","30","60","120","240","480","720","1D","3D","1W","1M"] as ResolutionString[];
