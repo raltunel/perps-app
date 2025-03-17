@@ -1,13 +1,39 @@
 import { useEffect, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
+type positions =
+    | 'center'
+    | 'bottomRight';
+
+interface positionCSS {
+    position?: 'fixed';
+    top?: string;
+    bottom?: string;
+    left?: string;
+    right?: string;
+}
+
+const positionStyles: Record<positions, positionCSS> = {
+    center: {
+        position: 'fixed',
+        top: '0',
+        bottom: '0',
+    },
+    bottomRight: {
+        position: 'fixed',
+        bottom: '0',
+        right: '0',
+    },
+};
+
 interface propsIF {
     close?: () => void;
+    position: positions;
     children: ReactNode;
 }
 
 export default function Modal(props: propsIF) {
-    const { close, children } = props;
+    const { close, position, children } = props;
 
     // return children without creating curtain behind modal
     // this allows us to make multiple non-exclusive modals at once
@@ -45,6 +71,7 @@ export default function Modal(props: propsIF) {
             }
             id={OUTSIDE_MODAL_DOM_ID}
             className={styles.outside_modal}
+            style={positionStyles[position]}
         >
             {children}
         </div>

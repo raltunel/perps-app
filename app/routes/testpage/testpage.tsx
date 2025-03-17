@@ -69,28 +69,22 @@ export default function testpage(props: propsIF) {
         console.log(notifications);
     }, [notifications]);
 
-    const modalControl: useModalIF = useModal('closed');
-
     return (
         <div className={styles.testpage}>
-            {/* interactable to open modal on user action */}
             <button onClick={() => addNotification()}>
-                Open Modal
+                Add Notification
             </button>
-            {/* format to insantiate modal in the DOM */}
-            { notifications.length &&
-                <Modal>
-                    {
-                        notifications.map((n: notificationIF, i) => 
-                            <Notification
-                                key={JSON.stringify(n) + i.toString()}
-                                status='pending'
-                                dismiss={() => null}
-                            />
-                        )
-                    }
-                </Modal>
-            }
+            {!!notifications.length && <div className={styles.notifications}>
+                {
+                    notifications.map((n: notificationIF, i) => 
+                        <Notification
+                            key={JSON.stringify(n) + i.toString()}
+                            status='pending'
+                            dismiss={() => null}
+                        />
+                    )
+                }
+            </div>}
         </div>
     );
 }
