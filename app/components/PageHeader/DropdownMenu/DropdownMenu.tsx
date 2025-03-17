@@ -21,12 +21,10 @@ const menuItems = [
 ];
 
 const DropdownMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-      <div className={`${styles.container} ${isOpen ? styles.open : styles.closed}`}> 
+      <div className={styles.container }> 
         {menuItems.map((item, index) => (
           <div key={index} className={styles.menuItem}>
             <span>{item.name}</span>

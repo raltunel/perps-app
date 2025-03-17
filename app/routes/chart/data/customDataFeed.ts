@@ -9,6 +9,7 @@ import { getHistoricalData } from './candleDataCache';
 import { mapResolutionToInterval, supportedResolutions } from '../utils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
+import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -42,7 +43,7 @@ export const createDataFeed = (
                 ticker: symbolName,
                 name: symbolName,
                 minmov: 1,
-                pricescale: 1,
+                pricescale: 1000,
                 timezone: 'Etc/UTC',
                 session: '24x7',
                 has_intraday: true,

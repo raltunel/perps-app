@@ -1,0 +1,23 @@
+.option_line {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    color: var(--text1);
+    cursor: pointer;
+    font-size: var(----font-size-s);
+}
+
+.checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--text2);
+    border-radius: 4px;
+}
