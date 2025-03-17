@@ -8,6 +8,7 @@ const DEFAULTS = {
     optOutSpotDusting: false,
     persistTradingConnection: false,
     displayVerboseErrors: false,
+    enableTxNotifications: true,
     enableBackgroundFillNotif: true,
     playFillSound: false,
     animateOrderBook: true,

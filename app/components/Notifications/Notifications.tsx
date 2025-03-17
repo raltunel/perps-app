@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './Notifications.module.css';
 import Notification from './Notification';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 
 type notificationType = 'spinner'|'check';
 
@@ -84,17 +85,20 @@ export default function Notifications() {
         };
     }, [addNotificationOnKeypress]);
 
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     return (
         <div className={styles.notifications}>
             {
-                notifications.map((n: notificationIF) => (
-                    <Notification
-                        key={JSON.stringify(n)}
-                        data={n}
-                        dismiss={removeNotification}
-                    />
-                ))
+                activeOptions.enableTxNotifications && (
+                    notifications.map((n: notificationIF) => (
+                        <Notification
+                            key={JSON.stringify(n)}
+                            data={n}
+                            dismiss={removeNotification}
+                        />
+                    ))
+                )
             }
         </div>
     );
