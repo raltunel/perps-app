@@ -1,17 +1,20 @@
 import {
     widget,
-    type Bar,
     type IChartingLibraryWidget,
-    type LibrarySymbolInfo,
-  type ResolutionString,
+    type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { loadChartDrawState } from '~/routes/chart/data/utils/chartStorage';
-import { useChartEvents } from '~/routes/chart/hook/useChartEvents';
 import { priceFormatterFactory } from '~/routes/chart/data/utils/utils';
+import {
+    drawingEvent,
+    drawingEventUnsubscribe,
+    studyEvents,
+    studyEventsUnsubscribe,
+} from '~/routes/chart/data/utils/chartEvents';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -42,8 +45,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { subscribe } = useWsObserver();
     const { symbol } = useTradeDataStore();
-    
-    useChartEvents(chart);
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -68,9 +69,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             autosize: true,
             datafeed: createDataFeed(subscribe) as any,
             interval: defaultProps.interval,
-            disabled_features: [
-                'volume_force_overlay' /* "use_localstorage_for_settings" */,
-            ],
+            disabled_features: ['volume_force_overlay'],
             locale: 'en',
             theme: 'dark',
             overrides: {
@@ -87,10 +86,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 { text: '4H', resolution: '240' as ResolutionString },
                 { text: '1D', resolution: '1D' as ResolutionString },
             ],
-          custom_formatters: {
-        priceFormatterFactory: priceFormatterFactory,
-      },
-    });
+            custom_formatters: {
+                priceFormatterFactory: priceFormatterFactory,
+            },
+        });
 
         tvWidget.onChartReady(() => {
             tvWidget.applyOverrides({
@@ -98,26 +97,38 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
+            loadChartDrawState(tvWidget);
+
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
              */
             const volumePaneIndex = 1;
-            const priceScale = tvWidget
-                .activeChart()
-                .getPanes()
-                [volumePaneIndex].getMainSourcePriceScale();
 
-            if (priceScale) {
-                priceScale.setAutoScale(true);
-                priceScale.setMode(0);
+            const paneCount = tvWidget.activeChart().getPanes().length;
+
+            if (paneCount > volumePaneIndex) {
+                const priceScale = tvWidget
+                    .activeChart()
+                    .getPanes()
+                    [volumePaneIndex].getMainSourcePriceScale();
+
+                if (priceScale) {
+                    priceScale.setAutoScale(true);
+                    priceScale.setMode(0);
+                }
             }
             setChart(tvWidget);
-
-            loadChartDrawState(tvWidget);
         });
 
-        return () => tvWidget.remove();
+        return () => {
+            if (chart) {
+                drawingEventUnsubscribe(chart);
+                studyEventsUnsubscribe(chart);
+
+                chart.remove();
+            }
+        };
     }, []);
 
     useEffect(() => {
@@ -126,6 +137,12 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             chartRef.setSymbol(symbol);
         }
     }, [symbol]);
+
+    useEffect(() => {
+        if (!chart) return;
+        drawingEvent(chart);
+        studyEvents(chart);
+    }, [chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>
