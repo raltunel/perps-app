@@ -6,7 +6,28 @@ interface propsIF {
 
 }
 
-const notificationTexts = [
+interface notificationMetaIF {
+    title: string;
+    messages: string[],
+    icon: 'spinner'|'check';
+}
+
+const notificationMeta: notificationMetaIF[] = [
+    {
+        title: 'Leverage Mode Changed',
+        messages: [
+            'Switched to Isolated Margin Mode',
+            'Switched to 100x Leverage',
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Sub Account Created',
+        messages: [
+            'Sub Account 1 Created'
+        ],
+        icon: 'check',
+    },
     
 ];
 
