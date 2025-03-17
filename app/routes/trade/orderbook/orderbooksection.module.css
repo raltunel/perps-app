@@ -52,3 +52,14 @@
 .childOfLargeContainer {
     flex: 1 1;
 }
+
+.menuContent{
+    display: flex;
+    justify-content: center;
+ 
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 8px;
+}

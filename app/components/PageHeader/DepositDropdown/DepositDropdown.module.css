@@ -22,7 +22,7 @@
 .dropdownContainer {
   background: var(--dark2, #0e0e14);
   position: absolute;
-  top: 56px;
+  top:30px;
   right: 0;
   width: 303px;
   height: 293px;
