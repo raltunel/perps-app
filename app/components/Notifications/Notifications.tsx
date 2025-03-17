@@ -92,7 +92,7 @@ export default function Notifications() {
                     <Notification
                         key={JSON.stringify(n)}
                         data={n}
-                        dismiss={() => removeNotification(n.oid)}
+                        dismiss={removeNotification}
                     />
                 ))
             }
