@@ -1,7 +1,7 @@
 import {
     widget,
     type IChartingLibraryWidget,
-    type ResolutionString,
+      type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -69,7 +69,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             autosize: true,
             datafeed: createDataFeed(subscribe) as any,
             interval: defaultProps.interval,
-            disabled_features: ['volume_force_overlay'],
+            disabled_features: [
+                'volume_force_overlay',
+                'header_symbol_search',
+                'header_compare',
+            ],
+            favorites: {
+                intervals: ['5', '1h', 'D'] as ResolutionString[],
+            },
             locale: 'en',
             theme: 'dark',
             overrides: {
@@ -79,12 +86,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             loading_screen: { backgroundColor: '#0e0e14' },
             // load_last_chart:false,
             time_frames: [
-                { text: '1m', resolution: '1' as ResolutionString },
-                { text: '5m', resolution: '5' as ResolutionString },
-                { text: '15m', resolution: '15' as ResolutionString },
-                { text: '1H', resolution: '60' as ResolutionString },
-                { text: '4H', resolution: '240' as ResolutionString },
-                { text: '1D', resolution: '1D' as ResolutionString },
+                { text: '5y', resolution: '1w' as ResolutionString },
+                { text: '1y', resolution: '1w' as ResolutionString },
+                { text: '6m', resolution: '120' as ResolutionString },
+                { text: '3m', resolution: '60' as ResolutionString },
+                { text: '1m', resolution: '30' as ResolutionString },
+                { text: '5d', resolution: '5' as ResolutionString },
+                { text: '1d', resolution: '1' as ResolutionString },
             ],
             custom_formatters: {
                 priceFormatterFactory: priceFormatterFactory,
