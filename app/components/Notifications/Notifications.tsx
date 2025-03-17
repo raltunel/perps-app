@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import styles from './Notifications.module.css';
-import { ImSpinner8 } from 'react-icons/im';
-import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
+import Notification from './Notification';
 
 type notificationType = 'spinner'|'check';
 
@@ -89,30 +88,13 @@ export default function Notifications() {
     return (
         <div className={styles.notifications}>
             {
-                notifications.map((n: notificationIF) => {
-                    return (
-                        <section className={styles.notification}>
-                            <header>
-                                <div className={styles.header_content}>
-                                    {
-                                        n.icon === 'spinner' &&
-                                        <ImSpinner8 size={24} color={'var(--accent1)'} />
-                                    }
-                                    {
-                                        n.icon === 'check' &&
-                                        <IoCheckmarkCircleOutline size={24} color={'var(--accent1)'} />
-                                    }
-                                    <h2>{n.title}</h2>
-                                </div>
-                                <IoClose
-                                    className={styles.close}
-                                    onClick={() => removeNotification(n.oid)}
-                                />
-                            </header>
-                            <p>{n.message} {n.oid}</p>
-                        </section>
-                    );
-                })
+                notifications.map((n: notificationIF) => (
+                    <Notification
+                        key={JSON.stringify(n)}
+                        data={n}
+                        dismiss={() => removeNotification(n.oid)}
+                    />
+                ))
             }
         </div>
     );
