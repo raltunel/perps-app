@@ -33,13 +33,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         if (orderBookSection) {
             const wrapperHeight =
                 orderBookSection.getBoundingClientRect().height;
-            if (orderBookModeRef.current !== 'stacked') {
-                const orderCount = Math.floor(wrapperHeight / 60);
-                setOrderCount(orderCount);
-                setTradesCount(Math.floor(wrapperHeight / 23));
-            } else {
-                const orderCount = Math.floor(wrapperHeight / 1000);
-                setOrderCount(orderCount);
+            if(wrapperHeight > 0){
+                if (orderBookModeRef.current !== 'stacked') {
+                    const orderCount = Math.floor(wrapperHeight / 60);
+                    setOrderCount(orderCount);
+                    setTradesCount(Math.floor(wrapperHeight / 23));
+                } else {
+                    const orderCount = Math.floor(wrapperHeight / 1000);
+                    setOrderCount(orderCount);
+                }
             }
         }
     };
