@@ -1,17 +1,20 @@
 import {
     widget,
-    type Bar,
     type IChartingLibraryWidget,
-    type LibrarySymbolInfo,
-    type ResolutionString,
+      type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
-import { useWebSocketContext } from './WebSocketContext';
 import { useWsObserver } from '~/hooks/useWsObserver';
-import { processWSCandleMessage } from '~/routes/chart/data/processChartData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { priceFormatterFactory } from '~/routes/chart/utils';
+import { loadChartDrawState, saveChartLayout } from '~/routes/chart/data/utils/chartStorage';
+import { priceFormatterFactory } from '~/routes/chart/data/utils/utils';
+import {
+    drawingEvent,
+    drawingEventUnsubscribe,
+    studyEvents,
+    studyEventsUnsubscribe,
+} from '~/routes/chart/data/utils/chartEvents';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -56,22 +59,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         studiesOverrides: {},
     };
 
-    // const changeSubscription = (payload: any) => {
-    //   subscribe('candle',
-    //     {payload: payload,
-    //     handler: candleDataHandler,
-    //     single: true
-    //   })
-    // }
-
-    // useEffect(() => {
-    //   changeSubscription({
-    //     coin: defaultProps.symbolName,
-    //     // interval: defaultProps.interval,
-    //     interval: "1d",
-    //   });
-    // }, [defaultProps.symbolName])
-
     useEffect(() => {
         const tvWidget = new widget({
             container: 'tv_chart',
@@ -95,13 +82,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             overrides: {
                 volumePaneSize: 'medium',
             },
-            /*   overrides: {
-        //  "paneProperties.background": "rgba(14,14,20, 1)",
-        //  "paneProperties.backgroundType": "solid",
-        "mainSeriesProperties.priceAxisProperties.log" : false,
-        // "mainSeriesProperties.priceAxisProperties.log" : "false",
-
-      }, */
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
             // load_last_chart:false,
@@ -123,35 +103,55 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             tvWidget.applyOverrides({
                 'paneProperties.background': '#0e0e14',
                 'paneProperties.backgroundType': 'solid',
-                // "paneProperties.gridLinesMode": "none"
             });
+
+            loadChartDrawState(tvWidget);
 
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
              */
             const volumePaneIndex = 1;
-            const priceScale = tvWidget
-                .activeChart()
-                .getPanes()
-                [volumePaneIndex].getMainSourcePriceScale();
 
-            if (priceScale) {
-                priceScale.setAutoScale(true);
-                priceScale.setMode(0);
+            const paneCount = tvWidget.activeChart().getPanes().length;
+
+            if (paneCount > volumePaneIndex) {
+                const priceScale = tvWidget
+                    .activeChart()
+                    .getPanes()
+                    [volumePaneIndex].getMainSourcePriceScale();
+
+                if (priceScale) {
+                    priceScale.setAutoScale(true);
+                    priceScale.setMode(0);
+                }
             }
             setChart(tvWidget);
         });
 
-        return () => tvWidget.remove();
+        return () => {
+            if (chart) {
+                drawingEventUnsubscribe(chart);
+                studyEventsUnsubscribe(chart);
+
+                chart.remove();
+            }
+        };
     }, []);
 
     useEffect(() => {
         if (chart) {
             const chartRef = chart.chart();
             chartRef.setSymbol(symbol);
+            saveChartLayout(chart);
         }
     }, [symbol]);
+
+    useEffect(() => {
+        if (!chart) return;
+        drawingEvent(chart);
+        studyEvents(chart);
+    }, [chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>
