@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
@@ -11,6 +11,7 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface OrderBookProps {
   symbol: string;
@@ -27,11 +28,11 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const assetPrice = useRef<number>(0);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
+    const { formatNum } = useNumFormatter();
+
+
     const {buys, sells, setOrderBook} = useOrderBookStore();
     const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
-
-    const [userBuyIndices, setUserBuyIndices] = useState<number[]>([]);
-    const [userSellIndices, setUserSellIndices] = useState<number[]>([]);
 
     const addFakeBuySellsToOrderBook = () => {
       const buysIndices:number[] = [];
@@ -54,14 +55,27 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         sellsIndices.push(tempIndex);
       }
 
-      setUserBuyIndices(buysIndices);
-      setUserSellIndices(sellsIndices);
     }
 
     useEffect(() => {
 
       console.log('>>> user orders', userOrders);
     }, [userOrders])
+
+
+    const userSlots:Set<string> = useMemo(() => {
+
+      const slots = new Set<string>();
+       userSymbolOrders.map((order) => {
+
+        if(selectedResolution){
+          const slot = formatNum(order.limitPx, selectedResolution);
+          slots.add(slot);
+        }
+      })
+
+      return slots;
+    }, [userSymbolOrders, selectedResolution])
 
     useEffect(() => {
 
@@ -175,7 +189,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     <div className={styles.orderBookBlock}>
           {sells.slice(0, orderCount).reverse().map((order, index) => (
             <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
-            hasUserOrder={userSellIndices.includes(index)} />
+            resolution={selectedResolution}
+            userSlots={userSlots} />
           ))}
     </div>
     
@@ -191,7 +206,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     <div className={styles.orderBookBlock}>
           {buys.slice(0, orderCount).map((order, index) => (
             <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current} 
-            hasUserOrder={userBuyIndices.includes(index)} />
+            resolution={selectedResolution}
+            userSlots={userSlots} />
           ))} 
     </div>
     </>
