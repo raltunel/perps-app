@@ -62,7 +62,7 @@ export default function testpage(props: propsIF) {
     function addNotification(): void {
         const nextNotification: notificationIF = makeNotificationData();
         setNotifications([
-            ...notifications, nextNotification,
+            ...notifications.slice(notifications.length - 2), nextNotification,
         ]);
     }
 
