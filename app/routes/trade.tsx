@@ -19,6 +19,7 @@ import { getLS } from '~/utils/AppUtils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
 import TradeModules from './trade/trademodules/trademodules';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -95,7 +96,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
               <div className={styles.tradeModules}><TradeModules /></div>
             </section>
             <section className={styles.containerBottom}>
-                <div className={styles.table}>table</div>
+                <div className={styles.table}>
+                    <TradeTable/>
+                </div>
                 <div className={styles.wallet}>
                     <DepositDropdown
                         isUserConnected={false}
