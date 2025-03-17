@@ -1,5 +1,4 @@
 import styles from './testpage.module.css';
-import Notifications from '~/components/Notifications/Notifications';
 
 interface propsIF {
 
@@ -11,7 +10,6 @@ export default function testpage(props: propsIF) {
 
     return (
         <div className={styles.testpage}>
-            <Notifications />
         </div>
     );
 }
