@@ -7,7 +7,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { loadChartDrawState } from '~/routes/chart/data/utils/chartStorage';
+import { loadChartDrawState, saveChartLayout } from '~/routes/chart/data/utils/chartStorage';
 import { priceFormatterFactory } from '~/routes/chart/data/utils/utils';
 import {
     drawingEvent,
@@ -135,6 +135,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         if (chart) {
             const chartRef = chart.chart();
             chartRef.setSymbol(symbol);
+            saveChartLayout(chart);
         }
     }, [symbol]);
 

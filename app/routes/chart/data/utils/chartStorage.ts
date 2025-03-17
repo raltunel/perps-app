@@ -2,9 +2,11 @@ import { useChartStore } from '~/stores/TradingviewChartStore';
 
 export const saveChartLayout = (tvWidget: any) => {
     setTimeout(() => {
-        tvWidget.save((state: object) => {
-            useChartStore.getState().saveLayout(state);
-        });
+        try {
+            tvWidget.save((state: object) => {
+                useChartStore.getState().saveLayout(state);
+            });
+        } catch (error) {}
     }, 100);
 };
 export const loadChartDrawState = (tvWidget: any) => {
