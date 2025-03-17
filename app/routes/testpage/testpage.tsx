@@ -1,5 +1,5 @@
 import styles from './testpage.module.css';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
 
@@ -37,13 +37,14 @@ interface notificationIF {
     title: string;
     message: string;
     icon: notificationType;
+    oid: number;
 }
 
 // main react fn
 export default function testpage(props: propsIF) {
     false && props;
 
-    function makeNotificationData() {
+    function makeNotificationData(): notificationIF {
         function getRandomElement<T>(a: Array<T>): T {
             const randomIndex = Math.floor(Math.random() * a.length);
             return a[randomIndex];
@@ -53,6 +54,7 @@ export default function testpage(props: propsIF) {
             title: meta.title,
             message: getRandomElement(meta.messages),
             icon: meta.icon,
+            oid: makeOID(14),
         });
     }
 
@@ -64,6 +66,18 @@ export default function testpage(props: propsIF) {
         ]);
     }
 
+    function removeNotification(id: number): void {
+        setNotifications(notifications.filter(
+            (n: notificationIF) => n.oid !== id
+        ));
+    }
+
+    function makeOID(digits: number): number {
+        const min = 10 ** (digits - 1);
+        const max = 10 ** digits - 1;
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     return (
         <div className={styles.testpage}>
             <button onClick={() => addNotification()}>
@@ -71,7 +85,7 @@ export default function testpage(props: propsIF) {
             </button>
             {!!notifications.length && <div className={styles.notifications}>
                 {
-                    notifications.map((n: notificationIF, i) => {
+                    notifications.map((n: notificationIF) => {
                         return (
                             <section className={styles.notification}>
                                 <header>
@@ -88,10 +102,10 @@ export default function testpage(props: propsIF) {
                                     </div>
                                     <IoClose
                                         className={styles.close}
-                                        onClick={() => null}
+                                        onClick={() => removeNotification(n.oid)}
                                     />
                                 </header>
-                                <p>{n.message}</p>
+                                <p>{n.message} {n.oid}</p>
                             </section>
                         );
                     })
