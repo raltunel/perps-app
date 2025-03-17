@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
-import type { OrderRowIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
+import type { OrderBookRowIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderrow.module.css';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeModuleStore } from '~/stores/TradeModuleStore';
 
 interface OrderRowProps {
-  order: OrderRowIF;
+  order: OrderBookRowIF;
   coef: number;
   resolution: OrderRowResolutionIF | null;
   userSlots: Set<string>;

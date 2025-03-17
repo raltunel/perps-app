@@ -1,5 +1,5 @@
 import {create} from 'zustand';
-import type { OrderBookTradeIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
+import type { OrderBookTradeIF, OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
 
 import { wsUrls } from '~/utils/Constants';
 

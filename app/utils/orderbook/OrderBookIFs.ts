@@ -1,4 +1,4 @@
-export interface OrderRowIF{
+export interface OrderBookRowIF{
     coin: string;
     px: number;
     sz: number;
@@ -35,7 +35,7 @@ export interface OrderDataIF {
   orderType?: string;
   origSz: number;
   reduceOnly? :boolean;
-  side: string;
+  side: 'buy' | 'sell';
   sz: number;
   tif?: string;
   timestamp: number;

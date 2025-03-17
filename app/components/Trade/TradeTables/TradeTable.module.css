@@ -3,6 +3,7 @@
     height: 100%;
 border-radius: var(--main-border-radius, 16px);
 background: var(--dark2, #0E0E14);
+font-family: var(--font-family-main);
 
 
 

@@ -1,4 +1,7 @@
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 export interface OpenOrderData {
   time: string;
@@ -15,34 +18,36 @@ export interface OpenOrderData {
 }
 
 interface OpenOrdersTableRowProps {
-  order: OpenOrderData;
-  onCancel?: (time: string, coin: string) => void;
+  order: OrderDataIF;
+  onCancel?: (time: number, coin: string) => void;
 }
 
 export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
   const { order, onCancel } = props;
 
+  const {formatNum} = useNumFormatter();
+
   const handleCancel = () => {
     if (onCancel) {
-      onCancel(order.time, order.coin);
+      onCancel(order.timestamp, order.coin);
     }
   };
 
   return (
     <div className={styles.rowContainer}>
-      <div className={`${styles.cell} ${styles.timeCell}`}>{order.time}</div>
-      <div className={`${styles.cell} ${styles.typeCell}`}>{order.type}</div>
+      <div className={`${styles.cell} ${styles.timeCell}`}>{formatTimestamp(order.timestamp)}</div>
+      <div className={`${styles.cell} ${styles.typeCell}`}>{order.orderType}</div>
       <div className={`${styles.cell} ${styles.coinCell}`}>{order.coin}</div>
-      <div className={`${styles.cell} ${styles.directionCell} ${order.direction === 'Long' ? styles.longDirection : styles.shortDirection}`}>
-        {order.direction}
+      <div className={`${styles.cell} ${styles.directionCell} ${order.side === 'buy' ? styles.longDirection : styles.shortDirection}`}>
+        {order.side === 'buy' ? 'Long' : 'Short'}
       </div>
-      <div className={`${styles.cell} ${styles.sizeCell}`}>{order.size}</div>
-      <div className={`${styles.cell} ${styles.originalSizeCell}`}>{order.originalSize}</div>
-      <div className={`${styles.cell} ${styles.orderValueCell}`}>{order.orderValue}</div>
-      <div className={`${styles.cell} ${styles.priceCell}`}>{order.price}</div>
-      <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>{order.reduceOnly}</div>
-      <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>{order.triggerConditions}</div>
-      <div className={`${styles.cell} ${styles.tpslCell}`}>{order.tpsl}</div>
+      <div className={`${styles.cell} ${styles.sizeCell}`}>{formatNum(order.sz)}</div>
+      <div className={`${styles.cell} ${styles.originalSizeCell}`}>{formatNum(order.origSz)}</div>
+      <div className={`${styles.cell} ${styles.orderValueCell}`}>${formatNum(order.sz * order.limitPx)}</div>
+      <div className={`${styles.cell} ${styles.priceCell}`}>{formatNum(order.limitPx)}</div>
+      <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>{order.reduceOnly ? 'Yes' : 'No'}</div>
+      <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>{order.triggerCondition}</div>
+      <div className={`${styles.cell} ${styles.tpslCell}`}>{order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}</div>
       <div className={`${styles.cell} ${styles.cancelCell}`}>
         <button className={styles.cancelButton} onClick={handleCancel}>
           Cancel
