@@ -10,6 +10,7 @@ import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
+import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 
 export interface FilterOption {
     id: string;
@@ -109,9 +110,7 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             case 'Deposits and Withdrawals':
                 return (
-                    <div className={styles.emptyState}>
-                        Deposits and Withdrawals data will appear here
-                    </div>
+                    <DepositsWithdrawalsTable/>
                 );
             default:
                 return (
