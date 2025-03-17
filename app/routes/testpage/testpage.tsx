@@ -3,6 +3,8 @@ import { type useModalIF, useModal } from "~/hooks/useModal";
 import Notification from '~/components/Notifications/Notification';
 import { useEffect, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
+import { ImSpinner8 } from 'react-icons/im';
+import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
 
 interface propsIF {
 
@@ -76,13 +78,30 @@ export default function testpage(props: propsIF) {
             </button>
             {!!notifications.length && <div className={styles.notifications}>
                 {
-                    notifications.map((n: notificationIF, i) => 
-                        <Notification
-                            key={JSON.stringify(n) + i.toString()}
-                            status='pending'
-                            dismiss={() => null}
-                        />
-                    )
+                    notifications.map((n: notificationIF, i) => {
+                        return (
+                            <section className={styles.notification}>
+                                <header>
+                                    <div className={styles.header_content}>
+                                        {
+                                            n.icon === 'spinner' &&
+                                            <ImSpinner8 size={24} color={'var(--accent1)'} />
+                                        }
+                                        {
+                                            n.icon === 'check' &&
+                                            <IoCheckmarkCircleOutline size={24} color={'var(--accent1)'} />
+                                        }
+                                        <h2>{n.title}</h2>
+                                    </div>
+                                    <IoClose
+                                        className={styles.close}
+                                        onClick={() => null}
+                                    />
+                                </header>
+                                <p>{n.message}</p>
+                            </section>
+                        );
+                    })
                 }
             </div>}
         </div>
