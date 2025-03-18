@@ -1,17 +1,25 @@
 import {
     widget,
     type IChartingLibraryWidget,
-      type ResolutionString,
+    type ResolutionString,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { loadChartDrawState, saveChartLayout } from '~/routes/chart/data/utils/chartStorage';
-import { priceFormatterFactory } from '~/routes/chart/data/utils/utils';
+import {
+    getChartLayout,
+    saveChartLayout,
+} from '~/routes/chart/data/utils/chartStorage';
+import {
+    priceFormatterFactory,
+    type ChartLayout,
+} from '~/routes/chart/data/utils/utils';
 import {
     drawingEvent,
     drawingEventUnsubscribe,
+    intervalChangedSubscribe,
+    intervalChangedUnsubscribe,
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
@@ -26,7 +34,6 @@ const TradingViewContext = createContext<TradingViewContextType>({
 
 export interface ChartContainerProps {
     symbolName: string;
-    interval: ResolutionString;
     libraryPath: string;
     chartsStorageUrl: string;
     chartsStorageApiVersion: string;
@@ -46,9 +53,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const { subscribe } = useWsObserver();
     const { symbol } = useTradeDataStore();
 
+    const [chartState, setChartState] = useState<ChartLayout | null>();
+
+    useEffect(() => {
+        const res = getChartLayout();
+        setChartState(res);
+    }, []);
+
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
-        interval: 'D' as ResolutionString,
         libraryPath: '/tv/charting_library/',
         chartsStorageUrl: 'https://saveload.tradingview.com',
         chartsStorageApiVersion: '1.1',
@@ -68,7 +81,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             fullscreen: false,
             autosize: true,
             datafeed: createDataFeed(subscribe) as any,
-            interval: defaultProps.interval,
+            interval: (chartState?.interval || "1D") as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
@@ -105,7 +118,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
-            loadChartDrawState(tvWidget);
+            chartState && tvWidget.load(chartState.chartLayout);
 
             /**
              * 0 -> main chart pane
@@ -133,11 +146,11 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             if (chart) {
                 drawingEventUnsubscribe(chart);
                 studyEventsUnsubscribe(chart);
-
+                intervalChangedUnsubscribe(chart);
                 chart.remove();
             }
         };
-    }, []);
+    }, [chartState]);
 
     useEffect(() => {
         if (chart) {
@@ -151,6 +164,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!chart) return;
         drawingEvent(chart);
         studyEvents(chart);
+        intervalChangedSubscribe(chart);
     }, [chart]);
 
     return (

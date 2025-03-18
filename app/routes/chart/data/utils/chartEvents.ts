@@ -25,5 +25,24 @@ export const studyEventsUnsubscribe = (chart: any) => {
     chart?.unsubscribe('study_properties_changed', () => {});
 };
 
+export const intervalChangedSubscribe = (chart: any) => {
+    chart
+        .activeChart()
+        .onIntervalChanged()
+        .subscribe(null, (interval: number, timeframeObj: any) => {
+                saveChartLayout(chart);
+        });
+};
 
-
+export const intervalChangedUnsubscribe = (chart: any) => {
+    chart
+        .activeChart()
+        .onIntervalChanged()
+        .unsubscribe(null, (interval: number, timeframeObj: any) => {
+            (timeframeObj.timeframe = {
+                value: '12M',
+                type: 'period-back',
+            }),
+                saveChartLayout(chart);
+        });
+};
