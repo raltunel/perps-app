@@ -8,6 +8,7 @@ import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNavigate } from 'react-router';
+import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 
 interface SymbolInfoProps {
 }
@@ -80,8 +81,10 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
           type={'big-val'}
       />
       </div>
+      <div>
       {
         symbolInfo && symbolInfo.coin === symbol && (
+            <HorizontalScrollable>
           <div className={styles.symbolInfoFieldsWrapper}>
             <SymbolInfoField label="Mark" value={'$'+formatNum(symbolInfo?.markPx)} lastWsChange={symbolInfo?.lastPriceChange} />
             <SymbolInfoField label="Oracle" value={'$'+formatNum(symbolInfo?.oraclePx)} />
@@ -90,10 +93,11 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
             <SymbolInfoField label="Open Interest" value={'$'+formatNum(symbolInfo?.openInterest * symbolInfo?.oraclePx, 2)} />
             <SymbolInfoField label="Funding Rate" value={(symbolInfo?.funding * 100).toString().substring(0, 7)+'%'} type={symbolInfo?.funding < 0 ? 'positive' : symbolInfo?.funding > 0 ? 'negative' : undefined} />
             <SymbolInfoField label="Funding Countdown" value={getTimeUntilNextHour()} />
-
           </div>
+            </HorizontalScrollable>
         )
       }
+      </div>
 
     </div>
   );

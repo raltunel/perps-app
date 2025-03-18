@@ -60,3 +60,26 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
 
     return `00:${minutes}:${seconds}`;
 }
+
+export const formatTimestamp = (timestamp: number) => {
+  const date = new Date(timestamp);
+  return date.toLocaleString(undefined, {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+  });
+}
+
+const decimalPrecision = (precisionNumber: number) => {
+  if (!precisionNumber.toString().includes('.')) return 0;
+  return precisionNumber.toString().split('.')[1].length;
+}
+
+export const getPrecisionForResolution = (resolution: OrderRowResolutionIF):number => {
+  return decimalPrecision(resolution.val);
+}
+
