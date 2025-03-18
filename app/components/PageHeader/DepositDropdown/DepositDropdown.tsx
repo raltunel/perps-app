@@ -1,17 +1,22 @@
+import { useNotificationStore, type notificationSlugs } from '~/stores/NotificationStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 
-interface PropsIF {
+interface propsIF {
   isUserConnected: boolean;
   setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
   isDropdown?: boolean;
 }
-export default function DepositDropdown(props: PropsIF) {
+export default function DepositDropdown(props: propsIF) {
   const { isUserConnected, isDropdown } = props;
+
+  // hook to populate a new notification in the notification center on user click
+  const populateNotification: (s: notificationSlugs) => void = useNotificationStore().add;
+
   const actionButtons = (
     <div className={styles.actionButtons}>
-      <button>Deposit</button>
-      <button>Withdraw</button>
+      <button onClick={() => populateNotification('depositPending')}>Deposit</button>
+      <button onClick={() => populateNotification('withdrawPending')}>Withdraw</button>
     </div>
   );
 

@@ -94,7 +94,7 @@ const nm: { [x: string]: notificationMetaIF } = {
     },
 }
 
-type notificationSlugs = keyof typeof nm;
+export type notificationSlugs = keyof typeof nm;
 
 export interface notificationIF {
     title: string;
