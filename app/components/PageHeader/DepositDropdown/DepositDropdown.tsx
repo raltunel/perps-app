@@ -1,29 +1,17 @@
+import { useNotificationStore, type notificationSlugs } from '~/stores/NotificationStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 
-interface PropsIF {
+interface propsIF {
   isUserConnected: boolean;
   setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
   isDropdown?: boolean;
 }
-export default function DepositDropdown(props: PropsIF) {
+export default function DepositDropdown(props: propsIF) {
   const { isUserConnected, isDropdown } = props;
-  const actionButtons = (
-    <div className={styles.actionButtons}>
-      <button>Deposit</button>
-      <button>Withdraw</button>
-    </div>
-  );
 
-  const notConnectedContent = (
-    <div className={styles.notConnectedContainer}>
-      <p className={styles.notConnectedText}>
-        Connect your wallet to start trading with zero gas.
-      </p>
-
-      <button className={styles.connectButton}>Connect Wallet</button>
-    </div>
-  );
+  // hook to populate a new notification in the notification center on user click
+  const populateNotification: (s: notificationSlugs) => void = useNotificationStore().add;
 
   const overviewData = [
     {
@@ -57,7 +45,19 @@ export default function DepositDropdown(props: PropsIF) {
     <div
     className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
     >
-      {isUserConnected ? actionButtons : notConnectedContent}
+      {
+        isUserConnected
+          ? (<div className={styles.actionButtons}>
+            <button onClick={() => populateNotification('depositPending')}>Deposit</button>
+            <button onClick={() => populateNotification('withdrawPending')}>Withdraw</button>
+          </div>)
+          : (<div className={styles.notConnectedContainer}>
+            <p className={styles.notConnectedText}>
+              Connect your wallet to start trading with zero gas.
+            </p>
+            <button className={styles.connectButton}>Connect Wallet</button>
+          </div>)
+      }
       <div className={styles.overviewContainer}>
         <h3>Account Overview</h3>
         {overviewData.map((data, idx) => (

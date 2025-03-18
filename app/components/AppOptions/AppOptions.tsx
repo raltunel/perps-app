@@ -34,6 +34,10 @@ const optionsBottom: appOptionDataIF[] = [
         text: 'Display Verbose Errors',
     },
     {
+        slug: 'enableTxNotifications',
+        text: 'Enable Transaction Notifications',
+    },
+    {
         slug: 'enableBackgroundFillNotif',
         text: 'Enable Background Fill Notifications',
     },

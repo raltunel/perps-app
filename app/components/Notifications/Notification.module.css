@@ -1,0 +1,49 @@
+/* top-level JSX return */
+.notification {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 380px;
+    height: 90px;
+    padding: 16px;
+    font-family: var(--font-family-main);
+    background-color: var(--dark3);
+    border-radius: 16px;
+    user-select: none;
+}
+
+/* top content in the notification card */
+.notification > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* icon and headline text in the <header> elem */
+.header_content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+/* headline in the <header> elem */
+.header_content > h2 {
+    font-size: var(--font-size-m);
+}
+
+/* descriptive text at bottom of the notification card */
+.notification > p {
+    font-size: var(--font-size-s);
+}
+
+/* clickable to close the notification (remove elem from DOM) */
+.close {
+    cursor: pointer;
+}
+
+.close:hover {
+    color: var(--accent1);
+}
