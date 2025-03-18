@@ -3,6 +3,7 @@ import Notification from './Notification';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useNotificationStore, type notificationIF, type NotificationStoreIF } from '~/stores/NotificationStore';
 import { useEffect } from 'react';
+import { useKeydown } from '~/hooks/useKeydown';
 
 export default function Notifications() {
 
@@ -13,12 +14,7 @@ export default function Notifications() {
         trigger.key === 'a' && data.add();
     }
 
-    useEffect(() => {
-        document.addEventListener('keydown', addNotificationOnKeypress);
-        return () => {
-            document.removeEventListener('keydown', addNotificationOnKeypress);
-        };
-    }, [addNotificationOnKeypress]);
+    useKeydown('a', () => data.add());
 
     return (
         <div className={styles.notifications}>

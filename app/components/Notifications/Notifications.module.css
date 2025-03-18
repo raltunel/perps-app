@@ -1,8 +1,13 @@
+/* container in which to populate notifications */
 .notifications {
+    /* remove the element from the normal layout flow */
     position: absolute;
+    /* rander element slightly up and left from bottom-right corner */
     bottom: 10px;
     right: 10px;
+    /* display notifications in a column */
     display: flex;
     flex-direction: column;
+    /* slight vertical gap between elements */
     gap: 15px;
 }
