@@ -153,6 +153,7 @@ export interface NotificationStoreIF {
     notifications: notificationIF[];
     add: (s?: notificationSlugs) => void;
     remove: (id: number) => void;
+    clearAll: () => void;
 }
 
 // the actual data store
@@ -171,4 +172,6 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     remove: (id: number): void => set({
         notifications: get().notifications.filter((n: notificationIF) => n.oid !== id)
     }),
+    // fn to clear all notifications from state
+    clearAll: (): void => set({ notifications: []}),
 }));
