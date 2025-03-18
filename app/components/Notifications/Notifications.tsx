@@ -14,7 +14,8 @@ export default function Notifications() {
         trigger.key === 'a' && data.add();
     }
 
-    useKeydown('a', () => data.add());
+    // run fn `data.add` when the user presses the 'a' key
+    useKeydown('a', data.add);
 
     return (
         <div className={styles.notifications}>
