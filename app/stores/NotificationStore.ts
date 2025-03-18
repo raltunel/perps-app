@@ -8,7 +8,7 @@ interface notificationMetaIF {
     icon: icons;
 }
 
-const nm: { [x: string]: notificationMetaIF } = {
+const notificationMeta: { [x: string]: notificationMetaIF } = {
     leverageModeChanged: {
         title: 'Leverage Mode Changed',
         messages: [
@@ -94,7 +94,7 @@ const nm: { [x: string]: notificationMetaIF } = {
     },
 }
 
-export type notificationSlugs = keyof typeof nm;
+export type notificationSlugs = keyof typeof notificationMeta;
 
 export interface notificationIF {
     title: string;
@@ -115,8 +115,8 @@ function makeNotificationData(slug?: notificationSlugs): notificationIF {
         return a[randomIndex];
     }
     const meta: notificationMetaIF = slug
-        ? nm[slug]
-        : getRandomElement(Object.values(nm));
+        ? notificationMeta[slug]
+        : getRandomElement(Object.values(notificationMeta));
     return ({
         title: meta.title,
         message: getRandomElement(meta.messages),
