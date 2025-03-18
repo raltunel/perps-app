@@ -12,10 +12,16 @@ interface propsIF {
 export default function Notification(props: propsIF) {
     const { data, dismiss } = props;
 
+    // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
 
+    // time period (ms) after which to auto-dismiss the notification
     const DISMISS_AFTER = 5000;
 
+    // logic to remove this elem from the DOM after a timeout, yes the
+    // ... logic shown is convoluted, any changes will result in all
+    // ... notifications being dismissed together or the timer being
+    // ... reset any time a notification disappears
     useEffect(() => {
         const autoDismiss: NodeJS.Timeout = setTimeout(
             () => dismiss(data.oid),
@@ -24,6 +30,7 @@ export default function Notification(props: propsIF) {
         return () => clearTimeout(autoDismiss);
     }, [dismiss]);
 
+    // px size at which to render SVG icons
     const ICON_SIZE = 24;
 
     return (
