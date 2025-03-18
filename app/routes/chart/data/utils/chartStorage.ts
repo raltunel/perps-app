@@ -4,14 +4,19 @@ export const saveChartLayout = (tvWidget: any) => {
     setTimeout(() => {
         try {
             tvWidget.save((state: object) => {
-                useChartStore.getState().saveLayout(state);
+                const chartState = {
+                    chartLayout: state,
+                    interval: tvWidget.activeChart().resolution(),
+                };
+
+                useChartStore.getState().saveLayout(chartState);
             });
         } catch (error) {}
     }, 100);
 };
-export const loadChartDrawState = (tvWidget: any) => {
+
+export const getChartLayout = () => {
     const savedState = useChartStore.getState().loadLayout();
-    if (savedState) {
-        tvWidget.load(savedState);
-    }
+
+    return savedState;
 };
