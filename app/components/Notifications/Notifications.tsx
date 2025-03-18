@@ -1,18 +1,22 @@
 import styles from './Notifications.module.css';
 import Notification from './Notification';
-import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
-import { useNotificationStore, type notificationIF, type NotificationStoreIF } from '~/stores/NotificationStore';
-import { useEffect } from 'react';
+import {
+    useAppOptions,
+    type useAppOptionsIF
+} from '~/stores/AppOptionsStore';
+import {
+    useNotificationStore,
+    type notificationIF,
+    type NotificationStoreIF
+} from '~/stores/NotificationStore';
 import { useKeydown } from '~/hooks/useKeydown';
 
 export default function Notifications() {
-
+    // notification data from which to generate DOM elements
     const data: NotificationStoreIF = useNotificationStore();
-    const activeOptions: useAppOptionsIF = useAppOptions();
 
-    function addNotificationOnKeypress(trigger: KeyboardEvent): void {
-        trigger.key === 'a' && data.add();
-    }
+    // boolean to suppress notifications if toggled by user
+    const { enableTxNotifications } = useAppOptions();
 
     // run fn `data.add` when the user presses the 'a' key
     useKeydown('a', data.add);
@@ -20,7 +24,7 @@ export default function Notifications() {
     return (
         <div className={styles.notifications}>
             {
-                activeOptions.enableTxNotifications && (
+                enableTxNotifications && (
                     data.notifications.map((n: notificationIF) => (
                         <Notification
                             key={JSON.stringify(n)}
