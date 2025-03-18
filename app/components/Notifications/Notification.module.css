@@ -36,3 +36,7 @@
 .close {
     cursor: pointer;
 }
+
+.close:hover {
+    color: var(--accent1);
+}
