@@ -24,22 +24,25 @@ export default function Notification(props: propsIF) {
         return () => clearTimeout(autoDismiss);
     }, [dismiss]);
 
+    const ICON_SIZE = 24;
+
     return (
         <section className={styles.notification}>
             <header>
                 <div className={styles.header_content}>
                     {
                         data.icon === 'spinner' &&
-                        <ImSpinner8 size={24} color={'var(--accent1)'} />
+                        <ImSpinner8 size={ICON_SIZE} color='var(--accent1)' />
                     }
                     {
                         data.icon === 'check' &&
-                        <IoCheckmarkCircleOutline size={24} color={'var(--accent1)'} />
+                        <IoCheckmarkCircleOutline size={ICON_SIZE} color='var(--accent1)' />
                     }
                     <h2>{data.title}</h2>
                 </div>
                 <IoClose
                     className={styles.close}
+                    size={ICON_SIZE}
                     onClick={() => dismiss(data.oid)}
                 />
             </header>
