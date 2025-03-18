@@ -1,8 +1,8 @@
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
 import styles from './Notification.module.css';
-import type { notificationIF } from './Notifications';
 import { useEffect, useRef } from 'react';
+import type { notificationIF } from '~/stores/NotificationStore';
 
 interface propsIF {
     data: notificationIF;
