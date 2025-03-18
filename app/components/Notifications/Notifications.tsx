@@ -16,7 +16,6 @@ const notificationMeta: notificationMetaIF[] = [
         title: 'Leverage Mode Changed',
         messages: [
             'Switched to Isolated Margin Mode',
-            'Switched to 100x Leverage',
         ],
         icon: 'check',
     },
@@ -24,6 +23,75 @@ const notificationMeta: notificationMetaIF[] = [
         title: 'Sub Account Created',
         messages: [
             'Sub Account 1 Created'
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Leverage Amount Changed',
+        messages: [
+            'Switched to 100x Leverage',
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Order Pending',
+        messages: [
+            'Order 0.0001 ETH at $2,300',
+        ],
+        icon: 'spinner',
+    },
+    {
+        title: 'Order Confirmed',
+        messages: [
+            'Order 0.0001 ETH at $2,300',
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Deposit Pending',
+        messages: [
+            'Deposit 69,000 USDC',
+            'Deposit 420,000 USDC',
+        ],
+        icon: 'spinner',
+    },
+    {
+        title: 'Deposit Confirmed',
+        messages: [
+            'Deposit 69,000 USDC',
+            'Deposit 420,000 USDC',
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Withdraw Pending',
+        messages: [
+            'Withdraw 69,000 USDC',
+            'Withdraw 420,000 USDC',
+        ],
+        icon: 'spinner',
+    },
+    {
+        title: 'Withdraw Confirmed',
+        messages: [
+            'Withdraw 69,000 USDC',
+            'Withdraw 420,000 USDC',
+        ],
+        icon: 'check',
+    },
+    {
+        title: 'Send Pending',
+        messages: [
+            'Send 69,000 USDC',
+            'Send 420,000 USDC',
+        ],
+        icon: 'spinner',
+    },
+    {
+        title: 'Send Confirmed',
+        messages: [
+            'Send 69,000 USDC',
+            'Send 420,000 USDC',
         ],
         icon: 'check',
     },
