@@ -9,6 +9,8 @@ export function useKeydown(
     // param to toggle on debug mode
     debug?: 'debug'
 ): () => void {
+    // type of event declared in central constant
+    const EVENT_TYPE = 'keydown';
     // listener to execute functionality on the appropriate keypress
     function listener(trigger: KeyboardEvent): void {
         // console log for debug mode
@@ -26,17 +28,17 @@ export function useKeydown(
     useEffect(() => {
         // console log for debug mode
         debug && console.log('adding event listener', {
-            event: 'keydown',
+            event: EVENT_TYPE,
             key: key,
             fn: fn,
         });
         // add the event listener when the component mounts
-        document.addEventListener('keydown', listener);
+        document.addEventListener(EVENT_TYPE, listener);
         // remove the event listener when the component dismounts
         return () => {
-            document.removeEventListener('keydown', listener);
+            document.removeEventListener(EVENT_TYPE, listener);
         };
     }, []);
     // return a function to simulate a keydown for testing
-    return () => document.dispatchEvent(new KeyboardEvent('keydown', { key }));
+    return () => document.dispatchEvent(new KeyboardEvent(EVENT_TYPE, { key }));
 }
