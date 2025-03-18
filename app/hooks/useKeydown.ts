@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
-export function useKeydown(key: string, fn: () => void) {
+export function useKeydown(key: string, fn: () => void): () => void {
     function listener(trigger: KeyboardEvent): void {
         trigger.key === key && fn();
     }
@@ -10,4 +10,5 @@ export function useKeydown(key: string, fn: () => void) {
                 document.removeEventListener('keydown', listener);
             };
         }, [listener]);
+    return () => document.dispatchEvent(new KeyboardEvent('keydown', { key }));
 }
