@@ -1,50 +1,50 @@
 import { create } from "zustand";
 
-type notificationType = 'spinner'|'check';
+type icons = 'spinner'|'check';
 
 interface notificationMetaIF {
     title: string;
     messages: string[],
-    icon: notificationType;
+    icon: icons;
 }
 
-const notificationMeta: notificationMetaIF[] = [
-    {
+const nm: { [x: string]: notificationMetaIF } = {
+    leverageModeChanged: {
         title: 'Leverage Mode Changed',
         messages: [
             'Switched to Isolated Margin Mode',
         ],
         icon: 'check',
     },
-    {
+    subAccountCreated: {
         title: 'Sub Account Created',
         messages: [
             'Sub Account 1 Created'
         ],
         icon: 'check',
     },
-    {
+    leverageAmountChanged: {
         title: 'Leverage Amount Changed',
         messages: [
             'Switched to 100x Leverage',
         ],
         icon: 'check',
     },
-    {
+    orderPending: {
         title: 'Order Pending',
         messages: [
             'Order 0.0001 ETH at $2,300',
         ],
         icon: 'spinner',
     },
-    {
+    orderConfirmed: {
         title: 'Order Confirmed',
         messages: [
             'Order 0.0001 ETH at $2,300',
         ],
         icon: 'check',
     },
-    {
+    depositPending: {
         title: 'Deposit Pending',
         messages: [
             'Deposit 69,000 USDC',
@@ -52,7 +52,7 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'spinner',
     },
-    {
+    depositConfirmed: {
         title: 'Deposit Confirmed',
         messages: [
             'Deposit 69,000 USDC',
@@ -60,7 +60,7 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'check',
     },
-    {
+    withdrawPending: {
         title: 'Withdraw Pending',
         messages: [
             'Withdraw 69,000 USDC',
@@ -68,7 +68,7 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'spinner',
     },
-    {
+    withdrawConfirmed: {
         title: 'Withdraw Confirmed',
         messages: [
             'Withdraw 69,000 USDC',
@@ -76,7 +76,7 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'check',
     },
-    {
+    sendPending: {
         title: 'Send Pending',
         messages: [
             'Send 69,000 USDC',
@@ -84,7 +84,7 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'spinner',
     },
-    {
+    sendConfirmed: {
         title: 'Send Confirmed',
         messages: [
             'Send 69,000 USDC',
@@ -92,12 +92,12 @@ const notificationMeta: notificationMetaIF[] = [
         ],
         icon: 'check',
     },
-];
+}
 
 export interface notificationIF {
     title: string;
     message: string;
-    icon: notificationType;
+    icon: icons;
     oid: number;
 }
 
@@ -109,10 +109,10 @@ function makeOID(digits: number): number {
 
 function makeNotificationData(): notificationIF {
     function getRandomElement<T>(a: Array<T>): T {
-        const randomIndex = Math.floor(Math.random() * a.length);
+        const randomIndex: number = Math.floor(Math.random() * a.length);
         return a[randomIndex];
     }
-    const meta = getRandomElement(notificationMeta);
+    const meta: notificationMetaIF = getRandomElement(Object.values(nm));
     return ({
         title: meta.title,
         message: getRandomElement(meta.messages),
