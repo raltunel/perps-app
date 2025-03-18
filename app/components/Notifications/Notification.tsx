@@ -14,7 +14,7 @@ export default function Notification(props: propsIF) {
 
     const createdAt = useRef<number>(Date.now());
 
-    const DISMISS_AFTER = 3000;
+    const DISMISS_AFTER = 5000;
 
     useEffect(() => {
         const autoDismiss: NodeJS.Timeout = setTimeout(
