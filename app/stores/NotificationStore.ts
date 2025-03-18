@@ -94,6 +94,8 @@ const nm: { [x: string]: notificationMetaIF } = {
     },
 }
 
+type notificationSlugs = keyof typeof nm;
+
 export interface notificationIF {
     title: string;
     message: string;
@@ -107,12 +109,14 @@ function makeOID(digits: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function makeNotificationData(): notificationIF {
+function makeNotificationData(slug?: notificationSlugs): notificationIF {
     function getRandomElement<T>(a: Array<T>): T {
         const randomIndex: number = Math.floor(Math.random() * a.length);
         return a[randomIndex];
     }
-    const meta: notificationMetaIF = getRandomElement(Object.values(nm));
+    const meta: notificationMetaIF = slug
+        ? nm[slug]
+        : getRandomElement(Object.values(nm));
     return ({
         title: meta.title,
         message: getRandomElement(meta.messages),
@@ -123,17 +127,17 @@ function makeNotificationData(): notificationIF {
 
 export interface NotificationStoreIF {
     notifications: notificationIF[];
-    add: () => void;
+    add: (s?: notificationSlugs) => void;
     remove: (id: number) => void;
 }
 
 export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     notifications: [],
-    add: (): void => {
+    add: (s?: notificationSlugs): void => {
         const current: notificationIF[] = get().notifications;
         set({ notifications: [
                 ...current.slice(current.length - 2),
-                makeNotificationData()
+                makeNotificationData(s)
             ] });
     },
     remove: (id: number): void => set({
