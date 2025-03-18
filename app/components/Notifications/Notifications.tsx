@@ -1,9 +1,6 @@
 import styles from './Notifications.module.css';
 import Notification from './Notification';
-import {
-    useAppOptions,
-    type useAppOptionsIF
-} from '~/stores/AppOptionsStore';
+import { useAppOptions } from '~/stores/AppOptionsStore';
 import {
     useNotificationStore,
     type notificationIF,
