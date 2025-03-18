@@ -13,23 +13,6 @@ export default function DepositDropdown(props: propsIF) {
   // hook to populate a new notification in the notification center on user click
   const populateNotification: (s: notificationSlugs) => void = useNotificationStore().add;
 
-  const actionButtons = (
-    <div className={styles.actionButtons}>
-      <button onClick={() => populateNotification('depositPending')}>Deposit</button>
-      <button onClick={() => populateNotification('withdrawPending')}>Withdraw</button>
-    </div>
-  );
-
-  const notConnectedContent = (
-    <div className={styles.notConnectedContainer}>
-      <p className={styles.notConnectedText}>
-        Connect your wallet to start trading with zero gas.
-      </p>
-
-      <button className={styles.connectButton}>Connect Wallet</button>
-    </div>
-  );
-
   const overviewData = [
     {
       label: 'Balance',
@@ -62,7 +45,19 @@ export default function DepositDropdown(props: propsIF) {
     <div
     className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
     >
-      {isUserConnected ? actionButtons : notConnectedContent}
+      {
+        isUserConnected
+          ? (<div className={styles.actionButtons}>
+            <button onClick={() => populateNotification('depositPending')}>Deposit</button>
+            <button onClick={() => populateNotification('withdrawPending')}>Withdraw</button>
+          </div>)
+          : (<div className={styles.notConnectedContainer}>
+            <p className={styles.notConnectedText}>
+              Connect your wallet to start trading with zero gas.
+            </p>
+            <button className={styles.connectButton}>Connect Wallet</button>
+          </div>)
+      }
       <div className={styles.overviewContainer}>
         <h3>Account Overview</h3>
         {overviewData.map((data, idx) => (
