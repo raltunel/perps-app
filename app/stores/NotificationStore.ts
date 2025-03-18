@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 
+// slugs to indicate which React icon should be rendered
 type icons = 'spinner'|'check';
 
+// shape of data structure from which to generate placeholder
+// ... notification content
 interface notificationMetaIF {
     title: string;
     messages: string[],
     icon: icons;
 }
 
+// structure of all notification types and potential content for
+// ... randomized generation
 const notificationMeta: { [x: string]: notificationMetaIF } = {
     leverageModeChanged: {
         title: 'Leverage Mode Changed',
@@ -94,29 +99,47 @@ const notificationMeta: { [x: string]: notificationMetaIF } = {
     },
 }
 
+// string union type of all keys in obj `notificationMeta` listing
+// ... all defined notification types
 export type notificationSlugs = keyof typeof notificationMeta;
 
+// shape of post-processed data used to construct a DOM element
 export interface notificationIF {
+    // title text for the card
     title: string;
+    // descriptive text body for the card
     message: string;
+    // icon to display on the card
     icon: icons;
+    // unique ID for the tx used to generate the card, used for
+    // ... updating and removing cards
     oid: number;
 }
 
+// fn to make an order ID number (later this will be supplied by the server)
 function makeOID(digits: number): number {
     const min: number = 10 ** (digits - 1);
     const max: number = 10 ** digits - 1;
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// fn to produce an obj literal in the correct shape to generate
+// ... a DOM notification element
+//      called with arg → fn will return an iteration of the notification
+//                        ... corresponding to the provided slug
+//      no arg → fn will randomly select a notification format to return
 function makeNotificationData(slug?: notificationSlugs): notificationIF {
+    // fn to select a random element from an array of same-type elements
     function getRandomElement<T>(a: Array<T>): T {
         const randomIndex: number = Math.floor(Math.random() * a.length);
         return a[randomIndex];
     }
+    // select a meta notification data structure by the provided slug or
+    // ... at random if no slug was provided
     const meta: notificationMetaIF = slug
         ? notificationMeta[slug]
         : getRandomElement(Object.values(notificationMeta));
+    // return data in the shape consumed by the DOM
     return ({
         title: meta.title,
         message: getRandomElement(meta.messages),
@@ -125,14 +148,18 @@ function makeNotificationData(slug?: notificationSlugs): notificationIF {
     });
 }
 
+// shape of the return obj produced by this store
 export interface NotificationStoreIF {
     notifications: notificationIF[];
     add: (s?: notificationSlugs) => void;
     remove: (id: number) => void;
 }
 
+// the actual data store
 export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
+    // raw data consumed by the app
     notifications: [],
+    // fn to add a new population to state
     add: (s?: notificationSlugs): void => {
         const current: notificationIF[] = get().notifications;
         set({ notifications: [
@@ -140,6 +167,7 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
                 makeNotificationData(s)
             ] });
     },
+    // fn to remove an existing element from the data array
     remove: (id: number): void => set({
         notifications: get().notifications.filter((n: notificationIF) => n.oid !== id)
     }),
