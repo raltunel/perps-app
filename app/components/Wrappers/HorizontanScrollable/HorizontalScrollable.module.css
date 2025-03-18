@@ -1,0 +1,6 @@
+.horizontalScrollable {
+    /* white-space: nowrap; */
+    width: fit-content;
+    overflow: hidden;
+    /* max-width: 50%; */
+}

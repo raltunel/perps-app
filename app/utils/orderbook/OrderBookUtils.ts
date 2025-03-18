@@ -73,3 +73,13 @@ export const formatTimestamp = (timestamp: number) => {
       hour12: false
   });
 }
+
+const decimalPrecision = (precisionNumber: number) => {
+  if (!precisionNumber.toString().includes('.')) return 0;
+  return precisionNumber.toString().split('.')[1].length;
+}
+
+export const getPrecisionForResolution = (resolution: OrderRowResolutionIF):number => {
+  return decimalPrecision(resolution.val);
+}
+

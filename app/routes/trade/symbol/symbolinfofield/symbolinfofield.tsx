@@ -18,6 +18,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsC
 
 
   return (
+    <div className={styles.symbolInfoFieldWrapper}>
     <div className={`${styles.symbolInfoField} ${isInverseColor ? styles.inverseColor : ''}`}>
       <div className={styles.symbolInfoFieldLabel}>{label}</div>
       <div className={`${styles.symbolInfoFieldValue} 
@@ -25,6 +26,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsC
       lastWsChange && lastWsChange < 0 ? styles.negativeAnimation : ''}
       ${type === 'positive' ? styles.positive : 
       type === 'negative' ? styles.negative : ''}`}>{value}</div>
+    </div>
     </div>
   );
 }

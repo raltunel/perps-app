@@ -67,7 +67,7 @@ export function useNumFormatter() {
   
 
 
-  return { formatNum, formatPriceForChart };
+  return { formatNum, formatPriceForChart, decimalPrecision };
 }
 
 export default useNumFormatter;
