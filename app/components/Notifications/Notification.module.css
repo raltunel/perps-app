@@ -1,3 +1,4 @@
+/* top-level JSX return */
 .notification {
     display: flex;
     flex-direction: column;
@@ -12,6 +13,7 @@
     user-select: none;
 }
 
+/* top content in the notification card */
 .notification > header {
     display: flex;
     flex-direction: row;
@@ -19,21 +21,25 @@
     align-items: center;
 }
 
-.notification > header > .header_content {
+/* icon and headline text in the <header> elem */
+.header_content {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 8px;
 }
 
-.notification h2 {
+/* headline in the <header> elem */
+.header_content > h2 {
     font-size: var(--font-size-m);
 }
 
+/* descriptive text at bottom of the notification card */
 .notification > p {
     font-size: var(--font-size-s);
 }
 
+/* clickable to close the notification (remove elem from DOM) */
 .close {
     cursor: pointer;
 }
