@@ -2,6 +2,11 @@ import type { ResolutionString } from '~/tv/charting_library';
 
 import type { LibrarySymbolInfo } from '~/tv/charting_library/charting_library';
 
+
+export type ChartLayout = {
+    chartLayout:object,
+    interval:string
+} 
 export const mapResolutionToInterval = (resolution: string): string => {
     const mapping: Record<string, string> = {
         '1': '1m',
