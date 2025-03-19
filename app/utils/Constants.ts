@@ -72,6 +72,10 @@ export const debugWallets: DebugWallet[] = [
         address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00'
     },
     {
+        label: 'Crazy 2',
+        address: '0x023a3d058020fb76cca98f01b3c48c8938a22355'
+    },
+    {
         label: 'Benjamin Hyper',
         address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353'
     },

@@ -9,12 +9,8 @@ interface TradeModulesProps {
 
 const TradeModules: React.FC<TradeModulesProps> = () => {
 
-    const { subscribe, unsubscribeAllByChannel} = useWsObserver();
-
     const { tradeSlot, setTradeSlot } = useTradeModuleStore();
     const { symbol } = useTradeDataStore();
-
-    const {userSymbolOrders} = useTradeDataStore();
 
     useEffect(() => {
         setTradeSlot(null);
@@ -22,27 +18,6 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
 
   return (
     <div className={styles.tradeModulesContainer}>
-
-<div style={{maxHeight: '50vh', width: '120px', overflowY: 'auto'}}>
-      {
-        userSymbolOrders.filter((order) => order.side === 'sell').sort((a, b) => b.limitPx - a.limitPx).map((order) => {
-          return (
-            <div key={order.cloid} style={{color: 'var(--red)'}}>
-              {order.limitPx}
-            </div>
-          )
-        })
-      }
-      {
-        userSymbolOrders.filter((order) => order.side === 'buy').sort((a, b) => b.limitPx - a.limitPx).map((order) => {
-          return (
-            <div key={order.cloid} style={{color: 'var(--green)'}}>
-              {order.limitPx}
-            </div>
-          )
-        })
-      }
-      </div>
 
      {
         tradeSlot && (
