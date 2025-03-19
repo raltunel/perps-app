@@ -2,6 +2,7 @@ import {
     widget,
     type IChartingLibraryWidget,
     type ResolutionString,
+    type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -81,11 +82,16 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             fullscreen: false,
             autosize: true,
             datafeed: createDataFeed(subscribe) as any,
-            interval: (chartState?.interval || "1D") as ResolutionString,
+            interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
                 'header_compare',
+                ...(chartState
+                    ? [
+                          'create_volume_indicator_by_default' as TradingTerminalFeatureset,
+                      ]
+                    : []),
             ],
             favorites: {
                 intervals: ['5', '1h', 'D'] as ResolutionString[],
