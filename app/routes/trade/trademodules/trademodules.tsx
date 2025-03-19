@@ -19,7 +19,7 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
   return (
     <div className={styles.tradeModulesContainer}>
 
-     {
+     {/* {
         tradeSlot && (
             <div className={styles.tradeSlot}>
                 <div className={styles.tradeSlotCoin}>{tradeSlot.coin}</div>
@@ -27,7 +27,7 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
                 <div className={styles.tradeSlotAmount}>Amount: {tradeSlot.amount}</div>
             </div>
         )
-     }
+     } */}
     </div>
   );
 }
