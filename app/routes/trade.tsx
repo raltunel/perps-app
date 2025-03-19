@@ -14,11 +14,12 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import WatchList from './trade/watchlist/watchlist';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { useDebugStore } from '~/stores/DebugStore';
-import { wsUrls } from '~/utils/Constants';
+import { debugWallets, wsUrls } from '~/utils/Constants';
 import { getLS } from '~/utils/AppUtils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
 import TradeModules from './trade/trademodules/trademodules';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -39,7 +40,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   const { orderBookMode } = useAppSettings();
 
 
-  const { wsUrl, setWsUrl } = useDebugStore();
+  const { wsUrl, setWsUrl, debugWallet, setDebugWallet } = useDebugStore();
 
 
     
@@ -60,7 +61,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
  
   // )
 
-
   return (
 <>
 <div className={styles.wsUrlSelector}>
@@ -68,6 +68,14 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   value={wsUrl}
   options={wsUrls}
   onChange={(value) => setWsUrl(value)}
+/>
+</div>
+<div className={styles.walletSelector}>
+<ComboBox
+  value={debugWallet.label}
+  options={debugWallets}
+  fieldName='label'
+  onChange={(value) => setDebugWallet({label: value, address: debugWallets.find((wallet) => wallet.label === value)?.address || ''})}
 />
 </div>
     
@@ -95,7 +103,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
               <div className={styles.tradeModules}><TradeModules /></div>
             </section>
             <section className={styles.containerBottom}>
-                <div className={styles.table}>table</div>
+                <div className={styles.table}>
+                    <TradeTable/>
+                </div>
                 <div className={styles.wallet}>
                     <DepositDropdown
                         isUserConnected={false}

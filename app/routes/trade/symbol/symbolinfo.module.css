@@ -1,9 +1,10 @@
+
 .symbolInfoContainer {
     width: 100%;
     font-family: var(--font-family-main);
     font-size: .8rem;
     display: flex;
-    align-items: center;
+    flex-direction: row;
 }
 
 .symbolInfoContainer div{
@@ -11,12 +12,18 @@
 }
 
 .symbolSelector {
-    display: inline-block;
+    /* flex-grow: auto; */
     margin-left: 2rem !important;
 }
 
 .symbolInfoFieldsWrapper {
-    display: inline-block;
+    /* flex-grow: auto; */
+    /* max-width: calc(100% - 10rem); */
+    display: grid;
+    grid-template-columns: repeat(7, auto) !important;
+    gap: 2rem;
+    margin-left: 2rem;
     /* white-space: nowrap;
+
     overflow: hidden; */
 }

@@ -25,3 +25,14 @@
 .symbolValue.negative{
     color: var(--red);
 }
+
+
+.inverseColor .symbolValue.positive{
+    color: var(--red);
+}
+
+.inverseColor .symbolValue.negative{
+    color: var(--green);
+}
+
+

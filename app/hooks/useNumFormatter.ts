@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
+import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 
 
@@ -28,18 +29,32 @@ export function useNumFormatter() {
   }, [parseNum]);
 
 
+  // returns the number of decimal places in a number
+  const decimalPrecision = (precisionNumber: number) => {
+      if (!precisionNumber.toString().includes('.')) return 0;
+      return precisionNumber.toString().split('.')[1].length;
+  }
 
 
-  const formatNum = useCallback((num: number | string, precision?: number) => {
+  const formatNum = useCallback((num: number | string, precision?: number | OrderRowResolutionIF | null) => {
 
     const formatType = numFormat.value;
+
+    let precisionVal = null;
+
+    if(precision && typeof precision === 'object'){
+      precisionVal = decimalPrecision(precision.val);
+    }
+    else if(precision){
+      precisionVal = precision;
+    }
     
     if (Number.isInteger(num)) {
       return num.toLocaleString(formatType);
     } else {
       return num.toLocaleString(formatType, {
-        minimumFractionDigits: precision || getDefaultPrecision(num),
-        maximumFractionDigits: precision || getDefaultPrecision(num)
+        minimumFractionDigits: precisionVal || getDefaultPrecision(num),
+        maximumFractionDigits: precisionVal || getDefaultPrecision(num)
       });
     }
 
@@ -52,7 +67,7 @@ export function useNumFormatter() {
   
 
 
-  return { formatNum, formatPriceForChart };
+  return { formatNum, formatPriceForChart, decimalPrecision };
 }
 
 export default useNumFormatter;

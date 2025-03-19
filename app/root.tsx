@@ -8,6 +8,8 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
+import Notifications from '~/components/Notifications/Notifications';
+
 import './css/app.css';
 import './css/index.css';
 
@@ -42,7 +44,7 @@ export default function App() {
           <Outlet />
         </main>
 
-       
+        <Notifications />
       </div>
     </Layout>
   );

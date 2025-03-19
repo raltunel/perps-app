@@ -7,7 +7,7 @@ import type {
     SubscribeBarsCallback,
 } from '~/tv/charting_library/charting_library';
 import { getHistoricalData, getMarkFillData } from './candleDataCache';
-import { mapResolutionToInterval } from '../utils';
+import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
 
@@ -28,7 +28,7 @@ export const createDataFeed = (
 
         onReady: (cb: any) => {
             cb({
-                supported_resolutions: ['1m', '5m', '15m', '1h', '1d'],
+                supported_resolutions: supportedResolutions,
                 supports_marks: true,
             }),
                 //   exchanges: [
@@ -46,18 +46,11 @@ export const createDataFeed = (
                 ticker: symbolName,
                 name: symbolName,
                 minmov: 1,
-                pricescale: 1,
+                pricescale: 1000,
                 timezone: 'Etc/UTC',
                 session: '24x7',
                 has_intraday: true,
-                supported_resolutions: [
-                    '1',
-                    '5',
-                    '15',
-                    '30',
-                    '60',
-                    'D',
-                ] as ResolutionString[],
+                supported_resolutions: supportedResolutions,
                 description: '',
                 type: '',
                 exchange: '',

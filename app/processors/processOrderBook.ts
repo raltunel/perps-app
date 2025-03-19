@@ -1,16 +1,16 @@
-import type { OrderBookTradeIF, OrderRowIF } from "~/utils/orderbook/OrderBookIFs";
+import type { OrderBookTradeIF, OrderDataIF, OrderBookRowIF } from "~/utils/orderbook/OrderBookIFs";
 import { parseNum } from "~/utils/orderbook/OrderBookUtils";
 
 
 
 
-export function processOrderBookMessage(data: any, slice?:number): {sells: OrderRowIF[], buys: OrderRowIF[]} {
+export function processOrderBookMessage(data: any, slice?:number): {sells: OrderBookRowIF[], buys: OrderBookRowIF[]} {
     const buysRaw = data.levels[0].slice(0, slice || 11);
     const sellsRaw = data.levels[1].slice(0, slice || 11);
 
     let buyTotal = 0;
     let sellTotal = 0;
-    let buysProcessed: OrderRowIF[] = buysRaw.map((e: any) => {
+    let buysProcessed: OrderBookRowIF[] = buysRaw.map((e: any) => {
       buyTotal += parseFloat(e.sz);
       return {
         coin: data.coin,
@@ -21,7 +21,7 @@ export function processOrderBookMessage(data: any, slice?:number): {sells: Order
         total: parseNum(buyTotal)
       }
     });
-    let sellsProcessed: OrderRowIF[] = sellsRaw.map((e: any) => {
+    let sellsProcessed: OrderBookRowIF[] = sellsRaw.map((e: any) => {
       sellTotal += parseFloat(e.sz);
       return {
         coin: data.coin,
@@ -60,6 +60,31 @@ export function processOrderBookTrades(data: any): OrderBookTradeIF[] {
       time: e.time,
       tid: e.tid,
       users: e.users
+    }
+  })
+}
+
+
+export function processUserOrders(data: any, status: string): OrderDataIF[] {
+  return data.map((e: any) => {
+    return {
+      coin: e.coin,
+      cloid: e.cloid,
+      oid: parseNum(e.oid),
+      // side: e.side,
+      side: e.side === 'A' ? 'sell' : 'buy',
+      sz: parseNum(e.sz),
+      tif: e.tif,
+      timestamp: e.timestamp,
+      status: status,
+      limitPx: parseNum(e.limitPx),
+      origSz: parseNum(e.origSz),
+      reduceOnly: e.reduceOnly,
+      isPositionTpsl: e.isPositionTpsl,
+      isTrigger: e.isTrigger,
+      triggerPx: parseNum(e.triggerPx),
+      triggerCondition: e.triggerCondition,
+      orderType: e.orderType
     }
   })
 }

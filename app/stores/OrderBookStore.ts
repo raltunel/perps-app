@@ -1,11 +1,11 @@
 import {create} from 'zustand';
-import type { OrderBookTradeIF, OrderRowIF } from '~/utils/orderbook/OrderBookIFs';
+import type { OrderBookTradeIF, OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
 
 interface OrderBookStore {
-    buys: OrderRowIF[];
-    sells: OrderRowIF[];
-    orderBook: OrderRowIF[];
-    setOrderBook: (buys: OrderRowIF[], sells: OrderRowIF[]) => void;
+    buys: OrderBookRowIF[];
+    sells: OrderBookRowIF[];
+    orderBook: OrderBookRowIF[];
+    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => void;
     trades: OrderBookTradeIF[];
     setTrades: (trades: OrderBookTradeIF[]) => void;
 }
@@ -15,6 +15,6 @@ export const useOrderBookStore = create<OrderBookStore>((set) => ({
     buys: [],
     sells: [],
     trades: [],
-    setOrderBook: (buys: OrderRowIF[], sells: OrderRowIF[]) => set({ buys, sells }),
+    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => set({ buys, sells }),
     setTrades: (trades: OrderBookTradeIF[]) => set({ trades })
 }));

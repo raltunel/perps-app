@@ -1,29 +1,17 @@
+import { useNotificationStore, type notificationSlugs } from '~/stores/NotificationStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 
-interface PropsIF {
+interface propsIF {
   isUserConnected: boolean;
   setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
   isDropdown?: boolean;
 }
-export default function DepositDropdown(props: PropsIF) {
+export default function DepositDropdown(props: propsIF) {
   const { isUserConnected, isDropdown } = props;
-  const actionButtons = (
-    <div className={styles.actionButtons}>
-      <button>Deposit</button>
-      <button>Withdraw</button>
-    </div>
-  );
 
-  const notConnectedContent = (
-    <div className={styles.notConnectedContainer}>
-      <p className={styles.notConnectedText}>
-        Connect your wallet to start trading with zero gas.
-      </p>
-
-      <button className={styles.connectButton}>Connect Wallet</button>
-    </div>
-  );
+  // hook to populate a new notification in the notification center on user click
+  const populateNotification: (s: notificationSlugs) => void = useNotificationStore().add;
 
   const overviewData = [
     {
@@ -57,7 +45,19 @@ export default function DepositDropdown(props: PropsIF) {
     <div
     className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
     >
-      {isUserConnected ? actionButtons : notConnectedContent}
+      {
+        isUserConnected
+          ? (<div className={styles.actionButtons}>
+            <button onClick={() => populateNotification('depositPending')}>Deposit</button>
+            <button onClick={() => populateNotification('withdrawPending')}>Withdraw</button>
+          </div>)
+          : (<div className={styles.notConnectedContainer}>
+            <p className={styles.notConnectedText}>
+              Connect your wallet to start trading with zero gas.
+            </p>
+            <button className={styles.connectButton}>Connect Wallet</button>
+          </div>)
+      }
       <div className={styles.overviewContainer}>
         <h3>Account Overview</h3>
         {overviewData.map((data, idx) => (
@@ -84,12 +84,12 @@ const tooltipSvg = (
     viewBox='0 0 16 16'
     fill='none'
   >
-    <g clip-path='url(#clip0_4025_6958)'>
+    <g clipPath='url(#clip0_4025_6958)'>
       <path
         d='M6.06001 6C6.21675 5.55445 6.52611 5.17874 6.93331 4.93942C7.34052 4.70011 7.81927 4.61263 8.28479 4.69248C8.75032 4.77232 9.17255 5.01435 9.47673 5.37569C9.7809 5.73702 9.94738 6.19435 9.94668 6.66667C9.94668 8 7.94668 8.66667 7.94668 8.66667M8.00001 11.3333H8.00668M14.6667 8C14.6667 11.6819 11.6819 14.6667 8.00001 14.6667C4.31811 14.6667 1.33334 11.6819 1.33334 8C1.33334 4.3181 4.31811 1.33333 8.00001 1.33333C11.6819 1.33333 14.6667 4.3181 14.6667 8Z'
         stroke='#6A6A6D'
-        stroke-linecap='round'
-        stroke-linejoin='round'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </g>
     <defs>
