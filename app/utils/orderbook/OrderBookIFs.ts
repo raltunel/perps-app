@@ -41,7 +41,7 @@ export interface OrderDataIF {
   timestamp: number;
   triggerCondition?: string;
   triggerPx?: number;
-  status: number;
+  status: string;
 
 }
 

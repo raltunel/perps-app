@@ -27,7 +27,7 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
       {
         userSymbolOrders.filter((order) => order.side === 'sell').sort((a, b) => b.limitPx - a.limitPx).map((order) => {
           return (
-            <div key={order.cloid} style={{color: 'var(--red)'}}>
+            <div key={order.oid} style={{color: 'var(--red)'}}>
               {order.limitPx}
             </div>
           )
@@ -36,7 +36,7 @@ const TradeModules: React.FC<TradeModulesProps> = () => {
       {
         userSymbolOrders.filter((order) => order.side === 'buy').sort((a, b) => b.limitPx - a.limitPx).map((order) => {
           return (
-            <div key={order.cloid} style={{color: 'var(--green)'}}>
+            <div key={order.oid} style={{color: 'var(--green)'}}>
               {order.limitPx}
             </div>
           )

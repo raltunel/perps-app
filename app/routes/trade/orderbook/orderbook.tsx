@@ -3,9 +3,9 @@ import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import OrderRow from './orderrow/orderrow';
 import styles from './orderbook.module.css';
 import { useWsObserver } from '~/hooks/useWsObserver';
-import { processOrderBookMessage, processUserOrders } from '~/processors/processOrderBook';
+import { processOrderBookMessage, processUserOrder } from '~/processors/processOrderBook';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
-import type { OrderBookMode, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
+import type { OrderBookMode, OrderDataIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import { getPrecisionForResolution, getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import BasicDivider from '~/components/Dividers/BasicDivider';
@@ -37,7 +37,28 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
-    const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
+    const {userOrders, setUserOrders, userSymbolOrders, removeFills} = useTradeDataStore();
+    const userOrdersRef = useRef<OrderDataIF[]>([]);
+    userOrdersRef.current = userOrders;
+
+
+    const updateUserOrders = useCallback((updates: OrderDataIF[]) => {
+      const currentOrders = userOrdersRef.current;
+      const cancels = new Set(updates.filter(e=> e.status === 'canceled').map(e=> e.cloid));
+      const notCancelled = currentOrders.filter((e:OrderDataIF)=> !cancels.has(e.cloid));
+      const notCancelledSet = new Set(notCancelled.map(e=> e.cloid));
+      const currentOrdersSet = new Set(currentOrders.map(e=> e.cloid));
+      const newOrders = updates.filter(e=> e.status === 'open' && !notCancelledSet.has(e.cloid) && !currentOrdersSet.has(e.cloid));
+      const updatedOrders = [...notCancelled, ...newOrders];
+      userOrdersRef.current = updatedOrders;
+      console.log('>>> updatedOrders', updatedOrders.length);
+
+      // if(new Date().getTime() % 100 === 77){
+      //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
+      //   // setUserOrders(updatedOrders);
+      // }
+      // setUserOrders(updatedOrders);
+    }, [])
 
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
@@ -63,7 +84,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      console.log('>>> user orders', userOrders);
+      console.log('>>> user orders', userOrders.length);
     }, [userOrders])
 
     const userBuySlots:Set<string> = useMemo(() => {
@@ -147,15 +168,60 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         handler: (payload) => {
 
           if(payload && payload.length > 0){
-            const userOrders = processUserOrders(payload, 'open');
+            const userOrders:OrderDataIF[] = [];
+            payload.map((order:any) => {
+              const processedOrder = processUserOrder(order, 'open');
+              if(processedOrder){
+                userOrders.push(processedOrder);
+              }
+            })
+            console.log('>>> api orders', userOrders);
             setUserOrders(userOrders);
           }
         }
       })
 
+      subscribe('userHistoricalOrders', {
+        payload: {
+          user: debugWallet.address
+        },
+        handler: (payload) => {
+          if(payload && payload.orderHistory && payload.orderHistory.length > 0){
+            const orderUpdates: OrderDataIF[] = [];
+            payload.orderHistory.map((o:any) => {
+              const processedOrder = processUserOrder(o.order, o.status);
+              if(processedOrder){
+                orderUpdates.push(processedOrder);
+              }
+              updateUserOrders(orderUpdates);
+            })
 
+            // console.log('>>> order updates', orderUpdates);
+            // updateUserOrders(orderUpdates);
+          }
+        }
+      })
+
+      subscribe('userFills', {
+        payload: {
+          user: debugWallet.address
+        },
+        handler: (payload) => {
+          const fills:OrderDataIF[] = [];
+          if(payload && payload.fills && payload.fills.length > 0){
+            payload.fills.map((fill:any) => {
+              const processedFill = processUserOrder(fill, 'filled');
+              if(processedFill){
+                fills.push(processedFill);
+              }
+            })
+          }
+          removeFills(fills);
+        }
+      })
       return () => {
         unsubscribeAllByChannel('l2Book');
+        unsubscribeAllByChannel('userHistoricalOrders');
       }
     }, [debugWallet.address])
 

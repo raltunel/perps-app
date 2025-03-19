@@ -1,5 +1,4 @@
-import {create} from 'zustand';
-import type { OrderBookTradeIF, OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
+import { create } from 'zustand';
 
 import { debugWallets, wsUrls } from '~/utils/Constants';
 
@@ -18,6 +17,6 @@ interface DebugStore {
 export const useDebugStore = create<DebugStore>((set) => ({
     wsUrl: wsUrls[0],
     setWsUrl: (wsUrl: string) => set({ wsUrl }),
-    debugWallet: debugWallets[0],
+    debugWallet: debugWallets[1],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet })
 }));
