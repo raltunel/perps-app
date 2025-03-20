@@ -39,7 +39,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const {buys, sells, setOrderBook} = useOrderBookStore();
     const {userOrders, setUserOrders, userSymbolOrders, removeFills} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
-    userOrdersRef.current = userOrders;
+    // userOrdersRef.current = userOrders;
 
 
     const updateUserOrders = useCallback((updates: OrderDataIF[]) => {
@@ -51,7 +51,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       const newOrders = updates.filter(e=> e.status === 'open' && !notCancelledSet.has(e.cloid) && !currentOrdersSet.has(e.cloid));
       const updatedOrders = [...notCancelled, ...newOrders];
       userOrdersRef.current = updatedOrders;
-      console.log('>>> updatedOrders', updatedOrders.length);
 
       // if(new Date().getTime() % 100 === 77){
       //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
@@ -84,7 +83,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      console.log('>>> user orders', userOrders.length);
+      if(!userOrdersRef.current){
+        userOrdersRef.current = userOrders;
+      }
     }, [userOrders])
 
     const userBuySlots:Set<string> = useMemo(() => {
@@ -143,7 +144,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      console.log('>>> user symbol orders', userSymbolOrders);
+      // console.log('>>> user symbol orders', userSymbolOrders);
     }, [userSymbolOrders])
 
     const changeSubscription = (payload: any) => {
@@ -157,6 +158,28 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         single: true
       })
     }
+
+
+    const orderProcessorIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+
+      if(orderProcessorIntervalRef.current){
+        clearInterval(orderProcessorIntervalRef.current);
+      }
+
+      orderProcessorIntervalRef.current = setInterval(() => {
+        console.log('>>> userOrdersRef', userOrdersRef.current.length);
+        setUserOrders(userOrdersRef.current);
+
+      }, 5000);
+
+      return () => {
+        if(orderProcessorIntervalRef.current){
+          clearInterval(orderProcessorIntervalRef.current);
+        }
+      }
+    }, [])
 
     useEffect(() => {
 

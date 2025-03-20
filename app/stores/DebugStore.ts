@@ -15,7 +15,7 @@ interface DebugStore {
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
-    wsUrl: wsUrls[0],
+    wsUrl: wsUrls[2],
     setWsUrl: (wsUrl: string) => set({ wsUrl }),
     debugWallet: debugWallets[1],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet })
