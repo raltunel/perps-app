@@ -10,4 +10,6 @@
     flex-direction: column;
     /* slight vertical gap between elements */
     gap: 15px;
+    /* added to show notifications above other elements on trade page */
+    z-index: 100;
 }
