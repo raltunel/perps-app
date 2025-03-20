@@ -12,6 +12,8 @@ import Notifications from '~/components/Notifications/Notifications';
 
 import './css/app.css';
 import './css/index.css';
+import { WebSocketProvider } from './contexts/WebSocketContext';
+import { useDebugStore } from './stores/DebugStore';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -33,8 +35,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+
+
+  const { wsUrl } = useDebugStore();
+  
   return (
     <Layout>
+      <WebSocketProvider url={wsUrl}>
       <div className='root-container'>
         <header className='header'>
           <PageHeader/>
@@ -46,6 +53,7 @@ export default function App() {
 
         <Notifications />
       </div>
+        </WebSocketProvider>
     </Layout>
   );
 }

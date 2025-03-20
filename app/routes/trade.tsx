@@ -20,6 +20,7 @@ import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
 import TradeModules from './trade/trademodules/trademodules';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import Notifications from '~/components/Notifications/Notifications';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -79,10 +80,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 />
 </div>
     
-    <WebSocketProvider url={wsUrl}>
-
       <TradeRouteHandler />
-
       {
         symbol && symbol.length > 0 && (
 
@@ -119,8 +117,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           
         )
       }
-    
-    </WebSocketProvider>
     </>
   );
 }
