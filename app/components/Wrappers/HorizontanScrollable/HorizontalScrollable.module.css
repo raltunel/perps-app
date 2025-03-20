@@ -1,6 +1,63 @@
 .horizontalScrollable {
     /* white-space: nowrap; */
-    width: fit-content;
-    overflow: hidden;
+    overflow: auto;
     /* max-width: 50%; */
+    position: relative;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-behavior: smooth; /* Smooth scrolling for supported browsers */
 }
+
+
+.horizontalScrollableContent{
+    display: flex;
+    position: inherit;
+}
+
+
+
+.scrollArrow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    background: rgba(17, 17, 24, 0.9);
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.3s ease;
+  }
+  
+  .scrollArrow svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--text2);
+    transition: fill 0.3s ease;
+  }
+  
+  .scrollArrow:hover svg {
+    fill: var(--text1);
+  }
+  
+  .scrollArrowLeft {
+    left: 0;
+    background: linear-gradient(to right, rgba(17, 17, 24, 1), rgba(17, 17, 24, 0.7));
+    padding-right: 8px;
+  }
+  
+  .scrollArrowRight {
+    right: 0;
+    background: linear-gradient(to left, rgba(17, 17, 24, 1), rgba(17, 17, 24, 0.7));
+    padding-left: 8px;
+  }
+  
+  .scrollArrowHidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
