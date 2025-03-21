@@ -7,3 +7,15 @@
     color: var(--text1);
     font-size: var(----font-size-s);
 }
+
+.active_option {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 200px;
+    padding: 2px 8px;
+    background-color: var(--dark6);
+    border-radius: 8px;
+}

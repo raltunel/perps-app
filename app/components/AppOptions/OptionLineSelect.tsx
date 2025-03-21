@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import styles from './OptionLineSelect.module.css';
+import { SlArrowDown } from 'react-icons/sl';
+
 
 interface dropdownOptionsIF {
     readable: string;
@@ -37,7 +39,15 @@ export default function OptionLineSelect(props: propsIF) {
                                 ))
                             }
                         </div>
-                    ) : <div onClick={() => setIsOpen(true)}>{active}</div>
+                    ) : (
+                        <div
+                            className={styles.active_option}
+                            onClick={() => setIsOpen(true)}
+                        >
+                            {active}
+                            <SlArrowDown />
+                        </div>
+                    )
             }
         </li>
     );
