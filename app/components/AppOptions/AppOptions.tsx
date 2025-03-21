@@ -20,7 +20,7 @@ export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
     const activeOptions: useAppOptionsIF = useAppOptions();
-    const { numFormat } = useAppSettings();
+    const { numFormat, setNumFormat } = useAppSettings();
 
     return (
         <section className={styles.app_options}>
@@ -108,7 +108,14 @@ export default function AppOptions(props: propsIF) {
                 <OptionLineSelect
                     text='Number Format'
                     active={numFormat.label}
-                    options={NumFormatTypes.map((n: NumFormat) => n.label)}
+                    options={NumFormatTypes.map((n: NumFormat) => ({
+                        readable: n.label,
+                        set: () => setNumFormat(
+                            NumFormatTypes.find(
+                                (format: NumFormat) => n.label === format.label
+                            ) as NumFormat
+                        ),
+                    }))}
                 />
                 {/* <OptionLineSelect text='Color' /> */}
             </ul>

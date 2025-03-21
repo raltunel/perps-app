@@ -1,10 +1,15 @@
 import { useState } from 'react';
 import styles from './OptionLineSelect.module.css';
 
+interface dropdownOptionsIF {
+    readable: string;
+    set: () => void;
+}
+
 interface propsIF {
     text: string;
     active: string;
-    options: string[];
+    options: dropdownOptionsIF[];
 }
 
 export default function OptionLineSelect(props: propsIF) {
@@ -20,8 +25,15 @@ export default function OptionLineSelect(props: propsIF) {
                     ? (
                         <div onClick={() => setIsOpen(false)}>
                             {
-                                options.map((o: string) => (
-                                    <div>{o}</div>
+                                options.map((o: dropdownOptionsIF) => (
+                                    <div
+                                        onClick={() => {
+                                            o.set();
+                                            setIsOpen(false);
+                                        }}
+                                    >
+                                        {o.readable}
+                                    </div>
                                 ))
                             }
                         </div>
