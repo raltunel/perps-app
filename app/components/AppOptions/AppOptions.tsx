@@ -5,6 +5,7 @@ import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/A
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -107,6 +108,7 @@ export default function AppOptions(props: propsIF) {
                 <OptionLineSelect
                     text='Number Format'
                     active={numFormat.label}
+                    options={NumFormatTypes.map((n: NumFormat) => n.label)}
                 />
                 {/* <OptionLineSelect text='Color' /> */}
             </ul>
