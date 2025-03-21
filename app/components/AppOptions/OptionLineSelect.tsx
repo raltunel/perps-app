@@ -22,33 +22,26 @@ export default function OptionLineSelect(props: propsIF) {
     return (
         <li className={styles.option_line}>
             {text}
-            {
-                isOpen
-                    ? (
-                        <div onClick={() => setIsOpen(false)}>
-                            {
-                                options.map((o: dropdownOptionsIF) => (
-                                    <div
-                                        onClick={() => {
-                                            o.set();
-                                            setIsOpen(false);
-                                        }}
-                                    >
-                                        {o.readable}
-                                    </div>
-                                ))
-                            }
-                        </div>
-                    ) : (
-                        <div
-                            className={styles.active_option}
-                            onClick={() => setIsOpen(true)}
-                        >
-                            {active}
-                            <SlArrowDown />
-                        </div>
-                    )
-            }
+            <div
+                onClick={() => setIsOpen(!isOpen)}
+                className={styles.dropdown_container}
+            >
+                <div className={styles.active_option}>
+                    {active}
+                    <SlArrowDown />
+                </div>
+                {isOpen && (
+                    <div className={styles.options_dropdown}>
+                        {
+                            options.map((o: dropdownOptionsIF) => (
+                                <div onClick={() => o.set()}>
+                                    {o.readable}
+                                </div>
+                            ))
+                        }
+                    </div>
+                )}
+            </div>
         </li>
     );
 }

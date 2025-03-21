@@ -4,8 +4,17 @@
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
+    height: 24px;
+    font-size: var(--font-size-s);
     color: var(--text1);
-    font-size: var(----font-size-s);
+}
+
+.dropdown_container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    overflow-y: visible;
 }
 
 .active_option {
@@ -18,4 +27,11 @@
     padding: 2px 8px;
     background-color: var(--dark6);
     border-radius: 8px;
+}
+
+.options_dropdown {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    outline: 1px solid salmon;
 }
