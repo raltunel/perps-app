@@ -3,6 +3,7 @@ import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
+import OptionLineSelect from './OptionLineSelect';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -98,6 +99,11 @@ export default function AppOptions(props: propsIF) {
                     isChecked={activeOptions['showAllWarnings']}
                     toggle={() => activeOptions.toggle('showAllWarnings')}
                 />
+            </ul>
+            <div className={styles.horizontal_divider} />
+            <ul>
+                <OptionLineSelect text='Number Format' />
+                <OptionLineSelect text='Color' />
             </ul>
             <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
                 Apply Defaults

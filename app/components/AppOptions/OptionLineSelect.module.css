@@ -1,0 +1,9 @@
+.option_line {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text1);
+    font-size: var(----font-size-s);
+}
