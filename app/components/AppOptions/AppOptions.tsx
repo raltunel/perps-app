@@ -9,64 +9,6 @@ export interface appOptionDataIF {
     text: string;
 }
 
-const optionsTop: appOptionDataIF[] = [
-    {
-        slug: 'skipOpenOrderConfirm',
-        text: 'Skip Open Order Confirmations',
-    },
-    {
-        slug: 'skipClosePositionConfirm',
-        text: 'Skip Close Position Confirmations',
-    },
-    {
-        slug: 'optOutSpotDusting',
-        text: 'Opt Out of Spot Dusting',
-    },
-    {
-        slug: 'persistTradingConnection',
-        text: 'Persist Trading Connection',
-    },
-];
-
-const optionsBottom: appOptionDataIF[] = [
-    {
-        slug: 'displayVerboseErrors',
-        text: 'Display Verbose Errors',
-    },
-    {
-        slug: 'enableTxNotifications',
-        text: 'Enable Transaction Notifications',
-    },
-    {
-        slug: 'enableBackgroundFillNotif',
-        text: 'Enable Background Fill Notifications',
-    },
-    {
-        slug: 'playFillSound',
-        text: 'Play Sound for Fills',
-    },
-    {
-        slug: 'animateOrderBook',
-        text: 'Animate Order Book',
-    },
-    {
-        slug: 'clickToSetOrderBookSize',
-        text: 'Order Book Set Size on Click',
-    },
-    {
-        slug: 'showBuysSellsOnChart',
-        text: 'Show Buys and Sells on Chart',
-    },
-    {
-        slug: 'showPnL',
-        text: 'Show PnL',
-    },
-    {
-        slug: 'showAllWarnings',
-        text: 'Show All Warnings',
-    },
-];
-
 interface propsIF {
     modalControl: useModalIF;
 }
@@ -88,33 +30,74 @@ export default function AppOptions(props: propsIF) {
                 />
             </header>
             <ul>
-                {
-                    optionsTop.map(
-                        (option: appOptionDataIF) => (
-                            <OptionLine
-                                key={JSON.stringify(option)}
-                                option={option}
-                                isChecked={activeOptions[option.slug]}
-                                toggle={() => activeOptions.toggle(option.slug)}
-                            />
-                        )
-                    )
-                }
+                <OptionLine
+                    text='Skip Open Order Confirmation'
+                    isChecked={activeOptions['skipOpenOrderConfirm']}
+                    toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
+                />
+                <OptionLine
+                    text='Skip Close Position Confirmations'
+                    isChecked={activeOptions['skipClosePositionConfirm']}
+                    toggle={() => activeOptions.toggle('skipClosePositionConfirm')}
+                />
+                <OptionLine
+                    text='Opt Out of Spot Dusting'
+                    isChecked={activeOptions['optOutSpotDusting']}
+                    toggle={() => activeOptions.toggle('optOutSpotDusting')}
+                />
+                <OptionLine
+                    text='Persist Trading Connection'
+                    isChecked={activeOptions['persistTradingConnection']}
+                    toggle={() => activeOptions.toggle('persistTradingConnection')}
+                />
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
-                {
-                    optionsBottom.map(
-                        (option: appOptionDataIF) => (
-                            <OptionLine
-                                key={JSON.stringify(option)}
-                                option={option}
-                                isChecked={activeOptions[option.slug] === true}
-                                toggle={() => activeOptions.toggle(option.slug)}
-                            />
-                        )
-                    )
-                }
+                <OptionLine
+                    text='Display Verbose Errors'
+                    isChecked={activeOptions['displayVerboseErrors']}
+                    toggle={() => activeOptions.toggle('displayVerboseErrors')}
+                />
+                <OptionLine
+                    text='Enable Transaction Notifications'
+                    isChecked={activeOptions['enableTxNotifications']}
+                    toggle={() => activeOptions.toggle('enableTxNotifications')}
+                />
+                <OptionLine
+                    text='Enable Background Fill Notifications'
+                    isChecked={activeOptions['enableBackgroundFillNotif']}
+                    toggle={() => activeOptions.toggle('enableBackgroundFillNotif')}
+                />
+                <OptionLine
+                    text='Play Sound for Fills'
+                    isChecked={activeOptions['playFillSound']}
+                    toggle={() => activeOptions.toggle('playFillSound')}
+                />
+                <OptionLine
+                    text='Animate Order Book'
+                    isChecked={activeOptions['animateOrderBook']}
+                    toggle={() => activeOptions.toggle('animateOrderBook')}
+                />
+                <OptionLine
+                    text='Order Book Set Size on Click'
+                    isChecked={activeOptions['clickToSetOrderBookSize']}
+                    toggle={() => activeOptions.toggle('clickToSetOrderBookSize')}
+                />
+                <OptionLine
+                    text='Show Buys and Sells on Chart'
+                    isChecked={activeOptions['showBuysSellsOnChart']}
+                    toggle={() => activeOptions.toggle('showBuysSellsOnChart')}
+                />
+                <OptionLine
+                    text='Show PnL'
+                    isChecked={activeOptions['showPnL']}
+                    toggle={() => activeOptions.toggle('showPnL')}
+                />
+                <OptionLine
+                    text='Show All Warnings'
+                    isChecked={activeOptions['showAllWarnings']}
+                    toggle={() => activeOptions.toggle('showAllWarnings')}
+                />
             </ul>
             <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
                 Apply Defaults
