@@ -4,6 +4,7 @@ import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -18,6 +19,7 @@ export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
     const activeOptions: useAppOptionsIF = useAppOptions();
+    const { numFormat } = useAppSettings();
 
     return (
         <section className={styles.app_options}>
@@ -102,8 +104,11 @@ export default function AppOptions(props: propsIF) {
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
-                <OptionLineSelect text='Number Format' />
-                <OptionLineSelect text='Color' />
+                <OptionLineSelect
+                    text='Number Format'
+                    active={numFormat.label}
+                />
+                {/* <OptionLineSelect text='Color' /> */}
             </ul>
             <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
                 Apply Defaults

@@ -3,10 +3,11 @@ import styles from './OptionLineSelect.module.css';
 
 interface propsIF {
     text: string;
+    active: string;
 }
 
 export default function OptionLineSelect(props: propsIF) {
-    const { text } = props;
+    const { text, active } = props;
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -16,7 +17,7 @@ export default function OptionLineSelect(props: propsIF) {
             {
                 isOpen
                     ? <div onClick={() => setIsOpen(false)}>Click to Close</div>
-                    : <div onClick={() => setIsOpen(true)}>Click to Open</div>
+                    : <div onClick={() => setIsOpen(true)}>{active}</div>
             }
         </li>
     );
