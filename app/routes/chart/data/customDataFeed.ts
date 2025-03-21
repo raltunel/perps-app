@@ -6,10 +6,19 @@ import type {
     ResolutionString,
     SubscribeBarsCallback,
 } from '~/tv/charting_library/charting_library';
-import { getHistoricalData, getMarkFillData } from './candleDataCache';
-import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
+import {
+    getHistoricalData,
+    getMarkFillData,
+    getMarkOrderData,
+} from './candleDataCache';
+import {
+    mapResolutionToInterval,
+    resolutionToSeconds,
+    supportedResolutions,
+} from './utils/utils';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
+import { useEffect } from 'react';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -90,66 +99,82 @@ export const createDataFeed = (
         },
 
         getMarks: async (symbolInfo, from, to, onDataCallback, resolution) => {
-            const orderHistoryMarks: Map<string, Mark> = new Map();
+            const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
+            const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-            const fillMarks = (payload: any, isLive: boolean) => {
-                if (payload.length > 0) {
-                    payload.forEach((element: any, index: number) => {
-                        const isBuy = element.side === 'B';
+            const floorMode = resolutionToSeconds(resolution) * 60 * 1000;
 
-                        const markerColor = isBuy ? '#26a69a' : '#ef5350';
+            const fillMarks = (payload: any) => {
+                payload.forEach((element: any, index: number) => {
+                    const isBuy = element.side === 'B';
 
-                        orderHistoryMarks.set(element.cloid, {
-                            id: index,
-                            time: element.time / 1000,
-                            color: {
-                                border: markerColor,
-                                background: markerColor,
-                            },
-                            text: element.dir + ' at ' + element.px,
-                            label: isBuy ? 'B' : 'S',
-                            labelFontColor: 'white',
-                            minSize: 15,
-                            borderWidth: 0,
-                            hoveredBorderWidth: 1,
-                        });
-                    });
-                }
+                    const markerColor = isBuy ? '#26a69a' : '#ef5350';
 
-                return orderHistoryMarks;
+                    const markData = {
+                        id: index,
+                        time:
+                            (Math.floor(element.time / floorMode) * floorMode) /
+                            1000,
+                        color: {
+                            border: markerColor,
+                            background: markerColor,
+                        },
+                        text: element.dir + ' at ' + element.px,
+                        label: isBuy ? 'B' : 'S',
+                        labelFontColor: 'white',
+                        minSize: 15,
+                        borderWidth: 0,
+                        hoveredBorderWidth: 1,
+                    };
+
+                    if (isBuy) {
+                        bSideOrderHistoryMarks.set(element.oid, markData);
+                    } else {
+                        aSideOrderHistoryMarks.set(element.oid, markData);
+                    }
+                });
             };
 
             try {
-                const fillHistory = await getMarkFillData(
-                    '0x023a3d058020fb76cca98f01b3c48c8938a22355',
-                    symbolInfo.name,
-                );
-
-                fillMarks(fillHistory, false);
-
-                const markArray = [...orderHistoryMarks.values()];
-
-                if (markArray.length > 0) {
-                    onDataCallback(markArray);
-                }
-
                 subscribe('userFills', {
                     payload: {
-                        user: '0x023a3d058020fb76cca98f01b3c48c8938a22355',
+                        user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
                     },
-                    handler: (payload: any) => {
-                        // console.log(payload.fills[0].coin)
+                    handler: async (payload: any) => {
+                        const fillHistory = await getMarkFillData(
+                            '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
+                            symbolInfo.name,
+                        );
+
+                        // fillHistory.sort((a, b) => a.px - b.px);
+
+                        fillMarks(fillHistory);
+
                         if (symbolInfo.name === payload.fills[0].coin) {
-                            fillMarks(payload, true);
-
-                            const markArray = [...orderHistoryMarks.values()];
-
-                            // console.log(markArray)
-
-                            if (markArray.length > 0) {
-                                onDataCallback(markArray);
-                            }
+                            fillMarks(payload.fills);
                         }
+
+                        // console.log(fillHistory, 'fill');
+
+                        const markArray = [
+                            ...bSideOrderHistoryMarks.values(),
+                            ...aSideOrderHistoryMarks.values(),
+                        ];
+
+                        if (markArray.length > 0) {
+                            onDataCallback(markArray);
+                        }
+
+                        // console.log(payload.fills);
+
+                        // const markArray = [
+                        //     ...bSideOrderHistoryMarks.values(),
+                        //     ...aSideOrderHistoryMarks.values(),
+                        // ];
+
+                        // if (markArray.length > 0) {
+                        //     onDataCallback(markArray);
+                        // }
                     },
                 });
             } catch (error) {

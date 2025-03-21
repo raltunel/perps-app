@@ -24,6 +24,8 @@ const symbolList = [
   'MELANIA',
   'HYPE',
   'HMSTR',
+  'FET',
+  'kPEPE'
 ]
 
 
