@@ -108,14 +108,12 @@ export default function AppOptions(props: propsIF) {
                 <OptionLineSelect
                     text='Number Format'
                     active={numFormat.label}
-                    options={NumFormatTypes.map((n: NumFormat) => ({
-                        readable: n.label,
-                        set: () => setNumFormat(
-                            NumFormatTypes.find(
-                                (format: NumFormat) => n.label === format.label
-                            ) as NumFormat
-                        ),
-                    }))}
+                    options={
+                        NumFormatTypes.map((n: NumFormat) => ({
+                            readable: n.label,
+                            set: () => setNumFormat(n),
+                        }))
+                    }
                 />
                 {/* <OptionLineSelect text='Color' /> */}
             </ul>
