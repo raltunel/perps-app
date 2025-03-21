@@ -20,10 +20,16 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
+
+  const scrollLeftBtnRef = useRef<HTMLButtonElement>(null);
+  const scrollRightBtnRef = useRef<HTMLButtonElement>(null);
+
   const checkScroll = () => {
-    if (contentRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = contentRef.current;
+    if (wrapperRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = wrapperRef.current;
+
       
+      console.log(scrollLeft, scrollWidth, clientWidth)
       // Can scroll left if we're not at the beginning
       setCanScrollLeft(scrollLeft > 1);
       
@@ -31,6 +37,7 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
       setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 1);
     }
   };
+
 
   const scrollLeft = () => {
     if (wrapperRef.current) {
@@ -40,6 +47,12 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
         left: -clientWidth / 2,
         behavior: 'smooth'
       });
+
+
+
+      setTimeout(() => {
+        checkScroll();
+      }, 350);
     }
   };
   
@@ -51,38 +64,51 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
         left: clientWidth / 2,
         behavior: 'smooth'
       });
+
+
+      setTimeout(() => {
+        checkScroll();
+      }, 350);
     }
   };
 
 
   const scrollLeftBtn = (
-    <button 
-      className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`}
-      onClick={scrollLeft}
-      aria-label="Scroll tabs left"
+      (canScrollLeft) && (
+        <button 
+          className={`${styles.scrollArrow} ${styles.scrollArrowLeft}`}
+          onClick={scrollLeft}
+          ref={scrollLeftBtnRef}
+          aria-label="Scroll tabs left"
     >
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
       </svg>
     </button>
+      )
+    
   )
 
   const scrollRightBtn = (
-    <button 
-      className={`${styles.scrollArrow} ${styles.scrollArrowRight}`}
-      onClick={scrollRight}
-      aria-label="Scroll tabs right"
+    (canScrollRight) && (
+      <button 
+        className={`${styles.scrollArrow} ${styles.scrollArrowRight}`}
+        onClick={scrollRight}
+        ref={scrollRightBtnRef}
+        aria-label="Scroll tabs right"
     >
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
       </svg>
-    </button>
+        </button>
+    )
   )
 
   useEffect(() => {
     checkScroll();
     
     const handleResize = () => {
+      console.log('handleResize')
       checkScroll();
     };
     
@@ -105,18 +131,22 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
     <>
       {
         maxWidth ? (
+          <div style={{position: 'relative'}}>
           <div ref={wrapperRef} className={`${styles.horizontalScrollable} ${className}`} style={{ maxWidth }}>
+            {scrollLeftBtn}
+            {scrollRightBtn}
               <div className={styles.horizontalScrollableContent} ref={contentRef}>
                 {children}
             </div>
-            {scrollLeftBtn}
-            {scrollRightBtn}
+            </div>
         </div>
       ) : (
+        <div style={{position: 'relative'}}>
         <div ref={wrapperRef} className={`${styles.horizontalScrollable} ${className}`}>
             <div className={styles.horizontalScrollableContent} ref={contentRef}>
                 {children}
             </div>
+        </div>
             {scrollLeftBtn}
             {scrollRightBtn}
         </div>

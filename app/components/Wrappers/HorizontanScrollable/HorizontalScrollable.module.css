@@ -4,16 +4,17 @@
     /* max-width: 50%; */
     position: relative;
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     scroll-behavior: smooth; /* Smooth scrolling for supported browsers */
 }
 
 
 .horizontalScrollableContent{
-    display: flex;
-    position: inherit;
+    display: block;
+    width: fit-content;
+    position: relative;
 }
 
 

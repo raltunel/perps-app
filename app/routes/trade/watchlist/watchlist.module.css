@@ -13,6 +13,7 @@
     align-items: center;
     font-family: var(--font-family-main);
     animation: fadeIn 0.1s ease;
+    white-space: nowrap;
 }
 
 .favIcon{
@@ -44,3 +45,26 @@
     align-items: center;
     justify-content: center;
 }
+
+.watchListLimitor{
+    max-width: calc(100vw - var(--order-book-width-desktop-small) 
+    - var(--trade-module-width-desktop-small) - var(--main-gap) * 4 - 10rem );
+}
+
+.watchListLimitorNarrow{
+    max-width: calc(100vw - var(--order-book-width-desktop-small) * 3 
+    - var(--trade-module-width-desktop-small) - var(--main-gap) * 4 - 10rem );
+}
+
+@media only screen and (min-width: 1920px) {
+    .watchListLimitor {
+        max-width: calc(100vw - var(--order-book-width-desktop-large) 
+        - var(--trade-module-width-desktop-large) - var(--main-gap) * 4 - 10rem );
+    }
+
+    .watchListLimitorNarrow {
+        max-width: calc(100vw - var(--order-book-width-desktop-large) * 3
+        - var(--trade-module-width-desktop-large) - var(--main-gap) * 4 - 10rem );
+    }
+}
+
