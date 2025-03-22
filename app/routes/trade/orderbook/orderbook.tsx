@@ -37,27 +37,48 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
-    const {userOrders, setUserOrders, userSymbolOrders, removeFills} = useTradeDataStore();
+    const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
+    const cancelsRef = useRef<Set<number>>(new Set<number>());
     // userOrdersRef.current = userOrders;
 
 
-    const updateUserOrders = useCallback((updates: OrderDataIF[]) => {
-      const currentOrders = userOrdersRef.current;
-      const cancels = new Set(updates.filter(e=> e.status === 'canceled').map(e=> e.cloid));
-      const notCancelled = currentOrders.filter((e:OrderDataIF)=> !cancels.has(e.cloid));
-      const notCancelledSet = new Set(notCancelled.map(e=> e.cloid));
-      const currentOrdersSet = new Set(currentOrders.map(e=> e.cloid));
-      const newOrders = updates.filter(e=> e.status === 'open' && !notCancelledSet.has(e.cloid) && !currentOrdersSet.has(e.cloid));
-      const updatedOrders = [...notCancelled, ...newOrders];
-      userOrdersRef.current = updatedOrders;
+    // const updateUserOrders = (updates: OrderDataIF[]) => {
 
-      // if(new Date().getTime() % 100 === 77){
-      //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
-      //   // setUserOrders(updatedOrders);
-      // }
-      // setUserOrders(updatedOrders);
-    }, [])
+     
+    //   updates.filter(e=> e.status === 'open').map(e=> {
+    //     const index = userOrdersRef.current.findIndex(o => o.coin === e.coin && o.limitPx === e.limitPx);
+    //     if (index >= 0) {
+    //       userOrdersRef.current.splice(index, 1);
+    //       userOrdersRef.current.push(e);
+    //     }
+    //     else{
+    //       userOrdersRef.current.push(e);
+    //     }
+    //   });
+
+    //   updates.filter(e=> e.status === 'canceled').map(e=> {
+    //     const index = userOrdersRef.current.findIndex(o => o.oid === e.oid);
+    //     if (index !== -1) {
+    //       userOrdersRef.current.splice(index, 1);
+    //     }
+    //   });
+
+
+    //   console.log('>>> updates', updates.length, ' cancels', updates.filter(e=> e.status === 'canceled').length, 
+    //   ' opens', updates.filter(e=> e.status === 'open').length);
+
+    //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
+    // }
+
+
+    // const removeFills = useCallback((fills: OrderDataIF[]) => {
+    //   const currentOrders = userOrdersRef.current;
+    //   const reducedOrders = currentOrders.filter((e:OrderDataIF)=> !fills.some(f=> f.oid === e.oid));
+    //   userOrdersRef.current = reducedOrders;
+
+    //   console.log('>>> removed fills', fills.length, ' current', currentOrders.length, ' reduced', reducedOrders.length);
+    // }, [])
 
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
@@ -83,7 +104,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      if(!userOrdersRef.current){
+      if(userOrdersRef.current.length === 0){
         userOrdersRef.current = userOrders;
       }
     }, [userOrders])
@@ -168,11 +189,11 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         clearInterval(orderProcessorIntervalRef.current);
       }
 
-      orderProcessorIntervalRef.current = setInterval(() => {
-        console.log('>>> userOrdersRef', userOrdersRef.current.length);
-        setUserOrders(userOrdersRef.current);
+      // orderProcessorIntervalRef.current = setInterval(() => {
+      //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
+      //   setUserOrders(userOrdersRef.current);
 
-      }, 5000);
+      // }, 5000);
 
       return () => {
         if(orderProcessorIntervalRef.current){
@@ -181,8 +202,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       }
     }, [])
 
-    useEffect(() => {
 
+    const fetchOpenOrders = useCallback(() => {
+      
       fetchInfo({
         type: 'frontendOpenOrders',
         payload: {
@@ -198,51 +220,61 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 userOrders.push(processedOrder);
               }
             })
-            console.log('>>> api orders', userOrders);
             setUserOrders(userOrders);
           }
         }
       })
+    }, [debugWallet.address])
 
-      subscribe('userHistoricalOrders', {
-        payload: {
-          user: debugWallet.address
-        },
-        handler: (payload) => {
-          if(payload && payload.orderHistory && payload.orderHistory.length > 0){
-            const orderUpdates: OrderDataIF[] = [];
-            payload.orderHistory.map((o:any) => {
-              const processedOrder = processUserOrder(o.order, o.status);
-              if(processedOrder){
-                orderUpdates.push(processedOrder);
-              }
-              updateUserOrders(orderUpdates);
-            })
+    useEffect(() => {
 
-            // console.log('>>> order updates', orderUpdates);
-            // updateUserOrders(orderUpdates);
-          }
-        }
-      })
+      fetchOpenOrders();
 
-      subscribe('userFills', {
-        payload: {
-          user: debugWallet.address
-        },
-        handler: (payload) => {
-          const fills:OrderDataIF[] = [];
-          if(payload && payload.fills && payload.fills.length > 0){
-            payload.fills.map((fill:any) => {
-              const processedFill = processUserOrder(fill, 'filled');
-              if(processedFill){
-                fills.push(processedFill);
-              }
-            })
-          }
-          removeFills(fills);
-        }
-      })
+
+      const intervalRef = setInterval(() => {
+        fetchOpenOrders();
+      }, 1000);
+
+      // subscribe('userHistoricalOrders', {
+      //   payload: {
+      //     user: debugWallet.address
+      //   },
+      //   handler: (payload) => {
+      //     if(payload && payload.orderHistory && payload.orderHistory.length > 0){
+      //       const orderUpdates: OrderDataIF[] = [];
+      //       payload.orderHistory.map((o:any) => {
+      //         const processedOrder = processUserOrder(o.order, o.status);
+      //         if(processedOrder){
+      //           orderUpdates.push(processedOrder);
+      //         }
+      //         updateUserOrders(orderUpdates);
+      //       })
+
+      //       // console.log('>>> order updates', orderUpdates);
+      //       // updateUserOrders(orderUpdates);
+      //     }
+      //   }
+      // })
+
+      // subscribe('userFills', {
+      //   payload: {
+      //     user: debugWallet.address
+      //   },
+      //   handler: (payload) => {
+      //     const fills:OrderDataIF[] = [];
+      //     if(payload && payload.fills && payload.fills.length > 0){
+      //       payload.fills.map((fill:any) => {
+      //         const processedFill = processUserOrder(fill, 'filled');
+      //         if(processedFill){
+      //           fills.push(processedFill);
+      //         }
+      //       })
+      //     }
+      //     removeFills(fills);
+      //   }
+      // })
       return () => {
+        clearInterval(intervalRef);
         unsubscribeAllByChannel('l2Book');
         unsubscribeAllByChannel('userHistoricalOrders');
       }
