@@ -48,3 +48,12 @@
     }
 }
 
+
+
+
+@media only screen and (max-width: 1080px) {    
+    .symbolInfoLimitor, .symbolInfoLimitorNarrow {
+        max-width: calc(100vw - var(--main-gap) * 4 - 9rem );
+    }
+
+}
