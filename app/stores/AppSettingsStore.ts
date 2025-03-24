@@ -9,6 +9,18 @@ export interface colorSetIF {
 export const bsColorSets = {
     default: { buy: '--green', sell: '--red' },
     opposite: { buy: '--red', sell: '--green' },
+    deuteranopia: {
+		buy: '#8C6AFF',
+		sell: '#FF796D',
+	},
+	tritanopia: {
+		buy: '#29B6F6',
+		sell: '#EC407A',
+	},
+	protanopia: {
+		buy: '#7F8E9E',
+		sell: '#4DBE71',
+	},
 }
 export type colorSetNames = keyof typeof bsColorSets;
 

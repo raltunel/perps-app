@@ -134,8 +134,8 @@ export default function AppOptions(props: propsIF) {
                                 readable: (<>
                                     <div>{text[0].toUpperCase() + text.slice(1)}</div>
                                     <div>
-                                        <FaCircle color={`var(${colors.buy})`} />
-                                        <FaCircle color={`var(${colors.sell})`} />
+                                        <FaCircle color={colors.buy} />
+                                        <FaCircle color={colors.sell} />
                                     </div>
                                 </>),
                                 set: () => setBsColor(text as colorSetNames),

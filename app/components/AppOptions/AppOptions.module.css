@@ -8,6 +8,9 @@
     font-family: var(--font-family-main);
     background-color: var(--dark3);
     border-radius: 20px;
+
+    --base-z-idx-app-options: 1;
+    z-index: var(--base-z-idx-app-options);
 }
 
 .app_options > header {
