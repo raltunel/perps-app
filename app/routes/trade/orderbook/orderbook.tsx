@@ -221,6 +221,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
               }
             })
             setUserOrders(userOrders);
+            addOrderToHistory(userOrders);
           }
         }
       })
@@ -235,7 +236,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         fetchOpenOrders();
       }, 1000);
 
-      subscribe('userHistoricalOrders', {
+      subscribe('userHistoricalOrders', { 
         payload: {
           user: debugWallet.address
         },

@@ -21,7 +21,9 @@ export const createUserTradesSlice = (set:any, get:any) => ({
     },
     orderHistory: [],
     addOrderToHistory: (newOrders: OrderDataIF[]) => {
-        set({ orderHistory: [...newOrders, ...get().orderHistory].slice(0, 50) })
+        const newOrderHistory = [...newOrders, ...get().orderHistory].slice(0, 50);
+        newOrderHistory.sort((a, b) => b.timestamp - a.timestamp);
+        set({ orderHistory: newOrderHistory })
     }
 });
 
