@@ -1,7 +1,8 @@
 import React from 'react';
-import OrderHistoryTableHeader from './OrderHistoryTableHeader';
-import OrderHistoryTableRow, { type OrderHistoryData } from './OrderHistoryTableRow';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderHistoryTable.module.css';
+import OrderHistoryTableHeader from './OrderHistoryTableHeader';
+import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
 
 interface OrderHistoryTableProps {
@@ -10,6 +11,8 @@ interface OrderHistoryTableProps {
 
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
   const { onViewAll } = props;
+
+  const { orderHistory } = useTradeDataStore();
 
   const handleViewAll = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -22,7 +25,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     <div className={styles.tableWrapper}>
       <OrderHistoryTableHeader />
       <div className={styles.tableBody}>
-        {orderHistoryData.map((order, index) => (
+        {orderHistory.map((order, index) => (
           <OrderHistoryTableRow 
             key={`order-${index}`} 
             order={order}

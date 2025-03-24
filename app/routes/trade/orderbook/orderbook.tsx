@@ -37,7 +37,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
-    const {userOrders, setUserOrders, userSymbolOrders} = useTradeDataStore();
+    const {userOrders, setUserOrders, userSymbolOrders, addOrderToHistory} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
     const cancelsRef = useRef<Set<number>>(new Set<number>());
     // userOrdersRef.current = userOrders;
@@ -235,26 +235,23 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         fetchOpenOrders();
       }, 1000);
 
-      // subscribe('userHistoricalOrders', {
-      //   payload: {
-      //     user: debugWallet.address
-      //   },
-      //   handler: (payload) => {
-      //     if(payload && payload.orderHistory && payload.orderHistory.length > 0){
-      //       const orderUpdates: OrderDataIF[] = [];
-      //       payload.orderHistory.map((o:any) => {
-      //         const processedOrder = processUserOrder(o.order, o.status);
-      //         if(processedOrder){
-      //           orderUpdates.push(processedOrder);
-      //         }
-      //         updateUserOrders(orderUpdates);
-      //       })
-
-      //       // console.log('>>> order updates', orderUpdates);
-      //       // updateUserOrders(orderUpdates);
-      //     }
-      //   }
-      // })
+      subscribe('userHistoricalOrders', {
+        payload: {
+          user: debugWallet.address
+        },
+        handler: (payload) => {
+          if(payload && payload.orderHistory && payload.orderHistory.length > 0){
+            const orderUpdates: OrderDataIF[] = [];
+            payload.orderHistory.map((o:any) => {
+              const processedOrder = processUserOrder(o.order, o.status);
+              if(processedOrder){
+                orderUpdates.push(processedOrder);
+              }
+            })
+            addOrderToHistory(orderUpdates);
+          }
+        }
+      })
 
       // subscribe('userFills', {
       //   payload: {

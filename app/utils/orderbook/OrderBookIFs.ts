@@ -37,6 +37,7 @@ export interface OrderDataIF {
   reduceOnly? :boolean;
   side: 'buy' | 'sell';
   sz: number;
+  filledSz?: number; // only used for filled orders
   tif?: string;
   timestamp: number;
   triggerCondition?: string;
@@ -44,5 +45,6 @@ export interface OrderDataIF {
   status: string;
 
 }
+
 
 export type OrderBookMode = 'symbol' | 'usd';
