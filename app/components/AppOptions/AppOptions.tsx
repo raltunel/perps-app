@@ -28,6 +28,7 @@ export default function AppOptions(props: propsIF) {
         numFormat,
         setNumFormat,
         bsColor,
+        setBsColor,
     } = useAppSettings();
 
     return (
@@ -125,13 +126,13 @@ export default function AppOptions(props: propsIF) {
                 />
                 <OptionLineSelect
                     text='Color'
-                    active={bsColor}
+                    active={bsColor[0].toUpperCase() + bsColor.slice(1)}
                     options={
                         Object.entries(bsColorSets).map((c) => {
                             const [text, colors] = c;
                             return ({
                                 readable: (<>
-                                    <div>{text}</div>
+                                    <div>{text[0].toUpperCase() + text.slice(1)}</div>
                                     <div>
                                         <FaCircle color={`var(${colors.buy})`} />
                                         <FaCircle color={`var(${colors.sell})`} />

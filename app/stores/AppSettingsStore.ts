@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 
 type bsColors = '--green'|'--red';
-interface colorSetIF {
+export interface colorSetIF {
     buy: bsColors;
     sell: bsColors;
 }
