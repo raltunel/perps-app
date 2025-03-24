@@ -20,6 +20,7 @@ import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
 import TradeModules from './trade/trademodules/trademodules';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -100,7 +101,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}><TradeModules /></div>
+              <div className={styles.tradeModules}><OrderInput/></div>
             </section>
             <section className={styles.containerBottom}>
                 <div className={styles.table}>
@@ -113,8 +114,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     />
                 </div>
              </section>
-      {/* Child routes (market, limit, pro) appear here */}
-      {/* <Outlet /> */}
+   
     </div>
           
         )
