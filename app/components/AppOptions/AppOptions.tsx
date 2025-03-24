@@ -9,6 +9,7 @@ import {
     NumFormatTypes,
     type NumFormat,
 } from '~/utils/Constants';
+import { FaCircle } from 'react-icons/fa';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -126,16 +127,19 @@ export default function AppOptions(props: propsIF) {
                     text='Color'
                     active={bsColor}
                     options={
-                        Object.keys(bsColorSets).map((c) => ({
-                            readable: (<>
-                                <div>{c}</div>
-                                <div>
-                                    <div>•</div>
-                                    <div>•</div>
-                                </div>
-                            </>),
-                            set: () => null,
-                        }))
+                        Object.entries(bsColorSets).map((c) => {
+                            const [text, colors] = c;
+                            return ({
+                                readable: (<>
+                                    <div>{text}</div>
+                                    <div>
+                                        <FaCircle color={`var(${colors.buy})`} />
+                                        <FaCircle color={`var(${colors.sell})`} />
+                                    </div>
+                                </>),
+                                set: () => null,
+                            })
+                        })
                     }
                 />
             </ul>

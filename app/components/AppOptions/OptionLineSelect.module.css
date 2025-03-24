@@ -38,3 +38,10 @@
     background-color: var(--dark6);
     border-radius: 8px;
 }
+
+.options_dropdown * {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
