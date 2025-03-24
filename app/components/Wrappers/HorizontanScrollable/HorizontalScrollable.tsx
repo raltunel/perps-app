@@ -28,8 +28,6 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
     if (wrapperRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = wrapperRef.current;
 
-      
-      console.log(scrollLeft, scrollWidth, clientWidth)
       // Can scroll left if we're not at the beginning
       setCanScrollLeft(scrollLeft > 1);
       
@@ -108,7 +106,6 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
     checkScroll();
     
     const handleResize = () => {
-      console.log('handleResize')
       checkScroll();
     };
     
