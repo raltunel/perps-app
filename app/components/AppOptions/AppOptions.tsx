@@ -138,7 +138,7 @@ export default function AppOptions(props: propsIF) {
                                         <FaCircle color={`var(${colors.sell})`} />
                                     </div>
                                 </>),
-                                set: () => null,
+                                set: () => setBsColor(text as colorSetNames),
                             })
                         })
                     }
