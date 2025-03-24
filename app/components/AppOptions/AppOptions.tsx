@@ -4,8 +4,11 @@ import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
+import { useAppSettings, bsColorSets, type colorSetNames } from '~/stores/AppSettingsStore';
+import {
+    NumFormatTypes,
+    type NumFormat,
+} from '~/utils/Constants';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -20,7 +23,11 @@ export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
     const activeOptions: useAppOptionsIF = useAppOptions();
-    const { numFormat, setNumFormat } = useAppSettings();
+    const {
+        numFormat,
+        setNumFormat,
+        bsColor,
+    } = useAppSettings();
 
     return (
         <section className={styles.app_options}>
@@ -115,7 +122,22 @@ export default function AppOptions(props: propsIF) {
                         }))
                     }
                 />
-                {/* <OptionLineSelect text='Color' /> */}
+                <OptionLineSelect
+                    text='Color'
+                    active={bsColor}
+                    options={
+                        Object.keys(bsColorSets).map((c) => ({
+                            readable: (<>
+                                <div>{c}</div>
+                                <div>
+                                    <div>•</div>
+                                    <div>•</div>
+                                </div>
+                            </>),
+                            set: () => null,
+                        }))
+                    }
+                />
             </ul>
             <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
                 Apply Defaults

@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useState, type JSX } from 'react';
 import styles from './OptionLineSelect.module.css';
 import { SlArrowDown } from 'react-icons/sl';
 
 
 interface dropdownOptionsIF {
-    readable: string;
+    readable: string|JSX.Element;
     set: () => void;
 }
 
 interface propsIF {
-    text: string;
+    text: string|JSX.Element;
     active: string;
     options: dropdownOptionsIF[];
 }
