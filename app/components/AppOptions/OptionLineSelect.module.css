@@ -16,6 +16,7 @@
     height: inherit;
     gap: 2px;
     overflow-y: visible;
+    cursor: pointer;
 }
 
 .active_option {
