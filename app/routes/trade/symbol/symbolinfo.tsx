@@ -9,6 +9,7 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNavigate } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface SymbolInfoProps {
 }
@@ -35,6 +36,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   const navigate = useNavigate();
 
   const { formatNum } = useNumFormatter();
+
+  const { orderBookMode } = useAppSettings();
 
   useEffect(() => {
     return () => {
@@ -84,8 +87,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
       <div>
       {
         symbolInfo && symbolInfo.coin === symbol && (
-            <HorizontalScrollable>
-          <div className={styles.symbolInfoFieldsWrapper}>
+            <HorizontalScrollable className={orderBookMode === 'large' ? styles.symbolInfoLimitorNarrow : styles.symbolInfoLimitor}>
+          <div className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}>
             <SymbolInfoField label="Mark" value={'$'+formatNum(symbolInfo?.markPx)} lastWsChange={symbolInfo?.lastPriceChange} />
             <SymbolInfoField label="Oracle" value={'$'+formatNum(symbolInfo?.oraclePx)} />
             <SymbolInfoField label="24h Change" value={get24hChangeString().str} type={get24hChangeString().usdChange > 0 ? 'positive' : get24hChangeString().usdChange < 0 ? 'negative' : undefined} />
