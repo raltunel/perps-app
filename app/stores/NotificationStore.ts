@@ -117,7 +117,7 @@ export interface notificationIF {
 }
 
 // fn to make an order ID number (later this will be supplied by the server)
-function makeOID(digits: number): number {
+export function makeOID(digits: number): number {
     const min: number = 10 ** (digits - 1);
     const max: number = 10 ** digits - 1;
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -152,6 +152,7 @@ function makeNotificationData(slug?: notificationSlugs): notificationIF {
 export interface NotificationStoreIF {
     notifications: notificationIF[];
     add: (s?: notificationSlugs) => void;
+    addFromWS: (data: notificationIF) => void;
     remove: (id: number) => void;
     clearAll: () => void;
 }
@@ -169,6 +170,14 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
             notifications: [
                 ...get().notifications,
                 makeNotificationData(s)
+            ].slice(-MAX_NOTIFICATIONS),
+        }
+    ),
+    addFromWS: (data: notificationIF): void => set(
+        {
+            notifications: [
+                ...get().notifications,
+                data
             ].slice(-MAX_NOTIFICATIONS),
         }
     ),

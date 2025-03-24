@@ -11,6 +11,7 @@ import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
+import TwapTable from '../TwapTable/TwapTable';
 
 export interface FilterOption {
     id: string;
@@ -87,31 +88,17 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return <PositionsTable />;
             case 'Open Orders':
-                return (
-                    <OpenOrdersTable/>
-                );
+                return <OpenOrdersTable />;
             case 'TWAP':
-                return (
-                    <div className={styles.emptyState}>
-                        TWAP data will appear here
-                    </div>
-                );
+                return <TwapTable />;
             case 'Trade History':
-                return (
-                    <TradeHistoryTable/>
-                );
+                return <TradeHistoryTable />;
             case 'Funding History':
-                return (
-                    <FundingHistoryTable/>
-                );
+                return <FundingHistoryTable />;
             case 'Order History':
-                return (
-                    <OrderHistoryTable/>
-                );
+                return <OrderHistoryTable />;
             case 'Deposits and Withdrawals':
-                return (
-                    <DepositsWithdrawalsTable/>
-                );
+                return <DepositsWithdrawalsTable />;
             default:
                 return (
                     <div className={styles.emptyState}>

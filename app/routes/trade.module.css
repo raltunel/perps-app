@@ -135,8 +135,8 @@
 
 .wsUrlSelector, .walletSelector{
   position: fixed;
-  top: 3rem;
-  right: 2rem;
+  top: 1rem;
+  right: 20rem;
   font-size: .8rem;
   z-index: 2;
   font-family: var(--font-family-main);
@@ -144,11 +144,10 @@
   border-radius: .4rem;
   border: 1px solid rgba(255, 255, 255, .2);
   padding: 0 1.2rem;
-  right: 1rem;
 }
 
 .walletSelector{
-  top: 5rem;
+  right: 38rem;
 }
 
 
