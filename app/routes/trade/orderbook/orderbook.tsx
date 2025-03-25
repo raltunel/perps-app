@@ -203,7 +203,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [])
 
 
-    const fetchOpenOrders = useCallback(() => {
+    const fetchOpenOrders = useCallback((saveIntoOrderHistory: boolean = false) => {
       
       fetchInfo({
         type: 'frontendOpenOrders',
@@ -221,7 +221,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
               }
             })
             setUserOrders(userOrders);
-            addOrderToHistory(userOrders);
+            if(saveIntoOrderHistory){
+              addOrderToHistory(userOrders);
+            }
           }
         }
       })
@@ -229,30 +231,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      fetchOpenOrders();
+      fetchOpenOrders(true);
 
 
       const intervalRef = setInterval(() => {
-        fetchOpenOrders();
+        fetchOpenOrders(false);
       }, 1000);
-
-      subscribe('userHistoricalOrders', { 
-        payload: {
-          user: debugWallet.address
-        },
-        handler: (payload) => {
-          if(payload && payload.orderHistory && payload.orderHistory.length > 0){
-            const orderUpdates: OrderDataIF[] = [];
-            payload.orderHistory.map((o:any) => {
-              const processedOrder = processUserOrder(o.order, o.status);
-              if(processedOrder){
-                orderUpdates.push(processedOrder);
-              }
-            })
-            addOrderToHistory(orderUpdates);
-          }
-        }
-      })
 
       // subscribe('userFills', {
       //   payload: {

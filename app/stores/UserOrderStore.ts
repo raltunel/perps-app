@@ -7,6 +7,7 @@ export interface UserTradeStore {
     setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => void;
     orderHistory: OrderDataIF[];
     addOrderToHistory: (orderHistory: OrderDataIF[]) => void;
+    setOrderHistory: (orderHistory: OrderDataIF[]) => void;
 }
 
 export const createUserTradesSlice = (set:any, get:any) => ({
@@ -24,6 +25,9 @@ export const createUserTradesSlice = (set:any, get:any) => ({
         const newOrderHistory = [...newOrders, ...get().orderHistory].slice(0, 50);
         newOrderHistory.sort((a, b) => b.timestamp - a.timestamp);
         set({ orderHistory: newOrderHistory })
+    },
+    setOrderHistory: (orderHistory: OrderDataIF[]) => {
+        set({ orderHistory })
     }
 });
 
