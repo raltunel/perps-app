@@ -8,6 +8,7 @@ import { TbHeartFilled } from 'react-icons/tb';
 import { FiDollarSign, FiPercent } from 'react-icons/fi';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import WatchListNode from './watchlistnode/watchlistnode';
+import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 
 interface WatchListProps {}
 
@@ -32,7 +33,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
             const favs = JSON.parse(lsVal);
             setFavs(favs);
         } else {
-            setFavs(['BTC', 'ETH', 'SOL']);
+            setFavs(['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK']);
         }
 
         return () => {
@@ -95,6 +96,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
                 }  ${watchListMode === 'percent' ? styles.active : ''}`}
             />
 
+                <HorizontalScrollable className={styles.watchListLimitor}>
             <div className={styles.watchListNodesWrapper}>
                 {favCoins &&
                     favCoins.map((e) => (
@@ -105,6 +107,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
                         ></WatchListNode>
                     ))}
             </div>
+                </HorizontalScrollable>
         </div>
     );
 };
