@@ -8,9 +8,10 @@ interface PropsIF {
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
     ariaLabel?: string;
+    useTotalSize: boolean;
 }
 export default function SizeInput(props: PropsIF) {
-    const { value, onChange, onBlur, onKeyDown, className, ariaLabel } = props;
+    const { value, onChange, onBlur, onKeyDown, className, ariaLabel, useTotalSize } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
         if (/^\d*$/.test(newValue) && newValue.length <= 12) {
@@ -19,7 +20,7 @@ export default function SizeInput(props: PropsIF) {
     };
     return (
         <div className={styles.sizeInputContainer}>
-            <span>Size</span>
+            <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <input
                 type='text'
                 value={value}

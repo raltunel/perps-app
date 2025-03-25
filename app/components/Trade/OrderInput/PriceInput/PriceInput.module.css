@@ -8,11 +8,15 @@ background: var(--dark3, #1C1C22);
 font-size: var(--Font-Size-Font-S, 12px);
 height: 32px;
 
-
+grid-template-columns:  auto 1fr;
 display: grid;
-grid-template-columns: auto 1fr 50px;
 gap: 4px;
 color: var(--text2);
+
+}
+
+.chaseLimit{
+    grid-template-columns: auto 1fr 50px;
 
 }
 .priceInputContainer input{
