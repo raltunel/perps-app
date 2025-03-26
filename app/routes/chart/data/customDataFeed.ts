@@ -158,8 +158,6 @@ export const createDataFeed = (
                                     (hs) => hs.hash === fill.hash,
                                 );
 
-                                console.log(key, index);
-
                                 if (key === undefined) {
                                     fillHistory.push(fill);
                                 }
