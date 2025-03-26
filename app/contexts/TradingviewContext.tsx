@@ -124,28 +124,36 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
-            chartState && tvWidget.load(chartState.chartLayout);
+            if (chartState) {
+                tvWidget.load(chartState.chartLayout).then(() => {
 
-            /**
-             * 0 -> main chart pane
-             * 1 -> volume chart pane
-             */
-            const volumePaneIndex = 1;
+                    setTimeout(() => {
+                        
+                        setChart(tvWidget);
+                    }, 500);
+                });
+            } else {
+                /**
+                 * 0 -> main chart pane
+                 * 1 -> volume chart pane
+                 */
+                const volumePaneIndex = 1;
 
-            const paneCount = tvWidget.activeChart().getPanes().length;
+                const paneCount = tvWidget.activeChart().getPanes().length;
 
-            if (paneCount > volumePaneIndex) {
-                const priceScale = tvWidget
-                    .activeChart()
-                    .getPanes()
-                    [volumePaneIndex].getMainSourcePriceScale();
+                if (paneCount > volumePaneIndex) {
+                    const priceScale = tvWidget
+                        .activeChart()
+                        .getPanes()
+                        [volumePaneIndex].getMainSourcePriceScale();
 
-                if (priceScale) {
-                    priceScale.setAutoScale(true);
-                    priceScale.setMode(0);
+                    if (priceScale) {
+                        priceScale.setAutoScale(true);
+                        priceScale.setMode(0);
+                    }
                 }
+                setChart(tvWidget);
             }
-            setChart(tvWidget);
         });
 
         return () => {
