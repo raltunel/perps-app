@@ -131,7 +131,6 @@ export const createDataFeed = (
                 const fillHistory = await getMarkFillData(
                     '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
                     symbolInfo.name,
-                    resolution,
                 );
 
                 fillHistory.sort((a, b) => a.px - b.px);
