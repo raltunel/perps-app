@@ -1,24 +1,16 @@
 import type {
-    HistoryCallback,
     IDatafeedChartApi,
     LibrarySymbolInfo,
     Mark,
-    ResolutionString,
-    SubscribeBarsCallback,
 } from '~/tv/charting_library/charting_library';
-import {
-    getHistoricalData,
-    getMarkFillData,
-    getMarkOrderData,
-} from './candleDataCache';
+import { getHistoricalData, getMarkFillData } from './candleDataCache';
 import {
     mapResolutionToInterval,
     resolutionToSeconds,
+    resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
-import { useWsObserver } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
-import { useEffect } from 'react';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -102,9 +94,9 @@ export const createDataFeed = (
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
-            const floorMode = resolutionToSeconds(resolution) * 60 * 1000;
-
             const fillMarks = (payload: any) => {
+                const floorMode = resolutionToSecondsMiliSeconds(resolution);
+
                 payload.forEach((element: any, index: number) => {
                     const isBuy = element.side === 'B';
 
@@ -136,25 +128,45 @@ export const createDataFeed = (
             };
 
             try {
+                const fillHistory = await getMarkFillData(
+                    '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
+                    symbolInfo.name,
+                    resolution,
+                );
+
+                fillHistory.sort((a, b) => a.px - b.px);
+
+                fillMarks(fillHistory);
+
+                const markArray = [
+                    ...bSideOrderHistoryMarks.values(),
+                    ...aSideOrderHistoryMarks.values(),
+                ];
+
+                if (markArray.length > 0) {
+                    onDataCallback(markArray);
+                }
+
                 subscribe('userFills', {
                     payload: {
                         user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
                     },
-                    handler: async (payload: any) => {
-                        const fillHistory = await getMarkFillData(
-                            '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
-                            symbolInfo.name,
-                        );
-
-                        // fillHistory.sort((a, b) => a.px - b.px);
-
-                        fillMarks(fillHistory);
-
+                    handler: async (payload: any, index: number) => {
                         if (symbolInfo.name === payload.fills[0].coin) {
-                            fillMarks(payload.fills);
+                            payload.fills.forEach((fill: any) => {
+                                const key = fillHistory.find(
+                                    (hs) => hs.hash === fill.hash,
+                                );
+
+                                console.log(key, index);
+
+                                if (key === undefined) {
+                                    fillHistory.push(fill);
+                                }
+                            });
                         }
 
-                        // console.log(fillHistory, 'fill');
+                        fillMarks(fillHistory);
 
                         const markArray = [
                             ...bSideOrderHistoryMarks.values(),
@@ -164,17 +176,6 @@ export const createDataFeed = (
                         if (markArray.length > 0) {
                             onDataCallback(markArray);
                         }
-
-                        // console.log(payload.fills);
-
-                        // const markArray = [
-                        //     ...bSideOrderHistoryMarks.values(),
-                        //     ...aSideOrderHistoryMarks.values(),
-                        // ];
-
-                        // if (markArray.length > 0) {
-                        //     onDataCallback(markArray);
-                        // }
                     },
                 });
             } catch (error) {

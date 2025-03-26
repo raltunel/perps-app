@@ -1,5 +1,5 @@
 import { mapResolutionToInterval, resolutionToSeconds } from './utils/utils';
-import { fetchCandles, fetchUserFillsHistory, fetchUserOrderHistory } from './fetchCandleData';
+import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 
 const dataCache = new Map<string, any[]>();
 
@@ -49,8 +49,8 @@ export async function getHistoricalData(
     });
 }
 
-export async function getMarkFillData(user: string, coin: string) {
-    const cacheKey = `${coin}-fillData`;
+export async function getMarkFillData(user: string, coin: string, resolution: string) {
+    const cacheKey = `${coin}-${resolution}-fillData`;
 
     const cachedData = dataCache.get(cacheKey) || [];
 
@@ -64,32 +64,6 @@ export async function getMarkFillData(user: string, coin: string) {
         if (res) {
             res.forEach((element: any) => {
                 if (element.coin === coin) {
-                    poolFillData.push(element);
-                }
-            });
-            
-            dataCache.set(cacheKey, poolFillData);
-        }
-
-        return poolFillData;
-    });
-}
-
-export async function getMarkOrderData(user: string, coin: string) {
-    const cacheKey = `${user}-orderData`;
-
-    const cachedData = dataCache.get(cacheKey) || [];
-
-    if(cachedData && cachedData.length > 0) {
-        return cachedData;
-    }
-
-    return await fetchUserOrderHistory(user).then((res: any) => {
-        const poolFillData = cachedData;
-
-        if (res) {
-            res.forEach((element: any) => {
-                if (element.order.coin === coin) {
                     poolFillData.push(element);
                 }
             });
