@@ -14,6 +14,8 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PriceRange from './PriceRange/PriceRange';
 import PriceDistribution from './PriceDistribution/PriceDistribution';
 import RunningTime from './RunningTime/RunningTime';
+import { useModal, type useModalIF } from '~/hooks/useModal';
+import Modal from '~/components/Modal/Modal';
 
 export interface OrderTypeOption {
     value: string;
@@ -70,6 +72,8 @@ export default function OrderInput() {
     const [priceRangeMin, setPriceRangeMin] = useState('');
     const [priceRangeMax, setPriceRangeMax] = useState('');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('');
+
+    const appSettingsModal: useModalIF = useModal('closed');
 
     const showPriceInputComponent = [
         'limit',
@@ -300,11 +304,12 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    <OrderDropdown
+                    {/* <OrderDropdown
                         options={isolatedOrderTypes}
                         value={isolatedOrderType}
                         onChange={handleIsolatedOrderTypeChange}
-                    />
+                    /> */}
+                    <button onClick={appSettingsModal.open}>Isolated</button>
                 </div>
 
                 <LeverageSlider {...leverageSliderProps} />
@@ -348,6 +353,12 @@ export default function OrderInput() {
             </div>
 
             <PlaceOrderButtons orderMarketPrice={marketOrderType} />
+
+            {appSettingsModal.isOpen && (
+                <Modal close={appSettingsModal.close}>
+                    <p>I am model things here</p>
+                </Modal>
+            )}
         </div>
     );
 }
