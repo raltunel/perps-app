@@ -81,10 +81,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 />
 </div>
 
-<div className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}>
+<div  className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`} onClick={() => setIsWsEnabled(!isWsEnabled)}>
   <div
     className={styles.wsToggleButton}
-    onClick={() => setIsWsEnabled(!isWsEnabled)}
   > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
 </div>
 
