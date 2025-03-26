@@ -99,3 +99,7 @@ export const buySellColors: BuySellColor[] = [
 
 
 
+export const OrderHistoryLimits = {
+    MAX: 1000,
+    RENDERED: 50
+}

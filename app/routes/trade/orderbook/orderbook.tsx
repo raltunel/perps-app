@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useWebSocketContext } from '~/contexts/WebSocketContext';
-import OrderRow from './orderrow/orderrow';
-import styles from './orderbook.module.css';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import BasicDivider from '~/components/Dividers/BasicDivider';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processOrderBookMessage, processUserOrder } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderBookMode, OrderDataIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import { getPrecisionForResolution, getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import BasicDivider from '~/components/Dividers/BasicDivider';
-import { useInfoApi } from '~/hooks/useInfoApi';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useDebugStore } from '~/stores/DebugStore';
+import styles from './orderbook.module.css';
+import OrderRow from './orderrow/orderrow';
 interface OrderBookProps {
   symbol: string;
   orderCount: number;
@@ -21,7 +20,7 @@ interface OrderBookProps {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { subscribe, unsubscribeAllByChannel} = useWsObserver();
-    const {fetchInfo} = useInfoApi();
+    const {fetchData} = useInfoApi();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const resolutionsShouldReset = useRef(true);
     const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
@@ -35,50 +34,14 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { formatNum, decimalPrecision } = useNumFormatter();
 
+    const {isWsEnabled} = useDebugStore();
+
+    const isWsEnabledRef = useRef<boolean>(true);
+    isWsEnabledRef.current = isWsEnabled;
 
     const {buys, sells, setOrderBook} = useOrderBookStore();
     const {userOrders, setUserOrders, userSymbolOrders, addOrderToHistory} = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
-    const cancelsRef = useRef<Set<number>>(new Set<number>());
-    // userOrdersRef.current = userOrders;
-
-
-    // const updateUserOrders = (updates: OrderDataIF[]) => {
-
-     
-    //   updates.filter(e=> e.status === 'open').map(e=> {
-    //     const index = userOrdersRef.current.findIndex(o => o.coin === e.coin && o.limitPx === e.limitPx);
-    //     if (index >= 0) {
-    //       userOrdersRef.current.splice(index, 1);
-    //       userOrdersRef.current.push(e);
-    //     }
-    //     else{
-    //       userOrdersRef.current.push(e);
-    //     }
-    //   });
-
-    //   updates.filter(e=> e.status === 'canceled').map(e=> {
-    //     const index = userOrdersRef.current.findIndex(o => o.oid === e.oid);
-    //     if (index !== -1) {
-    //       userOrdersRef.current.splice(index, 1);
-    //     }
-    //   });
-
-
-    //   console.log('>>> updates', updates.length, ' cancels', updates.filter(e=> e.status === 'canceled').length, 
-    //   ' opens', updates.filter(e=> e.status === 'open').length);
-
-    //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
-    // }
-
-
-    // const removeFills = useCallback((fills: OrderDataIF[]) => {
-    //   const currentOrders = userOrdersRef.current;
-    //   const reducedOrders = currentOrders.filter((e:OrderDataIF)=> !fills.some(f=> f.oid === e.oid));
-    //   userOrdersRef.current = reducedOrders;
-
-    //   console.log('>>> removed fills', fills.length, ' current', currentOrders.length, ' reduced', reducedOrders.length);
-    // }, [])
 
     const buySlots = useMemo(() => {
       return buys.map((order) => order.px);
@@ -163,15 +126,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)])
 
-    useEffect(() => {
-
-      // console.log('>>> user symbol orders', userSymbolOrders);
-    }, [userSymbolOrders])
 
     const changeSubscription = (payload: any) => {
-      subscribe('l2Book', 
+      subscribe(WsChannels.ORDERBOOK, 
         {payload: payload,
         handler: (response) => {
+          
+          if(!isWsEnabledRef.current){
+            return;
+          }
+
           filledResolution.current = payload.resolution;
           const {sells, buys} = processOrderBookMessage(response, orderCount);
           setOrderBook(buys, sells);
@@ -189,12 +153,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         clearInterval(orderProcessorIntervalRef.current);
       }
 
-      // orderProcessorIntervalRef.current = setInterval(() => {
-      //   console.log('>>> userOrdersRef', userOrdersRef.current.length);
-      //   setUserOrders(userOrdersRef.current);
-
-      // }, 5000);
-
       return () => {
         if(orderProcessorIntervalRef.current){
           clearInterval(orderProcessorIntervalRef.current);
@@ -203,10 +161,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [])
 
 
-    const fetchOpenOrders = useCallback((saveIntoOrderHistory: boolean = false) => {
+    const fetchOpenOrders = useCallback(() => {
       
-      fetchInfo({
-        type: 'frontendOpenOrders',
+      fetchData({
+        type: ApiEndpoints.OPEN_ORDERS,
         payload: {
           user: debugWallet.address
         },
@@ -221,9 +179,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
               }
             })
             setUserOrders(userOrders);
-            if(saveIntoOrderHistory){
-              addOrderToHistory(userOrders);
-            }
           }
         }
       })
@@ -231,30 +186,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
 
-      fetchOpenOrders(true);
-
-
+      fetchOpenOrders();
       const intervalRef = setInterval(() => {
-        fetchOpenOrders(false);
+        if(!isWsEnabledRef.current){ return; }
+        fetchOpenOrders();
       }, 1000);
 
-      // subscribe('userFills', {
-      //   payload: {
-      //     user: debugWallet.address
-      //   },
-      //   handler: (payload) => {
-      //     const fills:OrderDataIF[] = [];
-      //     if(payload && payload.fills && payload.fills.length > 0){
-      //       payload.fills.map((fill:any) => {
-      //         const processedFill = processUserOrder(fill, 'filled');
-      //         if(processedFill){
-      //           fills.push(processedFill);
-      //         }
-      //       })
-      //     }
-      //     removeFills(fills);
-      //   }
-      // })
       return () => {
         clearInterval(intervalRef);
         unsubscribeAllByChannel('l2Book');

@@ -1,14 +1,16 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { processUserOrder } from '~/processors/processOrderBook';
 import type { FilterOption } from '../TradeTables/TradeTables';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import { OrderHistoryLimits } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
   onViewAll?: () => void;
@@ -21,46 +23,59 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
   const { orderHistory } = useTradeDataStore();
 
   const {subscribe, unsubscribeAllByChannel} = useWsObserver();
-  const {addOrderToHistory, symbol, setOrderHistory} = useTradeDataStore();
-
-  const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
-
-  const {debugWallet} = useDebugStore();
-
-  const filterOrderHistory = useCallback((orderHistory: OrderDataIF[]) => {
-    switch(selectedFilter){
-      case 'all':
-        return orderHistory;
-      case 'active':
-        return orderHistory.filter((order) => order.coin === symbol);
-      case 'long':
-        return orderHistory.filter((order) => order.side === 'buy');
-      case 'short':
-        return orderHistory.filter((order) => order.side === 'sell');
-    }
-    return orderHistory;
-  }, [selectedFilter, symbol]);
+  const {addOrderToHistory, symbol, setOrderHistory, filterOrderHistory} = useTradeDataStore();
 
   
-  useEffect(() => {
+  const {debugWallet} = useDebugStore();
+  
+  const {fetchData} = useInfoApi();
+  
+  const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
 
+  const {isWsEnabled} = useDebugStore();
+  const isWsEnabledRef = useRef<boolean>(true);
+  isWsEnabledRef.current = isWsEnabled;
+  
+  useEffect(() => {
     const saveIntoStoreInterval = setInterval(() => {
-      addOrderToHistory(filterOrderHistory(userOrderHistoryRef.current));
+      if(!isWsEnabledRef.current){ return; }
+      addOrderToHistory(userOrderHistoryRef.current);
     }, 1000);
 
     return () => {
       clearInterval(saveIntoStoreInterval);
     }
     
-  }, [filterOrderHistory]);
+  }, []);
+
+  useEffect(()=> {
+    fetchData({
+      type: ApiEndpoints.HISTORICAL_ORDERS,
+      payload: { user: debugWallet.address },
+      handler: (payload) => {
+        if(!isWsEnabledRef.current){ return; }
+        if(payload && payload.length > 0){
+          const orders: OrderDataIF[] = [];
+          payload.slice(0, OrderHistoryLimits.MAX).map((o:any) => {
+            const processedOrder = processUserOrder(o.order, o.status);
+            if(processedOrder){
+              orders.push(processedOrder);
+            }
+          })
+          setOrderHistory(orders);
+        }
+      }
+    })
+  }, [debugWallet.address])
+
+
+  
+  const orderHistoryToShow = useMemo(() => {
+    return filterOrderHistory(orderHistory, selectedFilter);
+  }, [orderHistory, selectedFilter, symbol]);
 
   useEffect(() => {
-    userOrderHistoryRef.current = filterOrderHistory(orderHistory).slice(0, 50);
-    setOrderHistory(userOrderHistoryRef.current);
-  }, [selectedFilter, symbol]);
-
-  useEffect(() => {
-    subscribe('userHistoricalOrders', {
+    subscribe(WsChannels.USER_HISTORICAL_ORDERS, {
       payload: { user: debugWallet.address },
       handler: (payload) => {
         
@@ -72,7 +87,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
               orderUpdates.push(processedOrder);
             }
           })
-          userOrderHistoryRef.current = filterOrderHistory([...orderUpdates, ...userOrderHistoryRef.current]).slice(0, 50);
+          userOrderHistoryRef.current = [...orderUpdates, ...userOrderHistoryRef.current]
           userOrderHistoryRef.current.sort((a, b) => b.timestamp - a.timestamp);
         }
       }
@@ -94,7 +109,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     <div className={styles.tableWrapper}>
       <OrderHistoryTableHeader />
       <div className={styles.tableBody}>
-        {orderHistory.map((order, index) => (
+        {orderHistoryToShow.map((order, index) => (
           <OrderHistoryTableRow 
             key={`order-${index}`} 
             order={order}
