@@ -8,8 +8,12 @@ import {
 } from 'react-router';
 import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
+import Notifications from '~/components/Notifications/Notifications';
+
 import './css/app.css';
 import './css/index.css';
+import { WebSocketProvider } from './contexts/WebSocketContext';
+import { useDebugStore } from './stores/DebugStore';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,14 +28,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <script src="../tv/datafeeds/udf/dist/bundle.js"></script>
       </body>
     </html>
   );
 }
 
 export default function App() {
+
+
+  const { wsUrl } = useDebugStore();
+  
   return (
     <Layout>
+      <WebSocketProvider url={wsUrl}>
       <div className='root-container'>
         <header className='header'>
           <PageHeader/>
@@ -41,10 +51,9 @@ export default function App() {
           <Outlet />
         </main>
 
-        <footer className='footer'>
-          <p>Footer</p>
-        </footer>
+        <Notifications />
       </div>
+        </WebSocketProvider>
     </Layout>
   );
 }
@@ -66,14 +75,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className='content error-boundary'>
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre>
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
+      <main className='content error-boundary'>
+        <h1>{message}</h1>
+        <p>{details}</p>
+        {stack && (
+          <pre>
+            <code>{stack}</code>
+          </pre>
+        )}
+      </main>
   );
 }

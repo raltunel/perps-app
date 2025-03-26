@@ -39,16 +39,22 @@
   --order-book-width-desktop-large: 280px;
   --order-book-width-desktop-small: 220px;
 
+  
+  --order-book-width-desktop-large-doubled:  calc(var(--order-book-width-desktop-large) * 2);
+  --order-book-width-desktop-small-doubled:  calc(var(--order-book-width-desktop-small) * 2);
+
+
   --trade-module-width-desktop-large: 350px;
   --trade-module-width-desktop-small: 280px;
 
   /* fonts */
   --font-family-main: 'Lexend Deca';
 
-  --font-size-l: 24px;
-  --font-size-m: 18px;
-  --font-size-s: 12px;
   --font-size-xs: 10px;
+  --font-size-s: 12px;
+  --font-size-m: 18px;
+  --font-size-l: 24px;
+  --font-size-xl: 36px;
   --font-size-xxl: 64px;
 
   /* z indexes */
@@ -105,4 +111,18 @@ button {
 ul[role='list'],
 ol[role='list'] {
   list-style: none;
+}
+
+
+
+.content.error-boundary h1{
+  color: var(--accent1);
+  opacity: .2;
+}
+.content.error-boundary p{
+  color: var(--accent1);
+}
+
+.content.error-boundary code{
+  color: var(--text2);
 }
