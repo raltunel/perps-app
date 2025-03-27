@@ -56,8 +56,8 @@ export const useAppSettings = create<AppSettingsStore>()(
             setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
             isInverseColor: false,
             bsColor: 'default',
-            setBsColor: (c: colorSetNames): void => set({ bsColor: c }),
-            getBsColor: (): colorSetIF => bsColorSets[get().bsColor],
+            setBsColor: (c: colorSetNames) => set({ bsColor: c }),
+            getBsColor: () => bsColorSets[get().bsColor],
         }),
         {
             name: 'food-storage',

@@ -4,7 +4,7 @@ import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
-import { useAppSettings, bsColorSets, type colorSetNames } from '~/stores/AppSettingsStore';
+import { useAppSettings, bsColorSets, type colorSetNames, type colorSetIF } from '~/stores/AppSettingsStore';
 import {
     NumFormatTypes,
     type NumFormat,
@@ -28,9 +28,10 @@ export default function AppOptions(props: propsIF) {
         numFormat,
         setNumFormat,
         bsColor,
-        setBsColor,getBsColor
+        setBsColor,
+        getBsColor
     } = useAppSettings();
-console.log(getBsColor())
+
     return (
         <section className={styles.app_options}>
             <header>
@@ -126,10 +127,10 @@ console.log(getBsColor())
                 />
                 <OptionLineSelect
                     text='Color'
-                    active={bsColor[0].toUpperCase() + bsColor.slice(1)}
+                    active={(bsColor as string)[0].toUpperCase() + (bsColor as string).slice(1)}
                     options={
-                        Object.entries(bsColorSets).map((c) => {
-                            const [text, colors] = c;
+                        Object.entries(bsColorSets).map((c: [string, colorSetIF]) => {
+                            const [text, colors]: [string, colorSetIF] = c;
                             return ({
                                 readable: (<>
                                     <div>{text[0].toUpperCase() + text.slice(1)}</div>
@@ -146,7 +147,7 @@ console.log(getBsColor())
                                         } />
                                     </div>
                                 </>),
-                                set: () => setBsColor(text as colorSetNames),
+                                set: () => setBsColor(text),
                             })
                         })
                     }
