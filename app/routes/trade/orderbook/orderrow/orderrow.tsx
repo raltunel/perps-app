@@ -11,9 +11,10 @@ interface OrderRowProps {
   coef: number;
   resolution: OrderRowResolutionIF | null;
   userSlots: Set<string>;
+  orderRowClickListener?: () => void;
 }
 
-const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots }) => {
+const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots, orderRowClickListener }) => {
 
   const { formatNum } = useNumFormatter();
 
@@ -46,6 +47,10 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
     setTimeout(() => {
       setClickEffect(false);
     }, 1000);
+
+    if(orderRowClickListener){
+      orderRowClickListener();
+    }
   }
   return (
     <div className={`${styles.orderRow} ${type}`} onClick={handleClick} >
