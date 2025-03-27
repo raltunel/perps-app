@@ -1,6 +1,8 @@
 import { FaChevronDown } from 'react-icons/fa';
 import styles from './SizeInput.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeModuleStore } from '~/stores/TradeModuleStore';
+import { useEffect, useState } from 'react';
 
 interface PropsIF {
     value: string;
@@ -20,8 +22,22 @@ export default function SizeInput(props: PropsIF) {
         }
     };
     const {symbol} = useTradeDataStore();
+    const {tradeSlot} = useTradeModuleStore();
+    const [animationClass, setAnimationClass] = useState('');
+
+
+    useEffect(() => {
+        console.log('tradeSlot changed to:', tradeSlot);
+        if(tradeSlot){
+            setAnimationClass('boxShadowFlash');
+            setTimeout(() => {
+                setAnimationClass('');
+            }, 1000);
+        }
+    }, [tradeSlot]);
+
     return (
-        <div className={styles.sizeInputContainer}>
+        <div className={`${styles.sizeInputContainer} ${animationClass}`}>
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <input
                 type='text'

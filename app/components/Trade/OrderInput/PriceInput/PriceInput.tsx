@@ -1,4 +1,7 @@
+import { useState } from 'react';
+import { useEffect } from 'react';
 import styles from './PriceInput.module.css';
+import { useTradeModuleStore } from '~/stores/TradeModuleStore';
 
 interface PropsIF {
     value: string;
@@ -17,8 +20,21 @@ export default function PriceInput(props: PropsIF) {
             onChange(event);
         }
     };
+
+    const [animationClass, setAnimationClass] = useState('');
+    const {tradeSlot} = useTradeModuleStore();
+
+    useEffect(() => {
+        if(tradeSlot){
+            setAnimationClass('boxShadowFlash');
+            setTimeout(() => {
+                setAnimationClass('');
+            }, 1000);
+        }
+    }, [tradeSlot]);
+
     return (
-        <div className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}>
+        <div className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''} ${animationClass}`}>
             <span>Price</span>
             <input
                 type='text'
