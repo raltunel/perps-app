@@ -127,7 +127,23 @@ export default function AppOptions(props: propsIF) {
                 />
                 <OptionLineSelect
                     text='Color'
-                    active={(bsColor as string)[0].toUpperCase() + (bsColor as string).slice(1)}
+                    active={
+                        <div style={{gap: '10px'}}>
+                            <div>{(bsColor as string)[0].toUpperCase() + (bsColor as string).slice(1)}</div>
+                            <div>
+                                <FaCircle color={
+                                    getBsColor().buy.startsWith('--')
+                                        ? `var(${getBsColor().buy})`
+                                        : getBsColor().buy
+                                } />
+                                <FaCircle color={
+                                    getBsColor().sell.startsWith('--')
+                                        ? `var(${getBsColor().sell})`
+                                        : getBsColor().sell
+                                } />
+                            </div>
+                        </div>
+                    }
                     options={
                         Object.entries(bsColorSets).map((c: [string, colorSetIF]) => {
                             const [text, colors]: [string, colorSetIF] = c;

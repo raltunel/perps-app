@@ -9,8 +9,8 @@ interface dropdownOptionsIF {
 }
 
 interface propsIF {
-    text: string|JSX.Element;
-    active: string;
+    text: string;
+    active: string|JSX.Element;
     options: dropdownOptionsIF[];
 }
 

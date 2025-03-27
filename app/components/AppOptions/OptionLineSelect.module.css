@@ -31,6 +31,13 @@
     border-radius: 8px;
 }
 
+.active_option * {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .options_dropdown {
     position: relative;
     display: flex;
