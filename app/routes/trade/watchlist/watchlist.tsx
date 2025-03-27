@@ -37,7 +37,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
         }
 
         return () => {
-            unsubscribeAllByChannel('webData2');
+            unsubscribeAllByChannel(WsChannels.COINS);
         };
     }, []);
 
@@ -75,6 +75,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
         subscribe(WsChannels.COINS, {
             payload: { user: '0x0000000000000000000000000000000000000000' },
             handler: (payload) => {
+                console.log('>>> webData2payload', payload);
                 processWebData2Message(payload);
             },
         });

@@ -25,8 +25,6 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
 
   const connectWebSocket = () => { 
 
-    console.log('>>> connectWebSocket', url);
-
     if (!isClient) return; // ✅ Ensure WebSocket only runs on client side
 
     // Close the previous WebSocket if it exists
@@ -43,6 +41,9 @@ export const WebSocketProvider: React.FC<{ url: string; children: React.ReactNod
     };
 
     socket.onmessage = (event) => {
+      if(event.data.includes('webData2')){
+        console.log('>>> webData2 in WebSocketContext', JSON.parse(event.data));
+      }
       setMessage(event.data);
     };
 

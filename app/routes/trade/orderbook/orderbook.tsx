@@ -194,8 +194,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
       return () => {
         clearInterval(intervalRef);
-        unsubscribeAllByChannel('l2Book');
-        unsubscribeAllByChannel('userHistoricalOrders');
+        unsubscribeAllByChannel(WsChannels.ORDERBOOK);
+        unsubscribeAllByChannel(WsChannels.USER_HISTORICAL_ORDERS);
       }
     }, [debugWallet.address])
 

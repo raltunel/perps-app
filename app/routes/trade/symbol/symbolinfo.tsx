@@ -40,8 +40,18 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   const { orderBookMode } = useAppSettings();
 
   useEffect(() => {
+
+    console.log('>>> subs coins from symbol info component')
+    
+    subscribe(WsChannels.COINS, {
+      payload: {user: '0x0000000000000000000000000000000000000000'},
+      handler: (payload) => {
+        console.log('>>> coins payload', payload);
+      },
+    })
+
     return () => {
-      unsubscribeAllByChannel('activeAssetCtx');
+      unsubscribeAllByChannel(WsChannels.ACTIVE_COIN_DATA);
     }
   }, [])
 

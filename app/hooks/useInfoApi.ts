@@ -1,7 +1,3 @@
-import { useEffect, useRef, useState } from "react";
-import { useWebSocketContext } from "~/contexts/WebSocketContext";
-import { processOrderBookMessage } from "~/processors/processOrderBook";
-import { useOrderBookStore } from "~/stores/OrderBookStore";
 
 
 export type ApiCallConfig = {

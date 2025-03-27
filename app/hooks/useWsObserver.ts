@@ -46,6 +46,12 @@ export function useWsObserver() {
   useEffect(() => {
     if(lastMessage) {
       const msg = JSON.parse(lastMessage);
+
+
+      if(lastMessage.includes('webData2')){
+        console.log('>>> webData2 in useWsObserver', msg);
+      }
+
       if(subscriptions.current.has(msg.channel)){
         subscriptions.current.get(msg.channel)?.forEach(config => {
           config.handler(msg.data);

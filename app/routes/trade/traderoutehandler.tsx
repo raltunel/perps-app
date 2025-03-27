@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useWsObserver } from "~/hooks/useWsObserver";
+import { useWsObserver, WsChannels } from "~/hooks/useWsObserver";
 import { useTradeDataStore } from "~/stores/TradeDataStore";
 import { getLS } from "~/utils/AppUtils";
 
@@ -33,7 +33,7 @@ export default function TradeRouteHandler() {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-        type: 'l2Book',
+        type: WsChannels.ORDERBOOK,
         coin: urlSymbol
       })});
 
