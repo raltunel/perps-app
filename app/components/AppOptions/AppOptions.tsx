@@ -29,8 +29,6 @@ export default function AppOptions(props: propsIF) {
         setNumFormat,
         bsColor,
         setBsColor,
-        shouldInvertColors,
-        setShouldInvertColors,
     } = useAppSettings();
 
     return (
@@ -152,11 +150,6 @@ export default function AppOptions(props: propsIF) {
                             })
                         })
                     }
-                />
-                <OptionLine
-                    text='Invert Buy/Sell Colors'
-                    isChecked={shouldInvertColors}
-                    toggle={() => setShouldInvertColors(!shouldInvertColors)}
                 />
             </ul>
             <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>

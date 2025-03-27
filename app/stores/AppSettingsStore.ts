@@ -37,8 +37,6 @@ type AppSettingsStore = {
     isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
-    shouldInvertColors: boolean;
-    setShouldInvertColors: (s: boolean) => void;
 }
 
 export const useAppSettings = create<AppSettingsStore>()(
@@ -55,16 +53,11 @@ export const useAppSettings = create<AppSettingsStore>()(
             isInverseColor: false,
             bsColor: 'default',
             setBsColor: (c: colorSetNames) => set({ bsColor: c }),
-            shouldInvertColors: false,
-            setShouldInvertColors: (s: boolean): void => set({shouldInvertColors: s}),
         }),
         {
             name: 'food-storage',
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({
-                bsColor: state.bsColor,
-                shouldInvertColors: state.shouldInvertColors,
-            }),
+            partialize: (state) => ({ bsColor: state.bsColor }),
         },
     ),
 );
