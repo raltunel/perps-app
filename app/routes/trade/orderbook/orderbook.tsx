@@ -190,7 +190,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       const intervalRef = setInterval(() => {
         if(!isWsEnabledRef.current){ return; }
         fetchOpenOrders();
-      }, 1000);
+      }, 5000); // increased to 5 secs because of getting TooManyRequests error
 
       return () => {
         clearInterval(intervalRef);
