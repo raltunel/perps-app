@@ -37,11 +37,12 @@ type AppSettingsStore = {
     isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
+    getBsColor: () => void;
 }
 
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             orderBookMode: 'tab',
             setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') => set({ orderBookMode: mode }),
             numFormat: NumFormatTypes[0],
@@ -53,6 +54,7 @@ export const useAppSettings = create<AppSettingsStore>()(
             isInverseColor: false,
             bsColor: 'default',
             setBsColor: (c: colorSetNames) => set({ bsColor: c }),
+            getBsColor: () => bsColorSets[get().bsColor],
         }),
         {
             name: 'food-storage',

@@ -28,9 +28,9 @@ export default function AppOptions(props: propsIF) {
         numFormat,
         setNumFormat,
         bsColor,
-        setBsColor,
+        setBsColor,getBsColor
     } = useAppSettings();
-
+console.log(getBsColor())
     return (
         <section className={styles.app_options}>
             <header>
