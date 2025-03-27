@@ -17,7 +17,7 @@ export default function SizeInput(props: PropsIF) {
     const { value, onChange, onBlur, onKeyDown, className, ariaLabel, useTotalSize } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
-        if (/^\d*$/.test(newValue) && newValue.length <= 12) {
+        if (/^\d*\.?\d*$/.test(newValue) && newValue.length <= 12) {
             onChange(event);
         }
     };
@@ -27,7 +27,6 @@ export default function SizeInput(props: PropsIF) {
 
 
     useEffect(() => {
-        console.log('tradeSlot changed to:', tradeSlot);
         if(tradeSlot){
             setAnimationClass('boxShadowFlash');
             setTimeout(() => {

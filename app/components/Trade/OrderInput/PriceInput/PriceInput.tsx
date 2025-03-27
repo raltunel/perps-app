@@ -16,9 +16,10 @@ export default function PriceInput(props: PropsIF) {
     const { value, onChange, onBlur, onKeyDown, className, ariaLabel, showMidButton } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
-        if (/^\d*$/.test(newValue) && newValue.length <= 12) {
+        if (/^\d*\.?\d*$/.test(newValue) && newValue.length <= 12) {
             onChange(event);
         }
+        
     };
 
     const [animationClass, setAnimationClass] = useState('');
