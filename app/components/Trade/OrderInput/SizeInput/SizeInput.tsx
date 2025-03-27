@@ -1,5 +1,6 @@
 import { FaChevronDown } from 'react-icons/fa';
 import styles from './SizeInput.module.css';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface PropsIF {
     value: string;
@@ -18,6 +19,7 @@ export default function SizeInput(props: PropsIF) {
             onChange(event);
         }
     };
+    const {symbol} = useTradeDataStore();
     return (
         <div className={styles.sizeInputContainer}>
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
@@ -33,7 +35,7 @@ export default function SizeInput(props: PropsIF) {
                 pattern='[0-9]*'
                 placeholder='Enter Size'
             />
-            <button className={styles.tokenButton}>ETH <FaChevronDown />
+            <button className={styles.tokenButton}>{symbol} <FaChevronDown />
             </button>
         </div>
     );

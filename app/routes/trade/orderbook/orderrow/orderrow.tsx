@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocketContext } from '~/contexts/WebSocketContext';
 import type { OrderBookRowIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderrow.module.css';
@@ -21,6 +21,8 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
 
   const { setTradeSlot } = useTradeModuleStore();
 
+  const  [clickEffect, setClickEffect] = useState(false);
+
   const type = useMemo(() => {
     if (order.type === 'buy' && !isInverseColor) return styles.buy;
     if (order.type === 'sell' && !isInverseColor) return styles.sell;
@@ -39,6 +41,11 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
       price: order.px,
       type: order.type,
     });
+
+    setClickEffect(true);
+    setTimeout(() => {
+      setClickEffect(false);
+    }, 1000);
   }
   return (
     <div className={`${styles.orderRow} ${type}`} onClick={handleClick} >
@@ -47,6 +54,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
       <div className={styles.orderRowSize}>{formatNum(order.sz * coef)}</div>
       <div className={styles.orderRowTotal}>{formatNum(order.total * coef)}</div>
       <div className={styles.ratio} style={{ width: `${order.ratio * 100}%` }}></div>
+      {clickEffect && <div className={`${styles.clickEffect}`}></div>}
       {/* <div className={styles.fadeOverlay}></div> */}
     </div>
   );
