@@ -1,4 +1,5 @@
 import {create} from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 
 type bsColors = '--green'|'--red';
@@ -24,7 +25,7 @@ export const bsColorSets = {
 }
 export type colorSetNames = keyof typeof bsColorSets;
 
-interface AppSettingsStore {
+type AppSettingsStore = {
     orderBookMode: 'tab' | 'stacked' | 'large';
     setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') => void;
     numFormat: NumFormat;
@@ -36,18 +37,35 @@ interface AppSettingsStore {
     isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
+    bscA: [string, string];
 }
 
-export const useAppSettings = create<AppSettingsStore>((set) => ({
-    orderBookMode: 'tab',
-    setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') => set({ orderBookMode: mode }),
-    numFormat: NumFormatTypes[0],
-    setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
-    lang: Langs[0],
-    setLang: (lang: LangType) => set({ lang }),
-    buySellColor: buySellColors[0],
-    setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
-    isInverseColor: false,
-    bsColor: 'default',
-    setBsColor: (c: colorSetNames) => set({ bsColor: c }),
-}));
+export const useAppSettings = create<AppSettingsStore>()(
+    persist(
+        (set) => ({
+            orderBookMode: 'tab',
+            setOrderBookMode: (mode: 'tab' | 'stacked' | 'large') => set({ orderBookMode: mode }),
+            numFormat: NumFormatTypes[0],
+            setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
+            lang: Langs[0],
+            setLang: (lang: LangType) => set({ lang }),
+            buySellColor: buySellColors[0],
+            setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
+            isInverseColor: false,
+            bsColor: 'default',
+            bscA: [bsColorSets.default.buy, bsColorSets.default.sell],
+            setBsColor: (c: colorSetNames) => set({
+                bsColor: c,
+                bscA: [ bsColorSets[c].buy, bsColorSets[c].sell ]
+            }),
+        }),
+        {
+            name: 'food-storage',
+            storage: createJSONStorage(() => sessionStorage),
+            partialize: (state) => ({
+                bsColor: state.bsColor,
+                bscA: state.bscA,
+            }),
+        },
+    ),
+);
