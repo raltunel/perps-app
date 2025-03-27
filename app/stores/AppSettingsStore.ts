@@ -2,12 +2,14 @@ import {create} from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 
-type bsColors = '--green'|'--red';
+type bsColors = '--green'|'--red'|`#${string}`;
+
 export interface colorSetIF {
     buy: bsColors;
     sell: bsColors;
 }
-export const bsColorSets = {
+
+export const bsColorSets: { [x: string]: colorSetIF } = {
     default: { buy: '--green', sell: '--red' },
     opposite: { buy: '--red', sell: '--green' },
     deuteranopia: {
@@ -23,6 +25,7 @@ export const bsColorSets = {
 		sell: '#4DBE71',
 	},
 }
+
 export type colorSetNames = keyof typeof bsColorSets;
 
 type AppSettingsStore = {
@@ -37,7 +40,7 @@ type AppSettingsStore = {
     isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
-    getBsColor: () => void;
+    getBsColor: () => colorSetIF;
 }
 
 export const useAppSettings = create<AppSettingsStore>()(
@@ -53,8 +56,8 @@ export const useAppSettings = create<AppSettingsStore>()(
             setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
             isInverseColor: false,
             bsColor: 'default',
-            setBsColor: (c: colorSetNames) => set({ bsColor: c }),
-            getBsColor: () => bsColorSets[get().bsColor],
+            setBsColor: (c: colorSetNames): void => set({ bsColor: c }),
+            getBsColor: (): colorSetIF => bsColorSets[get().bsColor],
         }),
         {
             name: 'food-storage',
