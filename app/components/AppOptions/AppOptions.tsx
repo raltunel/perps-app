@@ -169,7 +169,14 @@ export default function AppOptions(props: propsIF) {
                     }
                 />
             </ul>
-            <div className={styles.apply_defaults} onClick={activeOptions.applyDefaults}>
+            <div
+                className={styles.apply_defaults}
+                onClick={() => {
+                    activeOptions.applyDefaults();
+                    setNumFormat(NumFormatTypes[0]);
+                    setBsColor('default');
+                }}
+            >
                 Apply Defaults
             </div>
         </section>
