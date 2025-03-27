@@ -37,7 +37,6 @@ type AppSettingsStore = {
     isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
-    bscA: [string, string];
     shouldInvertColors: boolean;
     setShouldInvertColors: (s: boolean) => void;
 }
@@ -55,11 +54,7 @@ export const useAppSettings = create<AppSettingsStore>()(
             setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
             isInverseColor: false,
             bsColor: 'default',
-            bscA: [bsColorSets.default.buy, bsColorSets.default.sell],
-            setBsColor: (c: colorSetNames) => set({
-                bsColor: c,
-                bscA: [ bsColorSets[c].buy, bsColorSets[c].sell ]
-            }),
+            setBsColor: (c: colorSetNames) => set({ bsColor: c }),
             shouldInvertColors: false,
             setShouldInvertColors: (s: boolean): void => set({shouldInvertColors: s}),
         }),
