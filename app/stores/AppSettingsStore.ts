@@ -43,6 +43,8 @@ type AppSettingsStore = {
     getBsColor: () => colorSetIF;
 }
 
+const LS_KEY = 'VISUAL_SETTINGS';
+
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
         (set, get) => ({
@@ -60,7 +62,7 @@ export const useAppSettings = create<AppSettingsStore>()(
             getBsColor: () => bsColorSets[get().bsColor],
         }),
         {
-            name: 'food-storage',
+            name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({ bsColor: state.bsColor }),
         },
