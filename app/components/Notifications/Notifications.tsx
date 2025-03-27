@@ -10,10 +10,10 @@ import {
 import { useKeydown } from '~/hooks/useKeydown';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useEffect, useRef } from 'react';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 
 export default function Notifications() {
-
+const hideNotificationsInDevelop = true
 
     // boolean to suppress notifications if toggled by user
     const { enableTxNotifications, enableBackgroundFillNotif } = useAppOptions();
@@ -36,7 +36,7 @@ export default function Notifications() {
     // use effect to subscribe to notifications
     useEffect(() => {
         if(debugWallet.address){
-            subscribe('notification', {
+            subscribe(WsChannels.NOTIFICATION, {
                 payload: {
                     user: debugWallet.address
                 },
@@ -64,7 +64,7 @@ export default function Notifications() {
     }, [debugWallet])
 
     
-
+if ( hideNotificationsInDevelop) return null
 
     return (
         <div className={styles.notifications}>
