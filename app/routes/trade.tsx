@@ -41,13 +41,13 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
   
-  if(!symbol || symbol.length === 0){
-    setTimeout(() => {
-      if(symbolRef.current && symbolRef.current.length === 0){
-        setSymbol('BTC');
-      }
-    }, 1000);
-  }
+  // if(!symbol || symbol.length === 0){
+  //   setTimeout(() => {
+  //     if(symbolRef.current && symbolRef.current.length === 0){
+  //       setSymbol('BTC');
+  //     }
+  //   }, 1000);
+  // }
 
   // const nav = (
   //      {/* Example nav links to each child route */}
@@ -88,7 +88,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     className={styles.wsToggleButton}
   > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
 </div>
-symbol {symbol}
     
       <TradeRouteHandler />
       {

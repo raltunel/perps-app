@@ -1,3 +1,5 @@
+'use client';
+
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './symbolinfo.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
