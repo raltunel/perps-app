@@ -94,6 +94,8 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     if (isClient) {
       console.log('>>> is client, connect web socket');
       connectWebSocket();
+    }else{
+      console.log('>>> not a client, do not connect web socket');
     }
 
     return () => {
