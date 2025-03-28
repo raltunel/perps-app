@@ -77,7 +77,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     className={styles.wsToggleButton}
   > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
 </div>
-
+symbol {symbol}
     
       <TradeRouteHandler />
       {
