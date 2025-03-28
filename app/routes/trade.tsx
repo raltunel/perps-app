@@ -13,6 +13,7 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
+import { useEffect } from 'react';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -29,13 +30,18 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
-  const {symbol} = useTradeDataStore();
+  const {symbol, setSymbol} = useTradeDataStore();
   const { orderBookMode } = useAppSettings();
 
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
 
+  useEffect(() => {
+    if(!symbol || symbol.length === 0){
+      setSymbol('BTC');
+    }
+  }, [symbol]);
     
   
   // const nav = (
