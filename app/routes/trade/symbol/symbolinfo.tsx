@@ -41,7 +41,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
 
   useEffect(() => {
 
-    console.log('>>> subs coins from symbol info component')
+    console.log('>>> symbolinfo.tsx useEffect[]')
     
     subscribe(WsChannels.COINS, {
       payload: {user: '0x0000000000000000000000000000000000000000'},
