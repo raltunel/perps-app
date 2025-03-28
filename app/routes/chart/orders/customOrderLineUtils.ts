@@ -14,13 +14,12 @@ export const addCustomOrderLine = async (chart: any, orderPrice: number) => {
             disableUndo: true,
             text: 'text',
             overrides: {
-              color:buyColor,
-              backgroundColor:buyColor,
+                color: buyColor,
+                backgroundColor: buyColor,
                 linestyle: 3,
                 extendLeft: true,
                 extendRight: true,
-                linewidth:1,
-              
+                linewidth: 1,
             },
         });
 
@@ -113,7 +112,6 @@ export const addCustomOrderLabel = (chart: any, orderPrice: number) => {
 // }
 
 export const createShapeText = (chart: any, price: number) => {
-    const RECT_WIDTH_PX = 80;
     const RECT_HEIGHT_PX = 4.5;
 
     const priceScale = chart.activeChart().getPanes()[0];
@@ -135,21 +133,21 @@ export const createShapeText = (chart: any, price: number) => {
     const maxPrice = priceRange.to;
 
     const chartWidth = Math.floor(timeScale.width());
+    const RECT_WIDTH_PX = chartWidth / 2;
 
     const timePerPixel = Math.floor((endTime - startTime) / chartWidth);
     const rectWidthTime = timePerPixel * RECT_WIDTH_PX;
     const chartHeight = priceScale.getHeight();
     const pricePerPixel = Math.floor((maxPrice - minPrice) / chartHeight);
     const rectHeightPrice = pricePerPixel * RECT_HEIGHT_PX;
-    const shape= chart.activeChart().createShape(
-        { time: startTime + rectWidthTime, price: price + rectHeightPrice },
+    const shape = chart.activeChart().createShape(
+        { time: startTime + rectWidthTime, price: price },
         {
-            shape: 'text',
+            shape: 'anchored_text',
             lock: true,
             disableSelection: true,
             disableSave: true,
-            disableUndo: true
-            ,
+            disableUndo: true,
             text: '   Liq. Price',
             overrides: {
                 fontsize: 10,
@@ -160,7 +158,7 @@ export const createShapeText = (chart: any, price: number) => {
                 borderColor: buyColor,
                 wordWrap: true,
                 wordWrapWidth: 60,
-                borderWidth:2,
+                borderWidth: 2,
             },
         },
     );

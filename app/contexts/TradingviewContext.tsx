@@ -24,6 +24,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
+import { customIndicator } from '~/routes/chart/customIndicator';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -126,9 +127,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             if (chartState) {
                 tvWidget.load(chartState.chartLayout).then(() => {
-
                     setTimeout(() => {
-                        
                         setChart(tvWidget);
                     }, 500);
                 });
@@ -152,6 +151,37 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                         priceScale.setMode(0);
                     }
                 }
+
+
+               
+
+                // const chart1 = tvWidget?.activeChart();
+                // chart1
+                //     ?.createStudy(
+                //         'Choppiness Index',
+                //         true, // Overlay değil
+                //         false, // Kilitli değil
+                //         {}, // Varsayılan girişler
+                //         {
+                //             'upperlimit.value': 110000, // Çizgi 50 seviyesinde
+                //             'upperlimit.visible': true,
+                //             'upperlimit.color': '#FF0000', // Kırmızı çizgi
+                //             'upperlimit.linestyle': 2, // Düz çizgi
+                //             'upperlimit.label': 'Resistance 100000', // Çizginin üstüne metin ekle
+                //         },
+                //     )
+                //     .then((studyId) => {
+                //         if (studyId) {
+                //             //   chart?.getStudyById(studyId)?.applyOverrides({
+                //             //     "upperlimit.value": 60, // Çizgiyi 60 seviyesine taşı
+                //             //     "upperlimit.label": "Strong Resistance 60", // Metni değiştir
+                //             //     "upperlimit.color": "#0000FF", // Mavi yap
+                //             //   });
+                //         }
+                //     });
+
+                // tvWidget.applyStudiesOverrides(customIndicator);
+
                 setChart(tvWidget);
             }
         });
