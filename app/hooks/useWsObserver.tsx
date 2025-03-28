@@ -45,18 +45,25 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
 
   const connectWebSocket = () => { 
 
-    if (!isClient) return; // ✅ Ensure WebSocket only runs on client side
+
+    if (!isClient) {
+      console.log('>>> not a client');
+      return;
+    }; // ✅ Ensure WebSocket only runs on client side
 
     // Close the previous WebSocket if it exists
     if (socketRef.current) {
+      console.log('>>> close previous socket');
       socketRef.current.close();
     }
 
       // Create a new WebSocket connection
+      console.log('>>> create new socket');
       const socket = new WebSocket(url);
       socketRef.current = socket;
 
       socket.onopen = () => {
+        console.log('>>> socket opened');
         setReadyState(WebSocketReadyState.OPEN);
       };
 
@@ -73,7 +80,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
       };
 
     socket.onclose = () => {
-      console.log('>>> socket closed');
+      console.log('>>> socket on close');
       setReadyState(WebSocketReadyState.CLOSED);
     };
 
@@ -85,6 +92,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
 
   useEffect(() => {
     if (isClient) {
+      console.log('>>> is client, connect web socket');
       connectWebSocket();
     }
 

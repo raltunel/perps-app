@@ -48,6 +48,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
       handler: (payload) => {
         console.log('>>> coins payload', payload);
       },
+      single: true
     })
 
     return () => {
