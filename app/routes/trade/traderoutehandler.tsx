@@ -16,7 +16,9 @@ export default function TradeRouteHandler() {
   const { subscribe } = useWsObserver();
 
   useEffect(() => {
+    console.log('>>> trade route handler');
     const activeSymbol = getLS('activeCoin');
+    console.log('>>> activeSymbol', activeSymbol);
     if(activeSymbol){
       setSymbol(activeSymbol);
     } else{

@@ -38,7 +38,8 @@ export default function App() {
 
 
   const { wsUrl } = useDebugStore();
-  
+  console.log('>>> APP() wsUrl', wsUrl);
+
   return (
     <Layout>
       <WsObserverProvider url={wsUrl}>
