@@ -24,7 +24,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
-import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { bsColorSets, useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -90,6 +90,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
+    console.log(bsColorSets.default.buy)
 
     useEffect(() => {
         const tvWidget = new widget({
@@ -116,8 +117,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             locale: 'en',
             theme: 'dark',
+            // initialize display options for a first-time user
             overrides: {
                 volumePaneSize: 'medium',
+                'mainSeriesProperties.candleStyle.upColor': bsColorSets.default.buy,
+                'mainSeriesProperties.candleStyle.downColor': bsColorSets.default.sell,
+                'mainSeriesProperties.candleStyle.borderUpColor': bsColorSets.default.buy,
+                'mainSeriesProperties.candleStyle.borderDownColor': bsColorSets.default.sell,
+                'mainSeriesProperties.candleStyle.wickUpColor': bsColorSets.default.buy,
+                'mainSeriesProperties.candleStyle.wickDownColor': bsColorSets.default.sell,
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
