@@ -24,6 +24,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
+import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -72,6 +73,23 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         autosize: true,
         studiesOverrides: {},
     };
+
+    const { bsColor, getBsColor } = useAppSettings();
+
+    function changeColors(c: colorSetIF): void {
+        if (chart) {
+            chart.applyOverrides({
+                'mainSeriesProperties.candleStyle.upColor': c.buy,
+                'mainSeriesProperties.candleStyle.downColor': c.sell,
+                'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
+            });
+        }
+    }
+
+    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
 
     useEffect(() => {
         const tvWidget = new widget({
