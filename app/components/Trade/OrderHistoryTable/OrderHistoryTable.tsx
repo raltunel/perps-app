@@ -61,11 +61,11 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     fetchData({
       type: ApiEndpoints.HISTORICAL_ORDERS,
       payload: { user: debugWallet.address },
-      handler: (payload) => {
+      handler: (data) => {
         if(!isWsEnabledRef.current){ return; }
-        if(payload && payload.length > 0){
+        if(data && data.length > 0){
           const orders: OrderDataIF[] = [];
-          payload.slice(0, OrderHistoryLimits.MAX).map((o:any) => {
+          data.slice(0, OrderHistoryLimits.MAX).map((o:any) => {
             const processedOrder = processUserOrder(o.order, o.status);
             if(processedOrder){
               orders.push(processedOrder);
