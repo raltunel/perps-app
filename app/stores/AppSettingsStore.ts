@@ -1,6 +1,10 @@
 import {create} from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
+import {
+    // buySellColors,
+    Langs, NumFormatTypes,
+    // type BuySellColor,
+    type LangType, type NumFormat } from '~/utils/Constants';
 
 type bsColors = '--green'|'--red'|`#${string}`;
 
@@ -35,9 +39,9 @@ type AppSettingsStore = {
     setNumFormat: (numFormat: NumFormat) => void;
     lang: LangType;
     setLang: (lang: LangType) => void;
-    buySellColor: BuySellColor;
-    setBuySellColor: (buySellColor: BuySellColor) => void;
-    isInverseColor: boolean;
+    // buySellColor: BuySellColor;
+    // setBuySellColor: (buySellColor: BuySellColor) => void;
+    // isInverseColor: boolean;
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
     getBsColor: () => colorSetIF;
@@ -54,9 +58,9 @@ export const useAppSettings = create<AppSettingsStore>()(
             setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
             lang: Langs[0],
             setLang: (lang: LangType) => set({ lang }),
-            buySellColor: buySellColors[0],
-            setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
-            isInverseColor: false,
+            // buySellColor: buySellColors[0],
+            // setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
+            // isInverseColor: false,
             bsColor: 'default',
             setBsColor: (c: colorSetNames) => set({ bsColor: c }),
             getBsColor: () => bsColorSets[get().bsColor],
