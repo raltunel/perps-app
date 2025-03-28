@@ -51,7 +51,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
     })
 
     return () => {
-      unsubscribeAllByChannel(WsChannels.ACTIVE_COIN_DATA);
+      unsubscribeAllByChannel(WsChannels.COINS);
     }
   }, [])
 

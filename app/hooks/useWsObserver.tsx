@@ -89,7 +89,8 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     }
 
     return () => {
-      socketRef.current?.close();
+      // console.log('>>> socket closed!!!!!!!!!!!!!');
+      // socketRef.current?.close();
     };
   }, [url, isClient]); // ✅ Only runs when client-side is ready
 
