@@ -12,27 +12,3 @@ framework = "vite"
 for = "/assets/*"
 [headers.values]
 "Cache-Control" = "public, max-age=31560000, immutable"
-
-
-# Redirects
-
-[[redirects]]
-  from = "/trade"
-  to = "/index.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/trade/*"
-  to = "/index.html"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-# Disable Netlify's edge handlers and functions for cleaner routing
-[build.processing]
-  skip_processing = true
