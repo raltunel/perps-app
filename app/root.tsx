@@ -6,13 +6,13 @@ import {
   Scripts,
   ScrollRestoration
 } from 'react-router';
+import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
-import Notifications from '~/components/Notifications/Notifications';
 
 import './css/app.css';
 import './css/index.css';
-import { WebSocketProvider } from './contexts/WebSocketContext';
+import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -41,7 +41,7 @@ export default function App() {
   
   return (
     <Layout>
-      <WebSocketProvider url={wsUrl}>
+      <WsObserverProvider url={wsUrl}>
       <div className='root-container'>
         <header className='header'>
           <PageHeader/>
@@ -53,7 +53,7 @@ export default function App() {
 
         <Notifications />
       </div>
-        </WebSocketProvider>
+        </WsObserverProvider>
     </Layout>
   );
 }

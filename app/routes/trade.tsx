@@ -1,27 +1,18 @@
-import { useEffect } from 'react';
-import { useParams } from 'react-router';
-import { WebSocketProvider } from '~/contexts/WebSocketContext';
-import type { Route } from '../+types/root';
-import styles from './trade.module.css';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
-import OrderBook from './trade/orderbook/orderbook';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import SymbolInfo from './trade/symbol/symbolinfo';
-import OrderBookSection from './trade/orderbook/orderbooksection';
-import TradingViewChart from './chart/chart';
+import OrderInput from '~/components/Trade/OrderInput/OrderInput';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import WatchList from './trade/watchlist/watchlist';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsUrls } from '~/utils/Constants';
-import { getLS } from '~/utils/AppUtils';
-import { useWsObserver } from '~/hooks/useWsObserver';
+import type { Route } from '../+types/root';
+import styles from './trade.module.css';
+import OrderBookSection from './trade/orderbook/orderbooksection';
+import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
-import TradeModules from './trade/trademodules/trademodules';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import OrderInput from '~/components/Trade/OrderInput/OrderInput';
-import Notifications from '~/components/Notifications/Notifications';
+import WatchList from './trade/watchlist/watchlist';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
