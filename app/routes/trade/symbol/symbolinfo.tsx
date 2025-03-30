@@ -48,7 +48,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
     subscribe(WsChannels.COINS, {
       payload: {user: '0x0000000000000000000000000000000000000000'},
       handler: (payload) => {
-        console.log('>>> coins payload', payload);
+        // console.log('>>> coins payload', payload);
       },
       single: true
     })
@@ -61,7 +61,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   useEffect(() => {
     subscribe(WsChannels.ACTIVE_COIN_DATA, {
       payload: {coin: symbol},
-      handler: (payload) => {
+      handler: (payload) => {51
         if(payload.coin === symbol){
           setSymbolInfo(processSymbolInfo(payload));
         }

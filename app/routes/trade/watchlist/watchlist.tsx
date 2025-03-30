@@ -29,6 +29,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
 
     useEffect(() => {
         const lsVal = localStorage.getItem(LS_KEY_FAV_COINS);
+        console.log(' watchlist useEffect []')
         if (lsVal !== null) {
             const favs = JSON.parse(lsVal);
             setFavs(favs);
@@ -36,9 +37,6 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
             setFavs(['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK']);
         }
 
-        return () => {
-            unsubscribeAllByChannel(WsChannels.COINS);
-        };
     }, []);
 
     const processWebData2Message = (payload: any) => {
@@ -75,7 +73,6 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
         subscribe(WsChannels.COINS, {
             payload: { user: '0x0000000000000000000000000000000000000000' },
             handler: (payload) => {
-                console.log('>>> webData2payload', payload);
                 processWebData2Message(payload);
             },
         });

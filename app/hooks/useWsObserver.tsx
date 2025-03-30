@@ -40,8 +40,11 @@ const WsObserverContext = createContext<WsObserverContextType | undefined>(undef
 export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNode }> = ({ url, children }) => {
   const isClient = useIsClient();
   const [readyState, setReadyState] = useState<number>(WebSocketReadyState.CLOSED);
+  const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
+  readyStateRef.current = readyState;
   const socketRef = useRef<WebSocket | null>(null);
   const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(new Map());
+
 
   const connectWebSocket = () => { 
 
@@ -129,7 +132,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
   const [, forceUpdate] = useState(0); // Used to force re-render when needed
 
   useEffect(() => {
-    if(readyState === 1){
+    if(readyStateRef.current === WebSocketReadyState.OPEN){
       subscriptions.current.forEach((configs, key) => { 
         configs.forEach(config => {
           registerWsSubscription(key, config.payload || {});
@@ -144,17 +147,22 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     if (!subscriptions.current.has(key)) {
       subscriptions.current.set(key, []);
     }
-    else{
-      const subs = subscriptions.current.get(key)!;
-      let found = false;
-      subs.forEach(sub => {
-        if(JSON.stringify(sub.payload) === JSON.stringify(config.payload) ){
-          found = true;
-          return;
-        }
-      });
-      if(found) return;
-    }
+    
+    // else{
+    //   const subs = subscriptions.current.get(key)!;
+    //   let found = false;
+    //   subs.forEach(sub => {
+    //     if(JSON.stringify(sub.payload) === JSON.stringify(config.payload) ){
+    //       found = true;
+    //       return;
+    //     }
+    //   }); 
+    //   if(key === 'webData2'){
+    //     console.log('found', found);
+    //   }
+    //   if(found) return;
+    // }
+
     if(config.single){
       const currentSubs = subscriptions.current.get(key) || [];
       currentSubs.forEach(sub => {
@@ -177,6 +185,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
         registerWsSubscription(channel, config.payload || {}, true);
       });
     }
+    subscriptions.current.delete(channel);
   }
 
 
