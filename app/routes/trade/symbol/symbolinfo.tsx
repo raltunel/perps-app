@@ -90,6 +90,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
           value={symbol}
           options={symbolList}
           onChange={(value) => {
+            setSymbol(value);
             navigate(`/trade/${value}`);
           }}
           modifyOptions={(value) => value += '-USD'}
