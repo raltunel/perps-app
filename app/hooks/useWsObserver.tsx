@@ -1,4 +1,4 @@
-import React,{ createContext, useContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useIsClient } from "./useIsClient";
 
 
@@ -27,7 +27,7 @@ export enum WsChannels {
   ORDERBOOK_TRADES = 'trades',
   USER_FILLS = 'userFills',
   USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
-  COINS = 'webData2',
+  WEB_DATA2 = 'webData2',
   ACTIVE_COIN_DATA = 'activeAssetCtx',
   NOTIFICATION = 'notification',
   CANDLE = 'candle',
@@ -46,7 +46,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
   const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(new Map());
 
 
-  const connectWebSocket = () => { 
+  const connectWebSocket = () => {
 
 
     if (!isClient) {
@@ -60,27 +60,27 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
       socketRef.current.close();
     }
 
-      // Create a new WebSocket connection
-      console.log('>>> create new socket');
-      const socket = new WebSocket(url);
-      socketRef.current = socket;
+    // Create a new WebSocket connection
+    console.log('>>> create new socket');
+    const socket = new WebSocket(url);
+    socketRef.current = socket;
 
-      socket.onopen = () => {
-        console.log('>>> socket opened');
-        setReadyState(WebSocketReadyState.OPEN);
-      };
+    socket.onopen = () => {
+      console.log('>>> socket opened');
+      setReadyState(WebSocketReadyState.OPEN);
+    };
 
-      socket.onmessage = (event) => {
-        if(event.data){
-          const msg = JSON.parse(event.data);
+    socket.onmessage = (event) => {
+      if (event.data) {
+        const msg = JSON.parse(event.data);
 
-          if(subscriptions.current.has(msg.channel)){
-            subscriptions.current.get(msg.channel)?.forEach(config => {
-              config.handler(msg.data);
-            });
-          }
+        if (subscriptions.current.has(msg.channel)) {
+          subscriptions.current.get(msg.channel)?.forEach(config => {
+            config.handler(msg.data);
+          });
         }
-      };
+      }
+    };
 
     socket.onclose = () => {
       console.log('>>> socket on close');
@@ -97,7 +97,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     if (isClient) {
       console.log('>>> is client, connect web socket');
       connectWebSocket();
-    }else{
+    } else {
       console.log('>>> not a client, do not connect web socket');
     }
 
@@ -106,6 +106,13 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
       // socketRef.current?.close();
     };
   }, [url, isClient]); // ✅ Only runs when client-side is ready
+
+  useEffect(() => {
+
+    return () => {
+      console.log('>>> close context !!!!!!!!!!!!');
+    };
+  }, []);
 
   const sendMessage = (msg: string) => {
     if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
@@ -132,8 +139,8 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
   const [, forceUpdate] = useState(0); // Used to force re-render when needed
 
   useEffect(() => {
-    if(readyStateRef.current === WebSocketReadyState.OPEN){
-      subscriptions.current.forEach((configs, key) => { 
+    if (readyStateRef.current === WebSocketReadyState.OPEN) {
+      subscriptions.current.forEach((configs, key) => {
         configs.forEach(config => {
           registerWsSubscription(key, config.payload || {});
         });
@@ -147,7 +154,7 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     if (!subscriptions.current.has(key)) {
       subscriptions.current.set(key, []);
     }
-    
+
     // else{
     //   const subs = subscriptions.current.get(key)!;
     //   let found = false;
@@ -163,24 +170,24 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     //   if(found) return;
     // }
 
-    if(config.single){
+    if (config.single) {
       const currentSubs = subscriptions.current.get(key) || [];
       currentSubs.forEach(sub => {
         registerWsSubscription(key, sub.payload || {}, true);
       });
       subscriptions.current.set(key, [config]);
     }
-    else{
+    else {
       subscriptions.current.get(key)!.push(config);
     }
 
-  // add subscription through websocket context
-  registerWsSubscription(key, config.payload || {});
-};
+    // add subscription through websocket context
+    registerWsSubscription(key, config.payload || {});
+  };
 
   // unsubscribe all subscriptions by channel
   const unsubscribeAllByChannel = (channel: string) => {
-    if(subscriptions.current.has(channel)){
+    if (subscriptions.current.has(channel)) {
       subscriptions.current.get(channel)!.forEach(config => {
         registerWsSubscription(channel, config.payload || {}, true);
       });
@@ -189,24 +196,24 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
   }
 
 
-const unsubscribe = (key: string, config: WsSubscriptionConfig) => {
-  if (subscriptions.current.has(key)) {
-    const configs = subscriptions.current.get(key)!.filter((c) => c !== config);
-    if (configs.length === 0) {
-      subscriptions.current.delete(key);
-    } else {
-      subscriptions.current.set(key, configs);
+  const unsubscribe = (key: string, config: WsSubscriptionConfig) => {
+    if (subscriptions.current.has(key)) {
+      const configs = subscriptions.current.get(key)!.filter((c) => c !== config);
+      if (configs.length === 0) {
+        subscriptions.current.delete(key);
+      } else {
+        subscriptions.current.set(key, configs);
+      }
     }
-  }
-};
+  };
 
-  
-return (
-  <WsObserverContext.Provider
-    value={{ subscribe, unsubscribe, unsubscribeAllByChannel }}>
-    {children}
-  </WsObserverContext.Provider>
-);
+
+  return (
+    <WsObserverContext.Provider
+      value={{ subscribe, unsubscribe, unsubscribeAllByChannel }}>
+      {children}
+    </WsObserverContext.Provider>
+  );
 }
 
 

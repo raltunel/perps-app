@@ -16,15 +16,17 @@ import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import { useEffect, useRef } from 'react';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'TRADE' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
+import WebDataConsumer from './trade/webdataconsumer';
+import LsConsumer from './trade/lsconsumer';
+export function meta({ }: Route.MetaArgs) {
+  return [
+    { title: 'TRADE' },
+    { name: 'description', content: 'Welcome to React Router!' },
+  ];
 }
 
 export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
+  return { message: context.VALUE_FROM_NETLIFY };
 }
 
 // const wsUrl = 'wss://api.hyperliquid.xyz/ws';
@@ -32,7 +34,7 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
-  const {symbol, setSymbol} = useTradeDataStore();
+  const { symbol, setSymbol } = useTradeDataStore();
   const symbolRef = useRef(symbol);
   symbolRef.current = symbol;
   const { orderBookMode } = useAppSettings();
@@ -40,7 +42,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
-  
+
   // if(!symbol || symbol.length === 0){
   //   setTimeout(() => {
   //     if(symbolRef.current && symbolRef.current.length === 0){
@@ -62,67 +64,69 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   //     Pro
   //   </Link>
   // </nav>
- 
+
   // )
 
   return (
-<>
-<div className={styles.wsUrlSelector}>
-<ComboBox
-  value={wsUrl}
-  options={wsUrls}
-  onChange={(value) => setWsUrl(value)}
-/>
-</div>
-<div className={styles.walletSelector}>
-<ComboBox
-  value={debugWallet.label}
-  options={debugWallets}
-  fieldName='label'
-  onChange={(value) => setDebugWallet({label: value, address: debugWallets.find((wallet) => wallet.label === value)?.address || ''})}
-/>
-</div>
+    <>
+      <div className={styles.wsUrlSelector}>
+        <ComboBox
+          value={wsUrl}
+          options={wsUrls}
+          onChange={(value) => setWsUrl(value)}
+        />
+      </div>
+      <div className={styles.walletSelector}>
+        <ComboBox
+          value={debugWallet.label}
+          options={debugWallets}
+          fieldName='label'
+          onChange={(value) => setDebugWallet({ label: value, address: debugWallets.find((wallet) => wallet.label === value)?.address || '' })}
+        />
+      </div>
 
-<div  className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`} onClick={() => setIsWsEnabled(!isWsEnabled)}>
-  <div
-    className={styles.wsToggleButton}
-  > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
-</div>
-    
+      <div className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`} onClick={() => setIsWsEnabled(!isWsEnabled)}>
+        <div
+          className={styles.wsToggleButton}
+        > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
+      </div>
+
       <TradeRouteHandler />
+      <WebDataConsumer />
+      <LsConsumer />
       {
         symbol && symbol.length > 0 && (
 
-<div className={styles.container}>
-      <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
-        <div className={styles.containerTopLeft}>
-          <div className={styles.watchlist}><WatchList/></div>
-          <div className={styles.symbolInfo}>
+          <div className={styles.container}>
+            <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
+              <div className={styles.containerTopLeft}>
+                <div className={styles.watchlist}><WatchList /></div>
+                <div className={styles.symbolInfo}>
 
-            <SymbolInfo />
+                  <SymbolInfo />
 
 
-          </div>
-          <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
-        </div>
+                </div>
+                <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
+              </div>
 
-        <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}><OrderInput/></div>
+              <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
+              <div className={styles.tradeModules}><OrderInput /></div>
             </section>
             <section className={styles.containerBottom}>
-                <div className={styles.table}>
-                    <TradeTable/>
-                </div>
-                <div className={styles.wallet}>
-                    <DepositDropdown
-                        isUserConnected={false}
-                        setIsUserConnected={() => console.log('connected')}
-                    />
-                </div>
-             </section>
-   
-    </div>
-          
+              <div className={styles.table}>
+                <TradeTable />
+              </div>
+              <div className={styles.wallet}>
+                <DepositDropdown
+                  isUserConnected={false}
+                  setIsUserConnected={() => console.log('connected')}
+                />
+              </div>
+            </section>
+
+          </div>
+
         )
       }
     </>
