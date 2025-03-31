@@ -423,6 +423,7 @@ export default function OrderInput() {
                             minPrice={parseFloat(priceRangeMin)}
                             maxPrice={parseFloat(priceRangeMax)}
                             isModal
+                            onClose={appSettingsModal.close}
                         />
                     )}
                 </Modal>

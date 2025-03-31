@@ -19,7 +19,7 @@ interface ScaleOrdersProps {
     minPrice: number;
     maxPrice: number;
     totalQuantity: number;
-    onClose?: () => void;
+    onClose: () => void;
     onConfirm?: (orders: OrderRow[]) => void;
     isModal?: boolean;
 }
@@ -135,6 +135,7 @@ export default function ScaleOrders({
         if (onConfirm && isValidRatio) {
             onConfirm(orders);
         }
+        onClose()
     };
 
     const handlePriceDistributionChange = (type: PriceDistributionType) => {
@@ -155,6 +156,9 @@ export default function ScaleOrders({
                 width: isModal ? '422.5px' : '100%',
             }}
         >
+            <div className={styles.scaleOrdersContent}>
+
+            
             {isModal && (
                 <div className={styles.header}>
                     <span />
@@ -261,7 +265,8 @@ export default function ScaleOrders({
                 <div className={styles.errorMessage}>
                     Sum of order ratios must be 100%
                 </div>
-            )}
+                )}
+                </div>
 
             {isModal && (
                 <div className={styles.actions}>
