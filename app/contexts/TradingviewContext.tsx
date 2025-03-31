@@ -30,7 +30,7 @@ interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
 }
 
-const TradingViewContext = createContext<TradingViewContextType>({
+export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
 });
 
@@ -89,8 +89,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
-    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
-    console.log(bsColorSets.default.buy)
+    useEffect(() => changeColors(getBsColor()), [bsColor]);
 
     useEffect(() => {
         const tvWidget = new widget({

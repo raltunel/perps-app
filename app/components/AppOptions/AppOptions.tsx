@@ -10,6 +10,8 @@ import {
     type NumFormat,
 } from '~/utils/Constants';
 import { FaCircle } from 'react-icons/fa';
+import { useContext } from 'react';
+import { TradingViewContext } from '~/contexts/TradingviewContext';
 
 export interface appOptionDataIF {
     slug: appOptions;
