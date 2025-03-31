@@ -1,9 +1,7 @@
 import ScaleOrders from '~/components/Trade/OrderInput/ScaleOrders/ScaleOrders';
 import styles from './testpage.module.css';
 
-interface propsIF {
-
-}
+interface propsIF {}
 
 // main react fn
 export default function testpage(props: propsIF) {
@@ -11,15 +9,16 @@ export default function testpage(props: propsIF) {
 
     return (
         <div className={styles.testpage}>
-             
-                                    <ScaleOrders
-                                        totalQuantity={parseFloat('0.2233')}
-                                        minPrice={parseFloat('242423')}
-                                        maxPrice={parseFloat('99993321')}
-                isModal
+            <div style={{width: '400px'}}>
+
+            <ScaleOrders
+                totalQuantity={parseFloat('0.2233')}
+                minPrice={parseFloat('242423')}
+                maxPrice={parseFloat('99993321')}
+                // isModal
                 onClose={() => console.log('close modal')}
-                                    />
-                                
+                />
+                </div>
         </div>
     );
 }
