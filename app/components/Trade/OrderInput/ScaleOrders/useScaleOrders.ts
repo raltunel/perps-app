@@ -162,40 +162,39 @@ export default function useScaleOrders({
   }, [totalOrders, priceDistribution, ratioDistribution, minPrice, maxPrice, totalQuantity]);
 
   // Update a specific order's ratio
-  const updateOrderRatio = (index: number, newRatio: number) => {
+  const updateOrderRatio = (index: number, newRatio: number | string) => {
     const newOrders = [...orders];
-    const oldRatio = newOrders[index].ratio;
-    const difference = newRatio - oldRatio;
     
-    // Update the ratio for this order
-    newOrders[index].ratio = +newRatio.toFixed(2);
+    // Convert the input to a number if it's a string
+    const numericRatio = typeof newRatio === 'string' 
+      ? (newRatio === '' ? 0 : parseFloat(newRatio) || 0) 
+      : newRatio;
     
-    // Adjust other ratios proportionally to maintain 100% total
-    if (Math.abs(difference) > 0.01) {
-      const otherOrders = newOrders.filter((_, i) => i !== index);
-      const totalOtherRatio = otherOrders.reduce((sum, order) => sum + order.ratio, 0);
-      
-      if (totalOtherRatio > 0) {
-        otherOrders.forEach(order => {
-          const orderIndex = newOrders.findIndex(o => o === order);
-          const adjustmentFactor = order.ratio / totalOtherRatio;
-          newOrders[orderIndex].ratio = +(order.ratio - difference * adjustmentFactor).toFixed(2);
-        });
-      }
-    }
+   
+    newOrders[index].ratio = +numericRatio.toFixed(2);
     
-    // Update quantities based on new ratios
-    newOrders.forEach(order => {
-      order.quantity = +(order.ratio * totalQuantity / 100).toFixed(3);
-    });
+    // Update the quantity for this order based on the new ratio
+    newOrders[index].quantity = +(newOrders[index].ratio * totalQuantity / 100).toFixed(3);
     
     setOrders(newOrders);
   };
 
   // Update a specific order's quantity
-  const updateOrderQuantity = (index: number, newQuantity: number) => {
-    const newRatio = +(newQuantity / totalQuantity * 100).toFixed(2);
-    updateOrderRatio(index, newRatio);
+  const updateOrderQuantity = (index: number, newQuantity: number | string) => {
+    const newOrders = [...orders];
+    
+    const numericQuantity = typeof newQuantity === 'string' 
+      ? (newQuantity === '' ? 0 : parseFloat(newQuantity) || 0) 
+      : newQuantity;
+    
+    // Calculate the corresponding ratio based on the new quantity
+    const newRatio = +(numericQuantity / totalQuantity * 100).toFixed(2);
+    
+    // Update the ratio and quantity for just this order
+    newOrders[index].ratio = newRatio;
+    newOrders[index].quantity = +numericQuantity.toFixed(3);
+    
+    setOrders(newOrders);
   };
 
   return {

@@ -109,7 +109,6 @@ export default function ScaleOrders({
         totalQuantity,
         totalOrders,
     });
- 
 
     // Event Handlers
     const handleTotalOrderInputBlur = () => {
@@ -135,7 +134,7 @@ export default function ScaleOrders({
         if (onConfirm && isValidRatio) {
             onConfirm(orders);
         }
-        onClose()
+        onClose();
     };
 
     const handlePriceDistributionChange = (type: PriceDistributionType) => {
@@ -157,116 +156,111 @@ export default function ScaleOrders({
             }}
         >
             <div className={styles.scaleOrdersContent}>
-
-            
-            {isModal && (
-                <div className={styles.header}>
-                    <span />
-                    <h2 className={styles.title}>Scale Options</h2>
-                    <button className={styles.closeButton} onClick={onClose}>
-                        ×
-                    </button>
-                </div>
-            )}
-
-            <div className={styles.totalOrdersSection}>
-                <input
-                    type='text'
-                    value={totalOrderInputValue}
-                    onChange={handleTotalOrderInputChange}
-                    onBlur={handleTotalOrderInputBlur}
-                    placeholder='Total Orders'
-                    className={styles.totalOrdersInput}
-                />
-                <div className={styles.quantityButtons}>
-                    {totalOrderQuantityOptions.map((value) => (
+                {isModal && (
+                    <div className={styles.header}>
+                        <span />
+                        <h2 className={styles.title}>Scale Options</h2>
                         <button
-                            key={value}
-                            className={`${styles.quantityButton} ${
-                                totalOrders === value ? styles.active : ''
-                            }`}
-                            onClick={() => setTotalOrders(value)}
+                            className={styles.closeButton}
+                            onClick={onClose}
                         >
-                            {value}
+                            ×
                         </button>
-                    ))}
+                    </div>
+                )}
+
+                <div className={styles.totalOrdersSection}>
+                    <input
+                        type='text'
+                        value={totalOrderInputValue}
+                        onChange={handleTotalOrderInputChange}
+                        onBlur={handleTotalOrderInputBlur}
+                        placeholder='Total Orders'
+                        className={styles.totalOrdersInput}
+                    />
+                    <div className={styles.quantityButtons}>
+                        {totalOrderQuantityOptions.map((value) => (
+                            <button
+                                key={value}
+                                className={`${styles.quantityButton} ${
+                                    totalOrders === value ? styles.active : ''
+                                }`}
+                                onClick={() => setTotalOrders(value)}
+                            >
+                                {value}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            <div className={styles.tableHeader}>
-                <DistributionDropdown
-                    label='Price'
-                    tooltipContent='price tooltip'
-                    options={priceDistributionOptions}
-                    currentValue={priceDistribution}
-                    isDropdownOpen={isPriceDropdownOpen}
-                    setIsDropdownOpen={setIsPriceDropdownOpen}
-                    onOptionSelect={handlePriceDistributionChange}
-                    headerClassName={styles.priceHeader}
-                />
+                <div className={styles.tableHeader}>
+                    <DistributionDropdown
+                        label='Price'
+                        tooltipContent='price tooltip'
+                        options={priceDistributionOptions}
+                        currentValue={priceDistribution}
+                        isDropdownOpen={isPriceDropdownOpen}
+                        setIsDropdownOpen={setIsPriceDropdownOpen}
+                        onOptionSelect={handlePriceDistributionChange}
+                        headerClassName={styles.priceHeader}
+                    />
 
-                <DistributionDropdown
-                    label='Ratio'
-                    tooltipContent='ratio'
-                    options={ratioDistributionOptions}
-                    currentValue={ratioDistribution}
-                    isDropdownOpen={isRatioDropdownOpen}
-                    setIsDropdownOpen={setIsRatioDropdownOpen}
-                    onOptionSelect={handleRatioDistributionChange}
-                    headerClassName={styles.ratioHeader}
-                />
+                    <DistributionDropdown
+                        label='Ratio'
+                        tooltipContent='ratio'
+                        options={ratioDistributionOptions}
+                        currentValue={ratioDistribution}
+                        isDropdownOpen={isRatioDropdownOpen}
+                        setIsDropdownOpen={setIsRatioDropdownOpen}
+                        onOptionSelect={handleRatioDistributionChange}
+                        headerClassName={styles.ratioHeader}
+                    />
 
-                <div className={styles.quantityHeader}>Quantity</div>
-            </div>
+                    <div className={styles.quantityHeader}>Quantity</div>
+                </div>
 
-            <div className={styles.orderList}>
-                {orders.map((order, index) => (
-                    <div key={index} className={styles.orderRow}>
-                        <input
-                            type='text'
-                            className={styles.priceInput}
-                            value={order.price}
-                            readOnly
-                        />
-
-                        <div className={styles.ratioCell}>
+                <div className={styles.orderList}>
+                    {orders.map((order, index) => (
+                        <div key={index} className={styles.orderRow}>
                             <input
                                 type='text'
-                                className={`${styles.ratioInput} ${
-                                    !isValidRatio ? styles.invalidInput : ''
-                                }`}
-                                value={order.ratio}
+                                className={styles.priceInput}
+                                value={order.price}
+                                readOnly
+                            />
+
+                            <div className={styles.ratioCell}>
+                                <input
+                                    type='text'
+                                    className={`${styles.ratioInput} ${
+                                        !isValidRatio ? styles.invalidInput : ''
+                                    }`}
+                                    value={order.ratio}
+                                    onChange={(e) => {
+                                        updateOrderRatio(index, e.target.value);
+                                    }}
+                                />
+                                <span className={styles.percentSign}>%</span>
+                            </div>
+
+                            <input
+                                type='text'
+                                className={styles.quantityInput}
+                                value={order.quantity}
                                 onChange={(e) => {
-                                    const value = parseFloat(e.target.value);
-                                    if (!isNaN(value)) {
-                                        updateOrderRatio(index, value);
-                                    }
+                                    updateOrderQuantity(index, e.target.value);
                                 }}
                             />
-                            <span className={styles.percentSign}>%</span>
                         </div>
+                    ))}
+                </div>
 
-                        <input
-                            type='text'
-                            className={styles.quantityInput}
-                            value={order.quantity}
-                            onChange={(e) => {
-                                const value = parseFloat(e.target.value);
-                                if (!isNaN(value)) {
-                                    updateOrderQuantity(index, value);
-                                }
-                            }}
-                        />
+                {!isValidRatio && (
+                    <div className={styles.errorMessage}>
+                        Sum of order ratios must be 100%
                     </div>
-                ))}
-            </div>
-
-            {!isValidRatio && (
-                <div className={styles.errorMessage}>
-                    Sum of order ratios must be 100%
-                </div>
                 )}
-                </div>
+            </div>
 
             {isModal && (
                 <div className={styles.actions}>
