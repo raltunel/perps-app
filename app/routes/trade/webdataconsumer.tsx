@@ -11,7 +11,9 @@ import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
 export default function WebDataConsumer() {
 
-    const { favKeys, setFavCoins, setUserOrders } = useTradeDataStore();
+    const { favKeys, setFavCoins, setUserOrders, symbol } = useTradeDataStore();
+    const symbolRef = useRef<string>(symbol);
+    symbolRef.current = symbol;
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
@@ -21,6 +23,8 @@ export default function WebDataConsumer() {
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet.address;
     const { setSymbolInfo } = useTradeDataStore();
+
+    const openOrdersRef = useRef<OrderDataIF[]>([]);
 
     useEffect(() => {
 
@@ -32,34 +36,62 @@ export default function WebDataConsumer() {
             single: true
         })
 
+        const openOrdersInterval = setInterval(() => {
+            setUserOrders(openOrdersRef.current);
+        }, 300);
+
         return () => {
+            clearInterval(openOrdersInterval);
             unsubscribeAllByChannel(WsChannels.WEB_DATA2);
         }
     }, [debugWallet.address])
 
 
 
+    const getCoinCtx = useCallback((payload: any, coin: string) => {
+        if (payload && payload.assetCtxs && payload.meta.universe) {
+            const indexOfCoin = payload.meta.universe.findIndex(
+                (item: any) => item.name === coin,
+            );
+            return payload.assetCtxs[indexOfCoin];
+        }
+        return null;
+    }, []);
+
     const processFavs = useCallback((payload: any) => {
 
         const newFavCoins: SymbolInfoIF[] = [];
+        let currentSymbolFound = false;
 
         if (favKeysRef.current) {
-
             favKeysRef.current.map((coin) => {
-                const indexOfCoin = payload.meta.universe.findIndex(
-                    (item: any) => item.name === coin,
-                );
-                if (indexOfCoin !== undefined) {
-                    const ctxVal = payload.assetCtxs[indexOfCoin];
 
+                const ctxVal = getCoinCtx(payload, coin);
+
+                if (ctxVal !== null) {
                     const coinObject = processSymbolInfo({
                         coin,
                         ctx: ctxVal,
                     });
                     newFavCoins.push(coinObject);
+                    if (coin === symbolRef.current) {
+                        setSymbolInfo(coinObject);
+                        currentSymbolFound = true;
+                    }
                 }
-            });
 
+            });
+        }
+
+        if (!currentSymbolFound) {
+            const currentSymbolCtx = getCoinCtx(payload, symbolRef.current);
+            if (currentSymbolCtx !== null) {
+                const coinObject = processSymbolInfo({
+                    coin: symbolRef.current,
+                    ctx: currentSymbolCtx,
+                });
+                setSymbolInfo(coinObject);
+            }
         }
 
         setFavCoins([...newFavCoins]);
@@ -74,8 +106,9 @@ export default function WebDataConsumer() {
                     userOrders.push(processedOrder);
                 }
             })
-            setUserOrders(userOrders);
+            openOrdersRef.current = userOrders;
         } else {
+            openOrdersRef.current = [];
             setUserOrders([]);
         }
     }, []);

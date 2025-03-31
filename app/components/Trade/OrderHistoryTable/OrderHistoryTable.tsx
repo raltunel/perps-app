@@ -22,52 +22,52 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
   const { orderHistory } = useTradeDataStore();
 
-  const {subscribe, unsubscribeAllByChannel} = useWsObserver();
-  const {addOrderToHistory, symbol, setOrderHistory, filterOrderHistory} = useTradeDataStore();
+  const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+  const { addOrderToHistory, symbol, setOrderHistory, filterOrderHistory } = useTradeDataStore();
 
 
-  const {debugWallet} = useDebugStore();
+  const { debugWallet } = useDebugStore();
 
   const currentUserRef = useRef<string>('');
   currentUserRef.current = debugWallet.address;
-  
-  const {fetchData} = useInfoApi();
-  
+
+  const { fetchData } = useInfoApi();
+
   const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
 
   const saveToStoreLock = useRef<boolean>(false);
 
-  const {isWsEnabled} = useDebugStore();
+  const { isWsEnabled } = useDebugStore();
   const isWsEnabledRef = useRef<boolean>(true);
   isWsEnabledRef.current = isWsEnabled;
-  
+
   useEffect(() => {
     const saveIntoStoreInterval = setInterval(() => {
-      if(!isWsEnabledRef.current){ return; }
-      if(saveToStoreLock.current){ return; }
+      if (!isWsEnabledRef.current) { return; }
+      if (saveToStoreLock.current) { return; }
       addOrderToHistory(userOrderHistoryRef.current);
     }, 1000);
 
     return () => {
       clearInterval(saveIntoStoreInterval);
     }
-    
+
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
 
     setOrderHistory([]);
-    
+
     fetchData({
       type: ApiEndpoints.HISTORICAL_ORDERS,
       payload: { user: debugWallet.address },
-      handler: (payload) => {
-        if(!isWsEnabledRef.current){ return; }
-        if(payload && payload.length > 0){
+      handler: (data) => {
+        if (!isWsEnabledRef.current) { return; }
+        if (data && data.length > 0) {
           const orders: OrderDataIF[] = [];
-          payload.slice(0, OrderHistoryLimits.MAX).map((o:any) => {
+          data.slice(0, OrderHistoryLimits.MAX).map((o: any) => {
             const processedOrder = processUserOrder(o.order, o.status);
-            if(processedOrder){
+            if (processedOrder) {
               orders.push(processedOrder);
             }
           })
@@ -78,7 +78,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
   }, [debugWallet.address])
 
 
-  
+
   const orderHistoryToShow = useMemo(() => {
     return filterOrderHistory(orderHistory, selectedFilter);
   }, [orderHistory, selectedFilter, symbol]);
@@ -88,33 +88,35 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
       payload: { user: debugWallet.address },
       handler: (payload) => {
 
-        if(payload && payload.orderHistory && 
+        if (payload && payload.orderHistory &&
           payload.orderHistory.length > 0
-          ){
+        ) {
 
-            if(payload.user !== currentUserRef.current){
-              saveToStoreLock.current = true;
-            }else{
-              const orderUpdates: OrderDataIF[] = [];
-              payload.orderHistory.map((o:any) => {
-                const processedOrder = processUserOrder(o.order, o.status);
-                if(processedOrder){
-                  orderUpdates.push(processedOrder);
-                }
-              })
+          if (payload.user !== currentUserRef.current) {
+            saveToStoreLock.current = true;
+          } else {
+            const orderUpdates: OrderDataIF[] = [];
+            payload.orderHistory.map((o: any) => {
+              const processedOrder = processUserOrder(o.order, o.status);
+              if (processedOrder) {
+                orderUpdates.push(processedOrder);
+              }
+            })
+            if (!payload.isSnapshot) {
               userOrderHistoryRef.current = [...orderUpdates, ...userOrderHistoryRef.current]
               userOrderHistoryRef.current.sort((a, b) => b.timestamp - a.timestamp);
-              saveToStoreLock.current = false;
             }
+            saveToStoreLock.current = false;
+          }
 
         }
       },
       single: true
     });
 
-    // return () => {
-    //   unsubscribeAllByChannel('userHistoricalOrders');
-    // }
+    return () => {
+      unsubscribeAllByChannel('userHistoricalOrders');
+    }
   }, [debugWallet.address]);
 
   const handleViewAll = (e: React.MouseEvent) => {
@@ -129,18 +131,18 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
       <OrderHistoryTableHeader />
       <div className={styles.tableBody}>
         {orderHistoryToShow.map((order, index) => (
-          <OrderHistoryTableRow 
-            key={`order-${index}`} 
+          <OrderHistoryTableRow
+            key={`order-${index}`}
             order={order}
           />
         ))}
-        
+
         {orderHistoryData.length === 0 && (
           <div className={styles.rowContainer} style={{ justifyContent: 'center', padding: '2rem 0' }}>
             No order history
           </div>
         )}
-        
+
         {orderHistoryData.length > 0 && (
           <a href="#" className={styles.viewAllLink} onClick={handleViewAll}>
             View All
