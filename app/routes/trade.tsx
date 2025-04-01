@@ -93,8 +93,8 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           className={styles.wsToggleButton}
         > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
       </div>
-      <TradeRouteHandler />
       <React.Suspense fallback={<div>Loading...</div>}>
+        <TradeRouteHandler />
         <WebDataConsumer />
         <LsConsumer />
         {
