@@ -34,6 +34,23 @@ export function loader({ context }: Route.LoaderArgs) {
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
+  // Trade bileşeninizin en üstüne
+  useEffect(() => {
+    console.log("Trade component hydrated");
+
+    // 3 saniye sonra komponentlerin durumunu kontrol et
+    setTimeout(() => {
+      console.log("Symbol:", symbol);
+      console.log("wsUrl options count:", wsUrls.length);
+      console.log("debugWallet options count:", debugWallets.length);
+      console.log("DOM status:", {
+        symbolInfoExists: !!document.querySelector(`.${styles.symbolInfo}`),
+        chartExists: !!document.querySelector(`#chartSection`),
+        orderBookExists: !!document.querySelector(`#orderBookSection`)
+      });
+    }, 3000);
+  }, []);
+
 
   const { symbol, setSymbol } = useTradeDataStore();
   const symbolRef = useRef(symbol);
@@ -110,7 +127,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
 
                   </div>
-                  {/* <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div> */}
+                  <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
                 </div>
 
                 <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
