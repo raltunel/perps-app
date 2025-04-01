@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -92,45 +93,46 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           className={styles.wsToggleButton}
         > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
       </div>
-
       <TradeRouteHandler />
-      <WebDataConsumer />
-      <LsConsumer />
-      {
-        symbol && symbol.length > 0 && (
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <WebDataConsumer />
+        <LsConsumer />
+        {
+          symbol && symbol.length > 0 && (
 
-          <div className={styles.container}>
-            <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
-              <div className={styles.containerTopLeft}>
-                <div className={styles.watchlist}><WatchList /></div>
-                <div className={styles.symbolInfo}>
+            <div className={styles.container}>
+              <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
+                <div className={styles.containerTopLeft}>
+                  <div className={styles.watchlist}><WatchList /></div>
+                  <div className={styles.symbolInfo}>
 
-                  <SymbolInfo />
+                    <SymbolInfo />
 
 
+                  </div>
+                  <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
                 </div>
-                <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
-              </div>
 
-              <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}><OrderInput /></div>
-            </section>
-            <section className={styles.containerBottom}>
-              <div className={styles.table}>
-                <TradeTable />
-              </div>
-              <div className={styles.wallet}>
-                <DepositDropdown
-                  isUserConnected={false}
-                  setIsUserConnected={() => console.log('connected')}
-                />
-              </div>
-            </section>
+                <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
+                <div className={styles.tradeModules}><OrderInput /></div>
+              </section>
+              <section className={styles.containerBottom}>
+                <div className={styles.table}>
+                  <TradeTable />
+                </div>
+                <div className={styles.wallet}>
+                  <DepositDropdown
+                    isUserConnected={false}
+                    setIsUserConnected={() => console.log('connected')}
+                  />
+                </div>
+              </section>
 
-          </div>
+            </div>
 
-        )
-      }
+          )
+        }
+      </React.Suspense>
     </>
   );
 }
