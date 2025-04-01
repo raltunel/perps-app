@@ -42,63 +42,76 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
   const [readyState, setReadyState] = useState<number>(WebSocketReadyState.CLOSED);
   const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
   readyStateRef.current = readyState;
+  const workers = useRef<Map<string, Worker>>(new Map());
   const socketRef = useRef<WebSocket | null>(null);
   const subscriptions = useRef<Map<string, WsSubscriptionConfig[]>>(new Map());
 
+  function extractChannelFromPayload(raw: string): string {
+    const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
+    return match ? match[1] : '';
+  }
 
   const connectWebSocket = () => {
 
 
     if (!isClient) {
-      console.log('>>> not a client');
       return;
     }; // ✅ Ensure WebSocket only runs on client side
 
     // Close the previous WebSocket if it exists
     if (socketRef.current) {
-      console.log('>>> close previous socket');
       socketRef.current.close();
     }
 
     // Create a new WebSocket connection
-    console.log('>>> create new socket');
     const socket = new WebSocket(url);
     socketRef.current = socket;
 
     socket.onopen = () => {
-      console.log('>>> socket opened');
       setReadyState(WebSocketReadyState.OPEN);
     };
 
     socket.onmessage = (event) => {
       if (event.data) {
-        const msg = JSON.parse(event.data);
 
-        if (subscriptions.current.has(msg.channel)) {
-          subscriptions.current.get(msg.channel)?.forEach(config => {
-            config.handler(msg.data);
-          });
+        const channel = extractChannelFromPayload(event.data);
+        const worker = getWorker(channel);
+        if (worker) {
+          worker.postMessage(event.data);
         }
+
+        // const sub = subscriptions.current.get(channel);
+        // if(sub){
+        //   if()
+        //   subscriptions.current.get(channel)?.forEach(config => {
+        //     config.handler(event.data);
+        //   });
+        // }
+
+
+
+        // const msg = JSON.parse(event.data);
+
+        // if (subscriptions.current.has(msg.channel)) {
+        //   subscriptions.current.get(msg.channel)?.forEach(config => {
+        //     config.handler(msg.data);
+        //   });
+        // }
       }
     };
 
     socket.onclose = () => {
-      console.log('>>> socket on close');
       setReadyState(WebSocketReadyState.CLOSED);
     };
 
     socket.onerror = (error) => {
-      console.error('>>> WebSocket error:', error);
       socket.close();
     };
   };
 
   useEffect(() => {
     if (isClient) {
-      console.log('>>> is client, connect web socket');
       connectWebSocket();
-    } else {
-      console.log('>>> not a client, do not connect web socket');
     }
 
     return () => {
@@ -107,12 +120,6 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
     };
   }, [url, isClient]); // ✅ Only runs when client-side is ready
 
-  useEffect(() => {
-
-    return () => {
-      console.log('>>> close context !!!!!!!!!!!!');
-    };
-  }, []);
 
   const sendMessage = (msg: string) => {
     if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
@@ -150,6 +157,9 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
 
 
   const subscribe = (key: string, config: WsSubscriptionConfig) => {
+
+    initWorker(key);
+
     // add subscripton in hook
     if (!subscriptions.current.has(key)) {
       subscriptions.current.set(key, []);
@@ -206,6 +216,48 @@ export const WsObserverProvider: React.FC<{ url: string; children: React.ReactNo
       }
     }
   };
+
+  const initWorker = (type: string) => {
+    if (workers.current.has(type)) {
+      return;
+    }
+
+    switch (type) {
+      case WsChannels.WEB_DATA2:
+        const w1 = new Worker(new URL('./../processors/workers/webdata2.worker.ts', import.meta.url), { type: 'module' });
+
+        w1.onmessage = (event) => {
+          const subs = subscriptions.current.get(event.data.channel);
+          if (subs) {
+            subs.forEach(config => {
+              config.handler(event.data);
+            });
+          }
+        }
+        workers.current.set(type, w1);
+        return w1;
+      default:
+        const w2 = new Worker(new URL('./../processors/workers/default.worker.ts', import.meta.url), { type: 'module' });
+
+        w2.onmessage = (event) => {
+          const subs = subscriptions.current.get(event.data.channel);
+          if (subs) {
+            subs.forEach(config => {
+              config.handler(event.data.data);
+            });
+          }
+        }
+
+        workers.current.set(type, w2);
+        return w2;
+    }
+
+
+  }
+
+  const getWorker = (type: string) => {
+    return workers.current.get(type);
+  }
 
 
   return (

@@ -40,6 +40,8 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   const { orderBookMode } = useAppSettings();
 
 
+
+
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
 

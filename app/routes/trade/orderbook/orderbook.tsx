@@ -22,7 +22,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
   const { subscribe, unsubscribeAllByChannel } = useWsObserver();
   const { fetchData } = useInfoApi();
   const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
-  const resolutionsShouldReset = useRef(true);
   const [selectedResolution, setSelectedResolution] = useState<OrderRowResolutionIF | null>(null);
 
   // added to pass true resolution to orderrow components
@@ -40,7 +39,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
   isWsEnabledRef.current = isWsEnabled;
 
   const { buys, sells, setOrderBook } = useOrderBookStore();
-  const { userOrders, setUserOrders, userSymbolOrders, addOrderToHistory } = useTradeDataStore();
+  const { userOrders, setUserOrders, userSymbolOrders, symbolInfo, addOrderToHistory } = useTradeDataStore();
   const userOrdersRef = useRef<OrderDataIF[]>([]);
 
   const buySlots = useMemo(() => {
@@ -164,9 +163,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
 
   useEffect(() => {
-    changeSubscription({ coin: symbol, resolution: selectedResolution });
-    resolutionsShouldReset.current = true;
-  }, [symbol, orderCount])
+
+    if (symbol === symbolInfo?.coin) {
+      const resolutionList = getResolutionListForPrice(symbolInfo.markPx);
+      setResolutions(resolutionList);
+      setSelectedResolution(resolutionList[0]);
+    }
+  }, [symbol, symbolInfo?.coin])
 
 
   useEffect(() => {
@@ -178,18 +181,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         resolution: selectedResolution
       });
     }
-  }, [selectedResolution, orderCount])
+  }, [selectedResolution])
 
-
-  useEffect(() => {
-    if (resolutionsShouldReset.current && buys.length > 0 && buys[0].coin === symbol) {
-      const resolutions = getResolutionListForPrice(buys[0].px);
-      assetPrice.current = buys[0].px;
-      setResolutions(resolutions);
-      setSelectedResolution(resolutions[0]);
-      resolutionsShouldReset.current = false;
-    }
-  }, [buys])
 
   return (
     <div className={styles.orderBookContainer}>
@@ -237,7 +230,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           <>
             <div className={styles.orderBookBlock}>
               {sells.slice(0, orderCount).reverse().map((order, index) => (
-                <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current}
+                <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : symbolInfo?.markPx ?? 0}
                   resolution={filledResolution.current}
                   userSlots={userSellSlots} />
               ))}
@@ -248,13 +241,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
               <div>Spread</div>
               <div>{selectedResolution?.val}</div>
-              <div>{(assetPrice.current && selectedResolution?.val) && (selectedResolution?.val / assetPrice.current * 100).toFixed(3)}%</div>
+              <div>{(symbolInfo?.markPx && selectedResolution?.val) && (selectedResolution?.val / symbolInfo?.markPx * 100).toFixed(3)}%</div>
 
             </div>
 
             <div className={styles.orderBookBlock}>
               {buys.slice(0, orderCount).map((order, index) => (
-                <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : assetPrice.current}
+                <OrderRow key={order.px} order={order} coef={selectedMode === 'symbol' ? 1 : symbolInfo?.markPx ?? 0}
                   resolution={filledResolution.current}
                   userSlots={userBuySlots} />
               ))}

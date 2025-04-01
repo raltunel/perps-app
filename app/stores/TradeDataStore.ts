@@ -19,6 +19,8 @@ type TradeDataStore = UserTradeStore & {
     addToFavKeys: (coin: string) => void;
     favCoins: SymbolInfoIF[];
     setFavCoins: (favs: SymbolInfoIF[]) => void;
+    coins: SymbolInfoIF[],
+    setCoins: (coins: SymbolInfoIF[]) => void;
 }
 
 const useTradeDataStore = create<TradeDataStore>((set, get) => ({
@@ -47,6 +49,8 @@ const useTradeDataStore = create<TradeDataStore>((set, get) => ({
     },
     favCoins: [],
     setFavCoins: (favs: SymbolInfoIF[]) => set({ favCoins: favs }),
+    coins: [],
+    setCoins: (coins: SymbolInfoIF[]) => set({ coins })
 }));
 
 

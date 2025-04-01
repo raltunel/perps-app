@@ -11,7 +11,7 @@ import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
 export default function WebDataConsumer() {
 
-    const { favKeys, setFavCoins, setUserOrders, symbol } = useTradeDataStore();
+    const { favKeys, setFavCoins, setUserOrders, symbol, setCoins, coins } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const favKeysRef = useRef<string[]>(null);
@@ -28,10 +28,28 @@ export default function WebDataConsumer() {
 
     useEffect(() => {
 
+        const foundCoin = coins.find(coin => coin.coin === symbol);
+        if (foundCoin) {
+            setSymbolInfo(foundCoin);
+        }
+
+
+    }, [symbol, coins])
+
+
+
+    useEffect(() => {
+
+        setUserOrders([]);
+        openOrdersRef.current = [];
+
         subscribe(WsChannels.WEB_DATA2, {
             payload: { user: debugWallet.address },
             handler: (payload) => {
-                processWebData2Message(payload);
+                setCoins(payload.data.coins);
+                if (payload.data.user === addressRef.current) {
+                    openOrdersRef.current = payload.data.userOpenOrders;
+                }
             },
             single: true
         })
@@ -48,91 +66,20 @@ export default function WebDataConsumer() {
 
 
 
-    const getCoinCtx = useCallback((payload: any, coin: string) => {
-        if (payload && payload.assetCtxs && payload.meta.universe) {
-            const indexOfCoin = payload.meta.universe.findIndex(
-                (item: any) => item.name === coin,
-            );
-            return payload.assetCtxs[indexOfCoin];
-        }
-        return null;
-    }, []);
 
-    const processFavs = useCallback((payload: any) => {
+    useEffect(() => {
 
-        const newFavCoins: SymbolInfoIF[] = [];
-        let currentSymbolFound = false;
-
-        if (favKeysRef.current) {
-            favKeysRef.current.map((coin) => {
-
-                const ctxVal = getCoinCtx(payload, coin);
-
-                if (ctxVal !== null) {
-                    const coinObject = processSymbolInfo({
-                        coin,
-                        ctx: ctxVal,
-                    });
-                    newFavCoins.push(coinObject);
-                    if (coin === symbolRef.current) {
-                        setSymbolInfo(coinObject);
-                        currentSymbolFound = true;
-                    }
+        if (favKeysRef.current && coins.length > 0) {
+            const favs: SymbolInfoIF[] = [];
+            favKeysRef.current.forEach((coin) => {
+                const c = coins.find((c) => c.coin === coin);
+                if (c) {
+                    favs.push(c);
                 }
-
             });
+            setFavCoins(favs);
         }
-
-        if (!currentSymbolFound) {
-            const currentSymbolCtx = getCoinCtx(payload, symbolRef.current);
-            if (currentSymbolCtx !== null) {
-                const coinObject = processSymbolInfo({
-                    coin: symbolRef.current,
-                    ctx: currentSymbolCtx,
-                });
-                setSymbolInfo(coinObject);
-            }
-        }
-
-        setFavCoins([...newFavCoins]);
-    }, []);
-
-    const processOpenOrders = useCallback((orders: any) => {
-        if (orders && orders.length > 0) {
-            const userOrders: OrderDataIF[] = [];
-            orders.map((order: any) => {
-                const processedOrder = processUserOrder(order, 'open');
-                if (processedOrder) {
-                    userOrders.push(processedOrder);
-                }
-            })
-            openOrdersRef.current = userOrders;
-        } else {
-            openOrdersRef.current = [];
-            setUserOrders([]);
-        }
-    }, []);
-
-    const processWebData2Message = useCallback((payload: any) => {
-
-        if (
-            payload &&
-            payload.meta &&
-            payload.meta.universe &&
-            payload.assetCtxs
-        ) {
-            processFavs(payload);
-
-
-            // process account related data
-            if (addressRef.current === payload.user) {
-                processOpenOrders(payload.openOrders);
-            } else {
-                setUserOrders([]);
-            }
-        }
-    }, []);
-
+    }, [favKeys, coins]);
 
     return (
         <></>
