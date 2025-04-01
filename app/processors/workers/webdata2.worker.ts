@@ -1,8 +1,8 @@
 // jsonParser.worker.js
 
-import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
+import type { SymbolInfoIF } from "../../utils/SymbolInfoIFs";
 import { processSymbolInfo } from "../processSymbolInfo";
-import type { OrderDataIF } from "~/utils/orderbook/OrderBookIFs";
+import type { OrderDataIF } from "../../utils/orderbook/OrderBookIFs";
 import { processUserOrder } from "../processOrderBook";
 
 

@@ -1,5 +1,5 @@
-import { parseNum } from "~/utils/orderbook/OrderBookUtils";
-import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
+import { parseNum } from "../utils/orderbook/OrderBookUtils";
+import type { SymbolInfoIF } from "../utils/SymbolInfoIFs";
 
 
 
