@@ -4,14 +4,12 @@ import OptionLine from './OptionLine';
 import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
-import { useAppSettings, bsColorSets, type colorSetNames, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useAppSettings, bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import {
     NumFormatTypes,
     type NumFormat,
 } from '~/utils/Constants';
 import { FaCircle } from 'react-icons/fa';
-import { useContext } from 'react';
-import { TradingViewContext } from '~/contexts/TradingviewContext';
 
 export interface appOptionDataIF {
     slug: appOptions;
