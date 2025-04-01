@@ -54,3 +54,7 @@
     justify-content: space-between;
     align-items: center;
 }
+
+.options_dropdown > *:hover {
+    cursor: pointer;
+}

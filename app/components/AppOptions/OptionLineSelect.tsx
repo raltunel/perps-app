@@ -63,7 +63,7 @@ export default function OptionLineSelect(props: propsIF) {
                     <div className={styles.options_dropdown}>
                         {
                             options.map((o: dropdownOptionsIF) => (
-                                <div className={styles.dropdown_option} onClick={() => o.set()}>
+                                <div onClick={() => o.set()}>
                                     {o.readable}
                                 </div>
                             ))
