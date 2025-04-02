@@ -79,6 +79,18 @@ export default function OrderInput() {
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
+    const minimumInputValue = 2;
+    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] = useState<number>(100);
+    const generateRandomMaximumInput = () => {
+        console.log('generating')
+        // Generate a random maximum between minimumInputValue and 100
+        const newMaximumInputValue = Math.floor(
+          Math.random() * (100 - minimumInputValue + 1)
+        ) + minimumInputValue;
+        
+        setTempMaximumLeverageInput(newMaximumInputValue);
+      }
+
     const appSettingsModal: useModalIF = useModal('closed');
 
     const showPriceInputComponent = [
@@ -282,6 +294,9 @@ export default function OrderInput() {
         options: leverageOptions,
         value: leverage,
         onChange: handleLeverageChange,
+        minimumInputValue: minimumInputValue,
+        maximumInputValue: tempMaximumLeverageInput,
+        generateRandomMaximumInput: generateRandomMaximumInput
     };
 
     const chasePriceProps = {
