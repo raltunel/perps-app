@@ -58,6 +58,8 @@ export default function App() {
             
             // İlk yükleme aşamasını kaydet
             document.documentElement.setAttribute('data-initial-load', timestamp);
+
+            console.log('load attemp')
             
             // Sayfa tamamen yüklenince
             window.addEventListener('load', function() {
