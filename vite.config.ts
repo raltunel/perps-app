@@ -9,7 +9,7 @@ export default defineConfig(({ isSsrBuild }) => ({
         input: "./server/app.ts",
       }
       : {
-        input: './src/root.tsx',
+        input: './app/root.tsx',
       },
   },
 
