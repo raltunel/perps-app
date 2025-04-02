@@ -40,21 +40,54 @@ export default function App() {
   const { wsUrl } = useDebugStore();
 
   return (
-    <Layout>
-      <WsObserverProvider url={wsUrl}>
-      <div className='root-container'>
-        <header className='header'>
-          <PageHeader/>
-        </header>
+    <>
+      <script dangerouslySetInnerHTML={{
+        __html: `
+        // Tanılama script'i - sayfanın en başında çalışır
+        (function() {
+          try {
+            var timestamp = Date.now();
+            var pageLoadData = {
+              url: window.location.href,
+              timestamp: timestamp,
+              userAgent: navigator.userAgent
+            };
+            
+            // Local storage'a kaydet
+            localStorage.setItem('last_page_load_attempt', JSON.stringify(pageLoadData));
+            
+            // İlk yükleme aşamasını kaydet
+            document.documentElement.setAttribute('data-initial-load', timestamp);
+            
+            // Sayfa tamamen yüklenince
+            window.addEventListener('load', function() {
+              document.documentElement.setAttribute('data-fully-loaded', 'true');
+              localStorage.setItem('last_page_load_success', JSON.stringify({
+                ...pageLoadData,
+                loadTime: Date.now() - timestamp
+              }));
+            });
+          } catch(e) {
+            // Sessizce başarısız ol
+          }
+        })();
+      `}} />
+      <Layout>
+        <WsObserverProvider url={wsUrl}>
+          <div className='root-container'>
+            <header className='header'>
+              <PageHeader />
+            </header>
 
-        <main className='content'>
-          <Outlet />
-        </main>
+            <main className='content'>
+              <Outlet />
+            </main>
 
-        <Notifications />
-      </div>
+            <Notifications />
+          </div>
         </WsObserverProvider>
-    </Layout>
+      </Layout>
+    </>
   );
 }
 
@@ -75,14 +108,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-      <main className='content error-boundary'>
-        <h1>{message}</h1>
-        <p>{details}</p>
-        {stack && (
-          <pre>
-            <code>{stack}</code>
-          </pre>
-        )}
-      </main>
+    <main className='content error-boundary'>
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre>
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
   );
 }

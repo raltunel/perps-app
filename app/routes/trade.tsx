@@ -26,9 +26,28 @@ export function meta({ }: Route.MetaArgs) {
   ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
+// trade.tsx - Render sırasında çalışan loglama
+export function loader({ context, request }: Route.LoaderArgs) {
+  // SSR sırasında log gönder
+  if (context && context.netlifyGraphToken) {
+    try {
+      fetch('https://your-site.netlify.app/.netlify/functions/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: 'SSR loader executed',
+          timestamp: Date.now(),
+          path: new URL(request.url).pathname
+        })
+      });
+    } catch (error) {
+      // Hatayı yok say
+    }
+  }
+
   return { message: context.VALUE_FROM_NETLIFY };
 }
+
 
 // const wsUrl = 'wss://api.hyperliquid.xyz/ws';
 // const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
@@ -118,6 +137,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
+
+      <noscript>
+        <div style={{ padding: '10px', background: 'yellow', color: 'black' }}>
+          JavaScript is disabled. This application requires JavaScript.
+        </div>
+      </noscript>
+
+      <div hidden id="diagnostic-info" data-render-attempt="true" data-timestamp={Date.now()}>
+        Render attempted: {new Date().toISOString()}
+      </div>
+
       <div className={styles.wsUrlSelector}>
         <ComboBox
           value={wsUrl}
