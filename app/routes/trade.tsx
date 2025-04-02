@@ -9,7 +9,6 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -108,7 +107,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
 
 
-  const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
+  const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled, wsUrls, debugWallets } = useDebugStore();
 
 
   // if(!symbol || symbol.length === 0){
