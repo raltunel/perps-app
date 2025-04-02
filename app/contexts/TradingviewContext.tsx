@@ -79,6 +79,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // fn to update colors on the chart
     function changeColors(c: colorSetIF): void {
+        console.log('chart');
         if (chart) {
             chart.applyOverrides({
                 'mainSeriesProperties.candleStyle.upColor': c.buy,
