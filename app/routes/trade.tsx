@@ -51,6 +51,35 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     }, 3000);
   }, []);
 
+  useEffect(() => {
+    // Client-side olduğundan emin ol
+    if (typeof window !== 'undefined') {
+      fetch('/.netlify/functions/log', {
+        method: 'POST',
+        body: JSON.stringify({ message: 'Trade sayfası yükleme başladı' })
+      }).catch(e => console.error('Log error:', e));
+
+      // Aşamalı loglar ekle
+      setTimeout(() => {
+        fetch('/.netlify/functions/log', {
+          method: 'POST',
+          body: JSON.stringify({ message: 'Trade - 2 saniye geçti' })
+        }).catch(e => { });
+      }, 2000);
+
+      setTimeout(() => {
+        fetch('/.netlify/functions/log', {
+          method: 'POST',
+          body: JSON.stringify({
+            message: 'Trade - 5 saniye geçti',
+            symbol: symbol,
+            wsUrlCount: wsUrls.length,
+            debugWalletCount: debugWallets.length
+          })
+        }).catch(e => { });
+      }, 5000);
+    }
+  }, []);
 
   const { symbol, setSymbol } = useTradeDataStore();
   const symbolRef = useRef(symbol);
