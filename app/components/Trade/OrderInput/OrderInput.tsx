@@ -60,7 +60,7 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | null>(
+    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'leverage' | null>(
         null,
     );
 
@@ -403,7 +403,6 @@ export default function OrderInput() {
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
-           
 
             <PlaceOrderButtons orderMarketPrice={marketOrderType} />
 

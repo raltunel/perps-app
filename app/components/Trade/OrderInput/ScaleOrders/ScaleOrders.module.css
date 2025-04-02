@@ -219,7 +219,7 @@
 
 .orderList {
     width: 100% ;
-    max-height: 130px;
+    height: 330px;
     overflow-y: auto;
     /* scrollbar-gutter: stable; */
     scrollbar-width: thin;
@@ -274,6 +274,7 @@
     border: 1px solid var(--text2);
 }
 
+
 .ratioCell {
     padding: 0 8px;
     background: var(--dark4, #27272c);
@@ -285,10 +286,19 @@
    
 
 }
+.ratioCell:focus{
+    border: 1px solid transparent !important;
+
+}
 .ratioInput {
     padding: 0 !important;
-}
+    border: 1px solid transparent !important;
 
+}
+.priceInput, .ratioCell, .quantityInput{
+    
+    height: 25px !important;
+   }
 .percentSign {
     font-size: var(--font-size-s, 12px);
     color: var(--text1);

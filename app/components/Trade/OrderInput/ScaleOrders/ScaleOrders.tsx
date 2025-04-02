@@ -84,7 +84,7 @@ export default function ScaleOrders({
     onConfirm,
     isModal = false,
 }: ScaleOrdersProps) {
-    const [totalOrders, setTotalOrders] = useState<number>(5);
+    const [totalOrders, setTotalOrders] = useState<number>(10);
     const [totalOrderInputValue, setTotalOrderInputValue] = useState(
         totalOrders.toString(),
     );
