@@ -6,12 +6,14 @@ export default defineConfig(({ isSsrBuild }) => ({
   build: {
     rollupOptions: isSsrBuild
       ? {
-          input: "./server/app.ts",
-        }
-      : undefined,
+        input: "./server/app.ts",
+      }
+      : {
+        input: './src/root.tsx',
+      },
   },
- 
-  plugins: [ reactRouter(), tsconfigPaths()],
+
+  plugins: [reactRouter(), tsconfigPaths()],
   // optimizeDeps: {
   //   include: ["react-use-websocket"],
   // },

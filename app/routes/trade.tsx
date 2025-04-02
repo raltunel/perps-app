@@ -69,36 +69,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     }, 3000);
   }, []);
 
-  useEffect(() => {
-    // Client-side olduğundan emin ol
-    if (typeof window !== 'undefined') {
-      fetch('/.netlify/functions/log', {
-        method: 'POST',
-        body: JSON.stringify({ message: 'Trade sayfası yükleme başladı' })
-      }).catch(e => console.error('Log error:', e));
-
-      // Aşamalı loglar ekle
-      setTimeout(() => {
-        fetch('/.netlify/functions/log', {
-          method: 'POST',
-          body: JSON.stringify({ message: 'Trade - 2 saniye geçti' })
-        }).catch(e => { });
-      }, 2000);
-
-      setTimeout(() => {
-        fetch('/.netlify/functions/log', {
-          method: 'POST',
-          body: JSON.stringify({
-            message: 'Trade - 5 saniye geçti',
-            symbol: symbol,
-            wsUrlCount: wsUrls.length,
-            debugWalletCount: debugWallets.length
-          })
-        }).catch(e => { });
-      }, 5000);
-    }
-  }, []);
-
   const { symbol, setSymbol } = useTradeDataStore();
   const symbolRef = useRef(symbol);
   symbolRef.current = symbol;
@@ -137,15 +107,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   return (
     <>
 
-      <noscript>
-        <div style={{ padding: '10px', background: 'yellow', color: 'black' }}>
-          JavaScript is disabled. This application requires JavaScript.
-        </div>
-      </noscript>
-
-      <div hidden id="diagnostic-info" data-render-attempt="true" data-timestamp={Date.now()}>
-        Render attempted: {new Date().toISOString()}
-      </div>
 
       <div className={styles.wsUrlSelector}>
         <ComboBox
@@ -168,7 +129,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           className={styles.wsToggleButton}
         > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
       </div>
-      <React.Suspense fallback={<div>Loading...</div>}>
+      <React.Suspense fallback={<div>loading...</div>}>
         <TradeRouteHandler />
         <WebDataConsumer />
         <LsConsumer />

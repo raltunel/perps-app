@@ -14,6 +14,8 @@ import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -34,6 +36,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+// export function Layout({ children }: { children: React.ReactNode }) {
+//   return (
+//     <>
+//       <Meta />
+//       <Links />
+//       {children}
+//       <ScrollRestoration />
+//       <Scripts />
+//       <script src="/tv/datafeeds/udf/dist/bundle.js"></script>
+//     </>
+//   );
+// }
+
+
 export default function App() {
 
 
@@ -41,39 +57,6 @@ export default function App() {
 
   return (
     <>
-      <script dangerouslySetInnerHTML={{
-        __html: `
-        // Tanılama script'i - sayfanın en başında çalışır
-        (function() {
-          try {
-            var timestamp = Date.now();
-            var pageLoadData = {
-              url: window.location.href,
-              timestamp: timestamp,
-              userAgent: navigator.userAgent
-            };
-            
-            // Local storage'a kaydet
-            localStorage.setItem('last_page_load_attempt', JSON.stringify(pageLoadData));
-            
-            // İlk yükleme aşamasını kaydet
-            document.documentElement.setAttribute('data-initial-load', timestamp);
-
-            console.log('load attemp')
-            
-            // Sayfa tamamen yüklenince
-            window.addEventListener('load', function() {
-              document.documentElement.setAttribute('data-fully-loaded', 'true');
-              localStorage.setItem('last_page_load_success', JSON.stringify({
-                ...pageLoadData,
-                loadTime: Date.now() - timestamp
-              }));
-            });
-          } catch(e) {
-            // Sessizce başarısız ol
-          }
-        })();
-      `}} />
       <Layout>
         <WsObserverProvider url={wsUrl}>
           <div className='root-container'>
@@ -121,3 +104,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     </main>
   );
 }
+
+
+// ReactDOM.createRoot(document.getElementById('root')!).render(
+//   <React.StrictMode>
+//     <App />
+//   </React.StrictMode>
+// );
