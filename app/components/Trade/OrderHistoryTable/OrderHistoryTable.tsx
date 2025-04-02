@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processUserOrder } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { useDebugStore } from '~/stores/DebugStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '~/processors/processOrderBook';
-import type { FilterOption } from '../TradeTables/TradeTables';
-import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
-import { OrderHistoryLimits } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
   onViewAll?: () => void;
@@ -20,7 +18,7 @@ interface OrderHistoryTableProps {
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
   const { onViewAll, selectedFilter } = props;
 
-  const { orderHistory } = useTradeDataStore();
+  const { orderHistory, orderHistoryLimits } = useTradeDataStore();
 
   const { subscribe, unsubscribeAllByChannel } = useWsObserver();
   const { addOrderToHistory, symbol, setOrderHistory, filterOrderHistory } = useTradeDataStore();
@@ -65,7 +63,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
         if (!isWsEnabledRef.current) { return; }
         if (data && data.length > 0) {
           const orders: OrderDataIF[] = [];
-          data.slice(0, OrderHistoryLimits.MAX).map((o: any) => {
+          data.slice(0, orderHistoryLimits.MAX).map((o: any) => {
             const processedOrder = processUserOrder(o.order, o.status);
             if (processedOrder) {
               orders.push(processedOrder);

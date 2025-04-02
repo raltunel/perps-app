@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { RefObject } from 'react';
+import { useCallback } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 
@@ -11,19 +9,19 @@ import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 export function useNumFormatter() {
 
-  const { numFormat} = useAppSettings();
-  
-  const parseNum = useCallback((val : string | number) => {
+  const { numFormat } = useAppSettings();
+
+  const parseNum = useCallback((val: string | number) => {
     return Number(val);
   }, []);
 
   const getDefaultPrecision = useCallback((num: number | string) => {
     const numVal = parseNum(num);
-    if(numVal > 1000000){
-        return 0;
+    if (numVal > 1000000) {
+      return 0;
     }
-    else if(numVal < 10){
-        return 4;
+    else if (numVal < 10) {
+      return 4;
     }
     return 2;
   }, [parseNum]);
@@ -31,8 +29,8 @@ export function useNumFormatter() {
 
   // returns the number of decimal places in a number
   const decimalPrecision = (precisionNumber: number) => {
-      if (!precisionNumber.toString().includes('.')) return 0;
-      return precisionNumber.toString().split('.')[1].length;
+    if (!precisionNumber.toString().includes('.')) return 0;
+    return precisionNumber.toString().split('.')[1].length;
   }
 
 
@@ -42,13 +40,13 @@ export function useNumFormatter() {
 
     let precisionVal = null;
 
-    if(precision && typeof precision === 'object'){
+    if (precision && typeof precision === 'object') {
       precisionVal = decimalPrecision(precision.val);
     }
-    else if(precision){
+    else if (precision) {
       precisionVal = precision;
     }
-    
+
     if (Number.isInteger(num)) {
       return num.toLocaleString(formatType);
     } else {
@@ -64,7 +62,7 @@ export function useNumFormatter() {
     const precision = Math.max(5 - Math.floor(Math.log10(Math.abs(parseInt(num.toString())) + 1)), 0) - 1;
     return formatNum(num, precision >= 0 ? precision : 0);
   }, [formatNum]);
-  
+
 
 
   return { formatNum, formatPriceForChart, decimalPrecision };

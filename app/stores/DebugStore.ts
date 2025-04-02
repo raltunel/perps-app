@@ -14,6 +14,8 @@ interface DebugStore {
     setDebugWallet: (debugWallet: DebugWallet) => void;
     isWsEnabled: boolean;
     setIsWsEnabled: (isWsEnabled: boolean) => void;
+    debugWallets: DebugWallet[];
+    wsUrls: string[];
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -22,5 +24,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
     debugWallet: debugWallets[2],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
-    setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled })
+    setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
+    debugWallets: debugWallets,
+    wsUrls: wsUrls
 }));

@@ -1,4 +1,4 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 import { buySellColors, Langs, NumFormatTypes, type BuySellColor, type LangType, type NumFormat } from '~/utils/Constants';
 
 interface AppSettingsStore {
@@ -11,6 +11,9 @@ interface AppSettingsStore {
     buySellColor: BuySellColor;
     setBuySellColor: (buySellColor: BuySellColor) => void;
     isInverseColor: boolean;
+    langs: LangType[];
+    numFormatTypes: NumFormat[];
+    buySellColors: BuySellColor[];
 }
 
 export const useAppSettings = create<AppSettingsStore>((set) => ({
@@ -21,6 +24,9 @@ export const useAppSettings = create<AppSettingsStore>((set) => ({
     lang: Langs[0],
     setLang: (lang: LangType) => set({ lang }),
     buySellColor: buySellColors[0],
-    setBuySellColor: (buySellColor: BuySellColor) => {set({ buySellColor }); if(buySellColor.type === 'inverse') {set({ isInverseColor: true })} else {set({ isInverseColor: false })} },
+    setBuySellColor: (buySellColor: BuySellColor) => { set({ buySellColor }); if (buySellColor.type === 'inverse') { set({ isInverseColor: true }) } else { set({ isInverseColor: false }) } },
     isInverseColor: false,
+    langs: Langs,
+    numFormatTypes: NumFormatTypes,
+    buySellColors: buySellColors
 }));

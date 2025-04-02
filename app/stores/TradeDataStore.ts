@@ -6,7 +6,11 @@ import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-
+import { OrderHistoryLimits } from '~/utils/Constants';
+type OrderHistoryLimitsType = {
+    MAX: number;
+    RENDERED: number;
+}
 
 
 type TradeDataStore = UserTradeStore & {
@@ -21,6 +25,7 @@ type TradeDataStore = UserTradeStore & {
     setFavCoins: (favs: SymbolInfoIF[]) => void;
     coins: SymbolInfoIF[],
     setCoins: (coins: SymbolInfoIF[]) => void;
+    orderHistoryLimits: OrderHistoryLimitsType;
 }
 
 const useTradeDataStore = create<TradeDataStore>((set, get) => ({
@@ -50,7 +55,8 @@ const useTradeDataStore = create<TradeDataStore>((set, get) => ({
     favCoins: [],
     setFavCoins: (favs: SymbolInfoIF[]) => set({ favCoins: favs }),
     coins: [],
-    setCoins: (coins: SymbolInfoIF[]) => set({ coins })
+    setCoins: (coins: SymbolInfoIF[]) => set({ coins }),
+    orderHistoryLimits: OrderHistoryLimits
 }));
 
 
