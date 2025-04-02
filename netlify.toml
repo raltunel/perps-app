@@ -1,6 +1,7 @@
 [build]
 command = "npm run build"
 publish = "build/client"
+functions = "netlify/functions" # Functions klasörünün konumu
 
 [build.processing]
 skip_processing = false
