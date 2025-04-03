@@ -36,6 +36,9 @@ export default function AppOptions(props: propsIF) {
     // !important:  ... .map() functions so we can easily mix different types
     // !important:  ... of interactables in sequence in the modal
 
+    // gap between colored circles in the color pair dropdown
+    const CIRCLE_GAP = '1px';
+
     return (
         <section className={styles.app_options}>
             <header>
@@ -135,17 +138,9 @@ export default function AppOptions(props: propsIF) {
                     active={
                         <div style={{gap: '10px'}}>
                             <div>{(bsColor as string)[0].toUpperCase() + (bsColor as string).slice(1)}</div>
-                            <div>
-                                <FaCircle color={
-                                    getBsColor().buy.startsWith('--')
-                                        ? `var(${getBsColor().buy})`
-                                        : getBsColor().buy
-                                } />
-                                <FaCircle color={
-                                    getBsColor().sell.startsWith('--')
-                                        ? `var(${getBsColor().sell})`
-                                        : getBsColor().sell
-                                } />
+                            <div style={{ gap: CIRCLE_GAP }}>
+                                <FaCircle color={getBsColor().buy} />
+                                <FaCircle color={getBsColor().sell} />
                             </div>
                         </div>
                     }
@@ -155,17 +150,9 @@ export default function AppOptions(props: propsIF) {
                             return ({
                                 readable: (<>
                                     <div>{text[0].toUpperCase() + text.slice(1)}</div>
-                                    <div>
-                                        <FaCircle color={
-                                            colors.buy.startsWith('--')
-                                                ? `var(${colors.buy})`
-                                                : colors.buy
-                                        } />
-                                        <FaCircle color={
-                                            colors.sell.startsWith('--')
-                                                ? `var(${colors.sell})`
-                                                : colors.sell
-                                        } />
+                                    <div style={{ gap: CIRCLE_GAP }}>
+                                        <FaCircle color={colors.buy} />
+                                        <FaCircle color={colors.sell} />
                                     </div>
                                 </>),
                                 set: () => setBsColor(text),
