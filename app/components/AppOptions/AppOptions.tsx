@@ -32,9 +32,14 @@ export default function AppOptions(props: propsIF) {
         getBsColor
     } = useAppSettings();
 
+    // !important:  this file instantiates children directly instead of using
+    // !important:  ... .map() functions so we can easily mix different types
+    // !important:  ... of interactables in sequence in the modal
+
     return (
         <section className={styles.app_options}>
             <header>
+                {/* first `<div>` is just to help with CSS spacing rules */}
                 <div />
                 <h2>Options</h2>
                 <MdOutlineClose

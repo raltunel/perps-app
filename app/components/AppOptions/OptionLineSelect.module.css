@@ -1,3 +1,4 @@
+/* top-level element returned by JSX file */
 .option_line {
     display: flex;
     flex-direction: row;
@@ -9,6 +10,7 @@
     color: var(--text1);
 }
 
+/* container for the active selection and the dropdown below it */
 .dropdown_container {
     position: relative;
     display: flex;
@@ -19,6 +21,7 @@
     cursor: pointer;
 }
 
+/* elem showing the active selection, opens or closes dropdown on click */
 .active_option {
     display: flex;
     flex-direction: row;
@@ -31,13 +34,6 @@
     border-radius: 8px;
 }
 
-.active_option * {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .options_dropdown {
     position: relative;
     display: flex;
@@ -48,13 +44,16 @@
     z-index: calc(var(--base-z-idx-app-options) + 1);
 }
 
-.options_dropdown * {
+/* general styling to apply if options are JSX rather than text  */
+.active_option *,
+.options_dropdown *  {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 }
 
+/* hover effects for clickable elems in the dropdown */
 .options_dropdown > *:hover {
     cursor: pointer;
 }
