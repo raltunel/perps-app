@@ -31,14 +31,6 @@ outline: none;
 border: none;
 }
 
-.greenButton{
-    
-    background: var(--green, #26A69A);
-}
-.redButton{
-    background: var(--red, #EF5350)
-}
-
 .inputDetailsDataContainer{
     width: 100%;
     display: flex;

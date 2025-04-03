@@ -81,18 +81,12 @@ export default function PlaceOrderButtons(props: propsIF) {
     return (
         <div className={styles.container}>
             <div className={styles.buttonsContainer}>
-                <button
-                    style={{ backgroundColor: getBsColor().buy }}
-                    className={styles.greenButton}
-                >
+                <button style={{ backgroundColor: getBsColor().buy }}>
                     Buy / Long
                 </button>
-                <button
-                    style={{ backgroundColor: getBsColor().sell }}
-                    className={styles.redButton}>
-                        Sell / Short
-                    </button>
-
+                <button style={{ backgroundColor: getBsColor().sell }}>
+                    Sell / Short
+                </button>
             </div>
             <div className={styles.inputDetailsDataContainer}>
                 {dataToUse.map((data, idx) => (
