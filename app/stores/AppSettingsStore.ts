@@ -6,7 +6,7 @@ import {
     // type BuySellColor,
     type LangType, type NumFormat } from '~/utils/Constants';
 
-type bsColors = '--green'|'--red'|`#${string}`;
+type bsColors = `#${string}`;
 
 export interface colorSetIF {
     buy: bsColors;
@@ -14,8 +14,8 @@ export interface colorSetIF {
 }
 
 export const bsColorSets: { [x: string]: colorSetIF } = {
-    default: { buy: '--green', sell: '--red' },
-    opposite: { buy: '--red', sell: '--green' },
+    default: { buy: '#26a69a', sell: '#ef5350' },
+    opposite: { buy: '#ef5350', sell: '#26a69a' },
     deuteranopia: {
 		buy: '#8C6AFF',
 		sell: '#FF796D',

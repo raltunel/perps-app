@@ -79,7 +79,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // fn to update colors on the chart
     function changeColors(c: colorSetIF): void {
-        console.log('chart');
+        console.log(c);
+        console.log(chart);
         if (chart) {
             chart.applyOverrides({
                 'mainSeriesProperties.candleStyle.upColor': c.buy,
@@ -92,7 +93,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
-    useEffect(() => changeColors(getBsColor()), [chart, bsColor]);
+    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
 
     useEffect(() => {
         const tvWidget = new widget({
