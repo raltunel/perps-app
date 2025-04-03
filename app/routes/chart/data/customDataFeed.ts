@@ -6,17 +6,15 @@ import type {
 import { getHistoricalData, getMarkFillData } from './candleDataCache';
 import {
     mapResolutionToInterval,
-    resolutionToSeconds,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+import { WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
 import type { DebugWallet } from '~/stores/DebugStore';
-import type { RefObject } from 'react';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
-    debugWallet: DebugWallet,
 ): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
@@ -183,7 +181,7 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick) => {
-            subscribe('candle', {
+            subscribe(WsChannels.CANDLE, {
                 payload: {
                     coin: symbolInfo.ticker,
                     interval: mapResolutionToInterval(resolution),

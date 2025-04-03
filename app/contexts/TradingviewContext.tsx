@@ -9,7 +9,6 @@ import React, {
     useContext,
     useState,
     useEffect,
-    useRef,
 } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
@@ -91,7 +90,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: symbol,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(subscribe, debugWallet) as any,
+            datafeed: createDataFeed(subscribe) as any,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
