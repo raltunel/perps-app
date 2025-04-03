@@ -80,12 +80,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // fn to update colors on the chart
     function changeColors(c: colorSetIF): void {
+        // make sure the chart exists
         if (chart) {
+            // object literal with all user-created candle customizations
             const candleStyles: CandleStylePreferences = chart
                 .activeChart()
                 .getSeries()
                 .chartStyleProperties(1);
-            const candleColorsInUse: string[] = [
+            // array of color codes from candle properties we care about
+            const activeColors: string[] = [
                 candleStyles.upColor,
                 candleStyles.downColor,
                 candleStyles.borderUpColor,
@@ -93,9 +96,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 candleStyles.wickUpColor,
                 candleStyles.wickDownColor,
             ];
-            const isCustomized: boolean = candleColorsInUse.some(
+            // determine if any of the candles have a color chosen through
+            // ... the trading view color customization workflow (custom 
+            // ...  colors are always formatted as `rgba`)
+            const isCustomized: boolean = activeColors.some(
                 (c: string) => c.startsWith('rgba')
             );
+            // apply color scheme to chart ONLY if no custom colors are
+            // ... found in the active colors array
             isCustomized || chart.applyOverrides({
                 'mainSeriesProperties.candleStyle.upColor': c.buy,
                 'mainSeriesProperties.candleStyle.downColor': c.sell,
@@ -107,6 +115,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
+    // side effect to load a custom color set into the table, runs when
+    // ... the user changes the app's color theme and when the chart
+    // ... finishes initialization
     useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
 
     useEffect(() => {
