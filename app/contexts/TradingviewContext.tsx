@@ -4,7 +4,13 @@ import {
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    useRef,
+} from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -24,6 +30,8 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
+import { useDebugStore } from '~/stores/DebugStore';
+import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -56,6 +64,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
+    const { debugWallet } = useDebugStore();
+
     useEffect(() => {
         const res = getChartLayout();
         setChartState(res);
@@ -81,7 +91,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: symbol,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(subscribe) as any,
+            datafeed: createDataFeed(subscribe, debugWallet) as any,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -172,6 +182,17 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         studyEvents(chart);
         intervalChangedSubscribe(chart);
     }, [chart]);
+
+    useEffect(() => {
+        if (debugWallet.address) {
+            getMarkFillData(symbol, debugWallet.address).then(() => {
+                if (chart) {
+                    chart.chart().clearMarks();
+                    chart.chart().refreshMarks();
+                }
+            });
+        }
+    }, [debugWallet, chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>

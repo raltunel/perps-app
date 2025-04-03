@@ -11,9 +11,12 @@ import {
     supportedResolutions,
 } from './utils/utils';
 import { processWSCandleMessage } from './processChartData';
+import type { DebugWallet } from '~/stores/DebugStore';
+import type { RefObject } from 'react';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
+    debugWallet: DebugWallet,
 ): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
@@ -127,57 +130,56 @@ export const createDataFeed = (
                 });
             };
 
-            try {
-                const fillHistory = await getMarkFillData(
-                    '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
-                    symbolInfo.name,
-                );
+            const markRes = (await getMarkFillData(
+                symbolInfo.name,
+                // debugWallet.address,
+            )) as any;
 
-                fillHistory.sort((a, b) => a.px - b.px);
+            const fillHistory = markRes.dataCache;
+            const userWallet = markRes.user;
 
-                fillMarks(fillHistory);
+            fillHistory.sort((a: any, b: any) => a.px - b.px);
 
-                const markArray = [
-                    ...bSideOrderHistoryMarks.values(),
-                    ...aSideOrderHistoryMarks.values(),
-                ];
+            fillMarks(fillHistory);
 
-                if (markArray.length > 0) {
-                    onDataCallback(markArray);
-                }
+            const markArray = [
+                ...bSideOrderHistoryMarks.values(),
+                ...aSideOrderHistoryMarks.values(),
+            ];
 
-                subscribe('userFills', {
-                    payload: {
-                        user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
-                    },
-                    handler: async (payload: any, index: number) => {
-                        if (symbolInfo.name === payload.fills[0].coin) {
-                            payload.fills.forEach((fill: any) => {
-                                const key = fillHistory.find(
-                                    (hs) => hs.hash === fill.hash,
-                                );
-
-                                if (key === undefined) {
-                                    fillHistory.push(fill);
-                                }
-                            });
-                        }
-
-                        fillMarks(fillHistory);
-
-                        const markArray = [
-                            ...bSideOrderHistoryMarks.values(),
-                            ...aSideOrderHistoryMarks.values(),
-                        ];
-
-                        if (markArray.length > 0) {
-                            onDataCallback(markArray);
-                        }
-                    },
-                });
-            } catch (error) {
-                console.error('Error fetching marks:', error);
+            if (markArray.length > 0) {
+                onDataCallback(markArray);
             }
+
+            // subscribe('userFills', {
+            //     payload: {
+            //         user: userWallet,
+            //     },
+            //     handler: (payload: any, index: number) => {
+            //         if (symbolInfo.name === payload.fills[0].coin) {
+            //             payload.fills.forEach((fill: any) => {
+            //                 const key = fillHistory.find(
+            //                     (hs: any) => hs.hash === fill.hash,
+            //                 );
+            //                 if (key === undefined) {
+            //                     fillHistory.push(fill);
+            //                 }
+            //             });
+            //         }
+            //         fillMarks(fillHistory);
+
+            //         const markArray = [
+            //             ...bSideOrderHistoryMarks.values(),
+            //             ...aSideOrderHistoryMarks.values(),
+            //         ];
+
+            //         console.log(markArray);
+
+            //         if (markArray.length > 0) {
+            //             onDataCallback(markArray);
+            //         }
+            //     },
+            // });
         },
 
         subscribeBars: (symbolInfo, resolution, onTick) => {

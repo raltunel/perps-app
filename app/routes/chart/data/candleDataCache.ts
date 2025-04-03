@@ -2,6 +2,7 @@ import { mapResolutionToInterval, resolutionToSeconds } from './utils/utils';
 import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 
 const dataCache = new Map<string, any[]>();
+const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
 export async function getHistoricalData(
     symbol: string,
@@ -49,28 +50,42 @@ export async function getHistoricalData(
     });
 }
 
-export async function getMarkFillData(user: string, coin: string) {
+export async function getMarkFillData(
+    coin: string,
+    user?: string,
+) {
     const cacheKey = `${coin}-fillData`;
 
-    const cachedData = dataCache.get(cacheKey) || [];
+    const cachedData = dataCacheWithUser.get(cacheKey);
 
-    if(cachedData && cachedData.length > 0) {
+    if (
+        cachedData &&
+        cachedData.dataCache.length > 0 &&
+        (!user || user === cachedData.user)
+    ) {
         return cachedData;
     }
 
-    return await fetchUserFillsHistory(user).then((res: any) => {
-        const poolFillData = cachedData;
+    if (user) {
+        return await fetchUserFillsHistory(user).then((res: any) => {
+            const poolFillData: Array<any> = [];
 
-        if (res) {
-            res.forEach((element: any) => {
-                if (element.coin === coin) {
-                    poolFillData.push(element);
-                }
-            });
-            
-            dataCache.set(cacheKey, poolFillData);
-        }
+            if (res) {
+                res.forEach((element: any) => {
+                    if (element.coin === coin) {
+                        poolFillData.push(element);
+                    }
+                });
 
-        return poolFillData;
-    });
+                const fetchedDataWithUser = {
+                    user: user,
+                    dataCache: poolFillData,
+                };
+
+                dataCacheWithUser.set(cacheKey, fetchedDataWithUser);
+            }
+        });
+    }
+
+    return [];
 }
