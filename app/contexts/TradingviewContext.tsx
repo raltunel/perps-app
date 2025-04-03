@@ -1,5 +1,6 @@
 import {
     widget,
+    type CandleStylePreferences,
     type IChartingLibraryWidget,
     type ResolutionString,
     type TradingTerminalFeatureset,
@@ -24,7 +25,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
-import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { bsColorSets, useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -79,10 +80,23 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     // fn to update colors on the chart
     function changeColors(c: colorSetIF): void {
-        console.log(c);
-        console.log(chart);
         if (chart) {
-            chart.applyOverrides({
+            const candleStyles: CandleStylePreferences = chart
+                .activeChart()
+                .getSeries()
+                .chartStyleProperties(1);
+            const candleColorsInUse: string[] = [
+                candleStyles.upColor,
+                candleStyles.downColor,
+                candleStyles.borderUpColor,
+                candleStyles.borderDownColor,
+                candleStyles.wickUpColor,
+                candleStyles.wickDownColor,
+            ];
+            const isCustomized: boolean = candleColorsInUse.some(
+                (c: string) => c.startsWith('rgba')
+            );
+            isCustomized || chart.applyOverrides({
                 'mainSeriesProperties.candleStyle.upColor': c.buy,
                 'mainSeriesProperties.candleStyle.downColor': c.sell,
                 'mainSeriesProperties.candleStyle.borderUpColor': c.buy,

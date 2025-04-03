@@ -14,8 +14,8 @@ export interface colorSetIF {
 }
 
 export const bsColorSets: { [x: string]: colorSetIF } = {
-    default: { buy: '#26a69a', sell: '#ef5350' },
-    opposite: { buy: '#ef5350', sell: '#26a69a' },
+    default: { buy: '#26A69A', sell: '#EF5350' },
+    opposite: { buy: '#EF5350', sell: '#26A69A' },
     deuteranopia: {
 		buy: '#8C6AFF',
 		sell: '#FF796D',
