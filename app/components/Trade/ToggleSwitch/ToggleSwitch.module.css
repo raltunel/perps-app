@@ -36,6 +36,9 @@
     user-select: none;
   }
   
+  .reverse{
+    flex-direction: row-reverse;
+  }
 
   
   @media (max-width: 480px) {

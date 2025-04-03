@@ -20,6 +20,7 @@ import { FiChevronDown } from 'react-icons/fi';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
+import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -60,7 +61,7 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'leverage' | null>(
+    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirmation' | null>(
         null,
     );
 
@@ -119,7 +120,7 @@ export default function OrderInput() {
             value: '0.000 ETH',
         },
     ];
-    const openModalWithContent = (content: 'margin' | 'scale') => {
+    const openModalWithContent = (content: 'margin' | 'scale' | 'confirmation') => {
         setModalContent(content);
         appSettingsModal.open();
     };
@@ -419,7 +420,7 @@ export default function OrderInput() {
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
 
-            <PlaceOrderButtons orderMarketPrice={marketOrderType} />
+            <PlaceOrderButtons orderMarketPrice={marketOrderType} openModalWithContent={openModalWithContent}/>
 
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close}>
@@ -438,6 +439,11 @@ export default function OrderInput() {
                             maxPrice={parseFloat(priceRangeMax)}
                             isModal
                             onClose={appSettingsModal.close}
+                        />
+                    )}
+                    {modalContent === 'confirmation' && (
+                        <ConfirmationModal 
+                        onClose={appSettingsModal.close}
                         />
                     )}
                 </Modal>

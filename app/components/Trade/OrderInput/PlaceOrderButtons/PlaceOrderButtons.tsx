@@ -4,15 +4,17 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 interface PropsIF {
     orderMarketPrice: string;
+    openModalWithContent: (content: "margin" | "scale" | "confirmation") => void
 }
 interface MarketInfoItem {
     label: string;
     tooltipLabel: string;
     value: string;
+    
   }
   
 export default function PlaceOrderButtons(props: PropsIF) {
-    const { orderMarketPrice } = props
+    const { orderMarketPrice, openModalWithContent } = props
 
     const showLiquidationPrice = ['market', 'limit', 'stop_limit', 'stop_market'].includes(
         orderMarketPrice,
@@ -79,8 +81,8 @@ export default function PlaceOrderButtons(props: PropsIF) {
     return (
         <div className={styles.container}>
             <div className={styles.buttonsContainer}>
-                <button className={styles.greenButton}>Buy / Long</button>
-                <button className={styles.redButton}>Sell / Short</button>
+                <button className={styles.greenButton} onClick={() => openModalWithContent('confirmation')}>Buy / Long</button>
+                <button className={styles.redButton} onClick={() => openModalWithContent('confirmation')}>Sell / Short</button>
 
             </div>
             <div className={styles.inputDetailsDataContainer}>
