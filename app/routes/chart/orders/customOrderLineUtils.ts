@@ -1,6 +1,5 @@
-import { color } from 'framer-motion';
-const buyColor = '#26A69A';
-const sellColor = '#EF5350';
+export const buyColor = '#26A69A';
+export const sellColor = '#E57373';
 export const addCustomOrderLine = async (chart: any, orderPrice: number) => {
     if (!chart) return;
 
@@ -12,10 +11,9 @@ export const addCustomOrderLine = async (chart: any, orderPrice: number) => {
             disableSelection: true,
             disableSave: true,
             disableUndo: true,
-            text: 'text',
             overrides: {
-                color: buyColor,
-                backgroundColor: buyColor,
+                linecolor: sellColor,
+                borderColor: sellColor,
                 linestyle: 3,
                 extendLeft: true,
                 extendRight: true,
@@ -56,64 +54,7 @@ export const addCustomOrderLabel = (chart: any, orderPrice: number) => {
     return orderLabel;
 };
 
-// export function createFixedRectangle(tvWidget: any,price:number) {
-//     const RECT_WIDTH_PX = 80;
-//     const RECT_HEIGHT_PX = 30;
-
-//     const priceScale = tvWidget.activeChart().getPanes()[0];
-
-//     const timeScale = tvWidget.activeChart().getTimeScale();
-
-//     const visibleRange = tvWidget.activeChart().getVisibleRange();
-//     const priceRange = priceScale
-//         .getMainSourcePriceScale()
-//         .getVisiblePriceRange();
-
-//     if (!visibleRange || !priceRange) return;
-
-//     const startTime = visibleRange.from;
-//     const endTime = visibleRange.to;
-
-//     const minPrice = priceRange.from;
-//     const maxPrice = priceRange.to;
-
-//     const chartWidth = Math.floor(timeScale.width());
-//     const chartHeight = priceScale.getHeight();
-
-//     const timePerPixel = Math.floor((endTime - startTime) / chartWidth);
-//     const rectWidthTime = timePerPixel * RECT_WIDTH_PX;
-
-//     const pricePerPixel = Math.floor((maxPrice - minPrice) / chartHeight);
-//     const rectHeightPrice = pricePerPixel * RECT_HEIGHT_PX;
-
-//     const rectTopLeft = { time: startTime, price: price };
-//     const rectBottomRight = {
-//         time: startTime + rectWidthTime,
-//         price: price + rectHeightPrice,
-//     };
-
-//     const shape = tvWidget
-//         .activeChart()
-//         .createMultipointShape([rectTopLeft, rectBottomRight], {
-//             shape: 'rectangle',
-//             lock: true,
-//             disableSelection: true,
-//             disableSave: true,
-//             disableUndo: true,
-//             text: 'Limit',
-//             overrides: {
-//                 backgroundColor: 'white',
-//                 color: buyColor,
-//                 fontsize: 8,
-//                 leftEnd: true,
-//                 textAlign: 'left',
-//             },
-//         });
-// }
-
 export const createShapeText = (chart: any, price: number) => {
-    const RECT_HEIGHT_PX = 4.5;
-
     const priceScale = chart.activeChart().getPanes()[0];
 
     const timeScale = chart.activeChart().getTimeScale();
@@ -129,17 +70,11 @@ export const createShapeText = (chart: any, price: number) => {
     const startTime = visibleRange.from;
     const endTime = visibleRange.to;
 
-    const minPrice = priceRange.from;
-    const maxPrice = priceRange.to;
-
     const chartWidth = Math.floor(timeScale.width());
     const RECT_WIDTH_PX = chartWidth / 2;
 
     const timePerPixel = Math.floor((endTime - startTime) / chartWidth);
     const rectWidthTime = timePerPixel * RECT_WIDTH_PX;
-    const chartHeight = priceScale.getHeight();
-    const pricePerPixel = Math.floor((maxPrice - minPrice) / chartHeight);
-    const rectHeightPrice = pricePerPixel * RECT_HEIGHT_PX;
     const shape = chart.activeChart().createShape(
         { time: startTime + rectWidthTime, price: price },
         {
@@ -151,11 +86,11 @@ export const createShapeText = (chart: any, price: number) => {
             text: '   Liq. Price',
             overrides: {
                 fontsize: 10,
-                backgroundColor: '#FFFFFF',
+                backgroundColor: '#D1D1D1',
                 bold: true,
                 fillBackground: true,
                 drawBorder: true,
-                borderColor: buyColor,
+                borderColor: sellColor,
                 wordWrap: true,
                 wordWrapWidth: 60,
                 borderWidth: 2,

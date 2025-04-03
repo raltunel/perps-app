@@ -24,7 +24,6 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
-import { customIndicator } from '~/routes/chart/customIndicator';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
