@@ -11,7 +11,6 @@ import {
 } from './utils/utils';
 import { WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
-import type { DebugWallet } from '~/stores/DebugStore';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -153,28 +152,36 @@ export const createDataFeed = (
             //     payload: {
             //         user: userWallet,
             //     },
-            //     handler: (payload: any, index: number) => {
+            //     handler: (payload: any) => {
             //         if (symbolInfo.name === payload.fills[0].coin) {
-            //             payload.fills.forEach((fill: any) => {
-            //                 const key = fillHistory.find(
-            //                     (hs: any) => hs.hash === fill.hash,
-            //                 );
-            //                 if (key === undefined) {
-            //                     fillHistory.push(fill);
-            //                 }
+            //             getMarkFillData(
+            //                 symbolInfo.name,
+            //                 // debugWallet.address,
+            //             ).then((res: any) => {
+            //                 const fetchedData = res.dataCache;
+
+            //                 payload.fills.forEach((fill: any) => {
+            //                     const key = fetchedData.find(
+            //                         (hs: any) => hs.hash === fill.hash,
+            //                     );
+            //                     if (key === undefined) {
+            //                         fetchedData.push(fill);
+            //                     }
+            //                 });
+
+            //                 fillMarks(fetchedData);
+
+            //                 const markArray = [
+            //                     ...bSideOrderHistoryMarks.values(),
+            //                     ...aSideOrderHistoryMarks.values(),
+            //                 ];
+
+            //                 console.log(markArray, fetchedData);
+
+            //                 // if (markArray.length > 0) {
+            //                 //     onDataCallback(markArray);
+            //                 // }
             //             });
-            //         }
-            //         fillMarks(fillHistory);
-
-            //         const markArray = [
-            //             ...bSideOrderHistoryMarks.values(),
-            //             ...aSideOrderHistoryMarks.values(),
-            //         ];
-
-            //         console.log(markArray);
-
-            //         if (markArray.length > 0) {
-            //             onDataCallback(markArray);
             //         }
             //     },
             // });

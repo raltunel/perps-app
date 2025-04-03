@@ -50,10 +50,7 @@ export async function getHistoricalData(
     });
 }
 
-export async function getMarkFillData(
-    coin: string,
-    user?: string,
-) {
+export async function getMarkFillData(coin: string, user?: string) {
     const cacheKey = `${coin}-fillData`;
 
     const cachedData = dataCacheWithUser.get(cacheKey);

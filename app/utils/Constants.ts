@@ -70,7 +70,7 @@ export const wsUrls = [
 export const debugWallets: DebugWallet[] = [
     {
         label: 'Crazy Account',
-        address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353'
+        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00'
     },
     {
         label: 'Crazy 2',
