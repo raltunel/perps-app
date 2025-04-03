@@ -73,7 +73,7 @@
 }
 
 /* Focus state */
-button:focus {
+.base:focus {
   outline: 2px solid var(--accent1, #7371fc);
   outline-offset: 2px;
 }
