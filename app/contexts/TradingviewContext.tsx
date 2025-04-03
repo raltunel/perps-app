@@ -25,7 +25,7 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
-import { bsColorSets, useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
