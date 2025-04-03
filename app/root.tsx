@@ -92,8 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   // Use memoized value to prevent unnecessary re-renders
-  const wsUrl = React.useMemo(() => useDebugStore.getState().wsUrl, []);
-  
+  const { wsUrl } = useDebugStore();
 
   
   return (
