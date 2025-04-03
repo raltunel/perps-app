@@ -18,7 +18,6 @@
     height: inherit;
     gap: 2px;
     overflow-y: visible;
-    cursor: pointer;
 }
 
 /* elem showing the active selection, opens or closes dropdown on click */
@@ -32,16 +31,22 @@
     padding: 2px 8px;
     background-color: var(--dark4);
     border-radius: 8px;
+    cursor: pointer;
 }
 
 .options_dropdown {
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 2px 8px;
+    padding: 4px 4px;
     background-color: var(--dark6);
     border-radius: 8px;
     z-index: calc(var(--base-z-idx-app-options) + 1);
+}
+
+.options_dropdown > * {
+    padding: 2px 8px;
+    border-radius: 6px;
 }
 
 /* general styling to apply if options are JSX rather than text  */
@@ -56,4 +61,5 @@
 /* hover effects for clickable elems in the dropdown */
 .options_dropdown > *:hover {
     cursor: pointer;
+    background-color: var(--dark4);
 }
