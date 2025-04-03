@@ -20,6 +20,8 @@ import { useWsObserver } from '~/hooks/useWsObserver';
 import TradeRouteHandler from './trade/traderoutehandler';
 import TradeModules from './trade/trademodules/trademodules';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import OrderInput from '~/components/Trade/OrderInput/OrderInput';
+import Notifications from '~/components/Notifications/Notifications';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'TRADE' },
@@ -40,7 +42,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   const { orderBookMode } = useAppSettings();
 
 
-  const { wsUrl, setWsUrl, debugWallet, setDebugWallet } = useDebugStore();
+  const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
 
     
@@ -78,11 +80,15 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   onChange={(value) => setDebugWallet({label: value, address: debugWallets.find((wallet) => wallet.label === value)?.address || ''})}
 />
 </div>
+
+<div  className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`} onClick={() => setIsWsEnabled(!isWsEnabled)}>
+  <div
+    className={styles.wsToggleButton}
+  > {isWsEnabled ? 'WS Running' : 'Paused'}</div>
+</div>
+
     
-    <WebSocketProvider url={wsUrl}>
-
       <TradeRouteHandler />
-
       {
         symbol && symbol.length > 0 && (
 
@@ -100,7 +106,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         </div>
 
         <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}><TradeModules /></div>
+              <div className={styles.tradeModules}><OrderInput/></div>
             </section>
             <section className={styles.containerBottom}>
                 <div className={styles.table}>
@@ -113,14 +119,11 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     />
                 </div>
              </section>
-      {/* Child routes (market, limit, pro) appear here */}
-      {/* <Outlet /> */}
+   
     </div>
           
         )
       }
-    
-    </WebSocketProvider>
     </>
   );
 }
