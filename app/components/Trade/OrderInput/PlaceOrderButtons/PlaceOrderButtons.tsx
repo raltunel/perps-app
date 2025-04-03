@@ -18,7 +18,12 @@ export default function PlaceOrderButtons(props: propsIF) {
     // logic to change the active color pair
     const { getBsColor } = useAppSettings();
 
-    const showLiquidationPrice = ['market', 'limit', 'stop_limit', 'stop_market'].includes(
+    const showLiquidationPrice: boolean = [
+        'market',
+        'limit',
+        'stop_limit',
+        'stop_market'
+    ].includes(
         orderMarketPrice,
     );
 
@@ -79,8 +84,8 @@ export default function PlaceOrderButtons(props: propsIF) {
     const dataToUse = infoDataMap[orderMarketPrice] || marketInfoData;
     
     return (
-        <div className={styles.container}>
-            <div className={styles.buttonsContainer}>
+        <div className={styles.place_order_buttons}>
+            <div className={styles.buttons_wrapper}>
                 <button style={{ backgroundColor: getBsColor().buy }}>
                     Buy / Long
                 </button>
@@ -88,10 +93,10 @@ export default function PlaceOrderButtons(props: propsIF) {
                     Sell / Short
                 </button>
             </div>
-            <div className={styles.inputDetailsDataContainer}>
-                {dataToUse.map((data, idx) => (
-                    <div className={styles.inputDetailsDataContent}>
-                        <div className={styles.inputDetailsLabel}>
+            <div className={styles.input_details}>
+                {dataToUse.map((data: MarketInfoItem) => (
+                    <div>
+                        <div className={styles.detail_label}>
                             <span>{data.label}</span>
                             <Tooltip
                                 content={data?.tooltipLabel}
@@ -100,7 +105,7 @@ export default function PlaceOrderButtons(props: propsIF) {
                                 <AiOutlineQuestionCircle size={13} />
                             </Tooltip>
                         </div>
-                        <span className={styles.inputDetailValue}>
+                        <span className={styles.detail_value}>
                             {data.value}
                         </span>
                     </div>
