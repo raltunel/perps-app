@@ -44,25 +44,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
-
-    
-  
-  // const nav = (
-  //      {/* Example nav links to each child route */}
-  //   <nav style={{ marginBottom: '1rem' }}>
-  //   <Link to='market' style={{ marginRight: '1rem' }}>
-  //     Market
-  //   </Link>
-  //   <Link to='limit' style={{ marginRight: '1rem' }}>
-  //     Limit
-  //   </Link>
-  //   <Link to='pro' style={{ marginRight: '1rem' }}>
-  //     Pro
-  //   </Link>
-  // </nav>
- 
-  // )
-
   return (
 <>
 <div className={styles.wsUrlSelector}>

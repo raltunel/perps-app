@@ -78,40 +78,44 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     // logic to change the active color pair
     const { bsColor, getBsColor } = useAppSettings();
 
-    // fn to update colors on the chart
     function changeColors(c: colorSetIF): void {
         // make sure the chart exists
         if (chart) {
             // object literal with all user-created candle customizations
-            const candleStyles: CandleStylePreferences = chart
-                .activeChart()
-                .getSeries()
-                .chartStyleProperties(1);
-            // array of color codes from candle properties we care about
-            const activeColors: string[] = [
-                candleStyles.upColor,
-                candleStyles.downColor,
-                candleStyles.borderUpColor,
-                candleStyles.borderDownColor,
-                candleStyles.wickUpColor,
-                candleStyles.wickDownColor,
-            ];
-            // determine if any of the candles have a color chosen through
-            // ... the trading view color customization workflow (custom 
-            // ...  colors are always formatted as `rgba`)
-            const isCustomized: boolean = activeColors.some(
-                (c: string) => c.startsWith('rgba')
+            const mainSeriesProperties = JSON.parse(
+                localStorage.getItem(
+                    'tradingview.chartproperties.mainSeriesProperties',
+                ) || '{}',
             );
+            const candleStyle = mainSeriesProperties?.candleStyle || {};
+            // array of color codes from candle properties we care about
+            const activeColors: string[] | undefined = candleStyle
+                ? [
+                    candleStyle.upColor,
+                    candleStyle.downColor,
+                    candleStyle.borderUpColor,
+                    candleStyle.borderDownColor,
+                    candleStyle.wickUpColor,
+                    candleStyle.wickDownColor,
+                ]
+                : undefined;
+            // determine if any of the candles have a color chosen through
+            // ... the trading view color customization workflow (custom
+            // ...  colors are always formatted as `rgba`)
+            const isCustomized: boolean = activeColors
+                ? activeColors.some((c: string) => c?.startsWith('rgba'))
+                : false;
             // apply color scheme to chart ONLY if no custom colors are
             // ... found in the active colors array
-            isCustomized || chart.applyOverrides({
-                'mainSeriesProperties.candleStyle.upColor': c.buy,
-                'mainSeriesProperties.candleStyle.downColor': c.sell,
-                'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
-                'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
-                'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
-                'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
-            });
+            isCustomized ||
+                chart.applyOverrides({
+                    'mainSeriesProperties.candleStyle.upColor': c.buy,
+                    'mainSeriesProperties.candleStyle.downColor': c.sell,
+                    'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
+                    'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
+                    'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
+                    'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
+                });
         }
     }
 
