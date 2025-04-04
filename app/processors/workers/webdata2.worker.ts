@@ -10,6 +10,7 @@ import { processUserOrder } from "../processOrderBook";
 
 self.onmessage = function (event) {
     try {
+        const size = event.data.length;
         const parsedData = JSON.parse(event.data);
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
@@ -41,7 +42,7 @@ self.onmessage = function (event) {
             }
         }
 
-        self.postMessage({ channel: parsedData.channel, data: { coins, userOpenOrders, user: data.user } });
+        self.postMessage({ channel: parsedData.channel, data: { coins, userOpenOrders, user: data.user, size } });
 
 
     } catch (error) {
