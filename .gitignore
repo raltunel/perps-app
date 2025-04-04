@@ -1,6 +1,10 @@
 .DS_Store
 /node_modules/
 
+# misc
+.env*
+.vscode/
+
 # React Router
 /.react-router/
 /build/
@@ -17,5 +21,3 @@
 
 /public/tradingview/charting_library
 /public/tradingview/datafeeds
-
-.vscode/
