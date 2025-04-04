@@ -31,25 +31,25 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
   const filteredOrders = useMemo(() => {
     switch(selectedFilter){
       case 'all':
-        return userOrders;
+        return userOrders.slice(0, 50);
       case 'active':
-        return userSymbolOrders;
+        return userSymbolOrders.slice(0, 50);
       case 'long':
-        return userOrders.filter((order) => order.side === 'buy');
+        return userOrders.filter((order) => order.side === 'buy').slice(0, 50);
       case 'short':
-        return userOrders.filter((order) => order.side === 'sell');
+        return userOrders.filter((order) => order.side === 'sell').slice(0, 50);
     }
 
-    return userOrders;
+    return userOrders.slice(0, 50);
   }, [userOrders, selectedFilter]);
   
   return (
     <div className={styles.tableWrapper}>
       <OpenOrdersTableHeader />
       <div className={styles.tableBody}>
-        {filteredOrders.slice(0, 50).map((order, index) => (
+        {filteredOrders.map((order, index) => (
           <OpenOrdersTableRow 
-            key={`order-${index}`} 
+            key={`order-${order.oid}`} 
             order={order} 
             onCancel={handleCancel}
           />
