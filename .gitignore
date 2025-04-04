@@ -17,3 +17,5 @@
 
 /public/tradingview/charting_library
 /public/tradingview/datafeeds
+
+.vscode/
