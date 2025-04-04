@@ -147,3 +147,22 @@ line-height: normal;
     font-size: var(--font-size-s, 12px);
 
   }
+
+  /* remove afterwards */
+  .randomMaxContainer{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: var(--font-size-s);
+  }
+
+  .randomMaxContainer button{
+    outline: none;
+    border: none;
+    background: var(--accent1);
+    color: var(--text1);
+    padding: 4px;
+  }
+

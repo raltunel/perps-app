@@ -5,15 +5,16 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface propsIF {
     orderMarketPrice: string;
+    openModalWithContent: (content: "margin" | "scale" | "confirmation") => void
 }
 interface MarketInfoItem {
     label: string;
     tooltipLabel: string;
-    value: string;
+    value: string;    
 }
 
 export default function PlaceOrderButtons(props: propsIF) {
-    const { orderMarketPrice } = props;
+    const { orderMarketPrice, openModalWithContent } = props
 
     // logic to change the active color pair
     const { getBsColor } = useAppSettings();
@@ -84,12 +85,19 @@ export default function PlaceOrderButtons(props: propsIF) {
     const dataToUse = infoDataMap[orderMarketPrice] || marketInfoData;
     
     return (
+
         <div className={styles.place_order_buttons}>
             <div className={styles.buttons_wrapper}>
-                <button style={{ backgroundColor: getBsColor().buy }}>
+                <button
+                    style={{ backgroundColor: getBsColor().buy }}
+                    onClick={() => openModalWithContent('confirmation')}
+                >
                     Buy / Long
                 </button>
-                <button style={{ backgroundColor: getBsColor().sell }}>
+                <button
+                    style={{ backgroundColor: getBsColor().sell }}
+                    onClick={() => openModalWithContent('confirmation')}
+                >
                     Sell / Short
                 </button>
             </div>
@@ -111,7 +119,6 @@ export default function PlaceOrderButtons(props: propsIF) {
                     </div>
                 ))}
             </div>
-
         </div>
     )
 }
