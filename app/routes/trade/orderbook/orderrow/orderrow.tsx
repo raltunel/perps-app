@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useWebSocketContext } from '~/contexts/WebSocketContext';
-import type { OrderBookRowIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
-import styles from './orderrow.module.css';
+import { useMemo } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeModuleStore } from '~/stores/TradeModuleStore';
+import type { OrderBookRowIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
+import styles from './orderrow.module.css';
 
 interface OrderRowProps {
   order: OrderBookRowIF;

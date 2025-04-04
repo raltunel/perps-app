@@ -13,17 +13,15 @@ interface OrderTradeRowProps {
 const OrderTradeRow: React.FC<OrderTradeRowProps> = ({ trade }) => {
 
   const { formatNum } = useNumFormatter();
-  const { buySellColor } = useAppSettings();
 
+  // TODO: replace color inversion logic, also why is this memoized?
   const type = useMemo(() => {
-    if (trade.side === 'buy' && buySellColor.type === 'normal') return styles.buy;
-    if (trade.side === 'sell' && buySellColor.type === 'normal') return styles.sell;
-    if (trade.side === 'buy' && buySellColor.type === 'inverse') return styles.sell;
-    if (trade.side === 'sell' && buySellColor.type === 'inverse') return styles.buy;
-  }, [trade.side, buySellColor.type]);
+    if (trade.side === 'buy') return styles.buy;
+    if (trade.side === 'sell') return styles.sell;
+  }, [trade.side, ]);
 
   return (
-    <div className={`${styles.orderTradeRow} ${type}`} >
+    <div className={`${styles.orderTradeRow} ${type}`}>
       <div className={styles.orderTradePrice}>{formatNum(trade.px)}</div>
       <div className={styles.orderTradeSize}>{formatNum(trade.sz)}</div>
       <div className={styles.orderTradeTime}>

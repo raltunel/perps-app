@@ -1,3 +1,4 @@
+/* top-level element returned by JSX file */
 .app_options {
     display: flex;
     flex-direction: column;
@@ -8,8 +9,16 @@
     font-family: var(--font-family-main);
     background-color: var(--dark3);
     border-radius: 20px;
+
+    /*
+        This approach to z-index allows children of this element to
+        ... define a z-axis value relative to the value in this file.
+    */
+    --base-z-idx-app-options: 1;
+    z-index: var(--base-z-idx-app-options);
 }
 
+/* <header> section of the options element */
 .app_options > header {
     display: flex;
     flex-direction: row;
@@ -18,6 +27,7 @@
     font-size: var(--font-size-l);
 }
 
+/* element has multiple <ul> elems broken up by horizontal dividers */
 .app_options > ul {
     display: flex;
     flex-direction: column;
@@ -25,11 +35,13 @@
     gap: 6px;
 }
 
+/* styling to make a <div> elem appear like an <hr> elem */
 .horizontal_divider {
     height: 2px;
     background-color: var(--dark6);
 }
 
+/* clickable to apply default settings at bottom of screen */
 .apply_defaults {
     align-self: center;
     cursor: pointer;
