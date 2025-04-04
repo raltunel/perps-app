@@ -29,7 +29,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({ symbol, tradesCount }
 
   useEffect(() => {
     return () => {
-      unsubscribeAllByChannel('trades');
+      unsubscribeAllByChannel(WsChannels.ORDERBOOK_TRADES);
     }
   }, [])
 

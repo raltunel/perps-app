@@ -1,50 +1,208 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './LeverageSlider.module.css';
 
-interface LeverageOption {
-    value: number;
-    label: string;
-}
-
 interface LeverageSliderProps {
-    options: LeverageOption[];
     value: number;
     onChange: (value: number) => void;
     className?: string;
+    minimumInputValue?: number;
+    maximumInputValue?: number;
+    generateRandomMaximumInput: () => void;
 }
 
 export default function LeverageSlider({
-    options = [
-        { value: 1, label: '1x' },
-        { value: 5, label: '5x' },
-        { value: 10, label: '10x' },
-        { value: 50, label: '50x' },
-        { value: 100, label: '100x' },
-    ],
     value = 1,
     onChange,
     className = '',
+    minimumInputValue = 1,
+    maximumInputValue = 100,
+    generateRandomMaximumInput
 }: LeverageSliderProps) {
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [tickMarks, setTickMarks] = useState<number[]>([]);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
 
+    // Update input value when prop value changes
     useEffect(() => {
         setInputValue(value.toString());
     }, [value]);
 
-    // Find the selected option index
-    const selectedIndex = options.findIndex((option) => option.value === value);
+    // Generate logarithmically distributed tick marks
+    useEffect(() => {
+        console.log("Min:", minimumInputValue, "Max:", maximumInputValue);
+        // Check for valid inputs
+        if (!isNaN(minimumInputValue) && !isNaN(maximumInputValue) && 
+            minimumInputValue > 0 && maximumInputValue > minimumInputValue) {
+            const generateLogarithmicTicks = (min: number, max: number, count: number): number[] => {
+                // Safety check for minimum value to prevent log(0)
+                const safeMin = Math.max(0.1, min);
+                
+                // Use logarithmic scale to distribute the ticks
+                const minLog = Math.log(safeMin);
+                const maxLog = Math.log(max);
+                const ticks = [];
+                
+                // Always include min and max
+                ticks.push(min);
+                
+                // Generate intermediate ticks (logarithmically distributed)
+                if (count > 2) {
+                    const step = (maxLog - minLog) / (count - 1);
+                    for (let i = 1; i < count - 1; i++) {
+                        const logValue = minLog + step * i;
+                        const value = Math.round(Math.exp(logValue));
+                        if (value > ticks[ticks.length - 1] && value < max) {
+                            ticks.push(value);
+                        }
+                    }
+                }
+                
+                // Make sure max is included
+                if (ticks[ticks.length - 1] !== max) {
+                    ticks.push(max);
+                }
+                
+                return ticks;
+            };
+            
+            // Generate 5-7 ticks depending on the range
+            const tickCount = maximumInputValue > 100 ? 7 : 5;
+            const ticks = generateLogarithmicTicks(minimumInputValue, maximumInputValue, tickCount);
+            setTickMarks(ticks);
+        }
+    }, [minimumInputValue, maximumInputValue]);
 
-    // Color ranges for the gradient
-    const colors: Record<string, string> = {
-        '1': '#26A69A', // teal
-        '5': '#66BB6A', // green
-        '10': '#EBDF4E', // yellow
-        '50': '#EF9350', // orange
-        '100': '#EF5350', // red
+    // Convert value to percentage position on slider
+    const valueToPercentage = (val: number): number => {
+        // Check for invalid inputs
+        if (isNaN(val) || isNaN(minimumInputValue) || isNaN(maximumInputValue)) return 0;
+        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue) return 0;
+        
+        // Safety check to prevent errors
+        const safeVal = Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+        const safeMin = Math.max(0.1, minimumInputValue);
+        
+        try {
+            // Convert to logarithmic scale for smoother distribution
+            const minLog = Math.log(safeMin);
+            const maxLog = Math.log(maximumInputValue);
+            const valueLog = Math.log(safeVal);
+            
+            // Percentage calculation
+            return ((valueLog - minLog) / (maxLog - minLog)) * 100;
+        } catch (error) {
+            console.error("Error calculating percentage:", error);
+            return 0;
+        }
+    };
+
+    // Convert percentage position to value
+    const percentageToValue = (percentage: number): number => {
+        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue) 
+            return minimumInputValue;
+        
+        // Bound the percentage between 0 and 100
+        const boundedPercentage = Math.max(0, Math.min(100, percentage));
+        const safeMin = Math.max(0.1, minimumInputValue);
+        
+        // Convert from percentage to logarithmic value
+        const minLog = Math.log(safeMin);
+        const maxLog = Math.log(maximumInputValue);
+        const valueLog = minLog + (boundedPercentage / 100) * (maxLog - minLog);
+        
+        return Math.exp(valueLog);
+    };
+
+    // Get position for the knob as percentage
+    const getKnobPosition = (): number => {
+      
+        if (isNaN(value)) {
+            return 0;
+        }
+        return valueToPercentage(value);
+    };
+
+    // Get color based on position
+    const getColorAtPosition = (position: number): string => {
+        
+        const colorStops = [
+            { position: 0, color: '#26A69A' },    // teal 
+            { position: 25, color: '#89C374' },   // green 
+            { position: 50, color: '#EBDF4E' },   // yellow 
+            { position: 75, color: '#EE9A4F' },   // orange 
+            { position: 100, color: '#EF5350' }   // red 
+        ];
+        
+        // Ensure position is between 0 and 100
+        const boundedPosition = Math.max(0, Math.min(100, position));
+        
+        // Find the two color stops that our position falls between
+        let lowerStop = colorStops[0];
+        let upperStop = colorStops[colorStops.length - 1];
+        
+        for (let i = 0; i < colorStops.length - 1; i++) {
+            if (boundedPosition >= colorStops[i].position && boundedPosition <= colorStops[i+1].position) {
+                lowerStop = colorStops[i];
+                upperStop = colorStops[i+1];
+                break;
+            }
+        }
+        
+        // If exactly on a stop, return that color
+        if (boundedPosition === lowerStop.position) return lowerStop.color;
+        if (boundedPosition === upperStop.position) return upperStop.color;
+        
+        // Calculate the color interpolation factor
+        const factor = (boundedPosition - lowerStop.position) / (upperStop.position - lowerStop.position);
+        
+        // Parse the hex colors to RGB
+        const parseColor = (hex: string) => {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return { r, g, b };
+        };
+        
+        const lowerColor = parseColor(lowerStop.color);
+        const upperColor = parseColor(upperStop.color);
+        
+        // Interpolate between the two colors
+        const r = Math.round(lowerColor.r + factor * (upperColor.r - lowerColor.r));
+        const g = Math.round(lowerColor.g + factor * (upperColor.g - lowerColor.g));
+        const b = Math.round(lowerColor.b + factor * (upperColor.b - lowerColor.b));
+        
+        return `rgb(${r}, ${g}, ${b})`;
+    };
+
+    // Get color for the knob based on percentage position
+    const getKnobColor = (): string => {
+        return getColorAtPosition(getKnobPosition());
+    };
+
+    // Handle track click to set value
+    const handleTrackClick = (e: React.MouseEvent) => {
+        if (!sliderRef.current) return;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const percentage = (offsetX / rect.width) * 100;
+        
+        // Convert percentage to value (logarithmic)
+        const newValue = percentageToValue(percentage);
+        
+        // Round to whole number
+        const roundedValue = Math.round(newValue);
+        
+        // Ensure value is within min/max bounds
+        const boundedValue = Math.max(
+            minimumInputValue, 
+            Math.min(maximumInputValue, roundedValue)
+        );
+        
+        onChange(boundedValue);
     };
 
     // Handle dragging functionality
@@ -57,29 +215,21 @@ export default function LeverageSlider({
                 0,
                 Math.min(e.clientX - rect.left, rect.width),
             );
-            const percentage = offsetX / rect.width;
-
-            // Find the closest option based on drag position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
-
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
-            }
+            const percentage = (offsetX / rect.width) * 100;
+            
+            // Convert percentage to value (logarithmic)
+            const newValue = percentageToValue(percentage);
+            
+            // Round to whole number
+            const roundedValue = Math.round(newValue);
+            
+            // Ensure value is within min/max bounds
+            const boundedValue = Math.max(
+                minimumInputValue, 
+                Math.min(maximumInputValue, roundedValue)
+            );
+            
+            onChange(boundedValue);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
@@ -91,29 +241,21 @@ export default function LeverageSlider({
                 0,
                 Math.min(touch.clientX - rect.left, rect.width),
             );
-            const percentage = offsetX / rect.width;
-
-            // Find the closest option based on touch position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
-
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
-            }
+            const percentage = (offsetX / rect.width) * 100;
+            
+            // Convert percentage to value (logarithmic)
+            const newValue = percentageToValue(percentage);
+            
+            // Round to 1 decimal place for cleaner values
+            const roundedValue = Math.round(newValue * 10) / 10;
+            
+            // Ensure value is within min/max bounds
+            const boundedValue = Math.max(
+                minimumInputValue, 
+                Math.min(maximumInputValue, roundedValue)
+            );
+            
+            onChange(boundedValue);
 
             // Prevent scrolling while dragging
             e.preventDefault();
@@ -141,14 +283,14 @@ export default function LeverageSlider({
         }
 
         return () => {
-            // Clean up all event listeners
+            // Clean up  event listeners
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
             document.removeEventListener('touchmove', handleTouchMove);
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, options, value, onChange]);
+    }, [isDragging, minimumInputValue, maximumInputValue, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -156,78 +298,68 @@ export default function LeverageSlider({
         setIsDragging(true);
     };
 
-    const handleTrackClick = (e: React.MouseEvent) => {
-        if (!sliderRef.current) return;
-
-        const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percentage = offsetX / rect.width;
-
-        // Find the closest option based on click position
-        const position = percentage * (options.length - 1);
-        const lowerIndex = Math.floor(position);
-        const upperIndex = Math.ceil(position);
-
-        // Determine which one is closer
-        let newIndex;
-        if (upperIndex >= options.length) {
-            newIndex = options.length - 1;
-        } else if (lowerIndex < 0) {
-            newIndex = 0;
-        } else {
-            const lowerDiff = Math.abs(position - lowerIndex);
-            const upperDiff = Math.abs(upperIndex - position);
-            newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-        }
-
-        onChange(options[newIndex].value);
-    };
-
-    // Get position for the knob as percentage
-    const getKnobPosition = () => {
-        return selectedIndex === -1
-            ? 0
-            : (selectedIndex / (options.length - 1)) * 100;
-    };
-
-    // Get color for the knob based on value
-    const getKnobColor = () => {
-        return colors[value.toString()] || colors['100'];
-    };
-
-    // Handle input change
+    
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
 
-    // Handle input blur (when user finishes typing)
+   
     const handleInputBlur = () => {
-        const newValue = parseInt(inputValue, 10);
+        const newValue = parseFloat(inputValue);
         if (!isNaN(newValue)) {
-            // Find the closest valid option
-            const closestOption = options.reduce((prev, curr) =>
-                Math.abs(curr.value - newValue) <
-                Math.abs(prev.value - newValue)
-                    ? curr
-                    : prev,
+            // Round to whole number
+            const roundedValue = Math.round(newValue);
+            
+            // Ensure value is within min/max bounds
+            const boundedValue = Math.max(
+                minimumInputValue, 
+                Math.min(maximumInputValue, roundedValue)
             );
-            onChange(closestOption.value);
+            onChange(boundedValue);
         } else {
-            // Reset to current value if invalid
+           
             setInputValue(value.toString());
         }
     };
 
-    // Handle Enter key in input
+    
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.currentTarget.blur();
         }
     };
 
+    // Creates gradient string for the active part of the slider
+    const createGradientString = (): string => {
+        // fixed color positions
+        return `linear-gradient(to right, 
+            #26A69A 0%, 
+            #89C374 25%, 
+            #EBDF4E 50%, 
+            #EE9A4F 75%, 
+            #EF5350 100%)`;
+    };
+
     return (
         <div className={`${styles.leverageSliderContainer} ${className}`}>
             <h3 className={styles.containerTitle}>Leverage</h3>
+            <div className={styles.randomMaxContainer}>
+                <span>Max: {isNaN(maximumInputValue) ? '0' : maximumInputValue}x</span>
+                <button 
+                    type="button"
+                    onClick={() => {
+                        console.log("Button clicked");
+                        if (typeof generateRandomMaximumInput === 'function') {
+                            generateRandomMaximumInput();
+                        } else {
+                            console.error("generateRandomMaximumInput is not a function");
+                        }
+                    }}
+               
+                >
+                   generate random Max
+                </button>
+            </div>
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -235,45 +367,46 @@ export default function LeverageSlider({
                         className={styles.sliderTrack}
                         onClick={handleTrackClick}
                     >
-                        {/* Gray background track */}
+                        {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
 
-                        {/* Colored active track */}
+                        {/* Active colored portion - using fixed position gradient */}
                         <div
                             className={styles.sliderActive}
                             style={{
                                 width: `${getKnobPosition()}%`,
-                                background: `linear-gradient(to right, ${colors['1']}, ${colors['5']}, ${colors['10']}, ${colors['50']}, ${colors['100']})`,
+                                background: createGradientString(),
+                                backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
+                                backgroundPosition: 'left center'
                             }}
                         ></div>
 
                         {/* Slider markers */}
-                        {options.map((option, index) => (
-                            <div
-                                key={option.value}
-                                className={`${styles.sliderMarker} ${
-                                    index <= selectedIndex ? styles.active : ''
-                                } ${
-                                    index === selectedIndex
-                                        ? styles.sliderMarkerCurrent
-                                        : ''
-                                }`}
-                                style={{
-                                    left: `${
-                                        (index / (options.length - 1)) * 100
-                                    }%`,
-                                    backgroundColor:
-                                        index <= selectedIndex
-                                            ? colors[option.value.toString()] ||
-                                              '#FFFFFF'
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= value;
+                            const isCurrent = Math.abs(tickValue - value) < 0.1;
+                            
+                            return (
+                                <div
+                                    key={index} 
+                                    className={`${styles.sliderMarker} ${
+                                        isActive ? styles.active : ''
+                                    } ${
+                                        isCurrent ? styles.sliderMarkerCurrent : ''
+                                    }`}
+                                    style={{
+                                        left: `${position}%`,
+                                        backgroundColor: isActive
+                                            ? getColorAtPosition((index / (tickMarks.length - 1)) * 100)
                                             : 'transparent',
-                                    borderColor:
-                                        index <= selectedIndex
+                                        borderColor: isActive
                                             ? 'transparent'
                                             : 'rgba(255, 255, 255, 0.3)',
-                                }}
-                            ></div>
-                        ))}
+                                    }}
+                                ></div>
+                            );
+                        })}
 
                         {/* Draggable knob */}
                         <div
@@ -290,37 +423,37 @@ export default function LeverageSlider({
                     </div>
 
                     <div className={styles.labelContainer}>
-                        {options.map((option, index) => (
-                            <div
-                                key={option.value}
-                                className={styles.valueLabel}
-                                style={{
-                                    left: `${
-                                        (index / (options.length - 1)) * 100
-                                    }%`,
-                                    color:
-                                        index <= selectedIndex
-                                            ? '#FFFFFF'
-                                            : '#808080',
-                                }}
-                                onClick={() => onChange(option.value)}
-                            >
-                                {option.label}
-                            </div>
-                        ))}
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= value;
+                            
+                            return (
+                                <div
+                                    key={index} 
+                                    className={styles.valueLabel}
+                                    style={{
+                                        left: `${position}%`,
+                                        color: isActive ? '#FFFFFF' : '#808080',
+                                    }}
+                                    onClick={() => onChange(tickValue)}
+                                >
+                                    {tickValue}x
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
                 {/* Current value display with input */}
                 <div className={styles.valueDisplay}>
                     <input
-                        type='text'
-                        value={inputValue}
+                        type="text"
+                        value={isNaN(parseFloat(inputValue)) ? '0' : inputValue}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
-                        aria-label='Leverage value'
+                        aria-label="Leverage value"
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>

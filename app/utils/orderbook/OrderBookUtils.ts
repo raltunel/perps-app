@@ -5,7 +5,8 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
     const magnitude = Math.floor(Math.log10(price));
     const exponent = magnitude - (nsigfigs - 1);
     const tickSize = Math.pow(10, exponent);
-    return tickSize * (mantissa || 1);
+    return Number((tickSize * (mantissa || 1)).toFixed(15));
+
   }
   
   export const createResolutionObject = (price: number, nsigfigs: number, mantissa?: number) => {
