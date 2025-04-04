@@ -35,10 +35,13 @@
     justify-content: space-between;
     width: 100%;
     position: relative;
-    font-size: .8rem;
     /* animation: fadeIn 0.1s ease-in-out; */
     padding: 0 .5rem;
     cursor: pointer;
+     /* font-family: var(--font-family-mono);
+    letter-spacing: -.05rem; */
+    /* font-family: var(--font-family-main); */
+    /* font-family: var(--font-family-chivo); */
 }
 
 
@@ -108,4 +111,18 @@
     height: 4px;
     border-radius: 100%;
     background-color: white;
+    background-color: #e9e980;
+    opacity: .4;
 }
+
+
+.userOrder .orderRowPrice {
+    color:  #e9e980 !important;
+}
+
+
+.userOrder{
+    /* border: 1px solid #e9e98055; */
+}
+
+

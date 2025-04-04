@@ -35,7 +35,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
 
   const navigate = useNavigate();
 
-  const { formatNum } = useNumFormatter();
+  const { formatNum, getDefaultPrecision } = useNumFormatter();
 
   const { orderBookMode } = useAppSettings();
 
@@ -62,9 +62,10 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
     if(symbolInfo){
       const usdChange = symbolInfo.markPx - symbolInfo.prevDayPx;
       const percentChange = (usdChange / symbolInfo.prevDayPx) * 100;
-      return {str:  `${usdChange > 0 ? '+' : ''}${formatNum(usdChange)} / ${formatNum(percentChange, 2)}%`, usdChange};
+      const precision = getDefaultPrecision(symbolInfo.markPx);
+      return {str:  `${usdChange > 0 ? '+' : ''}${formatNum(usdChange, precision + 1)}/${formatNum(percentChange, 2)}%`, usdChange};
     }
-    return {str: '+0.0 / %0.0', usdChange: 0};
+    return {str: '+0.0/%0.0', usdChange: 0};
   }
 
   
@@ -92,8 +93,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
             <SymbolInfoField label="Mark" value={'$'+formatNum(symbolInfo?.markPx)} lastWsChange={symbolInfo?.lastPriceChange} />
             <SymbolInfoField label="Oracle" value={'$'+formatNum(symbolInfo?.oraclePx)} />
             <SymbolInfoField label="24h Change" value={get24hChangeString().str} type={get24hChangeString().usdChange > 0 ? 'positive' : get24hChangeString().usdChange < 0 ? 'negative' : undefined} />
-            <SymbolInfoField label="24h Volume" value={'$'+formatNum(symbolInfo?.dayNtlVlm, 2)} />
-            <SymbolInfoField label="Open Interest" value={'$'+formatNum(symbolInfo?.openInterest * symbolInfo?.oraclePx, 2)} />
+            <SymbolInfoField label="24h Volume" value={'$'+formatNum(symbolInfo?.dayNtlVlm, 0)} />
+            <SymbolInfoField label="Open Interest" value={'$'+formatNum(symbolInfo?.openInterest * symbolInfo?.oraclePx, 0)} />
             <SymbolInfoField label="Funding Rate" value={(symbolInfo?.funding * 100).toString().substring(0, 7)+'%'} type={symbolInfo?.funding < 0 ? 'positive' : symbolInfo?.funding > 0 ? 'negative' : undefined} />
             <SymbolInfoField label="Funding Countdown" value={getTimeUntilNextHour()} />
           </div>

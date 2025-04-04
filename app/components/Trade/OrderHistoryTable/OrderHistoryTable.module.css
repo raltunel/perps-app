@@ -214,3 +214,29 @@
         display: none;
     }
 }
+
+.fontDebug1{
+    display: block;
+    font-family: var(--font-family-main);
+}
+
+.fontDebugAzeret{
+    display: block;
+    font-family: var(--font-family-azeret);
+}
+.fontDebugChivo{
+    display: block;
+    font-family: var(--font-family-chivo);
+}
+.fontDebugLekton{
+    display: block;
+    font-family: var(--font-family-lekton);
+}
+.fontDebugB612{
+    display: block;
+    font-family: var(--font-family-b612);
+}
+.fontDebugCourier{    
+    display: block;
+    font-family: var(--font-family-courier);
+}

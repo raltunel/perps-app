@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100;300;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chivo+Mono:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=B612+Mono:wght@400&display=swap'); 
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lekton:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400&display=swap');
 :root {
   /* Dark Shades */
   --dark1: #06060c;
@@ -48,7 +53,13 @@
   --trade-module-width-desktop-small: 280px;
 
   /* fonts */
-  --font-family-main: 'Lexend Deca';
+   --font-family-main: 'Lexend Deca';
+   --font-family-azeret: 'Azeret Mono';
+   --font-family-chivo: 'Chivo Mono';
+   --font-family-lekton: 'Lekton';
+   --font-family-b612: 'B612 Mono';
+   --font-family-courier: 'Courier Prime';
+  
 
   --font-size-xs: 10px;
   --font-size-s: 12px;

@@ -47,6 +47,8 @@
 
     color: var(--text1);
     margin-top: .2rem;
+    font-family: var(--font-family-chivo);
+    /* letter-spacing: -.04rem; */
 }
 
 .symbolInfoFieldValue.positiveAnimation {

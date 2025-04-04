@@ -107,6 +107,12 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
   return (
     <div className={styles.tableWrapper}>
+      <div className={styles.fontDebug1}>Main Font: 0123456789</div>
+      <div className={styles.fontDebugAzeret}>Azeret : 0123456789</div>
+      <div className={styles.fontDebugChivo}>Chivo : 0123456789</div>
+      <div className={styles.fontDebugLekton}>Lekton : 0123456789</div>
+      <div className={styles.fontDebugB612}>B612 : 0123456789</div>
+      <div className={styles.fontDebugCourier}>Courier : 0123456789</div>
       <OrderHistoryTableHeader />
       <div className={styles.tableBody}>
         {orderHistoryToShow.map((order, index) => (

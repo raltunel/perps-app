@@ -18,9 +18,15 @@ export function useNumFormatter() {
   }, []);
 
   const getDefaultPrecision = useCallback((num: number | string) => {
-    const numVal = parseNum(num);
-    if(numVal > 1000000){
+    const numVal = Math.abs(parseNum(num));
+    if(numVal > 10000){
         return 0;
+    }
+    else if(numVal > 1000){
+        return 1;
+    }
+    else if(numVal > 100){
+        return 2; 
     }
     else if(numVal < 10){
         return 4;
@@ -49,14 +55,14 @@ export function useNumFormatter() {
       precisionVal = precision;
     }
     
-    if (Number.isInteger(num)) {
-      return num.toLocaleString(formatType);
-    } else {
+    // if (Number.isInteger(num)) {
+    //   return num.toLocaleString(formatType);
+    // } else {
       return num.toLocaleString(formatType, {
         minimumFractionDigits: precisionVal || getDefaultPrecision(num),
         maximumFractionDigits: precisionVal || getDefaultPrecision(num)
       });
-    }
+    // }
 
   }, [numFormat, parseNum, getDefaultPrecision]);
 
@@ -67,7 +73,7 @@ export function useNumFormatter() {
   
 
 
-  return { formatNum, formatPriceForChart, decimalPrecision };
+  return { formatNum, formatPriceForChart, decimalPrecision, getDefaultPrecision };
 }
 
 export default useNumFormatter;
