@@ -10,11 +10,10 @@ interface propsIF {
 interface MarketInfoItem {
     label: string;
     tooltipLabel: string;
-    value: string;
-    
-  }
-  
-export default function PlaceOrderButtons(props: PropsIF) {
+    value: string;    
+}
+
+export default function PlaceOrderButtons(props: propsIF) {
     const { orderMarketPrice, openModalWithContent } = props
 
     // logic to change the active color pair
@@ -87,10 +86,20 @@ export default function PlaceOrderButtons(props: PropsIF) {
     
     return (
 
-        <div className={styles.container}>
-            <div className={styles.buttonsContainer}>
-                <button className={styles.greenButton} onClick={() => openModalWithContent('confirmation')}>Buy / Long</button>
-                <button className={styles.redButton} onClick={() => openModalWithContent('confirmation')}>Sell / Short</button>
+        <div className={styles.place_order_buttons}>
+            <div className={styles.buttons_wrapper}>
+                <button
+                    style={{ backgroundColor: getBsColor().buy }}
+                    onClick={() => openModalWithContent('confirmation')}
+                >
+                    Buy / Long
+                </button>
+                <button
+                    style={{ backgroundColor: getBsColor().sell }}
+                    onClick={() => openModalWithContent('confirmation')}
+                >
+                    Sell / Short
+                </button>
             </div>
             <div className={styles.input_details}>
                 {dataToUse.map((data: MarketInfoItem) => (
@@ -110,7 +119,6 @@ export default function PlaceOrderButtons(props: PropsIF) {
                     </div>
                 ))}
             </div>
-
         </div>
     )
 }
