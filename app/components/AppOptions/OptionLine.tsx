@@ -1,15 +1,14 @@
 import styles from './OptionLine.module.css';
-import type { appOptionDataIF } from './AppOptions';
 import { FaCheck } from 'react-icons/fa';
 
 interface propsIF {
-    option: appOptionDataIF;
+    text: string;
     isChecked: boolean;
     toggle: () => void;
 }
 
 export default function OptionLine(props: propsIF) {
-    const { option, isChecked, toggle } = props;
+    const { text, isChecked, toggle } = props;
 
     return (
         <li className={styles.option_line} onClick={toggle}>
@@ -19,7 +18,7 @@ export default function OptionLine(props: propsIF) {
             >
                 {isChecked && <FaCheck size={10} color={'var(--accent1)'} />}
             </div>
-            {option.text}
+            {text}
         </li>
     );
 }

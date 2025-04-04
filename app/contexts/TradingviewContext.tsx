@@ -1,5 +1,6 @@
 import {
     widget,
+    type CandleStylePreferences,
     type IChartingLibraryWidget,
     type ResolutionString,
     type TradingTerminalFeatureset,
@@ -24,12 +25,13 @@ import {
     studyEvents,
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
+import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
 }
 
-const TradingViewContext = createContext<TradingViewContextType>({
+export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
 });
 
@@ -72,6 +74,55 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         autosize: true,
         studiesOverrides: {},
     };
+
+    // logic to change the active color pair
+    const { bsColor, getBsColor } = useAppSettings();
+
+    function changeColors(c: colorSetIF): void {
+        // make sure the chart exists
+        if (chart) {
+            // object literal with all user-created candle customizations
+            const mainSeriesProperties = JSON.parse(
+                localStorage.getItem(
+                    'tradingview.chartproperties.mainSeriesProperties',
+                ) || '{}',
+            );
+            const candleStyle = mainSeriesProperties?.candleStyle || {};
+            // array of color codes from candle properties we care about
+            const activeColors: string[] | undefined = candleStyle
+                ? [
+                    candleStyle.upColor,
+                    candleStyle.downColor,
+                    candleStyle.borderUpColor,
+                    candleStyle.borderDownColor,
+                    candleStyle.wickUpColor,
+                    candleStyle.wickDownColor,
+                ]
+                : undefined;
+            // determine if any of the candles have a color chosen through
+            // ... the trading view color customization workflow (custom
+            // ...  colors are always formatted as `rgba`)
+            const isCustomized: boolean = activeColors
+                ? activeColors.some((c: string) => c?.startsWith('rgba'))
+                : false;
+            // apply color scheme to chart ONLY if no custom colors are
+            // ... found in the active colors array
+            isCustomized ||
+                chart.applyOverrides({
+                    'mainSeriesProperties.candleStyle.upColor': c.buy,
+                    'mainSeriesProperties.candleStyle.downColor': c.sell,
+                    'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
+                    'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
+                    'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
+                    'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
+                });
+        }
+    }
+
+    // side effect to load a custom color set into the table, runs when
+    // ... the user changes the app's color theme and when the chart
+    // ... finishes initialization
+    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
 
     useEffect(() => {
         const tvWidget = new widget({
