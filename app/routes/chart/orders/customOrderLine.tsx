@@ -1,104 +1,127 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
-    addCustomOrderLabel,
     addCustomOrderLine,
     createShapeText,
+    priceToPixel,
 } from './customOrderLineUtils';
 
 const CustomOrderLine = () => {
     const { chart } = useTradingView();
 
-    const price = 100000;
-
-    const [orderLine, setOrderLine] = useState<Promise<any> | undefined>();
-    const [orderText, setOrderText] = useState<Promise<any> | undefined>();
-
-    useEffect(() => {
-        if (chart) {
-            const line = addCustomOrderLine(chart, price);
-            const orderText = createShapeText(chart, price);
-
-            setOrderText(orderText);
-            setOrderLine(line);
-        }
-    }, [chart]);
-
-    const priceToPixel = (
-        minPrice: number,
-        maxPrice: number,
-        chartHeight: number,
-        isLogarithmic: boolean = false,
-    ) => {
-        const textHeight = 10;
-
-        if (isLogarithmic) {
-            const logMinPrice = Math.log(minPrice);
-            const logMaxPrice = Math.log(maxPrice);
-            const logPrice = Math.log(price);
-
-            const priceDifference = logMaxPrice - logMinPrice;
-            const relativePrice = logPrice - logMinPrice;
-            const pixelCoordinate =
-                (relativePrice / priceDifference) * chartHeight;
-
-            return chartHeight - pixelCoordinate - textHeight / 2;
-        } else {
-            const priceDifference = maxPrice - minPrice;
-            const relativePrice = price - minPrice;
-            const pixelCoordinate =
-                (relativePrice / priceDifference) * chartHeight;
-
-            return chartHeight - pixelCoordinate - textHeight / 2;
-        }
-    };
+    const { userSymbolOrders } = useTradeDataStore();
+    const [orderLines, setOrderLines] = useState<any[]>([]);
+    const [orderTexts, setOrderTexts] = useState<any[]>([]);
 
     useEffect(() => {
-        let interval: any = undefined;
-        if (chart && orderText && orderLine) {
-            orderText.then((res) => {
-                interval = setInterval(() => {
+        let isMounted = true;
+
+        const cleanupShapes = () => {
+            if (chart) {
+                orderLines.forEach((id) => {
+                    chart.activeChart().removeEntity(id);
+                });
+
+                orderTexts.forEach((id) => {
+                    chart.activeChart().removeEntity(id);
+                });
+            }
+        };
+
+        const setupShapes = async () => {
+            if (!chart || userSymbolOrders.length === 0) return;
+
+            cleanupShapes();
+
+            const shapePairs = await Promise.all(
+                userSymbolOrders.map(async (item) => {
+                    const lineId = await addCustomOrderLine(
+                        chart,
+                        item.limitPx,
+                        item.side,
+                    );
+                    const textId = await createShapeText(
+                        chart,
+                        item.limitPx,
+                        item.side,
+                    );
+                    return { lineId, textId };
+                }),
+            );
+
+            if (!isMounted) return;
+
+            setOrderLines(shapePairs.map((p) => p.lineId));
+            setOrderTexts(shapePairs.map((p) => p.textId));
+        };
+
+        setupShapes();
+
+        return () => {
+            isMounted = false;
+            cleanupShapes();
+        };
+    }, [chart, userSymbolOrders]);
+
+    useEffect(() => {
+        let isCancelled = false;
+        const intervals: number[] = [];
+
+        const setupTextPositioning = async () => {
+            if (!chart || orderTexts.length === 0) return;
+
+            for (let i = 0; i < orderTexts.length; i++) {
+                const textShapeId = await orderTexts[i];
+
+                const interval = setInterval(() => {
+                    if (isCancelled) return;
+
                     const priceScalePane = chart
                         .activeChart()
                         .getPanes()[0] as any;
                     const priceScale = priceScalePane.getMainSourcePriceScale();
-
-                    const activeLabel = chart.activeChart().getShapeById(res);
                     const priceRange = priceScale.getVisiblePriceRange();
+                    const chartHeight = priceScalePane.getHeight();
 
                     if (!priceRange) return;
 
                     const maxPrice = priceRange.to;
                     const minPrice = priceRange.from;
 
-                    const chartHeight = priceScalePane.getHeight();
-
-                    const result = priceToPixel(
+                    const pixel = priceToPixel(
                         minPrice,
                         maxPrice,
                         chartHeight,
+                        userSymbolOrders[i]?.limitPx ?? 0,
                         priceScale.getMode() === 1,
                     );
-                    const pricePerPixel = (result * 1) / chartHeight;
 
-                    /*      const time = chart
+                    const pricePerPixel = pixel / chartHeight;
+
+                    const activeLabel = chart
                         .activeChart()
-                        .getTimeScale()
-                        .coordinateToTime(chartWidth) as number; */
+                        .getShapeById(textShapeId);
+                    if (activeLabel) {
+                        activeLabel.setAnchoredPosition({
+                            x: 0.4,
+                            y: pricePerPixel,
+                        });
+                        chart.activeChart().restoreChart();
+                    }
+                }, 10) as unknown as number;
 
-                    activeLabel.setAnchoredPosition({
-                        x: 0.2,
-                        y: pricePerPixel,
-                    });
-                    chart.activeChart().restoreChart();
-                }, 10);
-            });
-        }
+                intervals.push(interval);
+            }
+        };
+
+        setupTextPositioning();
 
         return () => {
-            clearInterval(interval);
+            isCancelled = true;
+            intervals.forEach(clearInterval);
         };
-    }, [orderText]);
+    }, [orderTexts, chart, userSymbolOrders]);
 
     return null;
 };

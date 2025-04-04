@@ -1,19 +1,24 @@
 export const buyColor = '#26A69A';
 export const sellColor = '#E57373';
-export const addCustomOrderLine = async (chart: any, orderPrice: number) => {
+export const addCustomOrderLine = async (
+    chart: any,
+    orderPrice: number,
+    orderSide: 'buy' | 'sell',
+) => {
     if (!chart) return;
+    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
-    const orderLine = chart
+    const orderLine = await chart
         .activeChart()
         .createMultipointShape([{ time: 10, price: orderPrice }], {
             shape: 'horizontal_line',
-            lock: false,
+            lock: true,
             disableSelection: true,
             disableSave: true,
             disableUndo: true,
             overrides: {
-                linecolor: sellColor,
-                borderColor: sellColor,
+                linecolor: orderColor,
+                borderColor: orderColor,
                 linestyle: 3,
                 extendLeft: true,
                 extendRight: true,
@@ -24,8 +29,13 @@ export const addCustomOrderLine = async (chart: any, orderPrice: number) => {
     return orderLine;
 };
 
-export const addCustomOrderLabel = (chart: any, orderPrice: number) => {
+export const addCustomOrderLabel = (
+    chart: any,
+    orderPrice: number,
+    orderSide: 'buy' | 'sell',
+) => {
     const chartVisibleRanges = chart.activeChart().getVisibleRange();
+    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
     const from = chartVisibleRanges.from + 40 * 24 * 3600;
     const to = chartVisibleRanges.from + 60 * 24 * 3600;
@@ -44,7 +54,7 @@ export const addCustomOrderLabel = (chart: any, orderPrice: number) => {
             text: '   Liq. Price',
             overrides: {
                 backgroundColor: 'white',
-                color: buyColor,
+                color: orderColor,
                 fontsize: 8,
                 leftEnd: true,
                 textAlign: 'left',
@@ -54,29 +64,35 @@ export const addCustomOrderLabel = (chart: any, orderPrice: number) => {
     return orderLabel;
 };
 
-export const createShapeText = (chart: any, price: number) => {
-    const priceScale = chart.activeChart().getPanes()[0];
+export const createShapeText = async (
+    chart: any,
+    price: number,
+    orderSide: 'buy' | 'sell',
+) => {
+    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
-    const timeScale = chart.activeChart().getTimeScale();
+    const priceScalePane = chart.activeChart().getPanes()[0] as any;
+    const priceScale = priceScalePane.getMainSourcePriceScale();
+    const priceRange = priceScale.getVisiblePriceRange();
+    const chartHeight = priceScalePane.getHeight();
 
-    const visibleRange = chart.activeChart().getVisibleRange();
+    if (!priceRange) return;
 
-    const priceRange = priceScale
-        .getMainSourcePriceScale()
-        .getVisiblePriceRange();
+    const maxPrice = priceRange.to;
+    const minPrice = priceRange.from;
 
-    if (!visibleRange || !priceRange) return;
+    const pixel = priceToPixel(
+        minPrice,
+        maxPrice,
+        chartHeight,
+        price,
+        priceScale.getMode() === 1,
+    );
 
-    const startTime = visibleRange.from;
-    const endTime = visibleRange.to;
+    const pricePerPixel = (pixel * 1) / chartHeight;
 
-    const chartWidth = Math.floor(timeScale.width());
-    const RECT_WIDTH_PX = chartWidth / 2;
-
-    const timePerPixel = Math.floor((endTime - startTime) / chartWidth);
-    const rectWidthTime = timePerPixel * RECT_WIDTH_PX;
-    const shape = chart.activeChart().createShape(
-        { time: startTime + rectWidthTime, price: price },
+    const shape = await chart.activeChart().createShape(
+        { x: 0.2, price: pricePerPixel },
         {
             shape: 'anchored_text',
             lock: true,
@@ -90,7 +106,7 @@ export const createShapeText = (chart: any, price: number) => {
                 bold: true,
                 fillBackground: true,
                 drawBorder: true,
-                borderColor: sellColor,
+                borderColor: orderColor,
                 wordWrap: true,
                 wordWrapWidth: 60,
                 borderWidth: 2,
@@ -99,4 +115,32 @@ export const createShapeText = (chart: any, price: number) => {
     );
 
     return shape;
+};
+
+export const priceToPixel = (
+    minPrice: number,
+    maxPrice: number,
+    chartHeight: number,
+    price: number,
+    isLogarithmic: boolean = false,
+) => {
+    const textHeight = 10;
+
+    if (isLogarithmic) {
+        const logMinPrice = Math.log(minPrice);
+        const logMaxPrice = Math.log(maxPrice);
+        const logPrice = Math.log(price);
+
+        const priceDifference = logMaxPrice - logMinPrice;
+        const relativePrice = logPrice - logMinPrice;
+        const pixelCoordinate = (relativePrice / priceDifference) * chartHeight;
+
+        return chartHeight - pixelCoordinate - textHeight / 2;
+    } else {
+        const priceDifference = maxPrice - minPrice;
+        const relativePrice = price - minPrice;
+        const pixelCoordinate = (relativePrice / priceDifference) * chartHeight;
+
+        return chartHeight - pixelCoordinate - textHeight / 2;
+    }
 };
