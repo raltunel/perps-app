@@ -1,7 +1,6 @@
 import { OrderHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
-export type UserDataFetchMode = 'ws' | 'api';
 
 const limit = 10;
 export interface UserTradeStore {
@@ -15,8 +14,6 @@ export interface UserTradeStore {
     filterOrderHistory: (orderHistory: OrderDataIF[], filterType?: string) => OrderDataIF[];
     userSymbolOrderHistory: OrderDataIF[];
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => void;
-    userDataFetchMode: UserDataFetchMode;
-    setUserDataFetchMode: (userDataFetchMode: UserDataFetchMode) => void;
 }
 
 export const createUserTradesSlice = (set:any, get:any) => ({
@@ -56,9 +53,5 @@ export const createUserTradesSlice = (set:any, get:any) => ({
                 return orderHistory.filter(e=> e.side === 'sell').slice(0, OrderHistoryLimits.RENDERED);
         }
     },
-    userDataFetchMode: 'ws',
-    setUserDataFetchMode: (userDataFetchMode: UserDataFetchMode) => {
-        set({ userDataFetchMode })
-    }
 });
 

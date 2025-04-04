@@ -26,7 +26,6 @@ export default function WebDataConsumer() {
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
 
-    const last10SecDataLengthRef = useRef<number>(0);
 
     useEffect(() => {
 
@@ -37,18 +36,6 @@ export default function WebDataConsumer() {
 
 
     }, [symbol, coins])
-
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-
-            last10SecDataLengthRef.current = 0
-        }, 10000);
-
-        return () => {
-            clearInterval(interval);
-        }
-    }, []);
 
 
 
@@ -65,8 +52,6 @@ export default function WebDataConsumer() {
                 if (payload.data.user === addressRef.current) {
                     openOrdersRef.current = payload.data.userOpenOrders;
                 }
-                last10SecDataLengthRef.current += payload.data.size;
-                console.log('>>> last 10 secs', (last10SecDataLengthRef.current / 1024).toFixed(2) + ' KB');
             },
             single: true
         })
