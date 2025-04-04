@@ -18,15 +18,17 @@ const CustomOrderLine = () => {
         let isMounted = true;
 
         const cleanupShapes = () => {
-            if (chart) {
-                orderLines.forEach((id) => {
-                    chart.activeChart().removeEntity(id);
-                });
+            try {
+                if (chart) {
+                    orderLines.forEach((id) => {
+                        chart.activeChart().removeEntity(id);
+                    });
 
-                orderTexts.forEach((id) => {
-                    chart.activeChart().removeEntity(id);
-                });
-            }
+                    orderTexts.forEach((id) => {
+                        chart.activeChart().removeEntity(id);
+                    });
+                }
+            } catch (error) {}
         };
 
         const setupShapes = async () => {
@@ -45,6 +47,7 @@ const CustomOrderLine = () => {
                         chart,
                         item.limitPx,
                         item.side,
+                        'limit',
                     );
                     return { lineId, textId };
                 }),

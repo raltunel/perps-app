@@ -68,6 +68,7 @@ export const createShapeText = async (
     chart: any,
     price: number,
     orderSide: 'buy' | 'sell',
+    lineType: 'liq' | 'limit' | 'pnl'
 ) => {
     const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
@@ -99,7 +100,7 @@ export const createShapeText = async (
             disableSelection: true,
             disableSave: true,
             disableUndo: true,
-            text: '   Liq. Price',
+            text: lineType === "limit" ?' Limit  '+ price : '   Liq. Price',
             overrides: {
                 fontsize: 10,
                 backgroundColor: '#D1D1D1',
@@ -108,7 +109,7 @@ export const createShapeText = async (
                 drawBorder: true,
                 borderColor: orderColor,
                 wordWrap: true,
-                wordWrapWidth: 60,
+                wordWrapWidth: 70,
                 borderWidth: 2,
             },
         },
