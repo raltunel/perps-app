@@ -7,11 +7,12 @@ interface SymbolInfoFieldProps {
   value: string;
   lastWsChange?: number;
   type?: 'positive' | 'negative';
+  valueClass?: string;
 }
 
 
 
-const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type }) => {
+const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type, valueClass }) => {
 
 
   const {isInverseColor} = useAppSettings();
@@ -25,7 +26,8 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsC
       ${lastWsChange && lastWsChange > 0 ? styles.positiveAnimation : 
       lastWsChange && lastWsChange < 0 ? styles.negativeAnimation : ''}
       ${type === 'positive' ? styles.positive : 
-      type === 'negative' ? styles.negative : ''}`}>{value}</div>
+      type === 'negative' ? styles.negative : ''} 
+      ${valueClass}`}>{value}</div>
     </div>
     </div>
   );

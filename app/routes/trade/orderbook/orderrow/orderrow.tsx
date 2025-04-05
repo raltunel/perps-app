@@ -40,7 +40,7 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
     });
   }
   return (
-    <div className={`${styles.orderRow} ${type}`} onClick={handleClick} >
+    <div className={`${styles.orderRow} ${type} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`} onClick={handleClick} >
       {userSlots.has(formattedPrice) && <div className={styles.userOrderIndicator}></div>}
       <div className={styles.orderRowPrice}>{formattedPrice}</div>
       <div className={styles.orderRowSize}>{formatNum(order.sz * coef)}</div>

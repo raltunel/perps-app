@@ -126,3 +126,44 @@ ol[role='list'] {
 .content.error-boundary code{
   color: var(--text2);
 }
+
+
+.w1{
+  width: 1rem;
+}
+
+.w2{
+  width: 2rem;
+} 
+
+.w3{
+  width: 3rem;
+}
+
+.w4{
+  width: 4rem;
+}
+
+.w5{
+  width: 5rem;
+}
+
+.w6{
+  width: 6rem;
+}
+
+.w7{
+  width: 7rem;
+}
+
+.w8{
+  width: 8rem;
+}
+
+.w9{
+  width: 9rem;
+}
+
+.w10{
+  width: 10rem;
+}
