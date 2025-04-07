@@ -12,6 +12,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNavigate } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import SymbolSearch from './symbolsearch/symbolsearch';
 
 interface SymbolInfoProps {
 }
@@ -71,7 +72,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
   return (
     <div className={styles.symbolInfoContainer}>
       <div className={styles.symbolSelector}>
-        <ComboBox
+        {/* <ComboBox
           value={symbol}
           options={symbolList}
           onChange={(value) => {
@@ -81,7 +82,8 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
           modifyOptions={(value) => value += '-USD'}
           modifyValue={(value) => value += '-USD'}
           type={'big-val'}
-        />
+        /> */}
+        <SymbolSearch />
       </div>
       <div>
         {

@@ -1,0 +1,45 @@
+.symbolSearchBackdrop {
+    position: relative;
+}
+
+.symbolSearchContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    user-select: none;
+}
+
+.symbolIcon {
+    width: 1.4rem;
+    height: 1.4rem;
+}
+
+
+.symbolName {
+    white-space: nowrap;
+}
+
+.comboBoxIcon {
+  transition: ease-in-out .2s;
+  transform: rotate(0deg);
+  font-size: .7rem;
+  opacity: .3;
+}
+
+.comboBoxIconOpen {
+  transform: rotate(180deg);
+}
+
+
+
+.symbolListWrapper {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-height: 20rem;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
