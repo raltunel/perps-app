@@ -19,25 +19,6 @@
     white-space: nowrap;
 }
 
-
-@keyframes changePositive{
-    0% {
-        color: var(--green);
-    }
-    100% {
-        color: var(--text1);
-    }
-}
-
-@keyframes changeNegative{
-    0% {
-        color: var(--red);
-    }
-    100% {
-        color: var(--text1);
-    }
-}
-
 .symbolInfoFieldLabel {
     color: var(--text2);
     padding-right: 1rem;
@@ -48,38 +29,3 @@
     color: var(--text1);
     margin-top: .2rem;
 }
-
-.symbolInfoFieldValue.positiveAnimation {
-    animation: changePositive 1s ease-in-out;
-}
-
-.symbolInfoFieldValue.negativeAnimation {
-    animation: changeNegative 1s ease-in-out;
-}
-
-.symbolInfoFieldValue.positive {
-    color: var(--green);
-}
-
-.symbolInfoFieldValue.negative {
-    color: var(--red);
-}
-
-
-.inverseColor .symbolInfoFieldValue.positive {
-    color: var(--red);
-}
-
-.inverseColor .symbolInfoFieldValue.negative {
-    color: var(--green);
-}
-
-.inverseColor .symbolInfoFieldValue.positiveAnimation {
-    animation: changeNegative 1s ease-in-out;
-}
-
-.inverseColor .symbolInfoFieldValue.negativeAnimation {
-    animation: changePositive 1s ease-in-out;
-}
-
-
