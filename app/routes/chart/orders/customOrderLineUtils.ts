@@ -109,7 +109,7 @@ export const createShapeText = async (
                 drawBorder: true,
                 borderColor: orderColor,
                 wordWrap: true,
-                wordWrapWidth: 70,
+                wordWrapWidth: lineType === "liq" ? 70 : 100  ,
                 borderWidth: 2,
             },
         },
