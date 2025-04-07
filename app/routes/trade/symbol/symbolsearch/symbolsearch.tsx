@@ -3,6 +3,7 @@ import styles from './symbolsearch.module.css';
 import { FaChevronDown } from 'react-icons/fa';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import SymbolList from './symbollist/symbollist';
 
 
 interface SymbolInfoFieldProps {
@@ -16,22 +17,12 @@ interface SymbolInfoFieldProps {
 
 const SymbolSearch: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type }) => {
 
-    const navigate = useNavigate();
-
-    const {symbol, coins, setSymbol} = useTradeDataStore();
+    const {symbol} = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
 
     const wrapperClickHandler = () => {
         setIsOpen(!isOpen);
     }
-
-    const symbolSelectListener = (coin: string) => {
-        setSymbol(coin);
-        navigate(`/trade/${coin}`);
-        setIsOpen(false);
-    }
-
-
 
 
   return (
@@ -55,21 +46,7 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChan
 
 {
     isOpen && (
-        <div className={styles.symbolListWrapper}>
-
-            <div className={styles.symbolList}> 
-
-                {
-                    coins.map((c) => (
-                        <div className={styles.symbolListItem} onClick={() => symbolSelectListener(c.coin)}>
-                            {c.coin}
-                        </div>
-                    ))
-                }
-            </div>
-
-
-        </div>
+        <SymbolList setIsOpen={setIsOpen} />
     )
 }
 </div>

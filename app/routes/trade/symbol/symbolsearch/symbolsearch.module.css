@@ -9,6 +9,7 @@
     gap: 0.5rem;
     font-size: 1.2rem;
     user-select: none;
+    min-width: 10rem;
 }
 
 .symbolIcon {
@@ -31,15 +32,3 @@
 .comboBoxIconOpen {
   transform: rotate(180deg);
 }
-
-
-
-.symbolListWrapper {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    max-height: 20rem;
-    overflow-y: auto;
-    z-index: 1000;
-}
-
