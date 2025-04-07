@@ -29,49 +29,68 @@ export const addCustomOrderLine = async (
     return orderLine;
 };
 
-export const addCustomOrderLabel = (
-    chart: any,
-    orderPrice: number,
-    orderSide: 'buy' | 'sell',
-) => {
-    const chartVisibleRanges = chart.activeChart().getVisibleRange();
-    const orderColor = orderSide === 'buy' ? buyColor : sellColor;
-
-    const from = chartVisibleRanges.from + 40 * 24 * 3600;
-    const to = chartVisibleRanges.from + 60 * 24 * 3600;
-    const buffer = 2000;
-    const rectTopLeft = { time: from, price: orderPrice + buffer };
-    const rectBottomRight = { time: to, price: orderPrice - buffer };
-
-    const orderLabel = chart
-        .activeChart()
-        .createMultipointShape([rectTopLeft, rectBottomRight], {
-            shape: 'rectangle',
-            lock: true,
-            disableSelection: true,
-            disableSave: true,
-            disableUndo: true,
-            text: '   Liq. Price',
-            overrides: {
-                backgroundColor: 'white',
-                color: orderColor,
-                fontsize: 8,
-                leftEnd: true,
-                textAlign: 'left',
-            },
-        });
-
-    return orderLabel;
-};
-
 export const createShapeText = async (
     chart: any,
     price: number,
     orderSide: 'buy' | 'sell',
-    lineType: 'liq' | 'limit' | 'pnl'
+    lineType: 'liq' | 'limit' | 'pnl',
 ) => {
     const orderColor = orderSide === 'buy' ? buyColor : sellColor;
 
+    const priceScalePane = chart.activeChart().getPanes()[0] as any;
+    const priceScale = priceScalePane.getMainSourcePriceScale();
+    const priceRange = priceScale.getVisiblePriceRange();
+    const chartHeight = priceScalePane.getHeight();
+
+    const orderText =
+        lineType === 'limit' ? ' Limit  ' + price : '   Liq. Price';
+
+    if (!priceRange) return;
+
+    const maxPrice = priceRange.to;
+    const minPrice = priceRange.from;
+
+    const pixel = priceToPixel(
+        minPrice,
+        maxPrice,
+        chartHeight,
+        price,
+        priceScale.getMode() === 1,
+    );
+
+    const pricePerPixel = (pixel * 1) / chartHeight;
+
+    const shape = await chart.activeChart().createShape(
+        { x: 0.4, price: pricePerPixel },
+        {
+            shape: 'anchored_text',
+            lock: true,
+            disableSelection: true,
+            disableSave: true,
+            disableUndo: true,
+            text: orderText,
+            overrides: {
+                fontsize: 10,
+                backgroundColor: '#D1D1D1',
+                bold: true,
+                fillBackground: true,
+                drawBorder: true,
+                borderColor: orderColor,
+                wordWrap: true,
+                wordWrapWidth: lineType === 'liq' ? 70 : 100,
+                borderWidth: 2,
+            },
+        },
+    );
+
+    return shape;
+};
+
+export const createQuantityText = async (
+    chart: any,
+    price: number,
+    quantity: number,
+) => {
     const priceScalePane = chart.activeChart().getPanes()[0] as any;
     const priceScale = priceScalePane.getMainSourcePriceScale();
     const priceRange = priceScale.getVisiblePriceRange();
@@ -93,24 +112,28 @@ export const createShapeText = async (
     const pricePerPixel = (pixel * 1) / chartHeight;
 
     const shape = await chart.activeChart().createShape(
-        { x: 0.2, price: pricePerPixel },
+        {
+            x: getOrderQuantityTextLocation(chart),
+            price: pricePerPixel,
+        },
         {
             shape: 'anchored_text',
             lock: true,
             disableSelection: true,
             disableSave: true,
             disableUndo: true,
-            text: lineType === "limit" ?' Limit  '+ price : '   Liq. Price',
+            text: quantity,
             overrides: {
                 fontsize: 10,
-                backgroundColor: '#D1D1D1',
+                backgroundColor: '#000000',
                 bold: true,
                 fillBackground: true,
                 drawBorder: true,
-                borderColor: orderColor,
                 wordWrap: true,
-                wordWrapWidth: lineType === "liq" ? 70 : 100  ,
-                borderWidth: 2,
+                wordWrapWidth: 50,
+                color: '#FFFFFF',
+                borderWidth: 3,
+                borderColor: '#3C91FF',
             },
         },
     );
@@ -144,4 +167,15 @@ export const priceToPixel = (
 
         return chartHeight - pixelCoordinate - textHeight / 2;
     }
+};
+
+export const getOrderQuantityTextLocation = (chart: any) => {
+    const timeScale = chart.activeChart().getTimeScale();
+    const chartWidth = Math.floor(timeScale.width());
+
+    const wrapWidthPx = 105;
+
+    const offsetX = Number(wrapWidthPx / chartWidth);
+
+    return 0.4 + offsetX;
 };
