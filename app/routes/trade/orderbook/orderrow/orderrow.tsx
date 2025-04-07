@@ -16,16 +16,10 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
 
   const { formatNum } = useNumFormatter();
 
-  const { isInverseColor} = useAppSettings();
+  const { getBsColor } = useAppSettings();
 
   const { setTradeSlot } = useTradeModuleStore();
 
-  const type = useMemo(() => {
-    if (order.type === 'buy' && !isInverseColor) return styles.buy;
-    if (order.type === 'sell' && !isInverseColor) return styles.sell;
-    if (order.type === 'buy' && isInverseColor) return styles.sell;
-    if (order.type === 'sell' && isInverseColor) return styles.buy;
-  }, [order.type, isInverseColor]);
 
   const formattedPrice = useMemo(() => {
     return formatNum(order.px, resolution);
@@ -40,12 +34,12 @@ const OrderRow: React.FC<OrderRowProps> = ({ order, coef, resolution, userSlots 
     });
   }
   return (
-    <div className={`${styles.orderRow} ${type}`} onClick={handleClick} >
+    <div className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`} onClick={handleClick} >
       {userSlots.has(formattedPrice) && <div className={styles.userOrderIndicator}></div>}
-      <div className={styles.orderRowPrice}>{formattedPrice}</div>
+      <div className={styles.orderRowPrice} style={{color: order.type === 'buy' ? getBsColor().buy : getBsColor().sell}}>{formattedPrice}</div>
       <div className={styles.orderRowSize}>{formatNum(order.sz * coef)}</div>
       <div className={styles.orderRowTotal}>{formatNum(order.total * coef)}</div>
-      <div className={styles.ratio} style={{ width: `${order.ratio * 100}%` }}></div>
+      <div className={styles.ratio} style={{ width: `${order.ratio * 100}%`, backgroundColor: order.type === 'buy' ? getBsColor().buy : getBsColor().sell }} ></div>
       {/* <div className={styles.fadeOverlay}></div> */}
     </div>
   );

@@ -43,14 +43,6 @@
 
 
 
-.orderRow.buy .orderRowPrice {
-    color: var(--green);
-}
-
-.orderRow.sell .orderRowPrice {
-    color: var(--red);
-}
-
 .orderRow .ratio{
     position: absolute;
     top: 0;
@@ -72,14 +64,6 @@
     text-align: center;
 }
 
-.orderRow.buy .ratio {
-    background-color: var(--green);
-}
-
-.orderRow.sell .ratio {
-    background-color: var(--red);
-}
-
 .orderRow .fadeOverlay{
     position: absolute;
     top: 0;
@@ -91,13 +75,6 @@
     animation: orderRowEffect .5s ease-in-out forwards;
 }
 
-.orderRow.buy .fadeOverlay {
-    background-color: var(--green);
-}
-
-.orderRow.sell .fadeOverlay{
-    background-color: var(--red);
-}
 
 .userOrderIndicator{
     position: absolute;
@@ -108,4 +85,11 @@
     height: 4px;
     border-radius: 100%;
     background-color: white;
+    background-color: #e9e980;
+    opacity: .4;
+}
+
+
+.userOrder .orderRowPrice {
+    color:  #e9e980 !important;
 }

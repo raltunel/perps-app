@@ -5,6 +5,7 @@
     font-size: .8rem;
     display: flex;
     flex-direction: row;
+    align-items: center;
 }
 
 .symbolInfoContainer div{
@@ -21,7 +22,7 @@
     /* max-width: calc(100% - 10rem); */
     display: grid;
     grid-template-columns: repeat(7, auto) !important;
-    gap: 2rem;
+    gap: 1rem;
     margin-left: 2rem;
     border-radius: 0 !important;
 }
