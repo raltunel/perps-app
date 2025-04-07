@@ -154,6 +154,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
+            saved_data: chartState ? chartState.chartLayout : undefined,
             // load_last_chart:false,
             time_frames: [
                 { text: '5y', resolution: '1w' as ResolutionString },
@@ -175,37 +176,27 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
-            if (chartState) {
-                tvWidget.load(chartState.chartLayout).then(() => {
-                    setTimeout(() => {
-                        setChart(tvWidget);
-                    }, 500);
-                });
-            } else {
-                /**
-                 * 0 -> main chart pane
-                 * 1 -> volume chart pane
-                 */
-                const volumePaneIndex = 1;
+            /**
+             * 0 -> main chart pane
+             * 1 -> volume chart pane
+             */
+            const volumePaneIndex = 1;
 
-                const paneCount = tvWidget.activeChart().getPanes().length;
+            const paneCount = tvWidget.activeChart().getPanes().length;
 
-                if (paneCount > volumePaneIndex) {
-                    const priceScale = tvWidget
-                        .activeChart()
-                        .getPanes()
-                        [volumePaneIndex].getMainSourcePriceScale();
+            if (paneCount > volumePaneIndex) {
+                const priceScale = tvWidget
+                    .activeChart()
+                    .getPanes()
+                    [volumePaneIndex].getMainSourcePriceScale();
 
-                    if (priceScale) {
-                        priceScale.setAutoScale(true);
-                        priceScale.setMode(0);
-                    }
+                if (priceScale) {
+                    priceScale.setAutoScale(true);
+                    priceScale.setMode(0);
                 }
-
-
-
-                setChart(tvWidget);
             }
+
+            setChart(tvWidget);
         });
 
         return () => {
