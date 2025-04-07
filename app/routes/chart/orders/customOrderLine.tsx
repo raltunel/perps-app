@@ -21,11 +21,13 @@ const CustomOrderLine = () => {
             try {
                 if (chart) {
                     orderLines.forEach((id) => {
-                        chart.activeChart().removeEntity(id);
+                        const element = chart.activeChart().getShapeById(id);
+                        element && chart.activeChart().removeEntity(id);
                     });
 
                     orderTexts.forEach((id) => {
-                        chart.activeChart().removeEntity(id);
+                        const element = chart.activeChart().getShapeById(id);
+                        element && chart.activeChart().removeEntity(id);
                     });
                 }
             } catch (error) {}
@@ -65,7 +67,7 @@ const CustomOrderLine = () => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, userSymbolOrders]);
+    }, [chart, JSON.stringify(userSymbolOrders)]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -124,7 +126,7 @@ const CustomOrderLine = () => {
             isCancelled = true;
             intervals.forEach(clearInterval);
         };
-    }, [orderTexts, chart, userSymbolOrders]);
+    }, [orderTexts, chart, JSON.stringify(userSymbolOrders)]);
 
     return null;
 };
