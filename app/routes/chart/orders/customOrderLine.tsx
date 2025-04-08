@@ -58,28 +58,29 @@ const CustomOrderLine = (props: OrderLineProps) => {
             cleanupShapes();
 
             const shapePairs = await Promise.all(
-                data.map(async (item) => {
-                    const lineId = await addCustomOrderLine(
-                        chart,
-                        item.limitPx,
-                        item.side,
-                    );
+                data
+                    .sort((a, b) => a.timestamp - b.timestamp)
+                    .map(async (item) => {
+                        const lineId = await addCustomOrderLine(
+                            chart,
+                            item.limitPx,
+                            item.side,
+                        );
 
-                    const quantityText = await createQuantityText(
-                        chart,
-                        item.limitPx,
-                        item.sz,
-                    );
+                        const quantityText = await createQuantityText(
+                            chart,
+                            item.limitPx,
+                            item.sz,
+                        );
 
-                    const textId = await createShapeText(
-                        chart,
-                        item.limitPx,
-                        item.side,
-                        'limit',
-                    );
-
-                    return { lineId, textId, quantityText };
-                }),
+                        const textId = await createShapeText(
+                            chart,
+                            item.limitPx,
+                            item.side,
+                            'limit',
+                        );
+                        return { lineId, textId, quantityText };
+                    }),
             );
 
             if (!isMounted) return;

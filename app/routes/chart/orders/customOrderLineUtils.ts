@@ -83,6 +83,8 @@ export const createShapeText = async (
         },
     );
 
+    chart.activeChart().getShapeById(shape).bringToFront();
+
     return shape;
 };
 
@@ -137,6 +139,8 @@ export const createQuantityText = async (
             },
         },
     );
+
+    chart.activeChart().getShapeById(shape).bringToFront();
 
     return shape;
 };
