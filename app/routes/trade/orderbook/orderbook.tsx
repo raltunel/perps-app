@@ -50,6 +50,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     return sells.map((order) => order.px);
   }, [sells])
 
+  const orderCountRef = useRef<number>(0);
+  orderCountRef.current = orderCount;
+
+
 
   const findClosestSlot = useCallback((orderPriceRounded: number, slots: number[], gapTreshold: number) => {
     let closestSlot = null;
@@ -137,7 +141,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
           }
 
           filledResolution.current = payload.resolution;
-          const { sells, buys } = processOrderBookMessage(response, orderCount);
+          const { sells, buys } = processOrderBookMessage(response, orderCountRef.current);
           setOrderBook(buys, sells);
         },
         single: true
@@ -186,8 +190,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
   return (
     <div className={styles.orderBookContainer}>
-
-      <div className={styles.orderBookHeader}>
+      <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
         {
           <ComboBox
             value={selectedResolution?.val}
@@ -214,7 +217,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
       </div>
 
 
-      <div className={styles.orderBookHeader}>
+      <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
 
         <div>Price</div>
         <div>Size {selectedMode === 'symbol' ? `(${symbol.toUpperCase()})` : '(USD)'}</div>
@@ -237,7 +240,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             </div>
 
 
-            <div className={styles.orderBookBlockMid}>
+            <div id='orderBookMidHeader' className={styles.orderBookBlockMid}>
 
               <div>Spread</div>
               <div>{selectedResolution?.val}</div>

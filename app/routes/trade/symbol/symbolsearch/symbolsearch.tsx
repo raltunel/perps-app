@@ -7,15 +7,11 @@ import SymbolList from './symbollist/symbollist';
 
 
 interface SymbolInfoFieldProps {
-  label: string;
-  value: string;
-  lastWsChange?: number;
-  type?: 'positive' | 'negative';
 }
 
 
 
-const SymbolSearch: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type }) => {
+const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
 
     const {symbol} = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);

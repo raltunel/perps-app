@@ -47,7 +47,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
 
   return (
-    <div className={`${styles.watchListNodeContainer}`} onClick={nodeClickListener}>
+    <div className={`${styles.watchListNodeContainer} ${symbol.coin === storeSymbol ? styles.active : ''}` } onClick={nodeClickListener}>
       <div className={styles.symbolName}>{symbol.coin}-USD</div>
       <div className={`w2 ${styles.symbolValue}` } style={{color: change > 0 ? getBsColor().buy : (change < 0 ? getBsColor().sell : 'var(--text1)')}}>{shownVal}</div>
     </div>

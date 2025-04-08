@@ -17,7 +17,9 @@ export const processSymbolInfo = (payload: any): SymbolInfoIF => {
       oraclePx: parseNum(payload.ctx.oraclePx),
       premium: parseNum(payload.ctx.premium),
       prevDayPx: parseNum(payload.ctx.prevDayPx),
-      lastPriceChange: 0
+      lastPriceChange: 0,
+      szDecimals: payload.szDecimals,
+      maxLeverage: payload.maxLeverage
     }
   } catch (error) {
     console.error('Error processing symbol info', error);

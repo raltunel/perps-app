@@ -7,7 +7,9 @@ import styles from './symbollist.module.css';
 import { FaChevronDown } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';import { FiSearch } from "react-icons/fi";
-
+import useOutsideClick from "~/hooks/useOutsideClick";
+import SymbolListTableHeader from './SymbolListTableHeader';
+import SymbolListTableRow from './SymbolListTableRow';
 
 
 interface SymbolListProps {
@@ -18,7 +20,11 @@ interface SymbolListProps {
 
 const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
+    
     const navigate = useNavigate();
+    const symbolListRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsOpen(false);
+    }, true);
 
     const {coins, setSymbol} = useTradeDataStore();
 
@@ -30,35 +36,29 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
         setIsOpen(false);
     }
 
-    const changeListener = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    }
-
     const coinsToShow = useMemo(() => {
-        if(searchQuery.length === 0) return coins;
+        if(searchQuery.length === 0) return coins.slice(0, 50);
         return coins.filter((c) => c.coin.toLowerCase().includes(searchQuery.toLowerCase()));
-    }, [searchQuery]);
-
+    }, [searchQuery, coins]);
 
 
 
   return (
 <>
-<div className={styles.symbolListWrapper}>
+<div className={styles.symbolListWrapper} ref={symbolListRef}>
 
 
 <div className={styles.symbolListSearch}>
 <FiSearch className={styles.symbolListSearchIcon} />
-<input type="text" placeholder='Search' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+<input autoFocus type="text" placeholder='Search' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
 </div>
 
-            <div className={styles.symbolList}> 
 
+                <SymbolListTableHeader />
+            <div className={styles.symbolList}> 
                 {
                     coinsToShow.map((c) => (
-                        <div className={styles.symbolListItem} onClick={() => symbolSelectListener(c.coin)}>
-                            {c.coin}
-                        </div>
+                        <SymbolListTableRow key={c.coin} symbol={c} symbolSelectListener={symbolSelectListener} />
                     ))
                 }
             </div>

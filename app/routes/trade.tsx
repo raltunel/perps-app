@@ -17,7 +17,6 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import { useEffect, useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
-import LsConsumer from './trade/lsconsumer';
 export function meta({ }: Route.MetaArgs) {
   return [
     { title: 'TRADE' },
@@ -67,7 +66,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
       <TradeRouteHandler />
       <WebDataConsumer />
-      <LsConsumer />
       {
         symbol && symbol.length > 0 && (
 
@@ -87,7 +85,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
               <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
               <div className={styles.tradeModules}><OrderInput /></div>
             </section>
-            <section className={styles.containerBottom}>
+            <section id={'bottomSection'} className={styles.containerBottom}>
               <div className={styles.table}>
                 <TradeTable />
               </div>

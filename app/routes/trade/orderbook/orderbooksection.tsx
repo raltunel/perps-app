@@ -29,17 +29,24 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     const orderBookModeRef = useRef(orderBookMode);
 
     const calculateOrderCount = () => {
+        console.log('>>> calculate order count')
         const orderBookSection = document.getElementById('orderBookSection');
         if (orderBookSection) {
-            const wrapperHeight =
-                orderBookSection.getBoundingClientRect().height;
-            if(wrapperHeight > 0){
+            let availableHeight = orderBookSection.getBoundingClientRect().height;
+            if(window.innerHeight / availableHeight < 1.5 && window.innerHeight < 1000){
+                availableHeight = window.innerHeight / 1.5;
+            }
+            if(availableHeight > 0){
                 if (orderBookModeRef.current !== 'stacked') {
-                    const orderCount = Math.floor(wrapperHeight / 60);
+                    let otherHeightSum = document.getElementById('orderBookTabs')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookHeader1')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookHeader2')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookMidHeader')?.getBoundingClientRect()?.height || 0;
+                    const orderCount = Math.floor((availableHeight-otherHeightSum)/48);
                     setOrderCount(orderCount);
-                    setTradesCount(Math.floor(wrapperHeight / 23));
+                    setTradesCount(Math.floor(availableHeight / 23));
                 } else {
-                    const orderCount = Math.floor(wrapperHeight / 1000);
+                    const orderCount = Math.floor(availableHeight / 1000);
                     setOrderCount(orderCount);
                 }
             }
@@ -48,7 +55,9 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
 
     useEffect(() => {
         window.addEventListener('resize', () => {
-            calculateOrderCount();
+            setTimeout(() => {
+                calculateOrderCount();
+            }, 50)
         });
 
         calculateOrderCount();
@@ -139,8 +148,9 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         </div>
     );
     const orderBookTabsComponent = (
-        <div className={styles.orderBookSectionContainer}>
+        <div  className={styles.orderBookSectionContainer}>
             <Tabs
+                wrapperId='orderBookTabs'
                 tabs={orderBookTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}

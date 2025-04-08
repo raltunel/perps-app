@@ -5,7 +5,22 @@
     justify-content: center;
     font-size: .8rem;
     margin-left: 1rem;
+    margin-bottom: 0;
     cursor: pointer;
+    border-radius: .2rem !important;
+    transition: all .2s ease-in-out;                         
+}
+
+.watchListNodeContainer.active{
+    cursor: default;
+}
+
+.watchListNodeContainer:not(.active):hover{
+    opacity: .75;
+}
+
+.watchListNodeContainer div{
+    background-color: transparent !important;
 }
 
 .watchListNodeContainer div{

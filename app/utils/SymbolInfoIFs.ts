@@ -11,4 +11,6 @@ export interface SymbolInfoIF {
     premium: number;
     prevDayPx: number;
     lastPriceChange: number; // price change since last ws update
+    szDecimals: number;
+    maxLeverage: number;
 }
