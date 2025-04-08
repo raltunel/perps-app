@@ -20,7 +20,7 @@ import WebDataConsumer from './trade/webdataconsumer';
 import LsConsumer from './trade/lsconsumer';
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: 'TRADE' },
+    { title: '<<< LOADING >>>' },
     { name: 'description', content: 'Welcome to React Router!' },
   ];
 }
@@ -41,10 +41,12 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
+  const title: string = window.location.toString().split('/').pop() ?? 'BTC';
+
   return (
     <>
       <title>
-        { window.location.toString().split('/').pop() }
+        { title.toLowerCase() === 'trade' ? 'BTC' : title }
       </title>
       <div className={styles.wsUrlSelector}>
         <ComboBox
