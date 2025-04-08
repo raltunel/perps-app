@@ -4,19 +4,29 @@
     align-items: center;
     justify-content: center;
     font-size: .8rem;
-    margin-left: 1rem;
     margin-bottom: 0;
-    cursor: pointer;
-    border-radius: .2rem !important;
-    transition: all .2s ease-in-out;                         
+    margin-left: .5rem;
 }
 
-.watchListNodeContainer.active{
+.watchListNodeContent{
+    flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: .2rem !important;
+    transition: all .2s ease-in-out;
+    padding: .3rem;
+    ;                         
+}
+
+.watchListNodeContent.active{
     cursor: default;
 }
 
-.watchListNodeContainer:not(.active):hover{
-    opacity: .75;
+.watchListNodeContent:not(.active):hover{
+    background-color: var(--dark4) !important;
 }
 
 .watchListNodeContainer div{
@@ -26,8 +36,6 @@
 .watchListNodeContainer div{
     height: auto !important;
 }
-
-
 
 .symbolValue{
     margin-left: .5rem;

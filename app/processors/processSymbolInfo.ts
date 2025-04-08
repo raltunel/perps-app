@@ -18,6 +18,9 @@ export const processSymbolInfo = (payload: any): SymbolInfoIF => {
       premium: parseNum(payload.ctx.premium),
       prevDayPx: parseNum(payload.ctx.prevDayPx),
       lastPriceChange: 0,
+      last24hPriceChange: parseNum(payload.ctx.markPx - payload.ctx.prevDayPx),
+      last24hPriceChangePercent: parseNum((payload.ctx.markPx - payload.ctx.prevDayPx) / payload.ctx.prevDayPx * 100),
+      openInterestDollarized: parseNum(payload.ctx.openInterest * payload.ctx.oraclePx),
       szDecimals: payload.szDecimals,
       maxLeverage: payload.maxLeverage
     }

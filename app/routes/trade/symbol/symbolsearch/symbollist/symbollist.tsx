@@ -5,10 +5,12 @@
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './symbollist.module.css';
 import { FaChevronDown } from 'react-icons/fa';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';import { FiSearch } from "react-icons/fi";
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
+import { motion } from 'framer-motion';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 
 interface SymbolListProps {
@@ -26,6 +28,8 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     const {coins, setSymbol} = useTradeDataStore();
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortBy, setSortBy] = useState<string>('');
+    const [sortDirection, setSortDirection] = useState<string>('');
 
     const symbolSelectListener = (coin: string) => {
         setSymbol(coin);
@@ -33,25 +37,72 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
         setIsOpen(false);
     }
 
+
+    const sortClickHandler = (key: string) => {
+        if(key === sortBy){
+            if(sortDirection === 'desc'){
+                setSortDirection('asc');
+            }else if(sortDirection === 'asc'){
+                setSortDirection('');
+                setSortBy('');
+            }else{
+                setSortDirection('desc');
+            }
+        }else{
+            setSortBy(key);
+            setSortDirection('desc');
+        }
+    }
+    
+    const sortSymbols = (symbols: SymbolInfoIF[], sortBy: string, sortDirection: string) => {
+
+        switch(sortBy){
+            case 'symbol':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.coin.localeCompare(b.coin) : b.coin.localeCompare(a.coin));
+            case 'lastPrice':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.markPx - b.markPx : b.markPx - a.markPx);
+            case 'change':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.last24hPriceChangePercent - b.last24hPriceChangePercent : b.last24hPriceChangePercent - a.last24hPriceChangePercent);
+            case 'funding':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.funding - b.funding : b.funding - a.funding);
+            case 'volume':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.dayNtlVlm - b.dayNtlVlm : b.dayNtlVlm - a.dayNtlVlm);
+            case 'openInterest':
+                return [...symbols].sort((a, b) => sortDirection === 'asc' ? a.openInterestDollarized - b.openInterestDollarized : b.openInterestDollarized - a.openInterestDollarized);
+            default:{
+                return [...symbols];
+            }
+        }
+
+
+    }
+
+
+    const sortedSymbols = useMemo(() => {
+        return [...sortSymbols(coins.filter( c => c.openInterest > 0), sortBy, sortDirection)];
+    }, [coins, sortBy, sortDirection]);
+
     const coinsToShow = useMemo(() => {
-        if(searchQuery.length === 0) return coins.slice(0, 50);
-        return coins.filter((c) => c.coin.toLowerCase().includes(searchQuery.toLowerCase()));
-    }, [searchQuery, coins]);
+        if(searchQuery.length === 0){
+            return sortedSymbols.slice(0, 50);
+        } 
+        return sortedSymbols.filter((c) => c.coin.toLowerCase().includes(searchQuery.toLowerCase()));
+    }, [searchQuery, sortedSymbols]);
 
 
 
   return (
 <>
-<div className={styles.symbolListWrapper}>
+<motion.div className={styles.symbolListWrapper} initial={{opacity: 0, y: -10}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -10}} transition={{duration: 0.2}}>
 
 
 <div className={styles.symbolListSearch}>
 <FiSearch className={styles.symbolListSearchIcon} />
-<input autoFocus type="text" placeholder='Search' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+<input autoFocus type="text" placeholder='Search tokens...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
 </div>
 
 
-                <SymbolListTableHeader />
+                <SymbolListTableHeader sortClickHandler={sortClickHandler} sortBy={sortBy} sortDirection={sortDirection} />
             <div className={styles.symbolList}> 
                 {
                     coinsToShow.map((c) => (
@@ -61,7 +112,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
             </div>
 
 
-        </div>
+        </motion.div>
 
 </>
   );

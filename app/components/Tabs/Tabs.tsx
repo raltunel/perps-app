@@ -41,7 +41,7 @@ export interface TabsProps {
 
 export default function Tabs(props: TabsProps) {
   const { tabs, defaultTab, onTabChange, rightContent, wrapperId } = props;
-
+  
   // Function to get tab ID (either the string itself or the id property)
   const getTabId = (tab: string | { id: string; label: string }): string => {
     return typeof tab === 'string' ? tab : tab.id;

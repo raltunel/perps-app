@@ -3,14 +3,14 @@
 
 .symbolListWrapper {
   position: absolute;
-  top: 120%;
-  border-radius: 0.2rem;
+  top: 130%;
   left: 0;
   z-index: 1000;
   width: 50rem;
   background-color: var(--dark3) !important;
   padding: 0.5rem;
-  border-radius: 0.2rem !important;
+  border-radius: 0.4rem !important;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
 }
 
 .symbolListWrapper div{
@@ -26,7 +26,6 @@
 
 .symbolListSearch{
   width: 100%;
-  border-radius: 0.2rem;
   border: none;
   position: relative;
   margin-bottom: 0.5rem;
@@ -34,15 +33,15 @@
 
 .symbolListSearchIcon{
   position: absolute;
-  left: 1rem;
+  left: .6rem;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .symbolListSearch input{
   width: 100%;
-  padding: 0.5rem;
-  border-radius: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 0.4rem;
   background-color: var(--dark4);
   outline: none;
   border: none;
@@ -94,6 +93,15 @@
     align-items: center;
     gap: 4px;
     cursor: default;
+    user-select: none;
+}
+
+.headerCell.active{
+  color: var(--text1) !important;
+}
+
+.headerCell.sortable{
+  cursor: pointer;
 }
 
 .symbolCell{

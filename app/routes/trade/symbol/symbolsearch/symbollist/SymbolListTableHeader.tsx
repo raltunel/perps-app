@@ -9,9 +9,16 @@ export interface HeaderCell {
   className: string;
 }
 
-export default function SymbolListTableHeader() {
+interface SymbolListTableHeaderProps {
+    sortClickHandler: (key: string) => void;
+    sortBy: string;
+    sortDirection: string;
+}       
+
+export default function SymbolListTableHeader({ sortClickHandler, sortBy, sortDirection }: SymbolListTableHeaderProps) {
   const handleSort = (key: string) => {
-    console.log(`Sorting by: ${key}`);
+    
+    sortClickHandler(key);
    
   };
 
@@ -60,17 +67,19 @@ export default function SymbolListTableHeader() {
     },
   ];
 
+
   return (
     <div className={styles.headerContainer}>
       {tableHeaders.map((header) => (
         <div
           key={header.key}
-          className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} `}
+          className={`${styles.cell} ${styles.headerCell} 
+          ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
           onClick={header.onClick}
         >
           {header.name}
           {header.sortable && (
-            <SortIcon/>
+            <SortIcon sortDirection={sortDirection && header.key === sortBy ? sortDirection : undefined} />
           )}
         </div>
       ))}

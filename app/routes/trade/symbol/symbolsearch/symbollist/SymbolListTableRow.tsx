@@ -23,9 +23,9 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
 
   const get24hChangeString = () => {
     if (symbol) {
-      const usdChange = symbol.markPx - symbol.prevDayPx;
-      const percentChange = (usdChange / symbol.prevDayPx) * 100;
-      const precision = getDefaultPrecision(symbol.markPx);
+      const usdChange = symbol.last24hPriceChange;
+      const percentChange = symbol.last24hPriceChangePercent;
+      const precision = getDefaultPrecision(symbol.last24hPriceChange);
       return {str:  `${usdChange > 0 ? '+' : ''}${formatNum(usdChange, precision + 1)} / ${formatNum(percentChange, 2)}%`, usdChange};
     }
     return {str: '+0.0 / %0.0', usdChange: 0};
@@ -64,7 +64,7 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
       <div className={`${styles.cell} ${styles.changeCell}`} style={{color: get24hChangeString().usdChange > 0 ? getBsColor().buy : (get24hChangeString().usdChange < 0 ? getBsColor().sell : 'var(--text2)')}}>{get24hChangeString().str}</div>
       <div className={`${styles.cell} ${styles.fundingCell}`}>{formatNum(symbol.funding * 100)}</div>
       <div className={`${styles.cell} ${styles.volumeCell}`}>{formatNum(symbol.dayNtlVlm)}</div>
-      <div className={`${styles.cell} ${styles.openInterestCell}`}>{formatNum(symbol.openInterest * symbol.oraclePx)}</div>
+      <div className={`${styles.cell} ${styles.openInterestCell}`}>{formatNum(symbol.openInterestDollarized)}</div>
     </div>
   );
 }

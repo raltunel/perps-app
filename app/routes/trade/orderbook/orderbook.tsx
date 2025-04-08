@@ -54,7 +54,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
   orderCountRef.current = orderCount;
 
 
-
   const findClosestSlot = useCallback((orderPriceRounded: number, slots: number[], gapTreshold: number) => {
     let closestSlot = null;
     slots.map((slot) => {
