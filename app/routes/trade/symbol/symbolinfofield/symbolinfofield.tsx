@@ -1,31 +1,60 @@
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './symbolinfofield.module.css';
 
+import { motion } from 'framer-motion';
+
 
 interface SymbolInfoFieldProps {
   label: string;
   value: string;
   lastWsChange?: number;
   type?: 'positive' | 'negative';
+  valueClass?: string;
 }
 
 
 
-const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type }) => {
+const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type, valueClass }) => {
 
 
-  const {isInverseColor} = useAppSettings();
+  const {getBsColor} = useAppSettings();
+
+  const getValueColor = () => {
+    if(type === 'positive'){
+      return getBsColor().buy;
+    }
+    if(type === 'negative'){
+      return getBsColor().sell;
+    }
+    return 'var(--text1)';
+  }
+
+  const renderValue = () => {
+    if(lastWsChange){
+      return (<motion.div 
+            key={lastWsChange}
+            className={`${styles.symbolInfoFieldValue} ${valueClass}`} 
+            initial={{color: lastWsChange > 0 ? getBsColor().buy : (lastWsChange < 0 ? getBsColor().sell : 'var(--text1)')}}
+            animate={{color: 'var(--text1)'}}
+            transition={{duration: 1, ease: 'easeInOut'}}
+          >
+            {value}
+      </motion.div>)
+    }
+    return (<>
+      <div className={`${styles.symbolInfoFieldValue} ${valueClass}`} style={{color: getValueColor()}}>
+        {value}
+      </div>
+    </>)
+  }
+
 
 
   return (
     <div className={styles.symbolInfoFieldWrapper}>
-    <div className={`${styles.symbolInfoField} ${isInverseColor ? styles.inverseColor : ''}`}>
+    <div className={`${styles.symbolInfoField}`}>
       <div className={styles.symbolInfoFieldLabel}>{label}</div>
-      <div className={`${styles.symbolInfoFieldValue} 
-      ${lastWsChange && lastWsChange > 0 ? styles.positiveAnimation : 
-      lastWsChange && lastWsChange < 0 ? styles.negativeAnimation : ''}
-      ${type === 'positive' ? styles.positive : 
-      type === 'negative' ? styles.negative : ''}`}>{value}</div>
+      {renderValue()}
     </div>
     </div>
   );

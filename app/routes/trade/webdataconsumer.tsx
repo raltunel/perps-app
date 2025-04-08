@@ -6,12 +6,13 @@ import { processSymbolInfo } from "~/processors/processSymbolInfo";
 import { useDebugStore } from "~/stores/DebugStore";
 import { useTradeDataStore } from "~/stores/TradeDataStore";
 import type { OrderDataIF } from "~/utils/orderbook/OrderBookIFs";
+import type { PositionIF } from "~/utils/position/PositionIFs";
 import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
 
 
 export default function WebDataConsumer() {
 
-    const { favKeys, setFavCoins, setUserOrders, symbol, setCoins, coins } = useTradeDataStore();
+    const { favKeys, setFavCoins, setUserOrders, symbol, setCoins, coins, setPositions, positions } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const favKeysRef = useRef<string[]>(null);
@@ -21,11 +22,11 @@ export default function WebDataConsumer() {
     const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet.address;
+    addressRef.current = debugWallet.address.toLowerCase();
     const { setSymbolInfo } = useTradeDataStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
-
+    const positionsRef = useRef<PositionIF[]>([]);
 
     useEffect(() => {
 
@@ -49,8 +50,9 @@ export default function WebDataConsumer() {
             payload: { user: debugWallet.address },
             handler: (payload) => {
                 setCoins(payload.data.coins);
-                if (payload.data.user === addressRef.current) {
+                if (payload.data.user.toLowerCase() === addressRef.current) {
                     openOrdersRef.current = payload.data.userOpenOrders;
+                    positionsRef.current = payload.data.positions;
                 }
             },
             single: true
@@ -60,13 +62,16 @@ export default function WebDataConsumer() {
             setUserOrders(openOrdersRef.current);
         }, 1000);
 
+        const positionsInterval = setInterval(() => {
+            setPositions(positionsRef.current);
+        }, 1000);
+
         return () => {
             clearInterval(openOrdersInterval);
+            clearInterval(positionsInterval);
             unsubscribeAllByChannel(WsChannels.WEB_DATA2);
         }
     }, [debugWallet.address])
-
-
 
 
     useEffect(() => {
