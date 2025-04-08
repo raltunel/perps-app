@@ -7,7 +7,6 @@ import styles from './symbollist.module.css';
 import { FaChevronDown } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';import { FiSearch } from "react-icons/fi";
-import useOutsideClick from "~/hooks/useOutsideClick";
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
 
@@ -22,9 +21,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
     
     const navigate = useNavigate();
-    const symbolListRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsOpen(false);
-    }, true);
+    
 
     const {coins, setSymbol} = useTradeDataStore();
 
@@ -45,7 +42,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
   return (
 <>
-<div className={styles.symbolListWrapper} ref={symbolListRef}>
+<div className={styles.symbolListWrapper}>
 
 
 <div className={styles.symbolListSearch}>

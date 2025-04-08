@@ -10,6 +10,7 @@
     font-size: 1.2rem;
     user-select: none;
     min-width: 10rem;
+    cursor: pointer;
 }
 
 .symbolIcon {

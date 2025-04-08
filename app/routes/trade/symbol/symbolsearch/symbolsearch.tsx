@@ -4,7 +4,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import SymbolList from './symbollist/symbollist';
-
+import useOutsideClick from '~/hooks/useOutsideClick';
 
 interface SymbolInfoFieldProps {
 }
@@ -16,14 +16,18 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
     const {symbol} = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
 
-    const wrapperClickHandler = () => {
+    const symbolSearchBackdropRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsOpen(false);
+    }, true);
+
+    const wrapperClickHandler = (e: React.MouseEvent<HTMLDivElement>) => {
         setIsOpen(!isOpen);
     }
 
 
   return (
 <>
-<div className={styles.symbolSearchBackdrop}>
+<div className={styles.symbolSearchBackdrop} ref={symbolSearchBackdropRef}>
 
 <div className={styles.symbolSearchContainer} onClick={wrapperClickHandler}>
 
