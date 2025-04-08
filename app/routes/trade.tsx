@@ -15,7 +15,7 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
 import LsConsumer from './trade/lsconsumer';
 export function meta({ }: Route.MetaArgs) {
