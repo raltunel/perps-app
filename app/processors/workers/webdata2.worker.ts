@@ -4,7 +4,8 @@ import type { SymbolInfoIF } from "../../utils/SymbolInfoIFs";
 import { processSymbolInfo } from "../processSymbolInfo";
 import type { OrderDataIF } from "../../utils/orderbook/OrderBookIFs";
 import { processUserOrder } from "../processOrderBook";
-
+import { processPosition } from "../processPosition";
+import type { PositionIF } from "../../utils/position/PositionIFs";
 
 
 
@@ -14,7 +15,7 @@ self.onmessage = function (event) {
         const parsedData = JSON.parse(event.data);
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
-
+        const positions: PositionIF[] = [];
         const data = parsedData.data;
 
 
@@ -39,10 +40,17 @@ self.onmessage = function (event) {
                         userOpenOrders.push(processedOrder);
                     }
                 })
+
+                if(data.clearinghouseState){
+                    data.clearinghouseState.assetPositions.forEach((position: any) => {
+                        const processedPosition = processPosition(position);
+                        positions.push(processedPosition);
+                    })
+                }
             }
         }
 
-        self.postMessage({ channel: parsedData.channel, data: { coins, userOpenOrders, user: data.user, size } });
+        self.postMessage({ channel: parsedData.channel, data: { coins, userOpenOrders, user: data.user, size, positions } });
 
 
     } catch (error) {
