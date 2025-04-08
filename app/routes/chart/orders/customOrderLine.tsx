@@ -113,51 +113,54 @@ const CustomOrderLine = (props: OrderLineProps) => {
                 const textQuantityTextId = await orderTexts[i].quantityText;
 
                 const interval = setInterval(() => {
-                    if (isCancelled) return;
+                    try {
+                        if (isCancelled) return;
 
-                    const priceScalePane = chart
-                        .activeChart()
-                        .getPanes()[0] as any;
-                    const priceScale = priceScalePane.getMainSourcePriceScale();
-                    const priceRange = priceScale.getVisiblePriceRange();
-                    const chartHeight = priceScalePane.getHeight();
+                        const priceScalePane = chart
+                            .activeChart()
+                            .getPanes()[0] as any;
+                        const priceScale =
+                            priceScalePane.getMainSourcePriceScale();
+                        const priceRange = priceScale.getVisiblePriceRange();
+                        const chartHeight = priceScalePane.getHeight();
 
-                    if (!priceRange) return;
+                        if (!priceRange) return;
 
-                    const maxPrice = priceRange.to;
-                    const minPrice = priceRange.from;
+                        const maxPrice = priceRange.to;
+                        const minPrice = priceRange.from;
 
-                    const pixel = priceToPixel(
-                        minPrice,
-                        maxPrice,
-                        chartHeight,
-                        data[i]?.limitPx ?? 0,
-                        priceScale.getMode() === 1,
-                    );
+                        const pixel = priceToPixel(
+                            minPrice,
+                            maxPrice,
+                            chartHeight,
+                            data[i]?.limitPx ?? 0,
+                            priceScale.getMode() === 1,
+                        );
 
-                    const pricePerPixel = pixel / chartHeight;
+                        const pricePerPixel = pixel / chartHeight;
 
-                    const activeLabel = chart
-                        .activeChart()
-                        .getShapeById(textShapeId);
+                        const activeLabel = chart
+                            .activeChart()
+                            .getShapeById(textShapeId);
 
-                    const activeQuantityLabel = chart
-                        .activeChart()
-                        .getShapeById(textQuantityTextId);
+                        const activeQuantityLabel = chart
+                            .activeChart()
+                            .getShapeById(textQuantityTextId);
 
-                    if (activeLabel) {
-                        activeLabel.setAnchoredPosition({
-                            x: 0.4,
-                            y: pricePerPixel,
-                        });
+                        if (activeLabel) {
+                            activeLabel.setAnchoredPosition({
+                                x: 0.4,
+                                y: pricePerPixel,
+                            });
 
-                        activeQuantityLabel.setAnchoredPosition({
-                            x: getOrderQuantityTextLocation(chart),
-                            y: pricePerPixel,
-                        });
+                            activeQuantityLabel.setAnchoredPosition({
+                                x: getOrderQuantityTextLocation(chart),
+                                y: pricePerPixel,
+                            });
 
-                        chart.activeChart().restoreChart();
-                    }
+                            chart.activeChart().restoreChart();
+                        }
+                    } catch (error) {}
                 }, 10) as unknown as number;
 
                 intervals.push(interval);
