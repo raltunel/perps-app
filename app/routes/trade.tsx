@@ -18,6 +18,7 @@ import WatchList from './trade/watchlist/watchlist';
 import { useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
 import LsConsumer from './trade/lsconsumer';
+import { useParams } from 'react-router';
 export function meta({ }: Route.MetaArgs) {
   return [
     { title: '<<< LOADING >>>' },
@@ -41,13 +42,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
-  const title: string = window.location.toString().split('/').pop() ?? 'BTC';
+  const { marketId } = useParams<{ marketId: string }>();
 
   return (
     <>
-      <title>
-        { title.toLowerCase() === 'trade' ? 'BTC' : title }
-      </title>
+      <title>{`${marketId || 'BTC'}`}</title>
+      <meta
+          property='og:image'
+          content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${
+              marketId || 'BTC'
+          }%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
+      />
       <div className={styles.wsUrlSelector}>
         <ComboBox
           value={wsUrl}
