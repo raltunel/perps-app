@@ -74,20 +74,17 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
           <div className={styles.container}>
             <section className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}>
               <div className={styles.containerTopLeft}>
-                <div className={styles.watchlist}><WatchList /></div>
-                <div className={styles.symbolInfo}>
-
+                <div id='watchlistSection' className={styles.watchlist}><WatchList /></div>
+                <div id='symbolInfoSection' className={styles.symbolInfo}>
                   <SymbolInfo />
-
-
                 </div>
                 <div id='chartSection' className={styles.chart}><TradingViewWrapper /></div>
               </div>
 
               <div id='orderBookSection' className={styles.orderBook}><OrderBookSection symbol={symbol} /></div>
-              <div className={styles.tradeModules}><OrderInput /></div>
+              <div id='tradeModulesSection' className={styles.tradeModules}><OrderInput /></div>
             </section>
-            <section className={styles.containerBottom}>
+            <section id={'bottomSection'} className={styles.containerBottom}>
               <div className={styles.table}>
                 <TradeTable />
               </div>

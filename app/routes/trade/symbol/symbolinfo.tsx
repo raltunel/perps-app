@@ -94,7 +94,7 @@ const SymbolInfo: React.FC<SymbolInfoProps> = ({ }) => {
                 <SymbolInfoField label="24h Change" valueClass={'w7'} value={get24hChangeString().str} type={get24hChangeString().usdChange > 0 ? 'positive' : get24hChangeString().usdChange < 0 ? 'negative' : undefined} />
                 <SymbolInfoField label="24h Volume" valueClass={'w7'} value={'$'+formatNum(symbolInfo?.dayNtlVlm, 0)} />
                 <SymbolInfoField label="Open Interest" valueClass={'w7'} value={'$'+formatNum(symbolInfo?.openInterest * symbolInfo?.oraclePx, 0)} />
-                <SymbolInfoField label="Funding Rate" valueClass={'w7'} value={(symbolInfo?.funding * 100).toString().substring(0, 7) + '%'} type={symbolInfo?.funding < 0 ? 'positive' : symbolInfo?.funding > 0 ? 'negative' : undefined} />
+                <SymbolInfoField label="Funding Rate" valueClass={'w7'} value={(symbolInfo?.funding * 100).toString().substring(0, 7) + '%'} type={'positive'} />
                 <SymbolInfoField label="Funding Countdown" valueClass={'w7'} value={getTimeUntilNextHour()} />
               </div>
             </HorizontalScrollable>

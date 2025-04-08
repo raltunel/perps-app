@@ -35,10 +35,11 @@ export interface TabsProps {
   defaultTab?: string;
   onTabChange?: (tab: string) => void;
   rightContent?: React.ReactNode;
+  wrapperId?: string;
 }
 
 export default function Tabs(props: TabsProps) {
-  const { tabs, defaultTab, onTabChange, rightContent } = props;
+  const { tabs, defaultTab, onTabChange, rightContent, wrapperId } = props;
   
   // Function to get tab ID (either the string itself or the id property)
   const getTabId = (tab: string | { id: string; label: string }): string => {
@@ -150,7 +151,7 @@ export default function Tabs(props: TabsProps) {
   };
 
   return (
-    <div className={styles.tabsContainer}>
+    <div {...(wrapperId ? { id:wrapperId } : {})} className={styles.tabsContainer}>
       <div 
         className={`${styles.tabsWrapper} ${canScrollLeft ? styles.showLeftFade : ''} ${canScrollRight ? styles.showRightFade : ''}`}
         ref={tabsWrapperRef}

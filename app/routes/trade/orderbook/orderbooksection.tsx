@@ -10,7 +10,7 @@ interface OrderBookSectionProps {
     symbol: string;
 }
 
-const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
+const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => { 
     const [orderCount, setOrderCount] = useState(9);
     const [tradesCount, setTradesCount] = useState(25);
     const orderCountForStacked = useMemo(() => {
@@ -30,19 +30,39 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
 
     const calculateOrderCount = () => {
         const orderBookSection = document.getElementById('orderBookSection');
+        
         if (orderBookSection) {
-            const wrapperHeight =
-                orderBookSection.getBoundingClientRect().height;
-            if(wrapperHeight > 0){
+            let availableHeight = orderBookSection.getBoundingClientRect().height;
+            if(window.innerHeight / availableHeight < 1.5 && window.innerHeight < 1000){
+                availableHeight = window.innerHeight / 1.5;
+            }
+            if(availableHeight > 0){
                 if (orderBookModeRef.current !== 'stacked') {
-                    const orderCount = Math.floor(wrapperHeight / 60);
+                    let otherHeightSum = document.getElementById('orderBookTabs')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookHeader1')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookHeader2')?.getBoundingClientRect()?.height || 0;
+                    otherHeightSum += document.getElementById('orderBookMidHeader')?.getBoundingClientRect()?.height || 0;
+                    const orderCount = Math.floor((availableHeight-otherHeightSum)/48);
                     setOrderCount(orderCount);
-                    setTradesCount(Math.floor(wrapperHeight / 23));
+                    setTradesCount(Math.floor(availableHeight / 21));
                 } else {
-                    const orderCount = Math.floor(wrapperHeight / 1000);
+                    const orderCount = Math.floor(availableHeight / 1000);
                     setOrderCount(orderCount);
                 }
             }
+            
+            
+            // const watchlistSection = document.getElementById('watchlistSection');
+            // const symbolInfoSection = document.getElementById('symbolInfoSection');
+            // const tradeModulesSection = document.getElementById('tradeModulesSection');
+            // const chartSection = document.getElementById('chartSection');
+            
+            // if(watchlistSection && symbolInfoSection && chartSection && tradeModulesSection){
+            //     const modulesHeight = 16 + watchlistSection.getBoundingClientRect().height + symbolInfoSection.getBoundingClientRect().height + chartSection.getBoundingClientRect().height;
+            //     orderBookSection.style.height = `${modulesHeight}px`;
+            //     tradeModulesSection.style.height = `${modulesHeight}px`;
+            // }
+
         }
     };
 
@@ -141,6 +161,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     const orderBookTabsComponent = (
         <div className={styles.orderBookSectionContainer}>
             <Tabs
+                wrapperId='orderBookTabs'
                 tabs={orderBookTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}

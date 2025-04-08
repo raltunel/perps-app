@@ -93,3 +93,7 @@
 .userOrder .orderRowPrice {
     color:  #e9e980 !important;
 }
+
+.userOrder{
+    background-color: #e9e98013;
+} 
