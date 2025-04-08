@@ -1,18 +1,23 @@
 import PositionsTableHeader from './PositionsTableHeader';
-import PositionsTableRow, { type PositionData } from './PositionsTableRow';
+import PositionsTableRow from './PositionsTableRow';
 import styles from './PositionsTable.module.css';
 import { positionsData } from './data';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 export default function PositionsTable() {
+
+  const {positions} = useTradeDataStore();
+  const limit = 10;
+
   return (
     <div className={styles.tableWrapper}>
       <PositionsTableHeader />
       <div className={styles.tableBody}>
-        {positionsData.map((position, index) => (
+        {positions.slice(0, limit).map((position, index) => (
           <PositionsTableRow key={`position-${index}`} position={position} />
         ))}
         
-        {positionsData.length === 0 && (
+        {positions.length === 0 && (
           <div className={styles.rowContainer} style={{ justifyContent: 'center', padding: '2rem 0' }}>
             No open positions
           </div>
