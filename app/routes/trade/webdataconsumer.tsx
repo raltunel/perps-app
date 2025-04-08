@@ -75,11 +75,6 @@ export default function WebDataConsumer() {
 
 
     useEffect(() => {
-        console.log('>>>', positions);
-    }, [positions]);
-
-
-    useEffect(() => {
 
         if (favKeysRef.current && coins.length > 0) {
             const favs: SymbolInfoIF[] = [];
