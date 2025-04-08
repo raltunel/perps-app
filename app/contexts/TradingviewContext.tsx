@@ -154,6 +154,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
+            saved_data: chartState ? chartState.chartLayout : undefined,
             // load_last_chart:false,
             time_frames: [
                 { text: '5y', resolution: '1w' as ResolutionString },
@@ -175,8 +176,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
-            chartState && tvWidget.load(chartState.chartLayout);
-
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
@@ -196,6 +195,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     priceScale.setMode(0);
                 }
             }
+
             setChart(tvWidget);
         });
 

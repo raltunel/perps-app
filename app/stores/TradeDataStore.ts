@@ -6,7 +6,7 @@ import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-
+import { persist } from 'zustand/middleware';
 
 
 type TradeDataStore = UserTradeStore & {
@@ -21,9 +21,12 @@ type TradeDataStore = UserTradeStore & {
     setFavCoins: (favs: SymbolInfoIF[]) => void;
     coins: SymbolInfoIF[],
     setCoins: (coins: SymbolInfoIF[]) => void;
+    removeFromFavKeys: (coin: string) => void;
 }
 
-const useTradeDataStore = create<TradeDataStore>((set, get) => ({
+const useTradeDataStore =  create<TradeDataStore>()(
+    persist(
+        (set, get) => ({
     ...createUserTradesSlice(set, get),
     symbol: '',
     setSymbol: (symbol: string) => {
@@ -40,18 +43,31 @@ const useTradeDataStore = create<TradeDataStore>((set, get) => ({
         }
         set({ symbolInfo })
     },
-    favKeys: [],
+    favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
     setFavKeys: (favs: string[]) => set({ favKeys: favs }),
     addToFavKeys: (coin: string) => {
         if (get().favKeys.filter(e => e == coin).length === 0) {
             set({ favKeys: [...get().favKeys, coin] });
+            set({ favCoins: [...get().favCoins, get().coins.find(e => e.coin == coin) as SymbolInfoIF] });
         }
+    },
+    removeFromFavKeys: (coin: string) => {
+        set({ favKeys: get().favKeys.filter(e => e != coin) });
+        set({ favCoins: get().favCoins.filter(e => e.coin != coin) });
     },
     favCoins: [],
     setFavCoins: (favs: SymbolInfoIF[]) => set({ favCoins: favs }),
     coins: [],
     setCoins: (coins: SymbolInfoIF[]) => set({ coins })
-}));
+}),
+{
+    name: 'TRADE_DATA',
+    partialize: (state:any) => ({
+        favKeys: state.favKeys
+    }),
+}
+)
+);
 
 
 
