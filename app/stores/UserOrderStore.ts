@@ -59,6 +59,8 @@ export const createUserTradesSlice = (set:any, get:any) => ({
     positions: [],
     setPositions: (positions: PositionIF[]) => {
         set({ positions })
-    }
+    },
+    userSymbolOrderHistory: [],
+    setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => set({ userSymbolOrderHistory })
 });
 

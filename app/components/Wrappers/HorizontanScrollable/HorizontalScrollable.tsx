@@ -124,6 +124,10 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
     };
   }, []);
 
+  useEffect(() => {
+    checkScroll();
+  }, [children]);
+
   return (
     <>
       {
