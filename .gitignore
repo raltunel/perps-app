@@ -1,6 +1,10 @@
 .DS_Store
 /node_modules/
 
+# misc
+.env*
+.vscode/
+
 # React Router
 /.react-router/
 /build/

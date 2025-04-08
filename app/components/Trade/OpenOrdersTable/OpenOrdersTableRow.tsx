@@ -27,15 +27,8 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
   const { order, onCancel } = props;
 
   const {formatNum} = useNumFormatter();
-  const {isInverseColor} = useAppSettings();
+  const {getBsColor} = useAppSettings();
 
-
-  const getDirectionClass = (side: string) => {
-    if(side === 'buy' && !isInverseColor) return styles.longDirection;
-    if(side === 'buy' && isInverseColor) return styles.shortDirection;
-    if(side === 'sell' && !isInverseColor) return styles.shortDirection;
-    if(side === 'sell' && isInverseColor) return styles.longDirection;
-  }
 
 
   const handleCancel = () => {
@@ -49,7 +42,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
       <div className={`${styles.cell} ${styles.timeCell}`}>{formatTimestamp(order.timestamp)}</div>
       <div className={`${styles.cell} ${styles.typeCell}`}>{order.orderType}</div>
       <div className={`${styles.cell} ${styles.coinCell}`}>{order.coin}</div>
-      <div className={`${styles.cell} ${styles.directionCell} ${getDirectionClass(order.side)}`}>
+      <div className={`${styles.cell} ${styles.directionCell}`} style={{color: order.side === 'buy' ? getBsColor().buy : getBsColor().sell}}>
         {order.side === 'buy' ? 'Long' : 'Short'}
       </div>
       <div className={`${styles.cell} ${styles.sizeCell}`}>{formatNum(order.sz)}</div>

@@ -12,13 +12,21 @@ import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle
 import ChasePrice from './ChasePrice/ChasePrice';
 import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PriceRange from './PriceRange/PriceRange';
-import PriceDistribution from './PriceDistribution/PriceDistribution';
 import RunningTime from './RunningTime/RunningTime';
-
+import { useModal, type useModalIF } from '~/hooks/useModal';
+import Modal from '~/components/Modal/Modal';
+import MarginModal from './MarginModal/MarginModal';
+import { FiChevronDown } from 'react-icons/fi';
+import ScaleOrders from './ScaleOrders/ScaleOrders';
+import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
+import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
+import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 export interface OrderTypeOption {
     value: string;
     label: string;
 }
+
+export type MarginMode = 'cross' | 'isolated' | null;
 
 const marketOrderTypes: OrderTypeOption[] = [
     { value: 'market', label: 'Market' },
@@ -29,9 +37,7 @@ const marketOrderTypes: OrderTypeOption[] = [
     { value: 'twap', label: 'TWAP' },
     { value: 'chase_limit', label: 'Chase Limit' },
 ];
-const isolatedOrderTypes: OrderTypeOption[] = [
-    { value: 'isolated', label: 'Isolated' },
-];
+
 const chaseOptionTypes: OrderTypeOption[] = [
     { value: 'bid1ask1', label: 'Bid1/Ask1' },
     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
@@ -54,8 +60,11 @@ const positionSizeOptions = [
 
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [isolatedOrderType, setIsolatedOrderType] =
-        useState<string>('isolated');
+    const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
+    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirmation' | null>(
+        null,
+    );
+
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
@@ -67,9 +76,23 @@ export default function OrderInput() {
     const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
     const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
         useState(false);
-    const [priceRangeMin, setPriceRangeMin] = useState('');
-    const [priceRangeMax, setPriceRangeMax] = useState('');
-    const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('');
+    const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
+    const [priceRangeMax, setPriceRangeMax] = useState('90000');
+    const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
+
+    const minimumInputValue = 2;
+    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] = useState<number>(100);
+    const generateRandomMaximumInput = () => {
+        console.log('generating')
+        // Generate a random maximum between minimumInputValue and 100
+        const newMaximumInputValue = Math.floor(
+          Math.random() * (100 - minimumInputValue + 1)
+        ) + minimumInputValue;
+        
+        setTempMaximumLeverageInput(newMaximumInputValue);
+      }
+
+    const appSettingsModal: useModalIF = useModal('closed');
 
     const showPriceInputComponent = [
         'limit',
@@ -97,14 +120,25 @@ export default function OrderInput() {
             value: '0.000 ETH',
         },
     ];
+    const openModalWithContent = (content: 'margin' | 'scale' | 'confirmation') => {
+        setModalContent(content);
+        appSettingsModal.open();
+    };
 
     const handleMarketOrderTypeChange = (value: string) => {
         setMarketOrderType(value);
         console.log(`Order type changed to: ${value}`);
     };
-    const handleIsolatedOrderTypeChange = (value: string) => {
-        setIsolatedOrderType(value);
-        console.log(`isolated type changed to: ${value}`);
+    const handleMarginModeChange = (mode: MarginMode) => {
+        setActiveMargin(mode);
+        console.log(`Mode changed to: ${mode}`);
+    };
+
+    const handleMarginModeConfirm = () => {
+        if (activeMargin) {
+            console.log(`Confirmed: ${activeMargin} margin mode`);
+        }
+        appSettingsModal.close();
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
@@ -201,7 +235,7 @@ export default function OrderInput() {
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const value = event.target.value;
-        if (/^\d*$/.test(value) && value.length <= 12) {
+        if (/^\d*\.?\d*$/.test(value) && value.length <= 12) {
             setPriceRangeMin(value);
         }
     };
@@ -210,7 +244,7 @@ export default function OrderInput() {
         event: React.ChangeEvent<HTMLInputElement>,
     ) => {
         const value = event.target.value;
-        if (/^\d*$/.test(value) && value.length <= 12) {
+        if (/^\d*\.?\d*$/.test(value) && value.length <= 12) {
             setPriceRangeMax(value);
         }
     };
@@ -222,6 +256,28 @@ export default function OrderInput() {
             setPriceRangeTotalOrders(value);
         }
     };
+
+    // JSX RETURNS -----------------------------------
+    const priceDistributionButtons = (
+        <div className={styles.priceDistributionContainer}>
+            <div className={styles.inputDetailsLabel}>
+                <span>Price Distribution</span>
+                <Tooltip content={'price distribution'} position='right'>
+                    <AiOutlineQuestionCircle size={13} />
+                </Tooltip>
+            </div>
+            <div className={styles.actionButtonsContainer}>
+                <button onClick={() => openModalWithContent('scale')}>
+                    <img src={flatSvg} alt='flat price distribution' />
+                    Flat
+                </button>
+                <button onClick={() => openModalWithContent('scale')}>
+                    <img src={evenSvg} alt='even price distribution' />
+                    Evenly Split
+                </button>
+            </div>
+        </div>
+    );
     // -----------------------------PROPS----------------------------------------
     const reduceAndProfitToggleProps = {
         isReduceOnlyEnabled,
@@ -239,6 +295,9 @@ export default function OrderInput() {
         options: leverageOptions,
         value: leverage,
         onChange: handleLeverageChange,
+        minimumInputValue: minimumInputValue,
+        maximumInputValue: tempMaximumLeverageInput,
+        generateRandomMaximumInput: generateRandomMaximumInput
     };
 
     const chasePriceProps = {
@@ -300,11 +359,17 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    <OrderDropdown
+                    {/* <OrderDropdown
                         options={isolatedOrderTypes}
                         value={isolatedOrderType}
                         onChange={handleIsolatedOrderTypeChange}
-                    />
+                    /> */}
+                    <button
+                        onClick={() => openModalWithContent('margin')}
+                        className={styles.isolatedButton}
+                    >
+                        Isolated <FiChevronDown size={24} />
+                    </button>
                 </div>
 
                 <LeverageSlider {...leverageSliderProps} />
@@ -341,13 +406,48 @@ export default function OrderInput() {
                 <PositionSize {...positionSizeProps} />
 
                 {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
-                {marketOrderType === 'scale' && <PriceDistribution />}
+                {marketOrderType === 'scale' && priceDistributionButtons}
+                {/* {marketOrderType === 'scale' && (
+                    <ScaleOrders
+                    totalQuantity={parseFloat(priceRangeTotalOrders)}
+                    minPrice={parseFloat(priceRangeMin)}
+                    maxPrice={parseFloat(priceRangeMax)}
+                    
+                />
+                )} */}
                 {marketOrderType === 'twap' && <RunningTime />}
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
 
-            <PlaceOrderButtons orderMarketPrice={marketOrderType} />
+            <PlaceOrderButtons orderMarketPrice={marketOrderType} openModalWithContent={openModalWithContent}/>
+
+            {appSettingsModal.isOpen && (
+                <Modal close={appSettingsModal.close}>
+                    {modalContent === 'margin' && (
+                        <MarginModal
+                            handleMarginModeChange={handleMarginModeChange}
+                            handleMarginModeConfirm={handleMarginModeConfirm}
+                            activeMargin={activeMargin}
+                        />
+                    )}
+
+                    {modalContent === 'scale' && (
+                        <ScaleOrders
+                            totalQuantity={parseFloat(priceRangeTotalOrders)}
+                            minPrice={parseFloat(priceRangeMin)}
+                            maxPrice={parseFloat(priceRangeMax)}
+                            isModal
+                            onClose={appSettingsModal.close}
+                        />
+                    )}
+                    {modalContent === 'confirmation' && (
+                        <ConfirmationModal 
+                        onClose={appSettingsModal.close}
+                        />
+                    )}
+                </Modal>
+            )}
         </div>
     );
 }

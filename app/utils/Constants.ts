@@ -16,12 +16,6 @@ export type LangType = {
     label: string;
 }
 
-export type BuySellColor = {
-    type: 'normal' | 'inverse';
-    buy: string;
-    sell: string;
-}
-
 export const NumFormatTypes: NumFormat[] = [
     {
         label: '1,234.56',
@@ -82,22 +76,6 @@ export const debugWallets: DebugWallet[] = [
     },
     
 ]
-
-
-export const buySellColors: BuySellColor[] = [
-    {
-        type: 'normal',
-        buy: 'var(--green)',
-        sell: 'var(--red)'
-    },
-    {
-        type: 'inverse',
-        buy: 'var(--red)',
-        sell: 'var(--green)'
-    }
-]
-
-
 
 export const OrderHistoryLimits = {
     MAX: 1000,

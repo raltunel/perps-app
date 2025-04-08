@@ -21,7 +21,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
     const {symbol: storeSymbol, setSymbol: setStoreSymbol} = useTradeDataStore();
 
-    const {isInverseColor} = useAppSettings();
+    const {getBsColor} = useAppSettings();
 
     const change = useMemo(() => {
         return symbol.markPx - symbol.prevDayPx;
@@ -30,6 +30,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
     const nodeClickListener = () => {
         if(symbol.coin === storeSymbol) return;
+        setStoreSymbol(symbol.coin);
         navigate(`/trade/${symbol.coin}`);
     }
 
@@ -46,9 +47,11 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({symbol, showMode }) => {
 
 
   return (
-    <div className={`${styles.watchListNodeContainer} ${isInverseColor ? styles.inverseColor : ''}`} onClick={nodeClickListener}>
+    <div className={`${styles.watchListNodeContainer}` } >
+    <div className={`${styles.watchListNodeContent} ${symbol.coin === storeSymbol ? styles.active : ''}`} onClick={nodeClickListener} >
       <div className={styles.symbolName}>{symbol.coin}-USD</div>
-      <div className={`${styles.symbolValue} ${change > 0 ? styles.positive : change < 0 ? styles.negative : ''}` }>{shownVal}</div>
+      <div className={`w3 ${styles.symbolValue}` } style={{color: change > 0 ? getBsColor().buy : (change < 0 ? getBsColor().sell : 'var(--text1)')}}>{shownVal}</div>
+      </div>
     </div>
   );
 }
