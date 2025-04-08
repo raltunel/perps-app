@@ -3,30 +3,21 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     addCustomOrderLine,
-    createQuantityText,
     createShapeText,
     getOrderQuantityTextLocation,
     priceToPixel,
 } from './customOrderLineUtils';
-import { useDebugStore } from '~/stores/DebugStore';
 
-interface OrderLineProps {}
-
-const OpenOrderLine = (props: OrderLineProps) => {
+const PositionsLine = () => {
     const { chart } = useTradingView();
-    const { userSymbolOrders, symbol } = useTradeDataStore();
+
+    const { positions, symbol } = useTradeDataStore();
 
     const [orderLineItems, setOrderLineItems] = useState<any[]>([]);
 
-    const { debugWallet } = useDebugStore();
-
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<number[]>([]);
 
     const symbolRef = useRef(symbol);
-
-    useEffect(() => {
-        setData([]);
-    }, [debugWallet]);
 
     useEffect(() => {
         setData([]);
@@ -37,19 +28,12 @@ const OpenOrderLine = (props: OrderLineProps) => {
     }, [symbol]);
 
     useEffect(() => {
-        if (symbol === symbolRef.current) {
-            const tempData = userSymbolOrders.map((i) => {
-                return {
-                    timestamp: i.timestamp,
-                    price: i.limitPx,
-                    sz: i.sz,
-                    side: i.side,
-                };
-            });
+        const tempData = positions
+            .filter((i) => i.coin === symbol)
+            .map((i) => i.liquidationPx);
 
-            setData(tempData);
-        }
-    }, [JSON.stringify(userSymbolOrders), symbolRef.current]);
+        setData(tempData);
+    }, [JSON.stringify(positions), symbolRef.current]);
 
     useEffect(() => {
         let isMounted = true;
@@ -88,30 +72,24 @@ const OpenOrderLine = (props: OrderLineProps) => {
             cleanupShapes();
 
             const shapePairs = await Promise.all(
-                data
-                    .sort((a, b) => a.timestamp - b.timestamp)
-                    .map(async (item) => {
-                        const lineId = await addCustomOrderLine(
-                            chart,
-                            item.price,
-                            item.side,
-                        );
+                data.map(async (price) => {
+                    const lineId = await addCustomOrderLine(
+                        chart,
+                        price,
+                        'sell',
+                    );
 
-                        const quantityText = await createQuantityText(
-                            chart,
-                            item.price,
-                            item.sz,
-                            'limit',
-                        );
+                    const textId = await createShapeText(
+                        chart,
+                        price,
+                        'sell',
+                        'liq',
+                    );
 
-                        const textId = await createShapeText(
-                            chart,
-                            item.price,
-                            item.side,
-                            'limit',
-                        );
-                        return { lineId, textId, quantityText };
-                    }),
+                    const quantityText = undefined;
+
+                    return { lineId, textId, quantityText };
+                }),
             );
 
             if (!isMounted) return;
@@ -133,7 +111,7 @@ const OpenOrderLine = (props: OrderLineProps) => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, data]);
+    }, [chart, data.length]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -144,7 +122,9 @@ const OpenOrderLine = (props: OrderLineProps) => {
 
             for (let i = 0; i < orderLineItems.length; i++) {
                 const lineShapeId = await orderLineItems[i].lineId;
+
                 const textShapeId = await orderLineItems[i].text;
+
                 const textQuantityTextId = await orderLineItems[i].quantityText;
 
                 const interval = setInterval(() => {
@@ -168,7 +148,7 @@ const OpenOrderLine = (props: OrderLineProps) => {
                             minPrice,
                             maxPrice,
                             chartHeight,
-                            data[i]?.price ?? 0,
+                            data[i] ?? 0,
                             priceScale.getMode() === 1,
                         );
 
@@ -178,42 +158,44 @@ const OpenOrderLine = (props: OrderLineProps) => {
                             .activeChart()
                             .getShapeById(textShapeId);
 
-                        const activeQuantityLabel = chart
-                            .activeChart()
-                            .getShapeById(textQuantityTextId);
-
-                        const activeLine = chart
-                            .activeChart()
-                            .getShapeById(lineShapeId);
-
-                        const bufferX = 0.4;
+                        const bufferForLiqPrice = 0.2;
                         if (activeLabel) {
                             activeLabel.setAnchoredPosition({
-                                x: bufferX,
+                                x: bufferForLiqPrice,
                                 y: pricePerPixel,
                             });
-
-                            activeQuantityLabel.setAnchoredPosition({
-                                x: getOrderQuantityTextLocation(
-                                    bufferX,
-                                    chart,
-                                    'limit',
-                                    data[i].price,
-                                ),
-                                y: pricePerPixel,
-                            });
-
-                            chart.activeChart().restoreChart();
                         }
 
-                        if (activeLine) {
-                            activeLine.setPoints([
-                                {
-                                    time: 10,
-                                    price: data[i]?.price,
-                                },
-                            ]);
+                        if (textQuantityTextId) {
+                            const activeQuantityLabel = chart
+                                .activeChart()
+                                .getShapeById(textQuantityTextId);
+                            activeQuantityLabel &&
+                                activeQuantityLabel.setAnchoredPosition({
+                                    x: getOrderQuantityTextLocation(
+                                        bufferForLiqPrice,
+                                        chart,
+                                        'liq',
+                                        0,
+                                    ),
+                                    y: pricePerPixel,
+                                });
                         }
+
+                        if (lineShapeId) {
+                            const activeLine = chart
+                                .activeChart()
+                                .getShapeById(lineShapeId);
+                            if (activeLine) {
+                                activeLine.setPoints([
+                                    {
+                                        time: 10,
+                                        price: data[i],
+                                    },
+                                ]);
+                            }
+                        }
+                        chart.activeChart().restoreChart();
                     } catch (error) {}
                 }, 10) as unknown as number;
 
@@ -232,4 +214,4 @@ const OpenOrderLine = (props: OrderLineProps) => {
     return null;
 };
 
-export default OpenOrderLine;
+export default PositionsLine;

@@ -3,35 +3,41 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     addCustomOrderLine,
+    createQuantityText,
     createShapeText,
     getOrderQuantityTextLocation,
     priceToPixel,
 } from './customOrderLineUtils';
-import { useDebugStore } from '~/stores/DebugStore';
 
-const PositionsLine = () => {
+const PnlLine = () => {
     const { chart } = useTradingView();
 
     const { positions, symbol } = useTradeDataStore();
 
     const [orderLineItems, setOrderLineItems] = useState<any[]>([]);
 
-    const [data, setData] = useState<number[]>([]);
-    const symbolRef = useRef(symbol);
+    const [data, setData] = useState<any[]>([]);
 
+    const symbolRef = useRef(symbol);
 
     useEffect(() => {
         setData([]);
 
         setTimeout(() => {
             symbolRef.current = symbol;
-        }, 100);
+        }, 200);
     }, [symbol]);
 
     useEffect(() => {
         const tempData = positions
             .filter((i) => i.coin === symbol)
-            .map((i) => i.liquidationPx);
+            .map((i) => {
+                return {
+                    price: i.entryPx,
+                    pnl: i.unrealizedPnl.toFixed(2),
+                    szi: i.szi,
+                };
+            });
 
         setData(tempData);
     }, [JSON.stringify(positions), symbolRef.current]);
@@ -73,22 +79,26 @@ const PositionsLine = () => {
             cleanupShapes();
 
             const shapePairs = await Promise.all(
-                data.map(async (price) => {
+                data.map(async (item) => {
                     const lineId = await addCustomOrderLine(
                         chart,
-                        price,
-                        'sell',
+                        item.price,
+                        item.pnl > 0 ? 'buy' : 'sell',
+                    );
+
+                    const quantityText = await createQuantityText(
+                        chart,
+                        item.price,
+                        item.szi,
+                        'pnl',
                     );
 
                     const textId = await createShapeText(
                         chart,
-                        price,
-                        'sell',
-                        'liq',
+                        item.pnl,
+                        item.pnl > 0 ? 'buy' : 'sell',
+                        'pnl',
                     );
-
-                    const quantityText = undefined;
-
                     return { lineId, textId, quantityText };
                 }),
             );
@@ -112,7 +122,7 @@ const PositionsLine = () => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, data.length]);
+    }, [chart, data]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -149,7 +159,7 @@ const PositionsLine = () => {
                             minPrice,
                             maxPrice,
                             chartHeight,
-                            data[i] ?? 0,
+                            data[i].price ?? 0,
                             priceScale.getMode() === 1,
                         );
 
@@ -159,7 +169,7 @@ const PositionsLine = () => {
                             .activeChart()
                             .getShapeById(textShapeId);
 
-                        const bufferForLiqPrice = 0.2;
+                        const bufferForLiqPrice = 0.1;
                         if (activeLabel) {
                             activeLabel.setAnchoredPosition({
                                 x: bufferForLiqPrice,
@@ -171,11 +181,14 @@ const PositionsLine = () => {
                             const activeQuantityLabel = chart
                                 .activeChart()
                                 .getShapeById(textQuantityTextId);
+
                             activeQuantityLabel &&
                                 activeQuantityLabel.setAnchoredPosition({
                                     x: getOrderQuantityTextLocation(
                                         bufferForLiqPrice,
                                         chart,
+                                        'pnl',
+                                        data[i].pnl,
                                     ),
                                     y: pricePerPixel,
                                 });
@@ -189,7 +202,7 @@ const PositionsLine = () => {
                                 activeLine.setPoints([
                                     {
                                         time: 10,
-                                        price: data[i],
+                                        price: data[i].price,
                                     },
                                 ]);
                             }
@@ -210,7 +223,7 @@ const PositionsLine = () => {
         };
     }, [orderLineItems, chart, JSON.stringify(data)]);
 
-    return null;
+    return <></>;
 };
 
-export default PositionsLine;
+export default PnlLine;
