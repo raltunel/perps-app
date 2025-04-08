@@ -10,15 +10,12 @@ import {
 } from './customOrderLineUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
-interface OrderLineProps {
-    data: OrderDataIF[];
-    orderType: 'liq' | 'limit' | 'pnl';
-}
+interface OrderLineProps {}
 
-const CustomOrderLine = (props: OrderLineProps) => {
+const OpenOrderLine = (props: OrderLineProps) => {
     const { chart } = useTradingView();
+    const { userSymbolOrders: data } = useTradeDataStore();
 
-    const { data, orderType } = props;
     const [orderLines, setOrderLines] = useState<any[]>([]);
     const [orderTexts, setOrderTexts] = useState<any[]>([]);
 
@@ -99,7 +96,7 @@ const CustomOrderLine = (props: OrderLineProps) => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, JSON.stringify(data)]);
+    }, [chart, data]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -147,14 +144,15 @@ const CustomOrderLine = (props: OrderLineProps) => {
                             .activeChart()
                             .getShapeById(textQuantityTextId);
 
+                        const bufferX = 0.4;
                         if (activeLabel) {
                             activeLabel.setAnchoredPosition({
-                                x: 0.4,
+                                x: bufferX,
                                 y: pricePerPixel,
                             });
 
                             activeQuantityLabel.setAnchoredPosition({
-                                x: getOrderQuantityTextLocation(chart),
+                                x: getOrderQuantityTextLocation(bufferX, chart),
                                 y: pricePerPixel,
                             });
 
@@ -178,4 +176,4 @@ const CustomOrderLine = (props: OrderLineProps) => {
     return null;
 };
 
-export default CustomOrderLine;
+export default OpenOrderLine;

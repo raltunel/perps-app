@@ -112,10 +112,10 @@ export const createQuantityText = async (
     );
 
     const pricePerPixel = (pixel * 1) / chartHeight;
-
+    const bufferX = 0.4;
     const shape = await chart.activeChart().createShape(
         {
-            x: getOrderQuantityTextLocation(chart),
+            x: getOrderQuantityTextLocation(bufferX,chart),
             price: pricePerPixel,
         },
         {
@@ -152,7 +152,7 @@ export const priceToPixel = (
     price: number,
     isLogarithmic: boolean = false,
 ) => {
-    const textHeight = 10;
+    const textHeight = 15;
 
     if (isLogarithmic) {
         const logMinPrice = Math.log(minPrice);
@@ -173,7 +173,7 @@ export const priceToPixel = (
     }
 };
 
-export const getOrderQuantityTextLocation = (chart: any) => {
+export const getOrderQuantityTextLocation = (bufferX:number,chart: any) => {
     const timeScale = chart.activeChart().getTimeScale();
     const chartWidth = Math.floor(timeScale.width());
 
@@ -181,5 +181,5 @@ export const getOrderQuantityTextLocation = (chart: any) => {
 
     const offsetX = Number(wrapWidthPx / chartWidth);
 
-    return 0.4 + offsetX;
+    return bufferX + offsetX;
 };

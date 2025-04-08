@@ -1,16 +1,17 @@
 import React from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
-import CustomOrderLine from '~/routes/chart/orders/customOrderLine';
+import OpenOrderLine from '~/routes/chart/orders/openOrderLine';
+import PositionsLine from '~/routes/chart/orders/PositionsLine';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 const TradingViewWrapper: React.FC = () => {
-    const { userSymbolOrders } = useTradeDataStore();
-
     return (
         <TradingViewProvider>
             <TradingViewChart />
-            <CustomOrderLine data={userSymbolOrders} orderType='limit' />
+            <OpenOrderLine />
+            <PositionsLine/>
+
         </TradingViewProvider>
     );
 };
