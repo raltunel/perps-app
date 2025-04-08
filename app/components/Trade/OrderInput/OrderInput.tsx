@@ -62,7 +62,7 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirmation' | null>(
+    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null>(
         null,
     );
 
@@ -121,7 +121,7 @@ export default function OrderInput() {
             value: '0.000 ETH',
         },
     ];
-    const openModalWithContent = (content: 'margin' | 'scale' | 'confirmation') => {
+    const openModalWithContent = (content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell') => {
         setModalContent(content);
         appSettingsModal.open();
     };
@@ -438,12 +438,19 @@ export default function OrderInput() {
                             onClose={appSettingsModal.close}
                         />
                     )}
-                    {modalContent === 'confirmation' && (
+                    {modalContent === 'confirm_buy' && (
                         <ConfirmationModal 
                             onClose={() => {
-                                notifications.add();
+                                notifications.add('buyPending');
                                 appSettingsModal.close();
-                                console.log('wooooo');
+                            }}
+                        />
+                    )}
+                    {modalContent === 'confirm_sell' && (
+                        <ConfirmationModal 
+                            onClose={() => {
+                                notifications.add('sellPending');
+                                appSettingsModal.close();
                             }}
                         />
                     )}
