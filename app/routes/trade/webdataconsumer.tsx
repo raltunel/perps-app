@@ -22,7 +22,7 @@ export default function WebDataConsumer() {
     const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet.address;
+    addressRef.current = debugWallet.address.toLowerCase();
     const { setSymbolInfo } = useTradeDataStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
@@ -50,7 +50,7 @@ export default function WebDataConsumer() {
             payload: { user: debugWallet.address },
             handler: (payload) => {
                 setCoins(payload.data.coins);
-                if (payload.data.user === addressRef.current) {
+                if (payload.data.user.toLowerCase() === addressRef.current) {
                     openOrdersRef.current = payload.data.userOpenOrders;
                     positionsRef.current = payload.data.positions;
                 }
