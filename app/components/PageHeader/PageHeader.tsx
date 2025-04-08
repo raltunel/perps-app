@@ -192,7 +192,7 @@ export default function PageHeader() {
 
     return (
         <>
-            <header className={styles.container}>
+            <header id={'pageHeader'} className={styles.container}>
                 <Link to='/'>
                     <img
                         src='/images/perpsLogo.svg'

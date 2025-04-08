@@ -28,6 +28,8 @@ self.onmessage = function (event) {
                     if (ctxVal !== null) {
                         const coinObject = processSymbolInfo({
                             coin: coin.name,
+                            szDecimals: coin.szDecimals,
+                            maxLeverage: coin.maxLeverage,
                             ctx: ctxVal,
                         });
                         coins.push(coinObject);

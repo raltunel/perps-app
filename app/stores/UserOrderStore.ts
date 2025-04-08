@@ -53,5 +53,7 @@ export const createUserTradesSlice = (set:any, get:any) => ({
                 return orderHistory.filter(e=> e.side === 'sell').slice(0, OrderHistoryLimits.RENDERED);
         }
     },
+    userSymbolOrderHistory: [],
+    setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => set({ userSymbolOrderHistory }),
 });
 
