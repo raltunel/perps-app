@@ -43,6 +43,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
+      <title>
+        { window.location.toString().split('/').pop() }
+      </title>
       <div className={styles.wsUrlSelector}>
         <ComboBox
           value={wsUrl}
