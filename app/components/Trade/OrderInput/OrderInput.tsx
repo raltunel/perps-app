@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './OrderInput.module.css';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
@@ -21,6 +21,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import { useNotificationStore, type NotificationStoreIF } from '~/stores/NotificationStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -349,7 +350,11 @@ export default function OrderInput() {
         handleChangetotalOrders: handleTotalordersPriceRange,
         totalOrders: priceRangeTotalOrders,
     };
-    // ------------------------------------END OF PROPS-----------------------------
+
+    const notifications: NotificationStoreIF = useNotificationStore();
+
+    useEffect(() => {console.log(notifications.notifications)}, [notifications,notifications]);
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
@@ -407,14 +412,6 @@ export default function OrderInput() {
 
                 {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
                 {marketOrderType === 'scale' && priceDistributionButtons}
-                {/* {marketOrderType === 'scale' && (
-                    <ScaleOrders
-                    totalQuantity={parseFloat(priceRangeTotalOrders)}
-                    minPrice={parseFloat(priceRangeMin)}
-                    maxPrice={parseFloat(priceRangeMax)}
-                    
-                />
-                )} */}
                 {marketOrderType === 'twap' && <RunningTime />}
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
@@ -443,7 +440,11 @@ export default function OrderInput() {
                     )}
                     {modalContent === 'confirmation' && (
                         <ConfirmationModal 
-                        onClose={appSettingsModal.close}
+                            onClose={() => {
+                                notifications.add();
+                                appSettingsModal.close();
+                                console.log('wooooo');
+                            }}
                         />
                     )}
                 </Modal>

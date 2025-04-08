@@ -86,7 +86,7 @@ export default function ConfirmationModal(props: PropsIF) {
                 isOn={isDontShowEnabled}
                 onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
                     label={'Don\'t show this again'}
-                    reverse 
+                    // reverse 
                 
                 />
                 </div>

@@ -28,12 +28,16 @@ const positionStyles: Record<positions, positionCSS> = {
 
 interface propsIF {
     close?: () => void;
-    position: positions;
+    position?: positions;
     children: ReactNode;
 }
 
 export default function Modal(props: propsIF) {
-    const { close, position, children } = props;
+    const {
+        close,
+        position = 'center',
+        children
+    } = props;
 
     // return children without creating curtain behind modal
     // this allows us to make multiple non-exclusive modals at once
