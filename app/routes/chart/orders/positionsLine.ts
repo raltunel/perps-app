@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -7,50 +7,61 @@ import {
     getOrderQuantityTextLocation,
     priceToPixel,
 } from './customOrderLineUtils';
+import { useDebugStore } from '~/stores/DebugStore';
 
 const PositionsLine = () => {
     const { chart } = useTradingView();
 
     const { positions, symbol } = useTradeDataStore();
 
-    const [orderLines, setOrderLines] = useState<any[]>([]);
-    const [orderTexts, setOrderTexts] = useState<any[]>([]);
+    const [orderLineItems, setOrderLineItems] = useState<any[]>([]);
 
-    const data = useMemo(() => {                
-        return positions.filter((i) => i.coin === symbol).map((i)=>i.liquidationPx);
-    }, [JSON.stringify(positions), symbol]);
+    const [data, setData] = useState<number[]>([]);
+    const symbolRef = useRef(symbol);
 
-    
+
+    useEffect(() => {
+        setData([]);
+
+        setTimeout(() => {
+            symbolRef.current = symbol;
+        }, 100);
+    }, [symbol]);
+
+    useEffect(() => {
+        const tempData = positions
+            .filter((i) => i.coin === symbol)
+            .map((i) => i.liquidationPx);
+
+        setData(tempData);
+    }, [JSON.stringify(positions), symbolRef.current]);
+
     useEffect(() => {
         let isMounted = true;
 
         const cleanupShapes = () => {
             try {
                 if (chart) {
-                    orderLines.forEach((id) => {
-                        const element = chart.activeChart().getShapeById(id);
-                        element && chart.activeChart().removeEntity(id);
-                    });
+                    orderLineItems.forEach((order: any) => {
+                        const lineId = order.lineId;
+                        const textId = order.text;
+                        const quantityTextId = order.quantityText;
 
-                    orderTexts.forEach((orderTexts) => {
-                        const textId = orderTexts.text;
-                        const quantityTextId = orderTexts.quantityText;
+                        const element = chart
+                            .activeChart()
+                            .getShapeById(lineId);
+                        element && chart.activeChart().removeEntity(lineId);
 
                         const elementText = chart
                             .activeChart()
                             .getShapeById(textId);
+                        const quantityElementText = chart
+                            .activeChart()
+                            .getShapeById(quantityTextId);
 
                         elementText && chart.activeChart().removeEntity(textId);
-
-                        if (quantityTextId) {
-                            const quantityElementText = chart
-                                .activeChart()
-                                .getShapeById(quantityTextId);
-                            quantityElementText &&
-                                chart
-                                    .activeChart()
-                                    .removeEntity(quantityTextId);
-                        }
+                        quantityElementText &&
+                            chart.activeChart().removeEntity(quantityTextId);
                     });
                 }
             } catch (error) {}
@@ -62,31 +73,35 @@ const PositionsLine = () => {
             cleanupShapes();
 
             const shapePairs = await Promise.all(
-                data.map(async (item) => {
+                data.map(async (price) => {
                     const lineId = await addCustomOrderLine(
                         chart,
-                        item,
+                        price,
                         'sell',
                     );
 
                     const textId = await createShapeText(
                         chart,
-                        item,
+                        price,
                         'sell',
                         'liq',
                     );
 
                     const quantityText = undefined;
+
                     return { lineId, textId, quantityText };
                 }),
             );
 
             if (!isMounted) return;
 
-            setOrderLines(shapePairs.map((p: any) => p.lineId));
-            setOrderTexts(
+            setOrderLineItems(
                 shapePairs.map((p: any) => {
-                    return { text: p.textId, quantityText: p.quantityText };
+                    return {
+                        lineId: p.lineId,
+                        text: p.textId,
+                        quantityText: p.quantityText,
+                    };
                 }),
             );
         };
@@ -97,19 +112,21 @@ const PositionsLine = () => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, data]);
+    }, [chart, data.length]);
 
     useEffect(() => {
         let isCancelled = false;
         const intervals: number[] = [];
 
         const setupTextPositioning = async () => {
-            if (!chart || orderTexts.length === 0) return;
+            if (!chart || orderLineItems.length === 0) return;
 
-            for (let i = 0; i < orderTexts.length; i++) {
-                const textShapeId = await orderTexts[i].text;
+            for (let i = 0; i < orderLineItems.length; i++) {
+                const lineShapeId = await orderLineItems[i].lineId;
 
-                const textQuantityTextId = await orderTexts[i].quantityText;
+                const textShapeId = await orderLineItems[i].text;
+
+                const textQuantityTextId = await orderLineItems[i].quantityText;
 
                 const interval = setInterval(() => {
                     try {
@@ -164,6 +181,19 @@ const PositionsLine = () => {
                                 });
                         }
 
+                        if (lineShapeId) {
+                            const activeLine = chart
+                                .activeChart()
+                                .getShapeById(lineShapeId);
+                            if (activeLine) {
+                                activeLine.setPoints([
+                                    {
+                                        time: 10,
+                                        price: data[i],
+                                    },
+                                ]);
+                            }
+                        }
                         chart.activeChart().restoreChart();
                     } catch (error) {}
                 }, 10) as unknown as number;
@@ -178,7 +208,7 @@ const PositionsLine = () => {
             isCancelled = true;
             intervals.forEach(clearInterval);
         };
-    }, [orderTexts, chart, JSON.stringify(data)]);
+    }, [orderLineItems, chart, JSON.stringify(data)]);
 
     return null;
 };

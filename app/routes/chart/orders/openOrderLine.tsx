@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -9,26 +9,48 @@ import {
     priceToPixel,
 } from './customOrderLineUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface OrderLineProps {}
 
 const OpenOrderLine = (props: OrderLineProps) => {
     const { chart } = useTradingView();
-    const { userSymbolOrders } = useTradeDataStore();
+    const { userSymbolOrders, symbol } = useTradeDataStore();
 
-    const [orderLines, setOrderLines] = useState<any[]>([]);
-    const [orderTexts, setOrderTexts] = useState<any[]>([]);
+    const [orderLineItems, setOrderLineItems] = useState<any[]>([]);
 
-    const data = useMemo(() => {
-        return userSymbolOrders.map((i) => {
-            return {
-                timestamp: i.timestamp,
-                price: i.limitPx,
-                sz: i.sz,
-                side: i.side,
-            };
-        });
-    }, [JSON.stringify(userSymbolOrders)]);
+    const { debugWallet } = useDebugStore();
+
+    const [data, setData] = useState<any[]>([]);
+
+    const symbolRef = useRef(symbol);
+
+    useEffect(() => {
+        setData([]);
+    }, [debugWallet]);
+
+    useEffect(() => {
+        setData([]);
+
+        setTimeout(() => {
+            symbolRef.current = symbol;
+        }, 100);
+    }, [symbol]);
+
+    useEffect(() => {
+        if (symbol === symbolRef.current) {
+            const tempData = userSymbolOrders.map((i) => {
+                return {
+                    timestamp: i.timestamp,
+                    price: i.limitPx,
+                    sz: i.sz,
+                    side: i.side,
+                };
+            });
+
+            setData(tempData);
+        }
+    }, [JSON.stringify(userSymbolOrders), symbolRef.current]);
 
     useEffect(() => {
         let isMounted = true;
@@ -36,14 +58,15 @@ const OpenOrderLine = (props: OrderLineProps) => {
         const cleanupShapes = () => {
             try {
                 if (chart) {
-                    orderLines.forEach((id) => {
-                        const element = chart.activeChart().getShapeById(id);
-                        element && chart.activeChart().removeEntity(id);
-                    });
+                    orderLineItems.forEach((order: any) => {
+                        const lineId = order.lineId;
+                        const textId = order.text;
+                        const quantityTextId = order.quantityText;
 
-                    orderTexts.forEach((orderTexts) => {
-                        const textId = orderTexts.text;
-                        const quantityTextId = orderTexts.quantityText;
+                        const element = chart
+                            .activeChart()
+                            .getShapeById(lineId);
+                        element && chart.activeChart().removeEntity(lineId);
 
                         const elementText = chart
                             .activeChart()
@@ -93,10 +116,13 @@ const OpenOrderLine = (props: OrderLineProps) => {
 
             if (!isMounted) return;
 
-            setOrderLines(shapePairs.map((p: any) => p.lineId));
-            setOrderTexts(
+            setOrderLineItems(
                 shapePairs.map((p: any) => {
-                    return { text: p.textId, quantityText: p.quantityText };
+                    return {
+                        lineId: p.lineId,
+                        text: p.textId,
+                        quantityText: p.quantityText,
+                    };
                 }),
             );
         };
@@ -114,11 +140,12 @@ const OpenOrderLine = (props: OrderLineProps) => {
         const intervals: number[] = [];
 
         const setupTextPositioning = async () => {
-            if (!chart || orderTexts.length === 0) return;
+            if (!chart || orderLineItems.length === 0) return;
 
-            for (let i = 0; i < orderTexts.length; i++) {
-                const textShapeId = await orderTexts[i].text;
-                const textQuantityTextId = await orderTexts[i].quantityText;
+            for (let i = 0; i < orderLineItems.length; i++) {
+                const lineShapeId = await orderLineItems[i].lineId;
+                const textShapeId = await orderLineItems[i].text;
+                const textQuantityTextId = await orderLineItems[i].quantityText;
 
                 const interval = setInterval(() => {
                     try {
@@ -155,6 +182,10 @@ const OpenOrderLine = (props: OrderLineProps) => {
                             .activeChart()
                             .getShapeById(textQuantityTextId);
 
+                        const activeLine = chart
+                            .activeChart()
+                            .getShapeById(lineShapeId);
+
                         const bufferX = 0.4;
                         if (activeLabel) {
                             activeLabel.setAnchoredPosition({
@@ -169,6 +200,15 @@ const OpenOrderLine = (props: OrderLineProps) => {
 
                             chart.activeChart().restoreChart();
                         }
+
+                        if (activeLine) {
+                            activeLine.setPoints([
+                                {
+                                    time: 10,
+                                    price: data[i]?.price,
+                                },
+                            ]);
+                        }
                     } catch (error) {}
                 }, 10) as unknown as number;
 
@@ -182,7 +222,7 @@ const OpenOrderLine = (props: OrderLineProps) => {
             isCancelled = true;
             intervals.forEach(clearInterval);
         };
-    }, [orderTexts, chart, JSON.stringify(data)]);
+    }, [orderLineItems, chart, JSON.stringify(data)]);
 
     return null;
 };
