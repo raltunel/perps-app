@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -14,10 +14,21 @@ interface OrderLineProps {}
 
 const OpenOrderLine = (props: OrderLineProps) => {
     const { chart } = useTradingView();
-    const { userSymbolOrders: data } = useTradeDataStore();
+    const { userSymbolOrders } = useTradeDataStore();
 
     const [orderLines, setOrderLines] = useState<any[]>([]);
     const [orderTexts, setOrderTexts] = useState<any[]>([]);
+
+    const data = useMemo(() => {
+        return userSymbolOrders.map((i) => {
+            return {
+                timestamp: i.timestamp,
+                price: i.limitPx,
+                sz: i.sz,
+                side: i.side,
+            };
+        });
+    }, [JSON.stringify(userSymbolOrders)]);
 
     useEffect(() => {
         let isMounted = true;
@@ -60,19 +71,19 @@ const OpenOrderLine = (props: OrderLineProps) => {
                     .map(async (item) => {
                         const lineId = await addCustomOrderLine(
                             chart,
-                            item.limitPx,
+                            item.price,
                             item.side,
                         );
 
                         const quantityText = await createQuantityText(
                             chart,
-                            item.limitPx,
+                            item.price,
                             item.sz,
                         );
 
                         const textId = await createShapeText(
                             chart,
-                            item.limitPx,
+                            item.price,
                             item.side,
                             'limit',
                         );
@@ -130,7 +141,7 @@ const OpenOrderLine = (props: OrderLineProps) => {
                             minPrice,
                             maxPrice,
                             chartHeight,
-                            data[i]?.limitPx ?? 0,
+                            data[i]?.price ?? 0,
                             priceScale.getMode() === 1,
                         );
 
