@@ -135,9 +135,9 @@ export const createDataFeed = (
             )) as any;
 
             const fillHistory = markRes.dataCache;
-            const userWallet = markRes.user;
+            // const userWallet = markRes.user;
 
-            fillHistory.sort((a: any, b: any) => a.px - b.px);
+            fillHistory.sort((a: any, b: any) => b.time - a.time);
 
             fillMarks(fillHistory);
 
@@ -161,28 +161,27 @@ export const createDataFeed = (
             //                 // debugWallet.address,
             //             ).then((res: any) => {
             //                 const fetchedData = res.dataCache;
+            //                 const diffArry: any[] = [];
 
             //                 payload.fills.forEach((fill: any) => {
             //                     const key = fetchedData.find(
             //                         (hs: any) => hs.hash === fill.hash,
             //                     );
             //                     if (key === undefined) {
-            //                         fetchedData.push(fill);
+            //                         diffArry.push(fill);
             //                     }
             //                 });
 
-            //                 fillMarks(fetchedData);
+            //                 fillMarks(diffArry);
 
             //                 const markArray = [
             //                     ...bSideOrderHistoryMarks.values(),
             //                     ...aSideOrderHistoryMarks.values(),
             //                 ];
 
-            //                 console.log(markArray, fetchedData);
-
-            //                 // if (markArray.length > 0) {
-            //                 //     onDataCallback(markArray);
-            //                 // }
+            //                 if (markArray.length > 0) {
+            //                     onDataCallback(markArray);
+            //                 }
             //             });
             //         }
             //     },
