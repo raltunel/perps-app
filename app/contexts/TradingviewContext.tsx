@@ -91,13 +91,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             // array of color codes from candle properties we care about
             const activeColors: string[] | undefined = candleStyle
                 ? [
-                    candleStyle.upColor,
-                    candleStyle.downColor,
-                    candleStyle.borderUpColor,
-                    candleStyle.borderDownColor,
-                    candleStyle.wickUpColor,
-                    candleStyle.wickDownColor,
-                ]
+                      candleStyle.upColor,
+                      candleStyle.downColor,
+                      candleStyle.borderUpColor,
+                      candleStyle.borderDownColor,
+                      candleStyle.wickUpColor,
+                      candleStyle.wickDownColor,
+                  ]
                 : undefined;
             // determine if any of the candles have a color chosen through
             // ... the trading view color customization workflow (custom
@@ -116,6 +116,24 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
                     'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
                 });
+
+            if (chart) {
+                const volumeStudyId = chart
+                    .activeChart()
+                    .getAllStudies()
+                    .find((x) => x.name === 'Volume');
+
+                if (volumeStudyId) {
+                    const volume = chart
+                        .activeChart()
+                        .getStudyById(volumeStudyId.id);
+                    isCustomized ||
+                        volume.applyOverrides({
+                            'volume.color.0': c.buy,
+                            'volume.color.1': c.sell,
+                        });
+                }
+            }
         }
     }
 
