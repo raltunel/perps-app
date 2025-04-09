@@ -3,10 +3,13 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     addCustomOrderLine,
+    buyColor,
     createQuantityText,
     createShapeText,
+    getLabelText,
     getOrderQuantityTextLocation,
     priceToPixel,
+    sellColor,
 } from './customOrderLineUtils';
 
 const PnlLine = () => {
@@ -122,7 +125,7 @@ const PnlLine = () => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, data]);
+    }, [chart, data.length]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -171,6 +174,15 @@ const PnlLine = () => {
 
                         const bufferForLiqPrice = 0.1;
                         if (activeLabel) {
+                            const orderText = getLabelText('pnl', data[i].pnl);
+
+                            activeLabel.setProperties({
+                                text: orderText,
+                                wordWrapWidth: orderText.length > 13 ? 100 : 70,
+                                borderColor:
+                                    data[i].pnl > 0 ? buyColor : sellColor,
+                            });
+
                             activeLabel.setAnchoredPosition({
                                 x: bufferForLiqPrice,
                                 y: pricePerPixel,
@@ -192,6 +204,12 @@ const PnlLine = () => {
                                     ),
                                     y: pricePerPixel,
                                 });
+
+                            activeQuantityLabel.setProperties({
+                                text: data[i].szi,
+                                wordWrapWidth:
+                                    data[i].pnl.toString().length > 8 ? 70 : 60,
+                            });
                         }
 
                         if (lineShapeId) {
@@ -205,6 +223,12 @@ const PnlLine = () => {
                                         price: data[i].price,
                                     },
                                 ]);
+                                const orderColor =
+                                    data[i].pnl > 0 ? buyColor : sellColor;
+                                activeLine.setProperties({
+                                    linecolor: orderColor,
+                                    borderColor: orderColor,
+                                });
                             }
                         }
                         chart.activeChart().restoreChart();
