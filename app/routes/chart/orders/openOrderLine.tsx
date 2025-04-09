@@ -1,12 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     addCustomOrderLine,
+    buyColor,
     createQuantityText,
     createShapeText,
+    getLabelText,
     getOrderQuantityTextLocation,
     priceToPixel,
+    sellColor,
 } from './customOrderLineUtils';
 import { useDebugStore } from '~/stores/DebugStore';
 
@@ -133,7 +136,7 @@ const OpenOrderLine = (props: OrderLineProps) => {
             isMounted = false;
             cleanupShapes();
         };
-    }, [chart, data]);
+    }, [chart, data.length]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -192,6 +195,19 @@ const OpenOrderLine = (props: OrderLineProps) => {
                                 x: bufferX,
                                 y: pricePerPixel,
                             });
+                            const orderText = getLabelText(
+                                'limit',
+                                data[i].price,
+                            );
+
+                            activeLabel.setProperties({
+                                text: orderText,
+                                wordWrapWidth: orderText.length > 13 ? 100 : 70,
+                            });
+
+                            activeQuantityLabel.setProperties({
+                                text: data[i].sz,
+                            });
 
                             activeQuantityLabel.setAnchoredPosition({
                                 x: getOrderQuantityTextLocation(
@@ -207,12 +223,20 @@ const OpenOrderLine = (props: OrderLineProps) => {
                         }
 
                         if (activeLine) {
+                            const orderColor =
+                                data[i].side === 'buy' ? buyColor : sellColor;
+
                             activeLine.setPoints([
                                 {
                                     time: 10,
                                     price: data[i]?.price,
                                 },
                             ]);
+
+                            activeLine.setProperties({
+                                linecolor: orderColor,
+                                borderColor: orderColor,
+                            });
                         }
                     } catch (error) {}
                 }, 10) as unknown as number;
