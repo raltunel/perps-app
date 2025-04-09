@@ -1,3 +1,4 @@
+import type { SymbolInfoIF } from "../SymbolInfoIFs";
 import type { OrderRowResolutionIF } from "./OrderBookIFs";
 
 
@@ -13,6 +14,13 @@ import type { OrderRowResolutionIF } from "./OrderBookIFs";
     return {
         nsigfigs: nsigfigs,
         val: calculateResolutionValue(price, nsigfigs, mantissa || 1),
+        mantissa: mantissa || null,
+    }
+  }
+  export const createResolutionObjectForVal = (val:number, nsigfigs: number, mantissa?: number) => {
+    return {
+        nsigfigs: nsigfigs,
+        val: mantissa ? parseFloat(Number(val * mantissa).toFixed(15)) : Number(val),
         mantissa: mantissa || null,
     }
   }
@@ -82,5 +90,34 @@ const decimalPrecision = (precisionNumber: number) => {
 
 export const getPrecisionForResolution = (resolution: OrderRowResolutionIF):number => {
   return decimalPrecision(resolution.val);
+}
+
+const get10PowForPrice = (price: number): number => {
+  return Math.floor(Math.log10(price));
+}
+
+
+export const getResolutionListForSymbol = (symbol: SymbolInfoIF): OrderRowResolutionIF[] => {
+  const ret: OrderRowResolutionIF[] = [];
+
+  const price = symbol.markPx;
+
+  const pricePow = get10PowForPrice(price);
+
+  if(pricePow > -3) {
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 4), 5))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 4), 5, 2))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 4), 5, 5))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 3), 4))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 2), 3))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 1), 2))
+
+  }else{
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 3), 4))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 2), 3))
+    ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 1), 2))
+  }
+
+  return ret;
 }
 

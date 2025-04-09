@@ -52,7 +52,7 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
       <div className={`${styles.cell} ${styles.symbolCell}`}>
         {
           favKeys.includes(symbol.coin) ? (
-            <TbHeartFilled className={styles.favIcon} color='var(--red)' onClick={handleFavClick} />
+            <TbHeartFilled className={styles.favIcon + ' ' + styles.favIconActive} color='var(--red)' onClick={handleFavClick} />
           ) : (
             <TbHeart style={{color: 'var(--text2)'}} className={styles.favIcon} onClick={handleFavClick} />
           )

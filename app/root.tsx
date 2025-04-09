@@ -15,6 +15,7 @@ import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
+import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -121,6 +122,7 @@ export default function App() {
             <Notifications />
           </ComponentErrorBoundary>
         </div>
+        <RuntimeDomManipulation />
         </WsObserverProvider>
     </Layout>
   );
