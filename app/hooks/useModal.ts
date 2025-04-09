@@ -12,7 +12,7 @@ export interface useModalIF {
 //      'open' → modal is open on initial render
 //      'closed' → modal is closed on initial render
 //      number → modal will auto-open after X milliseconds
-type modalDefaultStates = 'open'|'closed'|number;
+type modalDefaultStates = 'open' | 'closed' | number;
 
 // main fn body for hook
 export function useModal(dfltState?: modalDefaultStates): useModalIF {
@@ -35,7 +35,7 @@ export function useModal(dfltState?: modalDefaultStates): useModalIF {
         // closed if hook is called that way, with number, or with
         // ... no explicit state provided
         case 'closed':
-        default:    
+        default:
             shouldOpenAtRender = false;
             break;
     }
@@ -55,7 +55,7 @@ export function useModal(dfltState?: modalDefaultStates): useModalIF {
         // timeout to open modal after time set in parameter
         const openAfterDelay: NodeJS.Timeout = setTimeout(
             () => openModal(),
-            dfltState
+            dfltState,
         );
         // clear the effect from the DOM when elem dismounts
         return () => clearTimeout(openAfterDelay);

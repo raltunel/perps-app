@@ -37,14 +37,15 @@ export default function Notification(props: propsIF) {
         <section className={styles.notification}>
             <header>
                 <div className={styles.header_content}>
-                    {
-                        data.icon === 'spinner' &&
+                    {data.icon === 'spinner' && (
                         <ImSpinner8 size={ICON_SIZE} color='var(--accent1)' />
-                    }
-                    {
-                        data.icon === 'check' &&
-                        <IoCheckmarkCircleOutline size={ICON_SIZE} color='var(--accent1)' />
-                    }
+                    )}
+                    {data.icon === 'check' && (
+                        <IoCheckmarkCircleOutline
+                            size={ICON_SIZE}
+                            color='var(--accent1)'
+                        />
+                    )}
                     <h2>{data.title}</h2>
                 </div>
                 <IoClose
@@ -53,7 +54,9 @@ export default function Notification(props: propsIF) {
                     onClick={() => dismiss(data.oid)}
                 />
             </header>
-            <p>{data.message} {data.oid}</p>
+            <p>
+                {data.message} {data.oid}
+            </p>
         </section>
     );
 }

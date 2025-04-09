@@ -43,17 +43,17 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         rowsPerPage,
         isFullScreen,
         sortConfig,
-        
+
         // Calculated values
         totalRows,
         startRow,
         endRow,
         isPrevButtonDisabled,
         isNextButtonDisabled,
-        
+
         // Data
         currentPageData,
-        
+
         // Actions
         handleSearchChange,
         handleClearSearchInput,
@@ -66,14 +66,14 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         toggleRowsDropdown,
         toggleFullScreen,
         currentPage,
-        totalPages
+        totalPages,
     } = useLeaderboard(leaderboardData);
 
     // Memoize the container class name
     const containerClassName = useMemo(() => {
         return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
     }, [isFullScreen]);
-    
+
     // Memoize the period dropdown items
     const periodItems = useMemo(() => {
         return periods.map((p) => (
@@ -86,7 +86,7 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
             </div>
         ));
     }, [handlePeriodChange]);
-    
+
     // Memoize the rows per page dropdown items
     const rowsItems = useMemo(() => {
         return rowsOptions.map((value) => (
@@ -102,10 +102,10 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
 
     const periodDropdownRef = useOutsideClick<HTMLDivElement>(() => {
         setIsPeriodDropdownOpen(false);
-      }, isPeriodDropdownOpen);
+    }, isPeriodDropdownOpen);
     const rowsDropdownRef = useOutsideClick<HTMLDivElement>(() => {
         setIsRowsDropdownOpen(false);
-      }, isRowsDropdownOpen);
+    }, isRowsDropdownOpen);
 
     return (
         <div className={containerClassName}>
@@ -126,12 +126,18 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
                             onChange={handleSearchChange}
                         />
                         {inputValue && (
-                            <MdClose onClick={handleClearSearchInput} size={18} />
+                            <MdClose
+                                onClick={handleClearSearchInput}
+                                size={18}
+                            />
                         )}
                     </div>
 
                     {/* Period Selector */}
-                    <div className={styles.periodSelectorContainer} ref={periodDropdownRef}>
+                    <div
+                        className={styles.periodSelectorContainer}
+                        ref={periodDropdownRef}
+                    >
                         <div
                             className={styles.periodSelector}
                             onClick={togglePeriodDropdown}

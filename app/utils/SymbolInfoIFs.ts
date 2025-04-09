@@ -2,7 +2,7 @@ export interface SymbolInfoIF {
     coin: string;
     dayBaseVlm: number;
     dayNtlVlm: number;
-    funding:number;
+    funding: number;
     impactPxs: number[];
     markPx: number;
     midPx: number;
@@ -16,5 +16,4 @@ export interface SymbolInfoIF {
     openInterestDollarized: number;
     szDecimals: number;
     maxLeverage: number;
-
 }

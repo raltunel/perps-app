@@ -20,11 +20,18 @@ export const useChartStore = create<ChartStore>()(
         {
             name: CHART_LAYOUT_KEY,
             storage: createJSONStorage(() => localStorage),
-            version:1,
-            migrate: (persistedState) => {                                
-                if (persistedState  && (persistedState as any) && !(persistedState as any).interval) {
+            version: 1,
+            migrate: (persistedState) => {
+                if (
+                    persistedState &&
+                    (persistedState as any) &&
+                    !(persistedState as any).interval
+                ) {
                     return {
-                        layout: {chartLayout:(persistedState as any).layout,interval:"1D"},
+                        layout: {
+                            chartLayout: (persistedState as any).layout,
+                            interval: '1D',
+                        },
                     };
                 }
                 return persistedState;
