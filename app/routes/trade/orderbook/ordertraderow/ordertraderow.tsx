@@ -13,18 +13,11 @@ interface OrderTradeRowProps {
 const OrderTradeRow: React.FC<OrderTradeRowProps> = ({ trade }) => {
 
   const { formatNum } = useNumFormatter();
-  const { buySellColor } = useAppSettings();
-
-  const type = useMemo(() => {
-    if (trade.side === 'buy' && buySellColor.type === 'normal') return styles.buy;
-    if (trade.side === 'sell' && buySellColor.type === 'normal') return styles.sell;
-    if (trade.side === 'buy' && buySellColor.type === 'inverse') return styles.sell;
-    if (trade.side === 'sell' && buySellColor.type === 'inverse') return styles.buy;
-  }, [trade.side, buySellColor.type]);
+  const { getBsColor } = useAppSettings();
 
   return (
-    <div className={`${styles.orderTradeRow} ${type}`} >
-      <div className={styles.orderTradePrice}>{formatNum(trade.px)}</div>
+    <div className={`${styles.orderTradeRow}`}>
+      <div className={styles.orderTradePrice} style={{color: trade.side === 'buy' ? getBsColor().buy : getBsColor().sell}}> {formatNum(trade.px)}</div>
       <div className={styles.orderTradeSize}>{formatNum(trade.sz)}</div>
       <div className={styles.orderTradeTime}>
         <span>

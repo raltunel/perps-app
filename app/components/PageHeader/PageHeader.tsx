@@ -9,7 +9,6 @@ import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-import InternarionalSettingsDropdown from './InternarionalSettingsDropdown/InternarionalSettingsDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
@@ -23,8 +22,6 @@ export default function PageHeader() {
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
-    const [isInternationalDropdownOpen, setIsInternationalDropdownOpen] =
-        useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     const location = useLocation();
 
@@ -55,9 +52,6 @@ export default function PageHeader() {
     const networkMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsNetworkDropdownOpen(false);
     }, isNetworkDropdownOpen);
-    const internationalMenuRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsInternationalDropdownOpen(false);
-    }, isInternationalDropdownOpen);
     const moreDropdownRef = useOutsideClick<HTMLDivElement>(() => {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
@@ -88,16 +82,6 @@ export default function PageHeader() {
             )}
         </section>
     );
-    // {isDropdownMenuOpen && (
-    //   <div
-    //     className={`${styles.dropdownMenu} ${
-    //       isDropdownMenuOpen ? styles.open : ''
-    //     }`}
-    //     ref={dropdownMenuRef}
-    //   >
-    //     <DropdownMenu />
-    //   </div>
-    // )}
 
     const dropdownMenuDisplay = (
         <section
@@ -187,25 +171,6 @@ export default function PageHeader() {
         </section>
     );
 
-    const internationalDropdownDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={internationalMenuRef}
-        >
-            <button
-                className={styles.internationalButton}
-                onClick={() =>
-                    setIsInternationalDropdownOpen(!isInternationalDropdownOpen)
-                }
-            >
-                {internationalButtonSvg}
-            </button>
-
-            {isInternationalDropdownOpen && <InternarionalSettingsDropdown />}
-        </section>
-    );
     const moreDropdownDisplay = (
         <section
             style={{
@@ -227,7 +192,7 @@ export default function PageHeader() {
 
     return (
         <>
-            <header className={styles.container}>
+            <header id={'pageHeader'} className={styles.container}>
                 <Link to='/'>
                     <img
                         src='/images/perpsLogo.svg'
@@ -281,7 +246,6 @@ export default function PageHeader() {
                         </Button>
                     )}
                     {isUserConnected && walletDisplay}
-                    {internationalDropdownDisplay}
 
                     <button
                         className={styles.internationalButton}
@@ -301,7 +265,7 @@ export default function PageHeader() {
 
             {dropdownMenuDisplay}
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close}>
+                <Modal close={appSettingsModal.close} position={'center'}>
                     <AppOptions modalControl={appSettingsModal} />
                 </Modal>
             )}

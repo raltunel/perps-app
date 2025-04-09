@@ -1,6 +1,9 @@
 import { OrderHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type { PositionIF } from '~/utils/position/PositionIFs';
 
+
+const limit = 10;
 export interface UserTradeStore {
     userOrders: OrderDataIF[];
     userSymbolOrders: OrderDataIF[];
@@ -12,14 +15,16 @@ export interface UserTradeStore {
     filterOrderHistory: (orderHistory: OrderDataIF[], filterType?: string) => OrderDataIF[];
     userSymbolOrderHistory: OrderDataIF[];
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => void;
+    positions: PositionIF[];
+    setPositions: (positions: PositionIF[]) => void;
 }
 
 export const createUserTradesSlice = (set:any, get:any) => ({
     userOrders: [],
     userSymbolOrders: [],
     setUserOrders: (userOrders: OrderDataIF[]) => {
-        set({ userOrders })
-        get().setUserSymbolOrders(userOrders.filter(e=> e.coin === get().symbol))
+        set({ userOrders: userOrders.slice(0, limit) })
+        get().setUserSymbolOrders(userOrders.filter(e=> e.coin === get().symbol).slice(0, limit))
     },
     setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => {
         set({ userSymbolOrders })
@@ -50,6 +55,12 @@ export const createUserTradesSlice = (set:any, get:any) => ({
             case 'short':
                 return orderHistory.filter(e=> e.side === 'sell').slice(0, OrderHistoryLimits.RENDERED);
         }
-    }
+    },
+    positions: [],
+    setPositions: (positions: PositionIF[]) => {
+        set({ positions })
+    },
+    userSymbolOrderHistory: [],
+    setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => set({ userSymbolOrderHistory })
 });
 

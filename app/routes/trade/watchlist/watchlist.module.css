@@ -41,7 +41,7 @@
 .watchListNodesWrapper{
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    /* gap: .7rem; */
     align-items: center;
     justify-content: center;
 }
