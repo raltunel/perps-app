@@ -35,6 +35,7 @@
   position: absolute;
   left: .6rem;
   top: 50%;
+  color: var(--text2);
   transform: translateY(-50%);
 }
 
@@ -119,3 +120,37 @@
   padding: 0 0.2rem !important;
   border-radius: 0.2rem !important;
 }
+
+.symbolListSearchClose{
+  transition: all 0.2s ease-in-out;
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text2);
+  cursor: pointer;
+}
+
+.symbolListSearchClose:hover{
+  color: var(--text1);
+}
+
+.favIcon{
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.favIcon svg{
+  color: var(--text2) !important;
+}
+
+.favIcon:not(.favIconActive):hover{
+  color: var(--text1) !important;
+}
+
+.favIconActive:hover{
+  opacity: .8;
+}
+

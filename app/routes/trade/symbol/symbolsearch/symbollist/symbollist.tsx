@@ -11,6 +11,7 @@ import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
 import { motion } from 'framer-motion';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import { IoCloseOutline } from "react-icons/io5";
 
 
 interface SymbolListProps {
@@ -25,7 +26,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     const navigate = useNavigate();
     
 
-    const {coins, setSymbol} = useTradeDataStore();
+    const {coins, setSymbol, favKeys} = useTradeDataStore();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState<string>('');
@@ -53,7 +54,13 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
             setSortDirection('desc');
         }
     }
-    
+
+    const inputKeyHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if(e.key === 'Escape'){
+            setSearchQuery('');
+        }
+    }
+
     const sortSymbols = (symbols: SymbolInfoIF[], sortBy: string, sortDirection: string) => {
 
         switch(sortBy){
@@ -79,8 +86,10 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
 
     const sortedSymbols = useMemo(() => {
-        return [...sortSymbols(coins.filter( c => c.openInterest > 0), sortBy, sortDirection)];
-    }, [coins, sortBy, sortDirection]);
+        const favCoins = coins.filter( c => favKeys.includes(c.coin));
+        const otherCoins = coins.filter( c => !favKeys.includes(c.coin) && c.openInterest > 0);
+        return [...sortSymbols(favCoins, sortBy, sortDirection), ...sortSymbols(otherCoins, sortBy, sortDirection)];
+    }, [coins, sortBy, sortDirection, favKeys]);
 
     const coinsToShow = useMemo(() => {
         if(searchQuery.length === 0){
@@ -98,7 +107,8 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
 <div className={styles.symbolListSearch}>
 <FiSearch className={styles.symbolListSearchIcon} />
-<input autoFocus type="text" placeholder='Search tokens...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}/>
+<input autoFocus type="text" placeholder='Search tokens...' value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={inputKeyHandler}/>
+<IoCloseOutline className={styles.symbolListSearchClose} onClick={() => setSearchQuery('')} />
 </div>
 
 
