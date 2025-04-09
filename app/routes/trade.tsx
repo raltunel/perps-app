@@ -15,9 +15,9 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 export function meta({ }: Route.MetaArgs) {
   return [
     { title: '<<< LOADING >>>' },
@@ -35,13 +35,20 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
   const { symbol, setSymbol } = useTradeDataStore();
+  const { marketId } = useParams<{ marketId: string }>();
+  const navigate = useNavigate();
+  // logic to automatically redirect the user if they land on a
+  // ... route with no token symbol in the URL
+  useEffect(() => {
+    marketId ?? navigate(`/trade/${symbol}`, { replace: true });
+  }, [navigate]);
+
+  
   const symbolRef = useRef(symbol);
   symbolRef.current = symbol;
   const { orderBookMode } = useAppSettings();
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
-
-  const { marketId } = useParams<{ marketId: string }>();
 
   return (
     <>
