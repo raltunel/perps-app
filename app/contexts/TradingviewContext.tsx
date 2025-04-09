@@ -242,7 +242,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
             });
         }
-    }, [debugWallet, chart]);
+    }, [debugWallet, chart, symbol]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>
