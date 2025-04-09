@@ -15,7 +15,6 @@
         "prestart": "node scripts/copy-tv.js",
         "lint": "eslint app --ext .js,.jsx,.ts,.tsx",
         "lint:fix": "eslint app --ext .js,.jsx,.ts,.tsx --fix",
-        "prepare": "husky",
         "prettier": "prettier --write ."
     },
     "dependencies": {
