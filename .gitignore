@@ -12,9 +12,6 @@
 # Netlify
 .netlify
 
-/.prettierignore
-
-
 # Tradingview
 /public/tv/charting_library
 /public/tv/datafeeds
