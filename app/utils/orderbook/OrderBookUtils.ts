@@ -91,10 +91,6 @@ const decimalPrecision = (precisionNumber: number) => {
 export const getPrecisionForResolution = (resolution: OrderRowResolutionIF):number => {
   return decimalPrecision(resolution.val);
 }
-Math.floor(Math.log10(100000))
-const getValForNsig = (szDecimals: number): number => {
-  return 1 / Math.pow(10, 5-szDecimals)
-}
 
 const get10PowForPrice = (price: number): number => {
   return Math.floor(Math.log10(price));
