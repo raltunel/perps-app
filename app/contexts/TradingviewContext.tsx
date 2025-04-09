@@ -5,12 +5,7 @@ import {
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
-import React, {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-} from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
 import { useWsObserver } from '~/hooks/useWsObserver';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -100,13 +95,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             // array of color codes from candle properties we care about
             const activeColors: string[] | undefined = candleStyle
                 ? [
-                    candleStyle.upColor,
-                    candleStyle.downColor,
-                    candleStyle.borderUpColor,
-                    candleStyle.borderDownColor,
-                    candleStyle.wickUpColor,
-                    candleStyle.wickDownColor,
-                ]
+                      candleStyle.upColor,
+                      candleStyle.downColor,
+                      candleStyle.borderUpColor,
+                      candleStyle.borderDownColor,
+                      candleStyle.wickUpColor,
+                      candleStyle.wickDownColor,
+                  ]
                 : undefined;
             // determine if any of the candles have a color chosen through
             // ... the trading view color customization workflow (custom
@@ -243,6 +238,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             });
         }
     }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            chart.chart().clearMarks();
+            chart.chart().refreshMarks();
+        }
+    }, [bsColor, chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>

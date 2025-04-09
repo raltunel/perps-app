@@ -3,7 +3,7 @@ import type {
     LibrarySymbolInfo,
     Mark,
 } from '~/tv/charting_library/charting_library';
-import { getHistoricalData, getMarkFillData } from './candleDataCache';
+import { getHistoricalData, getMarkColorData, getMarkFillData } from './candleDataCache';
 import {
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
@@ -94,13 +94,15 @@ export const createDataFeed = (
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
+            const chartTheme = getMarkColorData();
+
             const fillMarks = (payload: any) => {
                 const floorMode = resolutionToSecondsMiliSeconds(resolution);
 
                 payload.forEach((element: any, index: number) => {
                     const isBuy = element.side === 'B';
 
-                    const markerColor = isBuy ? '#26a69a' : '#ef5350';
+                    const markerColor = isBuy ? chartTheme.buy : chartTheme.sell;
 
                     const markData = {
                         id: index,

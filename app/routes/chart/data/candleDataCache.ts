@@ -1,5 +1,6 @@
 import { mapResolutionToInterval, resolutionToSeconds } from './utils/utils';
 import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
+import { bsColorSets } from '~/stores/AppSettingsStore';
 
 const dataCache = new Map<string, any[]>();
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
@@ -85,4 +86,16 @@ export async function getMarkFillData(coin: string, user?: string) {
     }
 
     return [];
+}
+
+export function getMarkColorData() {
+    const mainSeriesProperties = JSON.parse(
+        localStorage.getItem('VISUAL_SETTINGS') || '{}',
+    );
+
+    if (mainSeriesProperties) {
+        return bsColorSets[mainSeriesProperties.state.bsColor];
+    }
+
+    return bsColorSets['default'];
 }
