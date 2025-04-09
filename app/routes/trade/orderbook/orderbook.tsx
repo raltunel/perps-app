@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import { useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processOrderBookMessage, processUserOrder } from '~/processors/processOrderBook';
+import { processOrderBookMessage } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderBookMode, OrderDataIF, OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
-import { getPrecisionForResolution, getResolutionListForPrice } from '~/utils/orderbook/OrderBookUtils';
+import { getPrecisionForResolution, getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow from './orderrow/orderrow';
 interface OrderBookProps {
@@ -168,7 +168,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
   useEffect(() => {
 
     if (symbol === symbolInfo?.coin) {
-      const resolutionList = getResolutionListForPrice(symbolInfo.markPx);
+      const resolutionList = getResolutionListForSymbol(symbolInfo);
       setResolutions(resolutionList);
       setSelectedResolution(resolutionList[0]);
     }
