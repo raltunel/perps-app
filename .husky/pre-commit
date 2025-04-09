@@ -1,2 +1,2 @@
-# .husky/pre-commit
+pnpm prettier
 # pnpm lint
