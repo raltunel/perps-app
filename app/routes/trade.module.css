@@ -25,9 +25,9 @@
 }
 
 .containerTop.orderBookLarge {
-    grid-template-columns: 1fr var(
-            --order-book-width-desktop-large-doubled
-        ) var(--trade-module-width-desktop-large);
+    grid-template-columns:
+        1fr var(--order-book-width-desktop-large-doubled)
+        var(--trade-module-width-desktop-large);
 }
 /* .containerTop div{
     background: var(--dark2);
@@ -118,9 +118,9 @@
     }
 
     .containerTop.orderBookLarge {
-        grid-template-columns: 1fr var(
-                --order-book-width-desktop-large-doubled
-            ) var(--trade-module-width-desktop-large);
+        grid-template-columns:
+            1fr var(--order-book-width-desktop-large-doubled)
+            var(--trade-module-width-desktop-large);
     }
     .containerBottom {
         grid-template-columns: 1fr var(
