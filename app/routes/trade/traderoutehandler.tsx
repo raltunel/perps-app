@@ -25,9 +25,10 @@ export default function TradeRouteHandler() {
   }, []);
 
   const checkSymbol = async () => {
-    const urlSymbol = marketId?.toUpperCase();
+    const urlSymbol = marketId;
 
     if (urlSymbol && urlSymbol.length > 0 && urlSymbol !== symbol) {
+
       const response = await fetch(
         `https://api.hyperliquid.xyz/info`, {
         method: 'POST',

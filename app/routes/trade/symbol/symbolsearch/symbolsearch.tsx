@@ -1,7 +1,7 @@
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './symbolsearch.module.css';
 import { FaChevronDown } from 'react-icons/fa';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import SymbolList from './symbollist/symbollist';
 import useOutsideClick from '~/hooks/useOutsideClick';
@@ -25,6 +25,12 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
     }
 
 
+    const symbolFileName = useMemo(() => {
+        const match = symbol.match(/^k([A-Z]+)$/);
+        return match ? match[1] : symbol;
+    }, [symbol]);
+
+
   return (
 <>
 <div className={styles.symbolSearchBackdrop} ref={symbolSearchBackdropRef}>
@@ -32,7 +38,7 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
 <div className={styles.symbolSearchContainer} onClick={wrapperClickHandler}>
 
     <div className={styles.symbolIcon}>
-        <img src={`https://app.hyperliquid.xyz/coins/${symbol}.svg`} alt={symbol} />
+        <img src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`} alt={symbolFileName} />
     </div>
 
     <div className={styles.symbolName}>
