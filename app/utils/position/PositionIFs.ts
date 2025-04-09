@@ -1,6 +1,6 @@
 export interface PositionLeverageIF {
- type: string;
- value: number;
+    type: string;
+    value: number;
 }
 
 export interface CumulativeFundingIF {

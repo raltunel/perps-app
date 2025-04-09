@@ -1,23 +1,17 @@
-.tradeTableWrapper{
+.tradeTableWrapper {
     width: 100%;
     height: 100%;
-border-radius: var(--main-border-radius, 16px);
-background: var(--dark2, #0E0E14);
+    border-radius: var(--main-border-radius, 16px);
+    background: var(--dark2, #0e0e14);
 
-display: flex;
-flex-direction: column;
-
-
-
+    display: flex;
+    flex-direction: column;
 }
-.tableContent{
+.tableContent {
     padding: 8px 9px 0px 9px;
     height: 100%;
-
-  
- 
 }
-.tableControls{
+.tableControls {
     display: flex;
     align-items: center;
     gap: 16px;

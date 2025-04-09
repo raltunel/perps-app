@@ -3,61 +3,74 @@ import styles from './symbolinfofield.module.css';
 
 import { motion } from 'framer-motion';
 
-
 interface SymbolInfoFieldProps {
-  label: string;
-  value: string;
-  lastWsChange?: number;
-  type?: 'positive' | 'negative';
-  valueClass?: string;
+    label: string;
+    value: string;
+    lastWsChange?: number;
+    type?: 'positive' | 'negative';
+    valueClass?: string;
 }
 
+const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
+    label,
+    value,
+    lastWsChange,
+    type,
+    valueClass,
+}) => {
+    const { getBsColor } = useAppSettings();
 
+    const getValueColor = () => {
+        if (type === 'positive') {
+            return getBsColor().buy;
+        }
+        if (type === 'negative') {
+            return getBsColor().sell;
+        }
+        return 'var(--text1)';
+    };
 
-const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({ label, value, lastWsChange, type, valueClass }) => {
+    const renderValue = () => {
+        if (lastWsChange) {
+            return (
+                <motion.div
+                    key={lastWsChange}
+                    className={`${styles.symbolInfoFieldValue} ${valueClass}`}
+                    initial={{
+                        color:
+                            lastWsChange > 0
+                                ? getBsColor().buy
+                                : lastWsChange < 0
+                                  ? getBsColor().sell
+                                  : 'var(--text1)',
+                    }}
+                    animate={{ color: 'var(--text1)' }}
+                    transition={{ duration: 1, ease: 'easeInOut' }}
+                >
+                    {value}
+                </motion.div>
+            );
+        }
+        return (
+            <>
+                <div
+                    className={`${styles.symbolInfoFieldValue} ${valueClass}`}
+                    style={{ color: getValueColor() }}
+                >
+                    {value}
+                </div>
+            </>
+        );
+    };
 
-
-  const {getBsColor} = useAppSettings();
-
-  const getValueColor = () => {
-    if(type === 'positive'){
-      return getBsColor().buy;
-    }
-    if(type === 'negative'){
-      return getBsColor().sell;
-    }
-    return 'var(--text1)';
-  }
-
-  const renderValue = () => {
-    if(lastWsChange){
-      return (<motion.div 
-            key={lastWsChange}
-            className={`${styles.symbolInfoFieldValue} ${valueClass}`} 
-            initial={{color: lastWsChange > 0 ? getBsColor().buy : (lastWsChange < 0 ? getBsColor().sell : 'var(--text1)')}}
-            animate={{color: 'var(--text1)'}}
-            transition={{duration: 1, ease: 'easeInOut'}}
-          >
-            {value}
-      </motion.div>)
-    }
-    return (<>
-      <div className={`${styles.symbolInfoFieldValue} ${valueClass}`} style={{color: getValueColor()}}>
-        {value}
-      </div>
-    </>)
-  }
-
-
-
-  return (
-    <div className={styles.symbolInfoFieldWrapper}>
-    <div className={`${styles.symbolInfoField}`}>
-      <div className={styles.symbolInfoFieldLabel}>{label}</div>
-      {renderValue()}
-    </div>
-    </div>
-  );
-}
+    return (
+        <div className={styles.symbolInfoFieldWrapper}>
+            <div className={`${styles.symbolInfoField}`}>
+                <div className={styles.symbolInfoFieldLabel}>{label}</div>
+                {renderValue()}
+            </div>
+        </div>
+    );
+};
 
 export default SymbolInfoField;

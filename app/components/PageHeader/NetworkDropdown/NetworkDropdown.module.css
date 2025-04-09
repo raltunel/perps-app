@@ -11,20 +11,20 @@
     border-radius: var(--main-border-radius, 16px);
     background: var(--dark2, #0e0e14);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
-  
-  
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-  
+
+    transition:
+        opacity 0.3s ease-in-out,
+        visibility 0.3s ease-in-out;
+
     /* ---------------------------- */
-  
+
     opacity: 1;
     height: auto;
     visibility: visible;
     pointer-events: auto;
     z-index: var(--navbar-dropdown-zindex);
-
-  }
-  .networkContent{
+}
+.networkContent {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -32,21 +32,21 @@
     justify-content: space-between;
     height: 23px;
     padding: 8px;
-  }
+}
 
-  .leftSide{
+.leftSide {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 12px;
-  }
-  .testnet{
-    color: var(--core-accent1, #7371FC);
+}
+.testnet {
+    color: var(--core-accent1, #7371fc);
 
-/* Main/XS */
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-xs, 10px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
-  }
+    /* Main/XS */
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-xs, 10px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}

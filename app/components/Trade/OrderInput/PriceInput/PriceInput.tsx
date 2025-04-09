@@ -10,7 +10,15 @@ interface PropsIF {
     showMidButton: boolean;
 }
 export default function PriceInput(props: PropsIF) {
-    const { value, onChange, onBlur, onKeyDown, className, ariaLabel, showMidButton } = props;
+    const {
+        value,
+        onChange,
+        onBlur,
+        onKeyDown,
+        className,
+        ariaLabel,
+        showMidButton,
+    } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
         if (/^\d*$/.test(newValue) && newValue.length <= 12) {
@@ -18,7 +26,9 @@ export default function PriceInput(props: PropsIF) {
         }
     };
     return (
-        <div className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}>
+        <div
+            className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}
+        >
             <span>Price</span>
             <input
                 type='text'
@@ -32,7 +42,9 @@ export default function PriceInput(props: PropsIF) {
                 pattern='[0-9]*'
                 placeholder='Enter Price'
             />
-           {showMidButton && <button className={styles.midButton}>Mid </button>}
+            {showMidButton && (
+                <button className={styles.midButton}>Mid </button>
+            )}
         </div>
     );
 }

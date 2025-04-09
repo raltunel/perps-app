@@ -1,12 +1,11 @@
 .basicMenuWrapper {
     position: relative;
-    font-size: .8rem;
+    font-size: 0.8rem;
 }
 
 .triggerContent {
     cursor: pointer;
 }
-
 
 @keyframes menuAnimation {
     from {
@@ -22,10 +21,9 @@
 .menuContainer {
     position: absolute;
     animation: menuAnimation 0.2s ease-in-out;
-  background: var(--dark4);
-  border-radius: .5rem;
-  z-index: 10;
-
+    background: var(--dark4);
+    border-radius: 0.5rem;
+    z-index: 10;
 }
 
 .menuContainer.top {
@@ -40,14 +38,14 @@
     left: 0;
 }
 
-.menuContainer.right {  
+.menuContainer.right {
     right: 0;
 }
 
 .menuItem {
     cursor: pointer;
     color: var(--text2);
-    padding: .25rem .5rem;
+    padding: 0.25rem 0.5rem;
 }
 
 .menuItem:hover {
@@ -55,24 +53,22 @@
     background: var(--dark3);
 }
 
-
-
-.triggerWrapper{
-    transition: ease-in-out .2s;
+.triggerWrapper {
+    transition: ease-in-out 0.2s;
     cursor: pointer;
-    padding: 0 .7rem;
+    padding: 0 0.7rem;
     align-items: center;
     justify-content: center;
     height: 100%;
     display: flex;
 }
 
-.triggerWrapper:hover svg{
+.triggerWrapper:hover svg {
     color: var(--text1);
 }
 
-.triggerWrapper svg{
-    transition: ease-in-out .2s;
+.triggerWrapper svg {
+    transition: ease-in-out 0.2s;
     font-size: 1rem;
     color: var(--text2);
     min-width: 1.4rem;
