@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
@@ -10,6 +9,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
     OrderBookMode,
+    OrderBookRowIF,
     OrderDataIF,
     OrderRowResolutionIF,
 } from '~/utils/orderbook/OrderBookIFs';
@@ -18,15 +18,14 @@ import {
     getResolutionListForSymbol,
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
-import OrderRow from './orderrow/orderrow';
+import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
-    const { fetchData } = useInfoApi();
+    const { subscribe } = useWsObserver();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
@@ -34,16 +33,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     // added to pass true resolution to orderrow components
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
 
-    const assetPrice = useRef<number>(0);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
-    const { debugWallet } = useDebugStore();
 
-    const { formatNum, decimalPrecision } = useNumFormatter();
+    const { formatNum } = useNumFormatter();
 
     const { isWsEnabled } = useDebugStore();
 
     const isWsEnabledRef = useRef<boolean>(true);
     isWsEnabledRef.current = isWsEnabled;
+
+    const lockOrderBook = useRef<boolean>(false);
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
     const {
@@ -52,6 +51,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         userSymbolOrders,
         symbolInfo,
         addOrderToHistory,
+        setObChosenPrice,
+        setObChosenAmount,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -171,7 +172,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         subscribe(WsChannels.ORDERBOOK, {
             payload: payload,
             handler: (response) => {
-                if (!isWsEnabledRef.current) {
+                if (!isWsEnabledRef.current || lockOrderBook.current) {
                     return;
                 }
 
@@ -218,6 +219,34 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             });
         }
     }, [selectedResolution]);
+
+    const rowClickHandler = (
+        order: OrderBookRowIF,
+        type: OrderRowClickTypes,
+        rowIndex: number,
+    ) => {
+        lockOrderBook.current = true;
+        if (type === OrderRowClickTypes.PRICE) {
+            setObChosenPrice(order.px);
+        } else if (type === OrderRowClickTypes.AMOUNT) {
+            let amount = 0;
+            if (order.type === 'buy') {
+                for (let i = 0; i <= rowIndex; i++) {
+                    amount += buys[i].sz;
+                }
+            } else {
+                for (let i = 0; i < orderCount - rowIndex; i++) {
+                    amount += sells[i].sz;
+                }
+            }
+            setObChosenPrice(order.px);
+            setObChosenAmount(amount);
+        }
+
+        setTimeout(() => {
+            lockOrderBook.current = false;
+        }, 1000);
+    };
 
     return (
         <div className={styles.orderBookContainer}>
@@ -287,6 +316,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                 .reverse()
                                 .map((order, index) => (
                                     <OrderRow
+                                        rowIndex={index}
                                         key={order.px}
                                         order={order}
                                         coef={
@@ -296,6 +326,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                         }
                                         resolution={filledResolution.current}
                                         userSlots={userSellSlots}
+                                        clickListener={rowClickHandler}
                                     />
                                 ))}
                         </div>
@@ -321,6 +352,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                         <div className={styles.orderBookBlock}>
                             {buys.slice(0, orderCount).map((order, index) => (
                                 <OrderRow
+                                    rowIndex={index}
                                     key={order.px}
                                     order={order}
                                     coef={
@@ -330,6 +362,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                     }
                                     resolution={filledResolution.current}
                                     userSlots={userBuySlots}
+                                    clickListener={rowClickHandler}
                                 />
                             ))}
                         </div>

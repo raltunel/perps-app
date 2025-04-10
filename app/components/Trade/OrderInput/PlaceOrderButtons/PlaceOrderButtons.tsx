@@ -8,6 +8,7 @@ interface propsIF {
     openModalWithContent: (
         content: 'margin' | 'scale' | 'confirmation',
     ) => void;
+    orderValue?: string;
 }
 interface MarketInfoItem {
     label: string;
