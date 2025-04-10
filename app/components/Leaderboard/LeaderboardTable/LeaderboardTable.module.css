@@ -25,12 +25,10 @@
 }
 
 .tableWrapper {
-  
     width: 100%;
     height: 100%;
     overflow-x: auto;
     padding-right: 8px;
-   
 
     display: flex;
     flex-direction: column;
@@ -42,30 +40,26 @@
     padding-bottom: 1rem;
     padding-right: 8px;
 
-
     max-height: 294px;
     scrollbar-gutter: stable;
-
-    
 }
-
 
 .tableBody::-webkit-scrollbar {
     width: 4px !important;
-  }
-  
-  .tableBody::-webkit-scrollbar-track {
+}
+
+.tableBody::-webkit-scrollbar-track {
     background: var(--dark3) !important;
-  }
-  
-  .tableBody::-webkit-scrollbar-thumb {
+}
+
+.tableBody::-webkit-scrollbar-thumb {
     background: var(--accent1) !important;
     border-radius: 4px !important;
-  }
-  
-  .tableBody::-webkit-scrollbar-thumb:hover {
+}
+
+.tableBody::-webkit-scrollbar-thumb:hover {
     background: var(--accent1) !important;
-  }
+}
 
 .cell {
     font-size: var(--font-size-s, 12px);
@@ -103,19 +97,20 @@
 /* Specific cell classes */
 .rankCell {
     text-align: start;
-    
 }
 
-.traderCell {}
+.traderCell {
+}
 
-.accountValueCell {}
+.accountValueCell {
+}
 
 .pnlCell {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .roiCell {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .volumeCell {
@@ -125,19 +120,18 @@
 }
 
 .positive {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .negative {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 
-.fullScreen{
+.fullScreen {
     height: 100%;
 }
 
-.fullScreen .tableBody{
-
+.fullScreen .tableBody {
     max-height: 65vh;
 }
 @media (max-width: 1200px) {

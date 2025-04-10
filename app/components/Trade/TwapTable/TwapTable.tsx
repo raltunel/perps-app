@@ -22,10 +22,10 @@ export default function TwapTable(props: Props) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Active':
-                return <ActiveTwapTable/>;
+                return <ActiveTwapTable />;
 
             case 'History':
-                return <HistoryTwapTable/>;
+                return <HistoryTwapTable />;
             case 'Open Orders':
                 return (
                     <div className={styles.emptyState}>
@@ -33,10 +33,10 @@ export default function TwapTable(props: Props) {
                     </div>
                 );
             case 'Fill History':
-                return <FillTwapTable/>;
+                return <FillTwapTable />;
 
             default:
-                return <ActiveTwapTable/>;
+                return <ActiveTwapTable />;
         }
     };
 

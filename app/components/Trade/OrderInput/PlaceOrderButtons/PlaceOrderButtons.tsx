@@ -1,20 +1,23 @@
 import Tooltip from '~/components/Tooltip/Tooltip';
-import styles from './PlaceOrderButtons.module.css'
+import styles from './PlaceOrderButtons.module.css';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface propsIF {
     orderMarketPrice: string;
-    openModalWithContent: (content: "margin" | "scale" | "confirmation") => void
+    openModalWithContent: (
+        content: 'margin' | 'scale' | 'confirmation',
+    ) => void;
+    orderValue?: string;
 }
 interface MarketInfoItem {
     label: string;
     tooltipLabel: string;
-    value: string;    
+    value: string;
 }
 
 export default function PlaceOrderButtons(props: propsIF) {
-    const { orderMarketPrice, openModalWithContent } = props
+    const { orderMarketPrice, openModalWithContent } = props;
 
     // logic to change the active color pair
     const { getBsColor } = useAppSettings();
@@ -23,10 +26,8 @@ export default function PlaceOrderButtons(props: propsIF) {
         'market',
         'limit',
         'stop_limit',
-        'stop_market'
-    ].includes(
-        orderMarketPrice,
-    );
+        'stop_market',
+    ].includes(orderMarketPrice);
 
     const marketInfoData: MarketInfoItem[] = [
         showLiquidationPrice && {
@@ -45,7 +46,7 @@ export default function PlaceOrderButtons(props: propsIF) {
             value: 'N/A',
         },
     ].filter(Boolean) as MarketInfoItem[];
-    
+
     const twapInfoData: MarketInfoItem[] = [
         {
             label: 'Frequency',
@@ -83,9 +84,8 @@ export default function PlaceOrderButtons(props: propsIF) {
     };
 
     const dataToUse = infoDataMap[orderMarketPrice] || marketInfoData;
-    
-    return (
 
+    return (
         <div className={styles.place_order_buttons}>
             <div className={styles.buttons_wrapper}>
                 <button
@@ -120,5 +120,5 @@ export default function PlaceOrderButtons(props: propsIF) {
                 ))}
             </div>
         </div>
-    )
+    );
 }

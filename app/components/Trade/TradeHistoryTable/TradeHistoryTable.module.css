@@ -41,7 +41,7 @@
     padding-bottom: 1rem;
 }
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -69,11 +69,11 @@
 }
 
 .longDirection {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .shortDirection {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 
 .orderIcon {
@@ -103,11 +103,9 @@
 }
 
 .actionsContainer {
-    
     grid-column: 1 / -1;
     display: flex;
     padding: 8px;
-
 }
 
 /* Specific cell styles */
@@ -117,21 +115,28 @@
     gap: 8px;
 }
 
-.timeCell svg{
+.timeCell svg {
     color: var(--accent1);
     cursor: pointer;
 }
 
-.timeCell svg:hover{
-    color: var(--text1)
+.timeCell svg:hover {
+    color: var(--text1);
 }
-.coinCell {}
-.directionCell {}
-.priceCell {}
-.sizeCell {}
-.tradeValueCell {}
-.feeCell {}
-.closedPnlCell {}
+.coinCell {
+}
+.directionCell {
+}
+.priceCell {
+}
+.sizeCell {
+}
+.tradeValueCell {
+}
+.feeCell {
+}
+.closedPnlCell {
+}
 
 @media (max-width: 1200px) {
     .rowContainer,

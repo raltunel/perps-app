@@ -1,23 +1,29 @@
-import { useCallback, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useWsObserver, WsChannels } from "~/hooks/useWsObserver";
-import { processUserOrder } from "~/processors/processOrderBook";
-import { processSymbolInfo } from "~/processors/processSymbolInfo";
-import { useDebugStore } from "~/stores/DebugStore";
-import { useTradeDataStore } from "~/stores/TradeDataStore";
-import type { OrderDataIF } from "~/utils/orderbook/OrderBookIFs";
-import type { PositionIF } from "~/utils/position/PositionIFs";
-import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
-
+import { useCallback, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processUserOrder } from '~/processors/processOrderBook';
+import { processSymbolInfo } from '~/processors/processSymbolInfo';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 export default function WebDataConsumer() {
-
-    const { favKeys, setFavCoins, setUserOrders, symbol, setCoins, coins, setPositions, positions } = useTradeDataStore();
+    const {
+        favKeys,
+        setFavCoins,
+        setUserOrders,
+        symbol,
+        setCoins,
+        coins,
+        setPositions,
+        positions,
+    } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
-
 
     const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
@@ -29,20 +35,13 @@ export default function WebDataConsumer() {
     const positionsRef = useRef<PositionIF[]>([]);
 
     useEffect(() => {
-
-        const foundCoin = coins.find(coin => coin.coin === symbol);
+        const foundCoin = coins.find((coin) => coin.coin === symbol);
         if (foundCoin) {
             setSymbolInfo(foundCoin);
         }
-
-
-    }, [symbol, coins])
-
-
-
+    }, [symbol, coins]);
 
     useEffect(() => {
-
         setUserOrders([]);
         openOrdersRef.current = [];
 
@@ -55,8 +54,8 @@ export default function WebDataConsumer() {
                     positionsRef.current = payload.data.positions;
                 }
             },
-            single: true
-        })
+            single: true,
+        });
 
         const openOrdersInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
@@ -70,12 +69,10 @@ export default function WebDataConsumer() {
             clearInterval(openOrdersInterval);
             clearInterval(positionsInterval);
             unsubscribeAllByChannel(WsChannels.WEB_DATA2);
-        }
-    }, [debugWallet.address])
-
+        };
+    }, [debugWallet.address]);
 
     useEffect(() => {
-
         if (favKeysRef.current && coins.length > 0) {
             const favs: SymbolInfoIF[] = [];
             favKeysRef.current.forEach((coin) => {
@@ -88,10 +85,5 @@ export default function WebDataConsumer() {
         }
     }, [favKeys, coins]);
 
-    return (
-        <></>
-    )
-
+    return <></>;
 }
-
-

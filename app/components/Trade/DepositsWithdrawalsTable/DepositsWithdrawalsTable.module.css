@@ -42,17 +42,14 @@
 }
 
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .actionsContainer {
-    
     grid-column: 1 / -1;
     display: flex;
     padding: 8px;
-
 }
-
 
 .actionLink {
     background-color: transparent;
@@ -94,12 +91,18 @@
 }
 
 /* Specific cell classes */
-.timeCell {}
-.statusCell {}
-.networkCell {}
-.actionCell {}
-.valueChangeCell {}
-.feeCell {}
+.timeCell {
+}
+.statusCell {
+}
+.networkCell {
+}
+.actionCell {
+}
+.valueChangeCell {
+}
+.feeCell {
+}
 
 @media (max-width: 1000px) {
     .rowContainer,

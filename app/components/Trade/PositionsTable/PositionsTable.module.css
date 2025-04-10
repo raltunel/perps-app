@@ -35,7 +35,6 @@
     flex-direction: column;
 
     display: flex;
-    
 }
 
 .tableBody {
@@ -44,7 +43,7 @@
     padding-bottom: 1rem;
 }
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -72,7 +71,7 @@
 }
 
 .pnlPositive {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .badge {
@@ -109,30 +108,33 @@
     gap: 4px;
 }
 
-.sizeCell {}
-.positionValueCell {}
-.entryPriceCell {}
-.markPriceCell {}
-.pnlCell {}
-.liqPriceCell {}
-.marginCell {}
-.fundingCell {}
-.tpslCell {}
+.sizeCell {
+}
+.positionValueCell {
+}
+.entryPriceCell {
+}
+.markPriceCell {
+}
+.pnlCell {
+}
+.liqPriceCell {
+}
+.marginCell {
+}
+.fundingCell {
+}
+.tpslCell {
+}
 .closeCell {
     text-align: right;
     justify-self: end;
-
-    
-    
 }
 
 .headerContainer .closeCell {
-   
     text-align: end;
     justify-self: end;
     padding-right: 8px;
-   
-   
 }
 @media (max-width: 1400px) {
     .rowContainer,
@@ -173,7 +175,8 @@
         grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
     }
 
-    .sizeCell, .marginCell {
+    .sizeCell,
+    .marginCell {
         display: none;
     }
 }
@@ -184,7 +187,8 @@
         grid-template-columns: 0.8fr 1fr 0.8fr 1.2fr;
     }
 
-    .tpslCell, .liqPriceCell {
+    .tpslCell,
+    .liqPriceCell {
         display: none;
     }
 }

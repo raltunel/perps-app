@@ -2,15 +2,14 @@ import { useEffect, useRef, useState, type JSX } from 'react';
 import styles from './OptionLineSelect.module.css';
 import { SlArrowDown } from 'react-icons/sl';
 
-
 interface dropdownOptionsIF {
-    readable: string|JSX.Element;
+    readable: string | JSX.Element;
     set: () => void;
 }
 
 interface propsIF {
     text: string;
-    active: string|JSX.Element;
+    active: string | JSX.Element;
     options: dropdownOptionsIF[];
 }
 
@@ -32,9 +31,9 @@ export default function OptionLineSelect(props: propsIF) {
             // determine if this elem or children were clicked
             // gatekeeping with `isOpen` seems to save computation time
             if (
-                dropdownRef.current
-                && !dropdownRef.current.contains(event.target as Node)
-                && isOpen
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node) &&
+                isOpen
             ) {
                 setIsOpen(false);
             }
@@ -61,13 +60,9 @@ export default function OptionLineSelect(props: propsIF) {
                 </div>
                 {isOpen && (
                     <div className={styles.options_dropdown}>
-                        {
-                            options.map((o: dropdownOptionsIF) => (
-                                <div onClick={() => o.set()}>
-                                    {o.readable}
-                                </div>
-                            ))
-                        }
+                        {options.map((o: dropdownOptionsIF) => (
+                            <div onClick={() => o.set()}>{o.readable}</div>
+                        ))}
                     </div>
                 )}
             </div>

@@ -21,7 +21,7 @@
     align-items: center;
     flex: 1 0 0;
     border-radius: var(--half-border-radius, 8px);
-    color: var(--text1, #F0F0F8);
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
     font-weight: 400;
     outline: none;
@@ -37,7 +37,7 @@
     padding: 8px 0px;
     align-self: stretch;
     border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #27272C);
+    border: 1px solid var(--dark4, #27272c);
 }
 
 .input_details > * {
