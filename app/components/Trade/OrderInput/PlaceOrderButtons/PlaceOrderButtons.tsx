@@ -6,9 +6,8 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 interface propsIF {
     orderMarketPrice: string;
     openModalWithContent: (
-        content: 'margin' | 'scale' | 'confirmation',
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => void;
-    orderValue?: string;
 }
 interface MarketInfoItem {
     label: string;
@@ -90,13 +89,13 @@ export default function PlaceOrderButtons(props: propsIF) {
             <div className={styles.buttons_wrapper}>
                 <button
                     style={{ backgroundColor: getBsColor().buy }}
-                    onClick={() => openModalWithContent('confirmation')}
+                    onClick={() => openModalWithContent('confirm_buy')}
                 >
                     Buy / Long
                 </button>
                 <button
                     style={{ backgroundColor: getBsColor().sell }}
-                    onClick={() => openModalWithContent('confirmation')}
+                    onClick={() => openModalWithContent('confirm_sell')}
                 >
                     Sell / Short
                 </button>

@@ -21,6 +21,10 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import {
+    useNotificationStore,
+    type NotificationStoreIF,
+} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 export interface OrderTypeOption {
@@ -64,7 +68,7 @@ export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
     const [modalContent, setModalContent] = useState<
-        'margin' | 'scale' | 'confirmation' | null
+        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
     >(null);
 
     const [leverage, setLeverage] = useState(100);
@@ -156,7 +160,7 @@ export default function OrderInput() {
     };
 
     const openModalWithContent = (
-        content: 'margin' | 'scale' | 'confirmation',
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
         setModalContent(content);
         appSettingsModal.open();
@@ -387,7 +391,9 @@ export default function OrderInput() {
         handleChangetotalOrders: handleTotalordersPriceRange,
         totalOrders: priceRangeTotalOrders,
     };
-    // ------------------------------------END OF PROPS-----------------------------
+
+    const notifications: NotificationStoreIF = useNotificationStore();
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
@@ -397,11 +403,6 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    {/* <OrderDropdown
-                        options={isolatedOrderTypes}
-                        value={isolatedOrderType}
-                        onChange={handleIsolatedOrderTypeChange}
-                    /> */}
                     <button
                         onClick={() => openModalWithContent('margin')}
                         className={styles.isolatedButton}
@@ -445,14 +446,6 @@ export default function OrderInput() {
 
                 {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
                 {marketOrderType === 'scale' && priceDistributionButtons}
-                {/* {marketOrderType === 'scale' && (
-                    <ScaleOrders
-                    totalQuantity={parseFloat(priceRangeTotalOrders)}
-                    minPrice={parseFloat(priceRangeMin)}
-                    maxPrice={parseFloat(priceRangeMax)}
-                    
-                />
-                )} */}
                 {marketOrderType === 'twap' && <RunningTime />}
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
@@ -482,8 +475,21 @@ export default function OrderInput() {
                             onClose={appSettingsModal.close}
                         />
                     )}
-                    {modalContent === 'confirmation' && (
-                        <ConfirmationModal onClose={appSettingsModal.close} />
+                    {modalContent === 'confirm_buy' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('buyPending');
+                                appSettingsModal.close();
+                            }}
+                        />
+                    )}
+                    {modalContent === 'confirm_sell' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('sellPending');
+                                appSettingsModal.close();
+                            }}
+                        />
                     )}
                 </Modal>
             )}
