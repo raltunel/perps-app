@@ -21,7 +21,10 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
-import { useNotificationStore, type NotificationStoreIF } from '~/stores/NotificationStore';
+import {
+    useNotificationStore,
+    type NotificationStoreIF,
+} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 export interface OrderTypeOption {
@@ -64,9 +67,9 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null>(
-        null,
-    );
+    const [modalContent, setModalContent] = useState<
+        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
+    >(null);
 
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
@@ -156,7 +159,9 @@ export default function OrderInput() {
         }
     };
 
-    const openModalWithContent = (content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell') => {
+    const openModalWithContent = (
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
+    ) => {
         setModalContent(content);
         appSettingsModal.open();
     };
@@ -389,7 +394,9 @@ export default function OrderInput() {
 
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    useEffect(() => {console.log(notifications.notifications)}, [notifications,notifications]);
+    useEffect(() => {
+        console.log(notifications.notifications);
+    }, [notifications, notifications]);
 
     return (
         <div className={styles.mainContainer}>
@@ -478,7 +485,7 @@ export default function OrderInput() {
                         />
                     )}
                     {modalContent === 'confirm_buy' && (
-                        <ConfirmationModal 
+                        <ConfirmationModal
                             onClose={() => {
                                 notifications.add('buyPending');
                                 appSettingsModal.close();
@@ -486,7 +493,7 @@ export default function OrderInput() {
                         />
                     )}
                     {modalContent === 'confirm_sell' && (
-                        <ConfirmationModal 
+                        <ConfirmationModal
                             onClose={() => {
                                 notifications.add('sellPending');
                                 appSettingsModal.close();

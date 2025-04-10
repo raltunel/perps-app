@@ -5,7 +5,9 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface propsIF {
     orderMarketPrice: string;
-    openModalWithContent: (content: "margin" | "scale" | 'confirm_buy' | 'confirm_sell') => void;
+    openModalWithContent: (
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
+    ) => void;
 }
 interface MarketInfoItem {
     label: string;

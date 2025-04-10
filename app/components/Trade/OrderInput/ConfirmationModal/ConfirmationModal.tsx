@@ -81,13 +81,11 @@ export default function ConfirmationModal(props: PropsIF) {
                 ))}
             </div>
             <div className={styles.toggleContainer}>
-
-            <ToggleSwitch
-                isOn={isDontShowEnabled}
-                onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
-                    label={'Don\'t show this again'}
-                    // reverse 
-                
+                <ToggleSwitch
+                    isOn={isDontShowEnabled}
+                    onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
+                    label={"Don't show this again"}
+                    // reverse
                 />
             </div>
             <button className={styles.confirmButton} onClick={onClose}>

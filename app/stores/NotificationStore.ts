@@ -31,30 +31,22 @@ const notificationMeta: { [x: string]: notificationMetaIF } = {
     },
     buyPending: {
         title: 'Buy / Long Order Pending',
-        messages: [
-            'Buying 0.0001 ETH at $2,300',
-        ],
+        messages: ['Buying 0.0001 ETH at $2,300'],
         icon: 'spinner',
     },
     buyConfirmed: {
         title: 'Buy / Long Order Confirmed',
-        messages: [
-            'Bought 0.0001 ETH at $2,300',
-        ],
+        messages: ['Bought 0.0001 ETH at $2,300'],
         icon: 'check',
     },
     sellPending: {
         title: 'Sell / Short Order Pending',
-        messages: [
-            'Selling 0.0001 ETH at $2,300',
-        ],
+        messages: ['Selling 0.0001 ETH at $2,300'],
         icon: 'spinner',
     },
     sellConfirmed: {
         title: 'Sell / Short Confirmed',
-        messages: [
-            'Sold 0.0001 ETH at $2,300',
-        ],
+        messages: ['Sold 0.0001 ETH at $2,300'],
         icon: 'check',
     },
     depositPending: {
