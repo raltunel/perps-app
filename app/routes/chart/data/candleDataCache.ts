@@ -89,12 +89,13 @@ export async function getMarkFillData(coin: string, user?: string) {
 }
 
 export function getMarkColorData() {
-    const mainSeriesProperties = JSON.parse(
-        localStorage.getItem('VISUAL_SETTINGS') || '{}',
-    );
+    const visualSettings = localStorage.getItem('VISUAL_SETTINGS');
 
-    if (mainSeriesProperties) {
-        return bsColorSets[mainSeriesProperties.state.bsColor];
+    if (visualSettings) {
+        const mainSeriesProperties = JSON.parse(visualSettings);
+        if (mainSeriesProperties) {
+            return bsColorSets[mainSeriesProperties.state.bsColor];
+        }
     }
 
     return bsColorSets['default'];
