@@ -21,6 +21,10 @@ type TradeDataStore = UserTradeStore & {
     coins: SymbolInfoIF[];
     setCoins: (coins: SymbolInfoIF[]) => void;
     removeFromFavKeys: (coin: string) => void;
+    obChosenPrice: number;
+    setObChosenPrice: (price: number) => void;
+    obChosenAmount: number;
+    setObChosenAmount: (amount: number) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -34,6 +38,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                 get().setUserSymbolOrders(
                     get().userOrders.filter((e) => e.coin === symbol),
                 );
+                set({ obChosenPrice: 0, obChosenAmount: 0 });
             },
             symbolInfo: null,
             setSymbolInfo: (symbolInfo: SymbolInfoIF) => {
@@ -68,6 +73,11 @@ const useTradeDataStore = create<TradeDataStore>()(
             setFavCoins: (favs: SymbolInfoIF[]) => set({ favCoins: favs }),
             coins: [],
             setCoins: (coins: SymbolInfoIF[]) => set({ coins }),
+            obChosenPrice: 0,
+            setObChosenPrice: (price: number) => set({ obChosenPrice: price }),
+            obChosenAmount: 0,
+            setObChosenAmount: (amount: number) =>
+                set({ obChosenAmount: amount }),
         }),
         {
             name: 'TRADE_DATA',

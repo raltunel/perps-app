@@ -9,6 +9,7 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     useTotalSize: boolean;
+    symbol?: string;
 }
 export default function SizeInput(props: PropsIF) {
     const {
@@ -19,6 +20,7 @@ export default function SizeInput(props: PropsIF) {
         className,
         ariaLabel,
         useTotalSize,
+        symbol,
     } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
@@ -42,7 +44,7 @@ export default function SizeInput(props: PropsIF) {
                 placeholder='Enter Size'
             />
             <button className={styles.tokenButton}>
-                ETH <FaChevronDown />
+                {symbol ? symbol : 'ETH'} <FaChevronDown />
             </button>
         </div>
     );
