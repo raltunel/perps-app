@@ -2,11 +2,10 @@ import type { ResolutionString } from '~/tv/charting_library';
 
 import type { LibrarySymbolInfo } from '~/tv/charting_library/charting_library';
 
-
 export type ChartLayout = {
-    chartLayout:object,
-    interval:string
-} 
+    chartLayout: object;
+    interval: string;
+};
 export const mapResolutionToInterval = (resolution: string): string => {
     const mapping: Record<string, string> = {
         '1': '1m',
@@ -64,7 +63,10 @@ export const priceFormatterFactory = (
         return {
             format: (price: number) => {
                 const precision = calculatePrecision(price);
-                return price.toFixed(precision > 0 ? precision : 0);
+
+                const precisionOver = price < 1 ? precision + 1 : precision;
+
+                return price.toFixed(precision > 0 ? precisionOver : 0);
             },
         };
     } else {

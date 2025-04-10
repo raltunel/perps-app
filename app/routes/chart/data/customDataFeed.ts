@@ -46,7 +46,7 @@ export const createDataFeed = (
             const symbolInfo: LibrarySymbolInfo = {
                 ticker: symbolName,
                 name: symbolName,
-                minmov: 1,
+                minmov: 0.01,
                 pricescale: 1000,
                 timezone: 'Etc/UTC',
                 session: '24x7',
