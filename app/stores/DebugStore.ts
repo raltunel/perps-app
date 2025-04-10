@@ -5,7 +5,7 @@ import { debugWallets, wsUrls } from '~/utils/Constants';
 export type DebugWallet = {
     label: string;
     address: string;
-}
+};
 
 interface DebugStore {
     wsUrl: string;
@@ -22,5 +22,5 @@ export const useDebugStore = create<DebugStore>((set) => ({
     debugWallet: debugWallets[2],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
-    setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled })
+    setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
 }));

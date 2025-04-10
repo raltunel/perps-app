@@ -1,9 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 
-type positions =
-    | 'center'
-    | 'bottomRight';
+type positions = 'center' | 'bottomRight';
 
 interface positionCSS {
     position?: 'fixed';
@@ -63,15 +61,13 @@ export default function Modal(props: propsIF) {
         // add the event listener to the DOM
         document.addEventListener(EVENT_TYPE, handleEscape);
         // remove event listener from the DOM when component unmounts
-        return (() => document.removeEventListener(EVENT_TYPE, handleEscape));
+        return () => document.removeEventListener(EVENT_TYPE, handleEscape);
     }, []);
 
     return (
         <div
-            onClick={
-                (
-                    e: React.MouseEvent<HTMLDivElement, MouseEvent>
-                ) => handleOutsideClick(e.target as HTMLDivElement)
+            onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
+                handleOutsideClick(e.target as HTMLDivElement)
             }
             id={OUTSIDE_MODAL_DOM_ID}
             className={styles.outside_modal}

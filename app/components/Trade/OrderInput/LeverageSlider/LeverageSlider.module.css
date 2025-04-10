@@ -3,61 +3,57 @@
     padding: 0;
     margin: 0;
     gap: 8px;
-    
-  }
-  .containerTitle{
-    color: var(--text2, #BCBCC4);
+}
+.containerTitle {
+    color: var(--text2, #bcbcc4);
 
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-s, 12px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
 
-  }
-  
-  .sliderWithValue {
+.sliderWithValue {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     gap: 16px;
     padding-left: 4px;
+}
 
-  }
-  
-  .sliderContainer {
+.sliderContainer {
     flex: 1;
     position: relative;
-   
-  }
-  
-  .sliderTrack {
+}
+
+.sliderTrack {
     position: relative;
     width: 100%;
     height: 2px;
     cursor: pointer;
-    margin: 20px 0 30px 0; 
-  }
-  
-  .sliderBackground {
+    margin: 20px 0 30px 0;
+}
+
+.sliderBackground {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background-color: var(--dark4);
-  }
-  
-  .sliderActive {
+}
+
+.sliderActive {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     transition: width 0.2s ease;
-  }
-  
-  .sliderMarker {
+}
+
+.sliderMarker {
     position: absolute;
     width: 3px;
     height: 8px;
@@ -66,45 +62,41 @@ line-height: normal;
     transform: translate(-50%, -50%);
     border: 2px solid;
     z-index: 2;
+}
 
-    
-  }
-  
-  .sliderMarkerCurrent{
+.sliderMarkerCurrent {
     display: none;
-  }
-  .sliderKnob {
+}
+.sliderKnob {
     position: absolute;
     width: 14px;
     height: 14px;
     border-radius: 50%;
     top: 50%;
-    
+
     transform: translate(-10%, -50%);
     border: 2px solid;
-    background-color: transparent; 
+    background-color: transparent;
     z-index: 3;
     cursor: grab;
     transition: left 0.2s ease;
-    outline: none; 
+    outline: none;
+}
 
-    
-  }
-  
-  .sliderKnob:active {
+.sliderKnob:active {
     cursor: grabbing;
     width: 0;
     height: 0;
-  }
-  
-  .labelContainer {
+}
+
+.labelContainer {
     position: relative;
     width: 100%;
     height: 20px;
-    margin-top: -25px; 
-  }
-  
-  .valueLabel {
+    margin-top: -25px;
+}
+
+.valueLabel {
     position: absolute;
     transform: translateX(-50%);
     font-size: var(--font-size-xs, 10px);
@@ -112,15 +104,15 @@ line-height: normal;
     text-align: center;
     cursor: pointer;
     padding: 5px;
-  }
-  
-  .valueLabel:hover {
+}
+
+.valueLabel:hover {
     color: var(--text1) !important;
-  }
-  
-  .valueDisplay {
+}
+
+.valueDisplay {
     position: relative;
-    width: 50px;  
+    width: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,11 +120,10 @@ line-height: normal;
     background-color: var(--dark3);
     border-radius: 8px;
     padding: 0 8px;
-   
-  }
-  
-  .valueInput {
-   width: 100%;
+}
+
+.valueInput {
+    width: 100%;
     height: 32px;
     background-color: transparent;
     border: none;
@@ -141,28 +132,26 @@ line-height: normal;
     font-weight: 400;
     text-align: center;
     outline: none;
-  }
-  
-  .valueSuffix {
+}
+
+.valueSuffix {
     font-size: var(--font-size-s, 12px);
+}
 
-  }
-
-  /* remove afterwards */
-  .randomMaxContainer{
+/* remove afterwards */
+.randomMaxContainer {
     display: flex;
     width: 100%;
     justify-content: space-between;
     align-items: center;
 
     font-size: var(--font-size-s);
-  }
+}
 
-  .randomMaxContainer button{
+.randomMaxContainer button {
     outline: none;
     border: none;
     background: var(--accent1);
     color: var(--text1);
     padding: 4px;
-  }
-
+}

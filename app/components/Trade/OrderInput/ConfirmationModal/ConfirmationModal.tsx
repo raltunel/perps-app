@@ -5,7 +5,7 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import { useState } from 'react';
 
-interface PropsIF{
+interface PropsIF {
     onClose: () => void;
 }
 type InfoItem = {
@@ -46,18 +46,18 @@ const dataInfo: InfoItem[] = [
 ];
 
 export default function ConfirmationModal(props: PropsIF) {
-    const { onClose} = props
-    const [ isDontShowEnabled, setIsDontShowEnabled] = useState(false)
+    const { onClose } = props;
+    const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
             <header>
                 <span />
                 <h3>Confirm Order</h3>
-                <MdClose onClick={onClose}/>
+                <MdClose onClick={onClose} />
             </header>
 
             <div className={styles.contentContainer}>
-                {dataInfo.map((info, idx) => (
+                {dataInfo.map((info) => (
                     <div className={styles.infoRow}>
                         <div className={styles.infoLabel}>
                             {info.label}
@@ -89,8 +89,10 @@ export default function ConfirmationModal(props: PropsIF) {
                     // reverse 
                 
                 />
-                </div>
-            <button className={styles.confirmButton} onClick={onClose}>Buy/Long</button>
+            </div>
+            <button className={styles.confirmButton} onClick={onClose}>
+                Buy/Long
+            </button>
         </div>
     );
 }

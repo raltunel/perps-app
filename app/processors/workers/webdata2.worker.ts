@@ -1,13 +1,11 @@
 // jsonParser.worker.js
 
-import type { SymbolInfoIF } from "../../utils/SymbolInfoIFs";
-import { processSymbolInfo } from "../processSymbolInfo";
-import type { OrderDataIF } from "../../utils/orderbook/OrderBookIFs";
-import { processUserOrder } from "../processOrderBook";
-import { processPosition } from "../processPosition";
-import type { PositionIF } from "../../utils/position/PositionIFs";
-
-
+import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
+import { processSymbolInfo } from '../processSymbolInfo';
+import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
+import { processUserOrder } from '../processOrderBook';
+import { processPosition } from '../processPosition';
+import type { PositionIF } from '../../utils/position/PositionIFs';
 
 self.onmessage = function (event) {
     try {
@@ -17,7 +15,6 @@ self.onmessage = function (event) {
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
         const data = parsedData.data;
-
 
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
@@ -41,20 +38,23 @@ self.onmessage = function (event) {
                     if (processedOrder) {
                         userOpenOrders.push(processedOrder);
                     }
-                })
+                });
 
-                if(data.clearinghouseState){
-                    data.clearinghouseState.assetPositions.forEach((position: any) => {
-                        const processedPosition = processPosition(position);
-                        positions.push(processedPosition);
-                    })
+                if (data.clearinghouseState) {
+                    data.clearinghouseState.assetPositions.forEach(
+                        (position: any) => {
+                            const processedPosition = processPosition(position);
+                            positions.push(processedPosition);
+                        },
+                    );
                 }
             }
         }
 
-        self.postMessage({ channel: parsedData.channel, data: { coins, userOpenOrders, user: data.user, size, positions } });
-
-
+        self.postMessage({
+            channel: parsedData.channel,
+            data: { coins, userOpenOrders, user: data.user, size, positions },
+        });
     } catch (error) {
         self.postMessage({ error: (error as Error).message });
     }

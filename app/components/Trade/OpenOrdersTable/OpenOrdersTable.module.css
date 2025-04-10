@@ -41,7 +41,7 @@
     padding-bottom: 1rem;
 }
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -83,11 +83,11 @@
 }
 
 .longDirection {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .shortDirection {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 
 .viewAllLink {
@@ -111,17 +111,28 @@
 }
 
 /* Specific cell styles */
-.timeCell {}
-.typeCell {}
-.coinCell {}
-.directionCell {}
-.sizeCell {}
-.originalSizeCell {}
-.orderValueCell {}
-.priceCell {}
-.reduceOnlyCell {}
-.triggerConditionsCell {}
-.tpslCell {}
+.timeCell {
+}
+.typeCell {
+}
+.coinCell {
+}
+.directionCell {
+}
+.sizeCell {
+}
+.originalSizeCell {
+}
+.orderValueCell {
+}
+.priceCell {
+}
+.reduceOnlyCell {
+}
+.triggerConditionsCell {
+}
+.tpslCell {
+}
 .cancelCell {
     text-align: right;
     justify-self: end;

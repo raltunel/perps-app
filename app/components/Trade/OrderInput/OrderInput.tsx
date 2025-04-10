@@ -22,6 +22,8 @@ import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import { useNotificationStore, type NotificationStoreIF } from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -82,16 +84,20 @@ export default function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 2;
-    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] = useState<number>(100);
+    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
+        useState<number>(100);
     const generateRandomMaximumInput = () => {
-        console.log('generating')
+        console.log('generating');
         // Generate a random maximum between minimumInputValue and 100
-        const newMaximumInputValue = Math.floor(
-          Math.random() * (100 - minimumInputValue + 1)
-        ) + minimumInputValue;
-        
+        const newMaximumInputValue =
+            Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
+            minimumInputValue;
+
         setTempMaximumLeverageInput(newMaximumInputValue);
-      }
+    };
+
+    const { obChosenPrice, obChosenAmount, symbol } = useTradeDataStore();
+    const { formatNum } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -118,9 +124,38 @@ export default function OrderInput() {
         {
             label: 'Current Position',
             tooltipLabel: 'current position',
-            value: '0.000 ETH',
+            value: `0.000 ${symbol}`,
         },
     ];
+
+    useEffect(() => {
+        if (obChosenAmount > 0) {
+            setSize(formatNum(obChosenAmount));
+            handleTypeChange();
+        }
+        if (obChosenPrice > 0) {
+            console.log(obChosenPrice);
+            setPrice(obChosenPrice.toString());
+            handleTypeChange();
+        }
+    }, [obChosenAmount, obChosenPrice]);
+
+    useEffect(() => {
+        setSize('');
+        setPrice('');
+    }, [symbol]);
+
+    const handleTypeChange = () => {
+        switch (marketOrderType) {
+            case 'market':
+                setMarketOrderType('limit');
+                break;
+            case 'stop_market':
+                setMarketOrderType('stop_limit');
+                break;
+        }
+    };
+
     const openModalWithContent = (content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell') => {
         setModalContent(content);
         appSettingsModal.open();
@@ -298,7 +333,7 @@ export default function OrderInput() {
         onChange: handleLeverageChange,
         minimumInputValue: minimumInputValue,
         maximumInputValue: tempMaximumLeverageInput,
-        generateRandomMaximumInput: generateRandomMaximumInput
+        generateRandomMaximumInput: generateRandomMaximumInput,
     };
 
     const chasePriceProps = {
@@ -334,6 +369,7 @@ export default function OrderInput() {
         className: 'custom-input',
         ariaLabel: 'Size input',
         useTotalSize,
+        symbol,
     };
 
     const positionSizeProps = {
@@ -417,7 +453,10 @@ export default function OrderInput() {
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
 
-            <PlaceOrderButtons orderMarketPrice={marketOrderType} openModalWithContent={openModalWithContent}/>
+            <PlaceOrderButtons
+                orderMarketPrice={marketOrderType}
+                openModalWithContent={openModalWithContent}
+            />
 
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close}>

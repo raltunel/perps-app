@@ -1,13 +1,13 @@
 import { create } from 'zustand';
 
 // slugs to indicate which React icon should be rendered
-type icons = 'spinner'|'check';
+type icons = 'spinner' | 'check';
 
 // shape of data structure from which to generate placeholder
 // ... notification content
 interface notificationMetaIF {
     title: string;
-    messages: string[],
+    messages: string[];
     icon: icons;
 }
 
@@ -16,23 +16,17 @@ interface notificationMetaIF {
 const notificationMeta: { [x: string]: notificationMetaIF } = {
     leverageModeChanged: {
         title: 'Leverage Mode Changed',
-        messages: [
-            'Switched to Isolated Margin Mode',
-        ],
+        messages: ['Switched to Isolated Margin Mode'],
         icon: 'check',
     },
     subAccountCreated: {
         title: 'Sub Account Created',
-        messages: [
-            'Sub Account 1 Created'
-        ],
+        messages: ['Sub Account 1 Created'],
         icon: 'check',
     },
     leverageAmountChanged: {
         title: 'Leverage Amount Changed',
-        messages: [
-            'Switched to 100x Leverage',
-        ],
+        messages: ['Switched to 100x Leverage'],
         icon: 'check',
     },
     buyPending: {
@@ -65,53 +59,35 @@ const notificationMeta: { [x: string]: notificationMetaIF } = {
     },
     depositPending: {
         title: 'Deposit Pending',
-        messages: [
-            'Deposit 69,000 USDC',
-            'Deposit 420,000 USDC',
-        ],
+        messages: ['Deposit 69,000 USDC', 'Deposit 420,000 USDC'],
         icon: 'spinner',
     },
     depositConfirmed: {
         title: 'Deposit Confirmed',
-        messages: [
-            'Deposit 69,000 USDC',
-            'Deposit 420,000 USDC',
-        ],
+        messages: ['Deposit 69,000 USDC', 'Deposit 420,000 USDC'],
         icon: 'check',
     },
     withdrawPending: {
         title: 'Withdraw Pending',
-        messages: [
-            'Withdraw 69,000 USDC',
-            'Withdraw 420,000 USDC',
-        ],
+        messages: ['Withdraw 69,000 USDC', 'Withdraw 420,000 USDC'],
         icon: 'spinner',
     },
     withdrawConfirmed: {
         title: 'Withdraw Confirmed',
-        messages: [
-            'Withdraw 69,000 USDC',
-            'Withdraw 420,000 USDC',
-        ],
+        messages: ['Withdraw 69,000 USDC', 'Withdraw 420,000 USDC'],
         icon: 'check',
     },
     sendPending: {
         title: 'Send Pending',
-        messages: [
-            'Send 69,000 USDC',
-            'Send 420,000 USDC',
-        ],
+        messages: ['Send 69,000 USDC', 'Send 420,000 USDC'],
         icon: 'spinner',
     },
     sendConfirmed: {
         title: 'Send Confirmed',
-        messages: [
-            'Send 69,000 USDC',
-            'Send 420,000 USDC',
-        ],
+        messages: ['Send 69,000 USDC', 'Send 420,000 USDC'],
         icon: 'check',
     },
-}
+};
 
 // string union type of all keys in obj `notificationMeta` listing
 // ... all defined notification types
@@ -154,12 +130,12 @@ function makeNotificationData(slug?: notificationSlugs): notificationIF {
         ? notificationMeta[slug]
         : getRandomElement(Object.values(notificationMeta));
     // return data in the shape consumed by the DOM
-    return ({
+    return {
         title: meta.title,
         message: getRandomElement(meta.messages),
         icon: meta.icon,
         oid: makeOID(14),
-    });
+    };
 }
 
 // shape of the return obj produced by this store
@@ -179,26 +155,26 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     // raw data consumed by the app
     notifications: [],
     // fn to add a new population to state
-    add: (s?: notificationSlugs): void => set(
-        {
+    add: (s?: notificationSlugs): void =>
+        set({
             notifications: [
                 ...get().notifications,
-                makeNotificationData(s)
+                makeNotificationData(s),
             ].slice(-MAX_NOTIFICATIONS),
-        }
-    ),
-    addFromWS: (data: notificationIF): void => set(
-        {
-            notifications: [
-                ...get().notifications,
-                data
-            ].slice(-MAX_NOTIFICATIONS),
-        }
-    ),
+        }),
+    addFromWS: (data: notificationIF): void =>
+        set({
+            notifications: [...get().notifications, data].slice(
+                -MAX_NOTIFICATIONS,
+            ),
+        }),
     // fn to remove an existing element from the data array
-    remove: (id: number): void => set({
-        notifications: get().notifications.filter((n: notificationIF) => n.oid !== id)
-    }),
+    remove: (id: number): void =>
+        set({
+            notifications: get().notifications.filter(
+                (n: notificationIF) => n.oid !== id,
+            ),
+        }),
     // fn to clear all notifications from state
-    clearAll: (): void => set({ notifications: []}),
+    clearAll: (): void => set({ notifications: [] }),
 }));

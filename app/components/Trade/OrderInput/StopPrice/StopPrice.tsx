@@ -31,7 +31,6 @@ export default function StopPrice(props: PropsIF) {
                 pattern='[0-9]*'
                 placeholder='Enter Size'
             />
-            
         </div>
     );
 }

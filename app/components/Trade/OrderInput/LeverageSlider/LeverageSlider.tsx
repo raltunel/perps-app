@@ -16,7 +16,7 @@ export default function LeverageSlider({
     className = '',
     minimumInputValue = 1,
     maximumInputValue = 100,
-    generateRandomMaximumInput
+    generateRandomMaximumInput,
 }: LeverageSliderProps) {
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -32,22 +32,30 @@ export default function LeverageSlider({
 
     // Generate logarithmically distributed tick marks
     useEffect(() => {
-        console.log("Min:", minimumInputValue, "Max:", maximumInputValue);
+        console.log('Min:', minimumInputValue, 'Max:', maximumInputValue);
         // Check for valid inputs
-        if (!isNaN(minimumInputValue) && !isNaN(maximumInputValue) && 
-            minimumInputValue > 0 && maximumInputValue > minimumInputValue) {
-            const generateLogarithmicTicks = (min: number, max: number, count: number): number[] => {
+        if (
+            !isNaN(minimumInputValue) &&
+            !isNaN(maximumInputValue) &&
+            minimumInputValue > 0 &&
+            maximumInputValue > minimumInputValue
+        ) {
+            const generateLogarithmicTicks = (
+                min: number,
+                max: number,
+                count: number,
+            ): number[] => {
                 // Safety check for minimum value to prevent log(0)
                 const safeMin = Math.max(0.1, min);
-                
+
                 // Use logarithmic scale to distribute the ticks
                 const minLog = Math.log(safeMin);
                 const maxLog = Math.log(max);
                 const ticks = [];
-                
+
                 // Always include min and max
                 ticks.push(min);
-                
+
                 // Generate intermediate ticks (logarithmically distributed)
                 if (count > 2) {
                     const step = (maxLog - minLog) / (count - 1);
@@ -59,18 +67,22 @@ export default function LeverageSlider({
                         }
                     }
                 }
-                
+
                 // Make sure max is included
                 if (ticks[ticks.length - 1] !== max) {
                     ticks.push(max);
                 }
-                
+
                 return ticks;
             };
-            
+
             // Generate 5-7 ticks depending on the range
             const tickCount = maximumInputValue > 100 ? 7 : 5;
-            const ticks = generateLogarithmicTicks(minimumInputValue, maximumInputValue, tickCount);
+            const ticks = generateLogarithmicTicks(
+                minimumInputValue,
+                maximumInputValue,
+                tickCount,
+            );
             setTickMarks(ticks);
         }
     }, [minimumInputValue, maximumInputValue]);
@@ -78,47 +90,51 @@ export default function LeverageSlider({
     // Convert value to percentage position on slider
     const valueToPercentage = (val: number): number => {
         // Check for invalid inputs
-        if (isNaN(val) || isNaN(minimumInputValue) || isNaN(maximumInputValue)) return 0;
-        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue) return 0;
-        
+        if (isNaN(val) || isNaN(minimumInputValue) || isNaN(maximumInputValue))
+            return 0;
+        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue)
+            return 0;
+
         // Safety check to prevent errors
-        const safeVal = Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+        const safeVal = Math.max(
+            minimumInputValue,
+            Math.min(maximumInputValue, val),
+        );
         const safeMin = Math.max(0.1, minimumInputValue);
-        
+
         try {
             // Convert to logarithmic scale for smoother distribution
             const minLog = Math.log(safeMin);
             const maxLog = Math.log(maximumInputValue);
             const valueLog = Math.log(safeVal);
-            
+
             // Percentage calculation
             return ((valueLog - minLog) / (maxLog - minLog)) * 100;
         } catch (error) {
-            console.error("Error calculating percentage:", error);
+            console.error('Error calculating percentage:', error);
             return 0;
         }
     };
 
     // Convert percentage position to value
     const percentageToValue = (percentage: number): number => {
-        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue) 
+        if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue)
             return minimumInputValue;
-        
+
         // Bound the percentage between 0 and 100
         const boundedPercentage = Math.max(0, Math.min(100, percentage));
         const safeMin = Math.max(0.1, minimumInputValue);
-        
+
         // Convert from percentage to logarithmic value
         const minLog = Math.log(safeMin);
         const maxLog = Math.log(maximumInputValue);
         const valueLog = minLog + (boundedPercentage / 100) * (maxLog - minLog);
-        
+
         return Math.exp(valueLog);
     };
 
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
-      
         if (isNaN(value)) {
             return 0;
         }
@@ -127,37 +143,41 @@ export default function LeverageSlider({
 
     // Get color based on position
     const getColorAtPosition = (position: number): string => {
-        
         const colorStops = [
-            { position: 0, color: '#26A69A' },    // teal 
-            { position: 25, color: '#89C374' },   // green 
-            { position: 50, color: '#EBDF4E' },   // yellow 
-            { position: 75, color: '#EE9A4F' },   // orange 
-            { position: 100, color: '#EF5350' }   // red 
+            { position: 0, color: '#26A69A' }, // teal
+            { position: 25, color: '#89C374' }, // green
+            { position: 50, color: '#EBDF4E' }, // yellow
+            { position: 75, color: '#EE9A4F' }, // orange
+            { position: 100, color: '#EF5350' }, // red
         ];
-        
+
         // Ensure position is between 0 and 100
         const boundedPosition = Math.max(0, Math.min(100, position));
-        
+
         // Find the two color stops that our position falls between
         let lowerStop = colorStops[0];
         let upperStop = colorStops[colorStops.length - 1];
-        
+
         for (let i = 0; i < colorStops.length - 1; i++) {
-            if (boundedPosition >= colorStops[i].position && boundedPosition <= colorStops[i+1].position) {
+            if (
+                boundedPosition >= colorStops[i].position &&
+                boundedPosition <= colorStops[i + 1].position
+            ) {
                 lowerStop = colorStops[i];
-                upperStop = colorStops[i+1];
+                upperStop = colorStops[i + 1];
                 break;
             }
         }
-        
+
         // If exactly on a stop, return that color
         if (boundedPosition === lowerStop.position) return lowerStop.color;
         if (boundedPosition === upperStop.position) return upperStop.color;
-        
+
         // Calculate the color interpolation factor
-        const factor = (boundedPosition - lowerStop.position) / (upperStop.position - lowerStop.position);
-        
+        const factor =
+            (boundedPosition - lowerStop.position) /
+            (upperStop.position - lowerStop.position);
+
         // Parse the hex colors to RGB
         const parseColor = (hex: string) => {
             const r = parseInt(hex.slice(1, 3), 16);
@@ -165,15 +185,21 @@ export default function LeverageSlider({
             const b = parseInt(hex.slice(5, 7), 16);
             return { r, g, b };
         };
-        
+
         const lowerColor = parseColor(lowerStop.color);
         const upperColor = parseColor(upperStop.color);
-        
+
         // Interpolate between the two colors
-        const r = Math.round(lowerColor.r + factor * (upperColor.r - lowerColor.r));
-        const g = Math.round(lowerColor.g + factor * (upperColor.g - lowerColor.g));
-        const b = Math.round(lowerColor.b + factor * (upperColor.b - lowerColor.b));
-        
+        const r = Math.round(
+            lowerColor.r + factor * (upperColor.r - lowerColor.r),
+        );
+        const g = Math.round(
+            lowerColor.g + factor * (upperColor.g - lowerColor.g),
+        );
+        const b = Math.round(
+            lowerColor.b + factor * (upperColor.b - lowerColor.b),
+        );
+
         return `rgb(${r}, ${g}, ${b})`;
     };
 
@@ -187,21 +213,24 @@ export default function LeverageSlider({
         if (!sliderRef.current) return;
 
         const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+        const offsetX = Math.max(
+            0,
+            Math.min(e.clientX - rect.left, rect.width),
+        );
         const percentage = (offsetX / rect.width) * 100;
-        
+
         // Convert percentage to value (logarithmic)
         const newValue = percentageToValue(percentage);
-        
+
         // Round to whole number
         const roundedValue = Math.round(newValue);
-        
+
         // Ensure value is within min/max bounds
         const boundedValue = Math.max(
-            minimumInputValue, 
-            Math.min(maximumInputValue, roundedValue)
+            minimumInputValue,
+            Math.min(maximumInputValue, roundedValue),
         );
-        
+
         onChange(boundedValue);
     };
 
@@ -216,19 +245,19 @@ export default function LeverageSlider({
                 Math.min(e.clientX - rect.left, rect.width),
             );
             const percentage = (offsetX / rect.width) * 100;
-            
+
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
-            
+
             // Round to whole number
             const roundedValue = Math.round(newValue);
-            
+
             // Ensure value is within min/max bounds
             const boundedValue = Math.max(
-                minimumInputValue, 
-                Math.min(maximumInputValue, roundedValue)
+                minimumInputValue,
+                Math.min(maximumInputValue, roundedValue),
             );
-            
+
             onChange(boundedValue);
         };
 
@@ -242,19 +271,19 @@ export default function LeverageSlider({
                 Math.min(touch.clientX - rect.left, rect.width),
             );
             const percentage = (offsetX / rect.width) * 100;
-            
+
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
-            
+
             // Round to 1 decimal place for cleaner values
             const roundedValue = Math.round(newValue * 10) / 10;
-            
+
             // Ensure value is within min/max bounds
             const boundedValue = Math.max(
-                minimumInputValue, 
-                Math.min(maximumInputValue, roundedValue)
+                minimumInputValue,
+                Math.min(maximumInputValue, roundedValue),
             );
-            
+
             onChange(boundedValue);
 
             // Prevent scrolling while dragging
@@ -298,31 +327,27 @@ export default function LeverageSlider({
         setIsDragging(true);
     };
 
-    
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
 
-   
     const handleInputBlur = () => {
         const newValue = parseFloat(inputValue);
         if (!isNaN(newValue)) {
             // Round to whole number
             const roundedValue = Math.round(newValue);
-            
+
             // Ensure value is within min/max bounds
             const boundedValue = Math.max(
-                minimumInputValue, 
-                Math.min(maximumInputValue, roundedValue)
+                minimumInputValue,
+                Math.min(maximumInputValue, roundedValue),
             );
             onChange(boundedValue);
         } else {
-           
             setInputValue(value.toString());
         }
     };
 
-    
     const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.currentTarget.blur();
@@ -344,20 +369,23 @@ export default function LeverageSlider({
         <div className={`${styles.leverageSliderContainer} ${className}`}>
             <h3 className={styles.containerTitle}>Leverage</h3>
             <div className={styles.randomMaxContainer}>
-                <span>Max: {isNaN(maximumInputValue) ? '0' : maximumInputValue}x</span>
-                <button 
-                    type="button"
+                <span>
+                    Max: {isNaN(maximumInputValue) ? '0' : maximumInputValue}x
+                </span>
+                <button
+                    type='button'
                     onClick={() => {
-                        console.log("Button clicked");
+                        console.log('Button clicked');
                         if (typeof generateRandomMaximumInput === 'function') {
                             generateRandomMaximumInput();
                         } else {
-                            console.error("generateRandomMaximumInput is not a function");
+                            console.error(
+                                'generateRandomMaximumInput is not a function',
+                            );
                         }
                     }}
-               
                 >
-                   generate random Max
+                    generate random Max
                 </button>
             </div>
             <div className={styles.sliderWithValue}>
@@ -377,7 +405,7 @@ export default function LeverageSlider({
                                 width: `${getKnobPosition()}%`,
                                 background: createGradientString(),
                                 backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
-                                backgroundPosition: 'left center'
+                                backgroundPosition: 'left center',
                             }}
                         ></div>
 
@@ -386,19 +414,25 @@ export default function LeverageSlider({
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
                             const isCurrent = Math.abs(tickValue - value) < 0.1;
-                            
+
                             return (
                                 <div
-                                    key={index} 
+                                    key={index}
                                     className={`${styles.sliderMarker} ${
                                         isActive ? styles.active : ''
                                     } ${
-                                        isCurrent ? styles.sliderMarkerCurrent : ''
+                                        isCurrent
+                                            ? styles.sliderMarkerCurrent
+                                            : ''
                                     }`}
                                     style={{
                                         left: `${position}%`,
                                         backgroundColor: isActive
-                                            ? getColorAtPosition((index / (tickMarks.length - 1)) * 100)
+                                            ? getColorAtPosition(
+                                                  (index /
+                                                      (tickMarks.length - 1)) *
+                                                      100,
+                                              )
                                             : 'transparent',
                                         borderColor: isActive
                                             ? 'transparent'
@@ -426,10 +460,10 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
-                            
+
                             return (
                                 <div
-                                    key={index} 
+                                    key={index}
                                     className={styles.valueLabel}
                                     style={{
                                         left: `${position}%`,
@@ -447,13 +481,13 @@ export default function LeverageSlider({
                 {/* Current value display with input */}
                 <div className={styles.valueDisplay}>
                     <input
-                        type="text"
+                        type='text'
                         value={isNaN(parseFloat(inputValue)) ? '0' : inputValue}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
-                        aria-label="Leverage value"
+                        aria-label='Leverage value'
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>

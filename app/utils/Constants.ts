@@ -1,4 +1,4 @@
-import type { DebugWallet } from "~/stores/DebugStore";
+import type { DebugWallet } from '~/stores/DebugStore';
 
 export enum FormatTypes {
     EN = 'en-US',
@@ -10,32 +10,30 @@ export enum FormatTypes {
 export type NumFormat = {
     label: string;
     value: FormatTypes;
-}
+};
 
 export type LangType = {
     label: string;
-}
+};
 
 export const NumFormatTypes: NumFormat[] = [
     {
         label: '1,234.56',
-        value: FormatTypes.EN
+        value: FormatTypes.EN,
     },
     {
         label: '1.234,56',
-        value: FormatTypes.DE
+        value: FormatTypes.DE,
     },
     {
         label: '1234,56',
-        value: FormatTypes.FR
+        value: FormatTypes.FR,
     },
     {
         label: '1 234,56',
-        value: FormatTypes.SV
-    }
-
-]
-
+        value: FormatTypes.SV,
+    },
+];
 
 export const Langs: LangType[] = [
     {
@@ -50,34 +48,30 @@ export const Langs: LangType[] = [
     {
         label: '简体中文',
     },
-    
-]
-
-
+];
 
 export const wsUrls = [
     'wss://api.hyperliquid.xyz/ws',
     'wss://pulse-api-mock.liquidity.tools/ws',
-    'wss://api-ui.hyperliquid.xyz/ws'
-]
+    'wss://api-ui.hyperliquid.xyz/ws',
+];
 
 export const debugWallets: DebugWallet[] = [
     {
         label: 'Crazy Account',
-        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00'
+        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
     },
     {
         label: 'Crazy 2',
-        address: '0x023a3d058020fb76cca98f01b3c48c8938a22355'
+        address: '0x023a3d058020fb76cca98f01b3c48c8938a22355',
     },
     {
         label: 'Benjamin Hyper',
-        address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353'
+        address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     },
-    
-]
+];
 
 export const OrderHistoryLimits = {
     MAX: 1000,
-    RENDERED: 50
-}
+    RENDERED: 50,
+};

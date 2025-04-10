@@ -10,11 +10,11 @@ Import and use the `ButtonShowcase` component in your project:
 import ButtonShowcase from './ButtonShowcase';
 
 export default function App() {
-  return (
-    <div>
-      <ButtonShowcase />
-    </div>
-  );
+    return (
+        <div>
+            <ButtonShowcase />
+        </div>
+    );
 }
 ```
 
@@ -23,13 +23,13 @@ export default function App() {
 The showcase includes buttons in three sizes: **Large**, **Medium**, and **Small**. Each size has the following states:
 
 - **Selected**
-  - Default
-  - Focused
-  - Disabled
+    - Default
+    - Focused
+    - Disabled
 - **Unselected**
-  - Default
-  - Focused
-  - Disabled
+    - Default
+    - Focused
+    - Disabled
 
 ### Example:
 
@@ -52,5 +52,3 @@ The showcase includes buttons in three sizes: **Large**, **Medium**, and **Small
 The component uses CSS modules. You can customize styles in `ButtonShowcase.module.css`.
 
 ---
-
-

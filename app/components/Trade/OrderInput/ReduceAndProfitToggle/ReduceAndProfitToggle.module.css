@@ -18,33 +18,29 @@
     font-size: var(--font-size-s, 12px);
     font-weight: 400;
 }
-.chasingIntervalContainer{
+.chasingIntervalContainer {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.inputDetailsDataContent{
+.inputDetailsDataContent {
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     font-size: var(--font-size-s, 12px);
-  
-    height: 16px;
 
-    
+    height: 16px;
 }
-.inputDetailsLabel{
-  
+.inputDetailsLabel {
     color: var(--text2);
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 4px;
-
 }
-.inputDetailValue{
-    color: var(--text1)
+.inputDetailValue {
+    color: var(--text1);
 }

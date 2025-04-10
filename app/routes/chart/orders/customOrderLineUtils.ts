@@ -37,8 +37,8 @@ export const getLabelText = (
         lineType === 'limit'
             ? ' Limit  ' + price
             : lineType === 'pnl'
-            ? '  PNL ' + (price > 0 ? '$' + price : '-$' + Math.abs(price))
-            : '   Liq. Price';
+              ? '  PNL ' + (price > 0 ? '$' + price : '-$' + Math.abs(price))
+              : '   Liq. Price';
 
     return orderText;
 };

@@ -11,8 +11,7 @@ const TradingViewWrapper: React.FC = () => {
             <TradingViewChart />
             <PnlLine />
             <OpenOrderLine />
-            <PositionsLine/>
-
+            <PositionsLine />
         </TradingViewProvider>
     );
 };

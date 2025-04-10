@@ -10,13 +10,13 @@
     font-size: var(--font-size-s, 12px);
     font-weight: 400;
 }
-.inputContainer{
+.inputContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
 }
 
-.runningPriceMinutes{
+.runningPriceMinutes {
     border-radius: var(--half-border-radius, 8px);
 
     background-color: var(--dark3);
@@ -26,7 +26,7 @@
     align-items: center;
     justify-content: space-between;
 }
-.container input{
+.container input {
     border-radius: var(--half-border-radius, 8px);
 
     width: 100%;
@@ -39,10 +39,8 @@
     font-size: var(--font-size-s, 12px);
     padding: 0 8px;
     height: 32px;
-
 }
-.runningPriceMinutes span{
+.runningPriceMinutes span {
     color: var(--text1) !important;
     font-size: var(--font-size-s, 12px);
-
 }
