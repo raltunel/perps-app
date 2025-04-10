@@ -17,7 +17,7 @@
     cursor: pointer;
     border-radius: 0.2rem !important;
     transition: all 0.2s ease-in-out;
-    padding: 0.3rem;
+    padding: 0.4rem;
 }
 
 .watchListNodeContent.active {
@@ -37,5 +37,5 @@
 }
 
 .symbolValue {
-    margin-left: 0.5rem;
+    text-align: right;
 }

@@ -39,6 +39,10 @@
     --order-book-width-desktop-large: 280px;
     --order-book-width-desktop-small: 220px;
 
+    /* heights */
+    --trade-tables-height-desktop: 281px;
+    --header-height-desktop: 56px;
+
     --order-book-width-desktop-large-doubled: calc(
         var(--order-book-width-desktop-large) * 2
     );

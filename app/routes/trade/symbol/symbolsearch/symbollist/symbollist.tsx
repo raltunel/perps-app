@@ -1,14 +1,13 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './symbollist.module.css';
-import { FaChevronDown } from 'react-icons/fa';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
-import { motion } from 'framer-motion';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { IoCloseOutline } from 'react-icons/io5';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -20,6 +19,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     const { coins, setSymbol, favKeys } = useTradeDataStore();
 
     const [searchQuery, setSearchQuery] = useState('');
+
     const [sortBy, setSortBy] = useState<string>('');
     const [sortDirection, setSortDirection] = useState<string>('');
 
@@ -47,7 +47,11 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
     const inputKeyHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Escape') {
-            setSearchQuery('');
+            if (searchQuery.length > 0) {
+                setSearchQuery('');
+            } else {
+                setIsOpen(false);
+            }
         }
     };
 
@@ -140,10 +144,12 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={inputKeyHandler}
                     />
-                    <IoCloseOutline
-                        className={styles.symbolListSearchClose}
-                        onClick={() => setSearchQuery('')}
-                    />
+                    {searchQuery.length > 0 && (
+                        <IoCloseOutline
+                            className={styles.symbolListSearchClose}
+                            onClick={() => setSearchQuery('')}
+                        />
+                    )}
                 </div>
 
                 <SymbolListTableHeader
