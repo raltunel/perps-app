@@ -1,9 +1,9 @@
 .filterContainer {
     position: relative;
     display: inline-block;
-  }
-  
-  .filterButton {
+}
+
+.filterButton {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -21,60 +21,60 @@
     transition: all 0.2s ease;
     white-space: nowrap;
     cursor: pointer;
-  }
-  
-  .filterButton svg{
-    fill: var(--text2);
-  }
+}
 
-  .active svg, .filterButton:hover .chevron {
+.filterButton svg {
+    fill: var(--text2);
+}
+
+.active svg,
+.filterButton:hover .chevron {
     fill: var(--text1) !important;
-  }
-  
-  .chevron {
+}
+
+.chevron {
     transition: transform 0.2s ease;
     margin-left: auto;
-  }
-  
-  .rotated {
+}
+
+.rotated {
     transform: rotate(180deg);
-  }
-  
-  .dropdown {
+}
+
+.dropdown {
     position: absolute;
     top: calc(100% + 5px);
     right: 0;
     width: 68px;
-    background: var(--dark4, #1E1E24);  
+    background: var(--dark4, #1e1e24);
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
     border-radius: var(--half-border-radius, 8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     padding: 4px 0px;
     z-index: 100;
-  }
-  
-  .optionRow {
+}
+
+.optionRow {
     font-size: var(--font-size-s, 12px);
 
     padding: 0px 8px;
 
     transition: background-color 0.2s ease;
     cursor: pointer;
-    color: var(--text2, #6A6A6D);
+    color: var(--text2, #6a6a6d);
     cursor: pointer;
+}
 
-  }
-  
-  .optionRow:hover {
+.optionRow:hover {
     color: var(--text1);
-  }
-  
-  .selected {
+}
+
+.selected {
     color: var(--text1);
-  }
-  
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
     .dropdown {
-      right: 0;
+        right: 0;
     }
-  }
+}

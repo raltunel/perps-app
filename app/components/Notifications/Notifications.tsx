@@ -5,7 +5,7 @@ import {
     makeOID,
     useNotificationStore,
     type notificationIF,
-    type NotificationStoreIF
+    type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -13,16 +13,17 @@ import { useEffect, useRef } from 'react';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 
 export default function Notifications() {
-const hideNotificationsInDevelop = true
+    const hideNotificationsInDevelop = true;
 
     // boolean to suppress notifications if toggled by user
-    const { enableTxNotifications, enableBackgroundFillNotif } = useAppOptions();
+    const { enableTxNotifications, enableBackgroundFillNotif } =
+        useAppOptions();
 
     // notification data from which to generate DOM elements
     const data: NotificationStoreIF = useNotificationStore();
 
     // run fn `data.add` when the user presses the 'a' key
-    useKeydown('a', data.add);    
+    useKeydown('a', data.add);
 
     const backgroundFillNotifRef = useRef(false);
     backgroundFillNotifRef.current = enableBackgroundFillNotif;
@@ -35,13 +36,16 @@ const hideNotificationsInDevelop = true
 
     // use effect to subscribe to notifications
     useEffect(() => {
-        if(debugWallet.address){
+        if (debugWallet.address) {
             subscribe(WsChannels.NOTIFICATION, {
                 payload: {
-                    user: debugWallet.address
+                    user: debugWallet.address,
                 },
                 handler: (payload) => {
-                    if(backgroundFillNotifRef.current && payload.notification){
+                    if (
+                        backgroundFillNotifRef.current &&
+                        payload.notification
+                    ) {
                         // split the payload into title and message
                         const title = payload.notification.split(':')[0];
                         const message = payload.notification.split(':')[1];
@@ -51,34 +55,29 @@ const hideNotificationsInDevelop = true
                             title: title,
                             message: message,
                             icon: 'check',
-                            oid: makeOID(14)
-                        })
+                            oid: makeOID(14),
+                        });
                     }
                 },
-                // that flag will generate a single subscription for this payload, 
+                // that flag will generate a single subscription for this payload,
                 // will remove any existing subscription for this payload
-                single: true 
-            })
+                single: true,
+            });
         }
-        
-    }, [debugWallet])
+    }, [debugWallet]);
 
-    
-if ( hideNotificationsInDevelop) return null
+    if (hideNotificationsInDevelop) return null;
 
     return (
         <div className={styles.notifications}>
-            {
-                enableTxNotifications && (
-                    data.notifications.map((n: notificationIF) => (
-                        <Notification
-                            key={JSON.stringify(n)}
-                            data={n}
-                            dismiss={data.remove}
-                        />
-                    ))
-                )
-            }
+            {enableTxNotifications &&
+                data.notifications.map((n: notificationIF) => (
+                    <Notification
+                        key={JSON.stringify(n)}
+                        data={n}
+                        dismiss={data.remove}
+                    />
+                ))}
         </div>
     );
 }

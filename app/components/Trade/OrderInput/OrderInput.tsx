@@ -61,9 +61,9 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirmation' | null>(
-        null,
-    );
+    const [modalContent, setModalContent] = useState<
+        'margin' | 'scale' | 'confirmation' | null
+    >(null);
 
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
@@ -81,16 +81,17 @@ export default function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 2;
-    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] = useState<number>(100);
+    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
+        useState<number>(100);
     const generateRandomMaximumInput = () => {
-        console.log('generating')
+        console.log('generating');
         // Generate a random maximum between minimumInputValue and 100
-        const newMaximumInputValue = Math.floor(
-          Math.random() * (100 - minimumInputValue + 1)
-        ) + minimumInputValue;
-        
+        const newMaximumInputValue =
+            Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
+            minimumInputValue;
+
         setTempMaximumLeverageInput(newMaximumInputValue);
-      }
+    };
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -120,7 +121,9 @@ export default function OrderInput() {
             value: '0.000 ETH',
         },
     ];
-    const openModalWithContent = (content: 'margin' | 'scale' | 'confirmation') => {
+    const openModalWithContent = (
+        content: 'margin' | 'scale' | 'confirmation',
+    ) => {
         setModalContent(content);
         appSettingsModal.open();
     };
@@ -297,7 +300,7 @@ export default function OrderInput() {
         onChange: handleLeverageChange,
         minimumInputValue: minimumInputValue,
         maximumInputValue: tempMaximumLeverageInput,
-        generateRandomMaximumInput: generateRandomMaximumInput
+        generateRandomMaximumInput: generateRandomMaximumInput,
     };
 
     const chasePriceProps = {
@@ -420,7 +423,10 @@ export default function OrderInput() {
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
 
-            <PlaceOrderButtons orderMarketPrice={marketOrderType} openModalWithContent={openModalWithContent}/>
+            <PlaceOrderButtons
+                orderMarketPrice={marketOrderType}
+                openModalWithContent={openModalWithContent}
+            />
 
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close}>
@@ -442,9 +448,7 @@ export default function OrderInput() {
                         />
                     )}
                     {modalContent === 'confirmation' && (
-                        <ConfirmationModal 
-                        onClose={appSettingsModal.close}
-                        />
+                        <ConfirmationModal onClose={appSettingsModal.close} />
                     )}
                 </Modal>
             )}

@@ -6,7 +6,7 @@
         opacity: 1;
     }
 }
-.watchListContainer{
+.watchListContainer {
     width: 100%;
     display: flex;
     padding-left: 2rem;
@@ -16,61 +16,71 @@
     white-space: nowrap;
 }
 
-.favIcon{
-    
+.favIcon {
     color: var(--red);
     margin-right: 1rem;
 }
 
-.watchListToolbarIcon{
+.watchListToolbarIcon {
     cursor: pointer;
     color: var(--text2);
     /* padding: .5rem; */
-    margin-left: .5rem;
+    margin-left: 0.5rem;
 }
 
-.watchListToolbarIcon.active{
+.watchListToolbarIcon.active {
     color: var(--text1);
 }
 
-.percentIcon{
+.percentIcon {
     margin-right: 1rem;
 }
 
-
-.watchListNodesWrapper{
+.watchListNodesWrapper {
     display: flex;
     flex-direction: row;
-    gap: 1rem;
+    /* gap: .7rem; */
     align-items: center;
     justify-content: center;
 }
 
-.watchListLimitor{
-    max-width: calc(100vw - var(--order-book-width-desktop-small) 
-    - var(--trade-module-width-desktop-small) - var(--main-gap) * 4 - 9.2rem );
+.watchListLimitor {
+    max-width: calc(
+        100vw - var(--order-book-width-desktop-small) -
+            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
+            9.2rem
+    );
 }
 
-.watchListLimitorNarrow{
-    max-width: calc(100vw - var(--order-book-width-desktop-small) * 3 
-    - var(--trade-module-width-desktop-small) - var(--main-gap) * 4 - 9.2rem );
+.watchListLimitorNarrow {
+    max-width: calc(
+        100vw - var(--order-book-width-desktop-small) * 3 -
+            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
+            9.2rem
+    );
 }
 
 @media only screen and (min-width: 1920px) {
     .watchListLimitor {
-        max-width: calc(100vw - var(--order-book-width-desktop-large) 
-        - var(--trade-module-width-desktop-large) - var(--main-gap) * 4 - 9.2rem );
+        max-width: calc(
+            100vw - var(--order-book-width-desktop-large) -
+                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                9.2rem
+        );
     }
 
     .watchListLimitorNarrow {
-        max-width: calc(100vw - var(--order-book-width-desktop-large) * 3   
-        - var(--trade-module-width-desktop-large) - var(--main-gap) * 4 - 9.2rem );
+        max-width: calc(
+            100vw - var(--order-book-width-desktop-large) * 3 -
+                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                9.2rem
+        );
     }
 }
 
-
 @media only screen and (max-width: 1080px) {
-    .watchListLimitor, .watchListLimitorNarrow {
-        max-width: calc(100vw - var(--main-gap) * 4 - 8.2rem );
+    .watchListLimitor,
+    .watchListLimitorNarrow {
+        max-width: calc(100vw - var(--main-gap) * 4 - 8.2rem);
     }
 }

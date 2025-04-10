@@ -1,5 +1,4 @@
 .container {
- 
     width: 100%;
     height: 100%;
     display: flex;
@@ -14,7 +13,9 @@
     background: var(--dark3, #16161c);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    transition:
+        opacity 0.3s ease-in-out,
+        visibility 0.3s ease-in-out;
 
     /* ---------------------------- */
 
@@ -23,47 +24,46 @@
     visibility: visible;
     pointer-events: auto;
     z-index: var(--navbar-dropdown-zindex);
-
-  }
-
-.viewMoreButton{
-    color: var(--accent1, #7371FC);
-text-align: center;
-
-/* Main/S */
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-s, 12px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
 }
-.container section{
+
+.viewMoreButton {
+    color: var(--accent1, #7371fc);
+    text-align: center;
+
+    /* Main/S */
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+.container section {
     gap: 5px;
 }
 .rpcRowContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  align-self: stretch;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
 }
 
-.rpcRowContainer p{
-    color: var(--text1, #F0F0F8);
+.rpcRowContainer p {
+    color: var(--text1, #f0f0f8);
 
-/* Main/S */
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-s, 12px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    /* Main/S */
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
-.container h3{
-    color: var(--text2, #6A6A6D);
+.container h3 {
+    color: var(--text2, #6a6a6d);
 
-/* Main/S */
-font-family: var(--font-family-main, "Lexend Deca");
-font-size: var(--font-size-s, 12px);
-font-style: normal;
-font-weight: 400;
-line-height: normal;
+    /* Main/S */
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-s, 12px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }

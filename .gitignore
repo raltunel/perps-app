@@ -1,6 +1,10 @@
 .DS_Store
 /node_modules/
 
+# misc
+.env*
+.vscode/
+
 # React Router
 /.react-router/
 /build/
@@ -8,14 +12,9 @@
 # Netlify
 .netlify
 
-/.prettierignore
-
-
 # Tradingview
 /public/tv/charting_library
 /public/tv/datafeeds
 
 /public/tradingview/charting_library
 /public/tradingview/datafeeds
-
-.vscode/

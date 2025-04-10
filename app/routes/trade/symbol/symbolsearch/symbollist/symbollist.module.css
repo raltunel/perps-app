@@ -1,0 +1,147 @@
+.symbolListWrapper {
+    position: absolute;
+    top: 130%;
+    left: 0;
+    z-index: 1000;
+    width: 50rem;
+    background-color: var(--dark3) !important;
+    padding: 0.5rem;
+    border-radius: 0.4rem !important;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
+}
+
+.symbolListWrapper div {
+    background-color: transparent !important;
+}
+
+.symbolList {
+    max-height: 16rem;
+    overflow-y: auto;
+    border-radius: 0 !important;
+    scrollbar-width: none;
+}
+
+.symbolListSearch {
+    width: 100%;
+    border: none;
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.symbolListSearchIcon {
+    position: absolute;
+    left: 0.6rem;
+    top: 50%;
+    color: var(--text2);
+    transform: translateY(-50%);
+}
+
+.symbolListSearch input {
+    width: 100%;
+    padding: 0.2rem;
+    border-radius: 0.4rem;
+    background-color: var(--dark4);
+    outline: none;
+    border: none;
+    padding-left: 2rem;
+    color: var(--text1);
+}
+
+.symbolListItem {
+    cursor: pointer;
+    color: var(--text1);
+}
+
+.symbolListItem:hover {
+    background-color: var(--dark5) !important;
+    border-radius: 0 !important;
+}
+
+.headerContainer {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
+    gap: 0.5rem;
+    align-items: center;
+    position: sticky;
+}
+
+.rowContainer {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
+    gap: 0.5rem;
+    align-items: center;
+    margin: 0.5rem;
+}
+
+.rowContainer:hover {
+    background-color: var(--dark5) !important;
+    border-radius: 0 !important;
+    cursor: pointer;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+    user-select: none;
+}
+
+.headerCell.active {
+    color: var(--text1) !important;
+}
+
+.headerCell.sortable {
+    cursor: pointer;
+}
+
+.symbolCell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.symbolListWrapper .leverageLabel {
+    color: var(--text1);
+    background: var(--accent1) !important;
+    padding: 0 0.2rem !important;
+    border-radius: 0.2rem !important;
+}
+
+.symbolListSearchClose {
+    transition: all 0.2s ease-in-out;
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--text2);
+    cursor: pointer;
+}
+
+.symbolListSearchClose:hover {
+    color: var(--text1);
+}
+
+.favIcon {
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.favIcon svg {
+    color: var(--text2) !important;
+}
+
+.favIcon:not(.favIconActive):hover {
+    color: var(--text1) !important;
+}
+
+.favIconActive:hover {
+    opacity: 0.8;
+}

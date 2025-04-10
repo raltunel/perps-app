@@ -16,7 +16,7 @@ const DEFAULTS = {
     showBuysSellsOnChart: true,
     showPnL: true,
     showAllWarnings: true,
-}
+};
 
 // string-union type of all keys in the `DEFAULTS` obj
 export type appOptions = keyof typeof DEFAULTS;
@@ -41,11 +41,11 @@ export const useAppOptions = create<useAppOptionsIF>()(
             // ... local storage will re-hydrate if present
             ...DEFAULTS,
             // set a given option to `true`
-            enable: (o: appOptions): void => set({[o]: true}),
+            enable: (o: appOptions): void => set({ [o]: true }),
             // set a given option to `false`
-            disable: (o: appOptions): void => set({[o]: false}),
+            disable: (o: appOptions): void => set({ [o]: false }),
             // toggle a value `true` ⟷ `false`
-            toggle: (o: appOptions): void => set({[o]: !get()[o]}),
+            toggle: (o: appOptions): void => set({ [o]: !get()[o] }),
             applyDefaults: (): void => set(DEFAULTS),
         }),
         {
@@ -55,4 +55,4 @@ export const useAppOptions = create<useAppOptionsIF>()(
             storage: createJSONStorage(() => localStorage),
         },
     ),
-)
+);

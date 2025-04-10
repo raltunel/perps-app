@@ -1,9 +1,9 @@
 .tooltipWrapper {
     position: relative;
     display: inline-block;
-  }
-  
-  .tooltip {
+}
+
+.tooltip {
     position: absolute;
     background-color: var(--dark3);
     color: var(--text1);
@@ -17,20 +17,19 @@
     border-radius: var(--half-border-radius, 8px);
 
     font-size: var(--font-size-s, 12px);
+}
 
-  }
-  
-  .mobileTooltip {
+.mobileTooltip {
     animation: fadeIn 200ms ease-out;
-  }
-  
-  @keyframes fadeIn {
+}
+
+@keyframes fadeIn {
     from {
-      opacity: 0;
-      transform: scale(0.95);
+        opacity: 0;
+        transform: scale(0.95);
     }
     to {
-      opacity: 1;
-      transform: scale(1);
+        opacity: 1;
+        transform: scale(1);
     }
-  }
+}

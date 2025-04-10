@@ -9,7 +9,7 @@ import { getHistoricalData } from './candleDataCache';
 import { mapResolutionToInterval, supportedResolutions } from './utils/utils';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
-import type { SymbolInfoIF } from "~/utils/SymbolInfoIFs";
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -42,7 +42,7 @@ export const createDataFeed = (
             const symbolInfo: LibrarySymbolInfo = {
                 ticker: symbolName,
                 name: symbolName,
-                minmov: 1,
+                minmov: 0.01,
                 pricescale: 1000,
                 timezone: 'Etc/UTC',
                 session: '24x7',
@@ -106,4 +106,4 @@ export const createDataFeed = (
             clearInterval((window as any)[listenerGuid]);
             delete (window as any)[listenerGuid];
         },
-    } as IDatafeedChartApi);
+    }) as IDatafeedChartApi;

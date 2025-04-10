@@ -268,7 +268,6 @@ export default function PositionSize({
                             style={{
                                 left: `${getKnobPosition()}%`,
                                 // borderColor: getKnobColor(),
-
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}

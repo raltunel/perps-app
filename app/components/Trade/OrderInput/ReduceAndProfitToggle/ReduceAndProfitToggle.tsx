@@ -24,15 +24,15 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         isRandomizeEnabled,
         handleToggleRandomize,
         isChasingIntervalEnabled,
-        handleToggleIsChasingInterval
+        handleToggleIsChasingInterval,
     } = props;
 
     const showTakeProfitToggle = ['market', 'limit'].includes(marketOrderType);
-    const showReduceToggle = marketOrderType !== 'chase_limit'
+    const showReduceToggle = marketOrderType !== 'chase_limit';
 
     const showRandomizeToggle = marketOrderType === 'twap';
 
-    const chasingIntervalToggle = marketOrderType === 'chase_limit' &&(
+    const chasingIntervalToggle = marketOrderType === 'chase_limit' && (
         <div className={styles.chasingIntervalContainer}>
             <div className={styles.inputDetailsDataContent}>
                 <div className={styles.inputDetailsLabel}>
@@ -67,14 +67,16 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                     <h3 className={styles.toggleLabel}>Randomize</h3>
                 </div>
             )}
-       {showReduceToggle &&     <div className={styles.reduceToggleContent}>
-                <ToggleSwitch
-                    isOn={isReduceOnlyEnabled}
-                    onToggle={handleToggleReduceOnly}
-                    label=''
-                />
-                <h3 className={styles.toggleLabel}>Reduce Only</h3>
-            </div>}
+            {showReduceToggle && (
+                <div className={styles.reduceToggleContent}>
+                    <ToggleSwitch
+                        isOn={isReduceOnlyEnabled}
+                        onToggle={handleToggleReduceOnly}
+                        label=''
+                    />
+                    <h3 className={styles.toggleLabel}>Reduce Only</h3>
+                </div>
+            )}
             {showTakeProfitToggle && (
                 <div className={styles.reduceToggleContent}>
                     <ToggleSwitch

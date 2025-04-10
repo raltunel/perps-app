@@ -91,13 +91,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             // array of color codes from candle properties we care about
             const activeColors: string[] | undefined = candleStyle
                 ? [
-                    candleStyle.upColor,
-                    candleStyle.downColor,
-                    candleStyle.borderUpColor,
-                    candleStyle.borderDownColor,
-                    candleStyle.wickUpColor,
-                    candleStyle.wickDownColor,
-                ]
+                      candleStyle.upColor,
+                      candleStyle.downColor,
+                      candleStyle.borderUpColor,
+                      candleStyle.borderDownColor,
+                      candleStyle.wickUpColor,
+                      candleStyle.wickDownColor,
+                  ]
                 : undefined;
             // determine if any of the candles have a color chosen through
             // ... the trading view color customization workflow (custom
@@ -116,6 +116,24 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
                     'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
                 });
+
+            if (chart) {
+                const volumeStudyId = chart
+                    .activeChart()
+                    .getAllStudies()
+                    .find((x) => x.name === 'Volume');
+
+                if (volumeStudyId) {
+                    const volume = chart
+                        .activeChart()
+                        .getStudyById(volumeStudyId.id);
+                    isCustomized ||
+                        volume.applyOverrides({
+                            'volume.color.0': c.buy,
+                            'volume.color.1': c.sell,
+                        });
+                }
+            }
         }
     }
 
@@ -154,6 +172,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
+            saved_data: chartState ? chartState.chartLayout : undefined,
             // load_last_chart:false,
             time_frames: [
                 { text: '5y', resolution: '1w' as ResolutionString },
@@ -175,8 +194,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 'paneProperties.backgroundType': 'solid',
             });
 
-            chartState && tvWidget.load(chartState.chartLayout);
-
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
@@ -196,6 +213,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     priceScale.setMode(0);
                 }
             }
+
             setChart(tvWidget);
         });
 

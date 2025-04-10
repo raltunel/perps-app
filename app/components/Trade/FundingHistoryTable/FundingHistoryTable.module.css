@@ -41,7 +41,7 @@
     padding-bottom: 1rem;
 }
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -69,19 +69,19 @@
 }
 
 .longPosition {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .shortPosition {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 
 .negativePayment {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 
 .positivePayment {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 .viewAllLink {
@@ -104,17 +104,24 @@
     margin-top: 8px;
 }
 
-.viewAllLink:hover, .exportCsvLink:hover {
+.viewAllLink:hover,
+.exportCsvLink:hover {
     text-decoration: underline;
 }
 
 /* Specific cell styles */
-.timeCell {}
-.coinCell {}
-.sizeCell {}
-.positionSideCell {}
-.paymentCell {}
-.rateCell {}
+.timeCell {
+}
+.coinCell {
+}
+.sizeCell {
+}
+.positionSideCell {
+}
+.paymentCell {
+}
+.rateCell {
+}
 
 @media (max-width: 900px) {
     .rowContainer,
