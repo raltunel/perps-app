@@ -394,10 +394,6 @@ export default function OrderInput() {
 
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    useEffect(() => {
-        console.log(notifications.notifications);
-    }, [notifications, notifications]);
-
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
@@ -407,11 +403,6 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    {/* <OrderDropdown
-                        options={isolatedOrderTypes}
-                        value={isolatedOrderType}
-                        onChange={handleIsolatedOrderTypeChange}
-                    /> */}
                     <button
                         onClick={() => openModalWithContent('margin')}
                         className={styles.isolatedButton}
