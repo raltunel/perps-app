@@ -51,7 +51,7 @@
 
 /* general styling to apply if options are JSX rather than text  */
 .active_option *,
-.options_dropdown *  {
+.options_dropdown * {
     display: flex;
     flex-direction: row;
     justify-content: space-between;

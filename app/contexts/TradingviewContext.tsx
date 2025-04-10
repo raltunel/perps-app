@@ -120,6 +120,24 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
                     'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
                 });
+
+            if (chart) {
+                const volumeStudyId = chart
+                    .activeChart()
+                    .getAllStudies()
+                    .find((x) => x.name === 'Volume');
+
+                if (volumeStudyId) {
+                    const volume = chart
+                        .activeChart()
+                        .getStudyById(volumeStudyId.id);
+                    isCustomized ||
+                        volume.applyOverrides({
+                            'volume.color.0': c.buy,
+                            'volume.color.1': c.sell,
+                        });
+                }
+            }
         }
     }
 

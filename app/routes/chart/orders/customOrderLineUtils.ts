@@ -29,13 +29,16 @@ export const addCustomOrderLine = async (
     return orderLine;
 };
 
-const createText = (lineType: 'liq' | 'limit' | 'pnl', price: number) => {
+export const getLabelText = (
+    lineType: 'liq' | 'limit' | 'pnl',
+    price: number,
+) => {
     const orderText =
         lineType === 'limit'
             ? ' Limit  ' + price
             : lineType === 'pnl'
-            ? '  PNL ' + (price > 0 ? '$' + price : '-$' + Math.abs(price))
-            : '   Liq. Price';
+              ? '  PNL ' + (price > 0 ? '$' + price : '-$' + Math.abs(price))
+              : '   Liq. Price';
 
     return orderText;
 };
@@ -52,7 +55,7 @@ export const createShapeText = async (
     const priceRange = priceScale.getVisiblePriceRange();
     const chartHeight = priceScalePane.getHeight();
 
-    const orderText = createText(lineType, price);
+    const orderText = getLabelText(lineType, price);
     if (!priceRange) return;
 
     const maxPrice = priceRange.to;
@@ -141,7 +144,7 @@ export const createQuantityText = async (
                 fillBackground: true,
                 drawBorder: true,
                 wordWrap: true,
-                wordWrapWidth: quantity.toString().length > 8 ? 70 : 50,
+                wordWrapWidth: quantity.toString().length > 8 ? 70 : 60,
                 color: '#FFFFFF',
                 borderWidth: 3,
                 borderColor: '#3C91FF',
@@ -191,7 +194,7 @@ export const getOrderQuantityTextLocation = (
     const timeScale = chart.activeChart().getTimeScale();
     const chartWidth = Math.floor(timeScale.width());
 
-    const orderText = createText(lineType, price);
+    const orderText = getLabelText(lineType, price);
     const wrapWidthPx = orderText.length > 13 ? 105 : 75;
 
     const offsetX = Number(wrapWidthPx / chartWidth);

@@ -1,43 +1,41 @@
-.watchListNodeContainer{
+.watchListNodeContainer {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    font-size: .8rem;
+    font-size: 0.8rem;
     margin-bottom: 0;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
 }
 
-.watchListNodeContent{
+.watchListNodeContent {
     flex-direction: row;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: .2rem !important;
-    transition: all .2s ease-in-out;
-    padding: .3rem;
-    ;                         
+    border-radius: 0.2rem !important;
+    transition: all 0.2s ease-in-out;
+    padding: 0.3rem;
 }
 
-.watchListNodeContent.active{
+.watchListNodeContent.active {
     cursor: default;
 }
 
-.watchListNodeContent:not(.active):hover{
+.watchListNodeContent:not(.active):hover {
     background-color: var(--dark4) !important;
 }
 
-.watchListNodeContainer div{
+.watchListNodeContainer div {
     background-color: transparent !important;
 }
 
-.watchListNodeContainer div{
+.watchListNodeContainer div {
     height: auto !important;
 }
 
-.symbolValue{
-    margin-left: .5rem;
+.symbolValue {
+    margin-left: 0.5rem;
 }
-

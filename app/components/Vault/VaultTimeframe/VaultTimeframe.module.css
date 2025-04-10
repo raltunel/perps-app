@@ -2,9 +2,9 @@
     position: relative;
     display: inline-block;
     width: 57px;
-  }
-  
-  .dropdown button {
+}
+
+.dropdown button {
     height: 100%;
     width: 100%;
     background-color: transparent;
@@ -18,42 +18,39 @@
     cursor: pointer;
     padding: 0px 4px;
     gap: 8px;
+}
 
-  }
-  
-  .icon {
+.icon {
     color: var(--text2);
-  }
-  .dropdown button:hover .icon{
-    color: var(--text1)
-  }
-  
-  .menu {
+}
+.dropdown button:hover .icon {
+    color: var(--text1);
+}
+
+.menu {
     position: absolute;
     top: 40px;
-    right: 4px;;
+    right: 4px;
     background: var(--dark4);
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     padding: 8px 0;
     width: 80px;
     display: none;
-  }
-  
-  .menu.open {
+}
+
+.menu.open {
     display: block;
-  }
-  
-  .menuItem {
+}
+
+.menuItem {
     padding: 8px 12px;
     color: var(--text2);
     font-size: var(--font-size-s);
     cursor: pointer;
     transition: background 0.2s;
-  }
-  
-  .menuItem:hover {
-    
+}
+
+.menuItem:hover {
     color: var(--text1);
-  }
-  
+}

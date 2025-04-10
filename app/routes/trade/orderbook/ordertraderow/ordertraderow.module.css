@@ -1,56 +1,50 @@
-
-
-@keyframes fadeIn{
-    from{
+@keyframes fadeIn {
+    from {
         opacity: 0;
     }
-    to{
+    to {
         opacity: 1;
     }
 }
 
-.orderTradeRow{
-
+.orderTradeRow {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     position: relative;
-    font-size: .8rem;
-    padding: 0 .5rem;
+    font-size: 0.8rem;
+    padding: 0 0.5rem;
     /* animation: fadeIn .2s ease-in-out; */
 }
 
-.orderTradeTime{
+.orderTradeTime {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: .4rem;
+    gap: 0.4rem;
 }
 
-.orderTradeTime svg{
+.orderTradeTime svg {
     color: var(--accent1);
     cursor: pointer;
     font-size: 1rem;
 }
 
-
-
-.buy .orderTradePrice{
+.buy .orderTradePrice {
     color: var(--green);
 }
 
-.sell .orderTradePrice{
+.sell .orderTradePrice {
     color: var(--red);
 }
 
-
-div[class*="inverse"] .buy .orderTradePrice{
+div[class*='inverse'] .buy .orderTradePrice {
     color: var(--red);
 }
 
-div[class*="inverse"] .sell .orderTradePrice{
+div[class*='inverse'] .sell .orderTradePrice {
     color: var(--green);
 }

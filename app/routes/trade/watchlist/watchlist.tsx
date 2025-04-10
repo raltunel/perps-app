@@ -10,29 +10,29 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import WatchListNode from './watchlistnode/watchlistnode';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 
-interface WatchListProps { }
+interface WatchListProps {}
 
-const WatchList: React.FC<WatchListProps> = ({ }) => {
-
+const WatchList: React.FC<WatchListProps> = ({}) => {
     const { favCoins } = useTradeDataStore();
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
         'dollar',
     );
 
-
     return (
         <div className={styles.watchListContainer}>
             <TbHeartFilled className={styles.favIcon} />
             <FiDollarSign
                 onClick={() => setWatchListMode('dollar')}
-                className={`${styles.watchListToolbarIcon} ${watchListMode === 'dollar' ? styles.active : ''
-                    }`}
+                className={`${styles.watchListToolbarIcon} ${
+                    watchListMode === 'dollar' ? styles.active : ''
+                }`}
             />
             <FiPercent
                 onClick={() => setWatchListMode('percent')}
-                className={`${styles.watchListToolbarIcon} ${styles.percentIcon
-                    }  ${watchListMode === 'percent' ? styles.active : ''}`}
+                className={`${styles.watchListToolbarIcon} ${
+                    styles.percentIcon
+                }  ${watchListMode === 'percent' ? styles.active : ''}`}
             />
 
             <HorizontalScrollable className={styles.watchListLimitor}>

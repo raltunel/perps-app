@@ -11,6 +11,7 @@ import {
 } from './utils/utils';
 import { WsChannels } from '~/hooks/useWsObserver';
 import { processWSCandleMessage } from './processChartData';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 export const createDataFeed = (
     subscribe: (channel: string, payload: any) => void,
@@ -208,4 +209,4 @@ export const createDataFeed = (
             clearInterval((window as any)[listenerGuid]);
             delete (window as any)[listenerGuid];
         },
-    } as IDatafeedChartApi);
+    }) as IDatafeedChartApi;
