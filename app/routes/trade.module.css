@@ -1,7 +1,7 @@
 .container {
     height: 100%;
     display: grid;
-    grid-template-rows: 1fr 281px;
+    grid-template-rows: 1fr var(--trade-tables-height-desktop);
     gap: var(--main-gap);
 }
 
@@ -87,6 +87,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.orderBook,
+.tradeModules,
+.symbolSectionWrapper {
+    overflow: hidden;
+    max-height: calc(
+        100vh - var(--trade-tables-height-desktop) -
+            var(--header-height-desktop) - var(--main-gap)
+    );
 }
 
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
