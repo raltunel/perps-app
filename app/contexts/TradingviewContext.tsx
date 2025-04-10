@@ -26,6 +26,8 @@ import {
     studyEventsUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useDebugStore } from '~/stores/DebugStore';
+import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -57,6 +59,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const { symbol } = useTradeDataStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
+
+    const { debugWallet } = useDebugStore();
 
     useEffect(() => {
         const res = getChartLayout();
@@ -241,6 +245,24 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         studyEvents(chart);
         intervalChangedSubscribe(chart);
     }, [chart]);
+
+    useEffect(() => {
+        if (debugWallet.address) {
+            getMarkFillData(symbol, debugWallet.address).then(() => {
+                if (chart) {
+                    chart.chart().clearMarks();
+                    chart.chart().refreshMarks();
+                }
+            });
+        }
+    }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            chart.chart().clearMarks();
+            chart.chart().refreshMarks();
+        }
+    }, [bsColor, chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>
