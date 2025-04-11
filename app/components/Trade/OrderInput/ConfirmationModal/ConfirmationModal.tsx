@@ -92,7 +92,7 @@ export default function ConfirmationModal(props: PropsIF) {
                 />
             </div>
             <button className={styles.confirmButton} onClick={onClose}>
-                {tx === 'buy' ? 'Buy/Long' : 'Sell/Short'}
+                {tx === 'buy' ? 'Buy / Long' : 'Sell / Short'}
             </button>
         </div>
     );
