@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -15,21 +17,13 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useEffect, useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
-import { useNavigate, useParams } from 'react-router';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'TRADE' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
-}
 
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-export default function Trade({ loaderData }: Route.ComponentProps) {
+export default function Trade() {
     const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
@@ -49,7 +43,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
     // ... route with no token symbol in the URL
     useEffect(() => {
         console.log(symbol);
-        marketId ?? navigate(`/trade/${symbol}`, { replace: true });
+        if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
     }, [navigate]);
 
     return (
