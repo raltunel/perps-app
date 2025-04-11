@@ -18,11 +18,11 @@ import WatchList from './trade/watchlist/watchlist';
 import { useEffect, useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
 import { useNavigate, useParams } from 'react-router';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'TRADE' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
+export function meta({ }: Route.MetaArgs) {
+  return [
+    { title: 'TRADE' },
+    { name: 'description', content: 'Welcome to React Router!' },
+  ];
 }
 
 export function loader({ context }: Route.LoaderArgs) {
@@ -30,18 +30,12 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
-    const { symbol, setSymbol } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
-    // logic to automatically redirect the user if they land on a
-    // ... route with no token symbol in the URL
-    useEffect(() => {
-        marketId ?? navigate(`/trade/${symbol}`, { replace: true });
-    }, [navigate]);
-
     const {
         wsUrl,
         setWsUrl,
@@ -51,15 +45,22 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         setIsWsEnabled,
     } = useDebugStore();
 
+    // logic to automatically redirect the user if they land on a
+    // ... route with no token symbol in the URL
+    useEffect(() => {
+      console.log(symbol);
+      marketId ?? navigate(`/trade/${symbol}`, { replace: true });
+    }, [navigate]);
+
     return (
         <>
-            <title>{`${marketId || 'BTC'}`}</title>
-            <meta
-                property='og:image'
-                content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${
-                    marketId || 'BTC'
-                }%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
-            />
+        <title>{`${marketId || 'BTC'}`}</title>
+        <meta
+            property='og:image'
+            content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${
+                marketId || 'BTC'
+            }%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
+        />
             <div className={styles.wsUrlSelector}>
                 <ComboBox
                     value={wsUrl}
@@ -101,7 +102,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
-                        <div className={styles.containerTopLeft}>
+                        <div
+                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
+                        >
                             <div
                                 id='watchlistSection'
                                 className={styles.watchlist}

@@ -25,6 +25,6 @@ export default [
     route('more', 'routes/more/more.tsx'),
 
     route('testpage', 'routes/testpage/testpage.tsx'),
-    
-    route('*', 'routes/notFound/notFound.tsx')
+
+    route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;
