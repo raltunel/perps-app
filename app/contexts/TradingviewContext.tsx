@@ -152,7 +152,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         return () => {
             clearInterval(timer);
         };
-    }, [chart, bsColor]);
+    }, [chart]);
+
+    useEffect(() => {
+        if (chart) {
+            chart.chart().refreshMarks();
+        }
+    }, [bsColor, chart]);
 
     // side effect to load a custom color set into the table, runs when
     // ... the user changes the app's color theme and when the chart
