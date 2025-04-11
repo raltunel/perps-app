@@ -2,12 +2,15 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import styles from './PlaceOrderButtons.module.css';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface propsIF {
     orderMarketPrice: string;
     openModalWithContent: (
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => void;
+    leverage: number;
+    orderValue?: string;
 }
 interface MarketInfoItem {
     label: string;
@@ -16,10 +19,12 @@ interface MarketInfoItem {
 }
 
 export default function PlaceOrderButtons(props: propsIF) {
-    const { orderMarketPrice, openModalWithContent } = props;
+    const { orderMarketPrice, openModalWithContent, orderValue, leverage } =
+        props;
 
     // logic to change the active color pair
     const { getBsColor } = useAppSettings();
+    const { formatNum, parseFormattedNum } = useNumFormatter();
 
     const showLiquidationPrice: boolean = [
         'market',
@@ -42,7 +47,14 @@ export default function PlaceOrderButtons(props: propsIF) {
         {
             label: 'Order Value',
             tooltipLabel: 'order value',
-            value: 'N/A',
+            value: `$${orderValue}` || 'N/A',
+        },
+        {
+            label: 'Margin Required',
+            tooltipLabel: 'margin required',
+            value: orderValue
+                ? `$${formatNum(parseFormattedNum(orderValue) / leverage)}`
+                : 'N/A',
         },
     ].filter(Boolean) as MarketInfoItem[];
 
