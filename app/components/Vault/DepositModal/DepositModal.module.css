@@ -17,12 +17,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-   
 }
 
-.container header h3{
+.container header h3 {
     font-size: var(--font-size-l, 24px);
-
 }
 
 .textContent {
@@ -61,15 +59,13 @@
     background: var(--dark4, #27272c);
     position: relative;
     gap: 8px;
-   
 }
-.dropdownContainer span{
+.dropdownContainer span {
     font-size: 12px;
 }
-.dropdownContainer svg{
-    fill: var(--text2)
+.dropdownContainer svg {
+    fill: var(--text2);
 }
-
 
 .inputContainer {
     width: 100%;
@@ -84,7 +80,7 @@
     position: relative;
     gap: 8px;
 }
-.inputContainer input{
+.inputContainer input {
     width: 100%;
     outline: none;
     border: none;
@@ -94,14 +90,14 @@
     font-size: var(--font-size-s, 12px);
 }
 
-.inputContainer h6{
+.inputContainer h6 {
     font-size: var(--font-size-s, 12px);
     color: var(--text2);
     margin: 0;
 }
-.inputContainer button{
+.inputContainer button {
     font-size: var(--font-size-s, 12px);
-    color: var(--accent1, #7371FC);
+    color: var(--accent1, #7371fc);
     background: none;
     border: none;
     cursor: pointer;
@@ -125,10 +121,9 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    padding: 8px ;
+    padding: 8px;
     border-radius: var(--half-border-radius, 8px);
-border: 1px solid var(--dark4, #27272C);
-
+    border: 1px solid var(--dark4, #27272c);
 }
 
 .infoRow {
@@ -150,12 +145,12 @@ border: 1px solid var(--dark4, #27272C);
     font-size: var(--font-size-s, 12px);
 }
 
-.infoValue{
+.infoValue {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
 }
 
-.actionButton{
+.actionButton {
     display: flex;
     padding: 12px 16px;
     flex-direction: column;
@@ -163,14 +158,14 @@ border: 1px solid var(--dark4, #27272C);
     align-items: center;
     width: 100%;
     border-radius: 8px;
-    background: var(--accent1, #7371FC);
+    background: var(--accent1, #7371fc);
     border: none;
-   
+
     cursor: pointer;
-    
+
     font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    color: var(--text1, #F0F0F8);
+    color: var(--text1, #f0f0f8);
 }
 
 .actionButton:disabled {
