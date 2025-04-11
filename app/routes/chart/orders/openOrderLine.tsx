@@ -39,7 +39,7 @@ const OpenOrderLine = () => {
         });
 
         setLines(newLines);
-    }, [JSON.stringify(userSymbolOrders), debugWallet, symbol]);
+    }, [chart, JSON.stringify(userSymbolOrders), debugWallet, symbol]);
 
     if (!chart) return null;
 
