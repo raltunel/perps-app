@@ -42,7 +42,7 @@
 }
 
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -80,19 +80,23 @@
 
 /* Specific cell classes */
 .coinCell {
-    
 }
 
 .sizeCell {
-  
 }
 
-.executedSizeCell {}
-.averagePriceCell {}
-.runningTimeCell {}
-.reduceOnlyCell {}
-.creationTimeCell {}
-.terminateCell {}
+.executedSizeCell {
+}
+.averagePriceCell {
+}
+.runningTimeCell {
+}
+.reduceOnlyCell {
+}
+.creationTimeCell {
+}
+.terminateCell {
+}
 
 .terminateButton {
     background-color: transparent;

@@ -14,7 +14,9 @@ export default function OptionLine(props: propsIF) {
         <li className={styles.option_line} onClick={toggle}>
             <div
                 className={styles.checkbox}
-                style={{ borderColor: `var(${isChecked ? '--accent1' : '--text3'})` }}
+                style={{
+                    borderColor: `var(${isChecked ? '--accent1' : '--text3'})`,
+                }}
             >
                 {isChecked && <FaCheck size={10} color={'var(--accent1)'} />}
             </div>

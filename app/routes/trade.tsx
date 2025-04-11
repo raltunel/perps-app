@@ -26,12 +26,14 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export function loader({ context }: Route.LoaderArgs) {
-  return { message: context.VALUE_FROM_NETLIFY };
+    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 export default function Trade({ loaderData }: Route.ComponentProps) {
-
-  const { symbol } = useTradeDataStore();
+  const { symbol, setSymbol } = useTradeDataStore();
+  const symbolRef = useRef(symbol);
+  symbolRef.current = symbol;
+  const { orderBookMode } = useAppSettings();
   const { marketId } = useParams<{ marketId: string }>();
   const navigate = useNavigate();
   // logic to automatically redirect the user if they land on a
@@ -39,11 +41,6 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     marketId ?? navigate(`/trade/${symbol}`, { replace: true });
   }, [navigate]);
-
-  
-  const symbolRef = useRef<string>(symbol);
-  symbolRef.current = symbol;
-  const { orderBookMode } = useAppSettings();
 
   const { wsUrl, setWsUrl, debugWallet, setDebugWallet, isWsEnabled, setIsWsEnabled } = useDebugStore();
 
@@ -104,14 +101,11 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                 <DepositDropdown
                   isUserConnected={false}
                   setIsUserConnected={() => console.log('connected')}
-                />
-              </div>
-            </section>
-
-          </div>
-
-        )
-      }
-    </>
-  );
+                            />
+                        </div>
+                    </section>
+                </div>
+            )}
+        </>
+    );
 }

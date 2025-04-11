@@ -9,7 +9,6 @@
     margin-top: 48px;
 }
 
-
 .container header {
     color: #fff;
 
@@ -57,10 +56,9 @@
     font-weight: 400;
     line-height: normal;
 }
-.searchContainer svg:hover{
-    fill: var(--text1)
+.searchContainer svg:hover {
+    fill: var(--text1);
 }
-
 
 .searchInput {
     background: transparent;
@@ -70,12 +68,9 @@
     width: 100%;
 }
 
-
 .searchInput::placeholder {
     color: var(--text2, #6a6a6d);
 }
-
-
 
 .periodSelector {
     display: flex;
@@ -88,12 +83,11 @@
 }
 
 .periodSelector svg {
-    fill: var(--text2) ;
+    fill: var(--text2);
 }
 
 .periodSelector:hover svg {
     fill: var(--text1);
-   
 }
 
 .periodText {
@@ -101,14 +95,13 @@
     font-size: var(--font-size-s, 12px);
 }
 
-
 .dropdownMenu {
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
     background-color: var(--dark3);
     border-radius: var(--half-border-radius);
-    padding:8px;
+    padding: 8px;
     width: 100%;
     z-index: 10;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -116,27 +109,23 @@
 }
 
 .dropdownItem {
-
     width: 100%;
     padding: 8px;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     cursor: pointer;
-    
 }
 
 .dropdownItem:hover {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-
-
 .paginationContainer {
     width: 100%;
     display: flex;
     justify-content: flex-end;
     align-items: center;
-  
+
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
     gap: 12px;
@@ -146,7 +135,6 @@
     display: flex;
     align-items: center;
     gap: 12px;
-   
 }
 
 .rowSelector {
@@ -192,37 +180,36 @@
 }
 
 .footer {
-    color: var(--text2, #BCBCC4);
+    color: var(--text2, #bcbcc4);
     text-align: center;
-    
- 
-    font-family: var(--font-family-main, "Lexend Deca");
+
+    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     align-self: stretch;
 }
-.periodSelectorContainer{
+.periodSelectorContainer {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 8px;
 }
 
-.fullScreen{
+.fullScreen {
     margin-top: 0 !important;
-    gap: 8px !important
+    gap: 8px !important;
 }
 
-.fullScreen .searchRow{
+.fullScreen .searchRow {
     height: auto;
 }
-.expandIcon{
-    fill: var(--text2)
+.expandIcon {
+    fill: var(--text2);
 }
 .expandIcon:hover {
-    fill: var(--text1)
+    fill: var(--text1);
 }
 
 @media (min-width: 1280px) {
@@ -231,10 +218,9 @@
     }
 }
 @media (min-width: 1580px) {
-.container{
-    margin-top: 96px;
-}
-
+    .container {
+        margin-top: 96px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -258,7 +244,7 @@
     }
 }
 @media (max-width: 500px) {
-.container{
-    margin-top: 0;
-}
+    .container {
+        margin-top: 0;
+    }
 }

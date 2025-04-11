@@ -30,7 +30,7 @@ export const intervalChangedSubscribe = (chart: any) => {
         .activeChart()
         .onIntervalChanged()
         .subscribe(null, (interval: number, timeframeObj: any) => {
-                saveChartLayout(chart);
+            saveChartLayout(chart);
         });
 };
 

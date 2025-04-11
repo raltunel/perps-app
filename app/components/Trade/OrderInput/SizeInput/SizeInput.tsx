@@ -9,9 +9,19 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     useTotalSize: boolean;
+    symbol?: string;
 }
 export default function SizeInput(props: PropsIF) {
-    const { value, onChange, onBlur, onKeyDown, className, ariaLabel, useTotalSize } = props;
+    const {
+        value,
+        onChange,
+        onBlur,
+        onKeyDown,
+        className,
+        ariaLabel,
+        useTotalSize,
+        symbol,
+    } = props;
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
         if (/^\d*$/.test(newValue) && newValue.length <= 12) {
@@ -33,7 +43,8 @@ export default function SizeInput(props: PropsIF) {
                 pattern='[0-9]*'
                 placeholder='Enter Size'
             />
-            <button className={styles.tokenButton}>ETH <FaChevronDown />
+            <button className={styles.tokenButton}>
+                {symbol ? symbol : 'ETH'} <FaChevronDown />
             </button>
         </div>
     );

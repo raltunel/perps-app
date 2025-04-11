@@ -1,14 +1,19 @@
 import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
-import { useAppOptions, type appOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import {
+    useAppOptions,
+    type appOptions,
+    type useAppOptionsIF,
+} from '~/stores/AppOptionsStore';
 import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
-import { useAppSettings, bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import {
-    NumFormatTypes,
-    type NumFormat,
-} from '~/utils/Constants';
+    useAppSettings,
+    bsColorSets,
+    type colorSetIF,
+} from '~/stores/AppSettingsStore';
+import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import { FaCircle } from 'react-icons/fa';
 
 export interface appOptionDataIF {
@@ -24,13 +29,8 @@ export default function AppOptions(props: propsIF) {
     const { modalControl } = props;
 
     const activeOptions: useAppOptionsIF = useAppOptions();
-    const {
-        numFormat,
-        setNumFormat,
-        bsColor,
-        setBsColor,
-        getBsColor
-    } = useAppSettings();
+    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
+        useAppSettings();
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -60,7 +60,9 @@ export default function AppOptions(props: propsIF) {
                 <OptionLine
                     text='Skip Close Position Confirmations'
                     isChecked={activeOptions['skipClosePositionConfirm']}
-                    toggle={() => activeOptions.toggle('skipClosePositionConfirm')}
+                    toggle={() =>
+                        activeOptions.toggle('skipClosePositionConfirm')
+                    }
                 />
                 <OptionLine
                     text='Opt Out of Spot Dusting'
@@ -70,7 +72,9 @@ export default function AppOptions(props: propsIF) {
                 <OptionLine
                     text='Persist Trading Connection'
                     isChecked={activeOptions['persistTradingConnection']}
-                    toggle={() => activeOptions.toggle('persistTradingConnection')}
+                    toggle={() =>
+                        activeOptions.toggle('persistTradingConnection')
+                    }
                 />
             </ul>
             <div className={styles.horizontal_divider} />
@@ -88,7 +92,9 @@ export default function AppOptions(props: propsIF) {
                 <OptionLine
                     text='Enable Background Fill Notifications'
                     isChecked={activeOptions['enableBackgroundFillNotif']}
-                    toggle={() => activeOptions.toggle('enableBackgroundFillNotif')}
+                    toggle={() =>
+                        activeOptions.toggle('enableBackgroundFillNotif')
+                    }
                 />
                 <OptionLine
                     text='Play Sound for Fills'
@@ -103,7 +109,9 @@ export default function AppOptions(props: propsIF) {
                 <OptionLine
                     text='Order Book Set Size on Click'
                     isChecked={activeOptions['clickToSetOrderBookSize']}
-                    toggle={() => activeOptions.toggle('clickToSetOrderBookSize')}
+                    toggle={() =>
+                        activeOptions.toggle('clickToSetOrderBookSize')
+                    }
                 />
                 <OptionLine
                     text='Show Buys and Sells on Chart'
@@ -126,39 +134,45 @@ export default function AppOptions(props: propsIF) {
                 <OptionLineSelect
                     text='Number Format'
                     active={numFormat.label}
-                    options={
-                        NumFormatTypes.map((n: NumFormat) => ({
-                            readable: n.label,
-                            set: () => setNumFormat(n),
-                        }))
-                    }
+                    options={NumFormatTypes.map((n: NumFormat) => ({
+                        readable: n.label,
+                        set: () => setNumFormat(n),
+                    }))}
                 />
                 <OptionLineSelect
                     text='Color'
                     active={
-                        <div style={{gap: '10px'}}>
-                            <div>{(bsColor as string)[0].toUpperCase() + (bsColor as string).slice(1)}</div>
+                        <div style={{ gap: '10px' }}>
+                            <div>
+                                {(bsColor as string)[0].toUpperCase() +
+                                    (bsColor as string).slice(1)}
+                            </div>
                             <div style={{ gap: CIRCLE_GAP }}>
                                 <FaCircle color={getBsColor().buy} />
                                 <FaCircle color={getBsColor().sell} />
                             </div>
                         </div>
                     }
-                    options={
-                        Object.entries(bsColorSets).map((c: [string, colorSetIF]) => {
+                    options={Object.entries(bsColorSets).map(
+                        (c: [string, colorSetIF]) => {
                             const [text, colors]: [string, colorSetIF] = c;
-                            return ({
-                                readable: (<>
-                                    <div>{text[0].toUpperCase() + text.slice(1)}</div>
-                                    <div style={{ gap: CIRCLE_GAP }}>
-                                        <FaCircle color={colors.buy} />
-                                        <FaCircle color={colors.sell} />
-                                    </div>
-                                </>),
+                            return {
+                                readable: (
+                                    <>
+                                        <div>
+                                            {text[0].toUpperCase() +
+                                                text.slice(1)}
+                                        </div>
+                                        <div style={{ gap: CIRCLE_GAP }}>
+                                            <FaCircle color={colors.buy} />
+                                            <FaCircle color={colors.sell} />
+                                        </div>
+                                    </>
+                                ),
                                 set: () => setBsColor(text),
-                            })
-                        })
-                    }
+                            };
+                        },
+                    )}
                 />
             </ul>
             <div

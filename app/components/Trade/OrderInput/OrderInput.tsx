@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './OrderInput.module.css';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
@@ -21,6 +21,13 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import {
+    useNotificationStore,
+    type NotificationStoreIF,
+} from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -61,9 +68,9 @@ const positionSizeOptions = [
 export default function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<'margin' | 'scale' | 'confirmation' | null>(
-        null,
-    );
+    const [modalContent, setModalContent] = useState<
+        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
+    >(null);
 
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
@@ -81,16 +88,21 @@ export default function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 2;
-    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] = useState<number>(100);
+    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
+        useState<number>(100);
     const generateRandomMaximumInput = () => {
-        console.log('generating')
+        console.log('generating');
         // Generate a random maximum between minimumInputValue and 100
-        const newMaximumInputValue = Math.floor(
-          Math.random() * (100 - minimumInputValue + 1)
-        ) + minimumInputValue;
-        
+        const newMaximumInputValue =
+            Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
+            minimumInputValue;
+
         setTempMaximumLeverageInput(newMaximumInputValue);
-      }
+    };
+
+    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
+        useTradeDataStore();
+    const { formatNum, parseFormattedNum } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -117,10 +129,55 @@ export default function OrderInput() {
         {
             label: 'Current Position',
             tooltipLabel: 'current position',
-            value: '0.000 ETH',
+            value: `0.000 ${symbol}`,
         },
     ];
-    const openModalWithContent = (content: 'margin' | 'scale' | 'confirmation') => {
+
+    useEffect(() => {
+        if (obChosenAmount > 0) {
+            setSize(formatNum(obChosenAmount));
+            handleTypeChange();
+        }
+        if (obChosenPrice > 0) {
+            setPrice(obChosenPrice.toString());
+            handleTypeChange();
+        }
+    }, [obChosenAmount, obChosenPrice]);
+
+    const orderValue = useMemo(() => {
+        if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
+            return parseFormattedNum(size) * parseNum(symbolInfo?.markPx || 0);
+        } else if (
+            (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
+            price &&
+            price.length > 0 &&
+            size &&
+            size.length > 0
+        ) {
+            return parseFormattedNum(size) * parseNum(price);
+        }
+        return 0;
+    }, [size, price, marketOrderType, symbolInfo?.markPx]);
+
+    useEffect(() => {
+        setSize('');
+        setPrice('');
+    }, [symbol]);
+
+    const handleTypeChange = () => {
+        switch (marketOrderType) {
+            case 'market':
+                setMarketOrderType('limit');
+                break;
+            case 'stop_market':
+                setMarketOrderType('stop_limit');
+                break;
+        }
+    };
+
+    const openModalWithContent = (
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
+    ) => {
         setModalContent(content);
         appSettingsModal.open();
     };
@@ -297,7 +354,7 @@ export default function OrderInput() {
         onChange: handleLeverageChange,
         minimumInputValue: minimumInputValue,
         maximumInputValue: tempMaximumLeverageInput,
-        generateRandomMaximumInput: generateRandomMaximumInput
+        generateRandomMaximumInput: generateRandomMaximumInput,
     };
 
     const chasePriceProps = {
@@ -333,6 +390,7 @@ export default function OrderInput() {
         className: 'custom-input',
         ariaLabel: 'Size input',
         useTotalSize,
+        symbol,
     };
 
     const positionSizeProps = {
@@ -349,7 +407,9 @@ export default function OrderInput() {
         handleChangetotalOrders: handleTotalordersPriceRange,
         totalOrders: priceRangeTotalOrders,
     };
-    // ------------------------------------END OF PROPS-----------------------------
+
+    const notifications: NotificationStoreIF = useNotificationStore();
+
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
@@ -359,11 +419,6 @@ export default function OrderInput() {
                         value={marketOrderType}
                         onChange={handleMarketOrderTypeChange}
                     />
-                    {/* <OrderDropdown
-                        options={isolatedOrderTypes}
-                        value={isolatedOrderType}
-                        onChange={handleIsolatedOrderTypeChange}
-                    /> */}
                     <button
                         onClick={() => openModalWithContent('margin')}
                         className={styles.isolatedButton}
@@ -407,20 +462,17 @@ export default function OrderInput() {
 
                 {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
                 {marketOrderType === 'scale' && priceDistributionButtons}
-                {/* {marketOrderType === 'scale' && (
-                    <ScaleOrders
-                    totalQuantity={parseFloat(priceRangeTotalOrders)}
-                    minPrice={parseFloat(priceRangeMin)}
-                    maxPrice={parseFloat(priceRangeMax)}
-                    
-                />
-                )} */}
                 {marketOrderType === 'twap' && <RunningTime />}
 
                 <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
             </div>
 
-            <PlaceOrderButtons orderMarketPrice={marketOrderType} openModalWithContent={openModalWithContent}/>
+            <PlaceOrderButtons
+                orderMarketPrice={marketOrderType}
+                openModalWithContent={openModalWithContent}
+                orderValue={formatNum(orderValue)}
+                leverage={leverage}
+            />
 
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close}>
@@ -441,9 +493,20 @@ export default function OrderInput() {
                             onClose={appSettingsModal.close}
                         />
                     )}
-                    {modalContent === 'confirmation' && (
-                        <ConfirmationModal 
-                        onClose={appSettingsModal.close}
+                    {modalContent === 'confirm_buy' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('buyPending');
+                                appSettingsModal.close();
+                            }}
+                        />
+                    )}
+                    {modalContent === 'confirm_sell' && (
+                        <ConfirmationModal
+                            onClose={() => {
+                                notifications.add('sellPending');
+                                appSettingsModal.close();
+                            }}
                         />
                     )}
                 </Modal>

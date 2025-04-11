@@ -1,32 +1,37 @@
 import Tooltip from '~/components/Tooltip/Tooltip';
-import styles from './PlaceOrderButtons.module.css'
+import styles from './PlaceOrderButtons.module.css';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface propsIF {
     orderMarketPrice: string;
-    openModalWithContent: (content: "margin" | "scale" | "confirmation") => void
+    openModalWithContent: (
+        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
+    ) => void;
+    leverage: number;
+    orderValue?: string;
 }
 interface MarketInfoItem {
     label: string;
     tooltipLabel: string;
-    value: string;    
+    value: string;
 }
 
 export default function PlaceOrderButtons(props: propsIF) {
-    const { orderMarketPrice, openModalWithContent } = props
+    const { orderMarketPrice, openModalWithContent, orderValue, leverage } =
+        props;
 
     // logic to change the active color pair
     const { getBsColor } = useAppSettings();
+    const { formatNum, parseFormattedNum } = useNumFormatter();
 
     const showLiquidationPrice: boolean = [
         'market',
         'limit',
         'stop_limit',
-        'stop_market'
-    ].includes(
-        orderMarketPrice,
-    );
+        'stop_market',
+    ].includes(orderMarketPrice);
 
     const marketInfoData: MarketInfoItem[] = [
         showLiquidationPrice && {
@@ -42,10 +47,17 @@ export default function PlaceOrderButtons(props: propsIF) {
         {
             label: 'Order Value',
             tooltipLabel: 'order value',
-            value: 'N/A',
+            value: `$${orderValue}` || 'N/A',
+        },
+        {
+            label: 'Margin Required',
+            tooltipLabel: 'margin required',
+            value: orderValue
+                ? `$${formatNum(parseFormattedNum(orderValue) / leverage)}`
+                : 'N/A',
         },
     ].filter(Boolean) as MarketInfoItem[];
-    
+
     const twapInfoData: MarketInfoItem[] = [
         {
             label: 'Frequency',
@@ -83,20 +95,19 @@ export default function PlaceOrderButtons(props: propsIF) {
     };
 
     const dataToUse = infoDataMap[orderMarketPrice] || marketInfoData;
-    
-    return (
 
+    return (
         <div className={styles.place_order_buttons}>
             <div className={styles.buttons_wrapper}>
                 <button
                     style={{ backgroundColor: getBsColor().buy }}
-                    onClick={() => openModalWithContent('confirmation')}
+                    onClick={() => openModalWithContent('confirm_buy')}
                 >
                     Buy / Long
                 </button>
                 <button
                     style={{ backgroundColor: getBsColor().sell }}
-                    onClick={() => openModalWithContent('confirmation')}
+                    onClick={() => openModalWithContent('confirm_sell')}
                 >
                     Sell / Short
                 </button>
@@ -120,5 +131,5 @@ export default function PlaceOrderButtons(props: propsIF) {
                 ))}
             </div>
         </div>
-    )
+    );
 }

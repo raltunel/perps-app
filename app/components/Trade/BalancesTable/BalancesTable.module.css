@@ -41,7 +41,7 @@
     padding-bottom: 1rem;
 }
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {

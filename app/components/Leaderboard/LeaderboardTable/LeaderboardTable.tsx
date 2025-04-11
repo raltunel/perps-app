@@ -1,4 +1,4 @@
-import  { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import LeaderboardTableHeader from './LeaderboardTableHeader';
 import LeaderboardTableRow, {
     type LeaderboardData,
@@ -13,10 +13,14 @@ interface LeaderboardTableProps {
     };
     onSort: (key: string) => void;
     isFullScreen: boolean;
-   
 }
 
-function LeaderboardTable({ data, sortConfig, onSort, isFullScreen }: LeaderboardTableProps) {
+function LeaderboardTable({
+    data,
+    sortConfig,
+    onSort,
+    isFullScreen,
+}: LeaderboardTableProps) {
     // Memoize to prevent recalculation on every render
     const wrapperClassName = useMemo(() => {
         return `${styles.tableWrapper} ${isFullScreen ? styles.fullScreen : ''}`;
@@ -27,7 +31,7 @@ function LeaderboardTable({ data, sortConfig, onSort, isFullScreen }: Leaderboar
         return data.length > 0 ? (
             data.map((item) => (
                 <MemoizedLeaderboardTableRow
-                    key={`leader-${item.trader}`} 
+                    key={`leader-${item.trader}`}
                     data={item}
                 />
             ))
@@ -40,13 +44,11 @@ function LeaderboardTable({ data, sortConfig, onSort, isFullScreen }: Leaderboar
 
     return (
         <div className={wrapperClassName}>
-            <MemoizedLeaderboardTableHeader 
-                sortConfig={sortConfig} 
-                onSort={onSort} 
+            <MemoizedLeaderboardTableHeader
+                sortConfig={sortConfig}
+                onSort={onSort}
             />
-            <div className={styles.tableBody}>
-                {tableBody}
-            </div>
+            <div className={styles.tableBody}>{tableBody}</div>
         </div>
     );
 }

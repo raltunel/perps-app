@@ -7,7 +7,7 @@ export default [
     route('trade/:marketId?', 'routes/trade.tsx'),
 
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
-    route('vaults', 'routes/vaults/vaults.tsx'),
+    route('vaults', 'routes/vaults/vaultsNew.tsx'),
 
     // Renders "routes/leaderboard/leaderboard.tsx" at "/leaderboard"
     route('leaderboard', 'routes/leaderboard/leaderboard.tsx'),
@@ -20,10 +20,10 @@ export default [
 
     // Renders "routes/referrals/referrals.tsx" at "/referrals"
     route('referrals', 'routes/referrals/referrals.tsx'),
-    
+
     // Renders "routes/more/more.tsx" at "/more"
     route('more', 'routes/more/more.tsx'),
-    
+
     route('testpage', 'routes/testpage/testpage.tsx'),
     
     route('*', 'routes/notFound/notFound.tsx')

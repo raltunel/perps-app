@@ -8,7 +8,6 @@
     padding: 8px 16px 16px 16px;
     gap: 8px;
     min-width: 300px;
-   
 }
 
 .container header {
@@ -72,22 +71,18 @@
     font-size: var(--font-size-s, 12px);
 }
 
-.infoValue{
+.infoValue {
     font-size: var(--font-size-s, 12px);
-
 }
 
-
-
-.toggleContainer > div{
-   
-   width: 100%;
-   display: flex;
-   justify-content: flex-start;
-   align-items: flex-end;
-   /* flex-direction: row-reverse; */
-   left: 0;
-   padding: 16px 0;
+.toggleContainer > div {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    /* flex-direction: row-reverse; */
+    left: 0;
+    padding: 16px 0;
 }
 .confirmButton {
     width: 100%;
@@ -109,7 +104,7 @@
     font-size: var(--font-size-m, 18px);
     transition: all 0.3s ease-in-out;
 }
-.confirmButton:hover{
+.confirmButton:hover {
     opacity: 0.8;
 }
 
@@ -124,6 +119,6 @@
 }
 @media (min-width: 768px) {
     .container {
-        width: 439px ;
+        width: 439px;
     }
 }

@@ -20,7 +20,10 @@ export default function MarginModal(props: PropsIF) {
                 <MdClose onClick={() => handleMarginModeConfirm()} />
             </header>
             <div className={styles.contentContainer}>
-                <button className={`${styles.content} ${activeMargin === 'cross' ? styles.selected : ''}`} onClick={() => handleMarginModeChange('cross')}>
+                <button
+                    className={`${styles.content} ${activeMargin === 'cross' ? styles.selected : ''}`}
+                    onClick={() => handleMarginModeChange('cross')}
+                >
                     <h3>Cross Margin</h3>
                     <p>
                         All cross positions share the same cross margin as
@@ -29,7 +32,9 @@ export default function MarginModal(props: PropsIF) {
                         assets in this mode may be forfeited.
                     </p>
                 </button>
-                <button className={`${styles.content} ${activeMargin === 'isolated' ? styles.selected : ''}`} onClick={() => handleMarginModeChange('isolated')}
+                <button
+                    className={`${styles.content} ${activeMargin === 'isolated' ? styles.selected : ''}`}
+                    onClick={() => handleMarginModeChange('isolated')}
                 >
                     <h3>Isolated Mode</h3>
                     <p>

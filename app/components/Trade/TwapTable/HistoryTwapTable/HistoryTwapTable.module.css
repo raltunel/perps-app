@@ -42,7 +42,7 @@
 }
 
 .tableBody::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .cell {
@@ -93,27 +93,34 @@
 }
 
 /* Specific cell classes */
-.timeCell {}
-.coinCell {}
-.totalSizeCell {
-    
+.timeCell {
 }
-.executedSizeCell {}
-.averagePriceCell {}
-.totalRuntimeCell {}
-.reduceOnlyCell {}
-.randomizeCell {}
-.statusCell {}
+.coinCell {
+}
+.totalSizeCell {
+}
+.executedSizeCell {
+}
+.averagePriceCell {
+}
+.totalRuntimeCell {
+}
+.reduceOnlyCell {
+}
+.randomizeCell {
+}
+.statusCell {
+}
 
 /* Status styles */
 .statusActivated {
     color: var(--text1, #f0f0f8);
 }
 .statusTerminated {
-    color: var(--red, #FF5C5C);
+    color: var(--red, #ff5c5c);
 }
 .statusFinished {
-    color: var(--green, #4CD471);
+    color: var(--green, #4cd471);
 }
 
 /* Empty values */
