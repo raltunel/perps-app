@@ -32,9 +32,7 @@ jobs:
                   echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
 
                   # Create warning annotation but don't fail the workflow
-                  if [ "$ERROR_COUNT" -gt 0 ] || [ "$WARNING_COUNT" -gt 0 ]; then
-                    echo "::warning::Found $ERROR_COUNT errors and $WARNING_COUNT warnings in linting"
-                  fi
+                  echo "::warning::Found $ERROR_COUNT errors and $WARNING_COUNT warnings in linting"
               continue-on-error: true
 
             - name: Post lint results as comment
