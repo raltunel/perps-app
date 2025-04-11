@@ -141,6 +141,19 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }
 
+    // trigger order history marks to fill with candle colors
+    useEffect(() => {
+        const timer = setInterval(() => {
+            if (chart) {
+                chart.chart().refreshMarks();
+            }
+        }, 1000);
+
+        return () => {
+            clearInterval(timer);
+        };
+    }, [chart, bsColor]);
+
     // side effect to load a custom color set into the table, runs when
     // ... the user changes the app's color theme and when the chart
     // ... finishes initialization
@@ -256,13 +269,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             });
         }
     }, [debugWallet, chart, symbol]);
-
-    useEffect(() => {
-        if (chart) {
-            chart.chart().clearMarks();
-            chart.chart().refreshMarks();
-        }
-    }, [bsColor, chart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>

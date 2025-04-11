@@ -90,11 +90,24 @@ export async function getMarkFillData(coin: string, user?: string) {
 
 export function getMarkColorData() {
     const visualSettings = localStorage.getItem('VISUAL_SETTINGS');
+    const candleSettings = localStorage.getItem(
+        'tradingview.chartproperties.mainSeriesProperties',
+    );
 
-    if (visualSettings) {
-        const mainSeriesProperties = JSON.parse(visualSettings);
+    if (candleSettings) {
+        const mainSeriesProperties = JSON.parse(candleSettings);
         if (mainSeriesProperties) {
-            return bsColorSets[mainSeriesProperties.state.bsColor];
+            return {
+                buy: mainSeriesProperties.candleStyle.upColor,
+                sell: mainSeriesProperties.candleStyle.downColor,
+            };
+        }
+    } else {
+        if (visualSettings) {
+            const mainSeriesProperties = JSON.parse(visualSettings);
+            if (mainSeriesProperties) {
+                return bsColorSets[mainSeriesProperties.state.bsColor];
+            }
         }
     }
 
