@@ -96,7 +96,8 @@
     font-size: var(--font-size-s, 12px);
 }
 
-.dropdownMenu, .dropupMenu {
+.dropdownMenu,
+.dropupMenu {
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
@@ -212,11 +213,11 @@
 .expandIcon:hover {
     fill: var(--text1);
 }
-.chvrDown{
-    display:flex;
+.chvrDown {
+    display: none;
 }
-.chvrUp{
-    display: block;
+.chvrUp {
+    display: none;
 }
 
 @media (min-width: 1280px) {
@@ -257,20 +258,15 @@
 }
 
 /* For screens smaller than 1500px, make dropdown appear above */
-@media screen and (max-width: 2000px) {
-    .dropupMenu {
-        top: auto; 
-        bottom: calc(100% + 0.5rem); 
 
-        
-    }
-    .chvrDown{
-        display: none;
-    }
-    .chvrUp{
-        display: flex;
-    }
+.dropupMenu {
+    top: auto;
+    bottom: calc(100% + 0.5rem);
 }
+.chvrUp{
+    display: flex;
+}
+÷
 
 .dropdownItem {
     width: 100%;

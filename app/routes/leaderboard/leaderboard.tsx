@@ -5,7 +5,12 @@ import { leaderboardData } from './data';
 import LeaderboardTable from '~/components/Leaderboard/LeaderboardTable/LeaderboardTable';
 import { LuSearch } from 'react-icons/lu';
 import { MdClose, MdExpand } from 'react-icons/md';
-import { FaChevronDown, FaChevronLeft, FaChevronRight, FaChevronUp } from 'react-icons/fa';
+import {
+    FaChevronDown,
+    FaChevronLeft,
+    FaChevronRight,
+    FaChevronUp,
+} from 'react-icons/fa';
 import { useLeaderboard } from './useLeaderboard';
 import useOutsideClick from '~/hooks/useOutsideClick';
 
@@ -69,7 +74,7 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         totalPages,
     } = useLeaderboard(leaderboardData);
 
-    const isFullScreen = true
+    const isFullScreen = true;
 
     // Memoize the container class name
     const containerClassName = useMemo(() => {
@@ -180,9 +185,12 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
                             ref={rowsDropdownRef}
                         >
                             {rowsPerPage}
-                            <FaChevronDown className={styles.chvrDown} /> <FaChevronUp className={styles.chvrUp}/>
+                            {/* <FaChevronDown className={styles.chvrDown} />{' '} */}
+                            <FaChevronUp className={styles.chvrUp} />
                             {isRowsDropdownOpen && (
-                                <div className={`${styles.dropdownMenu} ${styles.dropupMenu}`}>
+                                <div
+                                    className={` ${styles.dropupMenu}`}
+                                >
                                     {rowsItems}
                                 </div>
                             )}
