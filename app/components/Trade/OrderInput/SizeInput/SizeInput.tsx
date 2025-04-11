@@ -1,9 +1,12 @@
 import { FaChevronDown } from 'react-icons/fa';
 import styles from './SizeInput.module.css';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useEffect, useMemo, useRef } from 'react';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface PropsIF {
     value: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
@@ -22,12 +25,32 @@ export default function SizeInput(props: PropsIF) {
         useTotalSize,
         symbol,
     } = props;
+
+    const {
+        inputRegex,
+        activeDecimalSeparator,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+    } = useNumFormatter();
+    const { numFormat } = useAppSettings();
+
+    const valueNum = useRef<number>(0);
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
-        if (/^\d*$/.test(newValue) && newValue.length <= 12) {
+        if (inputRegex.test(newValue) && newValue.length <= 12) {
             onChange(event);
+            valueNum.current = parseFormattedWithOnlyDecimals(newValue);
         }
     };
+
+    useEffect(() => {
+        if (valueNum.current > 0) {
+            const formattedValue = formatNumWithOnlyDecimals(valueNum.current);
+            onChange(formattedValue);
+        }
+    }, [numFormat]);
+
     return (
         <div className={styles.sizeInputContainer}>
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>

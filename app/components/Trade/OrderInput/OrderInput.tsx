@@ -102,7 +102,12 @@ export default function OrderInput() {
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
-    const { formatNum, parseFormattedNum } = useNumFormatter();
+    const {
+        formatNum,
+        parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        parseFormattedWithOnlyDecimals,
+    } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -135,7 +140,7 @@ export default function OrderInput() {
 
     useEffect(() => {
         if (obChosenAmount > 0) {
-            setSize(formatNum(obChosenAmount));
+            setSize(formatNumWithOnlyDecimals(obChosenAmount));
             handleTypeChange();
         }
         if (obChosenPrice > 0) {
@@ -203,8 +208,14 @@ export default function OrderInput() {
     };
 
     // SIZE INPUT-----------------------------
-    const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSize(event.target.value);
+    const handleSizeChange = (
+        event: React.ChangeEvent<HTMLInputElement> | string,
+    ) => {
+        if (typeof event === 'string') {
+            setSize(event);
+        } else {
+            setSize(event.target.value);
+        }
     };
 
     const handleSizeBlur = () => {

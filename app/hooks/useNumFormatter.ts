@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
@@ -75,6 +75,29 @@ export function useNumFormatter() {
         [numFormat, parseNum, getDefaultPrecision],
     );
 
+    const formatNumWithOnlyDecimals = useCallback(
+        (num: number | string, precision?: number) => {
+            const formattedNum = formatNum(num, precision);
+            const { group } = getSeparators(numFormat.value);
+
+            return formattedNum.replace(new RegExp(`\\${group}`, 'g'), '');
+        },
+        [formatNum],
+    );
+
+    const parseFormattedWithOnlyDecimals = useCallback(
+        (str: string) => {
+            const { group, decimal } = getSeparators(numFormat.value);
+
+            const cleaned = str
+                .replace(new RegExp(`\\${group}`, 'g'), '')
+                .replace(decimal, '.');
+
+            return Number(cleaned);
+        },
+        [numFormat],
+    );
+
     const parseFormattedNum = useCallback(
         (str: string) => {
             const { group, decimal } = getSeparators(numFormat.value);
@@ -103,12 +126,29 @@ export function useNumFormatter() {
         [formatNum],
     );
 
+    const activeDecimalSeparator = useMemo(() => {
+        return getSeparators(numFormat.value).decimal;
+    }, [numFormat]);
+
+    const activeGroupSeparator = useMemo(() => {
+        return getSeparators(numFormat.value).group;
+    }, [numFormat]);
+
+    const inputRegex = useMemo(() => {
+        return new RegExp(`^\\d*(?:${activeDecimalSeparator}\\d*)?$`);
+    }, [activeDecimalSeparator]);
+
     return {
         formatNum,
         formatPriceForChart,
         decimalPrecision,
         getDefaultPrecision,
         parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        parseFormattedWithOnlyDecimals,
+        activeDecimalSeparator,
+        activeGroupSeparator,
+        inputRegex,
     };
 }
 
