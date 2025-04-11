@@ -89,7 +89,6 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         ));
     }, [handlePeriodChange]);
 
-    // Memoize the rows per page dropdown items
     const rowsItems = useMemo(() => {
         return rowsOptions.map((value) => (
             <div
