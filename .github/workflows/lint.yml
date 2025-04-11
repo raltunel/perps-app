@@ -28,8 +28,8 @@ jobs:
                   WARNING_COUNT=$(grep -o "[0-9]* warnings" lint-results.txt | grep -o "[0-9]*" || echo 0)
 
                   # Set output variables for use in later steps
-                  # echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
-                  # echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
+                  echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
+                  echo "warning_count=$WARNING_COUNT" >> $GITHUB_OUTPUT
 
                   # Create warning annotation but don't fail the workflow
                   # echo "::warning::Found $ERROR_COUNT errors and $WARNING_COUNT warnings in linting"
