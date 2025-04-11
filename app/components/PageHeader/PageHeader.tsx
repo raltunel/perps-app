@@ -223,7 +223,6 @@ export default function PageHeader() {
                             }
                             onClick={() => {
                                 if (isMenuOpen) setIsMenuOpen(false);
-                                console.log({ link });
                             }}
                         >
                             {link.name}
