@@ -16,7 +16,6 @@
     flex-direction: row;
     align-items: flex-start;
     gap: 14px;
-   
 }
 .headerTextContainer {
     display: flex;
@@ -139,7 +138,7 @@
     transition: all 0.3s ease-in-out;
 }
 
-.buttonContainer button:hover{
+.buttonContainer button:hover {
     opacity: 0.8;
 }
 .depositButton {

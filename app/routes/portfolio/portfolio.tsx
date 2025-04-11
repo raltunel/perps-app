@@ -26,28 +26,26 @@ export default function Portfolio({ loaderData }: Route.ComponentProps) {
                     <div className={styles.detailsContent}>
                         <h6>14 Day Volume</h6>
                         <h3>$0</h3>
-                        <Link to ='/'>View volume</Link>
+                        <Link to='/'>View volume</Link>
                     </div>
                     <div className={styles.detailsContent}>
                         <h6>Fees (Taker / Maker)</h6>
                         <h3>0.0350% / 0.0100%</h3>
-                        <Link to ='/'>View fee schedule</Link>
+                        <Link to='/'>View fee schedule</Link>
                     </div>
                     <div className={styles.totalNetDisplay}>
-                        <h6><span>Total Net USD Value:</span> $1,987,654,32</h6>
+                        <h6>
+                            <span>Total Net USD Value:</span> $1,987,654,32
+                        </h6>
                         <div className={styles.rowButton}>
                             <button>Deposit</button>
                             <button>Withdraw</button>
                         </div>
-                            <button>Send</button>
-
+                        <button>Send</button>
                     </div>
-
                 </div>
 
-
                 <div></div>
-
             </div>
         </div>
     );
