@@ -20,7 +20,7 @@ import WebDataConsumer from './trade/webdataconsumer';
 import { useNavigate, useParams } from 'react-router';
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: '<<< LOADING >>>' },
+    { title: 'TRADE' },
     { name: 'description', content: 'Welcome to React Router!' },
   ];
 }
@@ -29,12 +29,9 @@ export function loader({ context }: Route.LoaderArgs) {
   return { message: context.VALUE_FROM_NETLIFY };
 }
 
-// const wsUrl = 'wss://api.hyperliquid.xyz/ws';
-// const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
-
 export default function Trade({ loaderData }: Route.ComponentProps) {
 
-  const { symbol, setSymbol } = useTradeDataStore();
+  const { symbol } = useTradeDataStore();
   const { marketId } = useParams<{ marketId: string }>();
   const navigate = useNavigate();
   // logic to automatically redirect the user if they land on a
@@ -44,7 +41,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
   }, [navigate]);
 
   
-  const symbolRef = useRef(symbol);
+  const symbolRef = useRef<string>(symbol);
   symbolRef.current = symbol;
   const { orderBookMode } = useAppSettings();
 
