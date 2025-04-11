@@ -6,7 +6,7 @@ import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import { useState } from 'react';
 
 interface PropsIF {
-    tx: 'buy'|'sell';
+    tx: 'buy' | 'sell';
     onClose: () => void;
 }
 type InfoItem = {
@@ -38,7 +38,8 @@ export default function ConfirmationModal(props: PropsIF) {
         {
             label: 'Est. Liquidation Price',
             value: 'N/A',
-            tooltip: 'Estimated price at which your position will be liquidated',
+            tooltip:
+                'Estimated price at which your position will be liquidated',
             className: styles.white,
         },
         {
@@ -90,10 +91,7 @@ export default function ConfirmationModal(props: PropsIF) {
                     // reverse
                 />
             </div>
-            <button
-                className={styles.confirmButton}
-                onClick={onClose}
-            >
+            <button className={styles.confirmButton} onClick={onClose}>
                 {tx === 'buy' ? 'Buy/Long' : 'Sell/Short'}
             </button>
         </div>
