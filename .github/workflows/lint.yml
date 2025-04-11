@@ -23,9 +23,9 @@ jobs:
                   # Run lint and capture output even if it fails
                   pnpm lint > lint-results.txt 2>&1 || true
 
-                  # Count errors/warnings (adjust pattern based on your linter output format)
-                  ERROR_COUNT=$(grep -c "error" lint-results.txt || echo 0)
-                  WARNING_COUNT=$(grep -c "warning" lint-results.txt || echo 0)
+                  # Extract error and warning counts from the summary line
+                  ERROR_COUNT=$(grep -o "[0-9]* errors" lint-results.txt | grep -o "[0-9]*" || echo 0)
+                  WARNING_COUNT=$(grep -o "[0-9]* warnings" lint-results.txt | grep -o "[0-9]*" || echo 0)
 
                   # Set output variables for use in later steps
                   echo "error_count=$ERROR_COUNT" >> $GITHUB_OUTPUT
