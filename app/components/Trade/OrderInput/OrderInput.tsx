@@ -477,6 +477,7 @@ export default function OrderInput() {
                     )}
                     {modalContent === 'confirm_buy' && (
                         <ConfirmationModal
+                            tx='buy'
                             onClose={() => {
                                 notifications.add('buyPending');
                                 appSettingsModal.close();
@@ -485,6 +486,7 @@ export default function OrderInput() {
                     )}
                     {modalContent === 'confirm_sell' && (
                         <ConfirmationModal
+                            tx='sell'
                             onClose={() => {
                                 notifications.add('sellPending');
                                 appSettingsModal.close();
