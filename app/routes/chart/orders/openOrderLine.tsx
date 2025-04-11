@@ -38,8 +38,6 @@ const OpenOrderLine = () => {
             };
         });
 
-        console.log('ORDERD', { newLines });
-
         setLines(newLines);
     }, [JSON.stringify(userSymbolOrders), debugWallet, symbol]);
 

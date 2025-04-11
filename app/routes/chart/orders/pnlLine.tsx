@@ -55,10 +55,9 @@ const PnlOrderLine = () => {
 
             return [pnlLine, liqLine];
         });
-        console.log('PNLL', { newLines });
 
         setLines(newLines);
-    }, [JSON.stringify(filteredPositions), symbol]);
+    }, [chart, JSON.stringify(filteredPositions), symbol]);
 
     if (!chart) return null;
 

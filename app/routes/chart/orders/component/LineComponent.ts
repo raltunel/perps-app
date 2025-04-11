@@ -102,8 +102,6 @@ const LineComponent = ({ lines }: LineProps) => {
             setOrderLineItems(shapeRefs);
         };
 
-        console.log('liness', lines.length);
-
         if (lines.length !== 0) {
             setupShapes();
         } else {
