@@ -37,18 +37,16 @@ const LineComponent = ({ lines }: LineProps) => {
 
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
 
-    const activeLines = useRef(false);
     const { symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
 
-    const cleanupShapes = () => {
+    const cleanupShapes = async () => {
         try {
-            activeLines.current = false;
             if (chart) {
                 const chartRef = chart.activeChart();
                 const prevItems = orderLineItemsRef.current;
 
-                orderLineItemsRef.current = prevItems.filter((order) => {
+                for (const order of prevItems) {
                     const { lineId, textId, quantityTextId } = order;
 
                     const element = chartRef.getShapeById(lineId);
@@ -63,31 +61,43 @@ const LineComponent = ({ lines }: LineProps) => {
                         if (quantityElementText)
                             chartRef.removeEntity(quantityTextId);
                     }
+                }
 
-                    return false;
-                });
-
-                setOrderLineItems(orderLineItemsRef.current);
+                orderLineItemsRef.current = [];
+                setOrderLineItems([]);
             }
         } catch (error: unknown) {
+            orderLineItemsRef.current = [];
             setOrderLineItems([]);
-
             console.error({ error });
         }
     };
 
-    useEffect(() => {
-        cleanupShapes();
-        setTimeout(() => {
-            activeLines.current = true;
-        }, 500);
-    }, []);
+    const [chartReady, setChartReady] = useState(true);
 
     useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        const chartRef = chart?.activeChart();
+        setChartReady(false);
         cleanupShapes();
-        setTimeout(() => {
-            activeLines.current = true;
-        }, 500);
+        if (!chartRef) return;
+
+        intervalId = setInterval(async () => {
+            const current = chartRef.symbol();
+            if (current === symbol) {
+                setTimeout(() => {
+                    setChartReady(true);
+                }, 2500);
+
+                clearInterval(intervalId);
+            }
+        }, 100);
+
+        return () => {
+            clearInterval(intervalId);
+            setChartReady(false);
+        };
     }, [symbol, debugWallet]);
 
     useEffect(() => {
@@ -124,10 +134,11 @@ const LineComponent = ({ lines }: LineProps) => {
             setOrderLineItems(shapeRefs);
         };
 
-        if (lines.length !== 0 && activeLines.current) {
+        if (lines.length !== 0 && chartReady) {
+            cleanupShapes();
             setupShapes();
         }
-    }, [chart, lines.length, activeLines.current]);
+    }, [chart, chartReady, lines.length]);
 
     useEffect(() => {
         let isCancelled = false;
