@@ -32,7 +32,7 @@ export interface OrderDataIF {
     isTrigger?: boolean;
     limitPx: number;
     oid: number;
-    orderType?: string;
+    orderType: string;
     origSz: number;
     reduceOnly?: boolean;
     side: 'buy' | 'sell';

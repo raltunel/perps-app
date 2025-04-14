@@ -6,6 +6,7 @@ import { openOrdersData } from './data';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 interface OpenOrdersTableProps {
     onCancel?: (time: number, coin: string) => void;
     onViewAll?: () => void;
@@ -32,24 +33,30 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
 
     const { userSymbolOrders, userOrders } = useTradeDataStore();
 
+    const openOrdersLimit = 50;
+
     const filteredOrders = useMemo(() => {
         switch (selectedFilter) {
             case 'all':
-                return userOrders.slice(0, 50);
+                return userOrders;
             case 'active':
-                return userSymbolOrders.slice(0, 50);
+                return userSymbolOrders;
             case 'long':
-                return userOrders
-                    .filter((order) => order.side === 'buy')
-                    .slice(0, 50);
+                return userOrders.filter((order) => order.side === 'buy');
             case 'short':
-                return userOrders
-                    .filter((order) => order.side === 'sell')
-                    .slice(0, 50);
+                return userOrders.filter((order) => order.side === 'sell');
         }
 
-        return userOrders.slice(0, 50);
+        return userOrders;
     }, [userOrders, selectedFilter]);
+
+    const sortedOrders = useMemo(() => {
+        return sortOrderData(filteredOrders, sortBy, sortDirection);
+    }, [filteredOrders, sortBy, sortDirection]);
+
+    const slicedOrders = useMemo(() => {
+        return sortedOrders.slice(0, openOrdersLimit);
+    }, [sortedOrders]);
 
     const handleSort = (key: string) => {
         if (sortBy === key) {
@@ -75,7 +82,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 sortClickHandler={handleSort}
             />
             <div className={styles.tableBody}>
-                {filteredOrders.map((order, index) => (
+                {slicedOrders.map((order, index) => (
                     <OpenOrdersTableRow
                         key={`order-${order.oid}`}
                         order={order}
