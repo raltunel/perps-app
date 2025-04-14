@@ -16,27 +16,31 @@ interface WithdrawModalProps {
     onClose: () => void;
 }
 
-export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawModalProps) {
+export default function WithdrawModal({
+    vault,
+    onWithdraw,
+    onClose,
+}: WithdrawModalProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    
-    const { 
-        formatCurrency, 
-        validateAmount, 
-        isValidNumberInput 
-    } = useVaultManager();
-    
+
+    const { formatCurrency, validateAmount, isValidNumberInput } =
+        useVaultManager();
+
     // Use a default unit if none is provided
     const unitValue = vault.unit || 'USD';
 
-    const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
-        
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, [isValidNumberInput]);
+    const handleInputChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const newValue = event.target.value;
+
+            if (isValidNumberInput(newValue)) {
+                setAmount(newValue);
+                setError(null);
+            }
+        },
+        [isValidNumberInput],
+    );
 
     const handleMaxClick = useCallback(() => {
         setAmount(vault.yourDeposit.toString());
@@ -45,9 +49,9 @@ export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawMo
 
     const handleWithdraw = useCallback(() => {
         const withdrawAmount = parseFloat(amount);
-        
+
         const validation = validateAmount(withdrawAmount, vault.yourDeposit);
-        
+
         if (!validation.isValid) {
             setError(validation.message);
             return;
@@ -60,7 +64,8 @@ export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawMo
         {
             label: 'Available to withdraw',
             value: formatCurrency(vault.yourDeposit, unitValue),
-            tooltip: 'The total amount you have available to withdraw from this vault',
+            tooltip:
+                'The total amount you have available to withdraw from this vault',
         },
         {
             label: 'Network Fee',
@@ -69,9 +74,10 @@ export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawMo
         },
     ];
 
-    const isButtonDisabled = !amount || 
-                             parseFloat(amount) <= 0 || 
-                             parseFloat(amount) > vault.yourDeposit;
+    const isButtonDisabled =
+        !amount ||
+        parseFloat(amount) <= 0 ||
+        parseFloat(amount) > vault.yourDeposit;
 
     return (
         <div className={styles.container}>
@@ -81,11 +87,14 @@ export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawMo
                 <MdClose onClick={onClose} />
             </header>
             <div className={styles.textContent}>
-                <h4>Withdraw {unitValue} from {vault.name}</h4>
+                <h4>
+                    Withdraw {unitValue} from {vault.name}
+                </h4>
                 <p>
-                    {unitValue} will be sent to your address. A {unitValue === 'USD' ? '$1' : '0.0001 BTC'} fee will be deducted
-                    from the {unitValue} withdrawn. Withdraws should arrive within 5
-                    minutes.
+                    {unitValue} will be sent to your address. A{' '}
+                    {unitValue === 'USD' ? '$1' : '0.0001 BTC'} fee will be
+                    deducted from the {unitValue} withdrawn. Withdraws should
+                    arrive within 5 minutes.
                 </p>
             </div>
 
@@ -120,15 +129,11 @@ export default function WithdrawModal({ vault, onWithdraw, onClose }: WithdrawMo
                                 </Tooltip>
                             )}
                         </div>
-                        <div
-                            className={styles.infoValue}
-                        >
-                            {info.value}
-                        </div>
+                        <div className={styles.infoValue}>{info.value}</div>
                     </div>
                 ))}
             </div>
-            <button 
+            <button
                 className={styles.actionButton}
                 onClick={handleWithdraw}
                 disabled={isButtonDisabled}

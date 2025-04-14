@@ -17,11 +17,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-   
 }
-.container header h3{
+.container header h3 {
     font-size: var(--font-size-l, 24px);
-
 }
 
 .textContent {
@@ -44,7 +42,6 @@
 .textContent p {
     font-size: var(--font-size-s, 12px);
     color: var(--text2);
- 
 }
 
 .inputContainer {
@@ -59,7 +56,7 @@
     background: var(--dark4, #27272c);
     gap: 8px;
 }
-.inputContainer input{
+.inputContainer input {
     width: 100%;
     outline: none;
     border: none;
@@ -69,15 +66,14 @@
     font-size: var(--font-size-s, 12px);
 }
 
-
-.inputContainer h6{
+.inputContainer h6 {
     font-size: var(--font-size-s, 12px);
     color: var(--text2);
     margin: 0;
 }
-.inputContainer button{
+.inputContainer button {
     font-size: var(--font-size-s, 12px);
-    color: var(--accent1, #7371FC);
+    color: var(--accent1, #7371fc);
     background: none;
     border: none;
     cursor: pointer;
@@ -100,10 +96,9 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    padding: 8px ;
+    padding: 8px;
     border-radius: var(--half-border-radius, 8px);
-border: 1px solid var(--dark4, #27272C);
-
+    border: 1px solid var(--dark4, #27272c);
 }
 
 .infoRow {
@@ -125,26 +120,23 @@ border: 1px solid var(--dark4, #27272C);
     font-size: var(--font-size-s, 12px);
 }
 
-.infoValue{
+.infoValue {
     font-size: var(--font-size-s, 12px);
-
 }
 
-.actionButton{
+.actionButton {
     width: 100%;
     display: flex;
-padding: 12px 16px;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-flex: 1 0 0;
-border-radius:8px;
-background: var(--accent1, #7371FC);
+    padding: 12px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    border-radius: 8px;
+    background: var(--accent1, #7371fc);
 
-font-size: var(--font-size-m, 18px);
-color: var(--text1, #F0F0F8);
-outline: none;
-border: none;
-
-
+    font-size: var(--font-size-m, 18px);
+    color: var(--text1, #f0f0f8);
+    outline: none;
+    border: none;
 }

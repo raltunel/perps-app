@@ -7,8 +7,6 @@ import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 import DepositModal from '~/components/Vault/DepositModal/DepositModal';
 import { useVaultManager } from './useVaultManager';
 
-
-
 export default function vaultsNew() {
     const {
         vaults,
@@ -19,9 +17,9 @@ export default function vaultsNew() {
         withdrawFromVault,
         processDeposit,
         processWithdraw,
-        closeModal
+        closeModal,
     } = useVaultManager();
-    
+
     return (
         <>
             <div className={styles.container}>
@@ -46,19 +44,16 @@ export default function vaultsNew() {
                             onDeposit={() => depositToVault(vault.id)}
                             onWithdraw={
                                 vault.hasWithdraw
-                                ? () => withdrawFromVault(vault.id)
-                                : undefined
+                                    ? () => withdrawFromVault(vault.id)
+                                    : undefined
                             }
                         />
                     ))}
                 </div>
             </div>
-            
+
             {modalOpen && selectedVault && (
-                <Modal
-                    close={closeModal}
-                    position="center"
-                >
+                <Modal close={closeModal} position='center'>
                     {modalContent === 'deposit' && (
                         <DepositModal
                             vault={selectedVault}

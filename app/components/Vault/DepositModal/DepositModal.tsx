@@ -18,33 +18,40 @@ interface DepositModalProps {
     onClose: () => void;
 }
 
-export default function DepositModal({ vault, onDeposit, onClose }: DepositModalProps) {
+export default function DepositModal({
+    vault,
+    onDeposit,
+    onClose,
+}: DepositModalProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken, setSelectedToken] = useState('USDe');
-    
-    const { 
-        formatCurrency, 
-        validateAmount, 
+
+    const {
+        formatCurrency,
+        validateAmount,
         isValidNumberInput,
-        getAvailableCapacity 
+        getAvailableCapacity,
     } = useVaultManager();
-    
+
     // Use the unit from the vault or default to USD
     const unitValue = vault.unit || 'USD';
-    
+
     // Get available capacity for this vault
     const availableCapacity = getAvailableCapacity(vault.id);
 
-    const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
-        
-        // Use the utility function for validation
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, [isValidNumberInput]);
+    const handleInputChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const newValue = event.target.value;
+
+            // Use the utility function for validation
+            if (isValidNumberInput(newValue)) {
+                setAmount(newValue);
+                setError(null);
+            }
+        },
+        [isValidNumberInput],
+    );
 
     const handleMaxClick = useCallback(() => {
         setAmount(availableCapacity.toString());
@@ -53,9 +60,9 @@ export default function DepositModal({ vault, onDeposit, onClose }: DepositModal
 
     const handleDeposit = useCallback(() => {
         const depositAmount = parseFloat(amount);
-        
+
         const validation = validateAmount(depositAmount, availableCapacity);
-        
+
         if (!validation.isValid) {
             setError(validation.message);
             return;
@@ -68,7 +75,8 @@ export default function DepositModal({ vault, onDeposit, onClose }: DepositModal
         {
             label: 'Available to deposit',
             value: formatCurrency(availableCapacity, unitValue),
-            tooltip: 'The maximum amount you can deposit into this vault based on remaining capacity',
+            tooltip:
+                'The maximum amount you can deposit into this vault based on remaining capacity',
         },
         {
             label: 'Network Fee',
@@ -77,9 +85,10 @@ export default function DepositModal({ vault, onDeposit, onClose }: DepositModal
         },
     ];
 
-    const isButtonDisabled = !amount || 
-                             parseFloat(amount) <= 0 || 
-                             parseFloat(amount) > availableCapacity;
+    const isButtonDisabled =
+        !amount ||
+        parseFloat(amount) <= 0 ||
+        parseFloat(amount) > availableCapacity;
 
     return (
         <div className={styles.container}>
@@ -89,10 +98,13 @@ export default function DepositModal({ vault, onDeposit, onClose }: DepositModal
                 <MdClose onClick={onClose} />
             </header>
             <div className={styles.textContent}>
-                <h4>Deposit {unitValue} to {vault.name}</h4>
+                <h4>
+                    Deposit {unitValue} to {vault.name}
+                </h4>
                 <p>
-                    Deposit {unitValue} to earn yield from the {vault.name}. Deposits will be 
-                    available for withdrawal after the next epoch.
+                    Deposit {unitValue} to earn yield from the {vault.name}.
+                    Deposits will be available for withdrawal after the next
+                    epoch.
                 </p>
             </div>
 
@@ -132,13 +144,11 @@ export default function DepositModal({ vault, onDeposit, onClose }: DepositModal
                                 </Tooltip>
                             )}
                         </div>
-                        <div className={styles.infoValue}>
-                            {info.value}
-                        </div>
+                        <div className={styles.infoValue}>{info.value}</div>
                     </div>
                 ))}
             </div>
-            <button 
+            <button
                 className={styles.actionButton}
                 onClick={handleDeposit}
                 disabled={isButtonDisabled}
