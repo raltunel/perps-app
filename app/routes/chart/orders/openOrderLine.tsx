@@ -13,52 +13,6 @@ const OpenOrderLine = () => {
 
     const [lines, setLines] = useState<LineData[]>([]);
 
-    const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
-
-    const [activeLines, setActiveLines] = useState(true);
-
-    const cleanupShapes = async () => {
-        setActiveLines(false);
-        try {
-            if (chart) {
-                const chartRef = chart.activeChart();
-
-                const tempOrderLines = orderLineItems.filter((order) => {
-                    const { lineId, textId, quantityTextId } = order;
-
-                    const element = chartRef.getShapeById(lineId);
-                    if (element) chartRef.removeEntity(lineId);
-
-                    const elementText = chartRef.getShapeById(textId);
-                    if (elementText) chartRef.removeEntity(textId);
-
-                    if (quantityTextId) {
-                        const quantityElementText =
-                            chartRef.getShapeById(quantityTextId);
-                        if (quantityElementText)
-                            chartRef.removeEntity(quantityTextId);
-                    }
-
-                    return false;
-                });
-
-                setOrderLineItems(tempOrderLines);
-            }
-        } catch (error: unknown) {
-            setOrderLineItems([]);
-
-            console.error({ error });
-        }
-    };
-
-    useEffect(() => {
-        cleanupShapes().then(() => {
-            setTimeout(() => {
-                setActiveLines(true);
-            }, 1000);
-        });
-    }, [symbol]);
-
     const pnlSzi = useMemo(() => {
         const data = positions
             .filter((i) => i.coin === symbol)
@@ -137,16 +91,9 @@ const OpenOrderLine = () => {
         JSON.stringify(pnlSzi),
     ]);
 
-    if (!chart || !activeLines) return null;
+    if (!chart) return null;
 
-    return (
-        <LineComponent
-            key='limit'
-            lines={lines}
-            orderLineItems={orderLineItems}
-            setOrderLineItems={setOrderLineItems}
-        />
-    );
+    return <LineComponent key='limit' lines={lines} />;
 };
 
 export default OpenOrderLine;
