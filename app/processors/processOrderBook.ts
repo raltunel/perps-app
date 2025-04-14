@@ -90,6 +90,7 @@ export function processUserOrder(
             triggerPx: parseNum(data.triggerPx),
             triggerCondition: data.triggerCondition,
             orderType: data.orderType,
+            orderValue: parseNum(data.sz * data.limitPx),
         };
     }
 

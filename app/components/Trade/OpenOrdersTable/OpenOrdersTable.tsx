@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow, { type OpenOrderData } from './OpenOrdersTableRow';
 import styles from './OpenOrdersTable.module.css';
 import { openOrdersData } from './data';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-
+import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 interface OpenOrdersTableProps {
     onCancel?: (time: number, coin: string) => void;
     onViewAll?: () => void;
@@ -13,6 +14,9 @@ interface OpenOrdersTableProps {
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const { onCancel, onViewAll, selectedFilter } = props;
+
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<OrderDataSortBy>();
 
     const handleCancel = (time: number, coin: string) => {
         if (onCancel) {
@@ -47,9 +51,29 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         return userOrders.slice(0, 50);
     }, [userOrders, selectedFilter]);
 
+    const handleSort = (key: string) => {
+        if (sortBy === key) {
+            if (sortDirection === 'desc') {
+                setSortDirection('asc');
+            } else if (sortDirection === 'asc') {
+                setSortDirection(undefined);
+                setSortBy(undefined);
+            } else {
+                setSortDirection('desc');
+            }
+        } else {
+            setSortBy(key as OrderDataSortBy);
+            setSortDirection('desc');
+        }
+    };
+
     return (
         <div className={styles.tableWrapper}>
-            <OpenOrdersTableHeader />
+            <OpenOrdersTableHeader
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                sortClickHandler={handleSort}
+            />
             <div className={styles.tableBody}>
                 {filteredOrders.map((order, index) => (
                     <OpenOrdersTableRow

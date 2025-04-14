@@ -1,15 +1,26 @@
+import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
 import styles from './OpenOrdersTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function OpenOrdersTableHeader() {
+interface OpenOrdersTableHeaderProps {
+    sortBy: OrderDataSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: string) => void;
+}
+
+export default function OpenOrdersTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: OpenOrdersTableHeaderProps) {
     const handleSort = (key: string) => {
         console.log(`Sorting by: ${key}`);
     };
@@ -17,86 +28,74 @@ export default function OpenOrdersTableHeader() {
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
-            key: 'time',
+            key: 'timestamp',
             sortable: true,
-            onClick: () => handleSort('time'),
             className: 'timeCell',
         },
         {
             name: 'Type',
-            key: 'type',
-            sortable: false,
-            onClick: undefined,
+            key: 'orderType',
+            sortable: true,
             className: 'typeCell',
         },
         {
             name: 'Coin',
             key: 'coin',
-            sortable: false,
-            onClick: undefined,
+            sortable: true,
             className: 'coinCell',
         },
         {
             name: 'Direction',
-            key: 'direction',
-            sortable: false,
-            onClick: undefined,
+            key: 'side',
+            sortable: true,
             className: 'directionCell',
         },
         {
             name: 'Size',
-            key: 'size',
-            sortable: false,
-            onClick: undefined,
+            key: 'sz',
+            sortable: true,
             className: 'sizeCell',
         },
         {
             name: 'Original Size',
-            key: 'originalSize',
-            sortable: false,
-            onClick: undefined,
+            key: 'origSz',
+            sortable: true,
             className: 'originalSizeCell',
         },
         {
             name: 'Order Value',
             key: 'orderValue',
             sortable: true,
-            onClick: () => handleSort('orderValue'),
             className: 'orderValueCell',
         },
         {
             name: 'Price',
             key: 'price',
-            sortable: false,
-            onClick: undefined,
+            sortable: true,
             className: 'priceCell',
         },
         {
             name: 'Reduce Only',
             key: 'reduceOnly',
             sortable: false,
-            onClick: undefined,
             className: 'reduceOnlyCell',
         },
         {
             name: 'Trigger Conditions',
             key: 'triggerConditions',
             sortable: false,
-            onClick: undefined,
             className: 'triggerConditionsCell',
         },
         {
             name: 'TP/SL',
             key: 'tpsl',
             sortable: false,
-            onClick: undefined,
             className: 'tpslCell',
         },
         {
             name: 'Cancel',
             key: 'cancel',
             sortable: false,
-            onClick: undefined,
             className: 'cancelCell',
         },
     ];
@@ -106,11 +105,23 @@ export default function OpenOrdersTableHeader() {
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>
