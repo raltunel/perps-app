@@ -5,7 +5,7 @@
     gap: 48px;
     max-width: 1280px;
     margin: 0 auto;
-  
+
     padding-bottom: 1rem;
     overflow-y: hidden;
 }
@@ -23,9 +23,6 @@
     display: grid;
     grid-template-rows: 141px 1fr;
     gap: 48px;
-
-   
-    
 }
 .detailsContainer {
     height: 100%;
@@ -101,17 +98,17 @@
     max-height: 47px;
 }
 
-.table{
+.table {
     height: 155;
     overflow-y: hidden;
 }
 
-.table > div{
+.table > div {
     height: 155px;
 }
-.mainContent{
+.mainContent {
     height: 100%;
-    
+
     display: grid;
     grid-template-rows: auto 155px;
     gap: 8px;

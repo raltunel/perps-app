@@ -16,7 +16,6 @@ export function loader({ context }: Route.LoaderArgs) {
 
 export default function Portfolio({ loaderData }: Route.ComponentProps) {
     return (
-       
         <div className={styles.container}>
             <header>Portfolio</header>
             <div className={styles.column}>
