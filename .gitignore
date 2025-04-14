@@ -1,20 +1,19 @@
 .DS_Store
-/node_modules/
+node_modules
 
 # misc
 .env*
-.vscode/
+.vscode
 
 # React Router
-/.react-router/
-/build/
+.react-router
+build
 
 # Netlify
 .netlify
 
 # Tradingview
-/public/tv/charting_library
-/public/tv/datafeeds
-
-/public/tradingview/charting_library
-/public/tradingview/datafeeds
+packages/frontend/public/tv/charting_library
+packages/frontend/public/tv/datafeeds
+packages/frontend/public/tradingview/charting_library
+packages/frontend/public/tradingview/datafeeds
