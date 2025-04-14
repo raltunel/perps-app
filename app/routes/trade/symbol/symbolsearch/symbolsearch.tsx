@@ -1,10 +1,9 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './symbolsearch.module.css';
-import { FaChevronDown } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import SymbolList from './symbollist/symbollist';
+import { FaChevronDown } from 'react-icons/fa';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import SymbolList from './symbollist/symbollist';
+import styles from './symbolsearch.module.css';
 
 interface SymbolInfoFieldProps {}
 

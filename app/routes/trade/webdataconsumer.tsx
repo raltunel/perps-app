@@ -1,8 +1,5 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useEffect, useRef } from 'react';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processUserOrder } from '~/processors/processOrderBook';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -18,7 +15,6 @@ export default function WebDataConsumer() {
         setCoins,
         coins,
         setPositions,
-        positions,
         setCoinPriceMap,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);

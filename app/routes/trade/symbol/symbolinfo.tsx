@@ -1,28 +1,19 @@
 'use client';
 
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './symbolinfo.module.css';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { useEffect } from 'react';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
-import SymbolInfoField from './symbolinfofield/symbolinfofield';
-import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNavigate } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
+import styles from './symbolinfo.module.css';
+import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
 
 interface SymbolInfoProps {}
 
-const symbolList = ['BTC', 'ETH', 'SOL', 'XRP', 'ADA', 'DOGE'];
-
 const SymbolInfo: React.FC<SymbolInfoProps> = ({}) => {
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
-
-    const { symbol, setSymbol, setSymbolInfo, symbolInfo } =
-        useTradeDataStore();
+    const { symbol, symbolInfo } = useTradeDataStore();
 
     const navigate = useNavigate();
 

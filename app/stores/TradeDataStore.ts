@@ -1,12 +1,9 @@
-import { use } from 'react';
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { setLS } from '~/utils/AppUtils';
-import { NumFormatTypes } from '~/utils/Constants';
-import type { NumFormat } from '~/utils/Constants';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import { persist } from 'zustand/middleware';
 
 type TradeDataStore = UserTradeStore & {
     symbol: string;

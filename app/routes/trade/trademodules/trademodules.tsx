@@ -1,18 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './trademodules.module.css';
-import { useWsObserver } from '~/hooks/useWsObserver';
-import { useTradeModuleStore } from '~/stores/TradeModuleStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 interface TradeModulesProps {}
 
 const TradeModules: React.FC<TradeModulesProps> = () => {
-    const { tradeSlot, setTradeSlot } = useTradeModuleStore();
-    const { symbol } = useTradeDataStore();
-
-    useEffect(() => {
-        setTradeSlot(null);
-    }, [symbol]);
-
     return (
         <div className={styles.tradeModulesContainer}>
             {/* {

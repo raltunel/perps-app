@@ -37,13 +37,6 @@ export const createResolutionObjectForVal = (
     };
 };
 
-const floorNum = (num: number, precision?: number) => {
-    if (precision) {
-        return Math.floor(num * Math.pow(10, precision));
-    }
-    return Math.floor(num);
-};
-
 export const parseNum = (val: string | number) => {
     return Number(val);
 };
