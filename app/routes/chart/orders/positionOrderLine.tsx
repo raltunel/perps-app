@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { LineData } from './component/LineComponent';
+import type { ChartShapeRefs, LineData } from './component/LineComponent';
 import { buyColor, sellColor } from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
-const PnlOrderLine = () => {
+const PositionOrderLine = () => {
     const { chart } = useTradingView();
     const { positions, symbol } = useTradeDataStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
+    const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
+    
     const filteredPositions = useMemo(() => {
         const data = positions
             .filter((i) => i.coin === symbol)
@@ -36,7 +38,7 @@ const PnlOrderLine = () => {
             const pnl = Number(order.pnl.toFixed(2));
             const orderText: string =
                 '  PNL ' + (pnl > 0 ? '$' + pnl : '-$' + Math.abs(pnl));
-
+                
             const pnlLine: LineData = {
                 xLoc: 0.1,
                 yLoc: order.price,
@@ -61,7 +63,8 @@ const PnlOrderLine = () => {
 
     if (!chart) return null;
 
-    return <LineComponent key='pnl' lines={lines} />;
+    return <LineComponent key='pnl' lines={lines}  orderLineItems={orderLineItems}
+    setOrderLineItems={setOrderLineItems}/>;
 };
 
-export default PnlOrderLine;
+export default PositionOrderLine;

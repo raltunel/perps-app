@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
 import type { EntityId, IPaneApi } from '~/tv/charting_library';
@@ -20,57 +20,66 @@ export type LineData = {
 
 interface LineProps {
     lines: LineData[];
+    setOrderLineItems: React.Dispatch<React.SetStateAction<ChartShapeRefs[]>>;
+    orderLineItems: ChartShapeRefs[];
 }
 
-type ChartShapeRefs = {
+export type ChartShapeRefs = {
     lineId: EntityId;
     textId: EntityId;
     quantityTextId?: EntityId;
 };
 
-const LineComponent = ({ lines }: LineProps) => {
+const LineComponent = ({
+    lines,
+    orderLineItems,
+    setOrderLineItems,
+}: LineProps) => {
     const { chart } = useTradingView();
-    const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
+
+    const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
 
     useEffect(() => {
-        let isMounted = true;
+        // let checkCleanState = false;
+        // const cleanupShapes = () => {
+        //     checkCleanState =true;
+        //     try {
+        //         if (chart) {
+        //             const chartRef = chart.activeChart();
+        //             const prevItems = orderLineItemsRef.current;
 
-        const cleanupShapes = () => {
-            try {
-                if (chart) {
-                    const chartRef = chart.activeChart();
+        //             orderLineItemsRef.current = prevItems.filter((order) => {
+        //                 const { lineId, textId, quantityTextId } = order;
 
-                    const remainingItems = orderLineItems.filter((order) => {
-                        const { lineId, textId, quantityTextId } = order;
+        //                 const element = chartRef.getShapeById(lineId);
+        //                 if (element) chartRef.removeEntity(lineId);
 
-                        const element = chartRef.getShapeById(lineId);
-                        if (element) chartRef.removeEntity(lineId);
+        //                 const elementText = chartRef.getShapeById(textId);
+        //                 if (elementText) chartRef.removeEntity(textId);
 
-                        const elementText = chartRef.getShapeById(textId);
-                        if (elementText) chartRef.removeEntity(textId);
+        //                 if (quantityTextId) {
+        //                     const quantityElementText =
+        //                         chartRef.getShapeById(quantityTextId);
+        //                     if (quantityElementText)
+        //                         chartRef.removeEntity(quantityTextId);
+        //                 }
 
-                        if (quantityTextId) {
-                            const quantityElementText =
-                                chartRef.getShapeById(quantityTextId);
-                            if (quantityElementText)
-                                chartRef.removeEntity(quantityTextId);
-                        }
+        //                 return false;
+        //             });
 
-                        return false;
-                    });
+        //             setOrderLineItems(orderLineItemsRef.current);
 
-                    setOrderLineItems(remainingItems);
-                }
-            } catch (error: unknown) {
-                setOrderLineItems([]);
-                console.error({ error });
-            }
-        };
+        //             console.log('removed Lines');
+        //         }
+        //     } catch (error: unknown) {
+        //         setOrderLineItems([]);
+
+        //         console.error({ error });
+        //     }
+        // };
 
         const setupShapes = async () => {
             if (!chart || lines.length === 0) return;
-            cleanupShapes();
-
             const shapeRefs: ChartShapeRefs[] = [];
 
             for (const line of lines) {
@@ -98,20 +107,13 @@ const LineComponent = ({ lines }: LineProps) => {
                 shapeRefs.push({ lineId, textId, quantityTextId });
             }
 
-            if (!isMounted) return;
+            orderLineItemsRef.current = shapeRefs;
             setOrderLineItems(shapeRefs);
         };
 
         if (lines.length !== 0) {
             setupShapes();
-        } else {
-            cleanupShapes();
         }
-
-        return () => {
-            isMounted = false;
-            cleanupShapes();
-        };
     }, [chart, lines.length]);
 
     useEffect(() => {
@@ -204,8 +206,6 @@ const LineComponent = ({ lines }: LineProps) => {
                                 borderColor: lineData.color,
                             });
                         }
-
-                        // chart.activeChart().restoreChart();
                     }
                 }, 10) as unknown as number;
 
