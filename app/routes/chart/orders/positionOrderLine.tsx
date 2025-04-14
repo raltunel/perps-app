@@ -11,7 +11,24 @@ const PositionOrderLine = () => {
 
     const [lines, setLines] = useState<LineData[]>([]);
 
-    const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
+    function formatWithComma(value: number): string {
+        const isNegative = value < 0;
+        const [integerPart, decimalPart] = Math.abs(value)
+            .toString()
+            .split('.');
+
+        const formattedInteger = integerPart.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ',',
+        );
+
+        let result = formattedInteger;
+        if (decimalPart !== undefined) {
+            result += '.' + decimalPart;
+        }
+
+        return isNegative ? `-${result}` : result;
+    }
 
     const filteredPositions = useMemo(() => {
         const data = positions
@@ -20,7 +37,7 @@ const PositionOrderLine = () => {
                 return {
                     price: i.entryPx,
                     pnl: Number(i.unrealizedPnl.toFixed(2)),
-                    szi: i.szi,
+                    szi: formatWithComma(i.szi),
                     liqPrice: i.liquidationPx,
                 };
             });
@@ -43,7 +60,7 @@ const PositionOrderLine = () => {
                 xLoc: 0.1,
                 yLoc: order.price,
                 text: orderText,
-                quantityText: order.szi.toFixed(5),
+                quantityText: order.szi,
                 color: pnl > 0 ? buyColor : sellColor,
             };
 
@@ -63,14 +80,7 @@ const PositionOrderLine = () => {
 
     if (!chart) return null;
 
-    return (
-        <LineComponent
-            key='pnl'
-            lines={lines}
-            orderLineItems={orderLineItems}
-            setOrderLineItems={setOrderLineItems}
-        />
-    );
+    return <LineComponent key='pnl' lines={lines} />;
 };
 
 export default PositionOrderLine;
