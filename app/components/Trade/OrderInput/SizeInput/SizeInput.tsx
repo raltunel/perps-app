@@ -28,13 +28,14 @@ export default function SizeInput(props: PropsIF) {
 
     const {
         inputRegex,
-        activeDecimalSeparator,
         parseFormattedWithOnlyDecimals,
         formatNumWithOnlyDecimals,
+        getPrecisionFromNumber,
     } = useNumFormatter();
-    const { numFormat } = useAppSettings();
 
     const valueNum = useRef<number>(0);
+    const valueRef = useRef<string>(value);
+    valueRef.current = value;
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
@@ -45,11 +46,13 @@ export default function SizeInput(props: PropsIF) {
     };
 
     useEffect(() => {
-        if (valueNum.current > 0) {
-            const formattedValue = formatNumWithOnlyDecimals(valueNum.current);
-            onChange(formattedValue);
-        }
-    }, [numFormat]);
+        valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
+    }, [valueRef.current]);
+
+    useEffect(() => {
+        const precision = getPrecisionFromNumber(valueNum.current);
+        onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
+    }, [formatNumWithOnlyDecimals]);
 
     return (
         <div className={styles.sizeInputContainer}>

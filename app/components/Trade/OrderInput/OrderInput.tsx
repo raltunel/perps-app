@@ -138,13 +138,14 @@ export default function OrderInput() {
         },
     ];
 
+
     useEffect(() => {
         if (obChosenAmount > 0) {
             setSize(formatNumWithOnlyDecimals(obChosenAmount));
             handleTypeChange();
         }
         if (obChosenPrice > 0) {
-            setPrice(obChosenPrice.toString());
+            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
@@ -159,10 +160,10 @@ export default function OrderInput() {
             size &&
             size.length > 0
         ) {
-            return parseFormattedNum(size) * parseNum(price);
+            return parseFormattedNum(size) * parseFormattedNum(price);
         }
         return 0;
-    }, [size, price, marketOrderType, symbolInfo?.markPx]);
+    }, [size, price, marketOrderType, symbolInfo?.markPx, parseNum, parseFormattedNum]);
 
     useEffect(() => {
         setSize('');
@@ -230,8 +231,12 @@ export default function OrderInput() {
         }
     };
     // PRICE INPUT----------------------------------
-    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPrice(event.target.value);
+    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement> | string) => {
+        if (typeof event === 'string') {
+            setPrice(event);
+        } else {
+            setPrice(event.target.value);
+        }
     };
 
     const handlePriceBlur = () => {

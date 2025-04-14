@@ -1,8 +1,10 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './PriceInput.module.css';
+import { useEffect, useRef } from 'react';
 
 interface PropsIF {
     value: string;
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
@@ -19,12 +21,37 @@ export default function PriceInput(props: PropsIF) {
         ariaLabel,
         showMidButton,
     } = props;
+
+    const {
+        inputRegex,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+        getPrecisionFromNumber,
+    } = useNumFormatter();
+
+    
+    const valueNum = useRef<number>(0);
+    const valueRef = useRef<string>(value);
+    valueRef.current = value;
+
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value;
-        if (/^\d*$/.test(newValue) && newValue.length <= 12) {
+        if (inputRegex.test(newValue) && newValue.length <= 12) {
             onChange(event);
+            valueNum.current = parseFormattedWithOnlyDecimals(newValue);
         }
     };
+
+    
+    useEffect(() => {
+        valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
+    }, [valueRef.current]);
+
+    useEffect(() => {
+        const precision = getPrecisionFromNumber(valueNum.current);
+        onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
+    }, [formatNumWithOnlyDecimals]);
+    
     return (
         <div
             className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}
