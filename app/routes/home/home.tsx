@@ -1,19 +1,12 @@
-import Tooltip from '~/components/Tooltip/Tooltip';
+import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
 import type { Route } from '../../+types/root';
 import styles from './home.module.css';
-import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'New React Router App' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
-}
 
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
+export default function Home() {
     return (
         <div className={styles.container}>
             <ButtonShowcase />
