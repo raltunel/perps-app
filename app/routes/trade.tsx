@@ -47,12 +47,12 @@ export default function Trade() {
     }, [navigate]);
 
     const marketIdWithFallback = useMemo(
-        () => `${marketId || 'BTC'}`,
+        () => `${marketId?.toUpperCase() || 'BTC'}`,
         [marketId],
     );
 
     const title = useMemo(
-        () => `Ambient Perps - Trade ${marketIdWithFallback}`,
+        () => `${marketIdWithFallback} | Ambient`,
         [marketIdWithFallback],
     );
     const ogImage = useMemo(
