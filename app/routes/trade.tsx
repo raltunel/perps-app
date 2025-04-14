@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -46,15 +46,25 @@ export default function Trade() {
         if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
     }, [navigate]);
 
+    const marketIdWithFallback = useMemo(
+        () => `${marketId || 'BTC'}`,
+        [marketId],
+    );
+
+    const title = useMemo(
+        () => `Ambient Perps - Trade ${marketIdWithFallback}`,
+        [marketIdWithFallback],
+    );
+    const ogImage = useMemo(
+        () =>
+            `https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${marketIdWithFallback}%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`,
+        [marketIdWithFallback],
+    );
+
     return (
         <>
-            <title>{`${marketId || 'BTC'}`}</title>
-            <meta
-                property='og:image'
-                content={`https://res.cloudinary.com/demo/image/upload/l_text:Arial_50_bold:${
-                    marketId || 'BTC'
-                }%20USDC,co_rgb:FFFFFF,c_fit,w_1000,h_500/v1/background.jpg`}
-            />
+            <title>{title}</title>
+            <meta property='og:image' content={ogImage} />
             <div className={styles.wsUrlSelector}>
                 <ComboBox
                     value={wsUrl}
@@ -91,7 +101,7 @@ export default function Trade() {
 
             <TradeRouteHandler />
             <WebDataConsumer />
-            {symbol && symbol.length > 0 && (
+            {symbol && (
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
