@@ -11,11 +11,11 @@ import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
+import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
 import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
-import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -99,33 +99,35 @@ export default function App() {
     const { wsUrl } = useDebugStore();
 
     return (
-        <Layout>
-            <WsObserverProvider url={wsUrl}>
-                <div className='root-container'>
-                    {/* Added error boundary for header */}
-                    <ComponentErrorBoundary>
-                        <header className='header'>
-                            <PageHeader />
-                        </header>
-                    </ComponentErrorBoundary>
+        <>
+            <Layout>
+                <WsObserverProvider url={wsUrl}>
+                    <div className='root-container'>
+                        {/* Added error boundary for header */}
+                        <ComponentErrorBoundary>
+                            <header className='header'>
+                                <PageHeader />
+                            </header>
+                        </ComponentErrorBoundary>
 
-                    <main className='content'>
-                        {/*  Added Suspense for async content loading */}
-                        <Suspense fallback={<LoadingIndicator />}>
-                            <ComponentErrorBoundary>
-                                <Outlet />
-                            </ComponentErrorBoundary>
-                        </Suspense>
-                    </main>
+                        <main className='content'>
+                            {/*  Added Suspense for async content loading */}
+                            <Suspense fallback={<LoadingIndicator />}>
+                                <ComponentErrorBoundary>
+                                    <Outlet />
+                                </ComponentErrorBoundary>
+                            </Suspense>
+                        </main>
 
-                    {/* Added error boundary for notifications */}
-                    <ComponentErrorBoundary>
-                        <Notifications />
-                    </ComponentErrorBoundary>
-                </div>
-                <RuntimeDomManipulation />
-            </WsObserverProvider>
-        </Layout>
+                        {/* Added error boundary for notifications */}
+                        <ComponentErrorBoundary>
+                            <Notifications />
+                        </ComponentErrorBoundary>
+                    </div>
+                    <RuntimeDomManipulation />
+                </WsObserverProvider>
+            </Layout>
+        </>
     );
 }
 

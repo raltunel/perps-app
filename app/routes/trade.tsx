@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -15,28 +17,19 @@ import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
-import { useEffect, useRef } from 'react';
 import WebDataConsumer from './trade/webdataconsumer';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'TRADE' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
-}
 
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-// const wsUrl = 'wss://api.hyperliquid.xyz/ws';
-// const wsUrl = 'wss://pulse-api-mock.liquidity.tools/ws';
-
-export default function Trade({ loaderData }: Route.ComponentProps) {
-    const { symbol, setSymbol } = useTradeDataStore();
+export default function Trade() {
+    const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
-
+    const { marketId } = useParams<{ marketId: string }>();
+    const navigate = useNavigate();
     const {
         wsUrl,
         setWsUrl,
@@ -45,6 +38,12 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
         isWsEnabled,
         setIsWsEnabled,
     } = useDebugStore();
+
+    // logic to automatically redirect the user if they land on a
+    // ... route with no token symbol in the URL
+    useEffect(() => {
+        if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
+    }, [navigate]);
 
     return (
         <>
@@ -84,7 +83,7 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
 
             <TradeRouteHandler />
             <WebDataConsumer />
-            {symbol && symbol.length > 0 && (
+            {symbol && (
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}

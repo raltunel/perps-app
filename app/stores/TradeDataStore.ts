@@ -1,11 +1,7 @@
-import { use } from 'react';
 import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
-import { NumFormatTypes } from '~/utils/Constants';
-import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { persist } from 'zustand/middleware';
 
 type TradeDataStore = UserTradeStore & {
@@ -33,7 +29,7 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
-            symbol: '',
+            symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
                 set({ symbol });
@@ -96,8 +92,9 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
-            partialize: (state: any) => ({
+            partialize: (state) => ({
                 favKeys: state.favKeys,
+                symbol: state.symbol,
             }),
         },
     ),
