@@ -51,8 +51,8 @@ export default function Trade() {
     );
 
     const title = useMemo(
-        () => `${marketIdWithFallback} | Ambient`,
-        [marketIdWithFallback],
+        () => `${marketIdWithFallback} | Ambient | ${symbol}`,
+        [marketIdWithFallback, symbol],
     );
     const ogImage = useMemo(
         () =>
