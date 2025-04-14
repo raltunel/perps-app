@@ -139,7 +139,7 @@ export const createAnchoredText = async (
                 color: color,
                 borderWidth: 3,
                 borderColor: borderColor,
-                zOrder:'top'
+                zOrder: 'top',
             },
         },
     );

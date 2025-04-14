@@ -12,7 +12,7 @@ const PositionOrderLine = () => {
     const [lines, setLines] = useState<LineData[]>([]);
 
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
-    
+
     const filteredPositions = useMemo(() => {
         const data = positions
             .filter((i) => i.coin === symbol)
@@ -38,7 +38,7 @@ const PositionOrderLine = () => {
             const pnl = Number(order.pnl.toFixed(2));
             const orderText: string =
                 '  PNL ' + (pnl > 0 ? '$' + pnl : '-$' + Math.abs(pnl));
-                
+
             const pnlLine: LineData = {
                 xLoc: 0.1,
                 yLoc: order.price,
@@ -63,8 +63,14 @@ const PositionOrderLine = () => {
 
     if (!chart) return null;
 
-    return <LineComponent key='pnl' lines={lines}  orderLineItems={orderLineItems}
-    setOrderLineItems={setOrderLineItems}/>;
+    return (
+        <LineComponent
+            key='pnl'
+            lines={lines}
+            orderLineItems={orderLineItems}
+            setOrderLineItems={setOrderLineItems}
+        />
+    );
 };
 
 export default PositionOrderLine;
