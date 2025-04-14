@@ -22,3 +22,13 @@ cd packages/frontend
 pnpm build
 pnpm start
 ```
+
+## Using the SDK in the Frontend
+
+```ts
+import { Info } from '@perps-app/sdk';
+
+const info = new Info();
+```
+
+Please refer to the [examples](./packages/sdk/examples) in the sdk package for more usage examples.
