@@ -1,14 +1,14 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './symbollist.module.css';
-import { FaChevronDown } from 'react-icons/fa';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { motion } from 'framer-motion';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { useNavigate } from 'react-router';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
-import { motion } from 'framer-motion';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { IoCloseOutline } from 'react-icons/io5';
+import { MdSearchOff } from 'react-icons/md';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -20,6 +20,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
     const { coins, setSymbol, favKeys } = useTradeDataStore();
 
     const [searchQuery, setSearchQuery] = useState('');
+
     const [sortBy, setSortBy] = useState<string>('');
     const [sortDirection, setSortDirection] = useState<string>('');
 
@@ -47,7 +48,11 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
 
     const inputKeyHandler = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Escape') {
-            setSearchQuery('');
+            if (searchQuery.length > 0) {
+                setSearchQuery('');
+            } else {
+                setIsOpen(false);
+            }
         }
     };
 
@@ -140,10 +145,12 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={inputKeyHandler}
                     />
-                    <IoCloseOutline
-                        className={styles.symbolListSearchClose}
-                        onClick={() => setSearchQuery('')}
-                    />
+                    {searchQuery.length > 0 && (
+                        <IoCloseOutline
+                            className={styles.symbolListSearchClose}
+                            onClick={() => setSearchQuery('')}
+                        />
+                    )}
                 </div>
 
                 <SymbolListTableHeader
@@ -151,15 +158,38 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                     sortBy={sortBy}
                     sortDirection={sortDirection}
                 />
-                <div className={styles.symbolList}>
-                    {coinsToShow.map((c) => (
-                        <SymbolListTableRow
-                            key={c.coin}
-                            symbol={c}
-                            symbolSelectListener={symbolSelectListener}
-                        />
-                    ))}
-                </div>
+                {coinsToShow.length > 0 ? (
+                    <div className={styles.symbolList}>
+                        {coinsToShow.map((c) => (
+                            <SymbolListTableRow
+                                key={c.coin}
+                                symbol={c}
+                                symbolSelectListener={symbolSelectListener}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    <div className={styles.symbolListEmpty}>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <MdSearchOff
+                                className={styles.symbolListEmptyIcon}
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2, delay: 0.2 }}
+                        >
+                            No results found
+                        </motion.div>
+                    </div>
+                )}
             </motion.div>
         </>
     );

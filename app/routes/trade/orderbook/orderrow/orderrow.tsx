@@ -9,17 +9,30 @@ import type {
 import styles from './orderrow.module.css';
 
 interface OrderRowProps {
+    rowIndex: number;
     order: OrderBookRowIF;
     coef: number;
     resolution: OrderRowResolutionIF | null;
     userSlots: Set<string>;
+    clickListener: (
+        order: OrderBookRowIF,
+        type: OrderRowClickTypes,
+        rowIndex: number,
+    ) => void;
+}
+
+export enum OrderRowClickTypes {
+    PRICE = 'price',
+    AMOUNT = 'amount',
 }
 
 const OrderRow: React.FC<OrderRowProps> = ({
+    rowIndex,
     order,
     coef,
     resolution,
     userSlots,
+    clickListener,
 }) => {
     const { formatNum } = useNumFormatter();
 
@@ -44,6 +57,16 @@ const OrderRow: React.FC<OrderRowProps> = ({
             className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`}
             onClick={handleClick}
         >
+            <div
+                className={styles.ratio}
+                style={{
+                    width: `${order.ratio * 100}%`,
+                    backgroundColor:
+                        order.type === 'buy'
+                            ? getBsColor().buy
+                            : getBsColor().sell,
+                }}
+            ></div>
             {userSlots.has(formattedPrice) && (
                 <div className={styles.userOrderIndicator}></div>
             )}
@@ -55,25 +78,28 @@ const OrderRow: React.FC<OrderRowProps> = ({
                             ? getBsColor().buy
                             : getBsColor().sell,
                 }}
+                onClick={() =>
+                    clickListener(order, OrderRowClickTypes.PRICE, rowIndex)
+                }
             >
                 {formattedPrice}
             </div>
-            <div className={styles.orderRowSize}>
+            <div
+                className={styles.orderRowSize}
+                onClick={() =>
+                    clickListener(order, OrderRowClickTypes.AMOUNT, rowIndex)
+                }
+            >
                 {formatNum(order.sz * coef)}
             </div>
-            <div className={styles.orderRowTotal}>
+            <div
+                className={styles.orderRowTotal}
+                onClick={() =>
+                    clickListener(order, OrderRowClickTypes.AMOUNT, rowIndex)
+                }
+            >
                 {formatNum(order.total * coef)}
             </div>
-            <div
-                className={styles.ratio}
-                style={{
-                    width: `${order.ratio * 100}%`,
-                    backgroundColor:
-                        order.type === 'buy'
-                            ? getBsColor().buy
-                            : getBsColor().sell,
-                }}
-            ></div>
             {/* <div className={styles.fadeOverlay}></div> */}
         </div>
     );

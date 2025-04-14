@@ -1,7 +1,7 @@
 .container {
     height: 100%;
     display: grid;
-    grid-template-rows: 1fr 281px;
+    grid-template-rows: 1fr var(--trade-tables-height-desktop);
     gap: var(--main-gap);
 }
 
@@ -30,9 +30,9 @@
         var(--trade-module-width-desktop-large);
 }
 /* .containerTop div{
-    background: var(--dark2);
-    height: 100%;
-    border-radius: var(--main-border-radius);
+  background: var(--dark2);
+  height: 100%;
+  border-radius: var(--main-border-radius);
 } */
 
 .containerBottom {
@@ -89,14 +89,24 @@
     align-items: center;
 }
 
+.orderBook,
+.tradeModules,
+.symbolSectionWrapper {
+    overflow: hidden;
+    max-height: calc(
+        100vh - var(--trade-tables-height-desktop) -
+            var(--header-height-desktop) - var(--main-gap)
+    );
+}
+
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
 
 .tradeModules {
     /* background: url('./tempImages/orderInput.png') !important;
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(2px); */
+background-size: 100% 100%;
+background-position: center;
+background-repeat: no-repeat;
+filter: blur(2px); */
 }
 
 /* -----------------------END OF TEMP CSS CODE */

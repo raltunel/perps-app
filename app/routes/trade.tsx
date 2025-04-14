@@ -89,7 +89,9 @@ export default function Trade({ loaderData }: Route.ComponentProps) {
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
-                        <div className={styles.containerTopLeft}>
+                        <div
+                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
+                        >
                             <div
                                 id='watchlistSection'
                                 className={styles.watchlist}

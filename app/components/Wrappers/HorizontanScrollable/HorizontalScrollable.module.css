@@ -8,6 +8,7 @@
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     scroll-behavior: smooth; /* Smooth scrolling for supported browsers */
+    border-radius: 0 !important;
 }
 
 .horizontalScrollableContent {

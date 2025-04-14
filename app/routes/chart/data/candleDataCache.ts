@@ -1,7 +1,9 @@
 import { mapResolutionToInterval, resolutionToSeconds } from './utils/utils';
-import { fetchCandles } from './fetchCandleData';
+import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
+import { bsColorSets } from '~/stores/AppSettingsStore';
 
 const dataCache = new Map<string, any[]>();
+const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
 export async function getHistoricalData(
     symbol: string,
@@ -47,4 +49,54 @@ export async function getHistoricalData(
             );
         }
     });
+}
+
+export async function getMarkFillData(coin: string, user?: string) {
+    const cacheKey = `${coin}-fillData`;
+
+    const cachedData = dataCacheWithUser.get(cacheKey);
+
+    if (
+        cachedData &&
+        cachedData.dataCache.length > 0 &&
+        (!user || user === cachedData.user)
+    ) {
+        return cachedData;
+    }
+
+    if (user) {
+        return await fetchUserFillsHistory(user).then((res: any) => {
+            const poolFillData: Array<any> = [];
+
+            if (res) {
+                res.forEach((element: any) => {
+                    if (element.coin === coin) {
+                        poolFillData.push(element);
+                    }
+                });
+
+                const fetchedDataWithUser = {
+                    user: user,
+                    dataCache: poolFillData,
+                };
+
+                dataCacheWithUser.set(cacheKey, fetchedDataWithUser);
+            }
+        });
+    }
+
+    return [];
+}
+
+export function getMarkColorData() {
+    const visualSettings = localStorage.getItem('VISUAL_SETTINGS');
+
+    if (visualSettings) {
+        const mainSeriesProperties = JSON.parse(visualSettings);
+        if (mainSeriesProperties) {
+            return bsColorSets[mainSeriesProperties.state.bsColor];
+        }
+    }
+
+    return bsColorSets['default'];
 }
