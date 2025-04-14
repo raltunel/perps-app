@@ -30,10 +30,6 @@ pnpm build
 
 [![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/remix-run/react-router-templates&create_from_path=netlify)
 
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
 ---
 
 Built with ❤️ using React Router.
