@@ -1,11 +1,7 @@
-import { use } from 'react';
 import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
-import { NumFormatTypes } from '~/utils/Constants';
-import type { NumFormat } from '~/utils/Constants';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { persist } from 'zustand/middleware';
 
 type TradeDataStore = UserTradeStore & {
@@ -20,6 +16,8 @@ type TradeDataStore = UserTradeStore & {
     setFavCoins: (favs: SymbolInfoIF[]) => void;
     coins: SymbolInfoIF[];
     setCoins: (coins: SymbolInfoIF[]) => void;
+    coinPriceMap: Map<string, number>;
+    setCoinPriceMap: (coinPriceMap: Map<string, number>) => void;
     removeFromFavKeys: (coin: string) => void;
     obChosenPrice: number;
     setObChosenPrice: (price: number) => void;
@@ -31,12 +29,14 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
-            symbol: '',
+            symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
                 set({ symbol });
                 get().setUserSymbolOrders(
-                    get().userOrders.filter((e) => e.coin === symbol),
+                    get().userOrders.filter(
+                        (e: OrderDataIF) => e.coin === symbol,
+                    ),
                 );
                 set({ obChosenPrice: 0, obChosenAmount: 0 });
             },
@@ -53,21 +53,29 @@ const useTradeDataStore = create<TradeDataStore>()(
             favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
-                if (get().favKeys.filter((e) => e == coin).length === 0) {
+                if (
+                    get().favKeys.filter((e: string) => e == coin).length === 0
+                ) {
                     set({ favKeys: [...get().favKeys, coin] });
                     set({
                         favCoins: [
                             ...get().favCoins,
                             get().coins.find(
-                                (e) => e.coin == coin,
+                                (e: SymbolInfoIF) => e.coin == coin,
                             ) as SymbolInfoIF,
                         ],
                     });
                 }
             },
             removeFromFavKeys: (coin: string) => {
-                set({ favKeys: get().favKeys.filter((e) => e != coin) });
-                set({ favCoins: get().favCoins.filter((e) => e.coin != coin) });
+                set({
+                    favKeys: get().favKeys.filter((e: string) => e != coin),
+                });
+                set({
+                    favCoins: get().favCoins.filter(
+                        (e: SymbolInfoIF) => e.coin != coin,
+                    ),
+                });
             },
             favCoins: [],
             setFavCoins: (favs: SymbolInfoIF[]) => set({ favCoins: favs }),
@@ -78,11 +86,15 @@ const useTradeDataStore = create<TradeDataStore>()(
             obChosenAmount: 0,
             setObChosenAmount: (amount: number) =>
                 set({ obChosenAmount: amount }),
+            coinPriceMap: new Map(),
+            setCoinPriceMap: (coinPriceMap: Map<string, number>) =>
+                set({ coinPriceMap }),
         }),
         {
             name: 'TRADE_DATA',
-            partialize: (state: any) => ({
+            partialize: (state) => ({
                 favKeys: state.favKeys,
+                symbol: state.symbol,
             }),
         },
     ),
