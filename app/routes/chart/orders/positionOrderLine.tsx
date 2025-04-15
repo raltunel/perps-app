@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { ChartShapeRefs, LineData } from './component/LineComponent';
-import { buyColor, sellColor } from './customOrderLineUtils';
+import type { LineData } from './component/LineComponent';
+import { buyColor, quantityTextFormatWithComma, sellColor } from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const PositionOrderLine = () => {
@@ -11,24 +11,7 @@ const PositionOrderLine = () => {
 
     const [lines, setLines] = useState<LineData[]>([]);
 
-    function formatWithComma(value: number): string {
-        const isNegative = value < 0;
-        const [integerPart, decimalPart] = Math.abs(value)
-            .toString()
-            .split('.');
-
-        const formattedInteger = integerPart.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ',',
-        );
-
-        let result = formattedInteger;
-        if (decimalPart !== undefined) {
-            result += '.' + decimalPart;
-        }
-
-        return isNegative ? `-${result}` : result;
-    }
+   
 
     const filteredPositions = useMemo(() => {
         const data = positions
@@ -37,7 +20,7 @@ const PositionOrderLine = () => {
                 return {
                     price: i.entryPx,
                     pnl: Number(i.unrealizedPnl.toFixed(2)),
-                    szi: formatWithComma(i.szi),
+                    szi: quantityTextFormatWithComma(i.szi),
                     liqPrice: i.liquidationPx,
                 };
             });

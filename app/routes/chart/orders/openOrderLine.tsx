@@ -2,8 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import type { ChartShapeRefs, LineData } from './component/LineComponent';
-import { buyColor, sellColor } from './customOrderLineUtils';
+import type { LineData } from './component/LineComponent';
+import {
+    buyColor,
+    quantityTextFormatWithComma,
+    sellColor,
+} from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const OpenOrderLine = () => {
@@ -20,7 +24,7 @@ const OpenOrderLine = () => {
                 return {
                     price: i.entryPx,
                     pnl: Number(i.unrealizedPnl.toFixed(2)),
-                    szi: i.szi,
+                    szi: quantityTextFormatWithComma(i.szi),
                     liqPrice: i.liquidationPx,
                 };
             });
@@ -56,12 +60,12 @@ const OpenOrderLine = () => {
 
             let price = order.limitPx;
 
-            let quantityText = 0;
+            let quantityText = '';
             let orderText: string | undefined = '';
 
             if (order.orderType === 'Limit') {
-                orderText = ' Limit  ' + price;
-                quantityText = order.sz;
+                orderText = ' Limit  ' + price + ' ' + order.triggerCondition;
+                quantityText = quantityTextFormatWithComma(sz);
             } else {
                 if (order.triggerCondition && order.orderType) {
                     orderText = formatTPorSLLabel(
@@ -77,7 +81,7 @@ const OpenOrderLine = () => {
                 xLoc: 0.4,
                 yLoc: price,
                 text: orderText,
-                quantityText: quantityText.toFixed(5),
+                quantityText: quantityText,
                 color: side === 'buy' ? buyColor : sellColor,
             };
         });

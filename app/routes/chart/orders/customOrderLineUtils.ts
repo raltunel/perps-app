@@ -148,3 +148,24 @@ export const createAnchoredText = async (
 
     return shape;
 };
+
+
+
+ export const quantityTextFormatWithComma =(value: number) : string =>  {
+        const isNegative = value < 0;
+        const [integerPart, decimalPart] = Math.abs(value)
+            .toString()
+            .split('.');
+
+        const formattedInteger = integerPart.replace(
+            /\B(?=(\d{3})+(?!\d))/g,
+            ',',
+        );
+
+        let result = formattedInteger;
+        if (decimalPart !== undefined) {
+            result += '.' + decimalPart;
+        }
+
+        return isNegative ? `-${result}` : result;
+    }
