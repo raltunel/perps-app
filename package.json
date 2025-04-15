@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "react": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend dev",
+        "dev": "pnpm i && pnpm prepare && pnpm update-submodules && pnpm --filter frontend dev",
         "prepare": "husky",
         "prettier": "prettier --write .",
         "update-submodules": "git submodule update --remote --recursive --merge"
