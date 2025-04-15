@@ -22,15 +22,10 @@ interface propsIF {
 }
 
 const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
-    'Funding History',
-    'Order History',
-    'Deposits and Withdrawals',
+    'Master Account'
 ];
+
+type availableTabsT = typeof availableTabs[number];
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -41,7 +36,10 @@ const filterOptions: FilterOption[] = [
 
 export default function PortfolioTable(props: propsIF) {
     const { initialTab = 'Balances' } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
+
+    // this controls which tab is active in the DOM
+    const [activeTab, setActiveTab] = useState<availableTabsT>(initialTab);
+
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
