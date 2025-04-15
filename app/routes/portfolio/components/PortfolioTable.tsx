@@ -1,17 +1,10 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import styles from './PortfolioTable.module.css';
+import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import BalancesTable from '~/components/Trade/BalancesTable/BalancesTable';
-import DepositsWithdrawalsTable from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '~/components/Trade/FilterDropdown/FilterDropdown';
-import FundingHistoryTable from '~/components/Trade/FundingHistoryTable/FundingHistoryTable';
-import OpenOrdersTable from '~/components/Trade/OpenOrdersTable/OpenOrdersTable';
-import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
-import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
 import ToggleSwitch from '~/components/Trade/ToggleSwitch/ToggleSwitch';
-import TradeHistoryTable from '~/components/Trade/TradeHistoryTable/TradeHistoryTable';
-import TwapTable from '~/components/Trade/TwapTable/TwapTable';
 
 export interface FilterOption {
     id: string;
@@ -21,11 +14,9 @@ interface propsIF {
     initialTab?: string;
 }
 
-const availableTabs = [
-    'Master Account'
-];
+const availableTabs = ['Master Account'];
 
-type availableTabsT = typeof availableTabs[number];
+type availableTabsT = (typeof availableTabs)[number];
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -35,7 +26,7 @@ const filterOptions: FilterOption[] = [
 ];
 
 export default function PortfolioTable(props: propsIF) {
-    const { initialTab = 'Balances' } = props;
+    const { initialTab = availableTabs[0] } = props;
 
     // this controls which tab is active in the DOM
     const [activeTab, setActiveTab] = useState<availableTabsT>(initialTab);
@@ -74,22 +65,8 @@ export default function PortfolioTable(props: propsIF) {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Balances':
+            case 'Master Account':
                 return <BalancesTable />;
-            case 'Positions':
-                return <PositionsTable />;
-            case 'Open Orders':
-                return <OpenOrdersTable selectedFilter={selectedFilter} />;
-            case 'TWAP':
-                return <TwapTable />;
-            case 'Trade History':
-                return <TradeHistoryTable />;
-            case 'Funding History':
-                return <FundingHistoryTable />;
-            case 'Order History':
-                return <OrderHistoryTable selectedFilter={selectedFilter} />;
-            case 'Deposits and Withdrawals':
-                return <DepositsWithdrawalsTable />;
             default:
                 return (
                     <div className={styles.emptyState}>
