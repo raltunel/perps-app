@@ -15,6 +15,12 @@ cd packages/frontend
 pnpm dev
 ```
 
+## Develop Frontend Shortcut (setup and run from root directory)
+
+```bash
+pnpm dev
+```
+
 ## Start Frontend in Production Mode
 
 ```bash
