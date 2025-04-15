@@ -1,7 +1,7 @@
 [build]
   base = "packages/frontend"
   publish = "build/client"
-  command = "pnpm --filter frontend build"
+  command = "pnpm build"
 
 [dev]
 command = "npm run dev"
