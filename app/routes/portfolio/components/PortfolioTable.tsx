@@ -2,9 +2,9 @@ import { useState } from 'react';
 import styles from './PortfolioTable.module.css';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
-import BalancesTable from '~/components/Trade/BalancesTable/BalancesTable';
 import FilterDropdown from '~/components/Trade/FilterDropdown/FilterDropdown';
 import ToggleSwitch from '~/components/Trade/ToggleSwitch/ToggleSwitch';
+import MasterAccount from './MasterAccount';
 
 export interface FilterOption {
     id: string;
@@ -66,7 +66,7 @@ export default function PortfolioTable(props: propsIF) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Master Account':
-                return <BalancesTable />;
+                return <MasterAccount />;
             default:
                 return (
                     <div className={styles.emptyState}>
