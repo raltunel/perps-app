@@ -55,36 +55,39 @@ const OpenOrderLine = () => {
             setLines([]);
             return;
         }
-        const newLines: LineData[] = userSymbolOrders.map((order) => {
-            const { sz, side } = order;
+        const newLines: LineData[] = userSymbolOrders
+            .sort((a, b) => a.timestamp - b.timestamp)
+            .map((order) => {
+                const { sz, side } = order;
 
-            let price = order.limitPx;
+                let price = order.limitPx;
 
-            let quantityText = '';
-            let orderText: string | undefined = '';
+                let quantityText = '';
+                let orderText: string | undefined = '';
 
-            if (order.orderType === 'Limit') {
-                orderText = ' Limit  ' + price + ' ' + order.triggerCondition;
-                quantityText = quantityTextFormatWithComma(sz);
-            } else {
-                if (order.triggerCondition && order.orderType) {
-                    orderText = formatTPorSLLabel(
-                        order.triggerCondition,
-                        order.orderType,
-                    );
-                    if (order.triggerPx) price = order.triggerPx;
-                    quantityText = pnlSzi;
+                if (order.orderType === 'Limit') {
+                    orderText =
+                        ' Limit  ' + price + ' ' + order.triggerCondition;
+                    quantityText = quantityTextFormatWithComma(sz);
+                } else {
+                    if (order.triggerCondition && order.orderType) {
+                        orderText = formatTPorSLLabel(
+                            order.triggerCondition,
+                            order.orderType,
+                        );
+                        if (order.triggerPx) price = order.triggerPx;
+                        quantityText = pnlSzi;
+                    }
                 }
-            }
 
-            return {
-                xLoc: 0.4,
-                yLoc: price,
-                text: orderText,
-                quantityText: quantityText,
-                color: side === 'buy' ? buyColor : sellColor,
-            };
-        });
+                return {
+                    xLoc: 0.4,
+                    yPrice: price,
+                    text: orderText,
+                    quantityText: quantityText,
+                    color: side === 'buy' ? buyColor : sellColor,
+                };
+            });
 
         setLines(newLines);
     }, [

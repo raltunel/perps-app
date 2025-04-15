@@ -1,4 +1,4 @@
-import type { IChartingLibraryWidget } from '~/tv/charting_library';
+import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 
 export const buyColor = '#26A69A';
 export const sellColor = '#E57373';
@@ -27,32 +27,46 @@ export const addCustomOrderLine = async (
     return orderLine;
 };
 
-export const priceToPixel = (
-    minPrice: number,
-    maxPrice: number,
-    chartHeight: number,
-    price: number,
-    isLogarithmic: boolean = false,
-) => {
+export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
     const textHeight = 15;
+    let pixel = 0;
 
-    if (isLogarithmic) {
-        const logMinPrice = Math.log(minPrice);
-        const logMaxPrice = Math.log(maxPrice);
-        const logPrice = Math.log(price);
+    const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
 
-        const priceDifference = logMaxPrice - logMinPrice;
-        const relativePrice = logPrice - logMinPrice;
-        const pixelCoordinate = (relativePrice / priceDifference) * chartHeight;
+    const priceScale = priceScalePane.getMainSourcePriceScale();
+    if (priceScale) {
+        const priceRange = priceScale.getVisiblePriceRange();
+        const chartHeight = priceScalePane.getHeight();
 
-        return chartHeight - pixelCoordinate - textHeight / 2;
-    } else {
-        const priceDifference = maxPrice - minPrice;
-        const relativePrice = price - minPrice;
-        const pixelCoordinate = (relativePrice / priceDifference) * chartHeight;
+        if (!priceRange) return 0;
 
-        return chartHeight - pixelCoordinate - textHeight / 2;
+        const maxPrice = priceRange.to;
+        const minPrice = priceRange.from;
+        const isLogarithmic = priceScale.getMode() === 1;
+        if (isLogarithmic) {
+            const logMinPrice = Math.log(minPrice);
+            const logMaxPrice = Math.log(maxPrice);
+            const logPrice = Math.log(price);
+
+            const priceDifference = logMaxPrice - logMinPrice;
+            const relativePrice = logPrice - logMinPrice;
+            const pixelCoordinate =
+                (relativePrice / priceDifference) * chartHeight;
+
+            pixel = chartHeight - pixelCoordinate - textHeight / 2;
+        } else {
+            const priceDifference = maxPrice - minPrice;
+            const relativePrice = price - minPrice;
+            const pixelCoordinate =
+                (relativePrice / priceDifference) * chartHeight;
+
+            pixel = chartHeight - pixelCoordinate - textHeight / 2;
+        }
+
+        return pixel / chartHeight;
     }
+
+    return 0;
 };
 
 export const getAnchoredQuantityTextLocation = (
@@ -63,7 +77,7 @@ export const getAnchoredQuantityTextLocation = (
     const timeScale = chart.activeChart().getTimeScale();
     const chartWidth = Math.floor(timeScale.width());
 
-    const wrapWidthPx = orderText.length > 13 ? 105 : 75;
+    const wrapWidthPx = orderText.length > 13 ? 100 : 70;
 
     const offsetX = Number(wrapWidthPx / chartWidth);
 
@@ -73,14 +87,14 @@ export const getAnchoredQuantityTextLocation = (
 export const createAnchoredMainText = async (
     chart: IChartingLibraryWidget,
     xLoc: number,
-    yLoc: number,
+    yPrice: number,
     text: string,
     borderColor: string,
 ) => {
     return createAnchoredText(
         chart,
         xLoc,
-        yLoc,
+        yPrice,
         text,
         '#D1D1D1',
         text.toString().length > 13 ? 100 : 70,
@@ -91,13 +105,13 @@ export const createAnchoredMainText = async (
 export const createQuantityAnchoredText = async (
     chart: IChartingLibraryWidget,
     xLoc: number,
-    yLoc: number,
+    yPrice: number,
     text: string,
 ) => {
     return createAnchoredText(
         chart,
         xLoc,
-        yLoc,
+        yPrice,
         text,
         '#000000',
         text.toString().length > 8 ? 70 : 60,
@@ -109,7 +123,7 @@ export const createQuantityAnchoredText = async (
 export const createAnchoredText = async (
     chart: IChartingLibraryWidget,
     xLoc: number,
-    yLoc: number,
+    yPrice: number,
     text: string,
     backgroundColor: string,
     wordWrapWidth: number,
@@ -119,7 +133,7 @@ export const createAnchoredText = async (
     const shape = await chart.activeChart().createAnchoredShape(
         {
             x: xLoc,
-            y: yLoc,
+            y: priceToPixel(chart, yPrice),
         },
         {
             shape: 'anchored_text',
@@ -149,23 +163,16 @@ export const createAnchoredText = async (
     return shape;
 };
 
+export const quantityTextFormatWithComma = (value: number): string => {
+    const isNegative = value < 0;
+    const [integerPart, decimalPart] = Math.abs(value).toString().split('.');
 
+    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
- export const quantityTextFormatWithComma =(value: number) : string =>  {
-        const isNegative = value < 0;
-        const [integerPart, decimalPart] = Math.abs(value)
-            .toString()
-            .split('.');
-
-        const formattedInteger = integerPart.replace(
-            /\B(?=(\d{3})+(?!\d))/g,
-            ',',
-        );
-
-        let result = formattedInteger;
-        if (decimalPart !== undefined) {
-            result += '.' + decimalPart;
-        }
-
-        return isNegative ? `-${result}` : result;
+    let result = formattedInteger;
+    if (decimalPart !== undefined) {
+        result += '.' + decimalPart;
     }
+
+    return isNegative ? `-${result}` : result;
+};

@@ -2,7 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { LineData } from './component/LineComponent';
-import { buyColor, quantityTextFormatWithComma, sellColor } from './customOrderLineUtils';
+import {
+    buyColor,
+    quantityTextFormatWithComma,
+    sellColor,
+} from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const PositionOrderLine = () => {
@@ -10,8 +14,6 @@ const PositionOrderLine = () => {
     const { positions, symbol } = useTradeDataStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
-
-   
 
     const filteredPositions = useMemo(() => {
         const data = positions
@@ -41,7 +43,7 @@ const PositionOrderLine = () => {
 
             const pnlLine: LineData = {
                 xLoc: 0.1,
-                yLoc: order.price,
+                yPrice: order.price,
                 text: orderText,
                 quantityText: order.szi,
                 color: pnl > 0 ? buyColor : sellColor,
@@ -49,7 +51,7 @@ const PositionOrderLine = () => {
 
             const liqLine: LineData = {
                 xLoc: 0.2,
-                yLoc: order.liqPrice,
+                yPrice: order.liqPrice,
                 text: '  Liq. Price',
                 quantityText: undefined,
                 color: sellColor,
