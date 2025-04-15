@@ -1,6 +1,6 @@
 [build]
 command = "pnpm --filter frontend build"
-publish = "build/client"
+publish = "packages/frontend/build/client"
 
 [dev]
 command = "npm run dev"
