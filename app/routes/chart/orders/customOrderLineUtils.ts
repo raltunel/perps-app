@@ -24,6 +24,7 @@ export const addCustomOrderLine = async (
             },
         });
 
+    chart.activeChart().getShapeById(orderLine).sendToBack();
     return orderLine;
 };
 
