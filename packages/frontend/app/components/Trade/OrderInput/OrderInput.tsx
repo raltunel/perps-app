@@ -102,7 +102,12 @@ export default function OrderInput() {
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
-    const { formatNum, parseFormattedNum } = useNumFormatter();
+    const {
+        formatNum,
+        parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        parseFormattedWithOnlyDecimals,
+    } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -133,13 +138,14 @@ export default function OrderInput() {
         },
     ];
 
+
     useEffect(() => {
         if (obChosenAmount > 0) {
-            setSize(formatNum(obChosenAmount));
+            setSize(formatNumWithOnlyDecimals(obChosenAmount));
             handleTypeChange();
         }
         if (obChosenPrice > 0) {
-            setPrice(obChosenPrice.toString());
+            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
@@ -154,10 +160,10 @@ export default function OrderInput() {
             size &&
             size.length > 0
         ) {
-            return parseFormattedNum(size) * parseNum(price);
+            return parseFormattedNum(size) * parseFormattedNum(price);
         }
         return 0;
-    }, [size, price, marketOrderType, symbolInfo?.markPx]);
+    }, [size, price, marketOrderType, symbolInfo?.markPx, parseNum, parseFormattedNum]);
 
     useEffect(() => {
         setSize('');
@@ -203,8 +209,14 @@ export default function OrderInput() {
     };
 
     // SIZE INPUT-----------------------------
-    const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSize(event.target.value);
+    const handleSizeChange = (
+        event: React.ChangeEvent<HTMLInputElement> | string,
+    ) => {
+        if (typeof event === 'string') {
+            setSize(event);
+        } else {
+            setSize(event.target.value);
+        }
     };
 
     const handleSizeBlur = () => {
@@ -219,8 +231,12 @@ export default function OrderInput() {
         }
     };
     // PRICE INPUT----------------------------------
-    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPrice(event.target.value);
+    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement> | string) => {
+        if (typeof event === 'string') {
+            setPrice(event);
+        } else {
+            setPrice(event.target.value);
+        }
     };
 
     const handlePriceBlur = () => {
