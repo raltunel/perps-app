@@ -42,7 +42,6 @@ export function useNumFormatter() {
         return { group, decimal };
     }
 
-
     // returns the number of decimal places in a number
     const decimalPrecision = (precisionNumber: number) => {
         if (!precisionNumber.toString().includes('.')) return 0;
@@ -127,7 +126,6 @@ export function useNumFormatter() {
         [formatNum],
     );
 
-
     const activeDecimalSeparator = useMemo(() => {
         return getSeparators(numFormat.value).decimal;
     }, [numFormat]);
@@ -137,9 +135,8 @@ export function useNumFormatter() {
     }, [numFormat]);
 
     const inputRegex = useMemo(() => {
-        return new RegExp(`^\\d*(?:${activeDecimalSeparator}\\d*)?$`);
+        return new RegExp(`^\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
     }, [activeDecimalSeparator]);
-
 
     const getPrecisionFromNumber = useCallback((value: number) => {
         const index = value.toString().indexOf('.');
