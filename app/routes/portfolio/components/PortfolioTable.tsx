@@ -12,16 +12,6 @@ import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
 import ToggleSwitch from '~/components/Trade/ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '~/components/Trade/TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '~/components/Trade/TwapTable/TwapTable';
-// import FilterDropdown from '../FilterDropdown/FilterDropdown';
-// import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
-// import BalancesTable from '../BalancesTable/BalancesTable';
-// import PositionsTable from '../PositionsTable/PositionsTable';
-// import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
-// import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
-// import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
-// import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
-// import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
-// import TwapTable from '../TwapTable/TwapTable';
 
 export interface FilterOption {
     id: string;
