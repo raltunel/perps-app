@@ -43,7 +43,7 @@ export default function PerformancePanel() {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleTabChange = useCallback((tab: any) => {
+    const handleTabChange = useCallback((tab: string) => {
         setActiveTab(tab);
     }, []);
 

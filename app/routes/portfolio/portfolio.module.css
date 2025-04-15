@@ -8,11 +8,11 @@
 
     padding-bottom: 1rem;
     overflow-y: hidden;
+  
 }
 .container header {
     color: var(--text1, #f0f0f8);
-
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
+    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
     font-style: normal;
     font-weight: 300;
@@ -112,4 +112,53 @@
     display: grid;
     grid-template-rows: auto 155px;
     gap: 8px;
+}
+.sendMobile, .netValueMobile{
+    display: none !important;
+}
+
+
+@media (max-width: 768px) {
+    .container{
+        overflow-y: auto;
+        gap: 8px;
+    }
+.detailsContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.detailsContent{
+    padding: 8px 0;
+}
+
+
+.column{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sendDesktop, .totalNetDisplay h6{
+    display: none !important;
+    height: 0px !important;
+}
+.sendMobile, .netValueMobile{
+    display: flex !important;
+}
+.detailsContent h6 {
+   
+    font-size: var(--font-size-s);
+}
+.detailsContent h3 {
+   
+
+    font-size: var(--font-size-l);
+}
+.detailsContent a {
+    font-size: var(--font-size-s);
+   
+}
+
+
 }

@@ -79,3 +79,20 @@
         background-position: -200% 0;
     }
 }
+
+@media (max-width: 768px) {
+.performanceContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+   
+}
+
+.metricsContainer{
+    height: 50px;
+    overflow-y: scroll;
+    display: none;
+}
+
+}
