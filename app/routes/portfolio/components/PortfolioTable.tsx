@@ -59,8 +59,7 @@ export default function PortfolioTable(props: propsIF) {
     };
 
     const rightAlignedContent = (
-        <div className={styles.tableControls}>
-            {' '}
+        <div className={styles.table_controls}>
             <FilterDropdown
                 options={filterOptions}
                 selectedOption={selectedFilter}
@@ -103,7 +102,7 @@ export default function PortfolioTable(props: propsIF) {
     };
 
     return (
-        <div className={styles.tradeTableWrapper}>
+        <div className={styles.table_wrapper}>
             <Tabs
                 tabs={availableTabs}
                 defaultTab={activeTab}
@@ -111,7 +110,7 @@ export default function PortfolioTable(props: propsIF) {
                 rightContent={rightAlignedContent}
             />
             <motion.div
-                className={styles.tableContent}
+                className={styles.table_content}
                 key={activeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
