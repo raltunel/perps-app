@@ -94,21 +94,44 @@ export function getMarkColorData() {
         'tradingview.chartproperties.mainSeriesProperties',
     );
 
-    if (candleSettings) {
-        const mainSeriesProperties = JSON.parse(candleSettings);
-        if (mainSeriesProperties) {
-            return {
-                buy: mainSeriesProperties.candleStyle.upColor,
-                sell: mainSeriesProperties.candleStyle.downColor,
-            };
+    const parsedCandleSettings = candleSettings
+        ? JSON.parse(candleSettings)
+        : null;
+    const parsedVisualSettings = visualSettings
+        ? JSON.parse(visualSettings)
+        : null;
+
+    if (parsedCandleSettings?.candleStyle) {
+        const {
+            upColor,
+            downColor,
+            borderUpColor,
+            borderDownColor,
+            wickUpColor,
+            wickDownColor,
+        } = parsedCandleSettings.candleStyle;
+
+        const activeColors = [
+            upColor,
+            downColor,
+            borderUpColor,
+            borderDownColor,
+            wickUpColor,
+            wickDownColor,
+        ];
+        const isCustomized = activeColors.some((color) =>
+            color?.startsWith('rgba'),
+        );
+
+        if (!isCustomized && parsedVisualSettings?.state?.bsColor) {
+            return bsColorSets[parsedVisualSettings.state.bsColor];
         }
-    } else {
-        if (visualSettings) {
-            const mainSeriesProperties = JSON.parse(visualSettings);
-            if (mainSeriesProperties) {
-                return bsColorSets[mainSeriesProperties.state.bsColor];
-            }
-        }
+
+        return { buy: upColor, sell: downColor };
+    }
+
+    if (parsedVisualSettings?.state?.bsColor) {
+        return bsColorSets[parsedVisualSettings.state.bsColor];
     }
 
     return bsColorSets['default'];
