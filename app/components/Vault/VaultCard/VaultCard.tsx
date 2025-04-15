@@ -79,10 +79,7 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
             </div>
 
             <div className={styles.buttonContainer}>
-                <button
-                    className={styles.depositButton}
-                    onClick={onDeposit}
-                >
+                <button className={styles.depositButton} onClick={onDeposit}>
                     Deposit
                 </button>
                 {hasWithdraw && (

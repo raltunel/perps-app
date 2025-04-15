@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './OrderInput.module.css';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
@@ -27,6 +27,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -99,8 +100,9 @@ export default function OrderInput() {
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
 
-    const { obChosenPrice, obChosenAmount, symbol } = useTradeDataStore();
-    const { formatNum } = useNumFormatter();
+    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
+        useTradeDataStore();
+    const { formatNum, parseFormattedNum } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 
@@ -137,11 +139,25 @@ export default function OrderInput() {
             handleTypeChange();
         }
         if (obChosenPrice > 0) {
-            console.log(obChosenPrice);
             setPrice(obChosenPrice.toString());
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
+
+    const orderValue = useMemo(() => {
+        if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
+            return parseFormattedNum(size) * parseNum(symbolInfo?.markPx || 0);
+        } else if (
+            (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
+            price &&
+            price.length > 0 &&
+            size &&
+            size.length > 0
+        ) {
+            return parseFormattedNum(size) * parseNum(price);
+        }
+        return 0;
+    }, [size, price, marketOrderType, symbolInfo?.markPx]);
 
     useEffect(() => {
         setSize('');
@@ -454,6 +470,8 @@ export default function OrderInput() {
             <PlaceOrderButtons
                 orderMarketPrice={marketOrderType}
                 openModalWithContent={openModalWithContent}
+                orderValue={formatNum(orderValue)}
+                leverage={leverage}
             />
 
             {appSettingsModal.isOpen && (
@@ -477,6 +495,7 @@ export default function OrderInput() {
                     )}
                     {modalContent === 'confirm_buy' && (
                         <ConfirmationModal
+                            tx='buy'
                             onClose={() => {
                                 notifications.add('buyPending');
                                 appSettingsModal.close();
@@ -485,6 +504,7 @@ export default function OrderInput() {
                     )}
                     {modalContent === 'confirm_sell' && (
                         <ConfirmationModal
+                            tx='sell'
                             onClose={() => {
                                 notifications.add('sellPending');
                                 appSettingsModal.close();
