@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -18,7 +18,6 @@ import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
-
 import { Info } from '@perps-app/sdk';
 
 export function loader({ context }: Route.LoaderArgs) {
@@ -39,12 +38,27 @@ export default function Trade() {
         setDebugWallet,
         isWsEnabled,
         setIsWsEnabled,
+        wsEnvironment,
+        setWsEnvironment,
     } = useDebugStore();
 
-    useEffect(() => {
-        const info = new Info({ environment: 'mock' });
-        console.log({ wsManager: info.wsManager });
-    }, []);
+    // useEffect(() => {
+    //     const info = new Info({ environment: 'mock' });
+
+    //     if (info.wsManager) {
+    //         info.wsManager.subscribe(
+    //             {
+    //                 type: 'l2Book',
+    //                 coin: 'BTC',
+    //             },
+    //             (msg) => {
+    //                 console.log('>>>', msg);
+    //             },
+    //         );
+    //     }
+    //     console.log('>>>', info.baseUrl);
+    //     console.log('>>>', { wsManager: info.wsManager });
+    // }, []);
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
@@ -56,9 +70,10 @@ export default function Trade() {
         <>
             <div className={styles.wsUrlSelector}>
                 <ComboBox
-                    value={wsUrl}
-                    options={wsUrls}
-                    onChange={(value) => setWsUrl(value)}
+                    value={wsEnvironment}
+                    options={wsEnvironments}
+                    fieldName='value'
+                    onChange={(value) => setWsEnvironment(value)}
                 />
             </div>
             <div className={styles.walletSelector}>

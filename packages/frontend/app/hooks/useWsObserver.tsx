@@ -6,6 +6,8 @@ import React, {
     useState,
 } from 'react';
 import { useIsClient } from './useIsClient';
+import { Info, WebsocketManager, type Environment } from '@perps-app/sdk';
+import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
@@ -44,7 +46,9 @@ const WsObserverContext = createContext<WsObserverContextType | undefined>(
 export const WsObserverProvider: React.FC<{
     url: string;
     children: React.ReactNode;
-}> = ({ url, children }) => {
+    wsEnvironment: string;
+}> = ({ url, children, wsEnvironment }) => {
+    const socketManagerRef = useRef<WebsocketManager | null>(null);
     const isClient = useIsClient();
     const [readyState, setReadyState] = useState<number>(
         WebSocketReadyState.CLOSED,
@@ -117,7 +121,7 @@ export const WsObserverProvider: React.FC<{
 
     useEffect(() => {
         if (isClient) {
-            connectWebSocket();
+            // connectWebSocket();
         }
 
         return () => {
@@ -126,9 +130,31 @@ export const WsObserverProvider: React.FC<{
         };
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
+    useEffect(() => {
+        if (isClient) {
+            if (socketManagerRef.current) {
+                socketManagerRef.current.stop();
+            }
+            const info = new Info({
+                environment: wsEnvironment as Environment,
+            });
+            if (info) {
+                socketManagerRef.current = info.wsManager;
+            }
+        }
+    }, [wsEnvironment, isClient]);
+
     const sendMessage = (msg: string) => {
         if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
             socketRef.current.send(msg);
+        }
+    };
+
+    const wsOnMessage = (data: string) => {
+        const channel = extractChannelFromPayload(data);
+        const worker = getWorker(channel);
+        if (worker) {
+            worker.postMessage(data);
         }
     };
 
@@ -137,15 +163,27 @@ export const WsObserverProvider: React.FC<{
         payload: any,
         unsubscribe: boolean = false,
     ) => {
-        sendMessage(
-            JSON.stringify({
-                method: unsubscribe ? 'unsubscribe' : 'subscribe',
-                subscription: {
+        // sendMessage(
+        //     JSON.stringify({
+        //         method: unsubscribe ? 'unsubscribe' : 'subscribe',
+        //         subscription: {
+        //             type: type,
+        //             ...payload,
+        //         },
+        //     }),
+        // );
+
+        if (socketManagerRef.current) {
+            socketManagerRef.current.subscribe(
+                {
                     type: type,
                     ...payload,
                 },
-            }),
-        );
+                (msg) => {
+                    wsOnMessage(JSON.stringify(msg));
+                },
+            );
+        }
     };
 
     const [, forceUpdate] = useState(0); // Used to force re-render when needed
