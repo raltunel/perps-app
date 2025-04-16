@@ -1,53 +1,40 @@
-# Welcome to React Router!
+# Perps App Monorepo
 
-A modern, production-ready template for building full-stack React applications using React Router.
-
-## Features
-
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
-
-## Getting Started
-
-### Installation
-
-Install the dependencies:
+## Setup
 
 ```bash
 pnpm install
+pnpm prepare
+pnpm update-submodules
 ```
 
-### Development
+## Develop Frontend
 
-Start the development server with HMR:
+```bash
+cd packages/frontend
+pnpm dev
+```
+
+## Develop Frontend Shortcut (setup and run from root directory)
 
 ```bash
 pnpm dev
 ```
 
-Your application will be available at `http://localhost:3000`.
-
-## Building for Production
-
-Create a production build:
+## Start Frontend in Production Mode
 
 ```bash
+cd packages/frontend
 pnpm build
+pnpm start
 ```
 
-## Deployment
+## Using the SDK in the Frontend
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/remix-run/react-router-templates&create_from_path=netlify)
+```ts
+import { Info } from '@perps-app/sdk';
 
-## Styling
+const info = new Info();
+```
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+Please refer to the [examples](./packages/sdk/examples) in the sdk package for more usage examples.

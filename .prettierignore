@@ -1,2 +1,2 @@
-app/tv/*
+packages/frontend/app/tv/*
 pnpm-lock.yaml
