@@ -58,13 +58,13 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 {order.side === 'buy' ? 'Long' : 'Short'}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {formatNum(order.sz)}
+                {order.sz ? formatNum(order.sz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.originalSizeCell}`}>
-                {formatNum(order.origSz)}
+                {order.origSz ? formatNum(order.origSz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
-                ${formatNum(order.sz * order.limitPx)}
+                {order.orderValue ? `$${formatNum(order.orderValue)}` : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
                 {formatNum(order.limitPx)}
