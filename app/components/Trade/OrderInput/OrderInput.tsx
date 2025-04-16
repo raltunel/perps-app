@@ -138,7 +138,6 @@ export default function OrderInput() {
         },
     ];
 
-
     useEffect(() => {
         if (obChosenAmount > 0) {
             setSize(formatNumWithOnlyDecimals(obChosenAmount));
@@ -163,7 +162,14 @@ export default function OrderInput() {
             return parseFormattedNum(size) * parseFormattedNum(price);
         }
         return 0;
-    }, [size, price, marketOrderType, symbolInfo?.markPx, parseNum, parseFormattedNum]);
+    }, [
+        size,
+        price,
+        marketOrderType,
+        symbolInfo?.markPx,
+        parseNum,
+        parseFormattedNum,
+    ]);
 
     useEffect(() => {
         setSize('');
@@ -231,7 +237,9 @@ export default function OrderInput() {
         }
     };
     // PRICE INPUT----------------------------------
-    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement> | string) => {
+    const handlePriceChange = (
+        event: React.ChangeEvent<HTMLInputElement> | string,
+    ) => {
         if (typeof event === 'string') {
             setPrice(event);
         } else {
@@ -491,15 +499,19 @@ export default function OrderInput() {
             />
 
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close}
-                title={
-                    modalContent === 'margin' ? 'Margin Mode' :
-                    modalContent === 'scale' ? 'Scale Options' :
-                    modalContent === 'confirm_buy' ? 'Confirm Buy Order' :
-                    modalContent === 'confirm_sell' ? 'Confirm Sell Order' : 
-                    ''
-                }
-                
+                <Modal
+                    close={appSettingsModal.close}
+                    title={
+                        modalContent === 'margin'
+                            ? 'Margin Mode'
+                            : modalContent === 'scale'
+                              ? 'Scale Options'
+                              : modalContent === 'confirm_buy'
+                                ? 'Confirm Buy Order'
+                                : modalContent === 'confirm_sell'
+                                  ? 'Confirm Sell Order'
+                                  : ''
+                    }
                 >
                     {modalContent === 'margin' && (
                         <MarginModal

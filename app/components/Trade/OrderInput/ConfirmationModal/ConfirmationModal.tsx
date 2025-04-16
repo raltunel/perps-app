@@ -52,8 +52,6 @@ export default function ConfirmationModal(props: PropsIF) {
     const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
-          
-
             <div className={styles.contentContainer}>
                 {dataInfo.map((info) => (
                     <div className={styles.infoRow}>

@@ -24,7 +24,6 @@
     font-size: var(--font-size-l, 24px);
 }
 
-
 .textContent {
     width: 100%;
     align-items: center;
@@ -177,7 +176,7 @@
 }
 
 @media (max-width: 768px) {
-.container{
-    width: auto;
-}
+    .container {
+        width: auto;
+    }
 }

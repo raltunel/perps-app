@@ -154,8 +154,6 @@ export default function ScaleOrders({
             }}
         >
             <div className={styles.scaleOrdersContent}>
-      
-
                 <div className={styles.totalOrdersSection}>
                     <input
                         type='text'

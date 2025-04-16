@@ -12,7 +12,6 @@ export default function MarginModal(props: PropsIF) {
 
     return (
         <section className={styles.container}>
-          
             <div className={styles.contentContainer}>
                 <button
                     className={`${styles.content} ${activeMargin === 'cross' ? styles.selected : ''}`}

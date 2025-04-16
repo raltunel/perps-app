@@ -6,42 +6,42 @@ import { useState, useEffect } from 'react';
  * @returns boolean indicating if the media query matches
  */
 export function useMediaQuery(query: string): boolean {
-  // Initialize with the current match state
-  const [matches, setMatches] = useState<boolean>(() => {
-    // Check if window is defined (for SSR compatibility)
-    if (typeof window !== 'undefined') {
-      return window.matchMedia(query).matches;
-    }
-    return false;
-  });
+    // Initialize with the current match state
+    const [matches, setMatches] = useState<boolean>(() => {
+        // Check if window is defined (for SSR compatibility)
+        if (typeof window !== 'undefined') {
+            return window.matchMedia(query).matches;
+        }
+        return false;
+    });
 
-  useEffect(() => {
-    // Return early if window is not defined (SSR)
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
+    useEffect(() => {
+        // Return early if window is not defined (SSR)
+        if (typeof window === 'undefined') {
+            return undefined;
+        }
 
-    // Create a media query list
-    const mediaQueryList = window.matchMedia(query);
+        // Create a media query list
+        const mediaQueryList = window.matchMedia(query);
 
-    // Update the state initially
-    setMatches(mediaQueryList.matches);
+        // Update the state initially
+        setMatches(mediaQueryList.matches);
 
-    // Define a callback function to handle changes
-    const handleChange = (event: MediaQueryListEvent): void => {
-      setMatches(event.matches);
-    };
+        // Define a callback function to handle changes
+        const handleChange = (event: MediaQueryListEvent): void => {
+            setMatches(event.matches);
+        };
 
-    // Modern browsers
-    mediaQueryList.addEventListener('change', handleChange);
+        // Modern browsers
+        mediaQueryList.addEventListener('change', handleChange);
 
-    // Cleanup function to remove the listener
-    return () => {
-      mediaQueryList.removeEventListener('change', handleChange);
-    };
-  }, [query]); // Re-run effect if the query changes
+        // Cleanup function to remove the listener
+        return () => {
+            mediaQueryList.removeEventListener('change', handleChange);
+        };
+    }, [query]); // Re-run effect if the query changes
 
-  return matches;
+    return matches;
 }
 
 /**
@@ -50,7 +50,7 @@ export function useMediaQuery(query: string): boolean {
  * @returns boolean indicating if the current viewport is mobile-sized
  */
 export function useMobile(breakpoint: number = 768): boolean {
-  return useMediaQuery(`(max-width: ${breakpoint}px)`);
+    return useMediaQuery(`(max-width: ${breakpoint}px)`);
 }
 
 /**
@@ -59,10 +59,13 @@ export function useMobile(breakpoint: number = 768): boolean {
  * @param maxBreakpoint - Maximum breakpoint in pixels (default: 1024)
  * @returns boolean indicating if the current viewport is tablet-sized
  */
-export function useTablet(minBreakpoint: number = 768, maxBreakpoint: number = 1024): boolean {
-  return useMediaQuery(
-    `(min-width: ${minBreakpoint}px) and (max-width: ${maxBreakpoint}px)`
-  );
+export function useTablet(
+    minBreakpoint: number = 768,
+    maxBreakpoint: number = 1024,
+): boolean {
+    return useMediaQuery(
+        `(min-width: ${minBreakpoint}px) and (max-width: ${maxBreakpoint}px)`,
+    );
 }
 
 /**
@@ -71,7 +74,7 @@ export function useTablet(minBreakpoint: number = 768, maxBreakpoint: number = 1
  * @returns boolean indicating if the current viewport is desktop-sized
  */
 export function useDesktop(breakpoint: number = 1024): boolean {
-  return useMediaQuery(`(min-width: ${breakpoint}px)`);
+    return useMediaQuery(`(min-width: ${breakpoint}px)`);
 }
 
 /**
@@ -79,7 +82,7 @@ export function useDesktop(breakpoint: number = 1024): boolean {
  * @returns boolean indicating if the user prefers dark mode
  */
 export function useDarkMode(): boolean {
-  return useMediaQuery('(prefers-color-scheme: dark)');
+    return useMediaQuery('(prefers-color-scheme: dark)');
 }
 
 /**
@@ -87,7 +90,7 @@ export function useDarkMode(): boolean {
  * @returns boolean indicating if the user prefers reduced motion
  */
 export function useReducedMotion(): boolean {
-  return useMediaQuery('(prefers-reduced-motion: reduce)');
+    return useMediaQuery('(prefers-reduced-motion: reduce)');
 }
 
 export default useMediaQuery;

@@ -81,7 +81,6 @@ export default function WithdrawModal({
 
     return (
         <div className={styles.container}>
-   
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {vault.name}

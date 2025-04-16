@@ -8,7 +8,6 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 16px;
-
 }
 .scaleOrdersContent {
     width: 100%;
@@ -17,7 +16,6 @@
     flex-direction: column;
     gap: 16px;
 }
-
 
 .totalOrdersSection {
     width: calc(100% - 8px);
