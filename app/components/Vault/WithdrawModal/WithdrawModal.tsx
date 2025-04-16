@@ -81,11 +81,7 @@ export default function WithdrawModal({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Withdraw</h3>
-                <MdClose onClick={onClose} />
-            </header>
+   
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {vault.name}

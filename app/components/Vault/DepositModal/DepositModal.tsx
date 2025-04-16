@@ -92,11 +92,11 @@ export default function DepositModal({
 
     return (
         <div className={styles.container}>
-            <header>
+            {/* <header>
                 <span />
                 <h3>Deposit</h3>
                 <MdClose onClick={onClose} />
-            </header>
+            </header> */}
             <div className={styles.textContent}>
                 <h4>
                     Deposit {unitValue} to {vault.name}
