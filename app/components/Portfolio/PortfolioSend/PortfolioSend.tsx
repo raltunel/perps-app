@@ -4,7 +4,6 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import styles from './PortfolioSend.module.css';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
-import { LuChevronDown } from 'react-icons/lu';
 import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
@@ -27,23 +26,20 @@ interface PortfolioSendProps {
 
 function PortfolioSend({
     availableAmount,
-    tokenType = 'USDe',
     networkFee = '$0.001',
     onSend,
     onClose,
     isProcessing = false,
-    portfolio
+    portfolio,
 }: PortfolioSendProps) {
     const [amount, setAmount] = useState<string>('');
     const [address, setAddress] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken, setSelectedToken] = useState<Token>(
-            AVAILABLE_TOKENS.find(
-                (token) => token.symbol === (portfolio.unit || 'USDe'),
-            ) || AVAILABLE_TOKENS[0],
-        );
-
-    
+        AVAILABLE_TOKENS.find(
+            (token) => token.symbol === (portfolio.unit || 'USDe'),
+        ) || AVAILABLE_TOKENS[0],
+    );
 
     const isValidNumberInput = useCallback((value: string) => {
         return value === '' || /^\d*\.?\d*$/.test(value);
@@ -201,7 +197,7 @@ function PortfolioSend({
                     <LuChevronDown size={22} />
                 </div>
             </div> */}
-                <TokenDropdown
+            <TokenDropdown
                 selectedToken={selectedToken.symbol}
                 onTokenSelect={handleTokenSelect}
                 disabled={isProcessing}
