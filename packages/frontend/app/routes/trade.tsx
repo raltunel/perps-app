@@ -19,6 +19,8 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
+import { Info } from '@perps-app/sdk';
+
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
@@ -38,6 +40,11 @@ export default function Trade() {
         isWsEnabled,
         setIsWsEnabled,
     } = useDebugStore();
+
+    useEffect(() => {
+        const info = new Info({ environment: 'mock' });
+        console.log({ wsManager: info.wsManager });
+    }, []);
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
