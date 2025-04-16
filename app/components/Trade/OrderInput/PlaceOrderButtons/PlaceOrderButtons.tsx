@@ -108,7 +108,6 @@ export default function PlaceOrderButtons(props: propsIF) {
                 <button
                     style={{ backgroundColor: getBsColor().sell }}
                     onClick={() => openModalWithContent('confirm_sell')}
-                    
                 >
                     Sell / Short
                 </button>
