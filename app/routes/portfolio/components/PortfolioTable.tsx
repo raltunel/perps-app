@@ -88,16 +88,16 @@ export default function PortfolioTable(props: propsIF) {
                     <div className={styles.tableBody}>
                         {accounts.map((acct) => (
                             <div className={styles.rowContainer}>
-                                <div className={styles.cell}>
-                                    {acct.name}
-                                </div>
+                                <div className={styles.cell}>{acct.name}</div>
                                 <div className={styles.cell}>
                                     {acct.address}
                                 </div>
-                                <div className={styles.cell}>
-                                    {acct.equity}
-                                </div>
-                                <div onClick={() => console.log('user clicked trade')}>
+                                <div className={styles.cell}>{acct.equity}</div>
+                                <div
+                                    onClick={() =>
+                                        console.log('user clicked trade')
+                                    }
+                                >
                                     Trade
                                 </div>
                             </div>
@@ -106,7 +106,10 @@ export default function PortfolioTable(props: propsIF) {
                         {accounts.length === 0 && (
                             <div
                                 className={styles.container}
-                                style={{ justifyContent: 'center', padding: '2rem 0' }}
+                                style={{
+                                    justifyContent: 'center',
+                                    padding: '2rem 0',
+                                }}
                             >
                                 No data to display
                             </div>

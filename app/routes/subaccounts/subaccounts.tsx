@@ -45,7 +45,7 @@ const accounts: allAccountsIF = {
             equity: '$0.00',
         },
     ],
-}
+};
 
 export default function subaccounts() {
     return (
@@ -57,10 +57,7 @@ export default function subaccounts() {
                 title='Master Account'
                 accounts={[accounts.master]}
             />
-            <PortfolioTable
-                title='Sub-Accounts'
-                accounts={accounts.sub}
-            />
+            <PortfolioTable title='Sub-Accounts' accounts={accounts.sub} />
         </>
     );
 }
