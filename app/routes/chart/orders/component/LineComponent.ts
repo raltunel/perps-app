@@ -6,8 +6,11 @@ import {
     addCustomOrderLine,
     createAnchoredMainText,
     createQuantityAnchoredText,
+    formatLineLabel,
     getAnchoredQuantityTextLocation,
     priceToPixel,
+    quantityTextFormatWithComma,
+    type LineLabel,
 } from '../customOrderLineUtils';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -15,9 +18,10 @@ import { useDebugStore } from '~/stores/DebugStore';
 export type LineData = {
     xLoc: number;
     yPrice: number;
-    text: string;
-    quantityText?: string;
+    textValue: LineLabel;
+    quantityTextValue?: number;
     color: string;
+    type: 'PNL' | 'LIMIT' | 'TP_SL' | 'LIQ';
 };
 
 interface LineProps {
@@ -115,20 +119,20 @@ const LineComponent = ({ lines }: LineProps) => {
                     chart,
                     line.xLoc,
                     line.yPrice,
-                    line.text,
+                    line.textValue,
                     line.color,
                 );
-                const quantityTextId = line.quantityText
+                const quantityTextId = line.quantityTextValue
                     ? await createQuantityAnchoredText(
                           chart,
                           getAnchoredQuantityTextLocation(
                               chart,
                               line.xLoc,
-                              line.text,
+                              line.textValue,
                           ),
 
                           line.yPrice,
-                          line.quantityText,
+                          quantityTextFormatWithComma(line.quantityTextValue),
                       )
                     : undefined;
 
@@ -167,9 +171,13 @@ const LineComponent = ({ lines }: LineProps) => {
                         .getShapeById(textId);
 
                     if (activeLabel) {
+                        const activeLabelText = formatLineLabel(
+                            lineData.textValue,
+                        );
                         activeLabel.setProperties({
-                            text: lineData.text,
-                            wordWrapWidth: lineData.text.length > 13 ? 100 : 70,
+                            text: activeLabelText,
+                            wordWrapWidth:
+                                activeLabelText.length > 13 ? 100 : 70,
                         });
 
                         activeLabel.setAnchoredPosition({
@@ -178,23 +186,26 @@ const LineComponent = ({ lines }: LineProps) => {
                         });
                     }
 
-                    if (quantityTextId && lineData.quantityText) {
+                    if (quantityTextId && lineData.quantityTextValue) {
                         const activeQuantityLabel = chart
                             .activeChart()
                             .getShapeById(quantityTextId);
                         if (activeQuantityLabel) {
+                            const quantityText = quantityTextFormatWithComma(
+                                lineData.quantityTextValue,
+                            );
                             activeQuantityLabel.setAnchoredPosition({
                                 x: getAnchoredQuantityTextLocation(
                                     chart,
                                     lineData.xLoc,
-                                    lineData.text,
+                                    lineData.textValue,
                                 ),
                                 y: pricePerPixel,
                             });
                             activeQuantityLabel.setProperties({
-                                text: lineData.quantityText,
+                                text: quantityText,
                                 wordWrapWidth:
-                                    lineData.quantityText.length > 8 ? 70 : 60,
+                                    quantityText.length > 8 ? 70 : 60,
                             });
                         }
                     }

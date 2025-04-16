@@ -3,6 +3,13 @@ import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 export const buyColor = '#26A69A';
 export const sellColor = '#E57373';
 
+export type LineLabelType = 'PNL' | 'LIMIT' | 'TP_SL' | 'LIQ';
+export type LineLabel =
+    | { type: 'PNL'; pnl: number }
+    | { type: 'LIMIT'; price: number; triggerCondition: string }
+    | { type: 'TP_SL'; triggerCondition: string; orderType: string }
+    | { type: 'Liq'; text: ' Liq. Price' };
+
 export const addCustomOrderLine = async (
     chart: IChartingLibraryWidget,
     orderPrice: number,
@@ -73,11 +80,12 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
 export const getAnchoredQuantityTextLocation = (
     chart: IChartingLibraryWidget,
     bufferX: number,
-    orderText: string,
+    orderTextValue: LineLabel,
 ) => {
     const timeScale = chart.activeChart().getTimeScale();
     const chartWidth = Math.floor(timeScale.width());
 
+    const orderText = formatLineLabel(orderTextValue);
     const wrapWidthPx = orderText.length > 13 ? 100 : 70;
 
     const offsetX = Number(wrapWidthPx / chartWidth);
@@ -89,9 +97,10 @@ export const createAnchoredMainText = async (
     chart: IChartingLibraryWidget,
     xLoc: number,
     yPrice: number,
-    text: string,
+    textValue: LineLabel,
     borderColor: string,
 ) => {
+    const text = formatLineLabel(textValue);
     return createAnchoredText(
         chart,
         xLoc,
@@ -177,3 +186,35 @@ export const quantityTextFormatWithComma = (value: number): string => {
 
     return isNegative ? `-${result}` : result;
 };
+
+function formatTPorSLLabel(rawText: string, orderType: string): string {
+    const match = rawText.match(/Price (above|below) (\d+)/);
+
+    if (!match) return rawText;
+
+    const direction = match[1];
+    const price = match[2];
+    const operator = direction === 'above' ? '>' : '<';
+
+    const labelPrefix = orderType === ' Take Profit Market' ? 'TP ' : 'SL ';
+
+    return ` ${labelPrefix} Price ${operator} ${price}`;
+}
+
+export function formatLineLabel(label: LineLabel): string {
+    switch (label.type) {
+        case 'PNL': {
+            const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
+            return ' PNL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl}  `);
+        }
+        case 'LIMIT':
+            return ` Limit ${label.price}  ${label.triggerCondition}  `;
+        case 'TP_SL':
+            return formatTPorSLLabel(label.triggerCondition, label.orderType);
+
+        case 'Liq':
+            return label.text;
+        default:
+            return '';
+    }
+}

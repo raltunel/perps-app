@@ -4,8 +4,8 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { LineData } from './component/LineComponent';
 import {
     buyColor,
-    quantityTextFormatWithComma,
     sellColor,
+    type LineLabel,
 } from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
@@ -21,8 +21,8 @@ const PositionOrderLine = () => {
             .map((i) => {
                 return {
                     price: i.entryPx,
-                    pnl: Number(i.unrealizedPnl.toFixed(2)),
-                    szi: quantityTextFormatWithComma(i.szi),
+                    pnl: i.unrealizedPnl,
+                    szi: i.szi,
                     liqPrice: i.liquidationPx,
                 };
             });
@@ -38,23 +38,25 @@ const PositionOrderLine = () => {
 
         const newLines: LineData[] = filteredPositions.flatMap((order) => {
             const pnl = Number(order.pnl.toFixed(2));
-            const orderText: string =
-                '  PNL ' + (pnl > 0 ? '$' + pnl : '-$' + Math.abs(pnl));
-
+            const orderTextValuePNL = {type:'PNL',pnl:pnl} as LineLabel; 
+            const orderTextValueLiq = {type:'Liq',text:' Liq. Price'} as LineLabel; 
+            
             const pnlLine: LineData = {
                 xLoc: 0.1,
                 yPrice: order.price,
-                text: orderText,
-                quantityText: order.szi,
+                textValue: orderTextValuePNL ,
+                quantityTextValue: order.szi,
                 color: pnl > 0 ? buyColor : sellColor,
+                type: 'PNL',
             };
 
             const liqLine: LineData = {
                 xLoc: 0.2,
                 yPrice: order.liqPrice,
-                text: '  Liq. Price',
-                quantityText: undefined,
+                textValue:orderTextValueLiq,
+                quantityTextValue: undefined,
                 color: sellColor,
+                type:'LIQ'
             };
 
             return [pnlLine, liqLine];
