@@ -1,3 +1,158 @@
 .container {
-    padding: 0 2rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+    max-width: 1280px;
+    margin: 0 auto;
+
+    padding-bottom: 1rem;
+    overflow-y: hidden;
+}
+.container header {
+    color: var(--text1, #f0f0f8);
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-size: var(--font-size-xl, 36px);
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+}
+.column {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 141px 1fr;
+    gap: 48px;
+}
+.detailsContainer {
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    gap: 4px;
+}
+.detailsContent {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.detailsContent h6 {
+    color: var(--base-text1, #f0f0f8);
+
+    font-size: var(--font-size-m, 18px);
+}
+.detailsContent h3 {
+    color: var(--base-text1, #f0f0f8);
+
+    font-size: var(--font-size-xl, 36px);
+}
+.detailsContent a {
+    font-size: var(--font-size-m, 18px);
+    color: var(--accent1, #7371fc);
+}
+
+.totalNetDisplay {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: var(--font-size-m, 18px);
+    text-align: center;
+}
+.totalNetDisplay h6 {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.totalNetDisplay h6 span {
+    color: var(--text2);
+}
+.rowButton {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+.totalNetDisplay button {
+    outline: none;
+    border: none;
+    display: flex;
+    padding: 12px 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    border-radius: var(--Corner-Radius-Button, 8px);
+    background: var(--dark3, #1c1c22);
+    color: var(--text1, #f0f0f8);
+
+    font-size: var(--font-size-m, 18px);
+    max-height: 47px;
+}
+
+.table {
+    height: 155;
+    overflow-y: hidden;
+}
+
+.table > div {
+    height: 155px;
+}
+.mainContent {
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: auto 155px;
+    gap: 8px;
+}
+.sendMobile,
+.netValueMobile {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .container {
+        overflow-y: auto;
+        gap: 8px;
+    }
+    .detailsContainer {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .detailsContent {
+        padding: 8px 0;
+    }
+
+    .column {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .sendDesktop,
+    .totalNetDisplay h6 {
+        display: none !important;
+        height: 0px !important;
+    }
+    .sendMobile,
+    .netValueMobile {
+        display: flex !important;
+    }
+    .detailsContent h6 {
+        font-size: var(--font-size-s);
+    }
+    .detailsContent h3 {
+        font-size: var(--font-size-l);
+    }
+    .detailsContent a {
+        font-size: var(--font-size-s);
+    }
 }

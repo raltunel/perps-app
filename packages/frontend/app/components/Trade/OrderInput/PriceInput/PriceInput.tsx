@@ -29,7 +29,6 @@ export default function PriceInput(props: PropsIF) {
         getPrecisionFromNumber,
     } = useNumFormatter();
 
-    
     const valueNum = useRef<number>(0);
     const valueRef = useRef<string>(value);
     valueRef.current = value;
@@ -42,7 +41,6 @@ export default function PriceInput(props: PropsIF) {
         }
     };
 
-    
     useEffect(() => {
         valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
     }, [valueRef.current]);
@@ -51,7 +49,7 @@ export default function PriceInput(props: PropsIF) {
         const precision = getPrecisionFromNumber(valueNum.current);
         onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
     }, [formatNumWithOnlyDecimals]);
-    
+
     return (
         <div
             className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}
