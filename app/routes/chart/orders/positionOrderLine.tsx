@@ -2,11 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { LineData } from './component/LineComponent';
-import {
-    buyColor,
-    sellColor,
-    type LineLabel,
-} from './customOrderLineUtils';
+import { buyColor, sellColor, type LineLabel } from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const PositionOrderLine = () => {
@@ -38,13 +34,16 @@ const PositionOrderLine = () => {
 
         const newLines: LineData[] = filteredPositions.flatMap((order) => {
             const pnl = Number(order.pnl.toFixed(2));
-            const orderTextValuePNL = {type:'PNL',pnl:pnl} as LineLabel; 
-            const orderTextValueLiq = {type:'Liq',text:' Liq. Price'} as LineLabel; 
-            
+            const orderTextValuePNL = { type: 'PNL', pnl: pnl } as LineLabel;
+            const orderTextValueLiq = {
+                type: 'Liq',
+                text: ' Liq. Price',
+            } as LineLabel;
+
             const pnlLine: LineData = {
                 xLoc: 0.1,
                 yPrice: order.price,
-                textValue: orderTextValuePNL ,
+                textValue: orderTextValuePNL,
                 quantityTextValue: order.szi,
                 color: pnl > 0 ? buyColor : sellColor,
                 type: 'PNL',
@@ -53,10 +52,10 @@ const PositionOrderLine = () => {
             const liqLine: LineData = {
                 xLoc: 0.2,
                 yPrice: order.liqPrice,
-                textValue:orderTextValueLiq,
+                textValue: orderTextValueLiq,
                 quantityTextValue: undefined,
                 color: sellColor,
-                type:'LIQ'
+                type: 'LIQ',
             };
 
             return [pnlLine, liqLine];
