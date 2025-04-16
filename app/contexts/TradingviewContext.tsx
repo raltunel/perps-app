@@ -1,6 +1,5 @@
 import {
     widget,
-    type CandleStylePreferences,
     type IChartingLibraryWidget,
     type ResolutionString,
     type TradingTerminalFeatureset,
@@ -14,6 +13,9 @@ import {
     saveChartLayout,
 } from '~/routes/chart/data/utils/chartStorage';
 import {
+    checkDefaultColors,
+    getChartDefaultColors,
+    getChartThemeColors,
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
@@ -85,41 +87,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     function changeColors(c: colorSetIF): void {
         // make sure the chart exists
         if (chart) {
-            // object literal with all user-created candle customizations
-            const mainSeriesProperties = JSON.parse(
-                localStorage.getItem(
-                    'tradingview.chartproperties.mainSeriesProperties',
-                ) || '{}',
-            );
-            const candleStyle = mainSeriesProperties?.candleStyle || {};
-            // array of color codes from candle properties we care about
-            const activeColors: string[] | undefined = candleStyle
-                ? [
-                      candleStyle.upColor,
-                      candleStyle.downColor,
-                      candleStyle.borderUpColor,
-                      candleStyle.borderDownColor,
-                      candleStyle.wickUpColor,
-                      candleStyle.wickDownColor,
-                  ]
-                : undefined;
-            // determine if any of the candles have a color chosen through
-            // ... the trading view color customization workflow (custom
-            // ...  colors are always formatted as `rgba`)
-            const isCustomized: boolean = activeColors
-                ? activeColors.some((c: string) => c?.startsWith('rgba'))
-                : false;
-            // apply color scheme to chart ONLY if no custom colors are
-            // ... found in the active colors array
-            isCustomized ||
-                chart.applyOverrides({
-                    'mainSeriesProperties.candleStyle.upColor': c.buy,
-                    'mainSeriesProperties.candleStyle.downColor': c.sell,
-                    'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
-                    'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
-                    'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
-                    'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
-                });
+            chart.applyOverrides({
+                'mainSeriesProperties.candleStyle.upColor': c.buy,
+                'mainSeriesProperties.candleStyle.downColor': c.sell,
+                'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
+            });
 
             if (chart) {
                 const volumeStudyId = chart
@@ -131,28 +106,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     const volume = chart
                         .activeChart()
                         .getStudyById(volumeStudyId.id);
-                    isCustomized ||
-                        volume.applyOverrides({
-                            'volume.color.0': c.buy,
-                            'volume.color.1': c.sell,
-                        });
+                    volume.applyOverrides({
+                        'volume.color.0': c.buy,
+                        'volume.color.1': c.sell,
+                    });
                 }
             }
         }
     }
-
-    // trigger order history marks to fill with candle colors
-    useEffect(() => {
-        const timer = setInterval(() => {
-            if (chart) {
-                chart.chart().refreshMarks();
-            }
-        }, 1000);
-
-        return () => {
-            clearInterval(timer);
-        };
-    }, [chart]);
 
     useEffect(() => {
         if (chart) {
@@ -160,10 +121,36 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
     }, [bsColor, chart]);
 
+    useEffect(() => {
+        if (chart) {
+            chart.subscribe('series_properties_changed', () => {
+                const activeColors = getChartDefaultColors();
+                const chartThemeColors = getChartThemeColors();
+
+                const isInitial =
+                    chartThemeColors &&
+                    activeColors &&
+                    activeColors[0] === chartThemeColors.buy &&
+                    activeColors[1] === chartThemeColors.sell;
+
+                const isCustomized = checkDefaultColors();
+
+                if (!isInitial && !isCustomized) {
+                    changeColors(getBsColor());
+                }
+
+                chart.chart().refreshMarks();
+            });
+        }
+    }, [chart]);
+
     // side effect to load a custom color set into the table, runs when
     // ... the user changes the app's color theme and when the chart
     // ... finishes initialization
-    useEffect(() => changeColors(getBsColor()), [bsColor, chart]);
+    useEffect(() => {
+        const isCustomized = checkDefaultColors();
+        isCustomized || changeColors(getBsColor());
+    }, [bsColor, chart]);
 
     useEffect(() => {
         const tvWidget = new widget({

@@ -1,4 +1,8 @@
-import { mapResolutionToInterval, resolutionToSeconds } from './utils/utils';
+import {
+    getChartThemeColors,
+    mapResolutionToInterval,
+    resolutionToSeconds,
+} from './utils/utils';
 import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 import { bsColorSets } from '~/stores/AppSettingsStore';
 
@@ -89,7 +93,6 @@ export async function getMarkFillData(coin: string, user?: string) {
 }
 
 export function getMarkColorData() {
-    const visualSettings = localStorage.getItem('VISUAL_SETTINGS');
     const candleSettings = localStorage.getItem(
         'tradingview.chartproperties.mainSeriesProperties',
     );
@@ -97,9 +100,8 @@ export function getMarkColorData() {
     const parsedCandleSettings = candleSettings
         ? JSON.parse(candleSettings)
         : null;
-    const parsedVisualSettings = visualSettings
-        ? JSON.parse(visualSettings)
-        : null;
+
+    const chartThemeColors = getChartThemeColors();
 
     if (parsedCandleSettings?.candleStyle) {
         const {
@@ -123,15 +125,15 @@ export function getMarkColorData() {
             color?.startsWith('rgba'),
         );
 
-        if (!isCustomized && parsedVisualSettings?.state?.bsColor) {
-            return bsColorSets[parsedVisualSettings.state.bsColor];
+        if (!isCustomized && chartThemeColors) {
+            return chartThemeColors;
         }
 
         return { buy: upColor, sell: downColor };
     }
 
-    if (parsedVisualSettings?.state?.bsColor) {
-        return bsColorSets[parsedVisualSettings.state.bsColor];
+    if (chartThemeColors) {
+        return chartThemeColors;
     }
 
     return bsColorSets['default'];
