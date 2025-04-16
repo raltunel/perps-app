@@ -1,98 +1,118 @@
-import { useState } from 'react';
 import styles from './PortfolioTable.module.css';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
-import FilterDropdown from '~/components/Trade/FilterDropdown/FilterDropdown';
-import ToggleSwitch from '~/components/Trade/ToggleSwitch/ToggleSwitch';
-import MasterAccount from './MasterAccount';
+import SortIcon from '~/components/Vault/SortIcon';
+import type { accountIF } from '~/routes/subaccounts/subaccounts';
 
 export interface FilterOption {
     id: string;
     label: string;
 }
-interface propsIF {
-    initialTab?: string;
+
+export interface headerItemIF {
+    name: string;
+    key: string;
+    sortable: boolean;
+    onClick: (() => void) | undefined;
+    className: string;
 }
 
-const availableTabs = ['Master Account'];
-
-type availableTabsT = (typeof availableTabs)[number];
-
-const filterOptions: FilterOption[] = [
-    { id: 'all', label: 'All' },
-    { id: 'active', label: 'Active' },
-    { id: 'long', label: 'Long' },
-    { id: 'short', label: 'Short' },
+const tableHeaders: headerItemIF[] = [
+    {
+        name: 'Name',
+        key: 'name',
+        sortable: true,
+        onClick: () => null,
+        className: '',
+    },
+    {
+        name: 'Address',
+        key: 'address',
+        sortable: false,
+        onClick: () => null,
+        className: '',
+    },
+    {
+        name: 'Account Equity',
+        key: 'accountEquity',
+        sortable: true,
+        onClick: () => null,
+        className: '',
+    },
+    {
+        name: '',
+        key: 'tradeLink',
+        sortable: false,
+        onClick: () => null,
+        className: '',
+    },
 ];
 
+interface propsIF {
+    title: string;
+    accounts: accountIF[];
+}
+
 export default function PortfolioTable(props: propsIF) {
-    const { initialTab = availableTabs[0] } = props;
-
-    // this controls which tab is active in the DOM
-    const [activeTab, setActiveTab] = useState<availableTabsT>(initialTab);
-
-    const [selectedFilter, setSelectedFilter] = useState<string>('all');
-    const [hideSmallBalances, setHideSmallBalances] = useState(false);
-
-    const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
-    };
-
-    const handleFilterChange = (selectedId: string) => {
-        setSelectedFilter(selectedId);
-    };
-
-    const handleToggleSmallBalances = (newState?: boolean) => {
-        const newValue = newState !== undefined ? newState : !hideSmallBalances;
-        setHideSmallBalances(newValue);
-    };
-
-    const rightAlignedContent = (
-        <div className={styles.table_controls}>
-            <FilterDropdown
-                options={filterOptions}
-                selectedOption={selectedFilter}
-                onChange={handleFilterChange}
-            />
-            {activeTab === 'Balances' && (
-                <ToggleSwitch
-                    isOn={hideSmallBalances}
-                    onToggle={handleToggleSmallBalances}
-                />
-            )}
-        </div>
-    );
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'Master Account':
-                return <MasterAccount />;
-            default:
-                return (
-                    <div className={styles.emptyState}>
-                        Select a tab to view data
-                    </div>
-                );
-        }
-    };
+    const { title, accounts } = props;
 
     return (
         <div className={styles.table_wrapper}>
             <Tabs
-                tabs={availableTabs}
-                defaultTab={activeTab}
-                onTabChange={handleTabChange}
-                rightContent={rightAlignedContent}
+                tabs={[title]}
+                defaultTab={title}
+                onTabChange={() => null}
+                rightContent={<></>}
             />
             <motion.div
                 className={styles.table_content}
-                key={activeTab}
+                key={title}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
             >
-                {renderTabContent()}
+                <div className={styles.tableWrapper}>
+                    <div className={styles.headerContainer}>
+                        {tableHeaders.map((header: headerItemIF) => (
+                            <div
+                                key={header.key}
+                                className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
+                                onClick={header.onClick}
+                            >
+                                {header.name}
+                                {header.sortable && <SortIcon />}
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.tableBody}>
+                        {accounts.map((acct) => (
+                            <div className={styles.rowContainer}>
+                                <div className={styles.cell}>
+                                    {acct.name}
+                                </div>
+                                <div className={styles.cell}>
+                                    {acct.address}
+                                </div>
+                                <div className={styles.cell}>
+                                    {acct.equity}
+                                </div>
+                                <div onClick={() => console.log('user clicked trade')}>
+                                    Trade
+                                </div>
+                            </div>
+                        ))}
+
+                        {accounts.length === 0 && (
+                            <div
+                                className={styles.container}
+                                style={{ justifyContent: 'center', padding: '2rem 0' }}
+                            >
+                                No data to display
+                            </div>
+                        )}
+                    </div>
+                </div>
             </motion.div>
         </div>
     );
