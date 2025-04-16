@@ -62,7 +62,7 @@ export const portfolioData: PortfolioData = {
             amount: 12.5,
             valueUSD: 752345.67,
             change24h: 2.35,
-            icon: 'btc-icon'
+            icon: 'btc-icon',
         },
         {
             id: 'eth',
@@ -71,7 +71,7 @@ export const portfolioData: PortfolioData = {
             amount: 150.25,
             valueUSD: 421987.45,
             change24h: -1.2,
-            icon: 'eth-icon'
+            icon: 'eth-icon',
         },
         {
             id: 'sol',
@@ -80,7 +80,7 @@ export const portfolioData: PortfolioData = {
             amount: 3500,
             valueUSD: 389456.78,
             change24h: 5.67,
-            icon: 'sol-icon'
+            icon: 'sol-icon',
         },
         {
             id: 'usdc',
@@ -89,7 +89,7 @@ export const portfolioData: PortfolioData = {
             amount: 250000,
             valueUSD: 250000,
             change24h: 0.01,
-            icon: 'usdc-icon'
+            icon: 'usdc-icon',
         },
         {
             id: 'usdt',
@@ -98,8 +98,8 @@ export const portfolioData: PortfolioData = {
             amount: 173864.42,
             valueUSD: 173864.42,
             change24h: 0.05,
-            icon: 'usdt-icon'
-        }
+            icon: 'usdt-icon',
+        },
     ],
     transactions: [
         {
@@ -110,7 +110,7 @@ export const portfolioData: PortfolioData = {
             valueUSD: 50000,
             timestamp: Date.now() - 86400000 * 2, // 2 days ago
             status: 'completed',
-            txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+            txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
         },
         {
             id: 'tx2',
@@ -120,18 +120,18 @@ export const portfolioData: PortfolioData = {
             valueUSD: 90281.45,
             timestamp: Date.now() - 86400000 * 5, // 5 days ago
             status: 'completed',
-            txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+            txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
         },
         {
             id: 'tx3',
             type: 'withdraw',
             asset: 'ETH',
             amount: 10,
-            valueUSD: 28132.50,
+            valueUSD: 28132.5,
             timestamp: Date.now() - 86400000 * 7, // 7 days ago
             status: 'completed',
             address: '0x9876543210fedcba9876543210fedcba9876543210',
-            txHash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456'
+            txHash: '0x7890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123456',
         },
         {
             id: 'tx4',
@@ -142,7 +142,7 @@ export const portfolioData: PortfolioData = {
             timestamp: Date.now() - 86400000 * 10, // 10 days ago
             status: 'completed',
             address: 'Hj98765432109876543210987654321098765432109876543210',
-            txHash: '0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123'
+            txHash: '0x4567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef123',
         },
         {
             id: 'tx5',
@@ -153,68 +153,71 @@ export const portfolioData: PortfolioData = {
             timestamp: Date.now() - 86400000 * 14, // 14 days ago
             status: 'completed',
             address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
-            txHash: '0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc'
-        }
+            txHash: '0xdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc',
+        },
     ],
     performance: {
         daily: 1.45,
         weekly: 5.67,
         monthly: 12.32,
-        yearly: 34.56
+        yearly: 34.56,
     },
     tradingVolume: {
-        daily: 215678.90,
+        daily: 215678.9,
         weekly: 1345678.23,
         biWeekly: 2456789.01,
-        monthly: 5678901.23
+        monthly: 5678901.23,
     },
     fees: {
-        taker: 0.0350,
-        maker: 0.0100
-    }
+        taker: 0.035,
+        maker: 0.01,
+    },
 };
 
 // Function to get portfolio data (simulates API call)
 export async function fetchPortfolioData(): Promise<PortfolioData> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return portfolioData;
 }
 
 // Function to update portfolio balance (simulates API call)
 export async function updatePortfolioBalance(
-    portfolioId: string, 
-    action: 'deposit' | 'withdraw' | 'send', 
-    amount: number, 
-    address?: string
-): Promise<{success: boolean, message?: string}> {
+    portfolioId: string,
+    action: 'deposit' | 'withdraw' | 'send',
+    amount: number,
+    address?: string,
+): Promise<{ success: boolean; message?: string }> {
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
     // Validate amount
     if (amount <= 0) {
         return {
             success: false,
-            message: 'Amount must be greater than 0'
+            message: 'Amount must be greater than 0',
         };
     }
-    
+
     // For withdraw and send, check if enough balance
-    if ((action === 'withdraw' || action === 'send') && amount > portfolioData.availableBalance) {
+    if (
+        (action === 'withdraw' || action === 'send') &&
+        amount > portfolioData.availableBalance
+    ) {
         return {
             success: false,
-            message: 'Insufficient balance'
+            message: 'Insufficient balance',
         };
     }
-    
+
     // For send, check if address is provided
     if (action === 'send' && !address) {
         return {
             success: false,
-            message: 'Address is required for send operation'
+            message: 'Address is required for send operation',
         };
     }
-    
+
     // Update balance
     if (action === 'deposit') {
         portfolioData.availableBalance += amount;
@@ -223,7 +226,7 @@ export async function updatePortfolioBalance(
         portfolioData.availableBalance -= amount;
         portfolioData.totalValueUSD -= amount;
     }
-    
+
     // Create transaction record
     const newTransaction: Transaction = {
         id: `tx${Date.now()}`,
@@ -233,13 +236,13 @@ export async function updatePortfolioBalance(
         valueUSD: amount,
         timestamp: Date.now(),
         status: 'completed',
-        address: address
+        address: address,
     };
-    
+
     // Add transaction to history
     portfolioData.transactions.unshift(newTransaction);
-    
+
     return {
-        success: true
+        success: true,
     };
 }

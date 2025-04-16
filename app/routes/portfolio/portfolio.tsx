@@ -8,10 +8,15 @@ import Modal from '~/components/Modal/Modal';
 import { lazy, Suspense } from 'react';
 import { usePortfolioManager } from './usePortfolioManager';
 
-const PortfolioDeposit = lazy(() => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'));
-const PortfolioWithdraw = lazy(() => import('~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw'));
-const PortfolioSend = lazy(() => import('~/components/Portfolio/PortfolioSend/PortfolioSend'));
-
+const PortfolioDeposit = lazy(
+    () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
+);
+const PortfolioWithdraw = lazy(
+    () => import('~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw'),
+);
+const PortfolioSend = lazy(
+    () => import('~/components/Portfolio/PortfolioSend/PortfolioSend'),
+);
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -38,10 +43,8 @@ function Portfolio() {
         closeModal,
         processDeposit,
         processWithdraw,
-        processSend
+        processSend,
     } = usePortfolioManager();
-
-
 
     return (
         <>
@@ -51,29 +54,52 @@ function Portfolio() {
                     <div className={styles.detailsContainer}>
                         <div className={styles.detailsContent}>
                             <h6>14 Day Volume</h6>
-                            <h3>{formatCurrency(portfolio.tradingVolume.biWeekly)}</h3>
+                            <h3>
+                                {formatCurrency(
+                                    portfolio.tradingVolume.biWeekly,
+                                )}
+                            </h3>
                             <Link to='/'>View volume</Link>
                         </div>
                         <div className={styles.detailsContent}>
                             <h6>Fees (Taker / Maker)</h6>
-                            <h3>{portfolio.fees.taker}% / {portfolio.fees.maker}%</h3>
+                            <h3>
+                                {portfolio.fees.taker}% / {portfolio.fees.maker}
+                                %
+                            </h3>
                             <Link to='/'>View fee schedule</Link>
                         </div>
-                        <div className={`${styles.detailsContent} ${styles.netValueMobile}`}>
+                        <div
+                            className={`${styles.detailsContent} ${styles.netValueMobile}`}
+                        >
                             <h6>Total Net USD Value</h6>
                             <h3>{formatCurrency(portfolio.totalValueUSD)}</h3>
-                           
                         </div>
                         <div className={styles.totalNetDisplay}>
                             <h6>
-                                <span>Total Net USD Value:</span> {formatCurrency(portfolio.totalValueUSD)}
+                                <span>Total Net USD Value:</span>{' '}
+                                {formatCurrency(portfolio.totalValueUSD)}
                             </h6>
                             <div className={styles.rowButton}>
-                                <button onClick={() => openModal('deposit')}>Deposit</button>
-                                <button onClick={() => openModal('withdraw')}>Withdraw</button>
-                                <button onClick={() => openModal('send')} className={styles.sendMobile}>Send</button>
+                                <button onClick={() => openModal('deposit')}>
+                                    Deposit
+                                </button>
+                                <button onClick={() => openModal('withdraw')}>
+                                    Withdraw
+                                </button>
+                                <button
+                                    onClick={() => openModal('send')}
+                                    className={styles.sendMobile}
+                                >
+                                    Send
+                                </button>
                             </div>
-                            <button onClick={() => openModal('send')} className={styles.sendDesktop}>Send</button>
+                            <button
+                                onClick={() => openModal('send')}
+                                className={styles.sendDesktop}
+                            >
+                                Send
+                            </button>
                         </div>
                     </div>
 
@@ -95,8 +121,9 @@ function Portfolio() {
                                 portfolio={{
                                     id: selectedPortfolio.id,
                                     name: selectedPortfolio.name,
-                                    availableBalance: selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit
+                                    availableBalance:
+                                        selectedPortfolio.availableBalance,
+                                    unit: selectedPortfolio.unit,
                                 }}
                                 onDeposit={processDeposit}
                                 onClose={closeModal}
@@ -109,8 +136,9 @@ function Portfolio() {
                                 portfolio={{
                                     id: selectedPortfolio.id,
                                     name: selectedPortfolio.name,
-                                    availableBalance: selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit
+                                    availableBalance:
+                                        selectedPortfolio.availableBalance,
+                                    unit: selectedPortfolio.unit,
                                 }}
                                 onWithdraw={processWithdraw}
                                 onClose={closeModal}
@@ -120,12 +148,25 @@ function Portfolio() {
 
                         {modalState.content === 'send' && (
                             <PortfolioSend
-                                availableAmount={selectedPortfolio.availableBalance}
+                                availableAmount={
+                                    selectedPortfolio.availableBalance
+                                }
                                 tokenType={selectedPortfolio.unit}
-                                networkFee={selectedPortfolio.unit === 'USD' ? '$0.001' : '0.0001 BTC'}
+                                networkFee={
+                                    selectedPortfolio.unit === 'USD'
+                                        ? '$0.001'
+                                        : '0.0001 BTC'
+                                }
                                 onSend={processSend}
                                 onClose={closeModal}
                                 isProcessing={isProcessing}
+                                portfolio={{
+                                    id: selectedPortfolio.id,
+                                    name: selectedPortfolio.name,
+                                    availableBalance:
+                                        selectedPortfolio.availableBalance,
+                                    unit: selectedPortfolio.unit,
+                                }}
                             />
                         )}
                     </Suspense>

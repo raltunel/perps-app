@@ -30,29 +30,40 @@ function PortfolioWithdraw({
 
     const isValidNumberInput = useCallback((value: string) => {
         if (value === '') return true;
-        
+
         const regex = /^(\d+)?(\.\d{0,8})?$/;
         return regex.test(value);
     }, []);
 
-    const USD_FORMATTER = useMemo(() => new Intl.NumberFormat('en-US', { 
-        style: 'currency', 
-        currency: 'USD',
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
-    }), []);
+    const USD_FORMATTER = useMemo(
+        () =>
+            new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }),
+        [],
+    );
 
-    const OTHER_FORMATTER = useMemo(() => new Intl.NumberFormat('en-US', { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 8 
-    }), []);
-    
-    const formatCurrency = useCallback((value: number, unit: string) => {
-        if (unit === 'USD') {
-            return USD_FORMATTER.format(value);
-        }
-        return `${OTHER_FORMATTER.format(value)} ${unit}`;
-    }, [USD_FORMATTER, OTHER_FORMATTER]);
+    const OTHER_FORMATTER = useMemo(
+        () =>
+            new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 8,
+            }),
+        [],
+    );
+
+    const formatCurrency = useCallback(
+        (value: number, unit: string) => {
+            if (unit === 'USD') {
+                return USD_FORMATTER.format(value);
+            }
+            return `${OTHER_FORMATTER.format(value)} ${unit}`;
+        },
+        [USD_FORMATTER, OTHER_FORMATTER],
+    );
 
     const validateAmount = useCallback((amount: number, maxAmount: number) => {
         if (!amount || isNaN(amount)) {
@@ -81,20 +92,20 @@ function PortfolioWithdraw({
             message: null,
         };
     }, []);
-    
+
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
         if (isValidNumberInput(newValue)) {
             setAmount(newValue);
             setError(null);
         }
     }, 150);
-    
+
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
             debouncedHandleChange(newValue);
         },
-        [debouncedHandleChange]
+        [debouncedHandleChange],
     );
 
     const handleMaxClick = useCallback(() => {
@@ -105,7 +116,10 @@ function PortfolioWithdraw({
     const handleWithdraw = useCallback(() => {
         const withdrawAmount = parseFloat(amount);
 
-        const validation = validateAmount(withdrawAmount, portfolio.availableBalance);
+        const validation = validateAmount(
+            withdrawAmount,
+            portfolio.availableBalance,
+        );
 
         if (!validation.isValid) {
             setError(validation.message);
@@ -114,29 +128,35 @@ function PortfolioWithdraw({
 
         onWithdraw(withdrawAmount);
     }, [amount, portfolio.availableBalance, onWithdraw, validateAmount]);
-    
+
     // Memoize info items to prevent recreating on each render
-    const infoItems = useMemo(() => [
-        {
-            label: 'Available to withdraw',
-            value: formatCurrency(portfolio.availableBalance, unitValue),
-            tooltip:
-                'The total amount you have available to withdraw from your portfolio',
-        },
-        {
-            label: 'Network Fee',
-            value: unitValue === 'USD' ? '$0.001' : '0.0001 BTC',
-            tooltip: 'Fee charged for processing the withdrawal transaction',
-        },
-    ], [portfolio.availableBalance, unitValue, formatCurrency]);
+    const infoItems = useMemo(
+        () => [
+            {
+                label: 'Available to withdraw',
+                value: formatCurrency(portfolio.availableBalance, unitValue),
+                tooltip:
+                    'The total amount you have available to withdraw from your portfolio',
+            },
+            {
+                label: 'Network Fee',
+                value: unitValue === 'USD' ? '$0.001' : '0.0001 BTC',
+                tooltip:
+                    'Fee charged for processing the withdrawal transaction',
+            },
+        ],
+        [portfolio.availableBalance, unitValue, formatCurrency],
+    );
 
     // Memoize button disabled state calculation
-    const isButtonDisabled = useMemo(() => 
-        isProcessing || 
-        !amount ||
-        parseFloat(amount) <= 0 ||
-        parseFloat(amount) > portfolio.availableBalance
-    , [isProcessing, amount, portfolio.availableBalance]);
+    const isButtonDisabled = useMemo(
+        () =>
+            isProcessing ||
+            !amount ||
+            parseFloat(amount) <= 0 ||
+            parseFloat(amount) > portfolio.availableBalance,
+        [isProcessing, amount, portfolio.availableBalance],
+    );
 
     return (
         <div className={styles.container}>
@@ -171,10 +191,7 @@ function PortfolioWithdraw({
                     step='any'
                     disabled={isProcessing}
                 />
-                <button 
-                    onClick={handleMaxClick}
-                    disabled={isProcessing}
-                >
+                <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}

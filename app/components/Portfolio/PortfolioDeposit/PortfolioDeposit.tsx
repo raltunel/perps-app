@@ -4,7 +4,10 @@ import styles from './PortfolioDeposit.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
-import TokenDropdown, { AVAILABLE_TOKENS, type Token } from '~/components/TokenDropdown/TokenDropdown';
+import TokenDropdown, {
+    AVAILABLE_TOKENS,
+    type Token,
+} from '~/components/TokenDropdown/TokenDropdown';
 
 interface PortfolioDepositProps {
     portfolio: {
@@ -27,18 +30,18 @@ function PortfolioDeposit({
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken, setSelectedToken] = useState<Token>(
-        AVAILABLE_TOKENS.find(token => token.symbol === (portfolio.unit || 'USDe')) || AVAILABLE_TOKENS[0]
+        AVAILABLE_TOKENS.find(
+            (token) => token.symbol === (portfolio.unit || 'USDe'),
+        ) || AVAILABLE_TOKENS[0],
     );
 
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-   
     const validateInput = useCallback((newValue: string) => {
         return newValue === '' || /^(\d+)?(\.\d{0,8})?$/.test(newValue);
     }, []);
 
-   
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
         if (validateInput(newValue)) {
             setAmount(newValue);
@@ -46,13 +49,12 @@ function PortfolioDeposit({
         }
     }, 150);
 
-   
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
             debouncedHandleChange(newValue);
         },
-        [debouncedHandleChange]
+        [debouncedHandleChange],
     );
 
     const handleMaxClick = useCallback(() => {
@@ -81,53 +83,67 @@ function PortfolioDeposit({
         onDeposit(depositAmount);
     }, [amount, availableBalance, onDeposit]);
 
-   
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
     }, []);
 
-    
-    const USD_FORMATTER = useMemo(() => new Intl.NumberFormat('en-US', { 
-        style: 'currency', 
-        currency: 'USD',
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 2 
-    }), []);
+    const USD_FORMATTER = useMemo(
+        () =>
+            new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            }),
+        [],
+    );
 
-    const OTHER_FORMATTER = useMemo(() => new Intl.NumberFormat('en-US', { 
-        minimumFractionDigits: 2, 
-        maximumFractionDigits: 8 
-    }), []);
+    const OTHER_FORMATTER = useMemo(
+        () =>
+            new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 8,
+            }),
+        [],
+    );
 
-    
-    const formatCurrency = useCallback((value: number, unit: string) => {
-        if (unit === 'USD') {
-            return USD_FORMATTER.format(value);
-        }
-        return `${OTHER_FORMATTER.format(value)} ${unit}`;
-    }, [USD_FORMATTER, OTHER_FORMATTER]);
+    const formatCurrency = useCallback(
+        (value: number, unit: string) => {
+            if (unit === 'USD') {
+                return USD_FORMATTER.format(value);
+            }
+            return `${OTHER_FORMATTER.format(value)} ${unit}`;
+        },
+        [USD_FORMATTER, OTHER_FORMATTER],
+    );
 
     // Memoize info items to prevent recreating on each render
-    const infoItems = useMemo(() => [
-        {
-            label: 'Available to deposit',
-            value: formatCurrency(availableBalance, selectedToken.symbol),
-            tooltip: 'The maximum amount you can deposit based on your balance',
-        },
-        {
-            label: 'Network Fee',
-            value: selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
-            tooltip: 'Fee charged for processing the deposit transaction',
-        },
-    ], [availableBalance, selectedToken.symbol, formatCurrency]);
+    const infoItems = useMemo(
+        () => [
+            {
+                label: 'Available to deposit',
+                value: formatCurrency(availableBalance, selectedToken.symbol),
+                tooltip:
+                    'The maximum amount you can deposit based on your balance',
+            },
+            {
+                label: 'Network Fee',
+                value:
+                    selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
+                tooltip: 'Fee charged for processing the deposit transaction',
+            },
+        ],
+        [availableBalance, selectedToken.symbol, formatCurrency],
+    );
 
-   
-    const isButtonDisabled = useMemo(() => 
-        isProcessing || 
-        !amount ||
-        parseFloat(amount) <= 0 ||
-        parseFloat(amount) > availableBalance
-    , [isProcessing, amount, availableBalance]);
+    const isButtonDisabled = useMemo(
+        () =>
+            isProcessing ||
+            !amount ||
+            parseFloat(amount) <= 0 ||
+            parseFloat(amount) > availableBalance,
+        [isProcessing, amount, availableBalance],
+    );
 
     return (
         <div className={styles.container}>
@@ -141,8 +157,9 @@ function PortfolioDeposit({
                     Deposit {selectedToken.symbol} to {portfolio.name}
                 </h4>
                 <p>
-                    Deposit {selectedToken.symbol} to your {portfolio.name} portfolio.
-                    Funds will be immediately available for allocation.
+                    Deposit {selectedToken.symbol} to your {portfolio.name}{' '}
+                    portfolio. Funds will be immediately available for
+                    allocation.
                 </p>
             </div>
 
@@ -167,10 +184,7 @@ function PortfolioDeposit({
                     step='any'
                     disabled={isProcessing}
                 />
-                <button 
-                    onClick={handleMaxClick}
-                    disabled={isProcessing}
-                >
+                <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
