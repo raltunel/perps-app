@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
@@ -27,6 +27,20 @@ export function useNumFormatter() {
         },
         [parseNum],
     );
+
+    // return the group and decimal separators for a given locale
+    function getSeparators(locale: string): { decimal: string; group: string } {
+        const numberWithGroupAndDecimal = 1234567.89;
+
+        const parts = new Intl.NumberFormat(locale).formatToParts(
+            numberWithGroupAndDecimal,
+        );
+
+        const group = parts.find((p) => p.type === 'group')?.value || ',';
+        const decimal = parts.find((p) => p.type === 'decimal')?.value || '.';
+
+        return { group, decimal };
+    }
 
     // returns the number of decimal places in a number
     const decimalPrecision = (precisionNumber: number) => {
@@ -61,6 +75,42 @@ export function useNumFormatter() {
         [numFormat, parseNum, getDefaultPrecision],
     );
 
+    const formatNumWithOnlyDecimals = useCallback(
+        (num: number | string, precision?: number) => {
+            const formattedNum = formatNum(num, precision);
+            const { group } = getSeparators(numFormat.value);
+
+            return formattedNum.replace(new RegExp(`\\${group}`, 'g'), '');
+        },
+        [formatNum],
+    );
+
+    const parseFormattedWithOnlyDecimals = useCallback(
+        (str: string) => {
+            const { group, decimal } = getSeparators(numFormat.value);
+
+            const cleaned = str
+                .replace(new RegExp(`\\${group}`, 'g'), '')
+                .replace(decimal, '.');
+
+            return Number(cleaned);
+        },
+        [numFormat],
+    );
+
+    const parseFormattedNum = useCallback(
+        (str: string) => {
+            const { group, decimal } = getSeparators(numFormat.value);
+
+            const cleaned = str
+                .replace(new RegExp(`\\${group}`, 'g'), '')
+                .replace(decimal, '.');
+
+            return Number(cleaned);
+        },
+        [numFormat],
+    );
+
     const formatPriceForChart = useCallback(
         (num: number | string) => {
             const precision =
@@ -76,11 +126,35 @@ export function useNumFormatter() {
         [formatNum],
     );
 
+    const activeDecimalSeparator = useMemo(() => {
+        return getSeparators(numFormat.value).decimal;
+    }, [numFormat]);
+
+    const activeGroupSeparator = useMemo(() => {
+        return getSeparators(numFormat.value).group;
+    }, [numFormat]);
+
+    const inputRegex = useMemo(() => {
+        return new RegExp(`^\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
+    }, [activeDecimalSeparator]);
+
+    const getPrecisionFromNumber = useCallback((value: number) => {
+        const index = value.toString().indexOf('.');
+        return index === -1 ? 0 : value.toString().length - index - 1;
+    }, []);
+
     return {
         formatNum,
         formatPriceForChart,
         decimalPrecision,
         getDefaultPrecision,
+        parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        parseFormattedWithOnlyDecimals,
+        activeDecimalSeparator,
+        activeGroupSeparator,
+        inputRegex,
+        getPrecisionFromNumber,
     };
 }
 

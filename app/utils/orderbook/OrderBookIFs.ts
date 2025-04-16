@@ -32,7 +32,7 @@ export interface OrderDataIF {
     isTrigger?: boolean;
     limitPx: number;
     oid: number;
-    orderType?: string;
+    orderType: string;
     origSz: number;
     reduceOnly?: boolean;
     side: 'buy' | 'sell';
@@ -43,6 +43,18 @@ export interface OrderDataIF {
     triggerCondition?: string;
     triggerPx?: number;
     status: string;
+    orderValue?: number;
 }
 
 export type OrderBookMode = 'symbol' | 'usd';
+
+export type OrderDataSortBy =
+    | 'timestamp'
+    | 'orderType'
+    | 'coin'
+    | 'side'
+    | 'sz'
+    | 'origSz'
+    | 'orderValue'
+    | 'price'
+    | undefined;
