@@ -1,35 +1,40 @@
-## Getting Started
+# Perps App Monorepo
 
-### Installation
-
-Install the dependencies:
+## Setup
 
 ```bash
 pnpm install
+pnpm prepare
+pnpm update-submodules
 ```
 
-### Development
+## Develop Frontend
 
-Start the development server with HMR:
+```bash
+cd packages/frontend
+pnpm dev
+```
+
+## Develop Frontend Shortcut (setup and run from root directory)
 
 ```bash
 pnpm dev
 ```
 
-Your application will be available at `http://localhost:3000`.
-
-## Building for Production
-
-Create a production build:
+## Start Frontend in Production Mode
 
 ```bash
+cd packages/frontend
 pnpm build
+pnpm start
 ```
 
-## Deployment
+## Using the SDK in the Frontend
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/remix-run/react-router-templates&create_from_path=netlify)
+```ts
+import { Info } from '@perps-app/sdk';
 
----
+const info = new Info();
+```
 
-Built with ❤️ using React Router.
+Please refer to the [examples](./packages/sdk/examples) in the sdk package for more usage examples.
