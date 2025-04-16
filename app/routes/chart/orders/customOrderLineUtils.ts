@@ -86,7 +86,7 @@ export const getAnchoredQuantityTextLocation = (
     const chartWidth = Math.floor(timeScale.width());
 
     const orderText = formatLineLabel(orderTextValue);
-    const wrapWidthPx = orderText.length > 13 ? 100 : 70;
+    const wrapWidthPx = orderText.length > 13 ? 105 : 75;
 
     const offsetX = Number(wrapWidthPx / chartWidth);
 
@@ -196,19 +196,19 @@ function formatTPorSLLabel(rawText: string, orderType: string): string {
     const price = match[2];
     const operator = direction === 'above' ? '>' : '<';
 
-    const labelPrefix = orderType === ' Take Profit Market' ? 'TP ' : 'SL ';
+    const labelPrefix = orderType === ' Take Profit Market' ? 'TP' : 'SL';
 
-    return ` ${labelPrefix} Price ${operator} ${price}`;
+    return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
 export function formatLineLabel(label: LineLabel): string {
     switch (label.type) {
         case 'PNL': {
             const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
-            return ' PNL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl}  `);
+            return ' PNL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
         }
         case 'LIMIT':
-            return ` Limit ${label.price}  ${label.triggerCondition}  `;
+            return ` Limit ${label.price}  ${label.triggerCondition} `;
         case 'TP_SL':
             return formatTPorSLLabel(label.triggerCondition, label.orderType);
 
