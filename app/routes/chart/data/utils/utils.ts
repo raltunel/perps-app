@@ -1,3 +1,4 @@
+import { bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import type { ResolutionString } from '~/tv/charting_library';
 
 import type { LibrarySymbolInfo } from '~/tv/charting_library/charting_library';
@@ -78,6 +79,58 @@ export const priceFormatterFactory = (
         };
     }
 };
+
+export function getChartThemeColors(): colorSetIF | undefined {
+    const visualSettings = localStorage.getItem('VISUAL_SETTINGS');
+
+    const parsedVisualSettings = visualSettings
+        ? JSON.parse(visualSettings)
+        : null;
+
+    if (parsedVisualSettings?.state?.bsColor) {
+        return bsColorSets[parsedVisualSettings.state.bsColor];
+    }
+
+    return undefined;
+}
+
+export function getChartDefaultColors(): string[] | undefined {
+    // object literal with all user-created candle customizations
+    const mainSeriesProperties = JSON.parse(
+        localStorage.getItem(
+            'tradingview.chartproperties.mainSeriesProperties',
+        ) || '{}',
+    );
+    const candleStyle = mainSeriesProperties?.candleStyle || {};
+    // array of color codes from candle properties we care about
+    const activeColors: string[] | undefined = candleStyle
+        ? [
+              candleStyle.upColor,
+              candleStyle.downColor,
+              candleStyle.borderUpColor,
+              candleStyle.borderDownColor,
+              candleStyle.wickUpColor,
+              candleStyle.wickDownColor,
+          ]
+        : undefined;
+
+    return activeColors;
+}
+
+export function checkDefaultColors(): boolean {
+    const activeColors = getChartDefaultColors();
+
+    // determine if any of the candles have a color chosen through
+    // ... the trading view color customization workflow (custom
+    // ...  colors are always formatted as `rgba`)
+    const isCustomized: boolean = activeColors
+        ? activeColors.some((c: string) => c?.startsWith('rgba'))
+        : false;
+    // apply color scheme to chart ONLY if no custom colors are
+    // ... found in the active colors array
+
+    return isCustomized;
+}
 
 export const supportedResolutions = [
     '1',
