@@ -3,7 +3,12 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { LineData } from './component/LineComponent';
-import { buyColor, sellColor, type LineLabel } from './customOrderLineUtils';
+import {
+    buyColor,
+    quantityTextFormatWithComma,
+    sellColor,
+    type LineLabel,
+} from './customOrderLineUtils';
 import LineComponent from './component/LineComponent';
 
 const OpenOrderLine = () => {
@@ -71,15 +76,25 @@ const OpenOrderLine = () => {
                         price: limitPx,
                         triggerCondition: tempTriggerCondition,
                     };
-                } else if (orderType) {
-                    label = {
-                        type: orderType as
-                            | 'Take Profit Market'
-                            | 'Stop Market'
-                            | 'Stop Limit',
-                        triggerCondition: tempTriggerCondition,
-                        orderType,
-                    };
+                } else {
+                    if (orderType === 'Stop Limit') {
+                        label = {
+                            type: 'Stop Limit',
+                            price: quantityTextFormatWithComma(limitPx),
+                            triggerCondition: tempTriggerCondition,
+                            orderType,
+                        };
+                    }
+                    if (
+                        orderType === 'Take Profit Market' ||
+                        orderType === 'Stop Market'
+                    ) {
+                        label = {
+                            type: orderType,
+                            triggerCondition: tempTriggerCondition,
+                            orderType,
+                        };
+                    }
 
                     if (triggerPx) {
                         yPrice = triggerPx;

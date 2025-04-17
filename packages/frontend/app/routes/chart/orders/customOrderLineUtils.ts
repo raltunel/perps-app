@@ -19,7 +19,12 @@ export type LineLabel =
           orderType: string;
       }
     | { type: 'Stop Market'; triggerCondition: string; orderType: string }
-    | { type: 'Stop Limit'; triggerCondition: string; orderType: string }
+    | {
+          type: 'Stop Limit';
+          price: string;
+          triggerCondition: string;
+          orderType: string;
+      }
     | { type: 'Liq'; text: ' Liq. Price' };
 
 export const addCustomOrderLine = async (
@@ -144,7 +149,7 @@ export const createQuantityAnchoredText = async (
         yPrice,
         text,
         '#000000',
-        text.toString().length > 8 ? 70 : 60,
+        estimateTextWidth(text) + 5,
         '#3C91FF',
         '#FFFFFF',
     );
@@ -207,7 +212,7 @@ export const quantityTextFormatWithComma = (value: number): string => {
     return isNegative ? `-${result}` : result;
 };
 
-function formatTPorSLLabel(rawText: string, orderType: string): string {
+function getTriggerConditionText(rawText: string, orderType: string): string {
     const match = rawText.match(/Price (above|below) (\d+)/);
 
     if (!match) return rawText;
@@ -226,7 +231,7 @@ function formatTPorSLLabel(rawText: string, orderType: string): string {
     }
 
     if (orderType === 'Stop Limit') {
-        labelPrefix = orderType;
+        labelPrefix = '';
     }
 
     return ` ${labelPrefix} Price ${operator} ${price}  `;
@@ -241,11 +246,22 @@ export function formatLineLabel(label: LineLabel): string {
         case 'Limit':
             return ` Limit ${label.price}  ${label.triggerCondition} `;
         case 'Take Profit Market':
-            return formatTPorSLLabel(label.triggerCondition, label.orderType);
+            return getTriggerConditionText(
+                label.triggerCondition,
+                label.orderType,
+            );
         case 'Stop Market':
-            return formatTPorSLLabel(label.triggerCondition, label.orderType);
-        case 'Stop Limit':
-            return formatTPorSLLabel(label.triggerCondition, label.orderType);
+            return getTriggerConditionText(
+                label.triggerCondition,
+                label.orderType,
+            );
+        case 'Stop Limit': {
+            const triggerConditionText = getTriggerConditionText(
+                label.triggerCondition,
+                label.orderType,
+            );
+            return ` ${label.orderType} ${label.price}${triggerConditionText}   `;
+        }
         case 'Liq':
             return label.text;
         default:
