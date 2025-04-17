@@ -1,0 +1,189 @@
+.rowContainer {
+    width: 100%;
+    height: 25px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 0.5fr 1.5fr 1.5fr 1.5fr 1fr 1.5fr;
+    align-items: center;
+}
+
+.headerContainer {
+    background: var(--dark2);
+    width: 100%;
+    height: 24px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 0.5fr 1.5fr 1.5fr 1.5fr 1fr 1.5fr;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+}
+
+.tableWrapper {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    padding-right: 8px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.tableBody {
+    height: 100%;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+    padding-right: 8px;
+
+    max-height: 294px;
+    scrollbar-gutter: stable;
+
+    height: 61vh;
+}
+
+.tableBody::-webkit-scrollbar {
+    width: 4px !important;
+}
+
+.tableBody::-webkit-scrollbar-track {
+    background: var(--dark3) !important;
+}
+
+.tableBody::-webkit-scrollbar-thumb {
+    background: var(--accent1) !important;
+    border-radius: 4px !important;
+}
+
+.tableBody::-webkit-scrollbar-thumb:hover {
+    background: var(--accent1) !important;
+}
+
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    cursor: default;
+}
+
+.sortable {
+    cursor: pointer;
+}
+
+.emptyState {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 0;
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size, 14px);
+}
+
+/* Specific cell classes */
+.rankCell {
+    text-align: start;
+}
+
+.traderCell {
+}
+
+.accountValueCell {
+}
+
+.pnlCell {
+    color: var(--green, #4cd471);
+}
+
+.roiCell {
+    color: var(--green, #4cd471);
+}
+
+.volumeCell {
+    display: flex;
+    justify-content: end;
+    align-items: end;
+}
+
+.positive {
+    color: var(--green, #4cd471);
+}
+
+.negative {
+    color: var(--red, #ff5c5c);
+}
+
+.fullScreen {
+    height: 100%;
+}
+
+.fullScreen .tableBody {
+    max-height: 68vh;
+}
+@media (max-width: 1200px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.5fr 1.5fr 1.5fr 1.5fr 1fr;
+    }
+
+    .volumeCell {
+        display: none;
+    }
+}
+
+@media (max-width: 1000px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.5fr 1.5fr 1.5fr 1fr;
+    }
+
+    .pnlCell {
+        display: none;
+    }
+}
+
+@media (max-width: 800px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.5fr 1.5fr 1.5fr;
+    }
+
+    .roiCell {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 0.5fr 1.5fr;
+    }
+
+    .accountValueCell {
+        display: none;
+    }
+
+    .headerCell {
+        font-size: 9px;
+    }
+
+    .cell {
+        font-size: 11px;
+    }
+}
