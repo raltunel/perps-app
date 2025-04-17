@@ -37,7 +37,27 @@ const OpenOrderLine = () => {
             setLines([]);
             return;
         }
-        const newLines: LineData[] = userSymbolOrders
+
+        const data = {
+            coin: 'BTC',
+            cloid: '',
+            oid: 85589596198,
+            side: 'sell',
+            sz: 0.5555,
+            tif: 'null',
+            timestamp: 1744293262831,
+            status: 'open',
+            limitPx: 64339,
+            origSz: 0,
+            reduceOnly: true,
+            isPositionTpsl: true,
+            isTrigger: true,
+            triggerPx: 69934,
+            triggerCondition: 'Price below 69934',
+            orderType: 'Stop Limit',
+            orderValue: 0,
+        };
+        const newLines: LineData[] = [...userSymbolOrders, data]
             .sort((a, b) => a.timestamp - b.timestamp)
             .map((order): LineData => {
                 const {
@@ -85,6 +105,8 @@ const OpenOrderLine = () => {
                         yPrice = triggerPx;
                     }
                     quantityTextValue = sz ? sz : pnlSzi;
+
+                    console.log({ sz, pnlSzi });
                 }
 
                 return {
