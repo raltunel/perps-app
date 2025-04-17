@@ -1,5 +1,4 @@
 import { useState, useCallback, memo, useMemo } from 'react';
-import { MdClose } from 'react-icons/md';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import styles from './PortfolioSend.module.css';
@@ -28,7 +27,7 @@ function PortfolioSend({
     availableAmount,
     networkFee = '$0.001',
     onSend,
-    onClose,
+   
     isProcessing = false,
     portfolio,
 }: PortfolioSendProps) {
@@ -170,11 +169,7 @@ function PortfolioSend({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Send</h3>
-                <MdClose onClick={onClose} />
-            </header>
+       
             <div className={styles.textContent}>
                 <h4>Send {selectedToken.symbol} on Fogo</h4>
                 <p>Send tokens to another address on Fogo.</p>

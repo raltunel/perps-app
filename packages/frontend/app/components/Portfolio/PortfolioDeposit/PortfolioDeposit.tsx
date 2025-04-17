@@ -147,11 +147,7 @@ function PortfolioDeposit({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Deposit</h3>
-                <MdClose onClick={onClose} />
-            </header>
+        
             <div className={styles.textContent}>
                 <h4>
                     Deposit {selectedToken.symbol} to {portfolio.name}

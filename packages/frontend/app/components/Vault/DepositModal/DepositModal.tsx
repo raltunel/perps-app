@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './DepositModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';

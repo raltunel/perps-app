@@ -1,5 +1,4 @@
 import { useState, useCallback, memo, useMemo } from 'react';
-import { MdClose } from 'react-icons/md';
 import styles from './PortfolioWithdraw.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
@@ -20,7 +19,6 @@ interface PortfolioWithdrawProps {
 function PortfolioWithdraw({
     portfolio,
     onWithdraw,
-    onClose,
     isProcessing = false,
 }: PortfolioWithdrawProps) {
     const [amount, setAmount] = useState<string>('');
@@ -160,11 +158,7 @@ function PortfolioWithdraw({
 
     return (
         <div className={styles.container}>
-            <header>
-                <span />
-                <h3>Withdraw</h3>
-                <MdClose onClick={onClose} />
-            </header>
+     
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {portfolio.name}
