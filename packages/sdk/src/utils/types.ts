@@ -95,6 +95,11 @@ export interface WebData2Subscription {
     user: string;
 }
 
+export interface NotificationSubscription {
+    type: 'notification';
+    user: string;
+}
+
 export type Subscription =
     | AllMidsSubscription
     | L2BookSubscription
@@ -105,7 +110,8 @@ export type Subscription =
     | OrderUpdatesSubscription
     | UserFundingsSubscription
     | UserNonFundingLedgerUpdatesSubscription
-    | WebData2Subscription;
+    | WebData2Subscription
+    | NotificationSubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;

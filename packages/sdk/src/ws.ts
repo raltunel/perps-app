@@ -30,6 +30,8 @@ function subscriptionToIdentifier(subscription: Subscription): string {
             return `userNonFundingLedgerUpdates:${subscription.user.toLowerCase()}`;
         case 'webData2':
             return `webData2:${subscription.user.toLowerCase()}`;
+        case 'notification':
+            return `notification:${subscription.user.toLowerCase()}`;
         default:
             throw new Error('Unknown subscription type');
     }
@@ -230,5 +232,10 @@ export class WebsocketManager {
         }
         this.activeSubscriptions[identifier] = newActiveSubs;
         return activeSubs.length !== newActiveSubs.length;
+    }
+
+    getWsReady() {
+        console.log('getWsReady', this.wsReady);
+        return this.wsReady;
     }
 }

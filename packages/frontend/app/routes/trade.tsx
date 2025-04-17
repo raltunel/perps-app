@@ -41,12 +41,14 @@ export default function Trade() {
         setIsWsEnabled,
         wsEnvironment,
         setWsEnvironment,
+        sdkEnabled,
+        setSdkEnabled,
     } = useDebugStore();
 
-    useEffect(() => {
-        const info = new Info({ environment: 'mock' });
-        console.log({ wsManager: info.wsManager });
-    }, []);
+    // useEffect(() => {
+    //     const info = new Info({ environment: 'mock' });
+    //     console.log({ wsManager: info.wsManager });
+    // }, []);
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
@@ -58,10 +60,12 @@ export default function Trade() {
         <>
             <div className={styles.wsUrlSelector}>
                 <ComboBox
-                    value={wsEnvironment}
-                    options={wsEnvironments}
+                    value={sdkEnabled ? wsEnvironment : wsUrl}
+                    options={sdkEnabled ? wsEnvironments : wsUrls}
                     fieldName='value'
-                    onChange={(value) => setWsEnvironment(value)}
+                    onChange={(value) =>
+                        sdkEnabled ? setWsEnvironment(value) : setWsUrl(value)
+                    }
                 />
             </div>
             <div className={styles.walletSelector}>
@@ -87,7 +91,16 @@ export default function Trade() {
             >
                 <div className={styles.wsToggleButton}>
                     {' '}
-                    {isWsEnabled ? 'WS Running' : 'Paused'}
+                    {isWsEnabled ? 'WS' : 'WS'}
+                </div>
+            </div>
+
+            <div
+                className={`${styles.sdkToggle} ${sdkEnabled ? styles.active : styles.disabled}`}
+                onClick={() => setSdkEnabled(!sdkEnabled)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {sdkEnabled ? 'SDK' : 'SDK'}
                 </div>
             </div>
 

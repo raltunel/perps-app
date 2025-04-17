@@ -6,6 +6,9 @@ import React, {
     useState,
 } from 'react';
 import { useIsClient } from './useIsClient';
+import { Info, WebsocketManager, type Environment } from '@perps-app/sdk';
+import type { WsMsg } from '@perps-app/sdk/src/utils/types';
+import { useDebugStore } from '~/stores/DebugStore';
 
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
@@ -44,7 +47,9 @@ const WsObserverContext = createContext<WsObserverContextType | undefined>(
 export const WsObserverProvider: React.FC<{
     url: string;
     children: React.ReactNode;
-}> = ({ url, children }) => {
+    wsEnvironment: string;
+}> = ({ url, children, wsEnvironment }) => {
+    const socketManagerRef = useRef<WebsocketManager | null>(null);
     const isClient = useIsClient();
     const [readyState, setReadyState] = useState<number>(
         WebSocketReadyState.CLOSED,
@@ -57,10 +62,28 @@ export const WsObserverProvider: React.FC<{
         new Map(),
     );
 
+    const { sdkEnabled } = useDebugStore();
+    const sdkEnabledRef = useRef(sdkEnabled);
+    sdkEnabledRef.current = sdkEnabled;
+
+    const [sdkReady, setSdkReady] = useState(
+        socketManagerRef.current?.getWsReady(),
+    );
+
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
         return match ? match[1] : '';
     }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            console.log('sdkReady', socketManagerRef.current?.getWsReady());
+            if (sdkReady !== socketManagerRef.current?.getWsReady()) {
+                setSdkReady(socketManagerRef.current?.getWsReady());
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     const connectWebSocket = () => {
         if (!isClient) {
@@ -114,9 +137,16 @@ export const WsObserverProvider: React.FC<{
             socket.close();
         };
     };
+    const sdkOnMessage = (data: string) => {
+        const channel = extractChannelFromPayload(data);
+        const worker = getWorker(channel);
+        if (worker) {
+            worker.postMessage(data);
+        }
+    };
 
     useEffect(() => {
-        if (isClient) {
+        if (isClient && !sdkEnabledRef.current) {
             connectWebSocket();
         }
 
@@ -124,7 +154,21 @@ export const WsObserverProvider: React.FC<{
             // console.log('>>> socket closed!!!!!!!!!!!!!');
             // socketRef.current?.close();
         };
-    }, [url, isClient]); // ✅ Only runs when client-side is ready
+    }, [url, isClient, sdkEnabled]); // ✅ Only runs when client-side is ready
+
+    useEffect(() => {
+        if (isClient && sdkEnabledRef.current) {
+            if (socketManagerRef.current) {
+                socketManagerRef.current.stop();
+            }
+            const info = new Info({
+                environment: wsEnvironment as Environment,
+            });
+            if (info) {
+                socketManagerRef.current = info.wsManager;
+            }
+        }
+    }, [wsEnvironment, isClient, sdkEnabled]);
 
     const sendMessage = (msg: string) => {
         if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
@@ -137,28 +181,62 @@ export const WsObserverProvider: React.FC<{
         payload: any,
         unsubscribe: boolean = false,
     ) => {
-        sendMessage(
-            JSON.stringify({
-                method: unsubscribe ? 'unsubscribe' : 'subscribe',
-                subscription: {
-                    type: type,
-                    ...payload,
-                },
-            }),
-        );
+        if (sdkEnabledRef.current) {
+            if (socketManagerRef.current) {
+                socketManagerRef.current.subscribe(
+                    {
+                        type: type,
+                        ...payload,
+                    },
+                    (msg) => {
+                        sdkOnMessage(JSON.stringify(msg));
+                    },
+                );
+            }
+        } else {
+            sendMessage(
+                JSON.stringify({
+                    method: unsubscribe ? 'unsubscribe' : 'subscribe',
+                    subscription: {
+                        type: type,
+                        ...payload,
+                    },
+                }),
+            );
+        }
     };
 
     const [, forceUpdate] = useState(0); // Used to force re-render when needed
 
     useEffect(() => {
-        if (readyStateRef.current === WebSocketReadyState.OPEN) {
+        if (
+            readyStateRef.current === WebSocketReadyState.OPEN &&
+            sdkEnabledRef.current === false
+        ) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
                     registerWsSubscription(key, config.payload || {});
                 });
             });
         }
-    }, [readyState]);
+    }, [readyState, sdkEnabledRef.current]);
+
+    useEffect(() => {
+        console.log(
+            'socketManagerRef.current?.getWsReady()',
+            socketManagerRef.current?.getWsReady(),
+        );
+        if (
+            socketManagerRef.current?.getWsReady() === true &&
+            sdkEnabledRef.current === true
+        ) {
+            subscriptions.current.forEach((configs, key) => {
+                configs.forEach((config) => {
+                    registerWsSubscription(key, config.payload || {});
+                });
+            });
+        }
+    }, [sdkEnabled, sdkReady]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
         initWorker(key);

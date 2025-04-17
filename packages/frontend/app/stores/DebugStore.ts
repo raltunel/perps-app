@@ -16,17 +16,19 @@ interface DebugStore {
     setDebugWallet: (debugWallet: DebugWallet) => void;
     isWsEnabled: boolean;
     setIsWsEnabled: (isWsEnabled: boolean) => void;
+    sdkEnabled: boolean;
+    setSdkEnabled: (sdkEnabled: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
     wsUrl: wsUrls[2],
     setWsUrl: (wsUrl: string) => set({ wsUrl }),
-    wsEnvironment: wsEnvironments[1].value as
-    | 'mock'
-    | 'hl'
-    | 'local'
-    | 'mainnet'
-    | 'testnet',
+    wsEnvironment: wsEnvironments[0].value as
+        | 'mock'
+        | 'hl'
+        | 'local'
+        | 'mainnet'
+        | 'testnet',
     setWsEnvironment: (wsEnvironment: string) =>
         set({
             wsEnvironment: wsEnvironment as
@@ -35,9 +37,11 @@ export const useDebugStore = create<DebugStore>((set) => ({
                 | 'local'
                 | 'mainnet'
                 | 'testnet',
-    }),
+        }),
     debugWallet: debugWallets[2],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
+    sdkEnabled: true,
+    setSdkEnabled: (sdkEnabled: boolean) => set({ sdkEnabled }),
 }));
