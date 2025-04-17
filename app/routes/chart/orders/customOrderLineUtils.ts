@@ -195,8 +195,7 @@ function formatTPorSLLabel(rawText: string, orderType: string): string {
     const direction = match[1];
     const price = match[2];
     const operator = direction === 'above' ? '>' : '<';
-
-    const labelPrefix = orderType === ' Take Profit Market' ? 'TP' : 'SL';
+    const labelPrefix = orderType === 'Take Profit Market' ? 'TP' : 'SL';
 
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
