@@ -6,6 +6,7 @@ import {
     addCustomOrderLine,
     createAnchoredMainText,
     createQuantityAnchoredText,
+    estimateTextWidth,
     formatLineLabel,
     getAnchoredQuantityTextLocation,
     priceToPixel,
@@ -21,7 +22,7 @@ export type LineData = {
     textValue: LineLabel;
     quantityTextValue?: number;
     color: string;
-    type: 'PNL' | 'LIMIT' | 'TP_SL' | 'LIQ';
+    type: 'PNL' | 'LIMIT' | 'LIQ';
 };
 
 interface LineProps {
@@ -176,8 +177,7 @@ const LineComponent = ({ lines }: LineProps) => {
                         );
                         activeLabel.setProperties({
                             text: activeLabelText,
-                            wordWrapWidth:
-                                activeLabelText.length > 13 ? 100 : 70,
+                            wordWrapWidth: estimateTextWidth(activeLabelText),
                         });
 
                         activeLabel.setAnchoredPosition({

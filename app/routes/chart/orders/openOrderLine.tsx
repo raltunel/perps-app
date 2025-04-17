@@ -59,32 +59,32 @@ const OpenOrderLine = () => {
                 let yPrice = limitPx;
                 let quantityTextValue = sz;
                 let label: LineLabel = {
-                    type: 'LIMIT',
+                    type: 'Limit',
                     price: limitPx,
                     triggerCondition: tempTriggerCondition,
                 };
-                let type: LineData['type'] = 'LIMIT';
+                const type = 'LIMIT';
 
                 if (orderType === 'Limit') {
                     label = {
-                        type: 'LIMIT',
+                        type: 'Limit',
                         price: limitPx,
                         triggerCondition: tempTriggerCondition,
                     };
-                    type = 'LIMIT';
                 } else if (orderType) {
                     label = {
-                        type: 'TP_SL',
+                        type: orderType as
+                            | 'Take Profit Market'
+                            | 'Stop Market'
+                            | 'Stop Limit',
                         triggerCondition: tempTriggerCondition,
                         orderType,
                     };
-                    type = 'TP_SL';
 
                     if (triggerPx) {
                         yPrice = triggerPx;
                     }
-
-                    quantityTextValue = pnlSzi;
+                    quantityTextValue = sz ? sz : pnlSzi;
                 }
 
                 return {

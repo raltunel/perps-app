@@ -3,11 +3,23 @@ import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 export const buyColor = '#26A69A';
 export const sellColor = '#E57373';
 
-export type LineLabelType = 'PNL' | 'LIMIT' | 'TP_SL' | 'LIQ';
+export type LineLabelType =
+    | 'PNL'
+    | 'Limit'
+    | 'Take Profit Market'
+    | 'Stop Market'
+    | 'Stop Limit'
+    | 'Liq';
 export type LineLabel =
     | { type: 'PNL'; pnl: number }
-    | { type: 'LIMIT'; price: number; triggerCondition: string }
-    | { type: 'TP_SL'; triggerCondition: string; orderType: string }
+    | { type: 'Limit'; price: number; triggerCondition: string }
+    | {
+          type: 'Take Profit Market';
+          triggerCondition: string;
+          orderType: string;
+      }
+    | { type: 'Stop Market'; triggerCondition: string; orderType: string }
+    | { type: 'Stop Limit'; triggerCondition: string; orderType: string }
     | { type: 'Liq'; text: ' Liq. Price' };
 
 export const addCustomOrderLine = async (
@@ -77,6 +89,14 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
     return 0;
 };
 
+export function estimateTextWidth(text: string, fontSize: number = 10): number {
+    const isMac = navigator.userAgent.includes('Macintosh');
+    const charWidthFactor = isMac ? 0.58 : 0.5;
+
+    const avgCharWidth = fontSize * charWidthFactor;
+    return text.length * avgCharWidth;
+}
+
 export const getAnchoredQuantityTextLocation = (
     chart: IChartingLibraryWidget,
     bufferX: number,
@@ -86,7 +106,7 @@ export const getAnchoredQuantityTextLocation = (
     const chartWidth = Math.floor(timeScale.width());
 
     const orderText = formatLineLabel(orderTextValue);
-    const wrapWidthPx = orderText.length > 13 ? 105 : 75;
+    const wrapWidthPx = estimateTextWidth(orderText) + 5;
 
     const offsetX = Number(wrapWidthPx / chartWidth);
 
@@ -107,7 +127,7 @@ export const createAnchoredMainText = async (
         yPrice,
         text,
         '#D1D1D1',
-        text.toString().length > 13 ? 100 : 70,
+        estimateTextWidth(text),
         borderColor,
     );
 };
@@ -195,7 +215,19 @@ function formatTPorSLLabel(rawText: string, orderType: string): string {
     const direction = match[1];
     const price = match[2];
     const operator = direction === 'above' ? '>' : '<';
-    const labelPrefix = orderType === 'Take Profit Market' ? 'TP' : 'SL';
+    let labelPrefix = '';
+
+    if (orderType === 'Take Profit Market') {
+        labelPrefix = 'TP';
+    }
+
+    if (orderType === 'Stop Market') {
+        labelPrefix = 'SL';
+    }
+
+    if (orderType === 'Stop Limit') {
+        labelPrefix = orderType;
+    }
 
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
@@ -206,11 +238,14 @@ export function formatLineLabel(label: LineLabel): string {
             const pnl = quantityTextFormatWithComma(Math.abs(label.pnl));
             return ' PNL ' + (label.pnl > 0 ? `$${pnl}  ` : `-$${pnl} `);
         }
-        case 'LIMIT':
+        case 'Limit':
             return ` Limit ${label.price}  ${label.triggerCondition} `;
-        case 'TP_SL':
+        case 'Take Profit Market':
             return formatTPorSLLabel(label.triggerCondition, label.orderType);
-
+        case 'Stop Market':
+            return formatTPorSLLabel(label.triggerCondition, label.orderType);
+        case 'Stop Limit':
+            return formatTPorSLLabel(label.triggerCondition, label.orderType);
         case 'Liq':
             return label.text;
         default:
