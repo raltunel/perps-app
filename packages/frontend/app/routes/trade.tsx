@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -39,6 +39,8 @@ export default function Trade() {
         setDebugWallet,
         isWsEnabled,
         setIsWsEnabled,
+        wsEnvironment,
+        setWsEnvironment,
     } = useDebugStore();
 
     useEffect(() => {
@@ -56,9 +58,10 @@ export default function Trade() {
         <>
             <div className={styles.wsUrlSelector}>
                 <ComboBox
-                    value={wsUrl}
-                    options={wsUrls}
-                    onChange={(value) => setWsUrl(value)}
+                    value={wsEnvironment}
+                    options={wsEnvironments}
+                    fieldName='value'
+                    onChange={(value) => setWsEnvironment(value)}
                 />
             </div>
             <div className={styles.walletSelector}>

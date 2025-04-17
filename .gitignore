@@ -17,3 +17,5 @@ packages/frontend/public/tv/charting_library
 packages/frontend/public/tv/datafeeds
 packages/frontend/public/tradingview/charting_library
 packages/frontend/public/tradingview/datafeeds
+public/tv/charting_library
+public/tv/datafeeds
