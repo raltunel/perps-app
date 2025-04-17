@@ -1,23 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
-import type { EntityId, IPaneApi } from '~/tv/charting_library';
+import type { EntityId } from '~/tv/charting_library';
 import {
     addCustomOrderLine,
     createAnchoredMainText,
     createQuantityAnchoredText,
+    estimateTextWidth,
+    formatLineLabel,
     getAnchoredQuantityTextLocation,
     priceToPixel,
+    quantityTextFormatWithComma,
+    type LineLabel,
 } from '../customOrderLineUtils';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
 
 export type LineData = {
     xLoc: number;
-    yLoc: number;
-    text: string;
-    quantityText?: string;
+    yPrice: number;
+    textValue: LineLabel;
+    quantityTextValue?: number;
     color: string;
+    type: 'PNL' | 'LIMIT' | 'LIQ';
 };
 
 interface LineProps {
@@ -76,7 +81,7 @@ const LineComponent = ({ lines }: LineProps) => {
     const [chartReady, setChartReady] = useState(true);
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
+        let intervalId: NodeJS.Timeout | undefined = undefined;
 
         const chartRef = chart?.activeChart();
         setChartReady(false);
@@ -108,22 +113,27 @@ const LineComponent = ({ lines }: LineProps) => {
             for (const line of lines) {
                 const lineId = await addCustomOrderLine(
                     chart,
-                    line.yLoc,
+                    line.yPrice,
                     line.color,
                 );
                 const textId = await createAnchoredMainText(
                     chart,
                     line.xLoc,
-                    line.yLoc,
-                    line.text,
+                    line.yPrice,
+                    line.textValue,
                     line.color,
                 );
-                const quantityTextId = line.quantityText
+                const quantityTextId = line.quantityTextValue
                     ? await createQuantityAnchoredText(
                           chart,
-                          line.xLoc,
-                          line.yLoc,
-                          line.text,
+                          getAnchoredQuantityTextLocation(
+                              chart,
+                              line.xLoc,
+                              line.textValue,
+                          ),
+
+                          line.yPrice,
+                          quantityTextFormatWithComma(line.quantityTextValue),
                       )
                     : undefined;
 
@@ -155,81 +165,60 @@ const LineComponent = ({ lines }: LineProps) => {
                 const interval = setInterval(() => {
                     if (isCancelled) return;
 
-                    const priceScalePane = chart
+                    const pricePerPixel = priceToPixel(chart, lineData.yPrice);
+
+                    const activeLabel = chart
                         .activeChart()
-                        .getPanes()[0] as IPaneApi;
+                        .getShapeById(textId);
 
-                    const priceScale = priceScalePane.getMainSourcePriceScale();
-                    if (priceScale) {
-                        const priceRange = priceScale.getVisiblePriceRange();
-                        const chartHeight = priceScalePane.getHeight();
-
-                        if (!priceRange) return;
-
-                        const maxPrice = priceRange.to;
-                        const minPrice = priceRange.from;
-
-                        const pixel = priceToPixel(
-                            minPrice,
-                            maxPrice,
-                            chartHeight,
-                            lineData.yLoc,
-                            priceScale.getMode() === 1,
+                    if (activeLabel) {
+                        const activeLabelText = formatLineLabel(
+                            lineData.textValue,
                         );
-                        const pricePerPixel = pixel / chartHeight;
+                        activeLabel.setProperties({
+                            text: activeLabelText,
+                            wordWrapWidth: estimateTextWidth(activeLabelText),
+                        });
 
-                        const activeLabel = chart
+                        activeLabel.setAnchoredPosition({
+                            x: lineData.xLoc,
+                            y: pricePerPixel,
+                        });
+                    }
+
+                    if (quantityTextId && lineData.quantityTextValue) {
+                        const activeQuantityLabel = chart
                             .activeChart()
-                            .getShapeById(textId);
-
-                        if (activeLabel) {
-                            activeLabel.setProperties({
-                                text: lineData.text,
-                                wordWrapWidth:
-                                    lineData.text.length > 13 ? 100 : 70,
-                            });
-
-                            activeLabel.setAnchoredPosition({
-                                x: lineData.xLoc,
+                            .getShapeById(quantityTextId);
+                        if (activeQuantityLabel) {
+                            const quantityText = quantityTextFormatWithComma(
+                                lineData.quantityTextValue,
+                            );
+                            activeQuantityLabel.setAnchoredPosition({
+                                x: getAnchoredQuantityTextLocation(
+                                    chart,
+                                    lineData.xLoc,
+                                    lineData.textValue,
+                                ),
                                 y: pricePerPixel,
                             });
-                        }
-
-                        if (quantityTextId && lineData.quantityText) {
-                            const activeQuantityLabel = chart
-                                .activeChart()
-                                .getShapeById(quantityTextId);
-                            if (activeQuantityLabel) {
-                                activeQuantityLabel.setAnchoredPosition({
-                                    x: getAnchoredQuantityTextLocation(
-                                        chart,
-                                        lineData.xLoc,
-                                        lineData.text,
-                                    ),
-                                    y: pricePerPixel,
-                                });
-                                activeQuantityLabel.setProperties({
-                                    text: lineData.quantityText,
-                                    wordWrapWidth:
-                                        lineData.quantityText.length > 8
-                                            ? 70
-                                            : 60,
-                                });
-                            }
-                        }
-
-                        const activeLine = chart
-                            .activeChart()
-                            .getShapeById(lineId);
-                        if (activeLine) {
-                            activeLine.setPoints([
-                                { time: 10, price: lineData.yLoc },
-                            ]);
-                            activeLine.setProperties({
-                                linecolor: lineData.color,
-                                borderColor: lineData.color,
+                            activeQuantityLabel.setProperties({
+                                text: quantityText,
+                                wordWrapWidth:
+                                    estimateTextWidth(quantityText) + 5,
                             });
                         }
+                    }
+
+                    const activeLine = chart.activeChart().getShapeById(lineId);
+                    if (activeLine) {
+                        activeLine.setPoints([
+                            { time: 10, price: lineData.yPrice },
+                        ]);
+                        activeLine.setProperties({
+                            linecolor: lineData.color,
+                            borderColor: lineData.color,
+                        });
                     }
                 }, 10) as unknown as number;
 
