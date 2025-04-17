@@ -51,7 +51,10 @@ const OpenOrderLine = () => {
 
                 const color = side === 'buy' ? buyColor : sellColor;
                 const xLoc = 0.4;
-                const tempTriggerCondition = triggerCondition ?? '';
+                const tempTriggerCondition =
+                    triggerCondition && triggerCondition !== 'N/A'
+                        ? triggerCondition
+                        : '';
 
                 let yPrice = limitPx;
                 let quantityTextValue = sz;
