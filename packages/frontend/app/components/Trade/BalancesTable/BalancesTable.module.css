@@ -4,7 +4,7 @@
     padding-left: 8px;
     gap: 8px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
     align-items: center;
 }
 
@@ -15,7 +15,7 @@
     padding-left: 8px;
     gap: 8px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
     align-items: center;
 
     position: sticky;
