@@ -54,6 +54,7 @@ export default function PortfolioTable(props: propsIF) {
     const {
         title,
         accounts,
+        noSort,
     } = props;
 
     const navigate = useNavigate();
@@ -122,6 +123,7 @@ export default function PortfolioTable(props: propsIF) {
                         {tableHeaders.map((header: headerItemIF) => (
                             <div
                                 key={header.key}
+                                style={{ cursor: noSort ? 'default' : 'pointer' }}
                                 className={header.sortable ? styles.sortable : ''}
                                 onClick={() => {
                                     let output: null|sortByIF = null;
@@ -140,7 +142,7 @@ export default function PortfolioTable(props: propsIF) {
                                 }}
                             >
                                 {header.name}
-                                {header.sortable &&
+                                {header.sortable && !noSort &&
                                     <SortIcon
                                         sortDirection={checkSortDirection(header.key)}
                                     />

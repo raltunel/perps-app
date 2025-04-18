@@ -26,7 +26,6 @@
     flex-direction: row;
     font-size: var(--font-size-s);
     color: var(--text2);
-    cursor: pointer;
 }
 
 .table_row {

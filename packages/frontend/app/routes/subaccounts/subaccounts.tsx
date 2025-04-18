@@ -73,6 +73,7 @@ export default function subaccounts() {
             <AccountsTable
                 title='Master Account'
                 accounts={[accounts.master]}
+                noSort
             />
             <AccountsTable
                 title='Sub-Accounts'
