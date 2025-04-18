@@ -95,6 +95,11 @@ export interface WebData2Subscription {
     user: string;
 }
 
+export interface NotificationSubscription {
+    type: 'notification';
+    user: string;
+}
+
 export type Subscription =
     | AllMidsSubscription
     | L2BookSubscription
@@ -105,7 +110,8 @@ export type Subscription =
     | OrderUpdatesSubscription
     | UserFundingsSubscription
     | UserNonFundingLedgerUpdatesSubscription
-    | WebData2Subscription;
+    | WebData2Subscription
+    | NotificationSubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;
@@ -206,6 +212,10 @@ export interface UserFillsData {
     fills: Fill[];
 }
 
+export interface NotificationData {
+    notification: string;
+}
+
 export interface UserFillsMsg {
     channel: 'userFills';
     data: UserFillsData;
@@ -221,6 +231,11 @@ export interface OtherWsMsg {
     data: any;
 }
 
+export interface NotificationMsg {
+    channel: 'notification';
+    data: NotificationData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -228,7 +243,8 @@ export type WsMsg =
     | UserEventsMsg
     | PongMsg
     | UserFillsMsg
-    | OtherWsMsg;
+    | OtherWsMsg
+    | NotificationMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder

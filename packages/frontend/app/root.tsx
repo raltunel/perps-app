@@ -96,12 +96,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
-    const { wsUrl } = useDebugStore();
+    const { wsUrl, wsEnvironment } = useDebugStore();
 
     return (
         <>
             <Layout>
-                <WsObserverProvider url={wsUrl}>
+                <WsObserverProvider url={wsUrl} wsEnvironment={wsEnvironment}>
                     <div className='root-container'>
                         {/* Added error boundary for header */}
                         <ComponentErrorBoundary>

@@ -56,6 +56,29 @@ export const wsUrls = [
     'wss://api-ui.hyperliquid.xyz/ws',
 ];
 
+export const wsEnvironments = [
+    {
+        label: 'Mock',
+        value: 'mock',
+    },
+    {
+        label: 'HyperLiquid',
+        value: 'hl',
+    },
+    {
+        label: 'Local',
+        value: 'local',
+    },
+    {
+        label: 'Mainnet',
+        value: 'mainnet',
+    },
+    {
+        label: 'Testnet',
+        value: 'testnet',
+    },
+];
+
 export const debugWallets: DebugWallet[] = [
     {
         label: 'Crazy Account',
