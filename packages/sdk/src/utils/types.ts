@@ -212,6 +212,10 @@ export interface UserFillsData {
     fills: Fill[];
 }
 
+export interface NotificationData {
+    notification: string;
+}
+
 export interface UserFillsMsg {
     channel: 'userFills';
     data: UserFillsData;
@@ -227,6 +231,11 @@ export interface OtherWsMsg {
     data: any;
 }
 
+export interface NotificationMsg {
+    channel: 'notification';
+    data: NotificationData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -234,7 +243,8 @@ export type WsMsg =
     | UserEventsMsg
     | PongMsg
     | UserFillsMsg
-    | OtherWsMsg;
+    | OtherWsMsg
+    | NotificationMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder

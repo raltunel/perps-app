@@ -63,6 +63,8 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
             return `userNonFundingLedgerUpdates:${wsMsg.data.user.toLowerCase()}`;
         case 'webData2':
             return `webData2:${wsMsg.data.user.toLowerCase()}`;
+        case 'notification':
+            return 'notification';
         default:
             return undefined;
     }
