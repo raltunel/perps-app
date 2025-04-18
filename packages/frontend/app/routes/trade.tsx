@@ -59,14 +59,20 @@ export default function Trade() {
     return (
         <>
             <div className={styles.wsUrlSelector}>
-                <ComboBox
-                    value={sdkEnabled ? wsEnvironment : wsUrl}
-                    options={sdkEnabled ? wsEnvironments : wsUrls}
-                    fieldName='value'
-                    onChange={(value) =>
-                        sdkEnabled ? setWsEnvironment(value) : setWsUrl(value)
-                    }
-                />
+                {sdkEnabled ? (
+                    <ComboBox
+                        value={wsEnvironment}
+                        options={wsEnvironments}
+                        fieldName='value'
+                        onChange={(value) => setWsEnvironment(value)}
+                    />
+                ) : (
+                    <ComboBox
+                        value={wsUrl}
+                        options={wsUrls}
+                        onChange={(value) => setWsUrl(value)}
+                    />
+                )}
             </div>
             <div className={styles.walletSelector}>
                 <ComboBox

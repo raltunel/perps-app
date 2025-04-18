@@ -23,7 +23,7 @@ interface DebugStore {
 export const useDebugStore = create<DebugStore>((set) => ({
     wsUrl: wsUrls[2],
     setWsUrl: (wsUrl: string) => set({ wsUrl }),
-    wsEnvironment: wsEnvironments[0].value as
+    wsEnvironment: wsEnvironments[1].value as
         | 'mock'
         | 'hl'
         | 'local'

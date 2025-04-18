@@ -14,6 +14,7 @@ export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
     payload?: any;
     single?: boolean;
+    subscriptionId?: number;
 };
 
 enum WebSocketReadyState {
@@ -62,12 +63,14 @@ export const WsObserverProvider: React.FC<{
         new Map(),
     );
 
+    const { isWsEnabled } = useDebugStore();
+
     const { sdkEnabled } = useDebugStore();
     const sdkEnabledRef = useRef(sdkEnabled);
     sdkEnabledRef.current = sdkEnabled;
 
     const [sdkReady, setSdkReady] = useState(
-        socketManagerRef.current?.getWsReady(),
+        socketManagerRef.current?.isWsReady(),
     );
 
     function extractChannelFromPayload(raw: string): string {
@@ -77,9 +80,8 @@ export const WsObserverProvider: React.FC<{
 
     useEffect(() => {
         const interval = setInterval(() => {
-            console.log('sdkReady', socketManagerRef.current?.getWsReady());
-            if (sdkReady !== socketManagerRef.current?.getWsReady()) {
-                setSdkReady(socketManagerRef.current?.getWsReady());
+            if (sdkReady !== socketManagerRef.current?.isWsReady()) {
+                setSdkReady(socketManagerRef.current?.isWsReady());
             }
         }, 1000);
         return () => clearInterval(interval);
@@ -145,30 +147,56 @@ export const WsObserverProvider: React.FC<{
         }
     };
 
+    const initSdkClient = () => {
+        if (socketManagerRef.current) {
+            socketManagerRef.current.stop();
+        }
+        const info = new Info({
+            environment: wsEnvironment as Environment,
+        });
+        if (info) {
+            socketManagerRef.current = info.wsManager;
+        }
+    };
+
     useEffect(() => {
         if (isClient && !sdkEnabledRef.current) {
-            connectWebSocket();
+            if (isWsEnabled) {
+                connectWebSocket();
+            } else if (socketRef.current) {
+                socketRef.current.close();
+            }
         }
 
         return () => {
             // console.log('>>> socket closed!!!!!!!!!!!!!');
             // socketRef.current?.close();
         };
-    }, [url, isClient, sdkEnabled]); // ✅ Only runs when client-side is ready
+    }, [url, isClient, sdkEnabled, isWsEnabled]); // ✅ Only runs when client-side is ready
 
     useEffect(() => {
         if (isClient && sdkEnabledRef.current) {
+            if (isWsEnabled) {
+                initSdkClient();
+            } else {
+                if (socketManagerRef.current) {
+                    socketManagerRef.current.stop();
+                }
+            }
+        }
+    }, [wsEnvironment, isClient, sdkEnabled, isWsEnabled]);
+
+    useEffect(() => {
+        if (sdkEnabled === false) {
             if (socketManagerRef.current) {
                 socketManagerRef.current.stop();
             }
-            const info = new Info({
-                environment: wsEnvironment as Environment,
-            });
-            if (info) {
-                socketManagerRef.current = info.wsManager;
+        } else {
+            if (socketRef.current) {
+                socketRef.current.close();
             }
         }
-    }, [wsEnvironment, isClient, sdkEnabled]);
+    }, [sdkEnabled]);
 
     const sendMessage = (msg: string) => {
         if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
@@ -176,14 +204,13 @@ export const WsObserverProvider: React.FC<{
         }
     };
 
-    const registerWsSubscription = (
-        type: string,
-        payload: any,
-        unsubscribe: boolean = false,
-    ) => {
+    const wsSubscribe = (type: string, payload: any): number | undefined => {
         if (sdkEnabledRef.current) {
-            if (socketManagerRef.current) {
-                socketManagerRef.current.subscribe(
+            if (
+                socketManagerRef.current &&
+                socketManagerRef.current.isWsReady()
+            ) {
+                const subscriptionId = socketManagerRef.current.subscribe(
                     {
                         type: type,
                         ...payload,
@@ -192,15 +219,52 @@ export const WsObserverProvider: React.FC<{
                         sdkOnMessage(JSON.stringify(msg));
                     },
                 );
+                return subscriptionId;
             }
         } else {
             sendMessage(
                 JSON.stringify({
-                    method: unsubscribe ? 'unsubscribe' : 'subscribe',
+                    method: 'subscribe',
                     subscription: {
                         type: type,
                         ...payload,
                     },
+                }),
+            );
+        }
+    };
+
+    const wsUnsubscribe = (
+        type: string,
+        payload: any,
+        subscriptionId?: number,
+    ) => {
+        if (sdkEnabledRef.current) {
+            if (
+                socketManagerRef.current &&
+                subscriptionId &&
+                socketManagerRef.current.isWsReady()
+            ) {
+                socketManagerRef.current.unsubscribe(
+                    {
+                        type: type,
+                        ...payload,
+                    },
+                    subscriptionId,
+                );
+            } else {
+                if (socketManagerRef.current) {
+                    console.error('No subscription id found', {
+                        type,
+                        payload,
+                    });
+                }
+            }
+        } else {
+            sendMessage(
+                JSON.stringify({
+                    method: 'unsubscribe',
+                    subscription: { type, ...payload },
                 }),
             );
         }
@@ -215,24 +279,26 @@ export const WsObserverProvider: React.FC<{
         ) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
-                    registerWsSubscription(key, config.payload || {});
+                    wsSubscribe(key, config.payload || {});
                 });
             });
         }
     }, [readyState, sdkEnabledRef.current]);
 
     useEffect(() => {
-        console.log(
-            'socketManagerRef.current?.getWsReady()',
-            socketManagerRef.current?.getWsReady(),
-        );
         if (
-            socketManagerRef.current?.getWsReady() === true &&
+            socketManagerRef.current?.isWsReady() === true &&
             sdkEnabledRef.current === true
         ) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
-                    registerWsSubscription(key, config.payload || {});
+                    const subscriptionId = wsSubscribe(
+                        key,
+                        config.payload || {},
+                    );
+                    if (subscriptionId) {
+                        config.subscriptionId = subscriptionId;
+                    }
                 });
             });
         }
@@ -264,7 +330,7 @@ export const WsObserverProvider: React.FC<{
         if (config.single) {
             const currentSubs = subscriptions.current.get(key) || [];
             currentSubs.forEach((sub) => {
-                registerWsSubscription(key, sub.payload || {}, true);
+                wsUnsubscribe(key, sub.payload || {}, sub.subscriptionId);
             });
             subscriptions.current.set(key, [config]);
         } else {
@@ -272,14 +338,21 @@ export const WsObserverProvider: React.FC<{
         }
 
         // add subscription through websocket context
-        registerWsSubscription(key, config.payload || {});
+        const subscriptionId = wsSubscribe(key, config.payload || {});
+        if (subscriptionId) {
+            config.subscriptionId = subscriptionId;
+        }
     };
 
     // unsubscribe all subscriptions by channel
     const unsubscribeAllByChannel = (channel: string) => {
         if (subscriptions.current.has(channel)) {
             subscriptions.current.get(channel)!.forEach((config) => {
-                registerWsSubscription(channel, config.payload || {}, true);
+                wsUnsubscribe(
+                    channel,
+                    config.payload || {},
+                    config.subscriptionId,
+                );
             });
         }
         subscriptions.current.delete(channel);

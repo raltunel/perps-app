@@ -234,8 +234,7 @@ export class WebsocketManager {
         return activeSubs.length !== newActiveSubs.length;
     }
 
-    getWsReady() {
-        console.log('getWsReady', this.wsReady);
+    isWsReady() {
         return this.wsReady;
     }
 }
