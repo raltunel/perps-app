@@ -1,10 +1,10 @@
-import Button from '~/components/Button/Button';
 import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
 import Modal from '~/components/Modal/Modal';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import { MdOutlineClose } from 'react-icons/md';
 import { useRef } from 'react';
+import Button from '~/components/Button/Button';
 
 export interface accountIF {
     name: string;
@@ -81,17 +81,18 @@ export default function subaccounts() {
             </div>
             { createSubaccountModal.isOpen && 
                 <Modal close={createSubaccountModal.close}>
-                    <div>
+                    <div className={styles.create_sub_account_modal}>
                         <header>
-                            <></>
+                            <div style={{ width: '20px' }}/>
                             <h3>Create Sub-Account</h3>
                             <MdOutlineClose
                                 size={20}
                                 onClick={createSubaccountModal.close}
                                 style={{ cursor: 'pointer' }}
+                                color='var(--text2)'
                             />
                         </header>
-                        <div>
+                        <div className={styles.text_entry}>
                             <div>Name</div>
                             <input
                                 type='text'
@@ -99,26 +100,22 @@ export default function subaccounts() {
                                 ref={inputRef}
                             />
                         </div>
-                        <div>
-                            <Button
-                                size='medium'
+                        <div className={styles.modal_buttons}>
+                            <button
                                 onClick={createSubaccountModal.close}
                             >
                                 Cancel
-                            </Button>
-                            <Button
-                                size='medium'
+                            </button>
+                            <button
                                 onClick={() => {
-                                    // Log the input value
                                     if (inputRef.current) {
                                         console.log(inputRef.current.value);
                                     }
-                                    // Close the modal
                                     createSubaccountModal.close();
                                 }}
                             >
                                 Confirm
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 </Modal>
