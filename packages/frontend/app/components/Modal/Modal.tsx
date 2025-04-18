@@ -237,10 +237,6 @@ export default function Modal(props: ModalProps) {
                 <div
                     ref={bottomSheetRef}
                     className={`${styles.bottomSheet} ${animation}`}
-                    style={{
-                        // Add padding-bottom to account for mobile safe area
-                        paddingBottom: `calc(env(safe-area-inset-bottom, 0px) + 16px)`
-                    }}
                 >
                     <div
                         ref={handleRef}
@@ -252,11 +248,6 @@ export default function Modal(props: ModalProps) {
                     >
                         <div className={styles.handle}></div>
                     </div>
-                    <header>
-                        <span />
-                        <h3>{title}</h3>
-                        <MdClose onClick={handleClose} color='var(--text2)' />
-                    </header>
                     <div className={styles.modalContent}>{children}</div>
                 </div>
             ) : (
