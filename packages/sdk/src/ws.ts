@@ -1,5 +1,5 @@
 import { DEFAULT_PING_INTERVAL_MS } from './config';
-import { Subscription, WsMsg } from './utils/types';
+import type { Subscription, WsMsg } from './utils/types';
 
 type Callback = (msg: WsMsg) => void;
 
@@ -112,6 +112,7 @@ export class WebsocketManager {
         }
         this.queuedSubscriptions = [];
 
+        // @ts-ignore
         this.pingInterval = setInterval(() => {
             if (this.stopped || this.ws.readyState !== WebSocket.OPEN) return;
             this.log('sending ping');

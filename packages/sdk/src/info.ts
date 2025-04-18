@@ -1,6 +1,6 @@
 import { API } from './api';
 import { WebsocketManager } from './ws';
-import {
+import type {
     AllMidsData,
     CandleSnapshotData,
     ClearinghouseState,
@@ -19,7 +19,7 @@ import {
 
 type Callback = (msg: any) => void;
 
-import { Environment } from './config';
+import type { Environment } from './config';
 
 interface InfoOptions {
     environment: Environment;
