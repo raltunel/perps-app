@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 export function useNumFormatter() {
     const { numFormat } = useAppSettings();
+    const { coinPriceMap, selectedCurrency } = useTradeDataStore();
 
     const parseNum = useCallback((val: string | number) => {
         return Number(val);
@@ -48,10 +50,24 @@ export function useNumFormatter() {
         return precisionNumber.toString().split('.')[1].length;
     };
 
+    const fillWithCurrencyChar = useCallback(
+        (currency: string, formattedNum: string, showDollarSign: boolean) => {
+            if (currency === 'USD')
+                return showDollarSign ? '$' + formattedNum : '' + formattedNum;
+            if (currency === 'BTC') return formattedNum + ' ₿';
+            if (currency === 'ETH') return formattedNum + ' Ξ';
+
+            return currency;
+        },
+        [],
+    );
+
     const formatNum = useCallback(
         (
             num: number | string,
             precision?: number | OrderRowResolutionIF | null,
+            currencyConversion: boolean = false,
+            showDollarSign: boolean = false,
         ) => {
             const formatType = numFormat.value;
 
@@ -63,16 +79,38 @@ export function useNumFormatter() {
                 precisionVal = precision;
             }
 
+            if (currencyConversion && selectedCurrency !== 'USD') {
+                num = parseNum(num);
+                num = num / (coinPriceMap.get(selectedCurrency) || 1);
+            }
+
             // if (Number.isInteger(num)) {
             //   return num.toLocaleString(formatType);
             // } else {
-            return num.toLocaleString(formatType, {
+
+            const formattedNum = num.toLocaleString(formatType, {
                 minimumFractionDigits: precisionVal || getDefaultPrecision(num),
                 maximumFractionDigits: precisionVal || getDefaultPrecision(num),
             });
+
+            if (currencyConversion) {
+                return fillWithCurrencyChar(
+                    selectedCurrency,
+                    formattedNum,
+                    showDollarSign,
+                );
+            } else {
+                return formattedNum;
+            }
             // }
         },
-        [numFormat, parseNum, getDefaultPrecision],
+        [
+            numFormat,
+            parseNum,
+            getDefaultPrecision,
+            coinPriceMap,
+            selectedCurrency,
+        ],
     );
 
     const formatNumWithOnlyDecimals = useCallback(

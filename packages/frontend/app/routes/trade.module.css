@@ -154,7 +154,8 @@ filter: blur(2px); */
 
 .wsUrlSelector,
 .walletSelector,
-.wsToggle {
+.wsToggle,
+.currencySelector {
     user-select: none;
     position: fixed;
     top: 1rem;
@@ -175,6 +176,12 @@ filter: blur(2px); */
 .wsToggle {
     transition: all 0.2s ease;
     right: 46rem;
+    top: 1.2rem;
+    cursor: pointer;
+}
+
+.currencySelector {
+    right: 54rem;
     top: 1.2rem;
     cursor: pointer;
 }

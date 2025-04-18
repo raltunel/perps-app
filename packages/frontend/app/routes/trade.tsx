@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -26,7 +26,8 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Trade() {
-    const { symbol } = useTradeDataStore();
+    const { symbol, selectedCurrency, setSelectedCurrency } =
+        useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
@@ -45,6 +46,8 @@ export default function Trade() {
         const info = new Info({ environment: 'mock' });
         console.log({ wsManager: info.wsManager });
     }, []);
+
+    const currencies = ['USD', 'BTC', 'ETH'];
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
@@ -75,6 +78,14 @@ export default function Trade() {
                                 )?.address || '',
                         })
                     }
+                />
+            </div>
+
+            <div className={styles.currencySelector}>
+                <ComboBox
+                    value={selectedCurrency}
+                    options={currencies}
+                    onChange={(value) => setSelectedCurrency(value)}
                 />
             </div>
 
