@@ -1,4 +1,5 @@
-import PortfolioTable from '../portfolio/components/PortfolioTable';
+import Button from '~/components/Button/Button';
+import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
 
 export interface accountIF {
@@ -25,7 +26,7 @@ const accounts: allAccountsIF = {
             equity: '$0.00',
         },
         {
-            name: 'Sub-Account 2',
+            name: 'Sub-Account 5',
             address: '0x0000000000000000000000000000000000000000',
             equity: '$0.00',
         },
@@ -40,7 +41,7 @@ const accounts: allAccountsIF = {
             equity: '$0.00',
         },
         {
-            name: 'Sub-Account 5',
+            name: 'Sub-Account 2',
             address: '0x0000000000000000000000000000000000000000',
             equity: '$0.00',
         },
@@ -49,15 +50,26 @@ const accounts: allAccountsIF = {
 
 export default function subaccounts() {
     return (
-        <>
             <div className={styles.subaccounts}>
-                This is the sub accounts page
+                <div className={styles.subaccounts_wrapper}>
+                <header>
+                    <h2>Sub-Accounts</h2>
+                    <Button
+                        size='medium'
+                        selected={true}
+                    >
+                        Create Sub-Account
+                    </Button>
+                </header>
+                <AccountsTable
+                    title='Master Account'
+                    accounts={[accounts.master]}
+                />
+                <AccountsTable
+                    title='Sub-Accounts'
+                    accounts={accounts.sub}
+                />
+                </div>
             </div>
-            <PortfolioTable
-                title='Master Account'
-                accounts={[accounts.master]}
-            />
-            <PortfolioTable title='Sub-Accounts' accounts={accounts.sub} />
-        </>
     );
 }
