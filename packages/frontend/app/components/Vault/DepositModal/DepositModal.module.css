@@ -1,7 +1,6 @@
 .container {
     display: flex;
     width: 398px;
-    padding: 8px 16px 16px 16px;
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -169,4 +168,9 @@
     background: var(--dark4, #27272c);
     color: var(--text2, #bcbcc4);
     cursor: not-allowed;
+}
+@media (max-width: 768px) {
+    .container {
+        width: auto;
+    }
 }

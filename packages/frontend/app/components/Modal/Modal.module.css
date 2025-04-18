@@ -42,14 +42,14 @@
 }
 
 .bottomSheet {
-    /* Style the actual content container */
-    border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
+  
+    border-radius: 16px 16px 0 0; 
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     width: 100%;
     
-    /* Use SVH instead of VH to account for mobile browser navigation */
-    max-height: 85svh; /* Small viewport height unit - accounts for browser UI */
+   
+    max-height: 85svh; 
     
     overflow-y: auto;
     transform: translateY(100%);
@@ -102,7 +102,7 @@
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     max-width: 90vw;
-    max-height: 90svh; /* Use SVH for consistent height across browsers */
+    max-height: 90svh; 
     overflow-y: auto;
 }
 
