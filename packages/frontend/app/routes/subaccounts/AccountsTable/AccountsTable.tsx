@@ -5,7 +5,6 @@ import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/routes/subaccounts/subaccounts';
 import { useMemo, useState } from 'react';
-
 export interface headerItemIF {
     name: string;
     key: string;

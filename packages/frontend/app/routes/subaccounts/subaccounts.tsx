@@ -1,6 +1,8 @@
 import Button from '~/components/Button/Button';
 import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
+import Modal from '~/components/Modal/Modal';
+import { useModal, type useModalIF } from '~/hooks/useModal';
 
 export interface accountIF {
     name: string;
@@ -49,6 +51,8 @@ const accounts: allAccountsIF = {
 };
 
 export default function subaccounts() {
+    const createSubaccountModal: useModalIF = useModal('closed');
+
     return (
             <div className={styles.subaccounts}>
                 <div className={styles.subaccounts_wrapper}>
@@ -57,6 +61,7 @@ export default function subaccounts() {
                     <Button
                         size='medium'
                         selected={true}
+                        onClick={createSubaccountModal.open}
                     >
                         Create Sub-Account
                     </Button>
@@ -70,6 +75,11 @@ export default function subaccounts() {
                     accounts={accounts.sub}
                 />
                 </div>
+                { createSubaccountModal.isOpen && 
+                    <Modal close={createSubaccountModal.close}>
+                        <h3>Good morning!</h3>
+                    </Modal>
+                }
             </div>
     );
 }
