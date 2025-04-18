@@ -3,6 +3,8 @@ import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
 import Modal from '~/components/Modal/Modal';
 import { useModal, type useModalIF } from '~/hooks/useModal';
+import { MdOutlineClose } from 'react-icons/md';
+import { useRef } from 'react';
 
 export interface accountIF {
     name: string;
@@ -53,33 +55,74 @@ const accounts: allAccountsIF = {
 export default function subaccounts() {
     const createSubaccountModal: useModalIF = useModal('closed');
 
+    const inputRef = useRef<HTMLInputElement>(null);
+
     return (
-            <div className={styles.subaccounts}>
-                <div className={styles.subaccounts_wrapper}>
-                <header>
-                    <h2>Sub-Accounts</h2>
-                    <Button
-                        size='medium'
-                        selected={true}
-                        onClick={createSubaccountModal.open}
-                    >
-                        Create Sub-Account
-                    </Button>
-                </header>
-                <AccountsTable
-                    title='Master Account'
-                    accounts={[accounts.master]}
-                />
-                <AccountsTable
-                    title='Sub-Accounts'
-                    accounts={accounts.sub}
-                />
-                </div>
-                { createSubaccountModal.isOpen && 
-                    <Modal close={createSubaccountModal.close}>
-                        <h3>Good morning!</h3>
-                    </Modal>
-                }
+        <div className={styles.subaccounts}>
+            <div className={styles.subaccounts_wrapper}>
+            <header>
+                <h2>Sub-Accounts</h2>
+                <Button
+                    size='medium'
+                    selected={true}
+                    onClick={createSubaccountModal.open}
+                >
+                    Create Sub-Account
+                </Button>
+            </header>
+            <AccountsTable
+                title='Master Account'
+                accounts={[accounts.master]}
+            />
+            <AccountsTable
+                title='Sub-Accounts'
+                accounts={accounts.sub}
+            />
             </div>
+            { createSubaccountModal.isOpen && 
+                <Modal close={createSubaccountModal.close}>
+                    <div>
+                        <header>
+                            <></>
+                            <h3>Create Sub-Account</h3>
+                            <MdOutlineClose
+                                size={20}
+                                onClick={createSubaccountModal.close}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </header>
+                        <div>
+                            <div>Name</div>
+                            <input
+                                type='text'
+                                placeholder='eg: My Sub-Account 1'
+                                ref={inputRef}
+                            />
+                        </div>
+                        <div>
+                            <Button
+                                size='medium'
+                                onClick={createSubaccountModal.close}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size='medium'
+                                onClick={() => {
+                                    // Log the input value
+                                    if (inputRef.current) {
+                                        console.log(inputRef.current.value);
+                                    }
+                                    // Close the modal
+                                    createSubaccountModal.close();
+                                }}
+                            >
+                                Confirm
+                            </Button>
+                        </div>
+                    </div>
+                </Modal>
+            }
+        </div>
     );
 }
