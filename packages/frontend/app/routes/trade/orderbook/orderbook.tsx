@@ -4,7 +4,6 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -36,11 +35,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const { formatNum } = useNumFormatter();
-
-    const { isWsEnabled } = useDebugStore();
-
-    const isWsEnabledRef = useRef<boolean>(true);
-    isWsEnabledRef.current = isWsEnabled;
 
     const lockOrderBook = useRef<boolean>(false);
 
@@ -172,7 +166,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         subscribe(WsChannels.ORDERBOOK, {
             payload: payload,
             handler: (response) => {
-                if (!isWsEnabledRef.current || lockOrderBook.current) {
+                if (!lockOrderBook.current) {
                     return;
                 }
 
@@ -210,6 +204,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [symbol, symbolInfo?.coin]);
 
     useEffect(() => {
+        console.log('selectedResolution', selectedResolution);
         if (selectedResolution) {
             changeSubscription({
                 coin: symbol,

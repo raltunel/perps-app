@@ -37,15 +37,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const saveToStoreLock = useRef<boolean>(false);
 
-    const { isWsEnabled } = useDebugStore();
-    const isWsEnabledRef = useRef<boolean>(true);
-    isWsEnabledRef.current = isWsEnabled;
-
     useEffect(() => {
         const saveIntoStoreInterval = setInterval(() => {
-            if (!isWsEnabledRef.current) {
-                return;
-            }
             if (saveToStoreLock.current) {
                 return;
             }
@@ -64,9 +57,6 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
             type: ApiEndpoints.HISTORICAL_ORDERS,
             payload: { user: debugWallet.address },
             handler: (data) => {
-                if (!isWsEnabledRef.current) {
-                    return;
-                }
                 if (data && data.length > 0) {
                     const orders: OrderDataIF[] = [];
                     data.slice(0, OrderHistoryLimits.MAX).map((o: any) => {

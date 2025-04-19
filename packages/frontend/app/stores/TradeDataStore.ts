@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { setLS } from '~/utils/AppUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import { persist } from 'zustand/middleware';
 
