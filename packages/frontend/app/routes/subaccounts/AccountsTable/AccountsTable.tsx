@@ -153,13 +153,10 @@ export default function PortfolioTable(props: propsIF) {
                     <div className={styles.table_body}>
                         {sorted.map((acct) => (
                             <div key={JSON.stringify(acct)} className={styles.table_row}>
-                                <div className={styles.cell}>{acct.name}</div>
-                                <div className={styles.cell}>
-                                    {acct.address}
-                                </div>
-                                <div className={styles.cell}>{acct.equity}</div>
+                                <div>{acct.name}</div>
+                                <div>{acct.address}</div>
+                                <div>{acct.equity}</div>
                                 <div
-                                    className={styles.cell}
                                     style={{
                                         justifyContent: 'flex-end',
                                         color: 'var(--accent1)',
