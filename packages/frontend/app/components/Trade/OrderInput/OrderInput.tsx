@@ -494,7 +494,7 @@ export default function OrderInput() {
             <PlaceOrderButtons
                 orderMarketPrice={marketOrderType}
                 openModalWithContent={openModalWithContent}
-                orderValue={formatNum(orderValue)}
+                orderValue={orderValue}
                 leverage={leverage}
             />
 
