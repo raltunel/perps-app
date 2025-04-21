@@ -4,32 +4,43 @@ import { MdOutlineClose } from 'react-icons/md';
 import Modal from '~/components/Modal/Modal';
 import type { useModalIF } from '~/hooks/useModal';
 
+// interface for functional component props
 interface propsIF {
     modalControl: useModalIF;
 }
 
+// main react functional component
 export default function CreateSubaccount(props: propsIF) {
     const { modalControl } = props;
 
-    // ref to hold input when user enters the
+    // ref to hold input field until form submission
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // string to link `<label>` and `<input>` fields
+    const INPUT_ID_FOR_DOM = 'create_subaccount_input_field';
+
+    // centralize icon size to keep <header> horizontally centered
+    const CLOSE_ICON_SIZE = 20;
+
+    // JSX return
     return (
         <Modal close={modalControl.close}>
             <div className={styles.create_sub_account_modal}>
                 <header>
-                    <div style={{ width: '20px' }} />
+                    {/* empty <div> below is just for spacing */}
+                    <div style={{ width: CLOSE_ICON_SIZE + 'px' }} />
                     <h3>Create Sub-Account</h3>
                     <MdOutlineClose
-                        size={20}
+                        size={CLOSE_ICON_SIZE}
                         onClick={modalControl.close}
                         style={{ cursor: 'pointer' }}
                         color='var(--text2)'
                     />
                 </header>
                 <div className={styles.text_entry}>
-                    <div>Name</div>
+                    <label htmlFor={INPUT_ID_FOR_DOM}>Name</label>
                     <input
+                        id={INPUT_ID_FOR_DOM}
                         type='text'
                         placeholder='eg: My Sub-Account 1'
                         ref={inputRef}
