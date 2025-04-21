@@ -1,5 +1,8 @@
 import Welcome from '~/components/Welcome/Welcome';
 import type { Route } from '../../+types/root';
+import styles from './referrals.module.css';
+import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
+import ReferralsTable from '~/components/Referrals/ReferralsTable/ReferralsTable';
 // import styles from './referrals.module.css'
 export function meta({}: Route.MetaArgs) {
     return [
@@ -13,5 +16,30 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Referrals({ loaderData }: Route.ComponentProps) {
-    return <Welcome title='Referrals' />;
+    return (
+        <div className={styles.container}>
+            <header>
+                Portfolio
+                <p>
+                    Refer users to earn rewards. Affiliates earn greater
+                    rewards. Learn More <a href='#'>Learn More</a>
+                </p>
+            </header>
+            <div className={styles.detailsContainer}>
+                <div className={styles.detailsContent}>
+                    <h6>Traders Referred</h6>
+                    <h3>0</h3>
+                </div>
+                <div className={styles.detailsContent}>
+                    <h6>Rewards Earned</h6>
+                    <h3>$0.00</h3>
+                </div>
+            </div>
+            <section className={styles.tableContainer}>
+                <CodeTabs />
+                <ReferralsTable/>
+
+            </section>
+        </div>
+    );
 }
