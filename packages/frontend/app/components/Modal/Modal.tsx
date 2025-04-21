@@ -1,5 +1,4 @@
-// Modal.tsx
-import { useEffect, useState, useRef, type ReactNode } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 import { useMobile } from '~/hooks/useMediaQuery';
 import { MdClose } from 'react-icons/md';
@@ -42,7 +41,7 @@ interface ModalProps {
     title: string;
 }
 
-export default function Modal(props: ModalProps) {
+function Modal(props: ModalProps) {
     const {
         close,
         position = 'center',
@@ -52,7 +51,6 @@ export default function Modal(props: ModalProps) {
         title,
     } = props;
 
-    // Use our custom hook to detect mobile devices
     const isMobile = useMobile(mobileBreakpoint);
 
     const [animation, setAnimation] = useState('');
@@ -67,43 +65,65 @@ export default function Modal(props: ModalProps) {
         isDragging: false,
     });
 
-    // Determine if we should use bottom sheet based on screen size or forced option
     const shouldUseBottomSheet = forceBottomSheet || isMobile;
     const actualPosition = shouldUseBottomSheet ? 'bottomSheet' : position;
 
-    // Function to handle closing with animation
-    const handleClose = (): void => {
+    const OUTSIDE_MODAL_DOM_ID = 'outside_modal';
+
+    // Memoize the close handler to prevent unnecessary re-renders
+    const handleClose = useCallback((): void => {
         if (actualPosition === 'bottomSheet') {
             setAnimation(styles.slideDown);
             setTimeout(() => {
                 if (close) {
                     close();
                 }
-            }, 300); // Match this with your CSS animation duration
+            }, 300); 
         } else {
             if (close) {
                 close();
             }
         }
-    };
+    }, [actualPosition, close]);
 
-    // DOM id for the area outside modal body
-    const OUTSIDE_MODAL_DOM_ID = 'outside_modal';
-
-    // fn to handle a click outside the modal body
-    const handleOutsideClick = (target: HTMLDivElement): void => {
-        // close the modal if area outside the body was clicked directly
+    // Memoize the outside click handler
+    const handleOutsideClick = useCallback((target: HTMLDivElement): void => {
         if (target.id === OUTSIDE_MODAL_DOM_ID && close) {
             handleClose();
         }
-    };
+    }, [OUTSIDE_MODAL_DOM_ID, close, handleClose]);
 
     // return children without creating curtain behind modal
     // this allows us to make multiple non-exclusive modals at once
     if (!close) return children;
+    
+    // Use requestAnimationFrame for smooth animations
+    const updateDragPosition = useCallback((deltaY: number) => {
+        if (!bottomSheetRef.current) return;
+        
+        requestAnimationFrame(() => {
+            if (bottomSheetRef.current) {
+                bottomSheetRef.current.style.transform = `translateY(${deltaY}px)`;
+                bottomSheetRef.current.style.transition = 'none'; // Disable transition during drag
+            }
+        });
+    }, []);
 
-    // Handle drag start
-    const handleDragStart = (e: React.TouchEvent | React.MouseEvent): void => {
+    // Batch related state updates for starting drag
+    const startDragging = useCallback((clientY: number) => {
+        dragState.current = {
+            startY: clientY,
+            currentY: 0,
+            isDragging: true,
+        };
+        
+        if (handleRef.current) {
+            handleRef.current.classList.add(styles.dragging);
+        }
+    }, []);
+
+    // Handle drag start - memoized
+    const handleDragStart = useCallback((e: React.TouchEvent | React.MouseEvent): void => {
         if (!bottomSheetRef.current) return;
 
         let clientY: number;
@@ -125,20 +145,11 @@ export default function Modal(props: ModalProps) {
             );
         }
 
-        dragState.current = {
-            startY: clientY,
-            currentY: 0,
-            isDragging: true,
-        };
+        startDragging(clientY);
+    }, [startDragging]);
 
-        // Add active class to show the grabbing cursor
-        if (handleRef.current) {
-            handleRef.current.classList.add(styles.dragging);
-        }
-    };
-
-    // Handle drag move
-    const handleDragMove = (e: React.TouchEvent | MouseEvent): void => {
+    // Handle drag move - memoized
+    const handleDragMove = useCallback((e: React.TouchEvent | MouseEvent): void => {
         if (!dragState.current.isDragging || !bottomSheetRef.current) return;
 
         let clientY: number;
@@ -159,13 +170,12 @@ export default function Modal(props: ModalProps) {
 
         dragState.current.currentY = deltaY;
 
-        // Apply the transformation
-        bottomSheetRef.current.style.transform = `translateY(${deltaY}px)`;
-        bottomSheetRef.current.style.transition = 'none'; // Disable transition during drag
-    };
+        // Apply the transformation using requestAnimationFrame
+        updateDragPosition(deltaY);
+    }, [updateDragPosition]);
 
-    // Handle drag end
-    const handleDragEnd = (): void => {
+    // Handle drag end - memoized
+    const handleDragEnd = useCallback((): void => {
         if (!dragState.current.isDragging || !bottomSheetRef.current) {
             return;
         }
@@ -198,7 +208,7 @@ export default function Modal(props: ModalProps) {
         if (handleRef.current) {
             handleRef.current.classList.remove(styles.dragging);
         }
-    };
+    }, [handleClose]);
 
     // Prevent background content from scrolling when modal is open
     useEffect(() => {
@@ -221,9 +231,9 @@ export default function Modal(props: ModalProps) {
 
     // event listener to close modal on `Escape` keydown event
     useEffect(() => {
-        // type of event
+        let animationTimeout: number;
         const EVENT_TYPE = 'keydown';
-        // fn to close modal when the `Escape` key is pressed
+        
         function handleEscape(evt: KeyboardEvent): void {
             if (evt.key === 'Escape' && close) {
                 handleClose();
@@ -233,16 +243,40 @@ export default function Modal(props: ModalProps) {
         // Add animation class on mount for bottom sheet
         if (actualPosition === 'bottomSheet') {
             // Slight delay to ensure the initial transform is applied first
-            setTimeout(() => {
+            animationTimeout = window.setTimeout(() => {
                 setAnimation(styles.slideUp);
             }, 10);
         }
 
         // add the event listener to the DOM
         document.addEventListener(EVENT_TYPE, handleEscape);
+        
         // remove event listener from the DOM when component unmounts
-        return () => document.removeEventListener(EVENT_TYPE, handleEscape);
-    }, [actualPosition, close]);
+        return () => {
+            document.removeEventListener(EVENT_TYPE, handleEscape);
+            if (animationTimeout) window.clearTimeout(animationTimeout);
+        };
+    }, [actualPosition, close, handleClose]);
+
+    // Memoize the modal header
+    const modalHeader = useMemo(() => (
+        <header>
+            <span />
+            <h3>{title}</h3>
+            {!shouldUseBottomSheet ? 
+                <MdClose onClick={handleClose} color='var(--text2)' /> : 
+                <span/>
+            }
+        </header>
+    ), [title, shouldUseBottomSheet, handleClose]);
+
+    // Memoize the modal content
+    const modalContent = useMemo(() => (
+        <div className={styles.modalContent}>
+            {children}
+            <div className={styles.safeAreaSpacer}></div>
+        </div>
+    ), [children]);
 
     return (
         <div
@@ -253,9 +287,11 @@ export default function Modal(props: ModalProps) {
             id={OUTSIDE_MODAL_DOM_ID}
             className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''}`}
             style={positionStyles[actualPosition]}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
         >
             {actualPosition === 'bottomSheet' ? (
-                // Bottom sheet - direct rendering without extra container
                 <div
                     ref={bottomSheetRef}
                     className={`${styles.bottomSheet} ${animation}`}
@@ -270,29 +306,18 @@ export default function Modal(props: ModalProps) {
                     >
                         <div className={styles.handle}></div>
                     </div>
-                    <header>
-                        <span />
-                        <h3>{title}</h3>
-                        <MdClose onClick={handleClose} color='var(--text2)' />
-                    </header>
-                    <div className={styles.modalContent}>
-                        {children}
-                        {/* Add spacer at the bottom to ensure content isn't hidden */}
-                        <div className={styles.safeAreaSpacer}></div>
-                    </div>
+                    {modalHeader}
+                    {modalContent}
                 </div>
             ) : (
                 // Center or other position modals - use centered styling
                 <div className={styles.centerModal}>
-                    <header>
-                        <span />
-                        <h3>{title}</h3>
-                        <MdClose onClick={handleClose} color='var(--text2)' />
-                    </header>
-
-                    {children}
+                    {modalHeader}
+                    {modalContent}
                 </div>
             )}
         </div>
     );
 }
+
+export default React.memo(Modal);

@@ -4,7 +4,7 @@
     left: 0px;
     width: 100vw;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height - adapts to UI changes */
+    height: 100dvh; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -38,29 +38,27 @@
 }
 /* Bottom sheet specific container style */
 .bottomSheetContainer {
-    /* Override the default modal container styles */
     justify-content: flex-end !important;
 
-    /* Remove any padding that might create empty space */
     padding: 0 !important;
     background: transparent !important;
 }
 
 .bottomSheet {
     /* Style the actual content container */
-    border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
+    border-radius: 16px 16px 0 0; 
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     width: 100%;
     
     /* Key fixes for mobile browsers */
-    max-height: 90dvh; /* Dynamic viewport height that adjusts with browser UI */
+    max-height: 90dvh; 
     
     /* This is important: extend the background color all the way to the bottom */
     padding-bottom: env(safe-area-inset-bottom, 16px);
     margin-bottom: -1px; /* Prevents any gap at the bottom */
     
-    /* Make sure this element extends below the visible area */
+    /* Make sure the element extends below the visible area */
     border-bottom: env(safe-area-inset-bottom, 16px) solid var(--dark3, #1c1c22);
     
     /* Ensure content is scrollable but modal itself doesn't scroll with page */
@@ -93,12 +91,12 @@
 .handle {
     width: 36px;
     height: 4px;
-    background-color: #666; /* Darker handle to match dark theme */
+    background-color: #666; 
     border-radius: 2px;
 }
 
 .modalContent {
-    padding: 0 16px 16px 16px;
+    /* padding: 0 16px 16px 16px; */
 }
 
 /* Add a spacer at the bottom to ensure content isn't hidden */
@@ -106,7 +104,6 @@
     height: env(safe-area-inset-bottom, 16px);
 }
 
-/* Animations */
 .slideUp {
     transform: translateY(0);
 }
@@ -122,7 +119,7 @@
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     max-width: 90vw;
-    max-height: 90dvh; /* Dynamic viewport height */
+    max-height: 90dvh; 
     overflow-y: auto;
 }
 
