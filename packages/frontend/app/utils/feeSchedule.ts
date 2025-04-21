@@ -62,7 +62,7 @@ export const feeSchedules: feeSchedulesIF = {
         },
         {
             tier: '3',
-            volume14d: '> $3.00',
+            volume14d: '> 3.00%',
             maker: '-0.003%',
         },
     ],
