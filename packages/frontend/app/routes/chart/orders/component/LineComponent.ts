@@ -267,7 +267,7 @@ const LineComponent = ({ lines }: LineProps) => {
                             activeQuantityLabel.setProperties({
                                 text: quantityText,
                                 wordWrapWidth:
-                                    estimateTextWidth(quantityText) + 5,
+                                    estimateTextWidth(quantityText) + 15,
                             });
                         }
                     }
