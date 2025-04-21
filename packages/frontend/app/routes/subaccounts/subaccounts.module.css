@@ -5,6 +5,7 @@
     justify-content: center;
     height: 100%;
     width: 100%;
+    font-family: var(--font-family-main);
 }
 
 .subaccounts_wrapper {
@@ -22,4 +23,8 @@
     width: 100%;
     align-items: center;
     justify-content: space-between;
+}
+
+.subaccounts_wrapper > header > h2 {
+    font-size: var(--font-size-xl);
 }
