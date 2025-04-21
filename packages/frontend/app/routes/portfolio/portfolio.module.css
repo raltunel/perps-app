@@ -117,6 +117,28 @@
     display: none !important;
 }
 
+
+
+.fee_schedule {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 16px 16px;
+    /* next line is the actual production val but its hard to see */
+    /* background-color: var(--dark3); */
+    background-color: green;
+}
+
+.fee_schedule > header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+
+
 @media (max-width: 768px) {
     .container {
         overflow-y: auto;

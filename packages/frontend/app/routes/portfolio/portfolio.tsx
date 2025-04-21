@@ -8,6 +8,7 @@ import Modal from '~/components/Modal/Modal';
 import { lazy, Suspense } from 'react';
 import { usePortfolioManager } from './usePortfolioManager';
 import { useModal, type useModalIF } from '~/hooks/useModal';
+import { MdOutlineClose } from 'react-icons/md';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -181,7 +182,18 @@ function Portfolio() {
             )}
             { feeScheduleModalCtrl.isOpen &&
                 <Modal close={feeScheduleModalCtrl.close}>
-                    This is the feel schedule modal!
+                    <div className={styles.fee_schedule}>
+                        <header>
+                            <div />
+                            <h3>Fee Schedule</h3>
+                            <MdOutlineClose
+                                size={20}
+                                onClick={feeScheduleModalCtrl.close}
+                                style={{ cursor: 'pointer' }}
+                            />
+                        </header>
+                        This is the feel schedule modal!
+                    </div>
                 </Modal>
             }
         </>
