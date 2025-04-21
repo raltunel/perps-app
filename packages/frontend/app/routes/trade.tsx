@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -40,12 +40,16 @@ export default function Trade() {
         setDebugWallet,
         isWsEnabled,
         setIsWsEnabled,
+        wsEnvironment,
+        setWsEnvironment,
+        sdkEnabled,
+        setSdkEnabled,
     } = useDebugStore();
 
-    useEffect(() => {
-        const info = new Info({ environment: 'mock' });
-        console.log({ wsManager: info.wsManager });
-    }, []);
+    // useEffect(() => {
+    //     const info = new Info({ environment: 'mock' });
+    //     console.log({ wsManager: info.wsManager });
+    // }, []);
 
     const currencies = ['USD', 'BTC', 'ETH'];
 
@@ -58,11 +62,20 @@ export default function Trade() {
     return (
         <>
             <div className={styles.wsUrlSelector}>
-                <ComboBox
-                    value={wsUrl}
-                    options={wsUrls}
-                    onChange={(value) => setWsUrl(value)}
-                />
+                {sdkEnabled ? (
+                    <ComboBox
+                        value={wsEnvironment}
+                        options={wsEnvironments}
+                        fieldName='value'
+                        onChange={(value) => setWsEnvironment(value)}
+                    />
+                ) : (
+                    <ComboBox
+                        value={wsUrl}
+                        options={wsUrls}
+                        onChange={(value) => setWsUrl(value)}
+                    />
+                )}
             </div>
             <div className={styles.walletSelector}>
                 <ComboBox
@@ -95,7 +108,16 @@ export default function Trade() {
             >
                 <div className={styles.wsToggleButton}>
                     {' '}
-                    {isWsEnabled ? 'WS Running' : 'Paused'}
+                    {isWsEnabled ? 'WS' : 'WS'}
+                </div>
+            </div>
+
+            <div
+                className={`${styles.sdkToggle} ${sdkEnabled ? styles.active : styles.disabled}`}
+                onClick={() => setSdkEnabled(!sdkEnabled)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {sdkEnabled ? 'SDK' : 'SDK'}
                 </div>
             </div>
 
