@@ -11,7 +11,6 @@ interface TabProps {
 
 export function Tab(props: TabProps) {
     const { label, isActive, onClick, noClick=false } = props;
-    console.log({noClick});
     return (
         <button
             className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
@@ -194,7 +193,6 @@ export default function Tabs(props: TabsProps) {
                     {tabs.map((tab, idx) => {
                         const tabId = getTabId(tab);
                         const tabLabel = getTabLabel(tab);
-                        console.log(tabs.length <= 1);
                         return (
                             <Tab
                                 key={tabId + tabLabel + idx} // Ensure unique key
