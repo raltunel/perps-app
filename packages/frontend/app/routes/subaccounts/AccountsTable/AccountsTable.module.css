@@ -33,6 +33,8 @@
 .col_headers_row > div {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    gap: 4px;
     font-size: var(--font-size-s);
     color: var(--text2);
 }
