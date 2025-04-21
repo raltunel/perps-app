@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { apiEnvironments, debugWallets } from '~/utils/Constants';
+import { apiEnvironments, debugWallets, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -18,6 +18,8 @@ import SymbolInfo from './trade/symbol/symbolinfo';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
+
+import { Info } from '@perps-app/sdk';
 
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
@@ -30,8 +32,20 @@ export default function Trade() {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
-    const { debugWallet, setDebugWallet, environment, setEnvironment } =
-        useDebugStore();
+    const {
+        debugWallet,
+        setDebugWallet,
+        environment,
+        setEnvironment,
+        wsUrl,
+        setWsUrl,
+        isWsEnabled,
+        setIsWsEnabled,
+        wsEnvironment,
+        setWsEnvironment,
+        sdkEnabled,
+        setSdkEnabled,
+    } = useDebugStore();
 
     // const currencies = ['USD', 'BTC', 'ETH'];
 
@@ -44,12 +58,20 @@ export default function Trade() {
     return (
         <>
             <div className={styles.wsUrlSelector}>
-                <ComboBox
-                    value={environment}
-                    options={apiEnvironments}
-                    fieldName='value'
-                    onChange={(value) => setEnvironment(value)}
-                />
+                {sdkEnabled ? (
+                    <ComboBox
+                        value={wsEnvironment}
+                        options={apiEnvironments}
+                        fieldName='value'
+                        onChange={(value) => setWsEnvironment(value)}
+                    />
+                ) : (
+                    <ComboBox
+                        value={wsUrl}
+                        options={wsUrls}
+                        onChange={(value) => setWsUrl(value)}
+                    />
+                )}
             </div>
             <div className={styles.walletSelector}>
                 <ComboBox
@@ -66,6 +88,25 @@ export default function Trade() {
                         })
                     }
                 />
+            </div>
+
+            <div
+                className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
+                onClick={() => setIsWsEnabled(!isWsEnabled)}
+            >
+                <div className={styles.wsToggleButton}>
+                    {' '}
+                    {isWsEnabled ? 'WS' : 'WS'}
+                </div>
+            </div>
+
+            <div
+                className={`${styles.sdkToggle} ${sdkEnabled ? styles.active : styles.disabled}`}
+                onClick={() => setSdkEnabled(!sdkEnabled)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {sdkEnabled ? 'SDK' : 'SDK'}
+                </div>
             </div>
 
             <TradeRouteHandler />

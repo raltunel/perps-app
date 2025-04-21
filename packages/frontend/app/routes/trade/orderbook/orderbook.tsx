@@ -18,6 +18,7 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+import { useDebugStore } from '~/stores/DebugStore';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -35,6 +36,11 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const { formatNum } = useNumFormatter();
+
+    const { isWsEnabled } = useDebugStore();
+
+    const isWsEnabledRef = useRef<boolean>(true);
+    isWsEnabledRef.current = isWsEnabled;
 
     const lockOrderBook = useRef<boolean>(false);
 
@@ -166,7 +172,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         subscribe(WsChannels.ORDERBOOK, {
             payload: payload,
             handler: (response) => {
-                if (!lockOrderBook.current) {
+                if (!isWsEnabledRef.current || lockOrderBook.current) {
                     return;
                 }
 

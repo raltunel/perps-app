@@ -4,7 +4,6 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import { persist } from 'zustand/middleware';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 type TradeDataStore = UserTradeStore & {
     symbol: string;
