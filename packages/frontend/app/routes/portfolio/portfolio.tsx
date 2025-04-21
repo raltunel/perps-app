@@ -217,7 +217,7 @@ function Portfolio() {
                             </ol>
                         </section>
                         <section className={styles.fee_table}>
-                            <h4>VIP Tiers</h4>
+                            <h4>Market Maker Tiers</h4>
                             <header>
                                 <div>Tier</div>
                                 <div>14D Volume</div>
