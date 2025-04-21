@@ -54,9 +54,11 @@ function Modal(props: ModalProps) {
     const isMobile = useMobile(mobileBreakpoint);
 
     const [animation, setAnimation] = useState('');
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
     const bottomSheetRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     // State to track drag
     const dragState = useRef({
@@ -88,10 +90,13 @@ function Modal(props: ModalProps) {
 
     // Memoize the outside click handler
     const handleOutsideClick = useCallback((target: HTMLDivElement): void => {
+        // Don't close if keyboard is visible (to prevent accidental dismissal)
+        if (isKeyboardVisible) return;
+        
         if (target.id === OUTSIDE_MODAL_DOM_ID && close) {
             handleClose();
         }
-    }, [OUTSIDE_MODAL_DOM_ID, close, handleClose]);
+    }, [OUTSIDE_MODAL_DOM_ID, close, handleClose, isKeyboardVisible]);
 
     // return children without creating curtain behind modal
     // this allows us to make multiple non-exclusive modals at once
@@ -124,7 +129,8 @@ function Modal(props: ModalProps) {
 
     // Handle drag start - memoized
     const handleDragStart = useCallback((e: React.TouchEvent | React.MouseEvent): void => {
-        if (!bottomSheetRef.current) return;
+        // Don't allow dragging when keyboard is visible
+        if (isKeyboardVisible || !bottomSheetRef.current) return;
 
         let clientY: number;
 
@@ -146,7 +152,7 @@ function Modal(props: ModalProps) {
         }
 
         startDragging(clientY);
-    }, [startDragging]);
+    }, [startDragging, isKeyboardVisible]);
 
     // Handle drag move - memoized
     const handleDragMove = useCallback((e: React.TouchEvent | MouseEvent): void => {
@@ -208,7 +214,69 @@ function Modal(props: ModalProps) {
         if (handleRef.current) {
             handleRef.current.classList.remove(styles.dragging);
         }
-    }, [handleClose]);
+    }, [handleClose, handleDragMove]);
+
+    // Keyboard detection effect
+    useEffect(() => {
+        const detectKeyboard = () => {
+            // Use visualViewport API if available (modern browsers)
+            if (window.visualViewport) {
+                const handler = () => {
+                    // When keyboard opens, the viewport height becomes smaller than window inner height
+                    const keyboardVisible = window.visualViewport!.height < window.innerHeight;
+                    
+                    if (keyboardVisible !== isKeyboardVisible) {
+                        setIsKeyboardVisible(keyboardVisible);
+                        
+                        // Scroll to active element when keyboard opens
+                        if (keyboardVisible && document.activeElement) {
+                            // Add a small delay to ensure the keyboard is fully visible
+                            setTimeout(() => {
+                                (document.activeElement as HTMLElement).scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+                            }, 100);
+                        }
+                    }
+                };
+                
+                window.visualViewport.addEventListener('resize', handler);
+                return () => window.visualViewport!.removeEventListener('resize', handler);
+            }
+            
+            // Fallback for older browsers using focus/blur events on input fields
+            const handleFocus = () => setIsKeyboardVisible(true);
+            const handleBlur = () => {
+                // Small delay to prevent flickering
+                setTimeout(() => setIsKeyboardVisible(false), 100);
+            };
+            
+            const addInputListeners = (element: HTMLElement) => {
+                const inputs = element.querySelectorAll('input, textarea');
+                inputs.forEach(input => {
+                    input.addEventListener('focus', handleFocus);
+                    input.addEventListener('blur', handleBlur);
+                });
+                
+                return () => {
+                    inputs.forEach(input => {
+                        input.removeEventListener('focus', handleFocus);
+                        input.removeEventListener('blur', handleBlur);
+                    });
+                };
+            };
+            
+            // Only add listeners if the content ref is available
+            if (contentRef.current) {
+                return addInputListeners(contentRef.current);
+            }
+            
+            return undefined;
+        };
+        
+        return detectKeyboard();
+    }, [isKeyboardVisible]);
 
     // Prevent background content from scrolling when modal is open
     useEffect(() => {
@@ -236,6 +304,11 @@ function Modal(props: ModalProps) {
         
         function handleEscape(evt: KeyboardEvent): void {
             if (evt.key === 'Escape' && close) {
+                // If keyboard is visible, just blur the active element
+                if (isKeyboardVisible && document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur();
+                    return;
+                }
                 handleClose();
             }
         }
@@ -256,13 +329,20 @@ function Modal(props: ModalProps) {
             document.removeEventListener(EVENT_TYPE, handleEscape);
             if (animationTimeout) window.clearTimeout(animationTimeout);
         };
-    }, [actualPosition, close, handleClose]);
+    }, [actualPosition, close, handleClose, isKeyboardVisible]);
+
+    // Blur any active element when tapping the modal background
+    const handleBackdropClick = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        if (e.target === e.currentTarget && document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+    }, []);
 
     // Memoize the modal header
     const modalHeader = useMemo(() => (
         <header>
             <span />
-            <h3>{title}</h3>
+            <h3 id="modal-title">{title}</h3>
             {!shouldUseBottomSheet ? 
                 <MdClose onClick={handleClose} color='var(--text2)' /> : 
                 <span/>
@@ -272,7 +352,7 @@ function Modal(props: ModalProps) {
 
     // Memoize the modal content
     const modalContent = useMemo(() => (
-        <div className={styles.modalContent}>
+        <div ref={contentRef} className={styles.modalContent}>
             {children}
             <div className={styles.safeAreaSpacer}></div>
         </div>
@@ -281,11 +361,12 @@ function Modal(props: ModalProps) {
     return (
         <div
             ref={modalRef}
-            onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
-                handleOutsideClick(e.target as HTMLDivElement)
-            }
+            onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+                handleOutsideClick(e.target as HTMLDivElement);
+                handleBackdropClick(e);
+            }}
             id={OUTSIDE_MODAL_DOM_ID}
-            className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''}`}
+            className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''} ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
             style={positionStyles[actualPosition]}
             role="dialog"
             aria-modal="true"
@@ -294,18 +375,20 @@ function Modal(props: ModalProps) {
             {actualPosition === 'bottomSheet' ? (
                 <div
                     ref={bottomSheetRef}
-                    className={`${styles.bottomSheet} ${animation}`}
+                    className={`${styles.bottomSheet} ${animation} ${isKeyboardVisible ? styles.keyboardActive : ''}`}
                 >
-                    <div
-                        ref={handleRef}
-                        className={styles.bottomSheetHandle}
-                        onTouchStart={handleDragStart}
-                        onTouchMove={handleDragMove}
-                        onTouchEnd={handleDragEnd}
-                        onMouseDown={handleDragStart}
-                    >
-                        <div className={styles.handle}></div>
-                    </div>
+                    {!isKeyboardVisible && (
+                        <div
+                            ref={handleRef}
+                            className={styles.bottomSheetHandle}
+                            onTouchStart={handleDragStart}
+                            onTouchMove={handleDragMove}
+                            onTouchEnd={handleDragEnd}
+                            onMouseDown={handleDragStart}
+                        >
+                            <div className={styles.handle}></div>
+                        </div>
+                    )}
                     {modalHeader}
                     {modalContent}
                 </div>
