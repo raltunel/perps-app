@@ -32,6 +32,8 @@ function subscriptionToIdentifier(subscription: Subscription): string {
             return `webData2:${subscription.user.toLowerCase()}`;
         case 'notification':
             return `notification:${subscription.user.toLowerCase()}`;
+        case 'userHistoricalOrders':
+            return `userHistoricalOrders:${subscription.user.toLowerCase()}`;
         default:
             throw new Error('Unknown subscription type');
     }
@@ -65,6 +67,8 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
             return `webData2:${wsMsg.data.user.toLowerCase()}`;
         case 'notification':
             return 'notification';
+        case 'userHistoricalOrders':
+            return `userHistoricalOrders:${wsMsg.data.user.toLowerCase()}`;
         default:
             return undefined;
     }
