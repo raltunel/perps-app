@@ -118,70 +118,67 @@ export default function PortfolioTable(props: propsIF) {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
             >
-                <div className={styles.tableWrapper}>
-                    <div className={styles.col_headers_row}>
-                        {tableHeaders.map((header: headerItemIF) => (
-                            <div
-                                key={header.key}
-                                style={{ cursor: noSort ? 'default' : 'pointer' }}
-                                className={header.sortable ? styles.sortable : ''}
-                                onClick={() => {
-                                    let output: null|sortByIF = null;
-                                    if (sortBy) {
-                                        output = {
-                                            cell: header.key,
-                                            reverse: !sortBy.reverse,
-                                        };
-                                    } else {
-                                        output = {
-                                            cell: header.key,
-                                            reverse: false,
-                                        };
-                                    }
-                                    setSortBy(output);
-                                }}
-                            >
-                                {header.name}
-                                {header.sortable && !noSort &&
-                                    <SortIcon
-                                        sortDirection={checkSortDirection(header.key)}
-                                    />
+                <div className={styles.col_headers_row}>
+                    {tableHeaders.map((header: headerItemIF) => (
+                        <div
+                            key={header.key}
+                            style={{ cursor: noSort ? 'default' : 'pointer' }}
+                            className={header.sortable ? styles.sortable : ''}
+                            onClick={() => {
+                                let output: null|sortByIF = null;
+                                if (sortBy) {
+                                    output = {
+                                        cell: header.key,
+                                        reverse: !sortBy.reverse,
+                                    };
+                                } else {
+                                    output = {
+                                        cell: header.key,
+                                        reverse: false,
+                                    };
                                 }
-                            </div>
-                        ))}
-                    </div>
-                    <div className={styles.table_body}>
-                        {sorted.map((acct) => (
-                            <div key={JSON.stringify(acct)} className={styles.table_row}>
-                                <div>{acct.name}</div>
-                                <div>{acct.address}</div>
-                                <div>{acct.equity}</div>
-                                <div
-                                    style={{
-                                        justifyContent: 'flex-end',
-                                        color: 'var(--accent1)',
-                                        cursor: 'pointer',
-                                    }}
-                                    onClick={() => navigate('/trade')}
-                                >
-                                    Trade
-                                </div>
-                            </div>
-                        ))}
-
-                        {sorted.length === 0 && (
-                            <div
-                                className={styles.container}
-                                style={{
-                                    justifyContent: 'center',
-                                    padding: '2rem 0',
-                                }}
-                            >
-                                No data to display
-                            </div>
-                        )}
-                    </div>
+                                setSortBy(output);
+                            }}
+                        >
+                            {header.name}
+                            {header.sortable && !noSort &&
+                                <SortIcon
+                                    sortDirection={checkSortDirection(header.key)}
+                                />
+                            }
+                        </div>
+                    ))}
                 </div>
+                <ol className={styles.table_body}>
+                    {sorted.map((acct) => (
+                        <li key={JSON.stringify(acct)} className={styles.table_row}>
+                            <div>{acct.name}</div>
+                            <div>{acct.address}</div>
+                            <div>{acct.equity}</div>
+                            <div
+                                style={{
+                                    justifyContent: 'flex-end',
+                                    color: 'var(--accent1)',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => navigate('/trade')}
+                            >
+                                Trade
+                            </div>
+                        </li>
+                    ))}
+                    {sorted.length === 0 && (
+                        <div
+                            className={styles.container}
+                            style={{
+                                justifyContent: 'center',
+                                padding: '2rem 0',
+                            }}
+                        >
+                            No data to display
+                        </div>
+                    )}
+                </ol>
             </motion.div>
         </div>
     );
