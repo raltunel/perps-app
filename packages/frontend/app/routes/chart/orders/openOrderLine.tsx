@@ -38,7 +38,7 @@ const OpenOrderLine = () => {
     }, [JSON.stringify(positions), symbol]);
 
     useEffect(() => {
-        if (!chart || !userSymbolOrders?.length || !pnlSzi) {
+        if (!chart || !userSymbolOrders?.length) {
             setLines([]);
             return;
         }
@@ -99,7 +99,7 @@ const OpenOrderLine = () => {
                     if (triggerPx) {
                         yPrice = triggerPx;
                     }
-                    quantityTextValue = sz ? sz : pnlSzi;
+                    quantityTextValue = sz ? sz : pnlSzi ? pnlSzi : 0;
                 }
 
                 return {
