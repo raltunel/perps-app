@@ -8,19 +8,19 @@ import { processPosition } from '../processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 
-export type Webdata2SendData = string;
-export type Webdata2ReceiveData = {
+export type WebData2Input = string;
+export type WebData2Output = {
     channel: string;
     data: {
         coins: SymbolInfoIF[];
         userOpenOrders: OrderDataIF[];
-        user: any;
+        user: string;
         positions: PositionIF[];
         coinPriceMap: Map<string, number>;
     };
 };
 
-self.onmessage = function (event: MessageEvent<string>) {
+self.onmessage = function (event: MessageEvent<WebData2Input>) {
     const parsedData = JSON.parse(event.data);
     const coins: SymbolInfoIF[] = [];
     const userOpenOrders: OrderDataIF[] = [];
@@ -29,6 +29,7 @@ self.onmessage = function (event: MessageEvent<string>) {
     const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
     const coinPriceMap: Map<string, number> = new Map();
 
+    // TODO: type check data, the type might end up kinda different for our backend though
     if (data) {
         if (data.meta && data.meta.universe && data.assetCtxs) {
             data.meta.universe.forEach((coin: any) => {
@@ -99,5 +100,5 @@ self.onmessage = function (event: MessageEvent<string>) {
             positions,
             coinPriceMap,
         },
-    });
+    } as WebData2Output);
 };
