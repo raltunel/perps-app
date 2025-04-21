@@ -396,7 +396,7 @@ export const WsObserverProvider: React.FC<{
             default:
                 const w2 = new Worker(
                     new URL(
-                        './../processors/workers/default.worker.ts',
+                        './../processors/workers/jsonParser.worker.ts',
                         import.meta.url,
                     ),
                     { type: 'module' },
