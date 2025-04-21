@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router';
+import { useMemo, useState } from 'react';
 import styles from './AccountsTable.module.css';
+import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/routes/subaccounts/subaccounts';
-import { useMemo, useState } from 'react';
+
+// interface for table column header metadata
 export interface headerItemIF {
     name: string;
     key: string;
@@ -13,6 +15,7 @@ export interface headerItemIF {
     className: string;
 }
 
+// data to label column headers
 const tableHeaders: headerItemIF[] = [
     {
         name: 'Name',
@@ -44,64 +47,73 @@ const tableHeaders: headerItemIF[] = [
     },
 ];
 
+// interface for functional component props
 interface propsIF {
     title: string;
     accounts: accountIF[];
     noSort?: boolean;
 }
 
-export default function PortfolioTable(props: propsIF) {
+// main react functional component
+export default function AccountsTable(props: propsIF) {
     const {
         title,
         accounts,
         noSort,
     } = props;
 
+    // this is needed for the Trade link on each line item
+    // should refactor it later as a `<Link />` elem
     const navigate = useNavigate();
 
+    // data structure for the active sort methodology, putting both values
+    // ... in a unified structure allows them to update concurrently
     interface sortByIF {
         cell: typeof tableHeaders[number]['key'];
         reverse: boolean;
     }
-
     const [sortBy, setSortBy] = useState<null|sortByIF>(null);
 
+    // memoized record of sorted data, updates when the user changes the
+    // ... active sort method or direction
     const sorted = useMemo<accountIF[]>(() => {
+        // only return native unsorted sequence if `noSort` prop is passed
         if (!sortBy) return accounts;
-
+        // declare an output variable
         let output: accountIF[];
-
-        if (sortBy) {
-            if (sortBy.cell === 'name') {
-                output = [...accounts].sort(
-                    (a: accountIF, b: accountIF) => a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase())
-                );
-            } else if (sortBy.cell === 'accountEquity') {
-                output = [...accounts].sort(
-                    (a: accountIF, b: accountIF) => a.equity.toLowerCase().localeCompare(b.equity.toLocaleLowerCase())
-                );
-            } else {
-                output = accounts;
-            }
+        // assignment tree for output variable
+        if (sortBy.cell === 'name') {
+            output = [...accounts].sort(
+                (a: accountIF, b: accountIF) => a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase())
+            );
+        } else if (sortBy.cell === 'accountEquity') {
+            output = [...accounts].sort(
+                (a: accountIF, b: accountIF) => a.equity.toLowerCase().localeCompare(b.equity.toLocaleLowerCase())
+            );
         } else {
             output = accounts;
         }
-
+        // return sorted data, reverse the sequence if relevant
         return sortBy.reverse ? output.reverse() : output;
     }, [sortBy]);
 
-    function checkSortDirection(col: typeof tableHeaders[number]['key']): 'asc'|'desc'|'' {
+    // fn to determine whether the sort direction is inverted
+    function checkSortDirection(
+        col: typeof tableHeaders[number]['key']
+    ): 'asc'|'desc'|'' {
+        // functionality is irrelevant if no sort is active
         if (!sortBy) return '';
-
+        // declare an output variable, fallback val will highlight neither arrow
         let output: 'asc'|'desc'|'' = '';
-
+        // return `asc` or `desc` to mark arrow indicating direction
         if (col === sortBy.cell) {
             output = sortBy.reverse ? 'asc' : 'desc';
         }
-
+        // return output
         return output;
     }
 
+    // JSX return statement
     return (
         <div className={styles.table_wrapper}>
             <Tabs
@@ -150,7 +162,7 @@ export default function PortfolioTable(props: propsIF) {
                     ))}
                 </div>
                 <ol className={styles.table_body}>
-                    {sorted.map((acct) => (
+                    {sorted.map((acct: accountIF) => (
                         <li key={JSON.stringify(acct)} className={styles.table_row}>
                             <div>{acct.name}</div>
                             <div>{acct.address}</div>
