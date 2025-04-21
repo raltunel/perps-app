@@ -40,9 +40,6 @@ function PortfolioSend({
         ) || AVAILABLE_TOKENS[0],
     );
 
-    const isValidNumberInput = useCallback((value: string) => {
-        return value === '' || /^\d*\.?\d*$/.test(value);
-    }, []);
 
     const validateAmount = useCallback(
         (inputAmount: number, maxAmount: number) => {
@@ -74,8 +71,8 @@ function PortfolioSend({
         [],
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const formatCurrency = useCallback(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         (value: number, currency = selectedToken) => {
             return CURRENCY_FORMATTER.format(value);
         },
@@ -83,18 +80,17 @@ function PortfolioSend({
     );
 
     const debouncedAmountChange = useDebouncedCallback((newValue: string) => {
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, 150);
+     
+        setAmount(newValue);
+        setError(null);
+    }, 20);
 
     const debouncedAddressChange = useDebouncedCallback((newValue: string) => {
         setAddress(newValue);
         if (error && error.includes('address')) {
             setError(null);
         }
-    }, 150);
+    }, 20);
 
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {

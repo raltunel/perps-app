@@ -20,16 +20,16 @@ interface DepositModalProps {
 export default function DepositModal({
     vault,
     onDeposit,
-    onClose,
+    // onClose,
 }: DepositModalProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
-    const [selectedToken, setSelectedToken] = useState('USDe');
+    const [selectedToken] = useState('USDe');
 
     const {
         formatCurrency,
         validateAmount,
-        isValidNumberInput,
+        // isValidNumberInput,
         getAvailableCapacity,
     } = useVaultManager();
 
@@ -42,14 +42,10 @@ export default function DepositModal({
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
-
-            // Use the utility function for validation
-            if (isValidNumberInput(newValue)) {
-                setAmount(newValue);
-                setError(null);
-            }
+            setAmount(newValue);
+            setError(null);
         },
-        [isValidNumberInput],
+        [],
     );
 
     const handleMaxClick = useCallback(() => {

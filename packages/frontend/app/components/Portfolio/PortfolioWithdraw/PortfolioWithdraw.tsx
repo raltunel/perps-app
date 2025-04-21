@@ -26,11 +26,8 @@ function PortfolioWithdraw({
 
     const unitValue = portfolio.unit || 'USD';
 
-    const isValidNumberInput = useCallback((value: string) => {
-        if (value === '') return true;
-
-        const regex = /^(\d+)?(\.\d{0,8})?$/;
-        return regex.test(value);
+    const isValidNumberInput = useCallback(() => {
+        return true
     }, []);
 
     const USD_FORMATTER = useMemo(
@@ -92,11 +89,10 @@ function PortfolioWithdraw({
     }, []);
 
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        if (isValidNumberInput(newValue)) {
-            setAmount(newValue);
-            setError(null);
-        }
-    }, 150);
+      
+        setAmount(newValue);
+        setError(null);
+    }, 20);
 
     const handleInputChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
