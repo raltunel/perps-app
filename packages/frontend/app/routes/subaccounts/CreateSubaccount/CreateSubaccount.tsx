@@ -11,14 +11,14 @@ interface propsIF {
 export default function CreateSubaccount(props: propsIF) {
     const { modalControl } = props;
 
-    // ref to hold input when user enters the 
+    // ref to hold input when user enters the
     const inputRef = useRef<HTMLInputElement>(null);
 
     return (
         <Modal close={modalControl.close}>
             <div className={styles.create_sub_account_modal}>
                 <header>
-                    <div style={{ width: '20px' }}/>
+                    <div style={{ width: '20px' }} />
                     <h3>Create Sub-Account</h3>
                     <MdOutlineClose
                         size={20}
@@ -36,11 +36,7 @@ export default function CreateSubaccount(props: propsIF) {
                     />
                 </div>
                 <div className={styles.modal_buttons}>
-                    <button
-                        onClick={modalControl.close}
-                    >
-                        Cancel
-                    </button>
+                    <button onClick={modalControl.close}>Cancel</button>
                     <button
                         onClick={() => {
                             if (inputRef.current) {

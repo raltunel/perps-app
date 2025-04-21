@@ -56,11 +56,7 @@ interface propsIF {
 
 // main react functional component
 export default function AccountsTable(props: propsIF) {
-    const {
-        title,
-        accounts,
-        noSort,
-    } = props;
+    const { title, accounts, noSort } = props;
 
     // this is needed for the Trade link on each line item
     // should refactor it later as a `<Link />` elem
@@ -69,10 +65,10 @@ export default function AccountsTable(props: propsIF) {
     // data structure for the active sort methodology, putting both values
     // ... in a unified structure allows them to update concurrently
     interface sortByIF {
-        cell: typeof tableHeaders[number]['key'];
+        cell: (typeof tableHeaders)[number]['key'];
         reverse: boolean;
     }
-    const [sortBy, setSortBy] = useState<null|sortByIF>(null);
+    const [sortBy, setSortBy] = useState<null | sortByIF>(null);
 
     // memoized record of sorted data, updates when the user changes the
     // ... active sort method or direction
@@ -83,12 +79,14 @@ export default function AccountsTable(props: propsIF) {
         let output: accountIF[];
         // assignment tree for output variable
         if (sortBy.cell === 'name') {
-            output = [...accounts].sort(
-                (a: accountIF, b: accountIF) => a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase())
+            output = [...accounts].sort((a: accountIF, b: accountIF) =>
+                a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase()),
             );
         } else if (sortBy.cell === 'accountEquity') {
-            output = [...accounts].sort(
-                (a: accountIF, b: accountIF) => a.equity.toLowerCase().localeCompare(b.equity.toLocaleLowerCase())
+            output = [...accounts].sort((a: accountIF, b: accountIF) =>
+                a.equity
+                    .toLowerCase()
+                    .localeCompare(b.equity.toLocaleLowerCase()),
             );
         } else {
             output = accounts;
@@ -99,12 +97,12 @@ export default function AccountsTable(props: propsIF) {
 
     // fn to determine whether the sort direction is inverted
     function checkSortDirection(
-        col: typeof tableHeaders[number]['key']
-    ): 'asc'|'desc'|'' {
+        col: (typeof tableHeaders)[number]['key'],
+    ): 'asc' | 'desc' | '' {
         // functionality is irrelevant if no sort is active
         if (!sortBy) return '';
         // declare an output variable, fallback val will highlight neither arrow
-        let output: 'asc'|'desc'|'' = '';
+        let output: 'asc' | 'desc' | '' = '';
         // return `asc` or `desc` to mark arrow indicating direction
         if (col === sortBy.cell) {
             output = sortBy.reverse ? 'asc' : 'desc';
@@ -137,7 +135,7 @@ export default function AccountsTable(props: propsIF) {
                             style={{ cursor: noSort ? 'default' : 'pointer' }}
                             className={header.sortable ? styles.sortable : ''}
                             onClick={() => {
-                                let output: null|sortByIF = null;
+                                let output: null | sortByIF = null;
                                 if (sortBy) {
                                     output = {
                                         cell: header.key,
@@ -153,17 +151,22 @@ export default function AccountsTable(props: propsIF) {
                             }}
                         >
                             {header.name}
-                            {header.sortable && !noSort &&
+                            {header.sortable && !noSort && (
                                 <SortIcon
-                                    sortDirection={checkSortDirection(header.key)}
+                                    sortDirection={checkSortDirection(
+                                        header.key,
+                                    )}
                                 />
-                            }
+                            )}
                         </div>
                     ))}
                 </div>
                 <ol className={styles.table_body}>
                     {sorted.map((acct: accountIF) => (
-                        <li key={JSON.stringify(acct)} className={styles.table_row}>
+                        <li
+                            key={JSON.stringify(acct)}
+                            className={styles.table_row}
+                        >
                             <div>{acct.name}</div>
                             <div>{acct.address}</div>
                             <div>{acct.equity}</div>

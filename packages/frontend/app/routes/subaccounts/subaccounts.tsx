@@ -56,29 +56,26 @@ export default function subaccounts() {
     return (
         <div className={styles.subaccounts}>
             <div className={styles.subaccounts_wrapper}>
-            <header>
-                <h2>Sub-Accounts</h2>
-                <Button
-                    size='medium'
-                    selected={true}
-                    onClick={createSubaccountModal.open}
-                >
-                    Create Sub-Account
-                </Button>
-            </header>
-            <AccountsTable
-                title='Master Account'
-                accounts={[accounts.master]}
-                noSort
-            />
-            <AccountsTable
-                title='Sub-Accounts'
-                accounts={accounts.sub}
-            />
+                <header>
+                    <h2>Sub-Accounts</h2>
+                    <Button
+                        size='medium'
+                        selected={true}
+                        onClick={createSubaccountModal.open}
+                    >
+                        Create Sub-Account
+                    </Button>
+                </header>
+                <AccountsTable
+                    title='Master Account'
+                    accounts={[accounts.master]}
+                    noSort
+                />
+                <AccountsTable title='Sub-Accounts' accounts={accounts.sub} />
             </div>
-            { createSubaccountModal.isOpen && 
+            {createSubaccountModal.isOpen && (
                 <CreateSubaccount modalControl={createSubaccountModal} />
-            }
+            )}
         </div>
     );
 }

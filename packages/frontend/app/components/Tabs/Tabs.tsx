@@ -10,7 +10,7 @@ interface TabProps {
 }
 
 export function Tab(props: TabProps) {
-    const { label, isActive, onClick, noClick=false } = props;
+    const { label, isActive, onClick, noClick = false } = props;
     return (
         <button
             className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
