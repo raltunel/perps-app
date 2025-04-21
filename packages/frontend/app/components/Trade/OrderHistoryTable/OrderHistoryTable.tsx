@@ -1,16 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processUserOrder } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { OrderHistoryLimits } from '~/utils/Constants';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { useDebugStore } from '~/stores/DebugStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '~/processors/processOrderBook';
-import type { FilterOption } from '../TradeTables/TradeTables';
-import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
-import { OrderHistoryLimits } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
     onViewAll?: () => void;
