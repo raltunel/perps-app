@@ -65,7 +65,11 @@ function Portfolio() {
                                     portfolio.tradingVolume.biWeekly,
                                 )}
                             </h3>
-                            <Link to='/'>View volume</Link>
+                            <div
+                                className={styles.view_detail_clickable}
+                                onClick={() => console.log('viewing volume')}>
+                                View volume
+                            </div>
                         </div>
                         <div className={styles.detailsContent}>
                             <h6>Fees (Taker / Maker)</h6>
@@ -74,7 +78,9 @@ function Portfolio() {
                                 %
                             </h3>
                             {/* <Link to='/'>View fee schedule</Link> */}
-                            <div onClick={feeScheduleModalCtrl.open}>
+                            <div
+                                className={styles.view_detail_clickable}
+                                onClick={feeScheduleModalCtrl.open}>
                                 View fee schedule
                             </div>
                         </div>

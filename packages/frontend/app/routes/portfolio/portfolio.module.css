@@ -49,9 +49,11 @@
 
     font-size: var(--font-size-xl, 36px);
 }
-.detailsContent a {
-    font-size: var(--font-size-m, 18px);
-    color: var(--accent1, #7371fc);
+
+.view_detail_clickable {
+    font-size: var(--font-size-m);
+    cursor: pointer;
+    color: var(--accent1);
 }
 
 .totalNetDisplay {
@@ -218,7 +220,7 @@
     .detailsContent h3 {
         font-size: var(--font-size-l);
     }
-    .detailsContent a {
+    .view_detail_clickable {
         font-size: var(--font-size-s);
     }
 }
