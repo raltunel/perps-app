@@ -1,3 +1,4 @@
+// Modal.tsx
 import { useEffect, useState, useRef, type ReactNode } from 'react';
 import styles from './Modal.module.css';
 import { useMobile } from '~/hooks/useMediaQuery';
@@ -57,6 +58,7 @@ export default function Modal(props: ModalProps) {
     const [animation, setAnimation] = useState('');
     const bottomSheetRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<HTMLDivElement>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
 
     // State to track drag
     const dragState = useRef({
@@ -198,6 +200,25 @@ export default function Modal(props: ModalProps) {
         }
     };
 
+    // Prevent background content from scrolling when modal is open
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        
+        // Prevent iOS safari from allowing swipe-up gestures on the modal
+        const preventDefaultTouchMove = (e: TouchEvent) => {
+            if (modalRef.current?.contains(e.target as Node)) {
+                e.preventDefault();
+            }
+        };
+        
+        document.addEventListener('touchmove', preventDefaultTouchMove, { passive: false });
+        
+        return () => {
+            document.body.style.overflow = '';
+            document.removeEventListener('touchmove', preventDefaultTouchMove);
+        };
+    }, []);
+
     // event listener to close modal on `Escape` keydown event
     useEffect(() => {
         // type of event
@@ -225,6 +246,7 @@ export default function Modal(props: ModalProps) {
 
     return (
         <div
+            ref={modalRef}
             onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) =>
                 handleOutsideClick(e.target as HTMLDivElement)
             }
@@ -248,7 +270,16 @@ export default function Modal(props: ModalProps) {
                     >
                         <div className={styles.handle}></div>
                     </div>
-                    <div className={styles.modalContent}>{children}</div>
+                    <header>
+                        <span />
+                        <h3>{title}</h3>
+                        <MdClose onClick={handleClose} color='var(--text2)' />
+                    </header>
+                    <div className={styles.modalContent}>
+                        {children}
+                        {/* Add spacer at the bottom to ensure content isn't hidden */}
+                        <div className={styles.safeAreaSpacer}></div>
+                    </div>
                 </div>
             ) : (
                 // Center or other position modals - use centered styling

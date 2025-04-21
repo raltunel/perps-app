@@ -4,13 +4,18 @@
     left: 0px;
     width: 100vw;
     height: 100vh;
-    height: 100svh; /* Small viewport height - accounts for browser UI at its largest */
+    height: 100dvh; /* Dynamic viewport height - adapts to UI changes */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(10px);
     z-index: 100000;
+    /* Prevent scrolling of background content */
+    overflow: hidden;
+    /* Prevent swipe-up navigation gestures on iOS */
+    overscroll-behavior: none;
+    touch-action: none;
 }
 
 .outside_modal header {
@@ -42,18 +47,30 @@
 }
 
 .bottomSheet {
-  
-    border-radius: 16px 16px 0 0; 
+    /* Style the actual content container */
+    border-radius: 16px 16px 0 0; /* Rounded corners only at the top */
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     width: 100%;
     
-   
-    max-height: 85svh; 
+    /* Key fixes for mobile browsers */
+    max-height: 90dvh; /* Dynamic viewport height that adjusts with browser UI */
     
+    /* This is important: extend the background color all the way to the bottom */
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    margin-bottom: -1px; /* Prevents any gap at the bottom */
+    
+    /* Make sure this element extends below the visible area */
+    border-bottom: env(safe-area-inset-bottom, 16px) solid var(--dark3, #1c1c22);
+    
+    /* Ensure content is scrollable but modal itself doesn't scroll with page */
     overflow-y: auto;
     transform: translateY(100%);
     transition: transform 0.3s ease-out;
+    
+    /* Prevent iOS safari from allowing swipe-up gestures */
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
 }
 
 .bottomSheetHandle {
@@ -82,8 +99,11 @@
 
 .modalContent {
     padding: 0 16px 16px 16px;
-    /* Add space at the bottom to ensure content isn't hidden by browser navigation */
-    padding-bottom: 16px;
+}
+
+/* Add a spacer at the bottom to ensure content isn't hidden */
+.safeAreaSpacer {
+    height: env(safe-area-inset-bottom, 16px);
 }
 
 /* Animations */
@@ -102,47 +122,18 @@
     background: var(--dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     max-width: 90vw;
-    max-height: 90svh; 
+    max-height: 90dvh; /* Dynamic viewport height */
     overflow-y: auto;
 }
 
-/* Add viewport height media query for tall devices */
-@media screen and (min-height: 700px) {
+/* Fallback for browsers that don't support env() */
+@supports not (padding-bottom: env(safe-area-inset-bottom)) {
     .bottomSheet {
-        max-height: 80svh;
-    }
-}
-
-/* Add viewport height media query for very tall devices */
-@media screen and (min-height: 900px) {
-    .bottomSheet {
-        max-height: 70svh;
-    }
-}
-
-/* Fallback for browsers that don't support svh */
-@supports not (height: 1svh) {
-    .outside_modal {
-        height: 100vh;
+        padding-bottom: 16px;
+        border-bottom: 16px solid var(--dark3, #1c1c22);
     }
     
-    .bottomSheet {
-        max-height: 85vh;
-    }
-    
-    .centerModal {
-        max-height: 90vh;
-    }
-    
-    @media screen and (min-height: 700px) {
-        .bottomSheet {
-            max-height: 80vh;
-        }
-    }
-    
-    @media screen and (min-height: 900px) {
-        .bottomSheet {
-            max-height: 70vh;
-        }
+    .safeAreaSpacer {
+        height: 16px;
     }
 }
