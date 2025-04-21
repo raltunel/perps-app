@@ -5,6 +5,9 @@
     background: var(--dark2, #0e0e14);
     display: flex;
     flex-direction: column;
+
+    /* centralize the column spacing rule */
+    --accounts-table-column-spacing: 2fr 4fr 2fr 1fr;
 }
 
 /* all content below the highest-level tab elem */
@@ -22,7 +25,7 @@
 /* row with column headers */
 .col_headers_row {
     display: grid;
-    grid-template-columns: 2fr 4fr 2fr 1fr;
+    grid-template-columns: var(--accounts-table-column-spacing);
 }
 
 /* individual cells in the .col_headers_row line */
@@ -36,7 +39,7 @@
 /* data line items in the table */
 .table_row {
     display: grid;
-    grid-template-columns: 2fr 4fr 2fr 1fr;
+    grid-template-columns: var(--accounts-table-column-spacing);
 }
 
 /* individual cells in the .table_row line */
