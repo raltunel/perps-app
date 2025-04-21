@@ -1,6 +1,9 @@
 /// <reference lib="webworker" />
 
-self.onmessage = function (event: MessageEvent<string>) {
+export type JsonParserInput = string;
+export type JsonParserOutput = object | { error: string };
+
+self.onmessage = function (event: MessageEvent<JsonParserInput>) {
     try {
         const parsedData = JSON.parse(event.data);
         self.postMessage(parsedData);
