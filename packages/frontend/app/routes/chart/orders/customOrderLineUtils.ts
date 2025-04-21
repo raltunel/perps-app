@@ -149,7 +149,7 @@ export const createQuantityAnchoredText = async (
         yPrice,
         text,
         '#000000',
-        estimateTextWidth(text) + 5,
+        estimateTextWidth(text) + 15,
         '#3C91FF',
         '#FFFFFF',
     );
