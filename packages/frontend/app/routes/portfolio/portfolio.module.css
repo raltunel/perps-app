@@ -131,6 +131,7 @@
     background-color: var(--dark3);
     user-select: none;
     -webkit-user-select: none;
+    outline: 1px solid green;
 }
 
 .fee_schedule_modal > header {
@@ -152,6 +153,7 @@
     /* this keeps consistent spacing in table header and data rows */
     --fee_table_col_spacing: 2fr 6fr 3fr 3fr;
     --fee_table_col_gap: 8px;
+    --fee_table_row_padding: 0 8px;
 }
 
 .fee_table > h4 {
@@ -161,6 +163,7 @@
 .fee_table > header {
     display: grid;
     grid-template-columns: var(--fee_table_col_spacing);
+    padding: var(--fee_table_row_padding);
     gap: var(--fee_table_col_gap);
     justify-items: start;
     font-size: var(--font-size-xs);
@@ -176,9 +179,17 @@
 .fee_table > ol > li {
     display: grid;
     grid-template-columns: var(--fee_table_col_spacing);
+    padding: var(--fee_table_row_padding);
     gap: var(--fee_table_col_gap);
     justify-items: start;
+    border-radius: var(--half-border-radius);
     font-size: var(--font-size-s);
+    transition: background-color 0.3s ease-out;
+}
+
+.fee_table > ol > li:hover {
+    background-color: var(--dark5);
+    transition: background-color 0.1s ease-in;
 }
 
 .neg_fees {
