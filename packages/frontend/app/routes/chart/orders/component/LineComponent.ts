@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
-import type { EntityId } from '~/tv/charting_library';
+import type { EntityId, IPaneApi } from '~/tv/charting_library';
 import {
     addCustomOrderLine,
     createAnchoredMainText,
@@ -79,6 +79,68 @@ const LineComponent = ({ lines }: LineProps) => {
     };
 
     const [chartReady, setChartReady] = useState(true);
+
+    const [zoomChanged, setZoomChanged] = useState(false);
+    const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
+    const animationFrameRef = useRef<number>(0);
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const isZoomingRef = useRef(false);
+
+    useEffect(() => {
+        if (!chart) return;
+
+        const chartRef = chart.activeChart();
+        const priceScalePane = chartRef.getPanes()[0] as IPaneApi;
+        const priceScale = priceScalePane.getMainSourcePriceScale();
+        if (!priceScale) return;
+
+        const loop = () => {
+            const priceRange = priceScale.getVisiblePriceRange();
+            if (priceRange) {
+                const currentRange = {
+                    min: priceRange.from,
+                    max: priceRange.to,
+                };
+
+                const prevRange = prevRangeRef.current;
+                const hasChanged =
+                    !prevRange ||
+                    prevRange.min !== currentRange.min ||
+                    prevRange.max !== currentRange.max;
+
+                if (hasChanged) {
+                    prevRangeRef.current = currentRange;
+
+                    if (!isZoomingRef.current) {
+                        isZoomingRef.current = true;
+                        setZoomChanged(true);
+                    }
+
+                    if (debounceTimerRef.current) {
+                        clearTimeout(debounceTimerRef.current);
+                    }
+
+                    debounceTimerRef.current = setTimeout(() => {
+                        isZoomingRef.current = false;
+                        setZoomChanged(false);
+                    }, 200);
+                }
+            }
+
+            animationFrameRef.current = requestAnimationFrame(loop);
+        };
+
+        animationFrameRef.current = requestAnimationFrame(loop);
+
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [chart]);
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout | undefined = undefined;
@@ -205,7 +267,7 @@ const LineComponent = ({ lines }: LineProps) => {
                             activeQuantityLabel.setProperties({
                                 text: quantityText,
                                 wordWrapWidth:
-                                    estimateTextWidth(quantityText) + 5,
+                                    estimateTextWidth(quantityText) + 15,
                             });
                         }
                     }
@@ -226,13 +288,17 @@ const LineComponent = ({ lines }: LineProps) => {
             });
         };
 
-        updateTextPosition();
+        if (zoomChanged) {
+            updateTextPosition();
+        } else {
+            intervals.forEach(clearInterval);
+        }
 
         return () => {
             isCancelled = true;
             intervals.forEach(clearInterval);
         };
-    }, [orderLineItems, chart, lines]);
+    }, [orderLineItems, chart, lines, zoomChanged]);
 
     return null;
 };
