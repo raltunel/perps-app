@@ -9,6 +9,7 @@ import { lazy, Suspense } from 'react';
 import { usePortfolioManager } from './usePortfolioManager';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import { MdOutlineClose } from 'react-icons/md';
+import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -182,7 +183,7 @@ function Portfolio() {
             )}
             { feeScheduleModalCtrl.isOpen &&
                 <Modal close={feeScheduleModalCtrl.close}>
-                    <div className={styles.fee_schedule}>
+                    <div className={styles.fee_schedule_modal}>
                         <header>
                             <div />
                             <h3>Fee Schedule</h3>
@@ -192,7 +193,53 @@ function Portfolio() {
                                 style={{ cursor: 'pointer' }}
                             />
                         </header>
-                        This is the feel schedule modal!
+                        <section className={styles.fee_table}>
+                            <h4>VIP Tiers</h4>
+                            <header>
+                                <div>Tier</div>
+                                <div>14D Volume</div>
+                                <div>Taker</div>
+                                <div>Maker</div>
+                            </header>
+                            <ol>
+                                {
+                                    feeSchedules.vip.map(
+                                        (feeTier: feeTierIF) => (
+                                            <li key={JSON.stringify(feeTier)}>
+                                                <div>{feeTier.tier}</div>
+                                                <div>{feeTier.volume14d}</div>
+                                                <div>{feeTier.taker}</div>
+                                                <div>{feeTier.maker}</div>
+                                            </li>
+                                        )
+                                    )
+                                }
+                            </ol>
+                        </section>
+                        <section className={styles.fee_table}>
+                            <h4>VIP Tiers</h4>
+                            <header>
+                                <div>Tier</div>
+                                <div>14D Volume</div>
+                                <div />
+                                <div>Maker</div>
+                            </header>
+                            <ol>
+                                {
+                                    feeSchedules.marketMaker.map(
+                                        (feeTier: feeTierIF) => (
+                                            <li key={JSON.stringify(feeTier)}>
+                                                <div>{feeTier.tier}</div>
+                                                <div>{feeTier.volume14d}</div>
+                                                <div>{feeTier.taker}</div>
+                                                <div>{feeTier.maker}</div>
+                                            </li>
+                                        )
+                                    )
+                                }
+                            </ol>
+                        </section>
+                        <div className={styles.neg_fees}>Negative fees are rebates</div>
                     </div>
                 </Modal>
             }

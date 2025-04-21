@@ -117,27 +117,71 @@
     display: none !important;
 }
 
-
-
-.fee_schedule {
+.fee_schedule_modal {
     display: flex;
     flex-direction: column;
+    min-width: 500px;
     padding: 8px 16px 16px;
-    /* next line is the actual production val but its hard to see */
-    /* background-color: var(--dark3); */
-    background-color: green;
+    border-radius: var(--main-border-radius);
+    font-family: var(--font-family-main);
+    color: var(--text1);
+    gap: 16px;
+    background-color: var(--dark3);
+    user-select: none;
+    -webkit-user-select: none;
 }
 
-.fee_schedule > header {
+.fee_schedule_modal > header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 }
 
+.fee_schedule_modal > header > h3 {
+    font-size: var(--font-size-l);
+}
 
+.fee_table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 
+    /* this keeps consistent spacing in table header and data rows */
+    --fee_table_col_spacing: 2fr 6fr 3fr 3fr;
+    --fee_table_col_gap: 8px;
+}
 
+.fee_table > h4 {
+    font-size: var(--font-size-m);
+}
+
+.fee_table > header {
+    display: grid;
+    grid-template-columns: var(--fee_table_col_spacing);
+    gap: var(--fee_table_col_gap);
+    justify-items: start;
+    font-size: var(--font-size-xs);
+}
+
+.fee_table > ol {
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    gap: 4px;
+}
+
+.fee_table > ol > li {
+    display: grid;
+    grid-template-columns: var(--fee_table_col_spacing);
+    gap: var(--fee_table_col_gap);
+    justify-items: start;
+    font-size: var(--font-size-s);
+}
+
+.neg_fees {
+    font-size: var(--font-size-xs);
+}
 
 @media (max-width: 768px) {
     .container {
