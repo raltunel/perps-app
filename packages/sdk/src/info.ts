@@ -34,7 +34,7 @@ export class Info extends API {
     public coinToAsset: Record<string, number> = {};
     public nameToCoin: Record<string, string> = {};
     public assetToSzDecimals: Record<number, number> = {};
-    public readonly environment: Environment;
+    public environment: Environment;
     public baseUrl: string;
 
     constructor(options: InfoOptions) {
@@ -61,7 +61,7 @@ export class Info extends API {
 
         console.log(`Setting new environment: ${newEnvironment}`);
 
-        (this as any).environment = newEnvironment;
+        this.environment = newEnvironment;
         this.baseUrl = API_URLS[newEnvironment];
 
         if (this.wsManager) {

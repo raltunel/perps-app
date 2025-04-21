@@ -27,7 +27,7 @@ export class Exchange extends API {
     public vaultAddress?: string;
     public accountAddress?: string;
     public info: Info;
-    public readonly environment: Environment;
+    public environment: Environment;
 
     constructor(wallet: any, options: ExchangeOptions) {
         super(options.environment);
@@ -41,6 +41,18 @@ export class Exchange extends API {
             meta: options.meta,
             isDebug: options.isDebug,
         });
+    }
+
+    public async setEnvironment(newEnvironment: Environment) {
+        if (newEnvironment === this.environment) {
+            console.log(
+                'New environment is the same as the current one. No action taken.',
+            );
+            return;
+        }
+
+        this.environment = newEnvironment;
+        this.info.setEnvironment(newEnvironment);
     }
 
     private async _postAction(
