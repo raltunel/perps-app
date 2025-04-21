@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, apiEnvironments } from '~/utils/Constants';
+import { apiEnvironments, debugWallets } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -32,6 +32,8 @@ export default function Trade() {
     const navigate = useNavigate();
     const { debugWallet, setDebugWallet, environment, setEnvironment } =
         useDebugStore();
+
+    // const currencies = ['USD', 'BTC', 'ETH'];
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
