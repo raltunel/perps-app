@@ -250,6 +250,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     return (
         <div className={styles.orderBookContainer}>
+            {formatNum(0.0000001)}
             <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
                 {
                     <ComboBox

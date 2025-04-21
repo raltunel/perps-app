@@ -85,23 +85,13 @@ const SymbolInfo: React.FC = () => {
                                 <SymbolInfoField
                                     label='Mark'
                                     valueClass={'w4'}
-                                    value={formatNum(
-                                        symbolInfo?.markPx,
-                                        null,
-                                        true,
-                                        false,
-                                    )}
+                                    value={formatNum(symbolInfo?.markPx)}
                                     lastWsChange={symbolInfo?.lastPriceChange}
                                 />
                                 <SymbolInfoField
                                     label='Oracle'
                                     valueClass={'w4'}
-                                    value={formatNum(
-                                        symbolInfo?.oraclePx,
-                                        null,
-                                        true,
-                                        false,
-                                    )}
+                                    value={formatNum(symbolInfo?.oraclePx)}
                                 />
                                 <SymbolInfoField
                                     label='24h Change'
@@ -118,23 +108,22 @@ const SymbolInfo: React.FC = () => {
                                 <SymbolInfoField
                                     label='24h Volume'
                                     valueClass={'w7'}
-                                    value={formatNum(
-                                        symbolInfo?.dayNtlVlm,
-                                        0,
-                                        true,
-                                        true,
-                                    )}
+                                    value={
+                                        '$' +
+                                        formatNum(symbolInfo?.dayNtlVlm, 0)
+                                    }
                                 />
                                 <SymbolInfoField
                                     label='Open Interest'
                                     valueClass={'w7'}
-                                    value={formatNum(
-                                        symbolInfo?.openInterest *
-                                            symbolInfo?.oraclePx,
-                                        0,
-                                        true,
-                                        true,
-                                    )}
+                                    value={
+                                        '$' +
+                                        formatNum(
+                                            symbolInfo?.openInterest *
+                                                symbolInfo?.oraclePx,
+                                            0,
+                                        )
+                                    }
                                 />
                                 <SymbolInfoField
                                     label='Funding Rate'

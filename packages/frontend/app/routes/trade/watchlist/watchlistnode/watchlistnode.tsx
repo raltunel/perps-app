@@ -34,11 +34,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
 
     const shownVal = useMemo(() => {
         if (showMode === 'dollar') {
-            if (selectedCurrency === symbol.coin) {
-                return formatNum(symbol.markPx, null);
-            } else {
-                return formatNum(symbol.markPx, null, true);
-            }
+            return formatNum(symbol.markPx);
         } else {
             return (
                 (change > 0 ? '+' : '') +
@@ -58,12 +54,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
                 className={`${styles.watchListNodeContent} ${symbol.coin === storeSymbol ? styles.active : ''}`}
                 onClick={nodeClickListener}
             >
-                <div className={styles.symbolName}>
-                    {symbol.coin}-
-                    {selectedCurrency === symbol.coin
-                        ? 'USD'
-                        : selectedCurrency}
-                </div>
+                <div className={styles.symbolName}>{symbol.coin}-USD</div>
                 <div
                     className={`w3 ${styles.symbolValue}`}
                     style={{
