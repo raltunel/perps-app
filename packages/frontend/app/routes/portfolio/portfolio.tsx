@@ -7,6 +7,7 @@ import PerformancePanel from '~/components/Portfolio/PerformancePanel/Performanc
 import Modal from '~/components/Modal/Modal';
 import { lazy, Suspense } from 'react';
 import { usePortfolioManager } from './usePortfolioManager';
+import { useModal, type useModalIF } from '~/hooks/useModal';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -46,6 +47,9 @@ function Portfolio() {
         processSend,
     } = usePortfolioManager();
 
+    // logic to open and close the fee schedule modal
+    const feeScheduleModalCtrl: useModalIF = useModal('closed');
+
     return (
         <>
             <div className={styles.container}>
@@ -67,7 +71,10 @@ function Portfolio() {
                                 {portfolio.fees.taker}% / {portfolio.fees.maker}
                                 %
                             </h3>
-                            <Link to='/'>View fee schedule</Link>
+                            {/* <Link to='/'>View fee schedule</Link> */}
+                            <div onClick={feeScheduleModalCtrl.open}>
+                                View fee schedule
+                            </div>
                         </div>
                         <div
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
@@ -172,6 +179,11 @@ function Portfolio() {
                     </Suspense>
                 </Modal>
             )}
+            { feeScheduleModalCtrl.isOpen &&
+                <Modal close={feeScheduleModalCtrl.close}>
+                    This is the feel schedule modal!
+                </Modal>
+            }
         </>
     );
 }
