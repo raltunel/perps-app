@@ -19,13 +19,14 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+import { useSdk } from '~/hooks/useSdk';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
-    const { subscribe } = useWsObserver();
+    const { subscribe } = useSdk();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);

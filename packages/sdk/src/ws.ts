@@ -270,7 +270,7 @@ export class WebsocketManager {
             this.subscriptionIdCounter += 1;
             subscriptionId = this.subscriptionIdCounter;
         } else {
-            if (this.allSubscriptions[subscriptionId]) {
+            if (this.activeSubscriptions[subscriptionId]) {
                 this.log(
                     `Subscription ID ${subscriptionId} already exists. Reusing.`,
                 );
@@ -334,8 +334,6 @@ export class WebsocketManager {
         subscription: Subscription,
         subscriptionId: number,
     ): boolean {
-        this.log('unsubscribing', subscription, subscriptionId);
-
         const wasTracked = this.allSubscriptions[subscriptionId] !== undefined;
         delete this.allSubscriptions[subscriptionId];
 

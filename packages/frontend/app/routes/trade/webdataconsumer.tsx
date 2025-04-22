@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { useSdk } from '~/hooks/useSdk';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processUserOrder } from '~/processors/processOrderBook';
 import { processSymbolInfo } from '~/processors/processSymbolInfo';
@@ -26,11 +27,13 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    // const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet.address.toLowerCase();
     const { setSymbolInfo } = useTradeDataStore();
+
+    const { subscribe } = useSdk();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -70,7 +73,7 @@ export default function WebDataConsumer() {
         return () => {
             clearInterval(openOrdersInterval);
             clearInterval(positionsInterval);
-            unsubscribeAllByChannel(WsChannels.WEB_DATA2);
+            // unsubscribeAllByChannel(WsChannels.WEB_DATA2);
         };
     }, [debugWallet.address]);
 
