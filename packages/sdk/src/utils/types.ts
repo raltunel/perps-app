@@ -147,6 +147,7 @@ export interface L2BookMsg {
 
 export interface PongMsg {
     channel: 'pong';
+    data?: string;
 }
 
 export interface Trade {

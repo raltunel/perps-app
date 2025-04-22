@@ -1,5 +1,6 @@
 import { DEFAULT_PING_INTERVAL_MS } from './config';
 import type { Subscription, WsMsg } from './utils/types';
+import { WorkerManager } from './workermanager';
 
 type Callback = (msg: WsMsg) => void;
 
@@ -92,9 +93,21 @@ export class WebsocketManager {
     private isDebug: boolean;
     private baseUrl: string;
 
-    constructor(baseUrl: string, isDebug: boolean = false) {
+    private workerManager: WorkerManager;
+
+    constructor(
+        baseUrl: string,
+        isDebug: boolean = false,
+        customWorkers?: Map<string, Worker>,
+    ) {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
+        this.workerManager = new WorkerManager(this.postMessage);
+        if (customWorkers) {
+            for (const [key, worker] of customWorkers.entries()) {
+                this.workerManager.registerWorker(key, worker);
+            }
+        }
         this.connect();
     }
 
@@ -152,17 +165,19 @@ export class WebsocketManager {
 
     private onMessage = (event: MessageEvent) => {
         const message = event.data;
+
         this.log('onMessage', message);
+
         if (message === 'Websocket connection established.') {
             this.log('Websocket connection established.');
             return;
         }
-        let wsMsg: WsMsg;
-        try {
-            wsMsg = JSON.parse(message);
-        } catch (e) {
-            this.log('Invalid JSON:', message);
-            return;
+        this.workerManager.processMsg(message);
+    };
+
+    private postMessage = (wsMsg: WsMsg) => {
+        if (wsMsg.channel === 'webData2') {
+            console.log('>>> postMessage', wsMsg);
         }
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
@@ -170,14 +185,14 @@ export class WebsocketManager {
             return;
         }
         if (!identifier) {
-            this.log('Unknown or empty message:', message);
+            this.log('Unknown or empty message:', wsMsg);
             return;
         }
         const activeSubs = this.activeSubscriptions[identifier] || [];
         if (activeSubs.length === 0) {
             this.log(
                 'Websocket message from an unexpected subscription:',
-                message,
+                wsMsg,
                 identifier,
             );
             return;
@@ -362,5 +377,9 @@ export class WebsocketManager {
 
     public isWsReady() {
         return this.wsReady;
+    }
+
+    public registerWorker(type: string, worker: Worker) {
+        this.workerManager.registerWorker(type, worker);
     }
 }

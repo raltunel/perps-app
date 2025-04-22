@@ -49,11 +49,11 @@ export default function WebDataConsumer() {
         subscribe(WsChannels.WEB_DATA2, {
             payload: { user: debugWallet.address },
             handler: (payload) => {
-                setCoins(payload.data.coins);
-                setCoinPriceMap(payload.data.coinPriceMap);
-                if (payload.data.user.toLowerCase() === addressRef.current) {
-                    openOrdersRef.current = payload.data.userOpenOrders;
-                    positionsRef.current = payload.data.positions;
+                setCoins(payload.coins);
+                setCoinPriceMap(payload.coinPriceMap);
+                if (payload.user.toLowerCase() === addressRef.current) {
+                    openOrdersRef.current = payload.userOpenOrders;
+                    positionsRef.current = payload.positions;
                 }
             },
             single: true,

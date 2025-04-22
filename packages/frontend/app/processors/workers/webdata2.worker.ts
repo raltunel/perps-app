@@ -23,6 +23,7 @@ export type WebData2Output =
     | { error: string };
 
 self.onmessage = function (event: MessageEvent<WebData2Input>) {
+    console.log('>>> webdata2 worker received message');
     try {
         const parsedData = JSON.parse(event.data);
         const coins: SymbolInfoIF[] = [];
