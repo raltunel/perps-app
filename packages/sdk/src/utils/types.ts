@@ -52,6 +52,8 @@ export interface AllMidsSubscription {
 export interface L2BookSubscription {
     type: 'l2Book';
     coin: string;
+    nSigFigs?: number;
+    mantissa?: number | null;
 }
 
 export interface TradesSubscription {
@@ -147,6 +149,7 @@ export interface L2BookMsg {
 
 export interface PongMsg {
     channel: 'pong';
+    data?: string;
 }
 
 export interface Trade {

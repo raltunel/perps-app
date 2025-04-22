@@ -1,4 +1,4 @@
-// jsonParser.worker.js
+/// <reference lib="webworker" />
 
 import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
 import { processSymbolInfo } from '../processSymbolInfo';
@@ -8,9 +8,22 @@ import { processPosition } from '../processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 
-self.onmessage = function (event) {
+export type WebData2Input = string;
+export type WebData2Output =
+    | {
+          channel: string;
+          data: {
+              coins: SymbolInfoIF[];
+              userOpenOrders: OrderDataIF[];
+              user: string;
+              positions: PositionIF[];
+              coinPriceMap: Map<string, number>;
+          };
+      }
+    | { error: string };
+
+self.onmessage = function (event: MessageEvent<WebData2Input>) {
     try {
-        const size = event.data.length;
         const parsedData = JSON.parse(event.data);
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
@@ -19,6 +32,7 @@ self.onmessage = function (event) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
 
+        // TODO: type check data, the type might end up kinda different for our backend though
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
                 data.meta.universe.forEach((coin: any) => {
@@ -91,12 +105,12 @@ self.onmessage = function (event) {
                 coins,
                 userOpenOrders,
                 user: data.user,
-                size,
                 positions,
                 coinPriceMap,
             },
-        });
+        } as WebData2Output);
     } catch (error) {
+        console.error('Error processing webdata2 worker:', error);
         self.postMessage({ error: (error as Error).message });
     }
 };

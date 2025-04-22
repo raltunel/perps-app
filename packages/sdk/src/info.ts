@@ -1,6 +1,6 @@
 import { API } from './api';
 import { WebsocketManager } from './ws';
-import {
+import type {
     AllMidsData,
     CandleSnapshotData,
     ClearinghouseState,
@@ -19,7 +19,8 @@ import {
 
 type Callback = (msg: any) => void;
 
-import { Environment } from './config';
+import type { Environment } from './config';
+import { API_URLS } from './config';
 
 interface InfoOptions {
     environment: Environment;
@@ -33,11 +34,13 @@ export class Info extends API {
     public coinToAsset: Record<string, number> = {};
     public nameToCoin: Record<string, string> = {};
     public assetToSzDecimals: Record<number, number> = {};
-    public readonly environment: Environment;
+    public environment: Environment;
+    public baseUrl: string;
 
     constructor(options: InfoOptions) {
         super(options.environment);
         this.environment = options.environment;
+        this.baseUrl = API_URLS[this.environment];
         const { skipWs = false, isDebug = false } = options;
 
         if (!skipWs) {
@@ -46,6 +49,31 @@ export class Info extends API {
 
         // async init
         this._initMappings(options.meta);
+    }
+
+    public async setEnvironment(newEnvironment: Environment) {
+        if (newEnvironment === this.environment) {
+            console.log(
+                'New environment is the same as the current one. No action taken.',
+            );
+            return;
+        }
+
+        console.log(`Setting new environment: ${newEnvironment}`);
+
+        this.environment = newEnvironment;
+        this.baseUrl = API_URLS[newEnvironment];
+
+        if (this.wsManager) {
+            this.wsManager.setBaseUrl(this.baseUrl);
+        }
+
+        this.coinToAsset = {};
+        this.nameToCoin = {};
+        this.assetToSzDecimals = {};
+
+        await this._initMappings();
+        console.log(`Environment successfully set to: ${newEnvironment}`);
     }
 
     private async _initMappings(meta?: Meta) {

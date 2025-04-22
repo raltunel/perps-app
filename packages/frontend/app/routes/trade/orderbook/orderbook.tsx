@@ -178,7 +178,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
                 filledResolution.current = payload.resolution;
                 const { sells, buys } = processOrderBookMessage(
-                    response,
+                    response.data,
                     orderCountRef.current,
                 );
                 setOrderBook(buys, sells);
