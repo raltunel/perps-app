@@ -7,7 +7,8 @@ import { processUserOrder } from '../processOrderBook';
 import { processPosition } from '../processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
-
+import type { UserBalanceIF } from '../../utils/UserDataIFs';
+import { processUserBalance } from '../processUserBalance';
 self.onmessage = function (event) {
     try {
         const size = event.data.length;
@@ -18,6 +19,7 @@ self.onmessage = function (event) {
         const data = parsedData.data;
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
+        const userBalances: UserBalanceIF[] = [];
 
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
@@ -81,6 +83,33 @@ self.onmessage = function (event) {
                             positions.push(processedPosition);
                         },
                     );
+
+                    if (data.clearinghouseState.marginSummary) {
+                        userBalances.push({
+                            coin: 'USDC',
+                            type: 'margin',
+                            total: parseNum(
+                                data.clearinghouseState.marginSummary
+                                    .accountValue,
+                            ),
+                            entryNtl: 0,
+                            hold:
+                                parseNum(
+                                    data.clearinghouseState.marginSummary
+                                        .accountValue,
+                                ) -
+                                parseNum(
+                                    data.clearinghouseState.marginSummary
+                                        .totalMarginUsed,
+                                ),
+                        });
+                    }
+                }
+
+                if (data.spotState && data.spotState.balances) {
+                    data.spotState.balances.forEach((balance: any) => {
+                        userBalances.push(processUserBalance(balance, 'spot'));
+                    });
                 }
             }
         }
@@ -94,6 +123,7 @@ self.onmessage = function (event) {
                 size,
                 positions,
                 coinPriceMap,
+                userBalances,
             },
         });
     } catch (error) {

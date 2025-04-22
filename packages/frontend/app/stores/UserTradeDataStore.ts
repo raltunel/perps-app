@@ -1,6 +1,7 @@
 import { OrderHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
 const limit = 10;
 export interface UserTradeDataStore {
@@ -19,6 +20,8 @@ export interface UserTradeDataStore {
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) => void;
     positions: PositionIF[];
     setPositions: (positions: PositionIF[]) => void;
+    userBalances: UserBalanceIF[];
+    setUserBalances: (userBalances: UserBalanceIF[]) => void;
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
@@ -85,4 +88,8 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     userSymbolOrderHistory: [],
     setUserSymbolOrderHistory: (userSymbolOrderHistory: OrderDataIF[]) =>
         set({ userSymbolOrderHistory }),
+    userBalances: [],
+    setUserBalances: (userBalances: UserBalanceIF[]) => {
+        set({ userBalances });
+    },
 });

@@ -8,6 +8,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import type { UserBalanceIF } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
     const {
@@ -19,6 +20,8 @@ export default function WebDataConsumer() {
         coins,
         setPositions,
         positions,
+        setUserBalances,
+        userBalances,
         setCoinPriceMap,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
@@ -34,6 +37,7 @@ export default function WebDataConsumer() {
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
+    const userBalancesRef = useRef<UserBalanceIF[]>([]);
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -54,25 +58,27 @@ export default function WebDataConsumer() {
                 if (payload.data.user.toLowerCase() === addressRef.current) {
                     openOrdersRef.current = payload.data.userOpenOrders;
                     positionsRef.current = payload.data.positions;
+                    userBalancesRef.current = payload.data.userBalances;
                 }
             },
             single: true,
         });
 
-        const openOrdersInterval = setInterval(() => {
+        const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
-        }, 1000);
-
-        const positionsInterval = setInterval(() => {
             setPositions(positionsRef.current);
+            setUserBalances(userBalancesRef.current);
         }, 1000);
 
         return () => {
-            clearInterval(openOrdersInterval);
-            clearInterval(positionsInterval);
+            clearInterval(userDataInterval);
             unsubscribeAllByChannel(WsChannels.WEB_DATA2);
         };
     }, [debugWallet.address]);
+
+    useEffect(() => {
+        console.log('>>>', userBalances);
+    }, [userBalances]);
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {
