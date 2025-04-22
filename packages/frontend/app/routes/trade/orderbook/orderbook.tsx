@@ -4,6 +4,7 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -18,7 +19,6 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useDebugStore } from '~/stores/DebugStore';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;

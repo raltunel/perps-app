@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -10,7 +10,7 @@ import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { apiEnvironments, debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import type { Route } from '../+types/root';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
@@ -26,19 +26,18 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Trade() {
-    const { symbol } = useTradeDataStore();
+    const { symbol, selectedCurrency, setSelectedCurrency } =
+        useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const {
-        debugWallet,
-        setDebugWallet,
-        environment,
-        setEnvironment,
         wsUrl,
         setWsUrl,
+        debugWallet,
+        setDebugWallet,
         isWsEnabled,
         setIsWsEnabled,
         wsEnvironment,
@@ -47,7 +46,12 @@ export default function Trade() {
         setSdkEnabled,
     } = useDebugStore();
 
-    // const currencies = ['USD', 'BTC', 'ETH'];
+    // useEffect(() => {
+    //     const info = new Info({ environment: 'mock' });
+    //     console.log({ wsManager: info.wsManager });
+    // }, []);
+
+    const currencies = ['USD', 'BTC', 'ETH'];
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
@@ -61,7 +65,7 @@ export default function Trade() {
                 {sdkEnabled ? (
                     <ComboBox
                         value={wsEnvironment}
-                        options={apiEnvironments}
+                        options={wsEnvironments}
                         fieldName='value'
                         onChange={(value) => setWsEnvironment(value)}
                     />
@@ -87,6 +91,14 @@ export default function Trade() {
                                 )?.address || '',
                         })
                     }
+                />
+            </div>
+
+            <div className={styles.currencySelector}>
+                <ComboBox
+                    value={selectedCurrency}
+                    options={currencies}
+                    onChange={(value) => setSelectedCurrency(value)}
                 />
             </div>
 

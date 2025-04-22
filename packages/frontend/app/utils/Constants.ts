@@ -56,7 +56,7 @@ export const wsUrls = [
     'wss://api-ui.hyperliquid.xyz/ws',
 ];
 
-export const apiEnvironments = [
+export const wsEnvironments = [
     {
         label: 'Mock',
         value: 'mock',
