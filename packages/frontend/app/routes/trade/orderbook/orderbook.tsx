@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { useSdk } from '~/hooks/useSdk';
+import { WsChannels } from '~/hooks/useWsObserver';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
@@ -19,7 +20,6 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useSdk } from '~/hooks/useSdk';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;

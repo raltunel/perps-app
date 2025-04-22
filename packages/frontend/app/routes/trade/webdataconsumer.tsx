@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useEffect, useRef } from 'react';
 import { useSdk } from '~/hooks/useSdk';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processUserOrder } from '~/processors/processOrderBook';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
+import { WsChannels } from '~/hooks/useWsObserver';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -27,7 +24,6 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
-    // const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet.address.toLowerCase();
