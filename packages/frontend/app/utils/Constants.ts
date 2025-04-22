@@ -98,3 +98,5 @@ export const OrderHistoryLimits = {
     MAX: 1000,
     RENDERED: 50,
 };
+
+export * from './feeSchedule';
