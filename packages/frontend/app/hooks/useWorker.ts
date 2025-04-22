@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from 'react';
 
-export const useWorker = (
+export const useWorker = <T>(
     workerPath: string,
-    onMessage: (event: MessageEvent) => void,
+    onMessage: (event: MessageEvent<T>) => void,
     onError?: (event: ErrorEvent) => void,
 ): ((message: any) => void) => {
     const workerRef = useRef<Worker | null>(null);
@@ -31,7 +31,7 @@ export const useWorker = (
             worker = new Worker(workerUrl, { type: 'module' });
             workerRef.current = worker;
 
-            const handleMessage = (event: MessageEvent) => {
+            const handleMessage = (event: MessageEvent<T>) => {
                 onMessageRef.current?.(event);
             };
 
@@ -71,7 +71,7 @@ export const useWorker = (
         }
     }, [workerPath]);
 
-    const postMessage = useCallback((message: any) => {
+    const postMessage = useCallback((message: T) => {
         if (workerRef.current) {
             workerRef.current.postMessage(message);
         } else {
