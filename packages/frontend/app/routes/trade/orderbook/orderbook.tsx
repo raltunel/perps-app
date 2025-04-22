@@ -18,7 +18,7 @@ import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/processors/workers/orderbook.worker';
+import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;

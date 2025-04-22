@@ -6,7 +6,10 @@ import type {
 } from '~/utils/orderbook/OrderBookIFs';
 import { processOrderBookMessage } from '../../processors/processOrderBook';
 
-export type OrderBookInput = string;
+export type OrderBookInput = {
+    channel: 'l2Book';
+    data: L2BookDataIF;
+};
 export type OrderBookOutput = {
     sells: OrderBookRowIF[];
     buys: OrderBookRowIF[];
@@ -14,8 +17,8 @@ export type OrderBookOutput = {
 
 self.onmessage = function (event: MessageEvent<OrderBookInput>) {
     try {
-        const { data } = JSON.parse(event.data);
-        const result = processOrderBookMessage(data as L2BookDataIF);
+        const { data } = event.data;
+        const result = processOrderBookMessage(data);
         self.postMessage(result);
     } catch (error) {
         console.error('Error parsing JSON in orderbook.worker:', error);
