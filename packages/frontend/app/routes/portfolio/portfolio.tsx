@@ -114,7 +114,19 @@ function Portfolio() {
             </div>
 
             {modalState.isOpen && selectedPortfolio && (
-                <Modal close={closeModal} position='center'>
+                <Modal
+                    close={closeModal}
+                    position='center'
+                    title={
+                        modalState.content === 'deposit'
+                            ? 'Deposit '
+                            : modalState.content === 'withdraw'
+                              ? 'Withdraw '
+                              : modalState.content === 'send'
+                                ? 'Send '
+                                : ''
+                    }
+                >
                     <Suspense fallback={<div>Loading...</div>}>
                         {modalState.content === 'deposit' && (
                             <PortfolioDeposit

@@ -499,7 +499,20 @@ export default function OrderInput() {
             />
 
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close}>
+                <Modal
+                    close={appSettingsModal.close}
+                    title={
+                        modalContent === 'margin'
+                            ? 'Margin Mode'
+                            : modalContent === 'scale'
+                              ? 'Scale Options'
+                              : modalContent === 'confirm_buy'
+                                ? 'Confirm Buy Order'
+                                : modalContent === 'confirm_sell'
+                                  ? 'Confirm Sell Order'
+                                  : ''
+                    }
+                >
                     {modalContent === 'margin' && (
                         <MarginModal
                             handleMarginModeChange={handleMarginModeChange}
