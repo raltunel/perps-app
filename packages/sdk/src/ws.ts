@@ -334,6 +334,8 @@ export class WebsocketManager {
         subscription: Subscription,
         subscriptionId: number,
     ): boolean {
+        this.log('unsubscribing', subscription, subscriptionId);
+
         const wasTracked = this.allSubscriptions[subscriptionId] !== undefined;
         delete this.allSubscriptions[subscriptionId];
 
