@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -174,7 +171,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     );
 
     const postOrderBookRaw = useWorker<OrderBookOutput>(
-        '../../../processors/workers/orderbook.worker',
+        './workers/orderbook.worker.ts',
         handleOrderBookWorkerResult,
     );
 
@@ -188,7 +185,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
         if (!info) return;
-        console.log('selectedResolution=', selectedResolution);
 
         if (selectedResolution) {
             const subKey = {
