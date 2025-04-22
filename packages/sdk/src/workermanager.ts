@@ -38,11 +38,9 @@ export class WorkerManager {
         if (this.workers.has(type)) {
             return;
         }
-        // console.log('>>> registering worker', type);
-        // worker.onmessage = (event) => {
-        //     console.log('>>> worker received message', event.data);
-        //     this.callback(event.data);
-        // };
+        worker.onmessage = (event) => {
+            this.callback(event.data);
+        };
         this.workers.set(type, worker);
     };
 
@@ -55,15 +53,8 @@ export class WorkerManager {
 
     public processMsg = (msg: string) => {
         const channel = this.extractChannelFromPayload(msg);
-
         const worker = this.getWorker(channel);
-        if (channel === 'webData2') {
-            console.log('>>> processMsg', channel, worker);
-        }
         if (worker) {
-            if (channel === 'webData2') {
-                console.log('>>> posting message to worker', msg);
-            }
             worker.postMessage(msg);
         }
     };
