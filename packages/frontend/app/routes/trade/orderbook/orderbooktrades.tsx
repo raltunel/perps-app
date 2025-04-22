@@ -3,7 +3,7 @@ import styles from './orderbooktrades.module.css';
 import { useCallback, useEffect, useRef } from 'react';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
-import { processOrderBookTrades } from '~/processors/processOrderBook';
+import { processTrades } from '~/processors/processOrderBook';
 import OrderTradeRow from './ordertraderow/ordertraderow';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -68,7 +68,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
         subscribe(WsChannels.ORDERBOOK_TRADES, {
             payload: { coin: symbol },
             handler: (payload) => {
-                mergeTrades(processOrderBookTrades(payload));
+                mergeTrades(processTrades(payload));
             },
             single: true,
         });

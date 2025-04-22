@@ -23,7 +23,7 @@ export const SdkProvider: React.FC<{
             info.current = new Info({
                 environment,
                 skipWs: false,
-                isDebug: true, // TODO: remove in prod
+                // isDebug: true, // TODO: remove in prod
             });
         } else {
             info.current.setEnvironment(environment);
@@ -34,7 +34,7 @@ export const SdkProvider: React.FC<{
                 {
                     environment,
                     accountAddress: DEMO_USER,
-                    isDebug: true, // TODO: remove in prod
+                    // isDebug: true, // TODO: remove in prod
                 },
             );
         } else {
