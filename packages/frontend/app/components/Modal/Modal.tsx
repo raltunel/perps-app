@@ -130,7 +130,16 @@ function Modal(props: ModalProps) {
     // Handle drag start - memoized
     const handleDragStart = useCallback((e: React.TouchEvent | React.MouseEvent): void => {
         // Don't allow dragging when keyboard is visible
-        if (isKeyboardVisible || !bottomSheetRef.current) return;
+        // if (isKeyboardVisible || !bottomSheetRef.current) return;
+        if (!bottomSheetRef.current) return;
+        // First dismiss the keyboard if it's visible
+    if (isKeyboardVisible && document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+        // Small delay to allow keyboard to dismiss
+        setTimeout(() => {
+            setIsKeyboardVisible(false);
+        }, 50);
+    }
 
         let clientY: number;
 
@@ -377,7 +386,7 @@ function Modal(props: ModalProps) {
                     ref={bottomSheetRef}
                     className={`${styles.bottomSheet} ${animation} ${isKeyboardVisible ? styles.keyboardActive : ''}`}
                 >
-                    {!isKeyboardVisible && (
+                    
                         <div
                             ref={handleRef}
                             className={styles.bottomSheetHandle}
@@ -388,7 +397,7 @@ function Modal(props: ModalProps) {
                         >
                             <div className={styles.handle}></div>
                         </div>
-                    )}
+                    
                     {modalHeader}
                     {modalContent}
                 </div>
