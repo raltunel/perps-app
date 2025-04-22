@@ -176,7 +176,6 @@ export class WebsocketManager {
     };
 
     private postMessage = (wsMsg: WsMsg) => {
-        console.log('>>> postMessage', wsMsg);
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
             this.log('Pong response received.');

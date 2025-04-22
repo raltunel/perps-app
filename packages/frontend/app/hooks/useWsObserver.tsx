@@ -60,11 +60,6 @@ export const WsObserverProvider: React.FC<{
         socketManagerRef.current?.isWsReady(),
     );
 
-    function extractChannelFromPayload(raw: string): string {
-        const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
-        return match ? match[1] : '';
-    }
-
     useEffect(() => {
         // that interval checks if the sdk websocket connection is ready
         // once it's ready, waiting subscriptions has been registered through websocket
@@ -97,7 +92,6 @@ export const WsObserverProvider: React.FC<{
         if (socketManagerRef.current && socketManagerRef.current.isWsReady()) {
             const worker = checkCustomWorker(type);
             if (worker) {
-                console.log('>>> there is a custom worker for', type);
                 socketManagerRef.current.registerWorker(type, worker);
             }
 
@@ -196,54 +190,6 @@ export const WsObserverProvider: React.FC<{
             } else {
                 subscriptions.current.set(key, configs);
             }
-        }
-    };
-
-    const initWorker = (type: string) => {
-        if (workers.current.has(type)) {
-            return;
-        }
-
-        switch (type) {
-            case WsChannels.WEB_DATA2:
-                const w1 = new Worker(
-                    new URL(
-                        './../processors/workers/webdata2.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
-
-                w1.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-                workers.current.set(type, w1);
-                return w1;
-            default:
-                const w2 = new Worker(
-                    new URL(
-                        './../processors/workers/jsonParser.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
-
-                w2.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-
-                workers.current.set(type, w2);
-                return w2;
         }
     };
 

@@ -2,6 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
+import { processOrderBookMessage } from '~/processors/processOrderBook';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -16,19 +19,13 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
-    // FIXME: data is not rendered on UI
-
-    const { info } = useSdk();
-
+    const { subscribe } = useWsObserver();
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
@@ -40,13 +37,20 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { formatNum } = useNumFormatter();
 
+    const { isWsEnabled } = useDebugStore();
+
+    const isWsEnabledRef = useRef<boolean>(true);
+    isWsEnabledRef.current = isWsEnabled;
+
     const lockOrderBook = useRef<boolean>(false);
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
     const {
         userOrders,
+        setUserOrders,
         userSymbolOrders,
         symbolInfo,
+        addOrderToHistory,
         setObChosenPrice,
         setObChosenAmount,
     } = useTradeDataStore();
@@ -164,16 +168,38 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
 
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) =>
-            setOrderBook(data.buys, data.sells),
-        [setOrderBook],
-    );
+    const changeSubscription = (payload: any) => {
+        subscribe(WsChannels.ORDERBOOK, {
+            payload: payload,
+            handler: (response) => {
+                if (!isWsEnabledRef.current || lockOrderBook.current) {
+                    return;
+                }
 
-    const postOrderBookRaw = useWorker<OrderBookOutput>(
-        './workers/orderbook.worker.ts',
-        handleOrderBookWorkerResult,
-    );
+                filledResolution.current = payload.resolution;
+                const { sells, buys } = processOrderBookMessage(
+                    response.data,
+                    orderCountRef.current,
+                );
+                setOrderBook(buys, sells);
+            },
+            single: true,
+        });
+    };
+
+    const orderProcessorIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (orderProcessorIntervalRef.current) {
+            clearInterval(orderProcessorIntervalRef.current);
+        }
+
+        return () => {
+            if (orderProcessorIntervalRef.current) {
+                clearInterval(orderProcessorIntervalRef.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
@@ -184,27 +210,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [symbol, symbolInfo?.coin]);
 
     useEffect(() => {
-        if (!info) return;
-
         if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
+            changeSubscription({
                 coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
-
-            const subId = info.subscribe(subKey, postOrderBookRaw);
-
-            return () => {
-                info.unsubscribe(subKey, subId);
-            };
+                nSigFigs: selectedResolution.nsigfigs,
+                mantissa: selectedResolution.mantissa,
+                resolution: selectedResolution,
+            });
         }
-    }, [selectedResolution, info]);
+    }, [selectedResolution]);
 
     const rowClickHandler = (
         order: OrderBookRowIF,
