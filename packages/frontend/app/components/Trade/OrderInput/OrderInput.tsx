@@ -139,10 +139,18 @@ export default function OrderInput() {
     ];
 
     useEffect(() => {
-        if (obChosenAmount > 0) {
-            setSize(formatNumWithOnlyDecimals(obChosenAmount));
-            handleTypeChange();
-        }
+        /* -----------------------------------------------------------------------------------------------
+        this code block has been commented out for now
+        it was used to set the size of the order based on the clicked orderbook slot 
+        */
+
+        // if (obChosenAmount > 0) {
+        //     setSize(formatNumWithOnlyDecimals(obChosenAmount));
+        //     handleTypeChange();
+        // }
+
+        /* ----------------------------------------------------------------------------------------------- */
+
         if (obChosenPrice > 0) {
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
