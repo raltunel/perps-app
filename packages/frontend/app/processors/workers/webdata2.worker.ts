@@ -28,6 +28,7 @@ self.onmessage = function (event) {
                         (item: any) => item.name === coin.name,
                     );
                     const ctxVal = data.assetCtxs[indexOfCoin];
+                    coinPriceMap.set('USDC', 1);
                     if (ctxVal !== null) {
                         const coinObject = processSymbolInfo({
                             coin: coin.name,
@@ -93,15 +94,10 @@ self.onmessage = function (event) {
                                     .accountValue,
                             ),
                             entryNtl: 0,
-                            hold:
-                                parseNum(
-                                    data.clearinghouseState.marginSummary
-                                        .accountValue,
-                                ) -
-                                parseNum(
-                                    data.clearinghouseState.marginSummary
-                                        .totalMarginUsed,
-                                ),
+                            hold: parseNum(
+                                data.clearinghouseState.marginSummary
+                                    .totalMarginUsed,
+                            ),
                         });
                     }
                 }
