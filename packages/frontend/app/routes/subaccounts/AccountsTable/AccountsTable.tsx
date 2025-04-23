@@ -51,12 +51,13 @@ const tableHeaders: headerItemIF[] = [
 interface propsIF {
     title: string;
     accounts: accountIF[];
+    tabId: string;
     noSort?: boolean;
 }
 
 // main react functional component
 export default function AccountsTable(props: propsIF) {
-    const { title, accounts, noSort } = props;
+    const { title, accounts, tabId, noSort } = props;
 
     // this is needed for the Trade link on each line item
     // should refactor it later as a `<Link />` elem
@@ -119,6 +120,7 @@ export default function AccountsTable(props: propsIF) {
                 defaultTab={title}
                 onTabChange={() => null}
                 rightContent={<></>}
+                wrapperId={tabId}
             />
             <motion.div
                 className={styles.table_content}

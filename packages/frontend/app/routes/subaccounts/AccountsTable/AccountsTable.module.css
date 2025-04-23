@@ -13,7 +13,7 @@
 
 /* all content below the highest-level tab elem */
 .table_content {
-    padding: 8px 9px 0px 9px;
+    padding: 8px 16px 0px 16px;
     height: 100%;
 }
 
@@ -27,6 +27,8 @@
 .col_headers_row {
     display: grid;
     grid-template-columns: var(--accounts-table-column-spacing);
+    /* keep same row height when sort arrows are suppressed */
+    min-height: 22px;
 }
 
 /* individual cells in the .col_headers_row line */

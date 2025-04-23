@@ -69,9 +69,14 @@ export default function subaccounts() {
                 <AccountsTable
                     title='Master Account'
                     accounts={[accounts.master]}
+                    tabId='table_1'
                     noSort
                 />
-                <AccountsTable title='Sub-Accounts' accounts={accounts.sub} />
+                <AccountsTable
+                    title='Sub-Accounts'
+                    accounts={accounts.sub}
+                    tabId='table_2'
+                />
             </div>
             {createSubaccountModal.isOpen && (
                 <CreateSubaccount modalControl={createSubaccountModal} />
