@@ -1,4 +1,5 @@
 import { DEFAULT_PING_INTERVAL_MS } from './config';
+import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
 type Callback = (msg: WsMsg) => void;
@@ -91,11 +92,60 @@ export class WebsocketManager {
     private stopped: boolean = false;
     private isDebug: boolean;
     private baseUrl: string;
+    private workers: Worker[] = [];
+    private nextWorkerIndex: number = 0;
+    private numWorkers: number;
+    private jsonParserWorkerBlobUrl: string | null = null;
 
-    constructor(baseUrl: string, isDebug: boolean = false) {
+    constructor(
+        baseUrl: string,
+        isDebug: boolean = false,
+        numWorkers: number = 4,
+    ) {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
+        this.numWorkers = numWorkers;
+        this.initializeWorkers();
         this.connect();
+    }
+
+    private initializeWorkers() {
+        if (this.numWorkers === 0) {
+            this.log(
+                'No workers requested, skipping initialization. JSON parsing will occur on the main thread.',
+            );
+            return;
+        }
+
+        this.workers.forEach((worker) => worker.terminate());
+        this.workers = [];
+
+        if (this.jsonParserWorkerBlobUrl) {
+            URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
+        }
+        this.jsonParserWorkerBlobUrl = createJsonParserWorker();
+
+        this.log(`Initializing ${this.numWorkers} JSON parsing worker(s)`);
+        for (let i = 0; i < this.numWorkers; i++) {
+            try {
+                const worker = new Worker(this.jsonParserWorkerBlobUrl);
+                worker.onmessage = (event: MessageEvent) =>
+                    this.handleWorkerMessage(event, i);
+                worker.onerror = (event) => {
+                    this.log(`Worker ${i} error: ${event.message}`, event);
+                };
+                this.workers.push(worker);
+            } catch (error) {
+                this.log(`Failed to create worker ${i}:`, error);
+            }
+        }
+        if (this.workers.length < this.numWorkers) {
+            this.log(
+                `Could only initialize ${this.workers.length} workers instead of the requested ${this.numWorkers}.`,
+            );
+            this.numWorkers = this.workers.length;
+        }
+        this.nextWorkerIndex = 0;
     }
 
     private connect = () => {
@@ -113,6 +163,17 @@ export class WebsocketManager {
         this.ws.addEventListener('open', this.onOpen);
         this.ws.addEventListener('message', this.onMessage);
         this.ws.addEventListener('close', this.onClose);
+
+        // make sure workers are ready before connecting
+        if (this.workers.length === 0 && this.numWorkers > 0) {
+            this.log('Workers not initialized, attempting re-initialization.');
+            this.initializeWorkers();
+            if (this.workers.length === 0) {
+                this.log(
+                    'Worker re-initialization failed. Proceeding without workers.',
+                );
+            }
+        }
     };
 
     private log = (...args: any[]) => {
@@ -150,40 +211,77 @@ export class WebsocketManager {
         }
     };
 
-    private onMessage = (event: MessageEvent) => {
-        const message = event.data;
-        this.log('onMessage', message);
-        if (message === 'Websocket connection established.') {
-            this.log('Websocket connection established.');
-            return;
-        }
-        let wsMsg: WsMsg;
-        try {
-            wsMsg = JSON.parse(message);
-        } catch (e) {
-            this.log('Invalid JSON:', message);
-            return;
-        }
+    private handleParsedMessage = (wsMsg: WsMsg, originalMessage: string) => {
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
             this.log('Pong response received.');
             return;
         }
         if (!identifier) {
-            this.log('Unknown or empty message:', message);
+            this.log(
+                'Unknown or empty message after parsing:',
+                wsMsg,
+                'Original:',
+                originalMessage,
+            );
             return;
         }
         const activeSubs = this.activeSubscriptions[identifier] || [];
         if (activeSubs.length === 0) {
             this.log(
                 'Websocket message from an unexpected subscription:',
-                message,
+                wsMsg,
                 identifier,
+                'Original:',
+                originalMessage,
             );
             return;
         }
         for (const active of activeSubs) {
             active.callback(wsMsg);
+        }
+    };
+
+    private onMessage = (event: MessageEvent) => {
+        const message = event.data;
+        this.log('onMessage Raw:', message);
+        if (message === 'Websocket connection established.') {
+            this.log('Websocket connection established.');
+            return;
+        }
+
+        if (this.workers.length > 0) {
+            const worker = this.workers[this.nextWorkerIndex];
+            worker.postMessage(message);
+            this.nextWorkerIndex = (this.nextWorkerIndex + 1) % this.numWorkers;
+        } else {
+            // parse on main thread if no workers initialized
+            this.log('No workers available, parsing JSON on main thread.');
+            let wsMsg: WsMsg;
+            try {
+                wsMsg = JSON.parse(message);
+                this.handleParsedMessage(wsMsg, message);
+            } catch (e) {
+                this.log('Invalid JSON (main thread):', message, e);
+            }
+        }
+    };
+
+    private handleWorkerMessage = (
+        event: MessageEvent,
+        workerIndex: number,
+    ) => {
+        const { success, data, error, originalMessage } = event.data;
+        if (success) {
+            this.log(`Parsed by worker ${workerIndex}:`, data);
+            this.handleParsedMessage(data as WsMsg, originalMessage);
+        } else {
+            this.log(
+                `Worker ${workerIndex} parsing error:`,
+                error,
+                'Original:',
+                originalMessage,
+            );
         }
     };
 
@@ -220,6 +318,20 @@ export class WebsocketManager {
         this.wsReady = false;
         this.queuedSubscriptions = [];
         this.activeSubscriptions = {};
+
+        if (this.numWorkers === 0) {
+            this.log('No workers, skipping worker termination.');
+            return;
+        }
+
+        this.log(`Terminating ${this.workers.length} worker(s)`);
+        this.workers.forEach((worker) => worker.terminate());
+        this.workers = [];
+        this.nextWorkerIndex = 0;
+        if (this.jsonParserWorkerBlobUrl) {
+            URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
+            this.jsonParserWorkerBlobUrl = null;
+        }
     }
 
     public setBaseUrl(newBaseUrl: string) {
@@ -231,17 +343,20 @@ export class WebsocketManager {
             return;
         }
 
+        const oldSubscriptions = { ...this.allSubscriptions };
+
         this.stop();
 
         this.queuedSubscriptions = [];
-        for (const _subId in this.allSubscriptions) {
+        for (const _subId in oldSubscriptions) {
             const subId = Number(_subId);
-            const { subscription, callback } = this.allSubscriptions[subId];
+            const { subscription, callback } = oldSubscriptions[subId];
             this.queuedSubscriptions.push({
                 subscription,
                 active: { callback, subscriptionId: subId },
             });
         }
+        this.allSubscriptions = {};
         this.activeSubscriptions = {};
 
         this.baseUrl = newBaseUrl;
@@ -260,8 +375,9 @@ export class WebsocketManager {
         } else {
             if (this.allSubscriptions[subscriptionId]) {
                 this.log(
-                    `Subscription ID ${subscriptionId} already exists. Reusing.`,
+                    `Subscription ID ${subscriptionId} already exists, replacing callback.`,
                 );
+                this.allSubscriptions[subscriptionId].callback = callback;
                 return subscriptionId;
             }
         }
