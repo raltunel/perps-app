@@ -198,11 +198,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     : {}),
             };
 
-            const subId = info.subscribe(subKey, postOrderBookRaw);
+            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            return () => {
-                info.unsubscribe(subKey, subId);
-            };
+            return unsubscribe;
         }
     }, [selectedResolution, info]);
 

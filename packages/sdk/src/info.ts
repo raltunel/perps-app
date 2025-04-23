@@ -208,7 +208,10 @@ export class Info extends API {
         return this.post('/info', { type: 'subAccounts', user });
     }
 
-    public subscribe(subscription: Subscription, callback: Callback): number {
+    public subscribe(
+        subscription: Subscription,
+        callback: Callback,
+    ): { subId: number; unsubscribe: () => void } {
         if (
             subscription.type === 'l2Book' ||
             subscription.type === 'trades' ||
@@ -219,7 +222,11 @@ export class Info extends API {
         if (!this.wsManager) {
             throw new Error('Cannot call subscribe since skipWs was used');
         }
-        return this.wsManager.subscribe(subscription, callback);
+        const subId = this.wsManager.subscribe(subscription, callback);
+        return {
+            subId,
+            unsubscribe: () => this.unsubscribe(subscription, subId),
+        };
     }
 
     public unsubscribe(
