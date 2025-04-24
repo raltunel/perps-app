@@ -1,30 +1,29 @@
 /// <reference lib="webworker" />
 
 import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
-import { processSymbolInfo } from '../processSymbolInfo';
+import { processSymbolInfo } from '../../processors/processSymbolInfo';
 import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '../processOrderBook';
-import { processPosition } from '../processPosition';
+import { processUserOrder } from '../../processors/processOrderBook';
+import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
+import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
 
-export type WebData2Input = string;
-export type WebData2Output =
-    | {
-          channel: string;
-          data: {
-              coins: SymbolInfoIF[];
-              userOpenOrders: OrderDataIF[];
-              user: string;
-              positions: PositionIF[];
-              coinPriceMap: Map<string, number>;
-          };
-      }
-    | { error: string };
+export type WebData2Input = OtherWsMsg;
+export type WebData2Output = {
+    channel: string;
+    data: {
+        coins: SymbolInfoIF[];
+        userOpenOrders: OrderDataIF[];
+        user: string;
+        positions: PositionIF[];
+        coinPriceMap: Map<string, number>;
+    };
+};
 
-self.onmessage = function (event: MessageEvent<WebData2Input>) {
+self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
     try {
-        const parsedData = JSON.parse(event.data);
+        const parsedData = event.data;
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];

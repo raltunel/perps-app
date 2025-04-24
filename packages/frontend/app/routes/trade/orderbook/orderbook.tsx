@@ -200,6 +200,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
+            setTimeout(() => {
+                filledResolution.current = selectedResolution;
+            }, 200);
+
             return unsubscribe;
         }
     }, [selectedResolution, info]);
