@@ -1,7 +1,15 @@
 import { useEffect, useRef, useCallback } from 'react';
 
+import webData2Worker from './workers/webdata2.worker.ts?worker';
+import orderbookWorker from './workers/orderbook.worker.ts?worker';
+
+export enum WorkerKeys {
+    WEB_DATA2 = 'webData2',
+    ORDERBOOK = 'orderbook',
+}
+
 export const useWorker = <T>(
-    workerPath: string,
+    workerKey: string,
     onMessage: (event: MessageEvent<T>) => void,
     onError?: (event: ErrorEvent) => void,
 ): ((message: any) => void) => {
@@ -18,17 +26,15 @@ export const useWorker = <T>(
     }, [onError]);
 
     useEffect(() => {
-        if (!workerPath) {
-            console.error('useWorker: workerPath is required.');
-            return;
-        }
-
         let worker: Worker | null = null;
-        let workerUrl: URL | null = null;
 
         try {
-            workerUrl = new URL(workerPath, import.meta.url);
-            worker = new Worker(workerUrl, { type: 'module' });
+            worker = getWorkerByKey(workerKey as WorkerKeys);
+            if (!worker) {
+                console.error("Worker couldn't be initialized");
+                return;
+            }
+
             workerRef.current = worker;
 
             const handleMessage = (event: MessageEvent<T>) => {
@@ -44,7 +50,7 @@ export const useWorker = <T>(
             worker.addEventListener('error', handleError);
 
             return () => {
-                console.log('Terminating worker:', workerPath);
+                console.log('Terminating worker:', workerKey);
                 worker?.removeEventListener('message', handleMessage);
                 worker?.removeEventListener('error', handleError);
                 worker?.terminate();
@@ -69,7 +75,18 @@ export const useWorker = <T>(
             }
             return;
         }
-    }, [workerPath]);
+    }, [workerKey]);
+
+    const getWorkerByKey = (key: WorkerKeys): Worker | null => {
+        switch (key) {
+            case WorkerKeys.WEB_DATA2:
+                return new webData2Worker();
+            case WorkerKeys.ORDERBOOK:
+                return new orderbookWorker();
+            default:
+                return null;
+        }
+    };
 
     const postMessage = useCallback((message: T) => {
         if (workerRef.current) {

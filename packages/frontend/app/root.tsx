@@ -102,7 +102,7 @@ export default function App() {
     return (
         <>
             <Layout>
-                <SdkProvider environment={'mock'}>
+                <SdkProvider environment={wsEnvironment}>
                     <WsObserverProvider
                         url={wsUrl}
                         wsEnvironment={wsEnvironment}

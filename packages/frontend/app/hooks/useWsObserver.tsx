@@ -374,25 +374,25 @@ export const WsObserverProvider: React.FC<{
         }
 
         switch (type) {
-            case WsChannels.WEB_DATA2:
-                const w1 = new Worker(
-                    new URL(
-                        './../processors/workers/webdata2.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
+            // case WsChannels.WEB_DATA2:
+            //     const w1 = new Worker(
+            //         new URL(
+            //             './../processors/workers/webdata2.worker.ts',
+            //             import.meta.url,
+            //         ),
+            //         { type: 'module' },
+            //     );
 
-                w1.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-                workers.current.set(type, w1);
-                return w1;
+            //     w1.onmessage = (event) => {
+            //         const subs = subscriptions.current.get(event.data.channel);
+            //         if (subs) {
+            //             subs.forEach((config) => {
+            //                 config.handler(event.data);
+            //             });
+            //         }
+            //     };
+            //     workers.current.set(type, w1);
+            //     return w1;
             default:
                 const w2 = new Worker(
                     new URL(

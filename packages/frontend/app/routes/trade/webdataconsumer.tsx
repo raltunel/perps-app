@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useSdk } from '~/hooks/useSdk';
+import { useWorker, WorkerKeys } from '~/hooks/useWorker';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
-import { processUserOrder } from '~/processors/processOrderBook';
-import { processSymbolInfo } from '~/processors/processSymbolInfo';
+import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -18,7 +18,6 @@ export default function WebDataConsumer() {
         setCoins,
         coins,
         setPositions,
-        positions,
         setCoinPriceMap,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
@@ -35,6 +34,8 @@ export default function WebDataConsumer() {
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
 
+    const { info } = useSdk();
+
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
         if (foundCoin) {
@@ -43,21 +44,15 @@ export default function WebDataConsumer() {
     }, [symbol, coins]);
 
     useEffect(() => {
+        if (!info) return;
+
         setUserOrders([]);
         openOrdersRef.current = [];
 
-        subscribe(WsChannels.WEB_DATA2, {
-            payload: { user: debugWallet.address },
-            handler: (payload) => {
-                setCoins(payload.data.coins);
-                setCoinPriceMap(payload.data.coinPriceMap);
-                if (payload.data.user.toLowerCase() === addressRef.current) {
-                    openOrdersRef.current = payload.data.userOpenOrders;
-                    positionsRef.current = payload.data.positions;
-                }
-            },
-            single: true,
-        });
+        const { unsubscribe } = info.subscribe(
+            { type: WsChannels.WEB_DATA2, user: debugWallet.address },
+            postWebData2,
+        );
 
         const openOrdersInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
@@ -70,9 +65,26 @@ export default function WebDataConsumer() {
         return () => {
             clearInterval(openOrdersInterval);
             clearInterval(positionsInterval);
-            unsubscribeAllByChannel(WsChannels.WEB_DATA2);
+            unsubscribe();
         };
-    }, [debugWallet.address]);
+    }, [debugWallet.address, info]);
+
+    const handleWebData2WorkerResult = useCallback(
+        ({ data }: { data: WebData2Output }) => {
+            setCoins(data.data.coins);
+            setCoinPriceMap(data.data.coinPriceMap);
+            if (data.data.user.toLowerCase() === addressRef.current) {
+                openOrdersRef.current = data.data.userOpenOrders;
+                positionsRef.current = data.data.positions;
+            }
+        },
+        [setCoins, setCoinPriceMap],
+    );
+
+    const postWebData2 = useWorker<WebData2Output>(
+        WorkerKeys.WEB_DATA2,
+        handleWebData2WorkerResult,
+    );
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {

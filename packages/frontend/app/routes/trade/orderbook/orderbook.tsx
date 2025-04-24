@@ -17,7 +17,7 @@ import {
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
+import { useWorker, WorkerKeys } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 interface OrderBookProps {
     symbol: string;
@@ -171,7 +171,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     );
 
     const postOrderBookRaw = useWorker<OrderBookOutput>(
-        './workers/orderbook.worker.ts',
+        WorkerKeys.ORDERBOOK,
         handleOrderBookWorkerResult,
     );
 
@@ -199,6 +199,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             };
 
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
+            setTimeout(() => {
+                filledResolution.current = selectedResolution;
+            }, 200);
 
             return unsubscribe;
         }
