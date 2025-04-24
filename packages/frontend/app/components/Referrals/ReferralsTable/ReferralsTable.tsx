@@ -1,57 +1,86 @@
-import { useState } from 'react';
-import styles from './ReferralsTable.module.css'
+import { memo } from 'react';
+import styles from './ReferralsTable.module.css';
+import ReferralsTableHeader from './ReferralsTableHeader';
+import ReferralsTableRow from './ReferralsTableRow';
+import { useReferralsTable } from './useReferralsTable';
+import { referralData } from './data';
+import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 
-import { motion } from 'framer-motion';
-import Tabs from '~/components/Tabs/Tabs';
+function ReferralsTable() {
 
-interface PropsIF {
-    initialTab?: string;
-}
 
-const availableTabs = ['Referrals', 'Reward History'];
+    const {
+        currentItems,
+        currentPage,
+        totalPages,
+        totalItems,
+        
+        startIndex,
+        endIndex,
+        goToNextPage,
+        goToPreviousPage,
+        sortConfig,
+        handleSort
+    } = useReferralsTable({
+        data: referralData,
+        itemsPerPage: 10,
+    });
 
-export default function RefferalsTable(props: PropsIF) {
-    const { initialTab = 'Referrals' } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
 
-    const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
-    };
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'Referrals':
-                return <div>enter code</div>;
-            case 'Reward History':
-                return <div>enter code</div>;
-            default:
-                return (
-                    <div className={styles.emptyState}>
-                        Select a tab to view data
-                    </div>
-                );
-        }
-    };
+    const isPrevButtonDisabled = currentPage === 1;
+    const isNextButtonDisabled = currentPage === totalPages;
 
     return (
         <div className={styles.tableWrapper}>
-            <Tabs
-                tabs={availableTabs}
-                defaultTab={activeTab}
-                onTabChange={handleTabChange}
-                wrapperId="referralsTabs" 
-                layoutIdPrefix="referralsTabIndicator" 
+            <ReferralsTableHeader 
+                sortConfig={sortConfig} 
+                onSort={handleSort} 
             />
-            <motion.div
-                className={styles.tableContent}
-                key={activeTab}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-            >
-                {renderTabContent()}
-            </motion.div>
+            <div className={styles.tableBody}>
+                {currentItems.map((referral, index) => (
+                    <ReferralsTableRow
+                        key={`referral-${index}`}
+                        referral={referral}
+                    />
+                ))}
+
+                {currentItems.length === 0 && (
+                    <div
+                        className={styles.rowContainer}
+                        style={{ justifyContent: 'center', padding: '2rem 0' }}
+                    >
+                        No data to display
+                    </div>
+                )}
+            </div>
+            
+          
+            <div className={styles.paginationContainer}>
+                <div className={styles.pageInfo}>
+                {totalItems > 0 ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}` : '0-0 of 0'}
+                </div>
+
+                <div className={styles.pageButtons}>
+                    <button
+                        className={styles.pageButton}
+                        onClick={goToPreviousPage}
+                        disabled={isPrevButtonDisabled}
+                    >
+                        <BiChevronLeft size={16} />
+                    </button>
+
+                    <button
+                        className={styles.pageButton}
+                        onClick={goToNextPage}
+                        disabled={isNextButtonDisabled}
+                    >
+                        <BiChevronRight size={16} />
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
+
+
+export default memo(ReferralsTable);

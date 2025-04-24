@@ -1,8 +1,7 @@
-import Welcome from '~/components/Welcome/Welcome';
 import type { Route } from '../../+types/root';
 import styles from './referrals.module.css';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
-import ReferralsTable from '~/components/Referrals/ReferralsTable/ReferralsTable';
+import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 // import styles from './referrals.module.css'
 export function meta({}: Route.MetaArgs) {
     return [
@@ -37,7 +36,7 @@ export default function Referrals({ loaderData }: Route.ComponentProps) {
             </div>
             <section className={styles.tableContainer}>
                 <CodeTabs />
-                <ReferralsTable/>
+                <ReferralsTabs/>
 
             </section>
         </div>

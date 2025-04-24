@@ -17,3 +17,38 @@
     align-items: center;
     gap: 16px;
 }
+
+.enterCodeContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  
+    align-items: flex-start;
+}
+
+.enterCodeContainer h6{
+    color: var(--base-text1, #F0F0F8);
+text-align: center;
+
+
+font-family: var(--Font-Family-Main, "Lexend Deca");
+font-size: var(--font-size-s, 12px);
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+.enterCodeContainer input{
+    display: flex;
+height: 33px;
+padding: 0px 8px;
+align-items: center;
+gap: 4px;
+align-self: stretch;
+border-radius: 8px;
+background: var(--dark4, #27272C);
+font-size: var(--font-size-s, 12px);
+outline: none;
+border: none;
+color: var(--text1)
+
+}

@@ -11,18 +11,31 @@ export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
 
+    const [referralCode, setReferralCode] = useState('');
+
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
+    const enterCodeContent = (
+        <div className={styles.enterCodeContainer}>
+            <h6>Enter a referral code</h6>
+            <input
+                type='text'
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value)}
+            />
+            <h6>You will receive a discount on your fees</h6>
+        </div>
+    );
 
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Enter Code':
-                return <div>enter code</div>;
+                return enterCodeContent;
             case 'Create Code':
-                return <div>enter code</div>;
+                return <div>Create code</div>;
             case 'Claim':
-                return <div>enter code</div>;
+                return <div>claim $0.00 in rewards</div>;
             default:
                 return (
                     <div className={styles.emptyState}>
@@ -38,8 +51,8 @@ export default function CodeTabs(props: Props) {
                 tabs={availableTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
-                wrapperId="codeTabs" 
-                layoutIdPrefix="codeTabIndicator" 
+                wrapperId='codeTabs'
+                layoutIdPrefix='codeTabIndicator'
             />
             <motion.div
                 className={styles.tableContent}

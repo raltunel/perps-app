@@ -1,6 +1,7 @@
 import { memo, useMemo, useCallback } from 'react';
 import SortIcon from '~/components/SortIcon/SortIcon';
-import styles from './LeaderboardTable.module.css';
+import styles from './ReferralsTable.module.css';
+import type { ReferralData } from './data';
 
 export interface HeaderCell {
     name: string;
@@ -9,56 +10,50 @@ export interface HeaderCell {
     className: string;
 }
 
-interface LeaderboardTableHeaderProps {
-sortConfig: {
+interface ReferralsTableHeaderProps {
+    sortConfig: {
         key: string;
         direction: 'asc' | 'desc' | null;
-    };
-    onSort: (key: string) => void;
+    } | null;
+    onSort: (key: keyof ReferralData) => void;
 }
 
-function LeaderboardTableHeader({
+function ReferralsTableHeader({
     sortConfig,
     onSort,
-}: LeaderboardTableHeaderProps) {
-    // Memoize  so it's not recreated on every render
+}: ReferralsTableHeaderProps) {
+    // Memoize so it's not recreated on every render
     const tableHeadersConfig = useMemo<HeaderCell[]>(
         () => [
             {
-                name: 'Rank',
-                key: 'rank',
+                name: 'Address',
+                key: 'address',
                 sortable: true,
-                className: 'rankCell',
+                className: 'addressCell',
             },
             {
-                name: 'Trader',
-                key: 'trader',
+                name: 'Date Joined',
+                key: 'dateJoined',
                 sortable: true,
-                className: 'traderCell',
+                className: 'dateJoinedCell',
             },
             {
-                name: 'Account Value',
-                key: 'accountValue',
-                sortable: true,
-                className: 'accountValueCell',
-            },
-            {
-                name: 'PNL (30D)',
-                key: 'pnl',
-                sortable: true,
-                className: 'pnlCell',
-            },
-            {
-                name: 'ROI (30D)',
-                key: 'roi',
-                sortable: true,
-                className: 'roiCell',
-            },
-            {
-                name: 'Volume (30D)',
-                key: 'volume',
+                name: 'Total Volume',
+                key: 'totalVolume',
                 sortable: true,
                 className: 'volumeCell',
+            },
+            {
+                name: 'Fees Paid',
+                key: 'feesPaid',
+                sortable: true,
+                className: 'feesCell',
+            },
+            {
+                name: 'Your Rewards',
+                key: 'yourRewards',
+                sortable: true,
+                className: 'rewardsCell',
             },
         ],
         [],
@@ -66,15 +61,15 @@ function LeaderboardTableHeader({
 
     const handleHeaderClick = useCallback(
         (key: string) => {
-            return () => onSort(key);
+            return () => onSort(key as keyof ReferralData);
         },
         [onSort],
     );
 
-    // Memoize to prevent unnecessary re-renders
+  
     const headerCells = useMemo(() => {
         return tableHeadersConfig.map((header) => {
-            const isActive = sortConfig.key === header.key;
+            const isActive = sortConfig?.key === header.key;
             const cellClassName = `${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`;
 
             return (
@@ -91,7 +86,7 @@ function LeaderboardTableHeader({
                     {header.sortable && (
                         <SortIcon
                             active={isActive}
-                            direction={isActive ? sortConfig.direction : null}
+                            direction={isActive ? sortConfig?.direction : null}
                         />
                     )}
                 </div>
@@ -103,8 +98,11 @@ function LeaderboardTableHeader({
 }
 
 // prevent re-renders when props haven't changed
-export default memo(LeaderboardTableHeader, (prevProps, nextProps) => {
-    // Custom comparison for more precise control over re-renders
+export default memo(ReferralsTableHeader, (prevProps, nextProps) => {
+    if (!prevProps.sortConfig && !nextProps.sortConfig) return true;
+    if (!prevProps.sortConfig || !nextProps.sortConfig) return false;
+    
+    
     return (
         prevProps.sortConfig.key === nextProps.sortConfig.key &&
         prevProps.sortConfig.direction === nextProps.sortConfig.direction
