@@ -3,13 +3,15 @@ import { useEffect, useRef, useCallback } from 'react';
 import webData2Worker from './workers/webdata2.worker.ts?worker';
 import orderbookWorker from './workers/orderbook.worker.ts?worker';
 
-export enum WorkerKeys {
-    WEB_DATA2 = 'webData2',
-    ORDERBOOK = 'orderbook',
-}
+export const WORKERS = {
+    webData2: webData2Worker,
+    orderbook: orderbookWorker,
+} as const;
+
+export type WorkerKey = keyof typeof WORKERS;
 
 export const useWorker = <T>(
-    workerKey: string,
+    workerKey: WorkerKey,
     onMessage: (event: MessageEvent<T>) => void,
     onError?: (event: ErrorEvent) => void,
 ): ((message: any) => void) => {
@@ -29,7 +31,7 @@ export const useWorker = <T>(
         let worker: Worker | null = null;
 
         try {
-            worker = getWorkerByKey(workerKey as WorkerKeys);
+            worker = new WORKERS[workerKey]();
             if (!worker) {
                 console.error("Worker couldn't be initialized");
                 return;
@@ -76,17 +78,6 @@ export const useWorker = <T>(
             return;
         }
     }, [workerKey]);
-
-    const getWorkerByKey = (key: WorkerKeys): Worker | null => {
-        switch (key) {
-            case WorkerKeys.WEB_DATA2:
-                return new webData2Worker();
-            case WorkerKeys.ORDERBOOK:
-                return new orderbookWorker();
-            default:
-                return null;
-        }
-    };
 
     const postMessage = useCallback((message: T) => {
         if (workerRef.current) {
