@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
+import { useWorker, WorkerKeys } from '~/hooks/useWorker';
 import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -82,7 +82,7 @@ export default function WebDataConsumer() {
     );
 
     const postWebData2 = useWorker<WebData2Output>(
-        './workers/webdata2.worker.ts',
+        WorkerKeys.WEB_DATA2,
         handleWebData2WorkerResult,
     );
 
