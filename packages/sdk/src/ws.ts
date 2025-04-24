@@ -374,11 +374,6 @@ export class WebsocketManager {
             subscriptionId = this.subscriptionIdCounter;
         } else {
             if (this.activeSubscriptions[subscriptionId]) {
-                console.log(
-                    '>>> replace callback',
-                    subscriptionId,
-                    subscription,
-                );
                 this.log(
                     `Subscription ID ${subscriptionId} already exists, replacing callback.`,
                 );
