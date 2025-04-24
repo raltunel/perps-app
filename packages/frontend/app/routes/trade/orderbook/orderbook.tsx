@@ -208,33 +208,32 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         }
     }, [selectedResolution, info]);
 
-    const rowClickHandler = (
-        order: OrderBookRowIF,
-        type: OrderRowClickTypes,
-        rowIndex: number,
-    ) => {
-        lockOrderBook.current = true;
-        if (type === OrderRowClickTypes.PRICE) {
-            setObChosenPrice(order.px);
-        } else if (type === OrderRowClickTypes.AMOUNT) {
-            let amount = 0;
-            if (order.type === 'buy') {
-                for (let i = 0; i <= rowIndex; i++) {
-                    amount += buys[i].sz;
+    const rowClickHandler = useCallback(
+        (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
+            lockOrderBook.current = true;
+            if (type === OrderRowClickTypes.PRICE) {
+                setObChosenPrice(order.px);
+            } else if (type === OrderRowClickTypes.AMOUNT) {
+                let amount = 0;
+                if (order.type === 'buy') {
+                    for (let i = 0; i <= rowIndex; i++) {
+                        amount += buys[i].sz;
+                    }
+                } else {
+                    for (let i = 0; i < orderCount - rowIndex; i++) {
+                        amount += sells[i].sz;
+                    }
                 }
-            } else {
-                for (let i = 0; i < orderCount - rowIndex; i++) {
-                    amount += sells[i].sz;
-                }
+                setObChosenPrice(order.px);
+                setObChosenAmount(amount);
             }
-            setObChosenPrice(order.px);
-            setObChosenAmount(amount);
-        }
 
-        setTimeout(() => {
-            lockOrderBook.current = false;
-        }, 1000);
-    };
+            setTimeout(() => {
+                lockOrderBook.current = false;
+            }, 1000);
+        },
+        [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+    );
 
     return (
         <div className={styles.orderBookContainer}>
