@@ -18,7 +18,7 @@ export default function Referrals({ loaderData }: Route.ComponentProps) {
     return (
         <div className={styles.container}>
             <header>
-                Portfolio
+                Referrals
                 <p>
                     Refer users to earn rewards. Affiliates earn greater
                     rewards. Learn More <a href='#'>Learn More</a>

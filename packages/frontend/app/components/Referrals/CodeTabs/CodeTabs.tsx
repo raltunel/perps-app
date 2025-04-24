@@ -17,15 +17,44 @@ export default function CodeTabs(props: Props) {
         setActiveTab(tab);
     };
     const enterCodeContent = (
-        <div className={styles.enterCodeContainer}>
-            <h6>Enter a referral code</h6>
-            <input
-                type='text'
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value)}
-            />
-            <h6>You will receive a discount on your fees</h6>
-        </div>
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Enter a referral code</h6>
+                <input
+                    type='text'
+                    value={referralCode}
+                    onChange={(e) => setReferralCode(e.target.value)}
+                />
+                <h6>You will receive a discount on your fees</h6>
+            </div>
+            <button>Enter</button>
+        </section>
+    );
+
+    const createCodeContent = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.createCodeContent}>
+                <p>Your code is DATAWALLET</p>
+                <div className={styles.walletLink}>
+                    <a href='#'>linktocode.com/join/datawallet</a>
+                </div>
+                <p>
+                    You will receive <span>10%</span> of referred users fees and
+                    they will receive a <span>4%</span> discount. See the Docs
+                    for more.
+                </p>
+            </div>
+            <button>Create</button>
+        </section>
+    );
+    const claimContent = (
+        <section className={styles.sectionWithButton}>
+            
+            <div className={styles.claimContent}>
+                <p>Claim $0.00 in rewards</p>
+            </div>
+            <button>Claim</button>
+        </section>
     );
 
     const renderTabContent = () => {
@@ -33,9 +62,9 @@ export default function CodeTabs(props: Props) {
             case 'Enter Code':
                 return enterCodeContent;
             case 'Create Code':
-                return <div>Create code</div>;
+                return createCodeContent;
             case 'Claim':
-                return <div>claim $0.00 in rewards</div>;
+                return claimContent;
             default:
                 return (
                     <div className={styles.emptyState}>
