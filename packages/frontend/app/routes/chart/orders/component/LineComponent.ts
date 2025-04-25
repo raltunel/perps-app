@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
@@ -5,10 +6,13 @@ import type { EntityId, IPaneApi } from '~/tv/charting_library';
 import {
     addCustomOrderLine,
     createAnchoredMainText,
+    createCancelAnchoredText,
     createQuantityAnchoredText,
     estimateTextWidth,
     formatLineLabel,
+    getAnchoredCancelButtonTextLocation,
     getAnchoredQuantityTextLocation,
+    isNear,
     priceToPixel,
     quantityTextFormatWithComma,
     type LineLabel,
@@ -27,15 +31,17 @@ export type LineData = {
 
 interface LineProps {
     lines: LineData[];
+    orderType: 'openOrder' | 'position';
 }
 
 export type ChartShapeRefs = {
     lineId: EntityId;
     textId: EntityId;
     quantityTextId?: EntityId;
+    cancelButtonTextId?: EntityId;
 };
 
-const LineComponent = ({ lines }: LineProps) => {
+const LineComponent = ({ lines, orderType }: LineProps) => {
     const { chart } = useTradingView();
 
     const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
@@ -173,6 +179,7 @@ const LineComponent = ({ lines }: LineProps) => {
             const shapeRefs: ChartShapeRefs[] = [];
 
             for (const line of lines) {
+                let cancelButtonTextId = undefined;
                 const lineId = await addCustomOrderLine(
                     chart,
                     line.yPrice,
@@ -199,7 +206,29 @@ const LineComponent = ({ lines }: LineProps) => {
                       )
                     : undefined;
 
-                shapeRefs.push({ lineId, textId, quantityTextId });
+                if (orderType === 'openOrder') {
+                    cancelButtonTextId = await createCancelAnchoredText(
+                        chart,
+                        getAnchoredCancelButtonTextLocation(
+                            chart,
+                            line.xLoc,
+                            line.textValue,
+                            line.quantityTextValue
+                                ? quantityTextFormatWithComma(
+                                      line.quantityTextValue,
+                                  )
+                                : undefined,
+                        ),
+                        line.yPrice,
+                    );
+                }
+
+                shapeRefs.push({
+                    lineId,
+                    textId,
+                    quantityTextId,
+                    cancelButtonTextId,
+                });
             }
 
             orderLineItemsRef.current = shapeRefs;
@@ -222,7 +251,8 @@ const LineComponent = ({ lines }: LineProps) => {
 
             orderLineItems.forEach((item, i) => {
                 const lineData = lines[i];
-                const { lineId, textId, quantityTextId } = item;
+                const { lineId, textId, quantityTextId, cancelButtonTextId } =
+                    item;
 
                 const interval = setInterval(() => {
                     if (isCancelled) return;
@@ -272,6 +302,28 @@ const LineComponent = ({ lines }: LineProps) => {
                         }
                     }
 
+                    if (cancelButtonTextId) {
+                        const activeCancelButtonLabel = chart
+                            .activeChart()
+                            .getShapeById(cancelButtonTextId);
+
+                        if (activeCancelButtonLabel) {
+                            activeCancelButtonLabel.setAnchoredPosition({
+                                x: getAnchoredCancelButtonTextLocation(
+                                    chart,
+                                    lineData.xLoc,
+                                    lineData.textValue,
+                                    lineData.quantityTextValue
+                                        ? quantityTextFormatWithComma(
+                                              lineData.quantityTextValue,
+                                          )
+                                        : undefined,
+                                ),
+                                y: pricePerPixel,
+                            });
+                        }
+                    }
+
                     const activeLine = chart.activeChart().getShapeById(lineId);
                     if (activeLine) {
                         activeLine.setPoints([
@@ -299,6 +351,89 @@ const LineComponent = ({ lines }: LineProps) => {
             intervals.forEach(clearInterval);
         };
     }, [orderLineItems, chart, lines, zoomChanged]);
+
+    useEffect(() => {
+        if (chart) {
+            chart?.subscribe('mouse_down', (params: any) => {
+                const chartDiv = document.getElementById('tv_chart');
+                const iframe = chartDiv?.querySelector(
+                    'iframe',
+                ) as HTMLIFrameElement;
+
+                const iframeDoc = iframe.contentDocument;
+
+                if (iframeDoc) {
+                    const paneCanvas = iframeDoc.querySelector(
+                        'canvas[data-name="pane-canvas"]',
+                    );
+
+                    const rect = paneCanvas?.getBoundingClientRect();
+
+                    if (rect) {
+                        const offsetX = params.clientX - rect.left;
+                        const offsetY = params.clientY - rect.top;
+
+                        orderLineItems.forEach(
+                            (element: ChartShapeRefs, i: number) => {
+                                const lineData = lines[i];
+
+                                const timeScale = chart
+                                    .activeChart()
+                                    .getTimeScale();
+                                const chartWidth = Math.floor(
+                                    timeScale.width(),
+                                );
+
+                                const priceScalePane = chart
+                                    .activeChart()
+                                    .getPanes()[0] as IPaneApi;
+
+                                const priceScale =
+                                    priceScalePane.getMainSourcePriceScale();
+                                if (priceScale) {
+                                    const chartHeight =
+                                        priceScalePane.getHeight();
+
+                                    const { cancelButtonTextId } = element;
+                                    if (cancelButtonTextId) {
+                                        const activeCancelButtonLabel = chart
+                                            .activeChart()
+                                            .getShapeById(cancelButtonTextId);
+
+                                        if (activeCancelButtonLabel) {
+                                            const points =
+                                                activeCancelButtonLabel.getAnchoredPosition();
+
+                                            if (points) {
+                                                const tempX =
+                                                    points.x * chartWidth;
+                                                const tempY =
+                                                    points.y * chartHeight;
+
+                                                const isClicked = isNear(
+                                                    tempX,
+                                                    tempY,
+                                                    offsetX,
+                                                    offsetY,
+                                                );
+
+                                                if (isClicked) {
+                                                    console.log(
+                                                        lineData.type,
+                                                        lineData.yPrice,
+                                                    );
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        );
+                    }
+                }
+            });
+        }
+    }, [chart, JSON.stringify(orderLineItems)]);
 
     return null;
 };
