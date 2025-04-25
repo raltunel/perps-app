@@ -3,6 +3,7 @@ import styles from './BalancesTable.module.css';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useMemo } from 'react';
+import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 interface BalancesTableRowProps {
     balance: UserBalanceIF;
 }
@@ -17,15 +18,26 @@ export default function BalancesTableRow(props: BalancesTableRowProps) {
         if (!coinPriceMap) {
             return 0;
         }
-
         const price = coinPriceMap.get(balance.coin);
-        console.log('>>>', balance.coin, price);
         if (!price) {
             return 0;
         }
-
         return balance.total * price;
     }, [coinPriceMap, balance.coin, balance.total]);
+
+    const pnlVal = useMemo(() => {
+        if (balance.entryNtl > 0) {
+            return parseNum(balanceValue) - balance.entryNtl;
+        }
+        return 0;
+    }, [balanceValue, balance.entryNtl]);
+
+    const pnlStr = useMemo(() => {
+        if (balance.entryNtl > 0) {
+            return `${formatNum(pnlVal, 2, true, true)} (${formatNum(pnlVal / balance.entryNtl, 2)}%)`;
+        }
+        return '';
+    }, [pnlVal]);
 
     return (
         <div className={styles.rowContainer}>
@@ -44,7 +56,11 @@ export default function BalancesTableRow(props: BalancesTableRowProps) {
             <div className={`${styles.cell} ${styles.buyingPowerCell}`}>
                 {formatNum(balanceValue, null, true, true)}
             </div>
-            <div className={`${styles.cell} ${styles.pnlCell}`}>0</div>
+            <div
+                className={`${styles.cell} ${styles.pnlCell} ${pnlVal > 0 ? styles.positive : pnlVal < 0 ? styles.negative : ''}`}
+            >
+                {pnlStr}
+            </div>
             <div className={`${styles.cell} ${styles.contractCell}`}>
                 {balance.coin}
             </div>

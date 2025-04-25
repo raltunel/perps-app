@@ -147,3 +147,11 @@
         padding: 0.2rem 0.4rem;
     }
 }
+
+.cell.positive {
+    color: var(--green);
+}
+
+.cell.negative {
+    color: var(--red);
+}

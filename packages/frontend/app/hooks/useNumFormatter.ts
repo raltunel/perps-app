@@ -65,10 +65,17 @@ export function useNumFormatter() {
 
     const fillWithCurrencyChar = useCallback(
         (currency: string, formattedNum: string, showDollarSign: boolean) => {
+            const isNegative = formattedNum.startsWith('-');
             if (currency === 'USD')
-                return showDollarSign ? '$' + formattedNum : '' + formattedNum;
-            if (currency === 'BTC') return '₿' + formattedNum;
-            if (currency === 'ETH') return 'Ξ' + formattedNum;
+                return isNegative
+                    ? '-'
+                    : '' + showDollarSign
+                      ? '$' + formattedNum
+                      : '' + formattedNum;
+            if (currency === 'BTC')
+                return isNegative ? '-' : '' + '₿' + formattedNum;
+            if (currency === 'ETH')
+                return isNegative ? '-' : '' + 'Ξ' + formattedNum;
 
             return currency;
         },
