@@ -12,7 +12,7 @@ import {
     formatLineLabel,
     getAnchoredCancelButtonTextLocation,
     getAnchoredQuantityTextLocation,
-    isNear,
+    isInsideTextBounds,
     priceToPixel,
     quantityTextFormatWithComma,
     type LineLabel,
@@ -58,7 +58,12 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                 const prevItems = orderLineItemsRef.current;
 
                 for (const order of prevItems) {
-                    const { lineId, textId, quantityTextId } = order;
+                    const {
+                        lineId,
+                        textId,
+                        quantityTextId,
+                        cancelButtonTextId,
+                    } = order;
 
                     const element = chartRef.getShapeById(lineId);
                     if (element) chartRef.removeEntity(lineId);
@@ -71,6 +76,13 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                             chartRef.getShapeById(quantityTextId);
                         if (quantityElementText)
                             chartRef.removeEntity(quantityTextId);
+                    }
+
+                    if (cancelButtonTextId) {
+                        const cancelButtonText =
+                            chartRef.getShapeById(cancelButtonTextId);
+                        if (cancelButtonText)
+                            chartRef.removeEntity(cancelButtonTextId);
                     }
                 }
 
@@ -410,16 +422,17 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                                                 const tempY =
                                                     points.y * chartHeight;
 
-                                                const isClicked = isNear(
-                                                    tempX,
-                                                    tempY,
-                                                    offsetX,
-                                                    offsetY,
-                                                );
+                                                const isClicked =
+                                                    isInsideTextBounds(
+                                                        offsetX,
+                                                        offsetY,
+                                                        tempX,
+                                                        tempY,
+                                                    );
 
                                                 if (isClicked) {
                                                     console.log(
-                                                        lineData.type,
+                                                        lineData.textValue.type,
                                                         lineData.yPrice,
                                                     );
                                                 }

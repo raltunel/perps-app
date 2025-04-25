@@ -284,16 +284,21 @@ function getTriggerConditionText(rawText: string, orderType: string): string {
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
-export function isNear(
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    tolerance: number = 10,
+export function isInsideTextBounds(
+    clickX: number,
+    clickY: number,
+    textX: number,
+    textY: number,
 ): boolean {
-    const dx = x1 - x2;
-    const dy = y1 - y2;
-    return Math.sqrt(dx * dx + dy * dy) <= tolerance;
+    const estimatedWidth = estimateTextWidth(' X ');
+    const estimatedHeight = 10 * 1.1;
+
+    return (
+        clickY - textY > 0 &&
+        clickY - textY < estimatedHeight &&
+        clickX - textX > 0 &&
+        clickX - textX < estimatedWidth
+    );
 }
 
 export function formatLineLabel(label: LineLabel): string {
