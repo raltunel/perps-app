@@ -365,8 +365,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [orderLineItems, chart, lines, zoomChanged]);
 
     useEffect(() => {
-        if (chart) {
-            chart?.subscribe('mouse_down', (params: any) => {
+        const handleMouseDown = (params: any) => {
+            if (chart) {
                 const chartDiv = document.getElementById('tv_chart');
                 const iframe = chartDiv?.querySelector(
                     'iframe',
@@ -385,67 +385,72 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                         const offsetX = params.clientX - rect.left;
                         const offsetY = params.clientY - rect.top;
 
-                        orderLineItems.forEach(
-                            (element: ChartShapeRefs, i: number) => {
-                                const lineData = lines[i];
+                        for (let i = 0; i < orderLineItems.length; i++) {
+                            const element = orderLineItems[i];
+                            const lineData = lines[i];
 
-                                const timeScale = chart
-                                    .activeChart()
-                                    .getTimeScale();
-                                const chartWidth = Math.floor(
-                                    timeScale.width(),
-                                );
+                            const timeScale = chart
+                                .activeChart()
+                                .getTimeScale();
+                            const chartWidth = Math.floor(timeScale.width());
 
-                                const priceScalePane = chart
-                                    .activeChart()
-                                    .getPanes()[0] as IPaneApi;
+                            const priceScalePane = chart
+                                .activeChart()
+                                .getPanes()[0] as IPaneApi;
 
-                                const priceScale =
-                                    priceScalePane.getMainSourcePriceScale();
-                                if (priceScale) {
-                                    const chartHeight =
-                                        priceScalePane.getHeight();
+                            const priceScale =
+                                priceScalePane.getMainSourcePriceScale();
+                            if (priceScale) {
+                                const chartHeight = priceScalePane.getHeight();
 
-                                    const { cancelButtonTextId } = element;
-                                    if (cancelButtonTextId) {
-                                        const activeCancelButtonLabel = chart
-                                            .activeChart()
-                                            .getShapeById(cancelButtonTextId);
+                                const { cancelButtonTextId } = element;
+                                if (cancelButtonTextId) {
+                                    const activeCancelButtonLabel = chart
+                                        .activeChart()
+                                        .getShapeById(cancelButtonTextId);
 
-                                        if (activeCancelButtonLabel) {
-                                            const points =
-                                                activeCancelButtonLabel.getAnchoredPosition();
+                                    if (activeCancelButtonLabel) {
+                                        const points =
+                                            activeCancelButtonLabel.getAnchoredPosition();
 
-                                            if (points) {
-                                                const tempX =
-                                                    points.x * chartWidth;
-                                                const tempY =
-                                                    points.y * chartHeight;
+                                        if (points) {
+                                            const tempX = points.x * chartWidth;
+                                            const tempY =
+                                                points.y * chartHeight;
 
-                                                const isClicked =
-                                                    isInsideTextBounds(
-                                                        offsetX,
-                                                        offsetY,
-                                                        tempX,
-                                                        tempY,
-                                                    );
+                                            const isClicked =
+                                                isInsideTextBounds(
+                                                    offsetX,
+                                                    offsetY,
+                                                    tempX,
+                                                    tempY,
+                                                );
 
-                                                if (isClicked) {
-                                                    console.log(
-                                                        lineData.textValue.type,
-                                                        lineData.yPrice,
-                                                    );
-                                                }
+                                            if (isClicked) {
+                                                console.log(
+                                                    lineData.textValue.type,
+                                                    lineData.yPrice,
+                                                );
+
+                                                break;
                                             }
                                         }
                                     }
                                 }
-                            },
-                        );
+                            }
+                        }
                     }
                 }
-            });
+            }
+        };
+        if (chart) {
+            chart.subscribe('mouse_down', handleMouseDown);
         }
+        return () => {
+            if (chart) {
+                chart.unsubscribe('mouse_down', handleMouseDown);
+            }
+        };
     }, [chart, JSON.stringify(orderLineItems)]);
 
     return null;
