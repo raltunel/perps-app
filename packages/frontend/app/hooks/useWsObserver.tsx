@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import { useIsClient } from './useIsClient';
 import { Info, WebsocketManager, type Environment } from '@perps-app/sdk';
-import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useDebugStore } from '~/stores/DebugStore';
 
 export type WsSubscriptionConfig = {
@@ -29,7 +28,6 @@ type WsObserverContextType = {
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
 };
-
 export enum WsChannels {
     ORDERBOOK = 'l2Book',
     ORDERBOOK_TRADES = 'trades',
@@ -40,7 +38,6 @@ export enum WsChannels {
     NOTIFICATION = 'notification',
     CANDLE = 'candle',
 }
-
 const WsObserverContext = createContext<WsObserverContextType | undefined>(
     undefined,
 );
@@ -377,29 +374,29 @@ export const WsObserverProvider: React.FC<{
         }
 
         switch (type) {
-            case WsChannels.WEB_DATA2:
-                const w1 = new Worker(
-                    new URL(
-                        './../processors/workers/webdata2.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
+            // case WsChannels.WEB_DATA2:
+            //     const w1 = new Worker(
+            //         new URL(
+            //             './../processors/workers/webdata2.worker.ts',
+            //             import.meta.url,
+            //         ),
+            //         { type: 'module' },
+            //     );
 
-                w1.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-                workers.current.set(type, w1);
-                return w1;
+            //     w1.onmessage = (event) => {
+            //         const subs = subscriptions.current.get(event.data.channel);
+            //         if (subs) {
+            //             subs.forEach((config) => {
+            //                 config.handler(event.data);
+            //             });
+            //         }
+            //     };
+            //     workers.current.set(type, w1);
+            //     return w1;
             default:
                 const w2 = new Worker(
                     new URL(
-                        './../processors/workers/default.worker.ts',
+                        './../processors/workers/jsonParser.worker.ts',
                         import.meta.url,
                     ),
                     { type: 'module' },
@@ -431,7 +428,6 @@ export const WsObserverProvider: React.FC<{
         </WsObserverContext.Provider>
     );
 };
-
 export const useWsObserver = () => {
     const context = useContext(WsObserverContext);
     if (!context) {
