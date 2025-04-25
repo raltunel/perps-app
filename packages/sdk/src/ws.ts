@@ -2,7 +2,7 @@ import { DEFAULT_PING_INTERVAL_MS } from './config';
 import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
-type Callback = (msg: WsMsg) => void;
+export type Callback = (msg: WsMsg) => void;
 
 interface ActiveSubscription {
     callback: Callback;
@@ -32,7 +32,7 @@ function subscriptionToIdentifier(subscription: Subscription): string {
         case 'webData2':
             return `webData2:${subscription.user.toLowerCase()}`;
         case 'notification':
-            return `notification:${subscription.user.toLowerCase()}`;
+            return `notification`;
         case 'userHistoricalOrders':
             return `userHistoricalOrders:${subscription.user.toLowerCase()}`;
         default:

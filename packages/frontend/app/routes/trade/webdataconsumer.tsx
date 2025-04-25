@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
@@ -25,7 +25,6 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet.address.toLowerCase();
