@@ -1,6 +1,14 @@
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+} from 'react';
 import { useIsClient } from './useIsClient';
 import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
+
+import webData2Worker from './workers/webdata2.worker.ts?worker';
 
 type SdkContextType = {
     info: Info | null;
@@ -17,12 +25,20 @@ export const SdkProvider: React.FC<{
     const info = useRef<Info | null>(null);
     const exchange = useRef<Exchange | null>(null);
 
+    const createCustomWorkers = useCallback(() => {
+        return {
+            webData2: new webData2Worker(),
+        };
+    }, []);
+
     useEffect(() => {
         if (!isClient) return;
         if (!info.current) {
             info.current = new Info({
                 environment,
                 skipWs: false,
+                numWorkers: 2,
+                customWorkers: createCustomWorkers(),
                 // isDebug: true, // TODO: remove in prod
             });
         } else {
@@ -35,6 +51,7 @@ export const SdkProvider: React.FC<{
                     environment,
                     accountAddress: DEMO_USER,
                     // isDebug: true, // TODO: remove in prod
+                    customWorkers: createCustomWorkers(),
                 },
             );
         } else {

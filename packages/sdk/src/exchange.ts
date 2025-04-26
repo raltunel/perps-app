@@ -20,6 +20,8 @@ export interface ExchangeOptions {
     vaultAddress?: string;
     accountAddress?: string;
     isDebug?: boolean;
+    numWorkers?: number;
+    customWorkers?: Record<string, Worker>;
 }
 
 export class Exchange extends API {
@@ -40,6 +42,8 @@ export class Exchange extends API {
             skipWs: true,
             meta: options.meta,
             isDebug: options.isDebug,
+            numWorkers: options.numWorkers,
+            customWorkers: options.customWorkers,
         });
     }
 

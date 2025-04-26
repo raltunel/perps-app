@@ -7,7 +7,7 @@ import { processUserOrder } from '../../processors/processOrderBook';
 import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
-import type { OtherWsMsg, WsMsg } from '@perps-app/sdk/src/utils/types';
+import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
 
 export type WebData2Input = OtherWsMsg;
 export type WebData2Output = {
@@ -21,10 +21,9 @@ export type WebData2Output = {
     };
 };
 
-self.onmessage = function (event: MessageEvent<string>) {
+self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
     try {
-        const parsedData = JSON.parse(event.data);
-        console.log('parsedData', parsedData.data);
+        const parsedData = event.data;
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
@@ -99,7 +98,7 @@ self.onmessage = function (event: MessageEvent<string>) {
             }
         }
 
-        const output: OtherWsMsg = {
+        self.postMessage({
             channel: parsedData.channel,
             data: {
                 coins,
@@ -108,11 +107,7 @@ self.onmessage = function (event: MessageEvent<string>) {
                 positions,
                 coinPriceMap,
             },
-        };
-
-        console.log('output', output);
-
-        self.postMessage(output);
+        } as WebData2Output);
     } catch (error) {
         console.error('Error processing webdata2 worker:', error);
         self.postMessage({ error: (error as Error).message });

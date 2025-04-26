@@ -27,6 +27,8 @@ interface InfoOptions {
     skipWs?: boolean;
     meta?: Meta;
     isDebug?: boolean;
+    numWorkers?: number;
+    customWorkers?: Record<string, Worker>;
 }
 
 export class Info extends API {
@@ -44,7 +46,12 @@ export class Info extends API {
         const { skipWs = false, isDebug = false } = options;
 
         if (!skipWs) {
-            this.wsManager = new WebsocketManager(this.baseUrl, isDebug);
+            this.wsManager = new WebsocketManager(
+                this.baseUrl,
+                isDebug,
+                options.numWorkers,
+                options.customWorkers,
+            );
         }
 
         // async init

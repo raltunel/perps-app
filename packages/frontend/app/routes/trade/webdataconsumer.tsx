@@ -1,3 +1,4 @@
+import type { OtherWsMsg, WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
@@ -50,7 +51,11 @@ export default function WebDataConsumer() {
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
-            postWebData2,
+            handleWebData2WorkerResult,
+            // (msg: OtherWsMsg) => {
+            //     console.log('msg', msg);
+            //     // postWebData2(msg);
+            // },
         );
 
         const openOrdersInterval = setInterval(() => {

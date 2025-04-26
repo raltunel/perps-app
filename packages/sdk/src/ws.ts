@@ -93,6 +93,7 @@ export class WebsocketManager {
     private isDebug: boolean;
     private baseUrl: string;
     private workers: Worker[] = [];
+    private customWorkers: Record<string, Worker> = {};
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
@@ -101,10 +102,17 @@ export class WebsocketManager {
         baseUrl: string,
         isDebug: boolean = false,
         numWorkers: number = 4,
+        customWorkers?: Record<string, Worker>,
     ) {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
         this.numWorkers = numWorkers;
+        this.customWorkers = customWorkers || {};
+
+        for (const [channel, worker] of Object.entries(this.customWorkers)) {
+            worker.onmessage = this.handleCustomWorkerMessage;
+        }
+
         this.initializeWorkers();
         this.connect();
     }
@@ -211,6 +219,11 @@ export class WebsocketManager {
         }
     };
 
+    private extractChannelFromPayload(raw: string): string {
+        const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
+        return match ? match[1] : '';
+    }
+
     private handleParsedMessage = (wsMsg: WsMsg, originalMessage: string) => {
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
@@ -243,7 +256,16 @@ export class WebsocketManager {
     };
 
     private onMessage = (event: MessageEvent) => {
+        console.log('activeSubscriptions', this.activeSubscriptions);
         const message = event.data;
+        const channel = this.extractChannelFromPayload(message);
+
+        if (channel in this.customWorkers) {
+            console.log('posting message to custom worker', channel);
+            this.customWorkers[channel].postMessage(message);
+            return;
+        }
+
         this.log('onMessage Raw:', message);
         if (message === 'Websocket connection established.') {
             this.log('Websocket connection established.');
@@ -282,6 +304,15 @@ export class WebsocketManager {
                 'Original:',
                 originalMessage,
             );
+        }
+    };
+
+    private handleCustomWorkerMessage = (event: MessageEvent) => {
+        console.log('handleCustomWorkerMessage', event);
+        const { channel, data } = event.data;
+        const activeSubs = this.activeSubscriptions[channel] || [];
+        for (const active of activeSubs) {
+            active.callback(data);
         }
     };
 
