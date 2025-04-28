@@ -10,43 +10,34 @@ export interface accountIF {
     equity: string;
 }
 
+class Account implements accountIF {
+    name: string;
+    address: string;
+    equity: string;
+    constructor(n: string, a: string, e: string) {
+        this.name = n;
+        this.address = a;
+        this.equity = e;
+    }
+}
+
 export interface allAccountsIF {
     master: accountIF;
     sub: accountIF[];
 }
 
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+const ZERO_DOLLARS = '$0.00';
+
 const accounts: allAccountsIF = {
-    master: {
-        name: 'Master Account',
-        address: '0x0000000000000000000000000000000000000000',
-        equity: '$0.00',
-    },
+
+    master: new Account('Master Account', ZERO_ADDRESS, ZERO_DOLLARS),
     sub: [
-        {
-            name: 'Sub-Account 1',
-            address: '0x0000000000000000000000000000000000000000',
-            equity: '$0.00',
-        },
-        {
-            name: 'Sub-Account 5',
-            address: '0x0000000000000000000000000000000000000000',
-            equity: '$0.00',
-        },
-        {
-            name: 'Sub-Account 3',
-            address: '0x0000000000000000000000000000000000000000',
-            equity: '$0.00',
-        },
-        {
-            name: 'Sub-Account 4',
-            address: '0x0000000000000000000000000000000000000000',
-            equity: '$0.00',
-        },
-        {
-            name: 'Sub-Account 2',
-            address: '0x0000000000000000000000000000000000000000',
-            equity: '$0.00',
-        },
+        new Account('Sub-Account 1', ZERO_ADDRESS, ZERO_DOLLARS),
+        new Account('Sub-Account 5', ZERO_ADDRESS, ZERO_DOLLARS),
+        new Account('Sub-Account 2', ZERO_ADDRESS, ZERO_DOLLARS),
+        new Account('Sub-Account 3', ZERO_ADDRESS, ZERO_DOLLARS),
+        new Account('Sub-Account 4', ZERO_ADDRESS, ZERO_DOLLARS),
     ],
 };
 
@@ -79,7 +70,9 @@ export default function subaccounts() {
                 />
             </div>
             {createSubaccountModal.isOpen && (
-                <CreateSubaccount modalControl={createSubaccountModal} />
+                <CreateSubaccount
+                    modalControl={createSubaccountModal}
+                />
             )}
         </div>
     );
