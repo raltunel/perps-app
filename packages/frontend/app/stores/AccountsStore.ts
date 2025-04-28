@@ -39,6 +39,7 @@ const MOCK_ACCOUNTS: allAccountsIF = {
 
 export interface useAccountsIF extends allAccountsIF {
     create: (n: string) => void;
+    reset: () => void;
 }
 
 // string-union type of all keys in the `DEFAULTS` obj
@@ -55,9 +56,12 @@ export const useAccounts = create<useAccountsIF>()(
             // consume default data from the `MOC_ACCOUNTS` obj, persisted
             // ... data from local storage will re-hydrate if present
             ...MOCK_ACCOUNTS,
+            // add a new sub-account
             create: (name: string): void => set({
                 sub: get().sub.concat(new Account(name, ZERO_ADDRESS, ZERO_DOLLARS))
             }),
+            // reset to only the default mock data
+            reset: (): void => set(MOCK_ACCOUNTS),
         }),
         {
             // key for local storage
