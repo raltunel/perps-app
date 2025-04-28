@@ -1,3 +1,4 @@
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './BalancesTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 
@@ -13,6 +14,8 @@ export default function BalancesTableHeader() {
     const handleSort = (key: string) => {
         console.log(`Sorting by: ${key}`);
     };
+
+    const { selectedCurrency } = useTradeDataStore();
 
     const tableHeaders: HeaderCell[] = [
         {
@@ -37,7 +40,7 @@ export default function BalancesTableHeader() {
             className: 'availableBalanceCell',
         },
         {
-            name: 'USDC Value',
+            name: `${selectedCurrency} Value`,
             key: 'usdcValue',
             sortable: true,
             onClick: () => handleSort('usdcValue'),
