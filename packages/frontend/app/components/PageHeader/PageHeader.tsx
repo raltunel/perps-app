@@ -198,6 +198,9 @@ export default function PageHeader() {
 
     return (
         <>
+            <section className={styles.mainContainer}>
+
+           
             <header id={'pageHeader'} className={styles.container}>
                 <Link to='/'>
                     <img
@@ -265,9 +268,11 @@ export default function PageHeader() {
                         <LuMenu size={20} />
                     </button>
                 </div>
-            </header>
-
             {dropdownMenuDisplay}
+            </header>
+               
+                </section>
+
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close} position={'center'} title='Options'>
                     <AppOptions modalControl={appSettingsModal} />
