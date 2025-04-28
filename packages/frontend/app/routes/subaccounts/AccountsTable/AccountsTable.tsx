@@ -167,10 +167,7 @@ export default function AccountsTable(props: propsIF) {
                 </div>
                 <ol className={styles.table_body}>
                     {sorted.map((acct: accountIF) => (
-                        <li
-                            key={JSON.stringify(acct)}
-                            className={styles.table_row}
-                        >
+                        <li key={JSON.stringify(acct)}>
                             <div>{acct.name}</div>
                             <div>{acct.address}</div>
                             <div>{acct.equity}</div>

@@ -20,13 +20,6 @@
     height: 100%;
 }
 
-/* <ol> elem containing all <li> elems */
-.table_body {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
 /* row with column headers */
 .col_headers_row {
     display: grid;
@@ -46,8 +39,15 @@
     color: var(--text2);
 }
 
+/* <ol> elem containing all <li> elems */
+.table_body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 /* data line items in the table */
-.table_row {
+.table_body > li {
     display: grid;
     grid-template-columns: var(--accounts-table-column-spacing);
     transition: background-color 0.3s ease-out;
@@ -55,13 +55,13 @@
     border-radius: var(--half-border-radius);
 }
 
-.table_row:hover {
+.table_body > li:hover {
     background-color: var(--dark5);
     transition: background-color 0.1s ease-in;
 }
 
 /* individual cells in the .table_row line */
-.table_row > div {
+.table_body > li > div {
     display: flex;
     flex-direction: row;
     font-size: var(--font-size-s);
