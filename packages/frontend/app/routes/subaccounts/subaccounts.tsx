@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
 import { useModal, type useModalIF } from '~/hooks/useModal';
@@ -44,6 +45,12 @@ const accounts: allAccountsIF = {
 export default function subaccounts() {
     const createSubaccountModal: useModalIF = useModal('closed');
 
+    const [subaccounts, setSubaccounts] = useState<accountIF[]>(accounts.sub);
+    function addAccount(n: string): void {
+        setSubaccounts([...accounts.sub, new Account(n, ZERO_ADDRESS, ZERO_DOLLARS)]);
+    }
+    console.log(addAccount);
+
     return (
         <div className={styles.subaccounts}>
             <div className={styles.subaccounts_wrapper}>
@@ -65,7 +72,7 @@ export default function subaccounts() {
                 />
                 <AccountsTable
                     title='Sub-Accounts'
-                    accounts={accounts.sub}
+                    accounts={subaccounts}
                     tabId='table_2'
                 />
             </div>
