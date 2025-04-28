@@ -284,23 +284,6 @@ function getTriggerConditionText(rawText: string, orderType: string): string {
     return ` ${labelPrefix} Price ${operator} ${price}  `;
 }
 
-export function isInsideTextBounds(
-    clickX: number,
-    clickY: number,
-    textX: number,
-    textY: number,
-): boolean {
-    const estimatedWidth = estimateTextWidth(' X ');
-    const estimatedHeight = 10 * 1.1;
-
-    return (
-        clickY - textY > 0 &&
-        clickY - textY < estimatedHeight &&
-        clickX - textX > 0 &&
-        clickX - textX < estimatedWidth
-    );
-}
-
 export function formatLineLabel(label: LineLabel): string {
     switch (label.type) {
         case 'PNL': {
@@ -331,4 +314,39 @@ export function formatLineLabel(label: LineLabel): string {
         default:
             return '';
     }
+}
+
+export function isInsideTextBounds(
+    hoverX: number,
+    hoverY: number,
+    textX: number,
+    cancelTextX: number,
+    textY: number,
+): boolean {
+    const estimatedTextsEndLocation = cancelTextX + estimateTextWidth(' X ');
+    const estimatedHeight = 10 * 1.1;
+
+    return (
+        hoverX >= textX &&
+        hoverX <= estimatedTextsEndLocation &&
+        hoverY >= textY &&
+        hoverY <= textY + estimatedHeight
+    );
+}
+
+export function isInsideCancelTextBounds(
+    clickX: number,
+    clickY: number,
+    textX: number,
+    textY: number,
+): boolean {
+    const estimatedCancelTextEndLocation = textX + estimateTextWidth(' X ');
+    const estimatedHeight = 10 * 1.1;
+
+    return (
+        clickX >= textX &&
+        clickX <= estimatedCancelTextEndLocation &&
+        clickY >= textY &&
+        clickY <= textY + estimatedHeight
+    );
 }

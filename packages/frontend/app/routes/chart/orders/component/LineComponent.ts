@@ -12,6 +12,7 @@ import {
     formatLineLabel,
     getAnchoredCancelButtonTextLocation,
     getAnchoredQuantityTextLocation,
+    isInsideCancelTextBounds,
     isInsideTextBounds,
     priceToPixel,
     quantityTextFormatWithComma,
@@ -365,6 +366,126 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [orderLineItems, chart, lines, zoomChanged]);
 
     useEffect(() => {
+        const handleMouseMove = (params: any) => {
+            if (chart) {
+                const chartDiv = document.getElementById('tv_chart');
+                const iframe = chartDiv?.querySelector(
+                    'iframe',
+                ) as HTMLIFrameElement;
+
+                iframe.style.cursor = 'pointer';
+                const iframeDoc = iframe.contentDocument;
+
+                if (iframeDoc) {
+                    const paneCanvas = iframeDoc.querySelector(
+                        'canvas[data-name="pane-canvas"]',
+                    );
+
+                    const rect = paneCanvas?.getBoundingClientRect();
+
+                    if (rect) {
+                        const offsetX = params.offsetX - rect.left;
+                        const offsetY = params.offsetY - rect.top;
+
+                        for (let i = 0; i < orderLineItems.length; i++) {
+                            const element = orderLineItems[i];
+                            // const lineData = lines[i];
+
+                            const timeScale = chart
+                                .activeChart()
+                                .getTimeScale();
+                            const chartWidth = Math.floor(timeScale.width());
+
+                            const priceScalePane = chart
+                                .activeChart()
+                                .getPanes()[0] as IPaneApi;
+
+                            const priceScale =
+                                priceScalePane.getMainSourcePriceScale();
+                            if (priceScale) {
+                                const chartHeight = priceScalePane.getHeight();
+
+                                const { textId, cancelButtonTextId } = element;
+                                if (cancelButtonTextId) {
+                                    const activeCancelButtonLabel = chart
+                                        .activeChart()
+                                        .getShapeById(cancelButtonTextId);
+
+                                    const activeLabel = chart
+                                        .activeChart()
+                                        .getShapeById(textId);
+
+                                    if (
+                                        activeCancelButtonLabel &&
+                                        activeLabel
+                                    ) {
+                                        const cancelButtonPoints =
+                                            activeCancelButtonLabel.getAnchoredPosition();
+
+                                        const textPoints =
+                                            activeLabel.getAnchoredPosition();
+
+                                        if (cancelButtonPoints && textPoints) {
+                                            const tempXForCancel =
+                                                cancelButtonPoints.x *
+                                                chartWidth;
+                                            const tempY =
+                                                cancelButtonPoints.y *
+                                                chartHeight;
+                                            const tempXForText =
+                                                textPoints.x * chartWidth;
+                                            const isInsideCancel =
+                                                isInsideTextBounds(
+                                                    offsetX,
+                                                    offsetY,
+                                                    tempXForText,
+                                                    tempXForCancel,
+                                                    tempY,
+                                                );
+                                            const elements =
+                                                iframeDoc.querySelectorAll(
+                                                    '.chart-markup-table.pane',
+                                                );
+
+                                            if (isInsideCancel) {
+                                                elements.forEach((item) => {
+                                                    item.classList.remove(
+                                                        'pane--cursor-ew-resize',
+                                                    );
+
+                                                    item.classList.add(
+                                                        'pane--cursor-pointer',
+                                                    );
+                                                });
+
+                                                return;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        if (chart) {
+            chart
+                .activeChart()
+                .crossHairMoved()
+                .subscribe(null, handleMouseMove);
+        }
+        return () => {
+            if (chart) {
+                chart
+                    .activeChart()
+                    .crossHairMoved()
+                    .unsubscribe(null, handleMouseMove);
+            }
+        };
+    }, [chart, JSON.stringify(orderLineItems)]);
+
+    useEffect(() => {
         const handleMouseDown = (params: any) => {
             if (chart) {
                 const chartDiv = document.getElementById('tv_chart');
@@ -419,7 +540,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                                                 points.y * chartHeight;
 
                                             const isClicked =
-                                                isInsideTextBounds(
+                                                isInsideCancelTextBounds(
                                                     offsetX,
                                                     offsetY,
                                                     tempX,
