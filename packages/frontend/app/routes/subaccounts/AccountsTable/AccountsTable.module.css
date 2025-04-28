@@ -50,14 +50,14 @@
 .table_row {
     display: grid;
     grid-template-columns: var(--accounts-table-column-spacing);
-    transition: background-color 0.8s ease-out;
+    transition: background-color 0.3s ease-out;
     padding: var(--accounts-table-row-padding);
     border-radius: var(--half-border-radius);
 }
 
 .table_row:hover {
     background-color: var(--dark5);
-    transition: background-color 0.3s ease-in;
+    transition: background-color 0.1s ease-in;
 }
 
 /* individual cells in the .table_row line */
