@@ -19,6 +19,8 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+import type { L2BookMsg, WsMsg } from '@perps-app/sdk/src/utils/types';
+import { processOrderBookMessage } from '~/processors/processOrderBook';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -164,15 +166,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         return slots;
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
 
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) =>
-            setOrderBook(data.buys, data.sells),
+    const postOrderBookRaw = useCallback(
+        (data: WsMsg) => {
+            const { buys, sells } = processOrderBookMessage(data as L2BookMsg);
+            setOrderBook(buys, sells);
+        },
         [setOrderBook],
-    );
-
-    const postOrderBookRaw = useWorker<OrderBookOutput>(
-        'orderbook',
-        handleOrderBookWorkerResult,
     );
 
     useEffect(() => {

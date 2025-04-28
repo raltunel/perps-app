@@ -256,12 +256,10 @@ export class WebsocketManager {
     };
 
     private onMessage = (event: MessageEvent) => {
-        console.log('activeSubscriptions', this.activeSubscriptions);
         const message = event.data;
         const channel = this.extractChannelFromPayload(message);
 
         if (channel in this.customWorkers) {
-            console.log('posting message to custom worker', channel);
             this.customWorkers[channel].postMessage(message);
             return;
         }
@@ -308,11 +306,15 @@ export class WebsocketManager {
     };
 
     private handleCustomWorkerMessage = (event: MessageEvent) => {
-        console.log('handleCustomWorkerMessage', event);
-        const { channel, data } = event.data;
-        const activeSubs = this.activeSubscriptions[channel] || [];
+        const msg = event.data;
+        const identifier = wsMsgToIdentifier(msg);
+        if (!identifier) {
+            this.log('Unknown or empty message after parsing:', msg);
+            return;
+        }
+        const activeSubs = this.activeSubscriptions[identifier] || [];
         for (const active of activeSubs) {
-            active.callback(data);
+            active.callback(msg);
         }
     };
 

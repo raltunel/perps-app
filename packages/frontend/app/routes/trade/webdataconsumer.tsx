@@ -74,7 +74,7 @@ export default function WebDataConsumer() {
     }, [debugWallet.address, info]);
 
     const handleWebData2WorkerResult = useCallback(
-        ({ data }: { data: WebData2Output }) => {
+        (data: OtherWsMsg) => {
             setCoins(data.data.coins);
             setCoinPriceMap(data.data.coinPriceMap);
             if (data.data.user.toLowerCase() === addressRef.current) {
@@ -85,10 +85,10 @@ export default function WebDataConsumer() {
         [setCoins, setCoinPriceMap],
     );
 
-    const postWebData2 = useWorker<WebData2Output>(
-        'webData2',
-        handleWebData2WorkerResult,
-    );
+    // const postWebData2 = useWorker<WebData2Output>(
+    //     'webData2',
+    //     handleWebData2WorkerResult,
+    // );
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {

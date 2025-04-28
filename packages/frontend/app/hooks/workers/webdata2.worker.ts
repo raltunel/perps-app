@@ -24,7 +24,6 @@ export type WebData2Output = {
 self.onmessage = function (event: MessageEvent<string>) {
     try {
         const parsedData = JSON.parse(event.data);
-        console.log('parsedData', parsedData.data);
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
@@ -109,8 +108,6 @@ self.onmessage = function (event: MessageEvent<string>) {
                 coinPriceMap,
             },
         };
-
-        console.log('output', output);
 
         self.postMessage(output);
     } catch (error) {
