@@ -11,24 +11,27 @@
     /* centralize the column spacing rule */
     /* this keeps header and data cells spaced consistently */
     --accounts-table-column-spacing: 2fr 4fr 2fr 1fr;
+    --accounts-table-row-padding: 2px 8px;
 }
 
 /* all content below the highest-level tab elem */
 .table_content {
-    padding: 8px 16px 0px 16px;
+    padding: var(--accounts-table-row-padding);
     height: 100%;
 }
 
-/* contains all data line items */
+/* <ol> elem containing all <li> elems */
 .table_body {
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 /* row with column headers */
 .col_headers_row {
     display: grid;
     grid-template-columns: var(--accounts-table-column-spacing);
+    padding: var(--accounts-table-row-padding);
     /* keep same row height when sort arrows are suppressed */
     min-height: 22px;
 }
@@ -48,6 +51,8 @@
     display: grid;
     grid-template-columns: var(--accounts-table-column-spacing);
     transition: background-color 0.8s ease-out;
+    padding: var(--accounts-table-row-padding);
+    border-radius: var(--half-border-radius);
 }
 
 .table_row:hover {
