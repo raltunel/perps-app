@@ -11,8 +11,6 @@ export interface headerItemIF {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
-    className: string;
 }
 
 // data to label column headers
@@ -21,29 +19,21 @@ const tableHeaders: headerItemIF[] = [
         name: 'Name',
         key: 'name',
         sortable: true,
-        onClick: () => null,
-        className: '',
     },
     {
         name: 'Address',
         key: 'address',
         sortable: false,
-        onClick: () => null,
-        className: '',
     },
     {
         name: 'Account Equity',
         key: 'accountEquity',
         sortable: true,
-        onClick: () => null,
-        className: '',
     },
     {
         name: '',
         key: 'tradeLink',
         sortable: false,
-        onClick: () => null,
-        className: '',
     },
 ];
 
