@@ -85,7 +85,6 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                 });
 
                 if (data.clearinghouseState) {
-                    console.log('clearinghouseState', data.clearinghouseState);
                     data.clearinghouseState.assetPositions.forEach(
                         (position: any) => {
                             const processedPosition = processPosition(position);
@@ -101,25 +100,34 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                     );
 
                     if (data.clearinghouseState.marginSummary) {
+                        const total = parseNum(
+                            data.clearinghouseState.marginSummary.accountValue,
+                        );
+                        const hold = parseNum(
+                            data.clearinghouseState.marginSummary
+                                .totalMarginUsed,
+                        );
                         userBalances.push({
                             coin: 'USDC',
                             type: 'margin',
-                            total: parseNum(
-                                data.clearinghouseState.marginSummary
-                                    .accountValue,
-                            ),
+                            total: total,
                             entryNtl: 0,
-                            hold: parseNum(
-                                data.clearinghouseState.marginSummary
-                                    .totalMarginUsed,
-                            ),
+                            hold: hold,
+                            sortName: '\x01',
+                            usdcValue: total,
+                            pnlValue: 0,
+                            available: total - hold,
+                            metaIndex: 0,
+                            buyingPower: total - hold,
                         });
                     }
                 }
 
                 if (data.spotState && data.spotState.balances) {
                     data.spotState.balances.forEach((balance: any) => {
-                        userBalances.push(processUserBalance(balance, 'spot'));
+                        userBalances.push(
+                            processUserBalance(balance, 'spot', coinPriceMap),
+                        );
                     });
                 }
             }

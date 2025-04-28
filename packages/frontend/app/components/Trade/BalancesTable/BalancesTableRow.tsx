@@ -14,30 +14,37 @@ export default function BalancesTableRow(props: BalancesTableRowProps) {
     const { coinPriceMap } = useTradeDataStore();
     const { formatNum } = useNumFormatter();
 
-    const balanceValue = useMemo(() => {
-        if (!coinPriceMap) {
-            return 0;
-        }
-        const price = coinPriceMap.get(balance.coin);
-        if (!price) {
-            return 0;
-        }
-        return balance.total * price;
-    }, [coinPriceMap, balance.coin, balance.total]);
+    // const balanceValue = useMemo(() => {
+    //     if (!coinPriceMap) {
+    //         return 0;
+    //     }
+    //     const price = coinPriceMap.get(balance.coin);
+    //     if (!price) {
+    //         return 0;
+    //     }
+    //     return balance.total * price;
+    // }, [coinPriceMap, balance.coin, balance.total]);
 
-    const pnlVal = useMemo(() => {
-        if (balance.entryNtl > 0) {
-            return parseNum(balanceValue) - balance.entryNtl;
-        }
-        return 0;
-    }, [balanceValue, balance.entryNtl]);
+    // const pnlVal = useMemo(() => {
+    //     if (balance.entryNtl > 0) {
+    //         return parseNum(balanceValue) - balance.entryNtl;
+    //     }
+    //     return 0;
+    // }, [balanceValue, balance.entryNtl]);
 
-    const pnlStr = useMemo(() => {
-        if (balance.entryNtl > 0) {
-            return `${formatNum(pnlVal, 2, true, true)} (${formatNum(pnlVal / balance.entryNtl, 2)}%)`;
+    // const pnlStr = useMemo(() => {
+    //     if (balance.entryNtl > 0) {
+    //         return `${formatNum(pnlVal, 2, true, true)} (${formatNum(pnlVal / balance.entryNtl, 2)}%)`;
+    //     }
+    //     return '';
+    // }, [pnlVal]);
+
+    const getPnlString = () => {
+        if (balance.entryNtl > 0 && Math.abs(balance.pnlValue) > 0) {
+            return `${formatNum(balance.pnlValue, 2, true, true)} (${formatNum((balance.pnlValue / balance.entryNtl) * 100, 2)}%)`;
         }
         return '';
-    }, [pnlVal]);
+    };
 
     return (
         <div className={styles.rowContainer}>
@@ -48,18 +55,18 @@ export default function BalancesTableRow(props: BalancesTableRowProps) {
                 {formatNum(balance.total)} {balance.coin}
             </div>
             <div className={`${styles.cell} ${styles.availableBalanceCell}`}>
-                {formatNum(balance.total - balance.hold)}
+                {formatNum(balance.available)} {balance.coin}
             </div>
             <div className={`${styles.cell} ${styles.usdcValueCell}`}>
-                {formatNum(balanceValue, null, true, true)}
+                {formatNum(balance.usdcValue, null, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.buyingPowerCell}`}>
-                {formatNum(balanceValue, null, true, true)}
+                {formatNum(balance.buyingPower, null, true, true)}
             </div>
             <div
-                className={`${styles.cell} ${styles.pnlCell} ${pnlVal > 0 ? styles.positive : pnlVal < 0 ? styles.negative : ''}`}
+                className={`${styles.cell} ${styles.pnlCell} ${balance.pnlValue > 0 ? styles.positive : balance.pnlValue < 0 ? styles.negative : ''}`}
             >
-                {pnlStr}
+                {getPnlString()}
             </div>
             <div className={`${styles.cell} ${styles.contractCell}`}>
                 {balance.coin}
