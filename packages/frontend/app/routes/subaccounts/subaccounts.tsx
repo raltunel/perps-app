@@ -1,57 +1,16 @@
-import { useState } from 'react';
 import AccountsTable from './AccountsTable/AccountsTable';
 import styles from './subaccounts.module.css';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import Button from '~/components/Button/Button';
 import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
-
-export interface accountIF {
-    name: string;
-    address: string;
-    equity: string;
-}
-
-class Account implements accountIF {
-    name: string;
-    address: string;
-    equity: string;
-    constructor(n: string, a: string, e: string) {
-        this.name = n;
-        this.address = a;
-        this.equity = e;
-    }
-}
-
-export interface allAccountsIF {
-    master: accountIF;
-    sub: accountIF[];
-}
-
-const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-const ZERO_DOLLARS = '$0.00';
-
-const accounts: allAccountsIF = {
-
-    master: new Account('Master Account', ZERO_ADDRESS, ZERO_DOLLARS),
-    sub: [
-        new Account('Sub-Account 1', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 5', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 2', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 3', ZERO_ADDRESS, ZERO_DOLLARS),
-        new Account('Sub-Account 4', ZERO_ADDRESS, ZERO_DOLLARS),
-    ],
-};
+import { useAccounts, type useAccountsIF } from '~/stores/AccountsStore';
 
 export default function subaccounts() {
+    // logic to open and close subaccount creation modal
     const createSubaccountModal: useModalIF = useModal('closed');
 
-    const [subaccounts, setSubaccounts] = useState<accountIF[]>(accounts.sub);
-    function addAccount(n: string): void {
-        setSubaccounts([
-            ...subaccounts,
-            new Account(n, ZERO_ADDRESS, ZERO_DOLLARS)
-        ]);
-    }
+    // state data for subaccounts
+    const data: useAccountsIF = useAccounts();
 
     return (
         <div className={styles.subaccounts}>
@@ -68,20 +27,20 @@ export default function subaccounts() {
                 </header>
                 <AccountsTable
                     title='Master Account'
-                    accounts={[accounts.master]}
+                    accounts={[data.master]}
                     tabId='table_1'
                     noSort
                 />
                 <AccountsTable
                     title='Sub-Accounts'
-                    accounts={subaccounts}
+                    accounts={data.sub}
                     tabId='table_2'
                 />
             </div>
             {createSubaccountModal.isOpen && (
                 <CreateSubaccount
                     modalControl={createSubaccountModal}
-                    create={addAccount}
+                    create={data.create}
                 />
             )}
         </div>
