@@ -94,7 +94,7 @@ export default function AccountsTable(props: propsIF) {
         }
         // return sorted data, reverse the sequence if relevant
         return sortBy.reverse ? output.reverse() : output;
-    }, [sortBy]);
+    }, [accounts, sortBy]);
 
     // fn to determine whether the sort direction is inverted
     function checkSortDirection(

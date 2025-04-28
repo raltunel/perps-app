@@ -47,9 +47,10 @@ export default function subaccounts() {
 
     const [subaccounts, setSubaccounts] = useState<accountIF[]>(accounts.sub);
     function addAccount(n: string): void {
-        setSubaccounts([...accounts.sub, new Account(n, ZERO_ADDRESS, ZERO_DOLLARS)]);
+        const next: accountIF = new Account(n, ZERO_ADDRESS, ZERO_DOLLARS);
+        console.log(next);
+        setSubaccounts([...subaccounts, next]);
     }
-    console.log(addAccount);
 
     return (
         <div className={styles.subaccounts}>
@@ -79,6 +80,7 @@ export default function subaccounts() {
             {createSubaccountModal.isOpen && (
                 <CreateSubaccount
                     modalControl={createSubaccountModal}
+                    create={(a: string) => addAccount(a)}
                 />
             )}
         </div>

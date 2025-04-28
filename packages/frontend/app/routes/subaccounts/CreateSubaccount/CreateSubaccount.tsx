@@ -6,11 +6,12 @@ import type { useModalIF } from '~/hooks/useModal';
 // interface for functional component props
 interface propsIF {
     modalControl: useModalIF;
+    create: (a: string) => void;
 }
 
 // main react functional component
 export default function CreateSubaccount(props: propsIF) {
-    const { modalControl } = props;
+    const { modalControl, create } = props;
 
     // ref to hold input field until form submission
     const inputRef = useRef<HTMLInputElement>(null);
@@ -36,7 +37,9 @@ export default function CreateSubaccount(props: propsIF) {
                     <button
                         onClick={() => {
                             if (inputRef.current) {
-                                console.log(inputRef.current.value);
+                                const userInput: string = inputRef.current.value;
+                                console.log(userInput);
+                                create(userInput);
                             }
                             modalControl.close();
                         }}
