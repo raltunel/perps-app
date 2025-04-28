@@ -80,7 +80,7 @@ export default function subaccounts() {
             {createSubaccountModal.isOpen && (
                 <CreateSubaccount
                     modalControl={createSubaccountModal}
-                    create={(a: string) => addAccount(a)}
+                    create={addAccount}
                 />
             )}
         </div>
