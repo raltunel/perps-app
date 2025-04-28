@@ -258,112 +258,115 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         let isCancelled = false;
         const intervals: number[] = [];
 
-        const updateTextPosition = async () => {
+        const updateSingleLine = (item: ChartShapeRefs, lineData: LineData) => {
+            if (!chart) return;
+            const { lineId, textId, quantityTextId, cancelButtonTextId } = item;
+            const pricePerPixel = priceToPixel(chart, lineData.yPrice);
+
+            const activeLabel = chart.activeChart().getShapeById(textId);
+            if (activeLabel) {
+                const activeLabelText = formatLineLabel(lineData.textValue);
+                activeLabel.setProperties({
+                    text: activeLabelText,
+                    wordWrapWidth: estimateTextWidth(activeLabelText),
+                });
+                activeLabel.setAnchoredPosition({
+                    x: lineData.xLoc,
+                    y: pricePerPixel,
+                });
+            }
+
+            if (quantityTextId && lineData.quantityTextValue) {
+                const quantityText = quantityTextFormatWithComma(
+                    lineData.quantityTextValue,
+                );
+                const activeQuantityLabel = chart
+                    .activeChart()
+                    .getShapeById(quantityTextId);
+                if (activeQuantityLabel) {
+                    activeQuantityLabel.setAnchoredPosition({
+                        x: getAnchoredQuantityTextLocation(
+                            chart,
+                            lineData.xLoc,
+                            lineData.textValue,
+                        ),
+                        y: pricePerPixel,
+                    });
+                    activeQuantityLabel.setProperties({
+                        text: quantityText,
+                        wordWrapWidth: estimateTextWidth(quantityText) + 15,
+                    });
+                }
+            }
+
+            if (cancelButtonTextId) {
+                const activeCancelButtonLabel = chart
+                    .activeChart()
+                    .getShapeById(cancelButtonTextId);
+                if (activeCancelButtonLabel) {
+                    activeCancelButtonLabel.setAnchoredPosition({
+                        x: getAnchoredCancelButtonTextLocation(
+                            chart,
+                            lineData.xLoc,
+                            lineData.textValue,
+                            lineData.quantityTextValue
+                                ? quantityTextFormatWithComma(
+                                      lineData.quantityTextValue,
+                                  )
+                                : undefined,
+                        ),
+                        y: pricePerPixel,
+                    });
+                }
+            }
+
+            const activeLine = chart.activeChart().getShapeById(lineId);
+            if (activeLine) {
+                activeLine.setPoints([{ time: 10, price: lineData.yPrice }]);
+                activeLine.setProperties({
+                    linecolor: lineData.color,
+                    borderColor: lineData.color,
+                });
+            }
+        };
+
+        const updateTextPositionOnce = () => {
             if (!chart || orderLineItems.length === 0 || lines.length === 0)
                 return;
+            orderLineItems.forEach((item, i) =>
+                updateSingleLine(item, lines[i]),
+            );
+        };
 
+        const startZoomInterval = () => {
+            if (!chart || orderLineItems.length === 0 || lines.length === 0)
+                return;
             orderLineItems.forEach((item, i) => {
-                const lineData = lines[i];
-                const { lineId, textId, quantityTextId, cancelButtonTextId } =
-                    item;
-
                 const interval = setInterval(() => {
-                    if (isCancelled) return;
-
-                    const pricePerPixel = priceToPixel(chart, lineData.yPrice);
-
-                    const activeLabel = chart
-                        .activeChart()
-                        .getShapeById(textId);
-
-                    if (activeLabel) {
-                        const activeLabelText = formatLineLabel(
-                            lineData.textValue,
-                        );
-                        activeLabel.setProperties({
-                            text: activeLabelText,
-                            wordWrapWidth: estimateTextWidth(activeLabelText),
-                        });
-
-                        activeLabel.setAnchoredPosition({
-                            x: lineData.xLoc,
-                            y: pricePerPixel,
-                        });
-                    }
-
-                    if (quantityTextId && lineData.quantityTextValue) {
-                        const activeQuantityLabel = chart
-                            .activeChart()
-                            .getShapeById(quantityTextId);
-                        if (activeQuantityLabel) {
-                            const quantityText = quantityTextFormatWithComma(
-                                lineData.quantityTextValue,
-                            );
-                            activeQuantityLabel.setAnchoredPosition({
-                                x: getAnchoredQuantityTextLocation(
-                                    chart,
-                                    lineData.xLoc,
-                                    lineData.textValue,
-                                ),
-                                y: pricePerPixel,
-                            });
-                            activeQuantityLabel.setProperties({
-                                text: quantityText,
-                                wordWrapWidth:
-                                    estimateTextWidth(quantityText) + 15,
-                            });
-                        }
-                    }
-
-                    if (cancelButtonTextId) {
-                        const activeCancelButtonLabel = chart
-                            .activeChart()
-                            .getShapeById(cancelButtonTextId);
-
-                        if (activeCancelButtonLabel) {
-                            activeCancelButtonLabel.setAnchoredPosition({
-                                x: getAnchoredCancelButtonTextLocation(
-                                    chart,
-                                    lineData.xLoc,
-                                    lineData.textValue,
-                                    lineData.quantityTextValue
-                                        ? quantityTextFormatWithComma(
-                                              lineData.quantityTextValue,
-                                          )
-                                        : undefined,
-                                ),
-                                y: pricePerPixel,
-                            });
-                        }
-                    }
-
-                    const activeLine = chart.activeChart().getShapeById(lineId);
-                    if (activeLine) {
-                        activeLine.setPoints([
-                            { time: 10, price: lineData.yPrice },
-                        ]);
-                        activeLine.setProperties({
-                            linecolor: lineData.color,
-                            borderColor: lineData.color,
-                        });
+                    if (!isCancelled) {
+                        updateSingleLine(item, lines[i]);
                     }
                 }, 10) as unknown as number;
-
                 intervals.push(interval);
             });
         };
 
         if (zoomChanged) {
-            updateTextPosition();
+            startZoomInterval();
         } else {
-            intervals.forEach(clearInterval);
+            updateTextPositionOnce();
         }
 
         return () => {
             isCancelled = true;
             intervals.forEach(clearInterval);
         };
-    }, [orderLineItems, chart, lines, zoomChanged]);
+    }, [
+        JSON.stringify(orderLineItems),
+        chart,
+        JSON.stringify(lines),
+        zoomChanged,
+    ]);
 
     useEffect(() => {
         const handleMouseMove = (params: any) => {
@@ -483,7 +486,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                     .unsubscribe(null, handleMouseMove);
             }
         };
-    }, [chart, JSON.stringify(orderLineItems)]);
+    }, [chart, JSON.stringify(orderLineItems), JSON.stringify(lines)]);
 
     useEffect(() => {
         const handleMouseDown = (params: any) => {
@@ -572,7 +575,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                 chart.unsubscribe('mouse_down', handleMouseDown);
             }
         };
-    }, [chart, JSON.stringify(orderLineItems)]);
+    }, [chart, JSON.stringify(orderLineItems), JSON.stringify(lines)]);
 
     return null;
 };
