@@ -42,7 +42,7 @@
     flex-direction: row;
     align-items: center;
     gap: 4px;
-    font-size: var(--font-size-s);
+    font-size: var(--font-size-xs);
     color: var(--text2);
 }
 

@@ -135,10 +135,8 @@ export default function AccountsTable(props: propsIF) {
                         <div
                             key={header.key}
                             style={{
-                                cursor: noSort ? 'default' : 'pointer',
-                                fontSize: 'var(--font-size-xs)',
+                                cursor: (noSort || !header.sortable) ? 'default' : 'pointer',
                             }}
-                            className={header.sortable ? styles.sortable : ''}
                             onClick={() => {
                                 if (!header.sortable) return;
                                 let output: null | sortByIF = null;
