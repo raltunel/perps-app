@@ -98,3 +98,16 @@ export const OrderHistoryLimits = {
     MAX: 1000,
     RENDERED: 50,
 };
+
+export * from './feeSchedule';
+
+export enum WsChannels {
+    ORDERBOOK = 'l2Book',
+    ORDERBOOK_TRADES = 'trades',
+    USER_FILLS = 'userFills',
+    USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
+    WEB_DATA2 = 'webData2',
+    ACTIVE_COIN_DATA = 'activeAssetCtx',
+    NOTIFICATION = 'notification',
+    CANDLE = 'candle',
+}

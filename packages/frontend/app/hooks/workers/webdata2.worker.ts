@@ -1,18 +1,31 @@
-// jsonParser.worker.js
+/// <reference lib="webworker" />
 
 import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
-import { processSymbolInfo } from '../processSymbolInfo';
+import { processSymbolInfo } from '../../processors/processSymbolInfo';
 import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
-import { processUserOrder } from '../processOrderBook';
-import { processPosition } from '../processPosition';
+import { processUserOrder } from '../../processors/processOrderBook';
+import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
+import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
 import type { UserBalanceIF } from '../../utils/UserDataIFs';
-import { processUserBalance } from '../processUserBalance';
-self.onmessage = function (event) {
+import { processUserBalance } from '../../processors/processUserBalance';
+export type WebData2Input = OtherWsMsg;
+export type WebData2Output = {
+    channel: string;
+    data: {
+        coins: SymbolInfoIF[];
+        userOpenOrders: OrderDataIF[];
+        user: string;
+        positions: PositionIF[];
+        coinPriceMap: Map<string, number>;
+        userBalances: UserBalanceIF[];
+    };
+};
+
+self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
     try {
-        const size = event.data.length;
-        const parsedData = JSON.parse(event.data);
+        const parsedData = event.data;
         const coins: SymbolInfoIF[] = [];
         const userOpenOrders: OrderDataIF[] = [];
         const positions: PositionIF[] = [];
@@ -21,6 +34,7 @@ self.onmessage = function (event) {
         const coinPriceMap: Map<string, number> = new Map();
         const userBalances: UserBalanceIF[] = [];
 
+        // TODO: type check data, the type might end up kinda different for our backend though
         if (data) {
             if (data.meta && data.meta.universe && data.assetCtxs) {
                 data.meta.universe.forEach((coin: any) => {
@@ -71,6 +85,7 @@ self.onmessage = function (event) {
                 });
 
                 if (data.clearinghouseState) {
+                    console.log('clearinghouseState', data.clearinghouseState);
                     data.clearinghouseState.assetPositions.forEach(
                         (position: any) => {
                             const processedPosition = processPosition(position);
@@ -116,13 +131,13 @@ self.onmessage = function (event) {
                 coins,
                 userOpenOrders,
                 user: data.user,
-                size,
                 positions,
                 coinPriceMap,
                 userBalances,
             },
-        });
+        } as WebData2Output);
     } catch (error) {
+        console.error('Error processing webdata2 worker:', error);
         self.postMessage({ error: (error as Error).message });
     }
 };
