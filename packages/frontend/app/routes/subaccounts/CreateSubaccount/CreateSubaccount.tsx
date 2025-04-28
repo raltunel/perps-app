@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import styles from './CreateSubaccount.module.css';
 import Modal from '~/components/Modal/Modal';
 import type { useModalIF } from '~/hooks/useModal';
+import { useKeydown } from '~/hooks/useKeydown';
 
 // interface for functional component props
 interface propsIF {
@@ -19,12 +20,17 @@ export default function CreateSubaccount(props: propsIF) {
     // string to link `<label>` and `<input>` fields
     const INPUT_ID_FOR_DOM = 'create_subaccount_input_field';
 
+    // fn to handle subaccount creation
     function createSubaccount(): void {
         if (inputRef.current) {
-            create(inputRef.current.value);
+            const text: string = inputRef.current.value;
+            if (text.length) create(inputRef.current.value);
         }
         modalControl.close();
     }
+
+    // trigger subaccount creation when user presses the `Enter` key
+    useKeydown('Enter', createSubaccount);
 
     // JSX return
     return (
