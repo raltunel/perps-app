@@ -140,6 +140,7 @@ export default function AccountsTable(props: propsIF) {
                             }}
                             className={header.sortable ? styles.sortable : ''}
                             onClick={() => {
+                                if (!header.sortable) return;
                                 let output: null | sortByIF = null;
                                 if (sortBy) {
                                     output = {
