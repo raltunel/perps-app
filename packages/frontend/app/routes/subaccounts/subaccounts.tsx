@@ -47,9 +47,10 @@ export default function subaccounts() {
 
     const [subaccounts, setSubaccounts] = useState<accountIF[]>(accounts.sub);
     function addAccount(n: string): void {
-        const next: accountIF = new Account(n, ZERO_ADDRESS, ZERO_DOLLARS);
-        console.log(next);
-        setSubaccounts([...subaccounts, next]);
+        setSubaccounts([
+            ...subaccounts,
+            new Account(n, ZERO_ADDRESS, ZERO_DOLLARS)
+        ]);
     }
 
     return (

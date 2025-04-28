@@ -37,9 +37,7 @@ export default function CreateSubaccount(props: propsIF) {
                     <button
                         onClick={() => {
                             if (inputRef.current) {
-                                const userInput: string = inputRef.current.value;
-                                console.log(userInput);
-                                create(userInput);
+                                create(inputRef.current.value);
                             }
                             modalControl.close();
                         }}
