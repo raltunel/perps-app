@@ -41,6 +41,7 @@ export default function CreateSubaccount(props: propsIF) {
                     <input
                         id={INPUT_ID_FOR_DOM}
                         type='text'
+                        autoComplete='off'
                         placeholder='eg: My Sub-Account 1'
                         ref={inputRef}
                     />
