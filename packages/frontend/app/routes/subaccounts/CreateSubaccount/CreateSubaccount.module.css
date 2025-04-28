@@ -10,16 +10,6 @@
     -webkit-user-select: none;
 }
 
-.create_sub_account_modal > header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    font-family: var(--font-family-main);
-    font-size: var(--font-size-l);
-    font-weight: 400;
-}
-
 .text_entry > input {
     width: 100%;
     padding: 4px 8px;
