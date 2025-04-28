@@ -41,67 +41,10 @@ export default function WebDataConsumer() {
     const positionsRef = useRef<PositionIF[]>([]);
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
 
-    const coinMetaRef = useRef<Map<number, TokenMetaIF>>(new Map());
-    // const userBalanceIndexes = useRef<Set<number>>(new Set());
-    const [userBalanceIndexes, setUserBalanceIndexes] = useState<number[]>([]);
-
     const { info } = useSdk();
     const { fetchData } = useInfoApi();
 
-    const lastIndexRef = useRef<number>(0);
-
     const { formatNum } = useNumFormatter();
-
-    // useEffect(() => {
-    //     lastIndexRef.current = 0;
-    //     // const metaInterval = setInterval(() => {
-    //     fetchData({
-    //         type: 'spotMeta',
-    //         payload: {},
-    //         handler: (data) => {
-    //             const tokens = data.tokens;
-
-    //             if (tokens) {
-    //                 tokens.forEach((token: TokenMetaIF) => {
-    //                     console.log(userBalanceIndexes);
-    //                     if (userBalanceIndexes.includes(token.index)) {
-    //                         coinMetaRef.current.set(token.index, token);
-    //                     }
-    //                 });
-    //             }
-    //         },
-    //     });
-    //     // }, 5000);
-
-    //     const fetchPriceInterval = setInterval(() => {
-    //         const coinKeys = Array.from(coinMetaRef.current.keys());
-    //         const coinToFetch = coinMetaRef.current.get(
-    //             coinKeys[lastIndexRef.current],
-    //         );
-    //         if (coinToFetch) {
-    //             fetchData({
-    //                 type: 'tokenDetails',
-    //                 payload: { tokenId: coinToFetch.tokenId },
-    //                 handler: (data: TokenDetailsIF) => {
-    //                     coinMetaRef.current.set(coinToFetch.index, {
-    //                         ...coinToFetch,
-    //                         price: parseFloat(data.markPx),
-    //                     });
-    //                     lastIndexRef.current++;
-    //                     if (lastIndexRef.current >= coinKeys.length) {
-    //                         lastIndexRef.current = 0;
-    //                         clearInterval(fetchPriceInterval);
-    //                     }
-    //                 },
-    //             });
-    //         }
-    //     }, 500);
-
-    //     return () => {
-    //         // clearInterval(metaInterval);
-    //         clearInterval(fetchPriceInterval);
-    //     };
-    // }, [userBalanceIndexes.length]);
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -141,9 +84,6 @@ export default function WebDataConsumer() {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
-                setUserBalanceIndexes(
-                    userBalancesRef.current.map((balance) => balance.metaIndex),
-                );
             }
         },
         [setCoins, setCoinPriceMap],

@@ -1,13 +1,21 @@
-import BalancesTableHeader from './BalancesTableHeader';
-import BalancesTableRow, { type BalanceData } from './BalancesTableRow';
-import styles from './BalancesTable.module.css';
-import { balanceData } from './data';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useMemo, useState } from 'react';
-import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
-import type { TableSortDirection } from '~/utils/CommonIFs';
 import { sortUserBalances } from '~/processors/processUserBalance';
-export default function BalancesTable() {
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
+import styles from './BalancesTable.module.css';
+import BalancesTableHeader from './BalancesTableHeader';
+import BalancesTableRow from './BalancesTableRow';
+
+type BalancesTableProps = {
+    hideSmallBalances: boolean;
+};
+
+export default function BalancesTable(props: BalancesTableProps) {
+    const { hideSmallBalances } = props;
+
+    const smallBalanceThreshold = 10;
+
     const { userBalances } = useTradeDataStore();
 
     const [sortBy, setSortBy] = useState<UserBalanceSortBy>();
@@ -33,6 +41,15 @@ export default function BalancesTable() {
         return sortUserBalances(userBalances, sortBy, sortDirection);
     }, [userBalances, sortBy, sortDirection]);
 
+    const filteredBalances = useMemo(() => {
+        if (hideSmallBalances) {
+            return sortedBalances.filter((balance) => {
+                return balance.usdcValue > smallBalanceThreshold;
+            });
+        }
+        return sortedBalances;
+    }, [sortedBalances, hideSmallBalances]);
+
     return (
         <div className={styles.tableWrapper}>
             <BalancesTableHeader
@@ -41,7 +58,7 @@ export default function BalancesTable() {
                 sortClickHandler={handleSort}
             />
             <div className={styles.tableBody}>
-                {sortedBalances.map((balance, index) => (
+                {filteredBalances.map((balance, index) => (
                     <BalancesTableRow
                         key={`balance-${index}`}
                         balance={balance}
