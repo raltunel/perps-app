@@ -197,7 +197,7 @@ export const createCancelAnchoredText = async (
         yPrice,
         ' X ',
         '#D1D1D1',
-        10,
+        12,
         '#3C91FF',
     );
 };
