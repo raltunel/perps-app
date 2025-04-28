@@ -19,6 +19,13 @@ export default function CreateSubaccount(props: propsIF) {
     // string to link `<label>` and `<input>` fields
     const INPUT_ID_FOR_DOM = 'create_subaccount_input_field';
 
+    function createSubaccount(): void {
+        if (inputRef.current) {
+            create(inputRef.current.value);
+        }
+        modalControl.close();
+    }
+
     // JSX return
     return (
         <Modal title='Create Sub-Account' close={modalControl.close}>
@@ -34,16 +41,7 @@ export default function CreateSubaccount(props: propsIF) {
                 </div>
                 <div className={styles.modal_buttons}>
                     <button onClick={modalControl.close}>Cancel</button>
-                    <button
-                        onClick={() => {
-                            if (inputRef.current) {
-                                create(inputRef.current.value);
-                            }
-                            modalControl.close();
-                        }}
-                    >
-                        Confirm
-                    </button>
+                    <button onClick={createSubaccount}>Confirm</button>
                 </div>
             </div>
         </Modal>

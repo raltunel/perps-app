@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
-import type { accountIF } from '~/routes/subaccounts/subaccounts';
+import type { accountIF } from '~/stores/AccountsStore';
 
 // interface for table column header metadata
 export interface headerItemIF {
