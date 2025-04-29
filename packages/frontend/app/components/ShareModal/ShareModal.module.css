@@ -1,0 +1,60 @@
+.share_modal {
+    display: flex;
+    flex-direction: row;
+    max-width: 1200px;
+    padding: 0 24px;
+    gap: 24px;
+    font-family: var(--font-family-main);
+    background-color: var(--dark3);
+}
+
+.picture_overlay {
+    display: flex;
+    flex-direction: column;
+    width: 900px;
+    height: 500px;
+    /* background-image: url(https://placehold.co/900x500/000000/FFF); */
+    background-color: green;
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 240px;
+}
+
+.referral_code {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: var(--text2);
+    font-size: var(--font-size-m);
+}
+
+.referral_code > div:last-child {
+    color: var(--accent1);
+}
+
+.custom_text {
+    color: var(--text2);
+}
+
+.message {
+    padding: 8px;
+    color: var(--white);
+    background-color: var(--dark4);
+}
+
+.button_bank {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.button_bank > button {
+    font-weight: 400;
+    font-size: var(--font-size-m);
+    color: var(--text1);
+    background-color: var(--accent1);
+}
