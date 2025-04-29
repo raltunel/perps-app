@@ -305,7 +305,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                 .slice(0, orderCount)
                                 .reverse()
                                 .map((order, index) => (
-                                    <div className={styles.orderRowWrapper}>
+                                    <div
+                                        key={index}
+                                        className={styles.orderRowWrapper}
+                                    >
                                         <OrderRow
                                             rowIndex={index}
                                             key={order.px}
@@ -355,7 +358,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
                         <div className={styles.orderBookBlock}>
                             {buys.slice(0, orderCount).map((order, index) => (
-                                <div className={styles.orderRowWrapper}>
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
                                     <OrderRow
                                         rowIndex={index}
                                         key={order.px}
