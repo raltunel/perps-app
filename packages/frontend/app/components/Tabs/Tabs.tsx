@@ -6,16 +6,21 @@ interface TabProps {
     label: string;
     isActive: boolean;
     onClick: () => void;
-    layoutId: string; 
+    layoutId: string;
+    notInteractive?: boolean;
 }
 
 export function Tab(props: TabProps) {
-    const { label, isActive, onClick, layoutId } = props;
+    const { label, isActive, onClick, layoutId, notInteractive = false } = props;
 
     return (
         <button
             className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
-            onClick={onClick}
+            style={{
+                color: notInteractive ? 'var(--text1)' : '',
+                cursor: notInteractive ? 'auto' : 'cursor',
+            }}
+            onClick={() => notInteractive || onClick()}
         >
             {label}
             {isActive && (
@@ -200,13 +205,13 @@ export default function Tabs(props: TabsProps) {
                     {tabs.map((tab, idx) => {
                         const tabId = getTabId(tab);
                         const tabLabel = getTabLabel(tab);
-
                         return (
                             <Tab
                                 key={tabId + tabLabel + idx} // Ensure unique key
                                 label={tabLabel}
                                 isActive={activeTab === tabId}
                                 onClick={() => handleTabClick(tabId)}
+                                notInteractive={tabs.length <= 1}
                                 layoutId={layoutId} // Pass the unique layoutId
                             />
                         );
