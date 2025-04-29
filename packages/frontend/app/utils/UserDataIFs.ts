@@ -12,6 +12,14 @@ export interface UserBalanceIF {
     buyingPower: number;
 }
 
+export interface AccountOverviewIF {
+    balance: number;
+    unrealizedPnl: number;
+    crossMarginRatio: number;
+    maintainanceMargin: number;
+    crossAccountLeverage: number;
+}
+
 export type UserBalanceSortBy =
     | 'sortName'
     | 'total'

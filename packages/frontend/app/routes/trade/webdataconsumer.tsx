@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
@@ -6,12 +6,11 @@ import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { TokenDetailsIF, TokenMetaIF } from '~/utils/ApiIFs';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import type { UserBalanceIF } from '~/utils/UserDataIFs';
+import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
     const {
@@ -26,6 +25,8 @@ export default function WebDataConsumer() {
         setUserBalances,
         userBalances,
         setCoinPriceMap,
+        setAccountOverview,
+        accountOverview,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -42,9 +43,13 @@ export default function WebDataConsumer() {
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
 
     const { info } = useSdk();
-    const { fetchData } = useInfoApi();
-
-    const { formatNum } = useNumFormatter();
+    const accountOverviewRef = useRef<AccountOverviewIF>({
+        balance: 0,
+        unrealizedPnl: 0,
+        crossMarginRatio: 0,
+        maintainanceMargin: 0,
+        crossAccountLeverage: 0,
+    });
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -68,6 +73,7 @@ export default function WebDataConsumer() {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
             setUserBalances(userBalancesRef.current);
+            setAccountOverview(accountOverviewRef.current);
         }, 1000);
 
         return () => {
@@ -84,6 +90,7 @@ export default function WebDataConsumer() {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
+                accountOverviewRef.current = data.data.accountOverview;
             }
         },
         [setCoins, setCoinPriceMap],

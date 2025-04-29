@@ -8,7 +8,7 @@ import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
-import type { UserBalanceIF } from '../../utils/UserDataIFs';
+import type { AccountOverviewIF, UserBalanceIF } from '../../utils/UserDataIFs';
 import { processUserBalance } from '../../processors/processUserBalance';
 export type WebData2Input = OtherWsMsg;
 export type WebData2Output = {
@@ -20,6 +20,7 @@ export type WebData2Output = {
         positions: PositionIF[];
         coinPriceMap: Map<string, number>;
         userBalances: UserBalanceIF[];
+        accountOverview: AccountOverviewIF;
     };
 };
 
@@ -33,6 +34,14 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
         const userBalances: UserBalanceIF[] = [];
+        const accountOverview: AccountOverviewIF = {
+            balance: 0,
+            unrealizedPnl: 0,
+            crossMarginRatio: 0,
+            maintainanceMargin: 0,
+            crossAccountLeverage: 0,
+        };
+        let unrealizedPnl = 0;
 
         // TODO: type check data, the type might end up kinda different for our backend though
         if (data) {
@@ -96,6 +105,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                                 processedPosition.sl = existingOrder?.sl || 0;
                             }
                             positions.push(processedPosition);
+                            unrealizedPnl += processedPosition.unrealizedPnl;
                         },
                     );
 
@@ -121,6 +131,23 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                             buyingPower: total - hold,
                         });
                     }
+
+                    if (data.clearinghouseState.marginSummary) {
+                        accountOverview.balance = parseNum(
+                            data.clearinghouseState.marginSummary.accountValue,
+                        );
+                        accountOverview.unrealizedPnl = unrealizedPnl;
+                        accountOverview.maintainanceMargin = parseNum(
+                            data.clearinghouseState.crossMaintenanceMarginUsed,
+                        );
+                        accountOverview.crossMarginRatio =
+                            (accountOverview.maintainanceMargin /
+                                accountOverview.balance) *
+                            100;
+
+                        // accountOverview.crossAccountLeverage =
+                        //     data.clearinghouseState.crossAccountLeverage;
+                    }
                 }
 
                 if (data.spotState && data.spotState.balances) {
@@ -142,6 +169,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                 positions,
                 coinPriceMap,
                 userBalances,
+                accountOverview,
             },
         } as WebData2Output);
     } catch (error) {
