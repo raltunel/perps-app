@@ -42,6 +42,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
             crossAccountLeverage: 0,
         };
         let unrealizedPnl = 0;
+        let totalPositionsValue = 0;
 
         // TODO: type check data, the type might end up kinda different for our backend though
         if (data) {
@@ -106,6 +107,8 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                             }
                             positions.push(processedPosition);
                             unrealizedPnl += processedPosition.unrealizedPnl;
+                            totalPositionsValue +=
+                                processedPosition.positionValue;
                         },
                     );
 
@@ -145,8 +148,8 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                                 accountOverview.balance) *
                             100;
 
-                        // accountOverview.crossAccountLeverage =
-                        //     data.clearinghouseState.crossAccountLeverage;
+                        accountOverview.crossAccountLeverage =
+                            totalPositionsValue / accountOverview.balance;
                     }
                 }
 

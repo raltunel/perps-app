@@ -18,6 +18,8 @@ export interface AccountOverviewIF {
     crossMarginRatio: number;
     maintainanceMargin: number;
     crossAccountLeverage: number;
+    balanceChange?: number;
+    maintainanceMarginChange?: number;
 }
 
 export type UserBalanceSortBy =
