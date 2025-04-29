@@ -480,10 +480,15 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         }
         return () => {
             if (chart) {
-                chart
-                    .activeChart()
-                    .crossHairMoved()
-                    .unsubscribe(null, handleMouseMove);
+                try {
+                    chart
+                        .activeChart()
+                        .crossHairMoved()
+                        .unsubscribe(null, handleMouseMove);
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error: unknown) {
+                    // console.error({ error });
+                }
             }
         };
     }, [chart, JSON.stringify(orderLineItems), JSON.stringify(lines)]);
@@ -572,7 +577,13 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         }
         return () => {
             if (chart) {
-                chart.unsubscribe('mouse_down', handleMouseDown);
+                try {
+                    chart.unsubscribe('mouse_down', handleMouseDown);
+
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error: unknown) {
+                    // console.error({ error });
+                }
             }
         };
     }, [chart, JSON.stringify(orderLineItems), JSON.stringify(lines)]);
