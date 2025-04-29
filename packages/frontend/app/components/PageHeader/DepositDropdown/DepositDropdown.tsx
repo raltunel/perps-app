@@ -8,6 +8,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useMemo } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { motion } from 'framer-motion';
 interface propsIF {
     isUserConnected: boolean;
     setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +33,7 @@ export default function DepositDropdown(props: propsIF) {
                 label: 'Balance',
                 tooltipContent: 'this is tooltip data',
                 value: formatNum(accountOverview.balance, 2, true, true),
+                change: accountOverview.balanceChange,
             },
             {
                 label: 'Unrealized PNL',
@@ -64,6 +66,7 @@ export default function DepositDropdown(props: propsIF) {
                     true,
                     true,
                 ),
+                change: accountOverview.maintainanceMarginChange,
             },
             {
                 label: 'Cross Account Leverage',
@@ -114,12 +117,34 @@ export default function DepositDropdown(props: propsIF) {
                                 {tooltipSvg}
                             </Tooltip>
                         </div>
-                        <p
-                            className={styles.value}
-                            style={{ color: data.color }}
-                        >
-                            {data.value}
-                        </p>
+                        {data.change ? (
+                            <motion.p
+                                key={data.change}
+                                className={styles.value}
+                                initial={{
+                                    color:
+                                        data.change > 0
+                                            ? getBsColor().buy
+                                            : getBsColor().sell,
+                                }}
+                                animate={{
+                                    color: 'var(--text1)',
+                                }}
+                                transition={{
+                                    duration: 0.3,
+                                    ease: 'easeInOut',
+                                }}
+                            >
+                                {data.value}
+                            </motion.p>
+                        ) : (
+                            <p
+                                className={styles.value}
+                                style={{ color: data.color }}
+                            >
+                                {data.value}
+                            </p>
+                        )}
                     </div>
                 ))}
             </div>

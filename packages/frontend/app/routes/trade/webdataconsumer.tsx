@@ -43,13 +43,9 @@ export default function WebDataConsumer() {
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
 
     const { info } = useSdk();
-    const accountOverviewRef = useRef<AccountOverviewIF>({
-        balance: 0,
-        unrealizedPnl: 0,
-        crossMarginRatio: 0,
-        maintainanceMargin: 0,
-        crossAccountLeverage: 0,
-    });
+    const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
+
+    const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -73,7 +69,17 @@ export default function WebDataConsumer() {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
             setUserBalances(userBalancesRef.current);
-            setAccountOverview(accountOverviewRef.current);
+            if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
+                accountOverviewRef.current.balanceChange =
+                    accountOverviewRef.current.balance -
+                    acccountOverviewPrevRef.current.balance;
+                accountOverviewRef.current.maintainanceMarginChange =
+                    accountOverviewRef.current.maintainanceMargin -
+                    acccountOverviewPrevRef.current.maintainanceMargin;
+            }
+            if (accountOverviewRef.current) {
+                setAccountOverview(accountOverviewRef.current);
+            }
         }, 1000);
 
         return () => {
@@ -81,6 +87,10 @@ export default function WebDataConsumer() {
             unsubscribe();
         };
     }, [debugWallet.address, info]);
+
+    useEffect(() => {
+        acccountOverviewPrevRef.current = accountOverview;
+    }, [accountOverview]);
 
     const handleWebData2WorkerResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
