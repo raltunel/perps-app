@@ -171,7 +171,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
         intervalId = setInterval(async () => {
             const current = chartRef.symbol();
-            if (current === symbol) {
+            if (current.toLocaleLowerCase() === symbol.toLocaleLowerCase()) {
                 setTimeout(() => {
                     setChartReady(true);
                 }, 2500);
