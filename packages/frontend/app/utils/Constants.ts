@@ -92,6 +92,10 @@ export const debugWallets: DebugWallet[] = [
         label: 'Benjamin Hyper',
         address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     },
+    {
+        label: 'strobie',
+        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
+    },
 ];
 
 export const OrderHistoryLimits = {
@@ -100,3 +104,14 @@ export const OrderHistoryLimits = {
 };
 
 export * from './feeSchedule';
+
+export enum WsChannels {
+    ORDERBOOK = 'l2Book',
+    ORDERBOOK_TRADES = 'trades',
+    USER_FILLS = 'userFills',
+    USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
+    WEB_DATA2 = 'webData2',
+    ACTIVE_COIN_DATA = 'activeAssetCtx',
+    NOTIFICATION = 'notification',
+    CANDLE = 'candle',
+}

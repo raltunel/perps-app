@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useInfoApi } from '~/hooks/useInfoApi';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
-import { useWsObserver, WsChannels } from '~/hooks/useWsObserver';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
     const {
@@ -18,14 +21,18 @@ export default function WebDataConsumer() {
         setCoins,
         coins,
         setPositions,
+        positions,
+        setUserBalances,
+        userBalances,
         setCoinPriceMap,
+        setAccountOverview,
+        accountOverview,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet.address.toLowerCase();
@@ -33,8 +40,12 @@ export default function WebDataConsumer() {
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
+    const userBalancesRef = useRef<UserBalanceIF[]>([]);
 
     const { info } = useSdk();
+    const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
+
+    const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -54,20 +65,32 @@ export default function WebDataConsumer() {
             postWebData2,
         );
 
-        const openOrdersInterval = setInterval(() => {
+        const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
-        }, 1000);
-
-        const positionsInterval = setInterval(() => {
             setPositions(positionsRef.current);
+            setUserBalances(userBalancesRef.current);
+            if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
+                accountOverviewRef.current.balanceChange =
+                    accountOverviewRef.current.balance -
+                    acccountOverviewPrevRef.current.balance;
+                accountOverviewRef.current.maintainanceMarginChange =
+                    accountOverviewRef.current.maintainanceMargin -
+                    acccountOverviewPrevRef.current.maintainanceMargin;
+            }
+            if (accountOverviewRef.current) {
+                setAccountOverview(accountOverviewRef.current);
+            }
         }, 1000);
 
         return () => {
-            clearInterval(openOrdersInterval);
-            clearInterval(positionsInterval);
+            clearInterval(userDataInterval);
             unsubscribe();
         };
     }, [debugWallet.address, info]);
+
+    useEffect(() => {
+        acccountOverviewPrevRef.current = accountOverview;
+    }, [accountOverview]);
 
     const handleWebData2WorkerResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
@@ -76,6 +99,8 @@ export default function WebDataConsumer() {
             if (data.data.user.toLowerCase() === addressRef.current) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
+                userBalancesRef.current = data.data.userBalances;
+                accountOverviewRef.current = data.data.accountOverview;
             }
         },
         [setCoins, setCoinPriceMap],
