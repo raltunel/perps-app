@@ -14,7 +14,6 @@ import PageHeader from './components/PageHeader/PageHeader';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
-import { WsObserverProvider } from './hooks/useWsObserver';
 import { useDebugStore } from './stores/DebugStore';
 import { SdkProvider } from './hooks/useSdk';
 
@@ -103,34 +102,29 @@ export default function App() {
         <>
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
-                    <WsObserverProvider
-                        url={wsUrl}
-                        wsEnvironment={wsEnvironment}
-                    >
-                        <div className='root-container'>
-                            {/* Added error boundary for header */}
-                            <ComponentErrorBoundary>
-                                <header className='header'>
-                                    <PageHeader />
-                                </header>
-                            </ComponentErrorBoundary>
+                    <div className='root-container'>
+                        {/* Added error boundary for header */}
+                        <ComponentErrorBoundary>
+                            <header className='header'>
+                                <PageHeader />
+                            </header>
+                        </ComponentErrorBoundary>
 
-                            <main className='content'>
-                                {/*  Added Suspense for async content loading */}
-                                <Suspense fallback={<LoadingIndicator />}>
-                                    <ComponentErrorBoundary>
-                                        <Outlet />
-                                    </ComponentErrorBoundary>
-                                </Suspense>
-                            </main>
+                        <main className='content'>
+                            {/*  Added Suspense for async content loading */}
+                            <Suspense fallback={<LoadingIndicator />}>
+                                <ComponentErrorBoundary>
+                                    <Outlet />
+                                </ComponentErrorBoundary>
+                            </Suspense>
+                        </main>
 
-                            {/* Added error boundary for notifications */}
-                            <ComponentErrorBoundary>
-                                <Notifications />
-                            </ComponentErrorBoundary>
-                        </div>
-                        <RuntimeDomManipulation />
-                    </WsObserverProvider>
+                        {/* Added error boundary for notifications */}
+                        <ComponentErrorBoundary>
+                            <Notifications />
+                        </ComponentErrorBoundary>
+                    </div>
+                    <RuntimeDomManipulation />
                 </SdkProvider>
             </Layout>
         </>
