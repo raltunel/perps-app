@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { Route } from '../../+types/root';
 import styles from './positions.module.css';
 import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
-
+import WebDataConsumer from '../trade/webdataconsumer';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'Perps - Positions' },
@@ -24,6 +24,7 @@ function Positions({ loaderData }: Route.ComponentProps) {
 
     return (
         <div className={containerClassName}>
+            <WebDataConsumer />
             <header>Positions</header>
 
             <div className={styles.content}>

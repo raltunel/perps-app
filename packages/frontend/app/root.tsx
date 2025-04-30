@@ -14,9 +14,8 @@ import PageHeader from './components/PageHeader/PageHeader';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
-import { useDebugStore } from './stores/DebugStore';
 import { SdkProvider } from './hooks/useSdk';
-import WebDataConsumer from './routes/trade/webdataconsumer';
+import { useDebugStore } from './stores/DebugStore';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -103,7 +102,6 @@ export default function App() {
         <>
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
-                    <WebDataConsumer />
                     <div className='root-container'>
                         {/* Added error boundary for header */}
                         <ComponentErrorBoundary>

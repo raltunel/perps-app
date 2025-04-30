@@ -28,7 +28,7 @@ export default [
 
     route('subaccounts', 'routes/subaccounts/subaccounts.tsx'),
 
-    route('positions/:wallet?', 'routes/positions/positions.tsx'),
+    route('positions', 'routes/positions/positions.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

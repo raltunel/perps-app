@@ -44,7 +44,7 @@ export default function Trade() {
     return (
         <>
             <TradeRouteHandler />
-            {/* <WebDataConsumer /> */}
+            <WebDataConsumer />
             {symbol && (
                 <div className={styles.container}>
                     <section

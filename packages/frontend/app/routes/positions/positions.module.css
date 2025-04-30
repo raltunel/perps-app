@@ -31,89 +31,8 @@
     gap: 8px;
 }
 
-.dropdownMenu,
-.dropupMenu {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    right: 0;
-    background-color: var(--dark3);
-    border-radius: var(--half-border-radius);
-    padding: 8px;
-    width: 100%;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    text-align: right;
-}
-
-.dropdownItem {
-    width: 100%;
-    padding: 8px;
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-s, 12px);
-    cursor: pointer;
-}
-
-.dropdownItem:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
-
-.paginationContainer {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-
-    font-size: var(--font-size-s, 12px);
-    color: var(--text1, #f0f0f8);
-    gap: 12px;
-}
-
-.rowsPerPage {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.rowSelector {
-    background-color: var(--dark2, #1a1b23);
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    position: relative;
-}
-
 .pageInfo {
     color: var(--text1, #f0f0f8);
-}
-
-.pageButtons {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.pageButton {
-    background-color: transparent;
-    border: none;
-    color: var(--text2, #6a6a6d);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-}
-
-.pageButton:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: var(--text1, #f0f0f8);
-}
-
-.pageButton:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
 }
 
 .fullScreen {
@@ -172,25 +91,4 @@
     .container {
         margin-top: 0;
     }
-}
-
-/* For screens smaller than 1500px, make dropdown appear above */
-
-.dropupMenu {
-    top: auto;
-    bottom: calc(100% + 0.5rem);
-}
-.chvrUp {
-    display: flex;
-}
-÷ .dropdownItem {
-    width: 100%;
-    padding: 8px;
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-s, 12px);
-    cursor: pointer;
-}
-
-.dropdownItem:hover {
-    background-color: rgba(255, 255, 255, 0.05);
 }
