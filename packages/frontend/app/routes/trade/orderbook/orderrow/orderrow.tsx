@@ -57,16 +57,6 @@ const OrderRow: React.FC<OrderRowProps> = ({
             className={`${styles.orderRow} ${userSlots.has(formattedPrice) ? styles.userOrder : ''}`}
             onClick={handleClick}
         >
-            <div
-                className={styles.ratio}
-                style={{
-                    width: `${order.ratio * 100}%`,
-                    backgroundColor:
-                        order.type === 'buy'
-                            ? getBsColor().buy
-                            : getBsColor().sell,
-                }}
-            ></div>
             {userSlots.has(formattedPrice) && (
                 <div className={styles.userOrderIndicator}></div>
             )}
