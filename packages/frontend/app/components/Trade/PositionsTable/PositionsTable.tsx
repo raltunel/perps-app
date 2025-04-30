@@ -1,13 +1,10 @@
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import Pagination from '~/components/Pagination/Pagination';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import styles from './PositionsTable.module.css';
-import { positionsData } from './data';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useNavigate } from 'react-router';
-import { useDebugStore } from '~/stores/DebugStore';
-import { useCallback, useMemo, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaChevronUp } from 'react-icons/fa';
-import Pagination from '~/components/Pagination/Pagination';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -57,7 +54,7 @@ export default function PositionsTable(props: PositionsTableProps) {
                     </div>
                 )}
 
-                {positions.length > 0 && !pageMode && (
+                {positions.length > limit && !pageMode && (
                     <a
                         href='#'
                         className={styles.viewAllLink}
