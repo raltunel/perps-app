@@ -19,6 +19,7 @@ import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -41,6 +42,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const { formatNum } = useNumFormatter();
 
     const lockOrderBook = useRef<boolean>(false);
+
+    const { getBsColor } = useAppSettings();
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
     const {
@@ -302,19 +305,36 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                 .slice(0, orderCount)
                                 .reverse()
                                 .map((order, index) => (
-                                    <OrderRow
-                                        rowIndex={index}
-                                        key={order.px}
-                                        order={order}
-                                        coef={
-                                            selectedMode === 'symbol'
-                                                ? 1
-                                                : (symbolInfo?.markPx ?? 0)
-                                        }
-                                        resolution={filledResolution.current}
-                                        userSlots={userSellSlots}
-                                        clickListener={rowClickHandler}
-                                    />
+                                    <div
+                                        key={index}
+                                        className={styles.orderRowWrapper}
+                                    >
+                                        <OrderRow
+                                            rowIndex={index}
+                                            key={order.px}
+                                            order={order}
+                                            coef={
+                                                selectedMode === 'symbol'
+                                                    ? 1
+                                                    : (symbolInfo?.markPx ?? 0)
+                                            }
+                                            resolution={
+                                                filledResolution.current
+                                            }
+                                            userSlots={userSellSlots}
+                                            clickListener={rowClickHandler}
+                                        />
+                                        <div
+                                            className={styles.ratioBar}
+                                            style={{
+                                                width: `${order.ratio * 100}%`,
+                                                backgroundColor:
+                                                    order.type === 'sell'
+                                                        ? getBsColor().sell
+                                                        : getBsColor().buy,
+                                            }}
+                                        ></div>
+                                    </div>
                                 ))}
                         </div>
 
@@ -338,19 +358,34 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
                         <div className={styles.orderBookBlock}>
                             {buys.slice(0, orderCount).map((order, index) => (
-                                <OrderRow
-                                    rowIndex={index}
-                                    key={order.px}
-                                    order={order}
-                                    coef={
-                                        selectedMode === 'symbol'
-                                            ? 1
-                                            : (symbolInfo?.markPx ?? 0)
-                                    }
-                                    resolution={filledResolution.current}
-                                    userSlots={userBuySlots}
-                                    clickListener={rowClickHandler}
-                                />
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
+                                    <OrderRow
+                                        rowIndex={index}
+                                        key={order.px}
+                                        order={order}
+                                        coef={
+                                            selectedMode === 'symbol'
+                                                ? 1
+                                                : (symbolInfo?.markPx ?? 0)
+                                        }
+                                        resolution={filledResolution.current}
+                                        userSlots={userBuySlots}
+                                        clickListener={rowClickHandler}
+                                    />
+                                    <div
+                                        className={styles.ratioBar}
+                                        style={{
+                                            width: `${order.ratio * 100}%`,
+                                            backgroundColor:
+                                                order.type === 'buy'
+                                                    ? getBsColor().buy
+                                                    : getBsColor().sell,
+                                        }}
+                                    ></div>
+                                </div>
                             ))}
                         </div>
                     </>
