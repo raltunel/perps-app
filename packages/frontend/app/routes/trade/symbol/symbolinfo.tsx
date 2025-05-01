@@ -67,7 +67,7 @@ const SymbolInfo: React.FC = () => {
             <title>{title}</title>
             <meta property='og:image' content={ogImage} />
             <div className={styles.symbolInfoContainer}>
-                <div className={styles.symbolSelector}>
+                <div className={styles.symbolSelector} id='tutorial-pool-explorer'>
                     <SymbolSearch />
                 </div>
                 <div>
@@ -81,6 +81,7 @@ const SymbolInfo: React.FC = () => {
                         >
                             <div
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
+                                id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
                                     label='Mark'
