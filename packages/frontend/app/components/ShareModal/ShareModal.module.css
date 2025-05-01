@@ -37,13 +37,22 @@
 }
 
 .custom_text {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom_text > label {
     color: var(--text2);
 }
 
-.message {
+.custom_text > textarea {
     padding: 8px;
     color: var(--white);
     background-color: var(--dark4);
+    border: none;
+    resize: none;
+    overflow: hidden;
+    color: var(--white);
 }
 
 .button_bank {

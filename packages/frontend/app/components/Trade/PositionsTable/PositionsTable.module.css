@@ -116,8 +116,18 @@
 }
 .markPriceCell {
 }
+
 .pnlCell {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
 }
+
+.pnlCell > svg {
+    cursor: pointer;
+}
+
 .liqPriceCell {
 }
 .marginCell {

@@ -1,9 +1,11 @@
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import styles from './PositionsTable.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useMemo } from 'react';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { RiExternalLinkLine } from "react-icons/ri";
+import { type useModalIF, useModal } from '~/hooks/useModal';
+import ShareModal from '~/components/ShareModal/ShareModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -30,6 +32,8 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         }
         return ret;
     };
+
+    const shareModalCtrl: useModalIF = useModal('closed');
 
     return (
         <div className={styles.rowContainer}>
@@ -66,6 +70,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
+                <RiExternalLinkLine onClick={shareModalCtrl.open} />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
@@ -95,6 +100,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                     <button className={styles.actionButton}>Market</button>
                 </div>
             </div>
+            { shareModalCtrl.isOpen &&
+                <ShareModal close={shareModalCtrl.close} slug='1' />
+            }
         </div>
     );
 }
