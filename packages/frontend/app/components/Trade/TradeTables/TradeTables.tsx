@@ -1,17 +1,18 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import styles from './TradeTable.module.css';
+import { useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
-import FilterDropdown from '../FilterDropdown/FilterDropdown';
-import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import BalancesTable from '../BalancesTable/BalancesTable';
-import PositionsTable from '../PositionsTable/PositionsTable';
-import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
-import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
-import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
-import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
+import FilterDropdown from '../FilterDropdown/FilterDropdown';
+import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
+import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
+import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
+import PositionsTable from '../PositionsTable/PositionsTable';
+import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
+import styles from './TradeTable.module.css';
 
 export interface FilterOption {
     id: string;
@@ -39,13 +40,12 @@ const filterOptions: FilterOption[] = [
     { id: 'short', label: 'Short' },
 ];
 export default function TradeTable(props: TradeTableProps) {
-    const { initialTab = 'Balances' } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const { selectedTradeTab, setSelectedTradeTab } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
+        setSelectedTradeTab(tab);
     };
 
     const handleFilterChange = (selectedId: string) => {
@@ -71,7 +71,7 @@ export default function TradeTable(props: TradeTableProps) {
                 selectedOption={selectedFilter}
                 onChange={handleFilterChange}
             />
-            {activeTab === 'Balances' && (
+            {selectedTradeTab === 'Balances' && (
                 <ToggleSwitch
                     isOn={hideSmallBalances}
                     onToggle={handleToggleSmallBalances}
@@ -81,7 +81,7 @@ export default function TradeTable(props: TradeTableProps) {
     );
 
     const renderTabContent = () => {
-        switch (activeTab) {
+        switch (selectedTradeTab) {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
@@ -111,7 +111,7 @@ export default function TradeTable(props: TradeTableProps) {
         <div className={styles.tradeTableWrapper}>
             <Tabs
                 tabs={availableTabs}
-                defaultTab={activeTab}
+                defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
                 wrapperId='tradeTableTabs'
@@ -119,7 +119,7 @@ export default function TradeTable(props: TradeTableProps) {
             />
             <motion.div
                 className={styles.tableContent}
-                key={activeTab}
+                key={selectedTradeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
