@@ -33,7 +33,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
 
     const { userSymbolOrders, userOrders } = useTradeDataStore();
 
-    const openOrdersLimit = 50;
+    const openOrdersLimit = 10;
 
     const filteredOrders = useMemo(() => {
         switch (selectedFilter) {

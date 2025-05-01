@@ -32,3 +32,17 @@
     padding: 0 0.5rem;
     color: var(--text3);
 }
+
+.orderRowWrapper {
+    width: 100%;
+    position: relative;
+}
+
+.ratioBar {
+    transition: width 0.3s ease-in-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    opacity: 0.2;
+}
