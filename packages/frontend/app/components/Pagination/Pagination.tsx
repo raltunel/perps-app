@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import styles from './Pagination.module.css';
 import { FaChevronLeft, FaChevronRight, FaChevronUp } from 'react-icons/fa';
+import styles from './Pagination.module.css';
 
 interface PaginationProps {
     totalCount: number;
@@ -20,8 +20,6 @@ const Pagination: React.FC<PaginationProps> = ({
     const [rowsPerPageState, setRowsPerPageState] = useState(rowsPerPage);
     const [page, setPage] = useState(0);
     const [isRowsDropdownOpen, setIsRowsDropdownOpen] = useState(false);
-
-    useEffect(() => {}, [rowsPerPage]);
 
     useEffect(() => {
         onPageChange(page);
