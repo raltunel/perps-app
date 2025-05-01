@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect,  useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -23,20 +23,17 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Trade() {
-    const { symbol } =
-        useTradeDataStore();
+    const { symbol } = useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
-   
 
     // useEffect(() => {
     //     const info = new Info({ environment: 'mock' });
     //     console.log({ wsManager: info.wsManager });
     // }, []);
-
 
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
@@ -46,20 +43,17 @@ export default function Trade() {
 
     return (
         <>
-           
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                    
-                
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
-                        >
+                    >
                         <div
                             className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
-                            >
-                                <ComboBoxContainer/>
+                        >
+                            <ComboBoxContainer />
                             <div
                                 id='watchlistSection'
                                 className={styles.watchlist}
@@ -103,8 +97,7 @@ export default function Trade() {
                             />
                         </div>
                     </section>
-                    </div>
-                  
+                </div>
             )}
         </>
     );
