@@ -61,11 +61,11 @@ export default function Tabs(props: TabsProps) {
         layoutIdPrefix = 'tabIndicator',
     } = props;
 
-    const { userBalances, positions, userOrders } = useTradeDataStore();
-
-    const balancesCount = userBalances.length;
-    const positionsCount = positions.length;
-    const openOrdersCount = userOrders.length;
+    const {
+        userBalances: { length: balancesCount },
+        positions: { length: positionsCount },
+        userOrders: { length: openOrdersCount },
+    } = useTradeDataStore();
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
