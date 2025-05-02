@@ -26,12 +26,11 @@ export default function ShareModal(props: propsIF) {
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
-    
     const symbolFileName = useMemo<string>(() => {
         const match = symbol.match(/^k([A-Z]+)$/);
         return match ? match[1] : symbol;
     }, [symbol]);
-
+console.log(memPosition.type);
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -45,8 +44,8 @@ export default function ShareModal(props: propsIF) {
                                     alt={symbolFileName}
                                 />
                             </div>
-                            <div>ETH</div>
-                            <div>Long 20x</div>
+                            <div className={styles.symbol}>{memPosition.coin}</div>
+                            <div className={styles.yield}>Long 20x</div>
                         </div>
                         <div className={styles.market_pct}>+2.9%</div>
                     </div>
