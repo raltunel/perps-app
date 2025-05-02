@@ -44,8 +44,6 @@
     align-items: center;
     padding: 4px;
     border-radius: var(--half-border-radius);
-    color: var(--green);
-    background-color: var(--green-dark);
 }
 
 .market_pct {

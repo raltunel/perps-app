@@ -32,7 +32,7 @@ export default function ShareModal(props: propsIF) {
         const match = symbol.match(/^k([A-Z]+)$/);
         return match ? match[1] : symbol;
     }, [symbol]);
-console.log(memPosition);
+console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -63,10 +63,18 @@ console.log(memPosition);
                                 />
                             </div>
                             <div className={styles.symbol}>{memPosition.coin}</div>
-                            <div className={styles.yield}>Long {memPosition.leverage.value}x</div>
+                            <div
+                                className={styles.yield}
+                                style={{
+                                    color: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'})`,
+                                    backgroundColor: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}-dark)`,
+                                }}
+                            >
+                                Long {memPosition.leverage.value}x
+                            </div>
                         </div>
                         <div className={styles.market_pct}>
-                            {position.returnOnEquity > 0 && '+'}{formatNum(position.returnOnEquity * 100, 1)}%
+                            {memPosition.returnOnEquity > 0 && '+'}{formatNum(position.returnOnEquity * 100, 1)}%
                         </div>
                     </div>
                     <div className={styles.prices}>
