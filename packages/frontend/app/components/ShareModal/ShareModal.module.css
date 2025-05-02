@@ -121,6 +121,10 @@
 }
 
 .button_bank > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
     font-size: var(--font-size-m);
     color: var(--text1);
     background-color: var(--accent1);

@@ -8,6 +8,8 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
 import shareCardBackground from './shareCardBackground.png';
 import perpsLogo from './perpsLogo.png';
+import { RiArrowDownLine, RiTwitterFill } from 'react-icons/ri';
+import { LuCopy } from 'react-icons/lu';
 
 interface propsIF {
     close: () => void;
@@ -108,9 +110,9 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                         />
                     </div>
                     <div className={styles.button_bank}>
-                        <Button size='medium'>Save Image</Button>
-                        <Button size='medium'>Copy Link</Button>
-                        <Button size='medium'>Share on X</Button>
+                        <Button size='medium'>Save Image <RiArrowDownLine /></Button>
+                        <Button size='medium'>Copy Link <LuCopy /></Button>
+                        <Button size='medium'>Share on X <RiTwitterFill /></Button>
                     </div>
                 </div>
             </div>
