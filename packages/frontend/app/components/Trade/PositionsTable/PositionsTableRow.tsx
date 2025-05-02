@@ -33,7 +33,11 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
 
     return (
         <div className={styles.rowContainer}>
-            <div className={`${styles.cell} ${styles.coinCell}`}>
+            <div
+                className={`${styles.cell} ${styles.coinCell} ${
+                    position.szi < 0 ? styles.coinCellRed : styles.coinCellGreen
+                }`}
+            >
                 {position.coin}
                 {position.leverage.value && (
                     <span className={styles.badge}>
@@ -41,8 +45,11 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                     </span>
                 )}
             </div>
-            <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {position.szi} {position.coin}
+            <div className={`${styles.cell} ${styles.sizeCell}`}
+            style={{color: position.szi < 0 ? 'var(--red)' : 'var(--green'}}
+            >
+
+                {Math.abs(position.szi)} {position.coin}
             </div>
             <div className={`${styles.cell} ${styles.positionValueCell}`}>
                 {formatNum(position.positionValue, null, true, true)}
