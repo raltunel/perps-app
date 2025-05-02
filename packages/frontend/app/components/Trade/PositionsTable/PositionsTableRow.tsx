@@ -101,7 +101,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 </div>
             </div>
             { shareModalCtrl.isOpen &&
-                <ShareModal close={shareModalCtrl.close} slug='1' />
+                <ShareModal close={shareModalCtrl.close} position={position} />
             }
         </div>
     );

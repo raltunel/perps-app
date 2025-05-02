@@ -1,31 +1,58 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 import styles from './ShareModal.module.css';
+import type { PositionIF } from '~/utils/position/PositionIFs';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
 
 interface propsIF {
     close: () => void;
-    slug?: string;
+    position: PositionIF;
 }
 
 export default function ShareModal(props: propsIF) {
-    const { close } = props;
+    const { close, position } = props;
+
+    const memPosition = useMemo<PositionIF>(() => position, []);
+
+    const { formatNum } = useNumFormatter();
+    const { coinPriceMap } = useTradeDataStore();
 
     const REFERRAL_CODE = '0x1';
 
     const TEXTAREA_ID_FOR_DOM = 'share_card_custom_text';
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
-
-if (props.slug) console.log(props.slug);
-
+console.log(inputRef);
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
-                <div
-                    className={styles.picture_overlay}
-                    
-                >
+                <div className={styles.picture_overlay}>
+                    <div>perps</div>
+                    <div className={styles.market}>
+                        <div className={styles.market_tkn}>
+                            <div>logo</div>
+                            <div>ETH</div>
+                            <div>Long 20x</div>
+                        </div>
+                        <div className={styles.market_pct}>+2.9%</div>
+                    </div>
+                    <div className={styles.prices}>
+                        <div className={styles.price}>
+                            <div>Entry Price</div>
+                            <div>{formatNum(memPosition.entryPx)}</div>
+                        </div>
+                        <div className={styles.price}>
+                            <div>Mark Price</div>
+                            <div>{formatNum(coinPriceMap.get(memPosition.coin) ?? 0)}</div>
+                        </div>
+                    </div>
+                    <div className={styles.price}>
+                        <div>Referral code:</div>
+                        <div>https://perps.ambient.finance/join</div>
+                    </div>
                 </div>
                 <div className={styles.info}>
                     <div className={styles.referral_code}>
@@ -37,8 +64,9 @@ if (props.slug) console.log(props.slug);
                         <textarea
                             id={TEXTAREA_ID_FOR_DOM}
                             ref={inputRef}
+                            maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            placeholder='eg: Trade $BTC Perps seamlessly on @AmbientPerps using my referral code'
+                            placeholder={`eg: Trade $BTC Perps seamlessly on ${PERPS_TWITTER} using my referral code`}
                         />
                     </div>
                     <div className={styles.button_bank}>

@@ -64,6 +64,7 @@
     --font-size-l: 24px;
     --font-size-xl: 36px;
     --font-size-xxl: 64px;
+    --font-size-xxxl: 100px;
 
     /* z indexes */
     --navbar-dropdown-zindex: 99;
