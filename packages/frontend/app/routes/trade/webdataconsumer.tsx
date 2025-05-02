@@ -27,6 +27,7 @@ export default function WebDataConsumer() {
         setCoinPriceMap,
         setAccountOverview,
         accountOverview,
+        setWebDataFetched,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -46,6 +47,7 @@ export default function WebDataConsumer() {
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
 
     const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
+    const webDataFetchedRef = useRef<boolean>(false);
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -56,6 +58,7 @@ export default function WebDataConsumer() {
 
     useEffect(() => {
         if (!info) return;
+        webDataFetchedRef.current = false;
 
         setUserOrders([]);
         openOrdersRef.current = [];
@@ -80,6 +83,9 @@ export default function WebDataConsumer() {
             if (accountOverviewRef.current) {
                 setAccountOverview(accountOverviewRef.current);
             }
+            if (webDataFetchedRef.current) {
+                setWebDataFetched(true);
+            }
         }, 1000);
 
         return () => {
@@ -102,6 +108,7 @@ export default function WebDataConsumer() {
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
             }
+            webDataFetchedRef.current = true;
         },
         [setCoins, setCoinPriceMap],
     );
