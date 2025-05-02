@@ -1,9 +1,8 @@
-import type { PositionIF } from '~/utils/position/PositionIFs';
-import styles from './PositionsTable.module.css';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useMemo } from 'react';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { PositionIF } from '~/utils/position/PositionIFs';
+import styles from './PositionsTable.module.css';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -33,10 +32,13 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
     const { buy, sell } = getBsColor();
     const baseColor = position.szi >= 0 ? buy : sell;
     function hexToRgba(hex: string, alpha: number): string {
-        const [r, g, b] = hex.replace('#', '').match(/.{2}/g)!.map((x) => parseInt(x, 16));
+        const [r, g, b] = hex
+            .replace('#', '')
+            .match(/.{2}/g)!
+            .map((x) => parseInt(x, 16));
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-      }
-      
+    }
+
     const gradientStyle = {
         background: `linear-gradient(
           to right,
@@ -47,27 +49,38 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         )`,
         paddingLeft: '8px',
         borderLeft: `1px solid ${baseColor}`,
-      };
-
-
+    };
 
     return (
         <div className={styles.rowContainer}>
             <div
                 className={`${styles.cell} ${styles.coinCell}`}
-                style={ gradientStyle}
+                style={gradientStyle}
             >
                 {position.coin}
                 {position.leverage.value && (
-                    <span className={styles.badge} style={{color: position.szi < 0 ? getBsColor().buy : getBsColor().sell}}>
+                    <span
+                        className={styles.badge}
+                        style={{
+                            color:
+                                position.szi >= 0
+                                    ? getBsColor().buy
+                                    : getBsColor().sell,
+                        }}
+                    >
                         {position.leverage.value}x
                     </span>
                 )}
             </div>
-            <div className={`${styles.cell} ${styles.sizeCell}`}
-            style={{color: position.szi < 0 ? getBsColor().buy : getBsColor().sell}}
+            <div
+                className={`${styles.cell} ${styles.sizeCell}`}
+                style={{
+                    color:
+                        position.szi >= 0
+                            ? getBsColor().buy
+                            : getBsColor().sell,
+                }}
             >
-
                 {Math.abs(position.szi)} {position.coin}
             </div>
             <div className={`${styles.cell} ${styles.positionValueCell}`}>
