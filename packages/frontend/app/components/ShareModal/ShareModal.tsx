@@ -6,6 +6,7 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
+import shareCardBackground from './shareCardBackground.png';
 
 interface propsIF {
     close: () => void;
@@ -34,7 +35,14 @@ console.log(memPosition.type);
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
-                <div className={styles.picture_overlay}>
+                <div
+                    className={styles.picture_overlay}
+                    style={{
+                        backgroundImage: `url(${shareCardBackground})`,
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                    }}
+                >
                     <div>perps</div>
                     <div className={styles.market}>
                         <div className={styles.market_tkn}>
