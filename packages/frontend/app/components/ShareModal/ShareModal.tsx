@@ -7,6 +7,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
 import shareCardBackground from './shareCardBackground.png';
+import perpsLogo from './perpsLogo.png';
 
 interface propsIF {
     close: () => void;
@@ -43,7 +44,16 @@ console.log(memPosition.type);
                         backgroundRepeat: 'no-repeat',
                     }}
                 >
-                    <div>perps</div>
+                    <img 
+                        src={perpsLogo} 
+                        alt="Description of the image"
+                        style={{
+                            width: '240px',
+                            height: 'auto',
+                            maxHeight: '300px',
+                            objectFit: 'cover'
+                        }}
+                    />
                     <div className={styles.market}>
                         <div className={styles.market_tkn}>
                             <div className={styles.symbol_icon}>
