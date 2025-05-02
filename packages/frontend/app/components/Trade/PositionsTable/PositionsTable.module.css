@@ -140,7 +140,7 @@
     padding-right: 8px;
 }
 
-.coinCellRed{
+/* .coinCellRed{
     background: linear-gradient(
         to right,
         rgba(255, 0, 0, 0.8) 0%,
@@ -163,7 +163,7 @@
       ) !important;
           padding-left: 8px;
         border-left: 1px solid var(--green);
-}
+} */
 
 @media (max-width: 1400px) {
     .rowContainer,
