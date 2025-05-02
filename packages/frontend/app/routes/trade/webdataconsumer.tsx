@@ -59,9 +59,7 @@ export default function WebDataConsumer() {
     useEffect(() => {
         if (!info) return;
         webDataFetchedRef.current = false;
-
-        setUserOrders([]);
-        openOrdersRef.current = [];
+        setWebDataFetched(false);
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
@@ -85,6 +83,8 @@ export default function WebDataConsumer() {
             }
             if (webDataFetchedRef.current) {
                 setWebDataFetched(true);
+            } else {
+                setWebDataFetched(false);
             }
         }, 1000);
 

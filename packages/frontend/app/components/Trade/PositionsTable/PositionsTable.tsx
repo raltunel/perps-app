@@ -1,21 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Pagination from '~/components/Pagination/Pagination';
+import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { TableState } from '~/utils/CommonIFs';
 import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import { useDebugStore } from '~/stores/DebugStore';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
 
 interface PositionsTableProps {
     pageMode?: boolean;
-}
-
-export enum TableState {
-    LOADING = 'loading',
-    EMPTY = 'empty',
-    FILLED = 'filled',
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
@@ -35,8 +30,6 @@ export default function PositionsTable(props: PositionsTableProps) {
     const { positions, webDataFetched } = useTradeDataStore();
     const limit = 10;
 
-    const { debugWallet } = useDebugStore();
-
     const positionsToShow = useMemo(() => {
         if (pageMode) {
             return positions.slice(
@@ -48,78 +41,67 @@ export default function PositionsTable(props: PositionsTableProps) {
     }, [positions, page, rowsPerPage, pageMode]);
 
     useEffect(() => {
-        setTableState(TableState.LOADING);
-    }, [debugWallet.address]);
-
-    useEffect(() => {
         if (webDataFetched) {
             if (positionsToShow.length > 0) {
                 setTableState(TableState.FILLED);
             } else {
                 setTableState(TableState.EMPTY);
             }
+        } else {
+            setTableState(TableState.LOADING);
         }
     }, [positionsToShow, webDataFetched]);
 
+    useEffect(() => {
+        console.log('>>> table state 2', tableState);
+    }, [tableState]);
+
     return (
         <div className={styles.tableWrapper}>
-            {/* <SkeletonTable
-                rows={7}
-                colRatios={[1, 2, 2, 1, 1, 3, 1, 1, 2, 3, 1]}
-            /> */}
-            {tableState === TableState.LOADING && (
+            {tableState === TableState.LOADING ? (
                 <SkeletonTable
                     rows={7}
                     colRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 />
-            )}
-
-            {tableState === TableState.FILLED && (
+            ) : (
                 <>
                     <PositionsTableHeader />
                     <div className={styles.tableBody}>
-                        {positionsToShow.map((position, index) => (
-                            <PositionsTableRow
-                                key={`position-${index}`}
-                                position={position}
-                            />
-                        ))}
-
-                        {positions.length === 0 && (
-                            <div
-                                className={styles.rowContainer}
-                                style={{
-                                    justifyContent: 'center',
-                                    padding: '2rem 0',
-                                }}
-                            >
-                                No open positions
-                            </div>
-                        )}
-
-                        {positions.length > limit && !pageMode && (
-                            <a
-                                href='#'
-                                className={styles.viewAllLink}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    handleViewAll();
-                                }}
-                            >
-                                View All
-                            </a>
-                        )}
-
-                        {pageMode && (
+                        {tableState === TableState.FILLED && (
                             <>
-                                <Pagination
-                                    totalCount={positions.length}
-                                    onPageChange={setPage}
-                                    rowsPerPage={rowsPerPage}
-                                    onRowsPerPageChange={setRowsPerPage}
-                                />
+                                {positionsToShow.map((position, index) => (
+                                    <PositionsTableRow
+                                        key={`position-${index}`}
+                                        position={position}
+                                    />
+                                ))}
+                                {positions.length > limit && !pageMode && (
+                                    <a
+                                        href='#'
+                                        className={styles.viewAllLink}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleViewAll();
+                                        }}
+                                    >
+                                        View All
+                                    </a>
+                                )}
+
+                                {pageMode && (
+                                    <>
+                                        <Pagination
+                                            totalCount={positions.length}
+                                            onPageChange={setPage}
+                                            rowsPerPage={rowsPerPage}
+                                            onRowsPerPageChange={setRowsPerPage}
+                                        />
+                                    </>
+                                )}
                             </>
                         )}
+
+                        {tableState === TableState.EMPTY && <NoDataRow />}
                     </div>
                 </>
             )}
