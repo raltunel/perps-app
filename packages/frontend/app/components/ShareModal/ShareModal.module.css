@@ -28,6 +28,11 @@
     flex-direction: row;
 }
 
+.symbol_icon {
+    width: 1.4rem;
+    height: 1.4rem;
+}
+
 .market_pct {
     color: var(--green);
     font-size: var(--font-size-xxl);

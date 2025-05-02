@@ -18,14 +18,20 @@ export default function ShareModal(props: propsIF) {
     const memPosition = useMemo<PositionIF>(() => position, []);
 
     const { formatNum } = useNumFormatter();
-    const { coinPriceMap } = useTradeDataStore();
+    const { coinPriceMap, symbol } = useTradeDataStore();
 
     const REFERRAL_CODE = '0x1';
 
     const TEXTAREA_ID_FOR_DOM = 'share_card_custom_text';
 
     const inputRef = useRef<HTMLTextAreaElement>(null);
-console.log(inputRef);
+
+    
+    const symbolFileName = useMemo<string>(() => {
+        const match = symbol.match(/^k([A-Z]+)$/);
+        return match ? match[1] : symbol;
+    }, [symbol]);
+
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -33,7 +39,12 @@ console.log(inputRef);
                     <div>perps</div>
                     <div className={styles.market}>
                         <div className={styles.market_tkn}>
-                            <div>logo</div>
+                            <div className={styles.symbol_icon}>
+                                <img
+                                    src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`}
+                                    alt={symbolFileName}
+                                />
+                            </div>
                             <div>ETH</div>
                             <div>Long 20x</div>
                         </div>
