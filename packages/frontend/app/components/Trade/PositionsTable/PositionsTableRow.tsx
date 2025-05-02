@@ -1,4 +1,3 @@
-import type { PositionIF } from '~/utils/position/PositionIFs';
 import styles from './PositionsTable.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
@@ -6,6 +5,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { RiExternalLinkLine } from "react-icons/ri";
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import ShareModal from '~/components/ShareModal/ShareModal';
+import type { PositionIF } from '~/utils/position/PositionIFs';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -32,21 +32,61 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         }
         return ret;
     };
+    const { buy, sell } = getBsColor();
+    const baseColor = position.szi >= 0 ? buy : sell;
+    function hexToRgba(hex: string, alpha: number): string {
+        const [r, g, b] = hex
+            .replace('#', '')
+            .match(/.{2}/g)!
+            .map((x) => parseInt(x, 16));
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    const gradientStyle = {
+        background: `linear-gradient(
+          to right,
+          ${hexToRgba(baseColor, 0.8)} 0%,
+          ${hexToRgba(baseColor, 0.5)} 5%,
+          ${hexToRgba(baseColor, 0.2)} 14%,
+          transparent 100%
+        )`,
+        paddingLeft: '8px',
+        borderLeft: `1px solid ${baseColor}`,
+    };
 
     const shareModalCtrl: useModalIF = useModal('closed');
 
     return (
         <div className={styles.rowContainer}>
-            <div className={`${styles.cell} ${styles.coinCell}`}>
+            <div
+                className={`${styles.cell} ${styles.coinCell}`}
+                style={gradientStyle}
+            >
                 {position.coin}
                 {position.leverage.value && (
-                    <span className={styles.badge}>
+                    <span
+                        className={styles.badge}
+                        style={{
+                            color:
+                                position.szi >= 0
+                                    ? getBsColor().buy
+                                    : getBsColor().sell,
+                        }}
+                    >
                         {position.leverage.value}x
                     </span>
                 )}
             </div>
-            <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {position.szi} {position.coin}
+            <div
+                className={`${styles.cell} ${styles.sizeCell}`}
+                style={{
+                    color:
+                        position.szi >= 0
+                            ? getBsColor().buy
+                            : getBsColor().sell,
+                }}
+            >
+                {Math.abs(position.szi)} {position.coin}
             </div>
             <div className={`${styles.cell} ${styles.positionValueCell}`}>
                 {formatNum(position.positionValue, null, true, true)}
