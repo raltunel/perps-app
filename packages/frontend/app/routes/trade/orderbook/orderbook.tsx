@@ -20,6 +20,8 @@ import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
+import { TableState } from '~/utils/CommonIFs';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -28,11 +30,15 @@ interface OrderBookProps {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     // FIXME: data is not rendered on UI
 
+    const loaderPreview = true;
+
     const { info } = useSdk();
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
+    
+    const [orderBookState, setOrderBookState] = useState(TableState.LOADING)
 
     // added to pass true resolution to orderrow components
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
@@ -168,8 +174,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
 
     const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) =>
-            setOrderBook(data.buys, data.sells),
+        ({ data }: { data: OrderBookOutput }) => {
+            setOrderBook(data.buys, data.sells)
+            setOrderBookState(TableState.FILLED)
+        },
         [setOrderBook],
     );
 
@@ -188,6 +196,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
         if (!info) return;
+
+        setOrderBookState(TableState.LOADING)
 
         if (selectedResolution) {
             const subKey = {
@@ -210,6 +220,30 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             return unsubscribe;
         }
     }, [selectedResolution, info]);
+
+    const midHeader = useCallback((id: string) => {
+        return (
+
+            <div
+                id={id}
+                className={styles.orderBookBlockMid}
+            >
+                <div>Spread</div>
+            <div>{selectedResolution?.val}</div>
+            <div>
+                {symbolInfo?.markPx &&
+                    selectedResolution?.val &&
+                    (
+                        (selectedResolution?.val /
+                            symbolInfo?.markPx) *
+                        100
+                    ).toFixed(3)}
+                %
+            </div>
+        </div>
+            
+        );
+    }, []);
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
@@ -295,7 +329,33 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             <BasicDivider />
 
-            {buys.length > 0 &&
+            {orderBookState === TableState.LOADING && (
+                <div className={styles.skeletonWrapper}>
+                    <div className={styles.orderBookBlock}>
+                        {
+                            Array.from({length: orderCount}).map((_, index) => (
+                                <div key={index} className={styles.orderRowWrapper}>
+                                    <SkeletonNode width={100 - index * 10 + Math.random() * 20} />
+                                </div>
+                            ))
+                        }
+                    </div>
+                        {midHeader('orderBookMidHeader2')}
+<div className={styles.orderBookBlock}>{
+    Array.from({length: orderCount}).map((_, index) => (
+        <div key={index} className={styles.orderRowWrapper}>
+            <SkeletonNode width={10 + index * 10 + Math.random() * 20}/>
+        </div>
+    ))
+}
+
+                </div>
+                </div>
+            )}
+
+            {
+            orderBookState === TableState.FILLED &&
+            buys.length > 0 &&
                 sells.length > 0 &&
                 buys[0].coin === symbol &&
                 sells[0].coin === symbol && (
@@ -338,23 +398,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                 ))}
                         </div>
 
-                        <div
-                            id='orderBookMidHeader'
-                            className={styles.orderBookBlockMid}
-                        >
-                            <div>Spread</div>
-                            <div>{selectedResolution?.val}</div>
-                            <div>
-                                {symbolInfo?.markPx &&
-                                    selectedResolution?.val &&
-                                    (
-                                        (selectedResolution?.val /
-                                            symbolInfo?.markPx) *
-                                        100
-                                    ).toFixed(3)}
-                                %
-                            </div>
-                        </div>
+                        {midHeader('orderBookMidHeader')}
 
                         <div className={styles.orderBookBlock}>
                             {buys.slice(0, orderCount).map((order, index) => (
