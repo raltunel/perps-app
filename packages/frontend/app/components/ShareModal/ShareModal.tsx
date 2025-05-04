@@ -72,7 +72,7 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                                     backgroundColor: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}-dark)`,
                                 }}
                             >
-                                {(memPosition.szi > 0 ? 'Long' : 'Short') + memPosition.leverage.value}x
+                                {(memPosition.szi > 0 ? 'Long' : 'Short') + ' ' + memPosition.leverage.value}x
                             </div>
                         </div>
                         <div className={styles.market_pct}>
