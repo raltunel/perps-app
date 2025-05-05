@@ -22,7 +22,7 @@ export default function ShareModal(props: propsIF) {
     const memPosition = useMemo<PositionIF>(() => position, []);
 
     const { formatNum } = useNumFormatter();
-    const { coinPriceMap, symbol } = useTradeDataStore();
+    const { coinPriceMap } = useTradeDataStore();
 
     const REFERRAL_CODE = '0x1';
 
@@ -31,9 +31,9 @@ export default function ShareModal(props: propsIF) {
     const inputRef = useRef<HTMLTextAreaElement>(null);
 
     const symbolFileName = useMemo<string>(() => {
-        const match = symbol.match(/^k([A-Z]+)$/);
-        return match ? match[1] : symbol;
-    }, [symbol]);
+        const match = position.coin.match(/^k([A-Z]+)$/);
+        return match ? match[1] : position.coin;
+    }, [position]);
 
     return (
         <Modal title='' close={close}>
