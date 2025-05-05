@@ -327,43 +327,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             <BasicDivider />
 
             {orderBookState === TableState.LOADING && (
-                <motion.div
-                    className={styles.skeletonWrapper}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 10 }}
-                    transition={{ duration: 0.2 }}
-                >
-                    <div className={styles.orderBookBlock}>
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={
-                                        100 -
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    {midHeader('orderBookMidHeader2')}
-                    <div className={styles.orderBookBlock}>
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={
-                                        100 / orderCount +
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
-                                />
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
+                <Spinner size={40} absolute />
             )}
 
             {orderBookState === TableState.FILLED &&
