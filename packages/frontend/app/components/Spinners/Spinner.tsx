@@ -15,7 +15,7 @@ const Spinner: React.FC<SpinnerProps> = ({ size = 48, absolute = false }) => {
             <motion.div
                 className={`${styles.spinnerWrapper} ${absolute ? styles.absolute : ''}`}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
+                animate={{ opacity: 0.3 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
             >
