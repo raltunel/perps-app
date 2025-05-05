@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { LuCopy } from 'react-icons/lu';
 import { RiArrowDownLine, RiTwitterFill } from 'react-icons/ri';
+import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
@@ -35,6 +36,9 @@ export default function ShareModal(props: propsIF) {
         return match ? match[1] : position.coin;
     }, [position]);
 
+    const bgType =
+        tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
+
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -58,7 +62,12 @@ export default function ShareModal(props: propsIF) {
                     />
                     <div className={styles.market}>
                         <div className={styles.market_tkn}>
-                            <div className={styles.symbol_icon}>
+                            <div
+                                className={styles.symbol_icon}
+                                style={{
+                                    background: `var(--${bgType === 'light' ? 'text1' : 'dark1'})`,
+                                }}
+                            >
                                 <img
                                     src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`}
                                     alt={symbolFileName}
@@ -106,7 +115,10 @@ export default function ShareModal(props: propsIF) {
                     </div>
                     <div className={styles.price}>
                         <div>Referral code:</div>
-                        <div>https://perps.ambient.finance/join</div>
+                        <div>
+                            {`https://perps.ambient.finance/join/` +
+                                REFERRAL_CODE}
+                        </div>
                     </div>
                 </div>
                 <div className={styles.info}>
@@ -123,7 +135,7 @@ export default function ShareModal(props: propsIF) {
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            value={`Trade ${memPosition.coin} Perps seamlessly on ${PERPS_TWITTER} using my referral code`}
+                            value={`Trade $${memPosition.coin} perps seamlessly on ${PERPS_TWITTER} using my referral code`}
                         />
                     </div>
                     <div className={styles.button_bank}>

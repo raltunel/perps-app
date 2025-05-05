@@ -31,6 +31,7 @@
 .symbol_icon {
     width: 30px;
     height: 30px;
+    border-radius: 16px;
 }
 
 .symbol {
@@ -47,7 +48,6 @@
 }
 
 .market_pct {
-    color: var(--green);
     font-size: var(--font-size-xxl);
 }
 
