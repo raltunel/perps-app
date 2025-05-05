@@ -9,8 +9,6 @@
     position: relative;
 }
 
-  
-
 .headerContainer {
     background: var(--dark2);
     width: 100%;
@@ -78,11 +76,12 @@
 }
 
 .badge {
-    background: var(--dark3);
-    border-radius: 2px;
+    background: var(--accent1);
+    border-radius: 4px;
     padding: 2px 4px;
     display: inline-block;
-    font-size: var(--font-size-xs, 10px);
+    font-size: var(--font-size-s, 12px);
+    margin-left: 8px;
 }
 
 .actionButton {
