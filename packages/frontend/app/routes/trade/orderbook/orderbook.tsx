@@ -22,6 +22,8 @@ import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { TableState } from '~/utils/CommonIFs';
+import { motion } from 'framer-motion';
+
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -37,8 +39,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
-    
-    const [orderBookState, setOrderBookState] = useState(TableState.LOADING)
+
+    const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     // added to pass true resolution to orderrow components
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
@@ -175,8 +177,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const handleOrderBookWorkerResult = useCallback(
         ({ data }: { data: OrderBookOutput }) => {
-            setOrderBook(data.buys, data.sells)
-            setOrderBookState(TableState.FILLED)
+            setOrderBook(data.buys, data.sells);
+            setOrderBookState(TableState.FILLED);
         },
         [setOrderBook],
     );
@@ -197,7 +199,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     useEffect(() => {
         if (!info) return;
 
-        setOrderBookState(TableState.LOADING)
+        setOrderBookState(TableState.LOADING);
 
         if (selectedResolution) {
             const subKey = {
@@ -223,25 +225,19 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const midHeader = useCallback((id: string) => {
         return (
-
-            <div
-                id={id}
-                className={styles.orderBookBlockMid}
-            >
+            <div id={id} className={styles.orderBookBlockMid}>
                 <div>Spread</div>
-            <div>{selectedResolution?.val}</div>
-            <div>
-                {symbolInfo?.markPx &&
-                    selectedResolution?.val &&
-                    (
-                        (selectedResolution?.val /
-                            symbolInfo?.markPx) *
-                        100
-                    ).toFixed(3)}
-                %
+                <div>{selectedResolution?.val}</div>
+                <div>
+                    {symbolInfo?.markPx &&
+                        selectedResolution?.val &&
+                        (
+                            (selectedResolution?.val / symbolInfo?.markPx) *
+                            100
+                        ).toFixed(3)}
+                    %
+                </div>
             </div>
-        </div>
-            
         );
     }, []);
 
@@ -330,108 +326,134 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             <BasicDivider />
 
             {orderBookState === TableState.LOADING && (
-                <div className={styles.skeletonWrapper}>
+                <motion.div
+                    className={styles.skeletonWrapper}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    transition={{ duration: 0.2 }}
+                >
                     <div className={styles.orderBookBlock}>
-                        {
-                            Array.from({length: orderCount}).map((_, index) => (
-                                <div key={index} className={styles.orderRowWrapper}>
-                                    <SkeletonNode width={100 - index * 10 + Math.random() * 20} />
-                                </div>
-                            ))
-                        }
+                        {Array.from({ length: orderCount }).map((_, index) => (
+                            <div key={index} className={styles.orderRowWrapper}>
+                                <SkeletonNode
+                                    width={
+                                        100 -
+                                        index * (100 / orderCount) +
+                                        Math.random() * 20
+                                    }
+                                />
+                            </div>
+                        ))}
                     </div>
-                        {midHeader('orderBookMidHeader2')}
-<div className={styles.orderBookBlock}>{
-    Array.from({length: orderCount}).map((_, index) => (
-        <div key={index} className={styles.orderRowWrapper}>
-            <SkeletonNode width={10 + index * 10 + Math.random() * 20}/>
-        </div>
-    ))
-}
-
-                </div>
-                </div>
+                    {midHeader('orderBookMidHeader2')}
+                    <div className={styles.orderBookBlock}>
+                        {Array.from({ length: orderCount }).map((_, index) => (
+                            <div key={index} className={styles.orderRowWrapper}>
+                                <SkeletonNode
+                                    width={
+                                        100 / orderCount +
+                                        index * (100 / orderCount) +
+                                        Math.random() * 20
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
             )}
 
-            {
-            orderBookState === TableState.FILLED &&
-            buys.length > 0 &&
+            {orderBookState === TableState.FILLED &&
+                buys.length > 0 &&
                 sells.length > 0 &&
                 buys[0].coin === symbol &&
                 sells[0].coin === symbol && (
                     <>
-                        <div className={styles.orderBookBlock}>
-                            {sells
-                                .slice(0, orderCount)
-                                .reverse()
-                                .map((order, index) => (
-                                    <div
-                                        key={index}
-                                        className={styles.orderRowWrapper}
-                                    >
-                                        <OrderRow
-                                            rowIndex={index}
-                                            key={order.px}
-                                            order={order}
-                                            coef={
-                                                selectedMode === 'symbol'
-                                                    ? 1
-                                                    : (symbolInfo?.markPx ?? 0)
-                                            }
-                                            resolution={
-                                                filledResolution.current
-                                            }
-                                            userSlots={userSellSlots}
-                                            clickListener={rowClickHandler}
-                                        />
+                        <motion.div
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <div className={styles.orderBookBlock}>
+                                {sells
+                                    .slice(0, orderCount)
+                                    .reverse()
+                                    .map((order, index) => (
                                         <div
-                                            className={styles.ratioBar}
-                                            style={{
-                                                width: `${order.ratio * 100}%`,
-                                                backgroundColor:
-                                                    order.type === 'sell'
-                                                        ? getBsColor().sell
-                                                        : getBsColor().buy,
-                                            }}
-                                        ></div>
-                                    </div>
-                                ))}
-                        </div>
+                                            key={index}
+                                            className={styles.orderRowWrapper}
+                                        >
+                                            <OrderRow
+                                                rowIndex={index}
+                                                key={order.px}
+                                                order={order}
+                                                coef={
+                                                    selectedMode === 'symbol'
+                                                        ? 1
+                                                        : (symbolInfo?.markPx ??
+                                                          0)
+                                                }
+                                                resolution={
+                                                    filledResolution.current
+                                                }
+                                                userSlots={userSellSlots}
+                                                clickListener={rowClickHandler}
+                                            />
+                                            <div
+                                                className={styles.ratioBar}
+                                                style={{
+                                                    width: `${order.ratio * 100}%`,
+                                                    backgroundColor:
+                                                        order.type === 'sell'
+                                                            ? getBsColor().sell
+                                                            : getBsColor().buy,
+                                                }}
+                                            ></div>
+                                        </div>
+                                    ))}
+                            </div>
 
-                        {midHeader('orderBookMidHeader')}
+                            {midHeader('orderBookMidHeader')}
 
-                        <div className={styles.orderBookBlock}>
-                            {buys.slice(0, orderCount).map((order, index) => (
-                                <div
-                                    key={index}
-                                    className={styles.orderRowWrapper}
-                                >
-                                    <OrderRow
-                                        rowIndex={index}
-                                        key={order.px}
-                                        order={order}
-                                        coef={
-                                            selectedMode === 'symbol'
-                                                ? 1
-                                                : (symbolInfo?.markPx ?? 0)
-                                        }
-                                        resolution={filledResolution.current}
-                                        userSlots={userBuySlots}
-                                        clickListener={rowClickHandler}
-                                    />
-                                    <div
-                                        className={styles.ratioBar}
-                                        style={{
-                                            width: `${order.ratio * 100}%`,
-                                            backgroundColor:
-                                                order.type === 'buy'
-                                                    ? getBsColor().buy
-                                                    : getBsColor().sell,
-                                        }}
-                                    ></div>
-                                </div>
-                            ))}
-                        </div>
+                            <div className={styles.orderBookBlock}>
+                                {buys
+                                    .slice(0, orderCount)
+                                    .map((order, index) => (
+                                        <div
+                                            key={index}
+                                            className={styles.orderRowWrapper}
+                                        >
+                                            <OrderRow
+                                                rowIndex={index}
+                                                key={order.px}
+                                                order={order}
+                                                coef={
+                                                    selectedMode === 'symbol'
+                                                        ? 1
+                                                        : (symbolInfo?.markPx ??
+                                                          0)
+                                                }
+                                                resolution={
+                                                    filledResolution.current
+                                                }
+                                                userSlots={userBuySlots}
+                                                clickListener={rowClickHandler}
+                                            />
+                                            <div
+                                                className={styles.ratioBar}
+                                                style={{
+                                                    width: `${order.ratio * 100}%`,
+                                                    backgroundColor:
+                                                        order.type === 'buy'
+                                                            ? getBsColor().buy
+                                                            : getBsColor().sell,
+                                                }}
+                                            ></div>
+                                        </div>
+                                    ))}
+                            </div>
+                        </motion.div>
                     </>
                 )}
         </div>
