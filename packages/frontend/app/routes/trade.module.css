@@ -1,4 +1,10 @@
-.mainContainer{
+html,
+body {
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+}
+
+.mainContainer {
     height: 100%;
     
     display: grid;
