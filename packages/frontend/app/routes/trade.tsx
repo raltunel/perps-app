@@ -35,6 +35,15 @@ export default function Trade() {
     //     console.log({ wsManager: info.wsManager });
     // }, []);
 
+    useEffect(() => {
+        document.body.style.overscrollBehaviorX = 'none';
+        document.body.style.touchAction = 'pan-y';
+        return () => {
+            document.body.style.overscrollBehaviorX = 'auto';
+            document.body.style.touchAction = 'auto';
+        };
+    }, []);
+
     // logic to automatically redirect the user if they land on a
     // ... route with no token symbol in the URL
     useEffect(() => {
