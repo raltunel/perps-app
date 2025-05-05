@@ -340,7 +340,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                     width={
                                         100 -
                                         index * (100 / orderCount) +
-                                        Math.random() * 20
+                                        Math.random() * 20 +
+                                        '%'
                                     }
                                 />
                             </div>
@@ -354,7 +355,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                     width={
                                         100 / orderCount +
                                         index * (100 / orderCount) +
-                                        Math.random() * 20
+                                        Math.random() * 20 +
+                                        '%'
                                     }
                                 />
                             </div>
