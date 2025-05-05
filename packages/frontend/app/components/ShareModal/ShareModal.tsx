@@ -1,15 +1,15 @@
 import { useMemo, useRef } from 'react';
-import Button from '../Button/Button';
-import Modal from '../Modal/Modal';
-import styles from './ShareModal.module.css';
-import type { PositionIF } from '~/utils/position/PositionIFs';
+import { LuCopy } from 'react-icons/lu';
+import { RiArrowDownLine, RiTwitterFill } from 'react-icons/ri';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
-import shareCardBackground from './shareCardBackground.png';
+import type { PositionIF } from '~/utils/position/PositionIFs';
+import Button from '../Button/Button';
+import Modal from '../Modal/Modal';
 import perpsLogo from './perpsLogo.png';
-import { RiArrowDownLine, RiTwitterFill } from 'react-icons/ri';
-import { LuCopy } from 'react-icons/lu';
+import shareCardBackground from './shareCardBackground.png';
+import styles from './ShareModal.module.css';
 
 interface propsIF {
     close: () => void;
@@ -34,7 +34,7 @@ export default function ShareModal(props: propsIF) {
         const match = symbol.match(/^k([A-Z]+)$/);
         return match ? match[1] : symbol;
     }, [symbol]);
-console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
+
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -46,14 +46,14 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                         backgroundRepeat: 'no-repeat',
                     }}
                 >
-                    <img 
-                        src={perpsLogo} 
-                        alt="Description of the image"
+                    <img
+                        src={perpsLogo}
+                        alt='Description of the image'
                         style={{
                             width: '240px',
                             height: 'auto',
                             maxHeight: '300px',
-                            objectFit: 'cover'
+                            objectFit: 'cover',
                         }}
                     />
                     <div className={styles.market}>
@@ -64,19 +64,30 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                                     alt={symbolFileName}
                                 />
                             </div>
-                            <div className={styles.symbol}>{memPosition.coin}</div>
+                            <div className={styles.symbol}>
+                                {memPosition.coin}
+                            </div>
                             <div
                                 className={styles.yield}
                                 style={{
-                                    color: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'})`,
-                                    backgroundColor: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}-dark)`,
+                                    color: `var(--${memPosition.szi > 0 ? 'green' : 'red'})`,
+                                    backgroundColor: `var(--${memPosition.szi > 0 ? 'green' : 'red'}-dark)`,
                                 }}
                             >
-                                {(memPosition.szi > 0 ? 'Long' : 'Short') + ' ' + memPosition.leverage.value}x
+                                {(memPosition.szi > 0 ? 'Long' : 'Short') +
+                                    ' ' +
+                                    memPosition.leverage.value}
+                                x
                             </div>
                         </div>
-                        <div className={styles.market_pct}>
-                            {memPosition.returnOnEquity > 0 && '+'}{formatNum(position.returnOnEquity * 100, 1)}%
+                        <div
+                            className={styles.market_pct}
+                            style={{
+                                color: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'})`,
+                            }}
+                        >
+                            {memPosition.returnOnEquity > 0 && '+'}
+                            {formatNum(memPosition.returnOnEquity * 100, 1)}%
                         </div>
                     </div>
                     <div className={styles.prices}>
@@ -86,7 +97,11 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                         </div>
                         <div className={styles.price}>
                             <div>Mark Price</div>
-                            <div>{formatNum(coinPriceMap.get(memPosition.coin) ?? 0)}</div>
+                            <div>
+                                {formatNum(
+                                    coinPriceMap.get(memPosition.coin) ?? 0,
+                                )}
+                            </div>
                         </div>
                     </div>
                     <div className={styles.price}>
@@ -100,19 +115,27 @@ console.log(`var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'}}-dark)`);
                         <div>{REFERRAL_CODE}</div>
                     </div>
                     <div className={styles.custom_text}>
-                        <label htmlFor={TEXTAREA_ID_FOR_DOM}>Customize your text</label>
+                        <label htmlFor={TEXTAREA_ID_FOR_DOM}>
+                            Customize your text
+                        </label>
                         <textarea
                             id={TEXTAREA_ID_FOR_DOM}
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            placeholder={`eg: Trade $BTC Perps seamlessly on ${PERPS_TWITTER} using my referral code`}
+                            value={`Trade ${memPosition.coin} Perps seamlessly on ${PERPS_TWITTER} using my referral code`}
                         />
                     </div>
                     <div className={styles.button_bank}>
-                        <Button size='medium'>Save Image <RiArrowDownLine /></Button>
-                        <Button size='medium'>Copy Link <LuCopy /></Button>
-                        <Button size='medium'>Share on X <RiTwitterFill /></Button>
+                        <Button size='medium'>
+                            Save Image <RiArrowDownLine />
+                        </Button>
+                        <Button size='medium'>
+                            Copy Link <LuCopy />
+                        </Button>
+                        <Button size='medium'>
+                            Share on X <RiTwitterFill />
+                        </Button>
                     </div>
                 </div>
             </div>
