@@ -9,6 +9,7 @@
 .orderBookContainer {
     width: 100%;
     font-size: 0.8rem;
+    position: relative;
 }
 
 .orderBookBlockMid {

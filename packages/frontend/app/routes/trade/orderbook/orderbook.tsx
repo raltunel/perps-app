@@ -23,6 +23,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { TableState } from '~/utils/CommonIFs';
 import { motion } from 'framer-motion';
+import Spinner from '~/components/Spinners/Spinner';
 
 interface OrderBookProps {
     symbol: string;
