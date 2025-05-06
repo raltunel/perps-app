@@ -1,3 +1,6 @@
+import { RiExternalLinkLine } from 'react-icons/ri';
+import ShareModal from '~/components/ShareModal/ShareModal';
+import { type useModalIF, useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -43,13 +46,16 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         background: `linear-gradient(
           to right,
           ${hexToRgba(baseColor, 0.8)} 0%,
-          ${hexToRgba(baseColor, 0.5)} 5%,
-          ${hexToRgba(baseColor, 0.2)} 14%,
+          ${hexToRgba(baseColor, 0.5)} 1%,
+          ${hexToRgba(baseColor, 0.2)} 2%,
+          ${hexToRgba(baseColor, 0)} 4%,
           transparent 100%
         )`,
         paddingLeft: '8px',
         borderLeft: `1px solid ${baseColor}`,
     };
+
+    const shareModalCtrl: useModalIF = useModal('closed');
 
     return (
         <div className={styles.rowContainer}>
@@ -62,10 +68,11 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                     <span
                         className={styles.badge}
                         style={{
-                            color:
-                                position.szi >= 0
-                                    ? getBsColor().buy
-                                    : getBsColor().sell,
+                            color: 'var(--text1)',
+                            // color:
+                            //     position.szi >= 0
+                            //         ? getBsColor().buy
+                            //         : getBsColor().sell,
                         }}
                     >
                         {position.leverage.value}x
@@ -105,6 +112,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
+                <RiExternalLinkLine onClick={shareModalCtrl.open} />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
@@ -134,6 +142,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                     <button className={styles.actionButton}>Market</button>
                 </div>
             </div>
+            {shareModalCtrl.isOpen && (
+                <ShareModal close={shareModalCtrl.close} position={position} />
+            )}
         </div>
     );
 }
