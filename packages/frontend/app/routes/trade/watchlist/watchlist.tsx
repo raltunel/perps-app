@@ -6,9 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlist.module.css';
 import WatchListNode from './watchlistnode/watchlistnode';
 
-interface WatchListProps {}
-
-const WatchList: React.FC<WatchListProps> = ({}) => {
+const WatchList: React.FC = () => {
     const { favCoins } = useTradeDataStore();
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(

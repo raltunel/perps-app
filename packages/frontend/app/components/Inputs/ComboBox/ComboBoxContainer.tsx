@@ -1,19 +1,14 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './ComboBox.module.css'
-import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
 import { useDebugStore } from '~/stores/DebugStore';
-import ComboBox from './ComboBox';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
+import ComboBox from './ComboBox';
+import styles from './ComboBox.module.css';
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
-    const { orderBookMode } = useAppSettings();
-    const { marketId } = useParams<{ marketId: string }>();
-    const navigate = useNavigate();
     const {
         wsUrl,
         setWsUrl,

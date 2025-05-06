@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import styles from './NoDataRow.module.css';
 import { motion } from 'framer-motion';
 import { MdSearchOff } from 'react-icons/md';
+import styles from './NoDataRow.module.css';
 
 interface NoDataRowProps {
     text?: string;

@@ -1,33 +1,33 @@
 import { useEffect, useMemo, useState } from 'react';
-import styles from './OrderInput.module.css';
-import OrderDropdown from './OrderDropdown/OrderDropdown';
-import LeverageSlider from './LeverageSlider/LeverageSlider';
-import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import SizeInput from './SizeInput/SizeInput';
-import PriceInput from './PriceInput/PriceInput';
-import StopPrice from './StopPrice/StopPrice';
-import PositionSize from './PositionSIze/PositionSize';
-import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
-import ChasePrice from './ChasePrice/ChasePrice';
-import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
-import PriceRange from './PriceRange/PriceRange';
-import RunningTime from './RunningTime/RunningTime';
-import { useModal, type useModalIF } from '~/hooks/useModal';
-import Modal from '~/components/Modal/Modal';
-import MarginModal from './MarginModal/MarginModal';
 import { FiChevronDown } from 'react-icons/fi';
-import ScaleOrders from './ScaleOrders/ScaleOrders';
-import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
-import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
-import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import Modal from '~/components/Modal/Modal';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import { useModal, type useModalIF } from '~/hooks/useModal';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
+import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
+import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
+import ChasePrice from './ChasePrice/ChasePrice';
+import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
+import LeverageSlider from './LeverageSlider/LeverageSlider';
+import MarginModal from './MarginModal/MarginModal';
+import OrderDropdown from './OrderDropdown/OrderDropdown';
+import styles from './OrderInput.module.css';
+import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
+import PositionSize from './PositionSIze/PositionSize';
+import PriceInput from './PriceInput/PriceInput';
+import PriceRange from './PriceRange/PriceRange';
+import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+import RunningTime from './RunningTime/RunningTime';
+import ScaleOrders from './ScaleOrders/ScaleOrders';
+import SizeInput from './SizeInput/SizeInput';
+import StopPrice from './StopPrice/StopPrice';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -102,12 +102,7 @@ export default function OrderInput() {
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
-    const {
-        formatNum,
-        parseFormattedNum,
-        formatNumWithOnlyDecimals,
-        parseFormattedWithOnlyDecimals,
-    } = useNumFormatter();
+    const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
 

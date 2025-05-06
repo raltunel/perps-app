@@ -5,21 +5,10 @@ import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import type { Route } from '../../+types/root';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './orderHistory.module.css';
-export function meta({}: Route.MetaArgs) {
-    return [
-        { title: 'Perps - Positions' },
-        { name: 'description', content: 'Welcome to React Router!' },
-    ];
-}
 
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
-}
-
-function OrderHistory({ loaderData }: Route.ComponentProps) {
+function OrderHistory() {
     const { address } = useParams<{ address: string }>();
 
     const [isFetched, setIsFetched] = useState(false);

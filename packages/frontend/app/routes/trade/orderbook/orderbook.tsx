@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useSdk } from '~/hooks/useSdk';
+import { useWorker } from '~/hooks/useWorker';
+import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -16,10 +20,6 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -327,7 +327,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                         <div
                                             className={styles.ratioBar}
                                             style={{
-                                                width: `${order.ratio * 100}%`,
+                                                width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                                 backgroundColor:
                                                     order.type === 'sell'
                                                         ? getBsColor().sell
@@ -378,7 +378,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                     <div
                                         className={styles.ratioBar}
                                         style={{
-                                            width: `${order.ratio * 100}%`,
+                                            width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                             backgroundColor:
                                                 order.type === 'buy'
                                                     ? getBsColor().buy
