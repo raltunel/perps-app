@@ -1,0 +1,131 @@
+.share_modal {
+    display: flex;
+    flex-direction: row;
+    max-width: 1200px;
+    padding: 0 24px;
+    gap: 24px;
+    font-family: var(--font-family-main);
+    background-color: var(--dark3);
+}
+
+.picture_overlay {
+    display: grid;
+    grid-template-rows: 3fr 5fr 1fr 1fr;
+    width: 900px;
+    height: 500px;
+    padding: 32px;
+}
+
+.market {
+    display: flex;
+    flex-direction: column;
+}
+
+.market_tkn {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.symbol_icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 16px;
+}
+
+.symbol {
+    font-size: var(--font-size-l);
+}
+
+.yield {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 4px;
+    border-radius: var(--half-border-radius);
+}
+
+.market_pct {
+    font-size: var(--font-size-xxl);
+}
+
+.prices {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.price > div:first-child {
+    font-size: var(--text-size-m);
+    color: var(--text2);
+}
+
+.price > div:last-child {
+    font-size: var(--text-size-m);
+    color: var(--text1);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 240px;
+}
+
+.referral_code {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: var(--text2);
+    font-size: var(--font-size-m);
+}
+
+.referral_code > div:last-child {
+    color: var(--accent3);
+}
+
+.custom_text {
+    display: flex;
+    flex-direction: column;
+}
+
+.custom_text > label {
+    color: var(--text1);
+}
+
+.custom_text > textarea {
+    height: 160px;
+    width: 240px;
+    padding: 8px;
+    color: var(--white);
+    background-color: var(--dark4);
+    border: none;
+    resize: none;
+    overflow: hidden;
+    color: var(--white);
+    font-size: var(--font-size-s) !important;
+}
+
+.button_bank {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.button_bank > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--font-size-m);
+    color: var(--text1);
+    background-color: var(--accent1);
+}

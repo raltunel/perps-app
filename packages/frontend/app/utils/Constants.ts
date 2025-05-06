@@ -101,6 +101,10 @@ export const OrderHistoryLimits = {
 
 export * from './feeSchedule';
 
+export const TWITTER_CHARACTER_LIMIT = 240;
+
+export const PERPS_TWITTER = '@AmbientPerps';
+
 export enum WsChannels {
     ORDERBOOK = 'l2Book',
     ORDERBOOK_TRADES = 'trades',
