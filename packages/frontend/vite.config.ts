@@ -20,6 +20,7 @@ export default defineConfig(({ isSsrBuild }) => ({
             workbox: {
                 maximumFileSizeToCacheInBytes: 3000000,
             },
+            manifest: false,
         }),
     ],
 }));
