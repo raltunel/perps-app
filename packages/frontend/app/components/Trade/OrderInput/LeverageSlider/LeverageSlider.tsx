@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './LeverageSlider.module.css';
 
 interface LeverageSliderProps {
@@ -32,7 +32,6 @@ export default function LeverageSlider({
 
     // Generate logarithmically distributed tick marks
     useEffect(() => {
-        console.log('Min:', minimumInputValue, 'Max:', maximumInputValue);
         // Check for valid inputs
         if (
             !isNaN(minimumInputValue) &&

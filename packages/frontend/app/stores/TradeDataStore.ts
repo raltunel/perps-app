@@ -1,11 +1,14 @@
 import { create } from 'zustand';
-import { setLS } from '~/utils/AppUtils';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { createUserTradesSlice, type UserTradeStore } from './UserOrderStore';
 import { persist } from 'zustand/middleware';
+import { setLS } from '~/utils/AppUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import {
+    createUserTradesSlice,
+    type UserTradeDataStore,
+} from './UserTradeDataStore';
 
-type TradeDataStore = UserTradeStore & {
+type TradeDataStore = UserTradeDataStore & {
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
@@ -26,6 +29,12 @@ type TradeDataStore = UserTradeStore & {
     setObChosenAmount: (amount: number) => void;
     selectedCurrency: string;
     setSelectedCurrency: (currency: string) => void;
+    selectedTradeTab: string;
+    setSelectedTradeTab: (tab: string) => void;
+    webDataFetched: boolean;
+    setWebDataFetched: (fetched: boolean) => void;
+    orderHistoryFetched: boolean;
+    setOrderHistoryFetched: (fetched: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -95,12 +104,26 @@ const useTradeDataStore = create<TradeDataStore>()(
             selectedCurrency: 'USD',
             setSelectedCurrency: (currency: string) =>
                 set({ selectedCurrency: currency }),
+            selectedTradeTab: 'Positions',
+            setSelectedTradeTab: (tab: string) => {
+                set({ selectedTradeTab: tab });
+            },
+            webDataFetched: false,
+            setWebDataFetched: (fetched: boolean) =>
+                set({ webDataFetched: fetched }),
+            orderHistoryFetched: false,
+            setOrderHistoryFetched: (fetched: boolean) =>
+                set({ orderHistoryFetched: fetched }),
         }),
         {
             name: 'TRADE_DATA',
             partialize: (state) => ({
                 favKeys: state.favKeys,
                 symbol: state.symbol,
+                selectedTradeTab:
+                    state.selectedTradeTab === 'Balances'
+                        ? 'Positions'
+                        : state.selectedTradeTab,
             }),
         },
     ),

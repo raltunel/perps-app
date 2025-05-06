@@ -42,12 +42,12 @@ export const createResolutionObjectForVal = (
     };
 };
 
-const floorNum = (num: number, precision?: number) => {
-    if (precision) {
-        return Math.floor(num * Math.pow(10, precision));
-    }
-    return Math.floor(num);
-};
+// const floorNum = (num: number, precision?: number) => {
+//     if (precision) {
+//         return Math.floor(num * Math.pow(10, precision));
+//     }
+//     return Math.floor(num);
+// };
 
 export const parseNum = (val: string | number) => {
     return Number(val);
@@ -196,6 +196,26 @@ export const sortOrderData = (
                     sortDirection === 'asc'
                         ? (a.limitPx ?? 0) - (b.limitPx ?? 0)
                         : (b.limitPx ?? 0) - (a.limitPx ?? 0),
+                );
+            case 'status':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? a.status.localeCompare(b.status)
+                        : b.status.localeCompare(a.status),
+                );
+            case 'triggerCondition':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? (a.triggerCondition ?? '').localeCompare(
+                              b.triggerCondition ?? '',
+                          )
+                        : (b.triggerCondition ?? '').localeCompare(
+                              a.triggerCondition ?? '',
+                          ),
+                );
+            case 'oid':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc' ? a.oid - b.oid : b.oid - a.oid,
                 );
             default:
                 return orderData;

@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { RefObject } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 export function useNumFormatter() {
@@ -65,12 +63,26 @@ export function useNumFormatter() {
 
     const fillWithCurrencyChar = useCallback(
         (currency: string, formattedNum: string, showDollarSign: boolean) => {
-            if (currency === 'USD')
-                return showDollarSign ? '$' + formattedNum : '' + formattedNum;
-            if (currency === 'BTC') return '₿' + formattedNum;
-            if (currency === 'ETH') return 'Ξ' + formattedNum;
+            let ret = '';
+            const isNegative = formattedNum.startsWith('-');
+            if (isNegative) {
+                formattedNum = formattedNum.slice(1);
+            }
+            if (currency === 'USD') {
+                ret = showDollarSign ? '$' + formattedNum : '' + formattedNum;
+            } else if (currency === 'BTC') {
+                ret = '₿' + formattedNum;
+            } else if (currency === 'ETH') {
+                ret = 'Ξ' + formattedNum;
+            } else {
+                ret = formattedNum + currency;
+            }
 
-            return currency;
+            if (isNegative) {
+                ret = '-' + ret;
+            }
+
+            return ret;
         },
         [],
     );

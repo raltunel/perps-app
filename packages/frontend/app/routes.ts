@@ -28,5 +28,9 @@ export default [
 
     route('subaccounts', 'routes/subaccounts/subaccounts.tsx'),
 
+    route('positions', 'routes/positions/positions.tsx'),
+
+    route('orderHistory/:address?', 'routes/orderHistory/orderHistory.tsx'),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

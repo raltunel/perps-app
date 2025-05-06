@@ -136,10 +136,11 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 const isCustomized = checkDefaultColors();
 
-                if (!isInitial && !isCustomized) {
+                if (chartThemeColors && !isInitial && !isCustomized) {
                     changeColors(getBsColor());
                 }
 
+                saveChartLayout(chart);
                 chart.chart().refreshMarks();
             });
         }

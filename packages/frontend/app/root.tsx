@@ -14,8 +14,8 @@ import PageHeader from './components/PageHeader/PageHeader';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import './css/app.css';
 import './css/index.css';
-import { useDebugStore } from './stores/DebugStore';
 import { SdkProvider } from './hooks/useSdk';
+import { useDebugStore } from './stores/DebugStore';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -81,6 +81,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     name='viewport'
                     content='width=device-width, initial-scale=1'
                 />
+                <link rel='icon' href='/images/favicon.ico' sizes='48x48' />
+                <link
+                    rel='icon'
+                    href='/images/favicon.svg'
+                    sizes='any'
+                    type='image/svg+xml'
+                />
+                <link
+                    rel='apple-touch-icon'
+                    href='/images/apple-touch-icon-180x180.png'
+                />
+                <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
                 <Links />
             </head>
@@ -96,7 +108,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
-    const { wsUrl, wsEnvironment } = useDebugStore();
+    const { wsEnvironment } = useDebugStore();
 
     return (
         <>

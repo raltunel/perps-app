@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './PositionSize.module.css';
 
 interface SizeOption {
@@ -27,7 +27,7 @@ export default function PositionSize({
 }: PositionSizeProps) {
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [showLabels, setShowLabels] = useState(false);
+    const [showLabels] = useState(false);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);

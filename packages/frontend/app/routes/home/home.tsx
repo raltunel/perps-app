@@ -21,8 +21,13 @@ export default function Home() {
             <meta property='og:image' content={ogImage} />
 
             <div className={styles.container}>
-                <ButtonShowcase />
-                <div style={{ padding: '100px' }}></div>
+            <img
+                        src='/images/perpsLogo.svg'
+                        alt='Perps Logo'
+                
+                    />
+                {/* <ButtonShowcase />
+                <div style={{ padding: '100px' }}></div> */}
             </div>
         </>
     );

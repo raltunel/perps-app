@@ -1,9 +1,10 @@
-import type { Route } from '../../+types/root';
-import styles from './referrals.module.css';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
+import type { Route } from '../../+types/root';
+import styles from './referrals.module.css';
 // import styles from './referrals.module.css'
-export function meta({}: Route.MetaArgs) {
+// export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         { title: 'Perps - Referrals' },
         { name: 'description', content: 'Welcome to React Router!' },
@@ -14,7 +15,8 @@ export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-export default function Referrals({ loaderData }: Route.ComponentProps) {
+// export default function Referrals({ loaderData }: Route.ComponentProps) {
+export default function Referrals() {
     return (
         <div className={styles.container}>
             <header>
@@ -36,8 +38,7 @@ export default function Referrals({ loaderData }: Route.ComponentProps) {
             </div>
             <section className={styles.tableContainer}>
                 <CodeTabs />
-                <ReferralsTabs/>
-
+                <ReferralsTabs />
             </section>
         </div>
     );

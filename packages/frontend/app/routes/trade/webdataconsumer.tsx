@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useInfoApi } from '~/hooks/useInfoApi';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
+import { processUserOrder } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
     const {
@@ -18,7 +22,15 @@ export default function WebDataConsumer() {
         setCoins,
         coins,
         setPositions,
+        positions,
+        setUserBalances,
+        userBalances,
         setCoinPriceMap,
+        setAccountOverview,
+        accountOverview,
+        setWebDataFetched,
+        setOrderHistoryFetched,
+        setOrderHistory,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -32,8 +44,17 @@ export default function WebDataConsumer() {
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
+    const userBalancesRef = useRef<UserBalanceIF[]>([]);
+    const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
 
     const { info } = useSdk();
+    const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
+
+    const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
+    const webDataFetchedRef = useRef<boolean>(false);
+    const orderHistoryFetchedRef = useRef<boolean>(false);
+
+    const { fetchOrderHistory } = useInfoApi();
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -44,29 +65,62 @@ export default function WebDataConsumer() {
 
     useEffect(() => {
         if (!info) return;
-
-        setUserOrders([]);
-        openOrdersRef.current = [];
+        webDataFetchedRef.current = false;
+        orderHistoryFetchedRef.current = false;
+        setWebDataFetched(false);
+        setOrderHistoryFetched(false);
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
             postWebData2,
         );
 
-        const openOrdersInterval = setInterval(() => {
-            setUserOrders(openOrdersRef.current);
-        }, 1000);
+        const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
+            {
+                type: WsChannels.USER_HISTORICAL_ORDERS,
+                user: debugWallet.address,
+            },
+            postUserHistoricalOrders,
+        );
 
-        const positionsInterval = setInterval(() => {
+        const userDataInterval = setInterval(() => {
+            setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
+            setUserBalances(userBalancesRef.current);
+            setOrderHistory(userOrderHistoryRef.current);
+            if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
+                accountOverviewRef.current.balanceChange =
+                    accountOverviewRef.current.balance -
+                    acccountOverviewPrevRef.current.balance;
+                accountOverviewRef.current.maintainanceMarginChange =
+                    accountOverviewRef.current.maintainanceMargin -
+                    acccountOverviewPrevRef.current.maintainanceMargin;
+            }
+            if (accountOverviewRef.current) {
+                setAccountOverview(accountOverviewRef.current);
+            }
+            if (webDataFetchedRef.current) {
+                setWebDataFetched(true);
+            } else {
+                setWebDataFetched(false);
+            }
+            if (orderHistoryFetchedRef.current) {
+                setOrderHistoryFetched(true);
+            } else {
+                setOrderHistoryFetched(false);
+            }
         }, 1000);
 
         return () => {
-            clearInterval(openOrdersInterval);
-            clearInterval(positionsInterval);
+            clearInterval(userDataInterval);
             unsubscribe();
+            unsubscribeOrderHistory();
         };
     }, [debugWallet.address, info]);
+
+    useEffect(() => {
+        acccountOverviewPrevRef.current = accountOverview;
+    }, [accountOverview]);
 
     const handleWebData2WorkerResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
@@ -75,7 +129,10 @@ export default function WebDataConsumer() {
             if (data.data.user.toLowerCase() === addressRef.current) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
+                userBalancesRef.current = data.data.userBalances;
+                accountOverviewRef.current = data.data.accountOverview;
             }
+            webDataFetchedRef.current = true;
         },
         [setCoins, setCoinPriceMap],
     );
@@ -84,6 +141,41 @@ export default function WebDataConsumer() {
         'webData2',
         handleWebData2WorkerResult,
     );
+
+    const postUserHistoricalOrders = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.orderHistory &&
+            data.orderHistory.length > 0 &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const orders: OrderDataIF[] = [];
+            data.orderHistory.forEach((order: any) => {
+                const processedOrder = processUserOrder(
+                    order.order,
+                    order.status,
+                );
+                if (processedOrder) {
+                    orders.push(processedOrder);
+                }
+            });
+            if (data.isSnapshot) {
+                orders.sort((a, b) => b.timestamp - a.timestamp);
+                userOrderHistoryRef.current = orders;
+            } else {
+                userOrderHistoryRef.current = [
+                    ...orders.sort((a, b) => b.timestamp - a.timestamp),
+                    ...userOrderHistoryRef.current,
+                ];
+                userOrderHistoryRef.current.sort(
+                    (a, b) => b.timestamp - a.timestamp,
+                );
+            }
+            orderHistoryFetchedRef.current = true;
+        }
+    }, []);
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {

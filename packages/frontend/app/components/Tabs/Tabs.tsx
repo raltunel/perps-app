@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './Tabs.module.css';
 
 interface TabProps {
@@ -11,7 +12,13 @@ interface TabProps {
 }
 
 export function Tab(props: TabProps) {
-    const { label, isActive, onClick, layoutId, notInteractive = false } = props;
+    const {
+        label,
+        isActive,
+        onClick,
+        layoutId,
+        notInteractive = false,
+    } = props;
 
     return (
         <button
@@ -26,7 +33,7 @@ export function Tab(props: TabProps) {
             {isActive && (
                 <motion.div
                     className={styles.activeIndicator}
-                    layoutId={layoutId} 
+                    layoutId={layoutId}
                     initial={false}
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
@@ -41,18 +48,25 @@ export interface TabsProps {
     onTabChange?: (tab: string) => void;
     rightContent?: React.ReactNode;
     wrapperId?: string;
-    layoutIdPrefix?: string; 
+    layoutIdPrefix?: string;
 }
 
 export default function Tabs(props: TabsProps) {
-    const { 
-        tabs, 
-        defaultTab, 
-        onTabChange, 
-        rightContent, 
+    const {
+        tabs,
+        defaultTab,
+        onTabChange,
+        rightContent,
         wrapperId,
-        layoutIdPrefix = 'tabIndicator' 
+        layoutIdPrefix = 'tabIndicator',
     } = props;
+
+    const {
+        webDataFetched,
+        userBalances: { length: balancesCount },
+        positions: { length: positionsCount },
+        userOrders: { length: openOrdersCount },
+    } = useTradeDataStore();
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
@@ -63,7 +77,23 @@ export default function Tabs(props: TabsProps) {
     const getTabLabel = (
         tab: string | { id: string; label: string },
     ): string => {
-        return typeof tab === 'string' ? tab : tab.label;
+        let label = typeof tab === 'string' ? tab : tab.label;
+        if (label === 'Balances' && webDataFetched && balancesCount > 0) {
+            label = `Balances (${balancesCount})`;
+        } else if (
+            label === 'Positions' &&
+            webDataFetched &&
+            positionsCount > 0
+        ) {
+            label = `Positions (${positionsCount})`;
+        } else if (
+            label === 'Open Orders' &&
+            webDataFetched &&
+            openOrdersCount > 0
+        ) {
+            label = `Open Orders (${openOrdersCount})`;
+        }
+        return label;
     };
 
     // Set default active tab

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 // Constants
 export const PRICE_DISTRIBUTION_TYPES = {
@@ -95,8 +95,8 @@ export default function useScaleOrders({
             // Based on Image 6 - Higher ratios for higher prices
             // Generate a sequence with increasing values
             // Example for 5 orders: 6.67%, 13.33%, 20%, 26.67%, 33.33%
-            let total = (count * (count + 1)) / 2; // Sum of 1+2+3+...+n
-            let ratios = Array.from({ length: count }, (_, i) => {
+            const total = (count * (count + 1)) / 2; // Sum of 1+2+3+...+n
+            const ratios = Array.from({ length: count }, (_, i) => {
                 const weight = i + 1;
                 return +((weight * 100) / total).toFixed(2);
             });
@@ -104,8 +104,8 @@ export default function useScaleOrders({
         } else if (ratioDistribution === RATIO_DISTRIBUTION_TYPES.DECREASING) {
             // Based on Image 4 - Higher ratios for lower prices
             // Example for 5 orders: 33.33%, 26.67%, 20%, 13.33%, 6.67%
-            let total = (count * (count + 1)) / 2; // Sum of 1+2+3+...+n
-            let ratios = Array.from({ length: count }, (_, i) => {
+            const total = (count * (count + 1)) / 2; // Sum of 1+2+3+...+n
+            const ratios = Array.from({ length: count }, (_, i) => {
                 const weight = count - i;
                 return +((weight * 100) / total).toFixed(2);
             });
@@ -122,7 +122,7 @@ export default function useScaleOrders({
         const prices = generatePrices();
 
         // Get ratios based on the selected distribution
-        let ratios = generateRatios();
+        const ratios = generateRatios();
 
         // Ensure ratios add up to exactly 100%
         const ratioSum = ratios.reduce((sum, r) => sum + r, 0);
