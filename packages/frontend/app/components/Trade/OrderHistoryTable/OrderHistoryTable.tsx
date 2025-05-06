@@ -27,30 +27,24 @@ import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 interface OrderHistoryTableProps {
     onViewAll?: () => void;
     selectedFilter: string;
+    pageMode?: boolean;
+    data: OrderDataIF[];
+    isFetched: boolean;
 }
 
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { onViewAll, selectedFilter } = props;
-
-    const { orderHistory } = useTradeDataStore();
+    const { onViewAll, selectedFilter, pageMode, data, isFetched } = props;
 
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
     const [sortBy, setSortBy] = useState<OrderDataSortBy>();
 
     const { info } = useSdk();
-    const { addOrderToHistory, symbol, setOrderHistory, filterOrderHistory } =
-        useTradeDataStore();
+    const { symbol, filterOrderHistory } = useTradeDataStore();
 
     const { debugWallet } = useDebugStore();
 
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
-
-    const { fetchData } = useInfoApi();
-
-    const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
-
-    const saveToStoreLock = useRef<boolean>(false);
 
     const { isWsEnabled } = useDebugStore();
     const isWsEnabledRef = useRef<boolean>(true);
@@ -59,108 +53,38 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
-
     useEffect(() => {
-        const saveIntoStoreInterval = setInterval(() => {
-            if (!isWsEnabledRef.current) {
-                return;
+        if (isFetched) {
+            if (data.length > 0) {
+                setTableState(TableState.FILLED);
+            } else {
+                setTableState(TableState.EMPTY);
             }
-            if (saveToStoreLock.current) {
-                return;
-            }
-            addOrderToHistory(userOrderHistoryRef.current);
-        }, 1000);
-
-        return () => {
-            clearInterval(saveIntoStoreInterval);
-        };
-    }, []);
-
-    useEffect(() => {
-        setOrderHistory([]);
-        setTableState(TableState.LOADING);
-
-        fetchData({
-            type: ApiEndpoints.HISTORICAL_ORDERS,
-            payload: { user: debugWallet.address },
-            handler: (data) => {
-                if (!isWsEnabledRef.current) {
-                    return;
-                }
-                if (data && data.length > 0) {
-                    const orders: OrderDataIF[] = [];
-                    data.slice(0, OrderHistoryLimits.MAX).map((o: any) => {
-                        const processedOrder = processUserOrder(
-                            o.order,
-                            o.status,
-                        );
-                        if (processedOrder) {
-                            orders.push(processedOrder);
-                        }
-                    });
-                    setTableState(TableState.FILLED);
-                    setOrderHistory(orders);
-                } else {
-                    setTableState(TableState.EMPTY);
-                }
-            },
-        });
-    }, [debugWallet.address]);
+        } else {
+            setTableState(TableState.LOADING);
+        }
+    }, [data, isFetched]);
 
     const filteredOrderHistory = useMemo(() => {
-        return filterOrderHistory(orderHistory, selectedFilter);
-    }, [orderHistory, selectedFilter, symbol]);
+        return filterOrderHistory(data, selectedFilter);
+    }, [data, selectedFilter, symbol]);
 
     const sortedOrderHistory = useMemo(() => {
         return sortOrderData(filteredOrderHistory, sortBy, sortDirection);
     }, [filteredOrderHistory, sortBy, sortDirection]);
 
     const orderHistoryToShow = useMemo(() => {
+        if (pageMode) {
+            return sortedOrderHistory.slice(0, 50);
+        }
         // TODO page logic will be implemented for external page
-        return sortedOrderHistory;
-    }, [sortedOrderHistory]);
+        return sortedOrderHistory.slice(0, 10);
+    }, [sortedOrderHistory, pageMode]);
 
     useEffect(() => {
         if (!info) return;
         if (!debugWallet.address) return;
-
-        const { unsubscribe } = info.subscribe(
-            {
-                type: WsChannels.USER_HISTORICAL_ORDERS,
-                user: debugWallet.address,
-            },
-            postUserHistoricalOrders,
-        );
-
-        return unsubscribe;
     }, [debugWallet.address, info]);
-
-    const postUserHistoricalOrders = useCallback((payload: any) => {
-        const data = payload.data;
-        if (data && data.orderHistory && data.orderHistory.length > 0) {
-            if (data.user !== currentUserRef.current) {
-                saveToStoreLock.current = true;
-            } else {
-                const orderUpdates: OrderDataIF[] = [];
-                data.orderHistory.map((o: any) => {
-                    const processedOrder = processUserOrder(o.order, o.status);
-                    if (processedOrder) {
-                        orderUpdates.push(processedOrder);
-                    }
-                });
-                if (!data.isSnapshot) {
-                    userOrderHistoryRef.current = [
-                        ...orderUpdates,
-                        ...userOrderHistoryRef.current,
-                    ];
-                    userOrderHistoryRef.current.sort(
-                        (a, b) => b.timestamp - a.timestamp,
-                    );
-                }
-                saveToStoreLock.current = false;
-            }
-        }
-    }, []);
 
     const handleSort = (key: string) => {
         if (sortBy === key) {
