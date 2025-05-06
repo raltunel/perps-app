@@ -2,13 +2,11 @@ import { memo } from 'react';
 import type { Route } from '../../+types/root';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import styles from './portfolio.module.css';
-import { Link } from 'react-router';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import Modal from '~/components/Modal/Modal';
 import { lazy, Suspense } from 'react';
 import { usePortfolioManager } from './usePortfolioManager';
 import { useModal, type useModalIF } from '~/hooks/useModal';
-import { MdOutlineClose } from 'react-icons/md';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 
 const PortfolioDeposit = lazy(
@@ -200,17 +198,8 @@ function Portfolio() {
                 </Modal>
             )}
             { feeScheduleModalCtrl.isOpen &&
-                <Modal close={feeScheduleModalCtrl.close}>
+                <Modal close={feeScheduleModalCtrl.close} title='Fee Schedule'>
                     <div className={styles.fee_schedule_modal}>
-                        <header>
-                            <div />
-                            <h3>Fee Schedule</h3>
-                            <MdOutlineClose
-                                size={20}
-                                onClick={feeScheduleModalCtrl.close}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </header>
                         <section className={styles.fee_table}>
                             <h4>VIP Tiers</h4>
                             <header>

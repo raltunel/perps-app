@@ -1,4 +1,3 @@
-import type { useModalIF } from '~/hooks/useModal';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import {
@@ -6,7 +5,6 @@ import {
     type appOptions,
     type useAppOptionsIF,
 } from '~/stores/AppOptionsStore';
-import { MdOutlineClose } from 'react-icons/md';
 import OptionLineSelect from './OptionLineSelect';
 import {
     useAppSettings,
@@ -21,12 +19,7 @@ export interface appOptionDataIF {
     text: string;
 }
 
-interface propsIF {
-    modalControl: useModalIF;
-}
-
-export default function AppOptions(props: propsIF) {
-    const { modalControl } = props;
+export default function AppOptions() {
 
     const activeOptions: useAppOptionsIF = useAppOptions();
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
@@ -41,15 +34,6 @@ export default function AppOptions(props: propsIF) {
 
     return (
         <section className={styles.app_options}>
-            {/* <header>
-                <div />
-                <h2>Options</h2>
-                <MdOutlineClose
-                    size={20}
-                    onClick={modalControl.close}
-                    style={{ cursor: 'pointer' }}
-                />
-            </header> */}
             <ul>
                 <OptionLine
                     text='Skip Open Order Confirmation'

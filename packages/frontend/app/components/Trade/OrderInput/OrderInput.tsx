@@ -103,10 +103,8 @@ export default function OrderInput() {
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
     const {
-        formatNum,
         parseFormattedNum,
         formatNumWithOnlyDecimals,
-        parseFormattedWithOnlyDecimals,
     } = useNumFormatter();
 
     const appSettingsModal: useModalIF = useModal('closed');
