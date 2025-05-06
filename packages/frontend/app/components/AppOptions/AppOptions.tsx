@@ -33,15 +33,6 @@ export default function AppOptions() {
 
     return (
         <section className={styles.app_options}>
-            {/* <header>
-                <div />
-                <h2>Options</h2>
-                <MdOutlineClose
-                    size={20}
-                    onClick={modalControl.close}
-                    style={{ cursor: 'pointer' }}
-                />
-            </header> */}
             <ul>
                 <OptionLine
                     text='Skip Open Order Confirmation'
