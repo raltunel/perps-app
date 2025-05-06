@@ -11,14 +11,18 @@ import { processUserOrder } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { OrderHistoryLimits, WsChannels } from '~/utils/Constants';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderDataIF,
+    OrderDataSortBy,
+} from '~/utils/orderbook/OrderBookIFs';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { orderHistoryData } from './data';
-import { TableState } from '~/utils/CommonIFs';
+import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
+import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 
 interface OrderHistoryTableProps {
     onViewAll?: () => void;
@@ -29,6 +33,9 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     const { onViewAll, selectedFilter } = props;
 
     const { orderHistory } = useTradeDataStore();
+
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<OrderDataSortBy>();
 
     const { info } = useSdk();
     const { addOrderToHistory, symbol, setOrderHistory, filterOrderHistory } =
@@ -100,9 +107,18 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
         });
     }, [debugWallet.address]);
 
-    const orderHistoryToShow = useMemo(() => {
+    const filteredOrderHistory = useMemo(() => {
         return filterOrderHistory(orderHistory, selectedFilter);
     }, [orderHistory, selectedFilter, symbol]);
+
+    const sortedOrderHistory = useMemo(() => {
+        return sortOrderData(filteredOrderHistory, sortBy, sortDirection);
+    }, [filteredOrderHistory, sortBy, sortDirection]);
+
+    const orderHistoryToShow = useMemo(() => {
+        // TODO page logic will be implemented for external page
+        return sortedOrderHistory;
+    }, [sortedOrderHistory]);
 
     useEffect(() => {
         if (!info) return;
@@ -146,6 +162,22 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
         }
     }, []);
 
+    const handleSort = (key: string) => {
+        if (sortBy === key) {
+            if (sortDirection === 'desc') {
+                setSortDirection('asc');
+            } else if (sortDirection === 'asc') {
+                setSortDirection(undefined);
+                setSortBy(undefined);
+            } else {
+                setSortDirection('desc');
+            }
+        } else {
+            setSortBy(key as OrderDataSortBy);
+            setSortDirection('desc');
+        }
+    };
+
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
         if (onViewAll) {
@@ -162,7 +194,11 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 />
             ) : (
                 <>
-                    <OrderHistoryTableHeader />
+                    <OrderHistoryTableHeader
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={handleSort}
+                    />
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>
