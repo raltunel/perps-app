@@ -3,6 +3,9 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
+const appName = 'Ambient Perps';
+const appDescription = 'A modern, performant app for perpetual contracts.';
+
 export default defineConfig(({ isSsrBuild }) => ({
     build: {
         rollupOptions: isSsrBuild
@@ -20,14 +23,20 @@ export default defineConfig(({ isSsrBuild }) => ({
             workbox: {
                 maximumFileSizeToCacheInBytes: 3000000,
             },
+            devOptions: {
+                enabled: !isSsrBuild && process.env.NODE_ENV === 'development',
+            },
             manifest: {
-                name: 'Ambient Perps',
-                short_name: 'Ambient Perps',
-                description: 'Ambient Perps description',
+                name: appName,
+                short_name: appName,
+                description: appDescription,
                 theme_color: '#7371fc',
                 background_color: '#7371fc',
                 display: 'standalone',
                 start_url: '/',
+                id: '/',
+                lang: 'en',
+                orientation: 'portrait',
                 icons: [
                     {
                         src: '/images/pwa-192x192.png',
