@@ -1,8 +1,8 @@
-import { useState, useCallback, memo, useMemo } from 'react';
-import styles from './PortfolioWithdraw.module.css';
-import Tooltip from '~/components/Tooltip/Tooltip';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
+import styles from './PortfolioWithdraw.module.css';
 
 interface PortfolioWithdrawProps {
     portfolio: {
@@ -26,9 +26,9 @@ function PortfolioWithdraw({
 
     const unitValue = portfolio.unit || 'USD';
 
-    const isValidNumberInput = useCallback(() => {
-        return true
-    }, []);
+    // const isValidNumberInput = useCallback(() => {
+    //     return true
+    // }, []);
 
     const USD_FORMATTER = useMemo(
         () =>
@@ -89,7 +89,6 @@ function PortfolioWithdraw({
     }, []);
 
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-      
         setAmount(newValue);
         setError(null);
     }, 20);
@@ -154,7 +153,6 @@ function PortfolioWithdraw({
 
     return (
         <div className={styles.container}>
-     
             <div className={styles.textContent}>
                 <h4>
                     Withdraw {unitValue} from {portfolio.name}

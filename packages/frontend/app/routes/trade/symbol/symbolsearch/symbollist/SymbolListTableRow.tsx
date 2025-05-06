@@ -1,10 +1,9 @@
+import { TbHeart, TbHeartFilled } from 'react-icons/tb';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import { TbHeart, TbHeartFilled } from 'react-icons/tb';
-import styles from './symbollist.module.css';
-import { useNavigate } from 'react-router';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import styles from './symbollist.module.css';
 
 interface SymbolListTableRowProps {
     symbol: SymbolInfoIF;
@@ -16,7 +15,6 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
 
     const { formatNum, getDefaultPrecision } = useNumFormatter();
     const { getBsColor } = useAppSettings();
-    const navigate = useNavigate();
 
     const { favKeys, addToFavKeys, removeFromFavKeys } = useTradeDataStore();
 

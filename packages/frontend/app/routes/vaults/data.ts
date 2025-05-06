@@ -61,21 +61,21 @@ const generateTrendData = (
 };
 
 // Helper function to determine trend direction from data
-const determineTrend = (data: number[]): 'up' | 'down' | 'neutral' => {
-    if (data.length < 2) return 'neutral';
+// const determineTrend = (data: number[]): 'up' | 'down' | 'neutral' => {
+//     if (data.length < 2) return 'neutral';
 
-    const firstHalf = data.slice(0, Math.floor(data.length / 2));
-    const secondHalf = data.slice(Math.floor(data.length / 2));
+//     const firstHalf = data.slice(0, Math.floor(data.length / 2));
+//     const secondHalf = data.slice(Math.floor(data.length / 2));
 
-    const firstAvg =
-        firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
-    const secondAvg =
-        secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
+//     const firstAvg =
+//         firstHalf.reduce((sum, val) => sum + val, 0) / firstHalf.length;
+//     const secondAvg =
+//         secondHalf.reduce((sum, val) => sum + val, 0) / secondHalf.length;
 
-    if (secondAvg > firstAvg * 1.05) return 'up';
-    if (secondAvg < firstAvg * 0.95) return 'down';
-    return 'neutral';
-};
+//     if (secondAvg > firstAvg * 1.05) return 'up';
+//     if (secondAvg < firstAvg * 0.95) return 'down';
+//     return 'neutral';
+// };
 
 // Generate 20 mock vault entries with various characteristics
 export const mockVaultData: VaultDataIF[] = [

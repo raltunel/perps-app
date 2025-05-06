@@ -1,7 +1,6 @@
-import type { Environment } from '@perps-app/sdk';
 import { create } from 'zustand';
 
-import { wsEnvironments, debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 
 export type DebugWallet = {
     label: string;

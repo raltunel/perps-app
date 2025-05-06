@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import styles from './DropdownMenu.module.css';
 import {
-    FaQuestionCircle,
-    FaFileAlt,
-    FaTwitter,
     FaDiscord,
+    FaFileAlt,
     FaMediumM,
+    FaQuestionCircle,
+    FaTwitter,
     FaUserSecret,
 } from 'react-icons/fa';
+import styles from './DropdownMenu.module.css';
 
 const menuItems = [
     { name: 'Tutorial', icon: <FaQuestionCircle /> },

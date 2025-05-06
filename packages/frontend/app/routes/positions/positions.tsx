@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import type { Route } from '../../+types/root';
-import styles from './positions.module.css';
 import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
+import type { Route } from '../../+types/root';
 import WebDataConsumer from '../trade/webdataconsumer';
-export function meta({}: Route.MetaArgs) {
+import styles from './positions.module.css';
+export function meta() {
     return [
         { title: 'Perps - Positions' },
         { name: 'description', content: 'Welcome to React Router!' },
@@ -14,7 +14,7 @@ export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-function Positions({ loaderData }: Route.ComponentProps) {
+function Positions() {
     const isFullScreen = true;
 
     // Memoize the container class name

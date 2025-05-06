@@ -18,9 +18,6 @@ export interface FilterOption {
     id: string;
     label: string;
 }
-interface TradeTableProps {
-    initialTab?: string;
-}
 
 const availableTabs = [
     'Balances',
@@ -39,7 +36,7 @@ const filterOptions: FilterOption[] = [
     { id: 'long', label: 'Long' },
     { id: 'short', label: 'Short' },
 ];
-export default function TradeTable(props: TradeTableProps) {
+export default function TradeTable() {
     const {
         selectedTradeTab,
         setSelectedTradeTab,

@@ -1,15 +1,13 @@
-import { memo } from 'react';
-import type { Route } from '../../+types/root';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import styles from './portfolio.module.css';
-import { Link } from 'react-router';
-import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
-import Modal from '~/components/Modal/Modal';
-import { lazy, Suspense } from 'react';
-import { usePortfolioManager } from './usePortfolioManager';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { lazy, memo, Suspense } from 'react';
 import { MdOutlineClose } from 'react-icons/md';
+import Modal from '~/components/Modal/Modal';
+import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
+import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import { useModal, type useModalIF } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
+import type { Route } from '../../+types/root';
+import styles from './portfolio.module.css';
+import { usePortfolioManager } from './usePortfolioManager';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -67,7 +65,8 @@ function Portfolio() {
                             </h3>
                             <div
                                 className={styles.view_detail_clickable}
-                                onClick={() => console.log('viewing volume')}>
+                                onClick={() => console.log('viewing volume')}
+                            >
                                 View volume
                             </div>
                         </div>
@@ -80,7 +79,8 @@ function Portfolio() {
                             {/* <Link to='/'>View fee schedule</Link> */}
                             <div
                                 className={styles.view_detail_clickable}
-                                onClick={feeScheduleModalCtrl.open}>
+                                onClick={feeScheduleModalCtrl.open}
+                            >
                                 View fee schedule
                             </div>
                         </div>
@@ -199,8 +199,11 @@ function Portfolio() {
                     </Suspense>
                 </Modal>
             )}
-            { feeScheduleModalCtrl.isOpen &&
-                <Modal close={feeScheduleModalCtrl.close}>
+            {feeScheduleModalCtrl.isOpen && (
+                <Modal
+                    close={feeScheduleModalCtrl.close}
+                    title={'Fee Schedule'}
+                >
                     <div className={styles.fee_schedule_modal}>
                         <header>
                             <div />
@@ -220,18 +223,14 @@ function Portfolio() {
                                 <div>Maker</div>
                             </header>
                             <ol>
-                                {
-                                    feeSchedules.vip.map(
-                                        (feeTier: feeTierIF) => (
-                                            <li key={JSON.stringify(feeTier)}>
-                                                <div>{feeTier.tier}</div>
-                                                <div>{feeTier.volume14d}</div>
-                                                <div>{feeTier.taker}</div>
-                                                <div>{feeTier.maker}</div>
-                                            </li>
-                                        )
-                                    )
-                                }
+                                {feeSchedules.vip.map((feeTier: feeTierIF) => (
+                                    <li key={JSON.stringify(feeTier)}>
+                                        <div>{feeTier.tier}</div>
+                                        <div>{feeTier.volume14d}</div>
+                                        <div>{feeTier.taker}</div>
+                                        <div>{feeTier.maker}</div>
+                                    </li>
+                                ))}
                             </ol>
                         </section>
                         <section className={styles.fee_table}>
@@ -243,24 +242,24 @@ function Portfolio() {
                                 <div>Maker</div>
                             </header>
                             <ol>
-                                {
-                                    feeSchedules.marketMaker.map(
-                                        (feeTier: feeTierIF) => (
-                                            <li key={JSON.stringify(feeTier)}>
-                                                <div>{feeTier.tier}</div>
-                                                <div>{feeTier.volume14d}</div>
-                                                <div>{feeTier.taker}</div>
-                                                <div>{feeTier.maker}</div>
-                                            </li>
-                                        )
-                                    )
-                                }
+                                {feeSchedules.marketMaker.map(
+                                    (feeTier: feeTierIF) => (
+                                        <li key={JSON.stringify(feeTier)}>
+                                            <div>{feeTier.tier}</div>
+                                            <div>{feeTier.volume14d}</div>
+                                            <div>{feeTier.taker}</div>
+                                            <div>{feeTier.maker}</div>
+                                        </li>
+                                    ),
+                                )}
                             </ol>
                         </section>
-                        <div className={styles.neg_fees}>Negative fees are rebates</div>
+                        <div className={styles.neg_fees}>
+                            Negative fees are rebates
+                        </div>
                     </div>
                 </Modal>
-            }
+            )}
         </>
     );
 }
