@@ -17,7 +17,7 @@ export default defineConfig(({ isSsrBuild }) => ({
         tsconfigPaths(),
         VitePWA({
             registerType: 'autoUpdate',
-            manifest: './public/site.webmanifest',
+            manifest: './public/manifest.webmanifest',
             devOptions: {
                 enabled: true,
             },

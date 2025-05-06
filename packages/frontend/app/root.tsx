@@ -92,6 +92,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     rel='apple-touch-icon'
                     href='/images/apple-touch-icon-180x180.png'
                 />
+                <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
                 <Links />
             </head>
