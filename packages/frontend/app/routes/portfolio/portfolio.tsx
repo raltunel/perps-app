@@ -1,13 +1,12 @@
-import { lazy, memo, Suspense } from 'react';
-import { MdOutlineClose } from 'react-icons/md';
-import Modal from '~/components/Modal/Modal';
-import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
+import type { Route } from '../../+types/root';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import styles from './portfolio.module.css';
+import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
+import Modal from '~/components/Modal/Modal';
+import { usePortfolioManager } from './usePortfolioManager';
+import { lazy, memo, Suspense } from 'react';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
-import type { Route } from '../../+types/root';
-import styles from './portfolio.module.css';
-import { usePortfolioManager } from './usePortfolioManager';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -205,15 +204,6 @@ function Portfolio() {
                     title={'Fee Schedule'}
                 >
                     <div className={styles.fee_schedule_modal}>
-                        <header>
-                            <div />
-                            <h3>Fee Schedule</h3>
-                            <MdOutlineClose
-                                size={20}
-                                onClick={feeScheduleModalCtrl.close}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </header>
                         <section className={styles.fee_table}>
                             <h4>VIP Tiers</h4>
                             <header>
