@@ -17,7 +17,6 @@ export default defineConfig(({ isSsrBuild }) => ({
         tsconfigPaths(),
         VitePWA({
             registerType: 'autoUpdate',
-            manifest: './public/manifest.webmanifest',
             workbox: {
                 maximumFileSizeToCacheInBytes: 3000000,
             },
