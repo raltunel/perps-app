@@ -10,6 +10,7 @@ import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
 import { openOrdersData } from './data';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
+import { WsChannels } from '~/utils/Constants';
 interface OpenOrdersTableProps {
     onCancel?: (time: number, coin: string) => void;
     onViewAll?: () => void;
@@ -38,8 +39,12 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     };
 
-    const { userSymbolOrders, userOrders, webDataFetched } =
+    const { userSymbolOrders, userOrders, fetchedChannels } =
         useTradeDataStore();
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
     const openOrdersLimit = 10;
 

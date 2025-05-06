@@ -8,6 +8,7 @@ import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { Route } from '../../+types/root';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './orderHistory.module.css';
+import { WsChannels } from '~/utils/Constants';
 export function meta({}: Route.MetaArgs) {
     return [
         { title: 'Perps - Positions' },
@@ -26,7 +27,11 @@ function OrderHistory({ loaderData }: Route.ComponentProps) {
 
     const { debugWallet } = useDebugStore();
 
-    const { orderHistory, orderHistoryFetched } = useTradeDataStore();
+    const { orderHistory, fetchedChannels } = useTradeDataStore();
+
+    const orderHistoryFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
+    }, [fetchedChannels]);
 
     const [fetchedHistoryData, setFetchedHistoryData] = useState<OrderDataIF[]>(
         [],

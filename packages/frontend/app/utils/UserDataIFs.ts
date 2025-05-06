@@ -30,3 +30,28 @@ export type UserBalanceSortBy =
     | 'buyingPower'
     | 'pnlValue'
     | undefined;
+
+export interface UserFillIF {
+    time: number;
+    coin: string;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    sz: number;
+    tid: number;
+    value: number;
+}
+
+export type UserFillSortBy =
+    | 'time'
+    | 'coin'
+    | 'side'
+    | 'px'
+    | 'sz'
+    | 'value'
+    | 'fee'
+    | undefined;
