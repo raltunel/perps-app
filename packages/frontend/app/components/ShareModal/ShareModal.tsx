@@ -145,7 +145,15 @@ export default function ShareModal(props: propsIF) {
                         <Button size='medium'>
                             Copy Link <LuCopy />
                         </Button>
-                        <Button size='medium'>
+                        <Button
+                            size='medium'
+                            onClick={() => {
+                                if (inputRef.current) window.open(
+                                    'https://x.com/intent/tweet?text=' + encodeURIComponent(inputRef.current.value),
+                                    '_blank'
+                                );
+                            }}
+                        >
                             Share on X <RiTwitterFill />
                         </Button>
                     </div>
