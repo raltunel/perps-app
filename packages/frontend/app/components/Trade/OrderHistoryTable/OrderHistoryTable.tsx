@@ -1,39 +1,37 @@
-import React, {
-    useCallback,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
-import { ApiEndpoints, useInfoApi } from '~/hooks/useInfoApi';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
+import Pagination from '~/components/Pagination/Pagination';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
+import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useSdk } from '~/hooks/useSdk';
-import { processUserOrder } from '~/processors/processOrderBook';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { OrderHistoryLimits, WsChannels } from '~/utils/Constants';
+import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import type {
     OrderDataIF,
     OrderDataSortBy,
 } from '~/utils/orderbook/OrderBookIFs';
+import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OrderHistoryTable.module.css';
 import OrderHistoryTableHeader from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
-import { orderHistoryData } from './data';
-import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 
 interface OrderHistoryTableProps {
-    onViewAll?: () => void;
-    selectedFilter: string;
+    selectedFilter?: string;
     pageMode?: boolean;
     data: OrderDataIF[];
     isFetched: boolean;
 }
 
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { onViewAll, selectedFilter, pageMode, data, isFetched } = props;
+    const { selectedFilter, pageMode, data, isFetched } = props;
+
+    const navigate = useNavigate();
+
+    const tableModeLimit = 10;
+
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
 
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
     const [sortBy, setSortBy] = useState<OrderDataSortBy>();
@@ -75,11 +73,14 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const orderHistoryToShow = useMemo(() => {
         if (pageMode) {
-            return sortedOrderHistory.slice(0, 50);
+            return sortedOrderHistory.slice(
+                page * rowsPerPage,
+                (page + 1) * rowsPerPage,
+            );
         }
         // TODO page logic will be implemented for external page
         return sortedOrderHistory.slice(0, 10);
-    }, [sortedOrderHistory, pageMode]);
+    }, [sortedOrderHistory, pageMode, page, rowsPerPage]);
 
     useEffect(() => {
         if (!info) return;
@@ -104,9 +105,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        if (onViewAll) {
-            onViewAll();
-        }
+        navigate(`/orderHistory/${currentUserRef.current}`);
     };
 
     return (
@@ -132,13 +131,25 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                                         order={order}
                                     />
                                 ))}
-                                <a
-                                    href='#'
-                                    className={styles.viewAllLink}
-                                    onClick={handleViewAll}
-                                >
-                                    View All
-                                </a>
+                                {data.length > tableModeLimit && !pageMode && (
+                                    <a
+                                        href='#'
+                                        className={styles.viewAllLink}
+                                        onClick={handleViewAll}
+                                    >
+                                        View All
+                                    </a>
+                                )}
+                                {pageMode && (
+                                    <>
+                                        <Pagination
+                                            totalCount={data.length}
+                                            onPageChange={setPage}
+                                            rowsPerPage={rowsPerPage}
+                                            onRowsPerPageChange={setRowsPerPage}
+                                        />
+                                    </>
+                                )}
                             </>
                         )}
 

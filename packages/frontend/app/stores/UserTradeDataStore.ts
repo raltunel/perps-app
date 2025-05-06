@@ -38,11 +38,12 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     },
     orderHistory: [],
     setOrderHistory: (orderHistory: OrderDataIF[]) => {
-        set({ orderHistory });
+        const sliced = orderHistory.slice(0, OrderHistoryLimits.MAX);
+        set({ orderHistory: sliced });
         set({
-            userSymbolOrderHistory: orderHistory
-                .filter((e) => e.coin === get().symbol)
-                .slice(0, OrderHistoryLimits.RENDERED),
+            userSymbolOrderHistory: sliced.filter(
+                (e) => e.coin === get().symbol,
+            ),
         });
     },
     filterOrderHistory: (orderHistory: OrderDataIF[], filterType?: string) => {
