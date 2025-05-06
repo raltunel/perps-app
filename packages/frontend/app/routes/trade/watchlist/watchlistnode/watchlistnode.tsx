@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './watchlistnode.module.css';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useNavigate } from 'react-router';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface WatchListNodeProps {
     symbol: SymbolInfoIF;
@@ -15,7 +15,6 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const navigate = useNavigate();
 
     const { formatNum } = useNumFormatter();
-    const { selectedCurrency } = useTradeDataStore();
 
     const { symbol: storeSymbol, setSymbol: setStoreSymbol } =
         useTradeDataStore();

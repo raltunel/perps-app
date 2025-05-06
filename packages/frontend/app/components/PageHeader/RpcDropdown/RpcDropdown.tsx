@@ -1,10 +1,6 @@
 import { Link } from 'react-router';
 import styles from './RpcDropdown.module.css';
 
-interface PropsIF {
-    isRpcDropdownOpen: boolean;
-    setIsRpcDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
 interface RowPropsIF {
     label: string;
 }

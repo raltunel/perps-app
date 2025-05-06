@@ -1,18 +1,18 @@
-import styles from './AppOptions.module.css';
-import OptionLine from './OptionLine';
+import { FaCircle } from 'react-icons/fa';
 import {
     useAppOptions,
     type appOptions,
     type useAppOptionsIF,
 } from '~/stores/AppOptionsStore';
-import OptionLineSelect from './OptionLineSelect';
 import {
-    useAppSettings,
     bsColorSets,
+    useAppSettings,
     type colorSetIF,
 } from '~/stores/AppSettingsStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
-import { FaCircle } from 'react-icons/fa';
+import styles from './AppOptions.module.css';
+import OptionLine from './OptionLine';
+import OptionLineSelect from './OptionLineSelect';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -20,7 +20,6 @@ export interface appOptionDataIF {
 }
 
 export default function AppOptions() {
-
     const activeOptions: useAppOptionsIF = useAppOptions();
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
         useAppSettings();

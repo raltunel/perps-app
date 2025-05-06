@@ -1,8 +1,6 @@
-import { BiChevronDown } from 'react-icons/bi';
-import styles from './VaultTimeframe.module.css';
-import { FaChevronDown } from 'react-icons/fa';
 import { LuChevronDown } from 'react-icons/lu';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import styles from './VaultTimeframe.module.css';
 
 interface Props {
     timeframe: string;

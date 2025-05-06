@@ -1,10 +1,10 @@
+import { bsColorSets } from '~/stores/AppSettingsStore';
+import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
 import {
     getChartThemeColors,
     mapResolutionToInterval,
     resolutionToSeconds,
 } from './utils/utils';
-import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
-import { bsColorSets } from '~/stores/AppSettingsStore';
 
 const dataCache = new Map<string, any[]>();
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
@@ -16,7 +16,7 @@ export async function getHistoricalData(
     to: number,
 ) {
     const key = `${symbol}-${resolution}`;
-    let cachedData = dataCache.get(key) || [];
+    const cachedData = dataCache.get(key) || [];
 
     const candleCount = (to - from) / resolutionToSeconds(resolution);
     const hasDataForRange =

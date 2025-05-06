@@ -14,7 +14,7 @@ export function useKeydown(
     // listener to execute functionality on the appropriate keypress
     function listener(trigger: KeyboardEvent): void {
         // console log for debug mode
-        debug &&
+        if (debug)
             console.log({
                 event: trigger,
                 event_key: trigger.key,
@@ -23,17 +23,10 @@ export function useKeydown(
                 fn_will_execute: trigger.key === key,
             });
         // execute functionality if keypress was appropriate
-        trigger.key === key && fn();
+        if (trigger.key === key) fn();
     }
     // hook to manage the event listener in the DOM
     useEffect(() => {
-        // console log for debug mode
-        debug &&
-            console.log('adding event listener', {
-                event: EVENT_TYPE,
-                key: key,
-                fn: fn,
-            });
         // add the event listener when the component mounts
         document.addEventListener(EVENT_TYPE, listener);
         // remove the event listener when the component dismounts

@@ -1,7 +1,6 @@
 import Button from '~/components/Button/Button';
-import type { Route } from '../../../+types/root';
 import styles from './ButtonShowcase.module.css';
-export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         { title: 'BUTTON SHOWCASE' },
         { name: 'description', content: 'Welcome to React Router!' },

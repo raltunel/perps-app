@@ -1,4 +1,4 @@
-import type { Config, Context } from '@netlify/functions';
+import type { Config } from '@netlify/functions';
 import { createRequestHandler } from 'react-router';
 
 declare module 'react-router' {
@@ -8,12 +8,11 @@ declare module 'react-router' {
 }
 
 const requestHandler = createRequestHandler(
-    // @ts-expect-error - virtual module provided by React Router at build time
     () => import('virtual:react-router/server-build'),
     import.meta.env.MODE,
 );
 
-export default async (request: Request, context: Context) => {
+export default async (request: Request) => {
     return requestHandler(request, {
         VALUE_FROM_NETLIFY: 'Hello from Netlify',
     });

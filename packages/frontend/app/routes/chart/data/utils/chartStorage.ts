@@ -11,7 +11,9 @@ export const saveChartLayout = (tvWidget: any) => {
 
                 useChartStore.getState().saveLayout(chartState);
             });
-        } catch (error) {}
+        } catch (error) {
+            console.error(error);
+        }
     }, 100);
 };
 

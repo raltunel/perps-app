@@ -1,8 +1,8 @@
+import type { FC } from 'react';
 import type { Route } from '../../+types/root';
 import styles from './Welcome.module.css';
-import type { FC } from 'react';
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         { title: 'New React Router App' },
         { name: 'description', content: 'Welcome to React Router!' },

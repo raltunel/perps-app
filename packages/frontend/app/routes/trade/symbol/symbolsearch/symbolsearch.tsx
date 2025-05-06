@@ -6,9 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SymbolList from './symbollist/symbollist';
 import styles from './symbolsearch.module.css';
 
-interface SymbolInfoFieldProps {}
-
-const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
+const SymbolSearch: React.FunctionComponent = () => {
     const { symbol } = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -16,7 +14,7 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
         setIsOpen(false);
     }, true);
 
-    const wrapperClickHandler = (e: React.MouseEvent<HTMLDivElement>) => {
+    const wrapperClickHandler = () => {
         setIsOpen(!isOpen);
     };
 
