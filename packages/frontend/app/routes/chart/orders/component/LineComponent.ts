@@ -2,7 +2,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
-import type { EntityId, IPaneApi } from '~/tv/charting_library';
+import type {
+    EntityId,
+    IChartingLibraryWidget,
+    IPaneApi,
+} from '~/tv/charting_library';
 import {
     addCustomOrderLine,
     createAnchoredMainText,
@@ -52,6 +56,15 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     const { symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
 
+    const removeShapeById = async (
+        chart: IChartingLibraryWidget,
+        id: EntityId,
+    ) => {
+        const chartRef = chart.activeChart();
+
+        const element = chartRef.getShapeById(id);
+        if (element) chartRef.removeEntity(id);
+    };
     const cleanupShapes = async () => {
         try {
             if (chart) {
@@ -189,67 +202,79 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     useEffect(() => {
         const setupShapes = async () => {
             if (!chart || lines.length === 0) return;
-            const shapeRefs: ChartShapeRefs[] = [];
 
-            for (const line of lines) {
-                let cancelButtonTextId = undefined;
-                const lineId = await addCustomOrderLine(
-                    chart,
-                    line.yPrice,
-                    line.color,
-                );
-                const textId = await createAnchoredMainText(
-                    chart,
-                    line.xLoc,
-                    line.yPrice,
-                    line.textValue,
-                    line.color,
-                );
-                const quantityTextId = line.quantityTextValue
-                    ? await createQuantityAnchoredText(
-                          chart,
-                          getAnchoredQuantityTextLocation(
-                              chart,
-                              line.xLoc,
-                              line.textValue,
-                          ),
+            const currentCount = orderLineItemsRef.current.length;
+            const newCount = lines.length;
 
-                          line.yPrice,
-                          quantityTextFormatWithComma(line.quantityTextValue),
-                      )
-                    : undefined;
-
-                if (orderType === 'openOrder') {
-                    cancelButtonTextId = await createCancelAnchoredText(
-                        chart,
-                        getAnchoredCancelButtonTextLocation(
-                            chart,
-                            line.xLoc,
-                            line.textValue,
-                            line.quantityTextValue
-                                ? quantityTextFormatWithComma(
-                                      line.quantityTextValue,
-                                  )
-                                : undefined,
-                        ),
-                        line.yPrice,
-                    );
+            if (currentCount > newCount) {
+                const toRemove = orderLineItemsRef.current.slice(newCount);
+                for (const shape of toRemove) {
+                    removeShapeById(chart, shape.lineId);
+                    removeShapeById(chart, shape.textId);
+                    if (shape.quantityTextId)
+                        removeShapeById(chart, shape.quantityTextId);
+                    if (shape.cancelButtonTextId)
+                        removeShapeById(chart, shape.cancelButtonTextId);
                 }
-
-                shapeRefs.push({
-                    lineId,
-                    textId,
-                    quantityTextId,
-                    cancelButtonTextId,
-                });
+                orderLineItemsRef.current.length = newCount;
             }
 
-            orderLineItemsRef.current = shapeRefs;
-            setOrderLineItems(shapeRefs);
+            if (currentCount < newCount) {
+                for (let i = currentCount; i < newCount; i++) {
+                    const line = lines[i];
+                    const shapeRefs: ChartShapeRefs = {
+                        lineId: await addCustomOrderLine(
+                            chart,
+                            line.yPrice,
+                            line.color,
+                        ),
+                        textId: await createAnchoredMainText(
+                            chart,
+                            line.xLoc,
+                            line.yPrice,
+                            line.textValue,
+                            line.color,
+                        ),
+                        quantityTextId: line.quantityTextValue
+                            ? await createQuantityAnchoredText(
+                                  chart,
+                                  getAnchoredQuantityTextLocation(
+                                      chart,
+                                      line.xLoc,
+                                      line.textValue,
+                                  ),
+                                  line.yPrice,
+                                  quantityTextFormatWithComma(
+                                      line.quantityTextValue,
+                                  ),
+                              )
+                            : undefined,
+                        cancelButtonTextId:
+                            orderType === 'openOrder'
+                                ? await createCancelAnchoredText(
+                                      chart,
+                                      getAnchoredCancelButtonTextLocation(
+                                          chart,
+                                          line.xLoc,
+                                          line.textValue,
+                                          line.quantityTextValue
+                                              ? quantityTextFormatWithComma(
+                                                    line.quantityTextValue,
+                                                )
+                                              : undefined,
+                                      ),
+                                      line.yPrice,
+                                  )
+                                : undefined,
+                    };
+                    orderLineItemsRef.current.push(shapeRefs);
+                }
+            }
+            
+            setOrderLineItems([...orderLineItemsRef.current]);
         };
 
         if (chartReady) {
-            cleanupShapes();
             setupShapes();
         }
     }, [chart, chartReady, lines.length]);
