@@ -1,5 +1,5 @@
 // Optimized Hero Section
-import { memo, useState, useEffect, CSSProperties, type JSX } from 'react';
+import { useState, useEffect,  type JSX, type CSSProperties } from 'react';
 import { Link } from 'react-router';
 import styles from './home.module.css';
 
@@ -8,7 +8,6 @@ import ethImage from '../../assets/tokens/eth.svg';
 import daiImage from '../../assets/tokens/dai.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 
-// Memoized token component with proper TypeScript interface
 interface FloatingTokenProps {
   src: string;
   size?: number;
@@ -19,30 +18,31 @@ interface FloatingTokenProps {
   direction?: number;
 }
 
-const FloatingBgToken = memo(({ src, size = 90, top = '50%', left = '50%', duration = 60, delay = 0, direction = 1 }: FloatingTokenProps) => (
-  <div 
-    className={styles.floatingToken}
-    style={{
-      position: 'absolute',
-      top,
-      left,
-      width: size,
-      height: size,
-      opacity: 0.06,
-      zIndex: 4,
-      filter: 'blur(1px)',
-      pointerEvents: 'none',
-      animationDuration: `${duration}s`,
-      animationDelay: `${delay}s`,
-      animationDirection: direction === 1 ? 'normal' : 'reverse'
-    } as CSSProperties}
-  >
-    <img src={src} alt="token-bg" width={size} height={size} />
-  </div>
-));
+function FloatingBgToken({ src, size = 90, top = '50%', left = '50%', duration = 60, delay = 0, direction = 1 }: FloatingTokenProps): JSX.Element {
+  return (
+    <div 
+      className={styles.floatingToken}
+      style={{
+        position: 'absolute',
+        top,
+        left,
+        width: size,
+        height: size,
+        opacity: 0.06,
+        zIndex: 4,
+        filter: 'blur(1px)',
+        pointerEvents: 'none',
+        animationDuration: `${duration}s`,
+        animationDelay: `${delay}s`,
+        animationDirection: direction === 1 ? 'normal' : 'reverse'
+      } as CSSProperties}
+    >
+      <img src={src} alt="token-bg" width={size} height={size} />
+    </div>
+  );
+}
 
-FloatingBgToken.displayName = 'FloatingBgToken';
-
+// Token data interface and definition
 interface TokenData {
   src: string;
   size: number;
@@ -61,7 +61,7 @@ const tokenData: TokenData[] = [
   { src: ethImage, size: 85, top: '20%', left: '-5%', duration: 60, delay: 1.5, direction: 1 }
 ];
 
-const Home = memo((): JSX.Element => {
+export default function Home(): JSX.Element {
   const [hasVisited, setHasVisited] = useState(false);
   
   useEffect(() => {
@@ -73,9 +73,8 @@ const Home = memo((): JSX.Element => {
         sessionStorage.setItem('hasVisitedHome', 'true');
       }
     } catch (e) {
-        console.error('Session storage error:', e);
-      }
-    
+      console.error('Session storage error:', e);
+    }
   }, []);
 
   return (
@@ -122,9 +121,4 @@ const Home = memo((): JSX.Element => {
       </div>
     </section>
   );
-});
-
-Home.displayName = 'Home';
-
-export default Home;
-
+}
