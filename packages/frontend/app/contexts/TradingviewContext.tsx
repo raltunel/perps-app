@@ -21,6 +21,7 @@ import {
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
+import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -64,6 +65,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
     const { debugWallet } = useDebugStore();
+
+    const { showBuysSellsOnChart } = useAppOptions();
 
     useEffect(() => {
         const res = getChartLayout();
@@ -266,6 +269,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             });
         }
     }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            showBuysSellsOnChart || chart.chart().clearMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
+        }
+    }, [showBuysSellsOnChart]);
 
     return (
         <TradingViewContext.Provider value={{ chart }}>
