@@ -148,14 +148,26 @@ export default function ShareModal(props: propsIF) {
                         <Button
                             size='medium'
                             onClick={() => {
-                                if (inputRef.current) window.open(
-                                    'https://x.com/intent/tweet?text=' +
-                                        encodeURIComponent(inputRef.current.value),
-                                    '_blank'
-                                );
+                                const width = 550;
+                                const height = 420;
+                                const left =
+                                    window.screenX +
+                                    (window.outerWidth - width) / 2;
+                                const top =
+                                    window.screenY +
+                                    (window.outerHeight - height) / 2;
+                                if (inputRef.current)
+                                    window.open(
+                                        'https://x.com/intent/tweet?text=' +
+                                            encodeURIComponent(
+                                                inputRef.current.value,
+                                            ),
+                                        'tweetWindow',
+                                        `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`,
+                                    );
                             }}
                         >
-                            Share on X <RiTwitterFill />
+                            Share on 𝕏 <RiTwitterFill />
                         </Button>
                     </div>
                 </div>
