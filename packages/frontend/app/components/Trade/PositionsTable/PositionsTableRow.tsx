@@ -112,7 +112,10 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
-                <RiExternalLinkLine onClick={shareModalCtrl.open} />
+                <RiExternalLinkLine
+                    color='var(--text2)'
+                    onClick={shareModalCtrl.open}
+                />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
