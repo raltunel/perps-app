@@ -22,8 +22,6 @@ import {
     quantityTextFormatWithComma,
     type LineLabel,
 } from '../customOrderLineUtils';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
 
 export type LineData = {
     xLoc: number;
@@ -47,14 +45,12 @@ export type ChartShapeRefs = {
 };
 
 const LineComponent = ({ lines, orderType }: LineProps) => {
-    const { chart } = useTradingView();
+    const { chart, isChartReady } = useTradingView();
 
     const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
 
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
-
-    const { symbol } = useTradeDataStore();
-    const { debugWallet } = useDebugStore();
+    const [localChartReady, setLocalChartReady] = useState(true);
 
     const removeShapeById = async (
         chart: IChartingLibraryWidget,
@@ -69,48 +65,49 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         try {
             if (chart) {
                 const chartRef = chart.activeChart();
-                const prevItems = orderLineItemsRef.current;
 
-                for (const order of prevItems) {
-                    const {
-                        lineId,
-                        textId,
-                        quantityTextId,
-                        cancelButtonTextId,
-                    } = order;
+                if (chartRef) {
+                    const prevItems = orderLineItemsRef.current;
 
-                    const element = chartRef.getShapeById(lineId);
-                    if (element) chartRef.removeEntity(lineId);
+                    for (const order of prevItems) {
+                        const {
+                            lineId,
+                            textId,
+                            quantityTextId,
+                            cancelButtonTextId,
+                        } = order;
 
-                    const elementText = chartRef.getShapeById(textId);
-                    if (elementText) chartRef.removeEntity(textId);
+                        const element = chartRef.getShapeById(lineId);
+                        if (element) chartRef.removeEntity(lineId);
 
-                    if (quantityTextId) {
-                        const quantityElementText =
-                            chartRef.getShapeById(quantityTextId);
-                        if (quantityElementText)
-                            chartRef.removeEntity(quantityTextId);
+                        const elementText = chartRef.getShapeById(textId);
+                        if (elementText) chartRef.removeEntity(textId);
+
+                        if (quantityTextId) {
+                            const quantityElementText =
+                                chartRef.getShapeById(quantityTextId);
+                            if (quantityElementText)
+                                chartRef.removeEntity(quantityTextId);
+                        }
+
+                        if (cancelButtonTextId) {
+                            const cancelButtonText =
+                                chartRef.getShapeById(cancelButtonTextId);
+                            if (cancelButtonText)
+                                chartRef.removeEntity(cancelButtonTextId);
+                        }
                     }
 
-                    if (cancelButtonTextId) {
-                        const cancelButtonText =
-                            chartRef.getShapeById(cancelButtonTextId);
-                        if (cancelButtonText)
-                            chartRef.removeEntity(cancelButtonTextId);
-                    }
+                    orderLineItemsRef.current = [];
+                    setOrderLineItems([]);
                 }
-
-                orderLineItemsRef.current = [];
-                setOrderLineItems([]);
             }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
             orderLineItemsRef.current = [];
             setOrderLineItems([]);
-            console.error({ error });
         }
     };
-
-    const [chartReady, setChartReady] = useState(true);
 
     const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
@@ -177,27 +174,19 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     useEffect(() => {
         let intervalId: NodeJS.Timeout | undefined = undefined;
 
-        const chartRef = chart?.activeChart();
-        setChartReady(false);
+        setLocalChartReady(false);
         cleanupShapes();
-        if (!chartRef) return;
 
-        intervalId = setInterval(async () => {
-            const current = chartRef.symbol();
-            if (current.toLocaleLowerCase() === symbol.toLocaleLowerCase()) {
-                setTimeout(() => {
-                    setChartReady(true);
-                }, 2500);
-
-                clearInterval(intervalId);
-            }
-        }, 100);
+        if (isChartReady) {
+            intervalId = setTimeout(() => {
+                setLocalChartReady(true);
+            }, 300);
+        }
 
         return () => {
             clearInterval(intervalId);
-            setChartReady(false);
         };
-    }, [symbol, debugWallet]);
+    }, [isChartReady]);
 
     useEffect(() => {
         const setupShapes = async () => {
@@ -274,10 +263,10 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             setOrderLineItems([...orderLineItemsRef.current]);
         };
 
-        if (chartReady) {
+        if (localChartReady && isChartReady) {
             setupShapes();
         }
-    }, [chart, chartReady, lines.length]);
+    }, [chart, isChartReady, localChartReady, lines.length]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -379,7 +368,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             !chart ||
             orderLineItems.length === 0 ||
             lines.length === 0 ||
-            orderLineItems.length !== lines.length
+            orderLineItems.length !== lines.length ||
+            !(localChartReady && isChartReady)
         )
             return;
 
@@ -398,6 +388,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         chart,
         JSON.stringify(lines),
         zoomChanged,
+        localChartReady,
+        isChartReady,
     ]);
 
     useEffect(() => {
