@@ -3,7 +3,7 @@ import styles from './CreateSubaccount.module.css';
 import Modal from '~/components/Modal/Modal';
 import type { useModalIF } from '~/hooks/useModal';
 import { useKeydown } from '~/hooks/useKeydown';
-import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
+import { useNotificationStore } from '~/stores/NotificationStore';
 
 // interface for functional component props
 interface propsIF {
@@ -34,7 +34,6 @@ export default function CreateSubaccount(props: propsIF) {
                     title: 'Sub Account Created',
                     message: inputRef.current.value,
                     icon: 'check',
-                    slug: makeSlug(14),
                 });
             }
         }

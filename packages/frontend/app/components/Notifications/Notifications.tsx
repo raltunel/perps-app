@@ -2,7 +2,6 @@ import styles from './Notifications.module.css';
 import Notification from './Notification';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import {
-    makeSlug,
     useNotificationStore,
     type notificationIF,
     type NotificationStoreIF,
@@ -59,7 +58,6 @@ export default function Notifications() {
                 title: title,
                 message: message,
                 icon: 'check',
-                slug: makeSlug(14),
             });
         }
     }, []);

@@ -6,7 +6,6 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
-    makeSlug,
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
@@ -542,7 +541,6 @@ export default function OrderInput() {
                                     title: 'Buy / Long Order Pending',
                                     message: 'Buying 0.0001 ETH at $2,300',
                                     icon: 'spinner',
-                                    slug: makeSlug(14),
                                 });
                                 appSettingsModal.close();
                             }}
@@ -556,7 +554,6 @@ export default function OrderInput() {
                                     title: 'Sell / Short Order Pending',
                                     message: 'Selling 0.0001 ETH at $2,300',
                                     icon: 'spinner',
-                                    slug: makeSlug(14),
                                 });
                                 appSettingsModal.close();
                             }}

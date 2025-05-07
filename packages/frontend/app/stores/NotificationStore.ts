@@ -13,7 +13,7 @@ export interface notificationIF {
     icon: icons;
     // unique ID for the tx used to generate the card, used for
     // ... updating and removing cards
-    slug: number;
+    slug?: number;
 }
 
 // fn to make an skug to ID each notifcation
@@ -41,15 +41,16 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     // fn to add a new population to state
     add: (data: notificationIF): void =>
         set({
-            notifications: [...get().notifications, data].slice(
-                -MAX_NOTIFICATIONS,
-            ),
+            notifications: [
+                ...get().notifications,
+                data.slug ? data : { ...data, slug: makeSlug(14) },
+            ].slice(-MAX_NOTIFICATIONS),
         }),
     // fn to remove an existing element from the data array
     remove: (id: number): void =>
         set({
             notifications: get().notifications.filter(
-                (n: notificationIF) => n.oid !== id,
+                (n: notificationIF) => n.slug !== id,
             ),
         }),
     // fn to clear all notifications from state
