@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
@@ -9,7 +10,6 @@ import styles from './OpenOrdersTable.module.css';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
 import { openOrdersData } from './data';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { WsChannels } from '~/utils/Constants';
 interface OpenOrdersTableProps {
     onCancel?: (time: number, coin: string) => void;
@@ -116,7 +116,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>
-                                {ordersToShow.map((order, index) => (
+                                {ordersToShow.map((order) => (
                                     <OpenOrdersTableRow
                                         key={`order-${order.oid}`}
                                         order={order}

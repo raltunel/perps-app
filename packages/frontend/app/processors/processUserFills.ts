@@ -24,6 +24,7 @@ export function processUserFills(data: UserFillsData): UserFillIF[] {
             tid: fill.tid,
             fee: parseNum(fill.fee),
             value: parseNum(fill.sz) * parseNum(fill.px),
+            closedPnl: parseFloat(fill.closedPnl),
         } as UserFillIF);
     });
     return ret;
@@ -93,8 +94,20 @@ export function sortUserFills(
                     }
                 });
             default:
-                return fills;
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
         }
     }
-    return fills;
+    return fills.sort((a, b) => {
+        if (sortDirection === 'asc') {
+            return a.time - b.time;
+        } else {
+            return b.time - a.time;
+        }
+    });
 }

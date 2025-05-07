@@ -8,7 +8,7 @@ import type { Route } from '../../+types/root';
 import { protocolVaults } from './data';
 import styles from './vaults.module.css';
 // import styles from './vaults.module.css'
-export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         { title: 'Perps - Vaults' },
         { name: 'description', content: 'Welcome to React Router!' },
@@ -19,7 +19,7 @@ export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
 }
 
-export default function Vaults({ loaderData }: Route.ComponentProps) {
+export default function Vaults() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilters, setActiveFilters] = useState<Record<string, boolean>>(
         {},
@@ -106,7 +106,7 @@ export default function Vaults({ loaderData }: Route.ComponentProps) {
                     <h3 className={styles.sectionTitle}>Protocol Vaults</h3>
                     <VaultRowHeader />
                     {protocolVaults.map((vault, idx) => (
-                        <VaultRow vault={vault} />
+                        <VaultRow vault={vault} key={idx} />
                     ))}
                 </section>
                 {/* <section className={styles.vaultSectionContainer}>

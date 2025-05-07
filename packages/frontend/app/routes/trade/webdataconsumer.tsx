@@ -36,6 +36,7 @@ export default function WebDataConsumer() {
         setOrderHistory,
         fetchedChannels,
         setFetchedChannels,
+        setUserSymbolOrders,
         setUserFills,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
@@ -73,6 +74,8 @@ export default function WebDataConsumer() {
         if (!info) return;
         setFetchedChannels(new Set());
         fetchedChannelsRef.current = new Set();
+        setUserOrders([]);
+        setUserSymbolOrders([]);
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
@@ -188,7 +191,11 @@ export default function WebDataConsumer() {
         ) {
             const fills = processUserFills(data);
             fills.sort((a, b) => b.time - a.time);
-            userFillsRef.current = [...fills, ...userFillsRef.current];
+            if (data.isSnapshot) {
+                userFillsRef.current = fills;
+            } else {
+                userFillsRef.current = [...fills, ...userFillsRef.current];
+            }
             fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
         }
     }, []);

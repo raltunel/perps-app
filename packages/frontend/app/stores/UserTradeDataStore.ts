@@ -1,4 +1,4 @@
-import { OrderHistoryLimits } from '~/utils/Constants';
+import { OrderHistoryLimits, TradeHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type {
@@ -90,6 +90,7 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     },
     userFills: [],
     setUserFills: (userFills: UserFillIF[]) => {
-        set({ userFills });
+        const sliced = userFills.slice(0, TradeHistoryLimits.MAX);
+        set({ userFills: sliced });
     },
 });

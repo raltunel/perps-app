@@ -44,6 +44,7 @@ export interface UserFillIF {
     sz: number;
     tid: number;
     value: number;
+    closedPnl: number;
 }
 
 export type UserFillSortBy =

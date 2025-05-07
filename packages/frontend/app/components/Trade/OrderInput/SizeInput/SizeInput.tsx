@@ -1,8 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-import styles from './SizeInput.module.css';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useEffect, useMemo, useRef } from 'react';
-import { useAppSettings } from '~/stores/AppSettingsStore';
+import styles from './SizeInput.module.css';
 
 interface PropsIF {
     value: string;

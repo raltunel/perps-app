@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './HorizontalScrollable.module.css';
 
 interface HorizontalScrollableProps {

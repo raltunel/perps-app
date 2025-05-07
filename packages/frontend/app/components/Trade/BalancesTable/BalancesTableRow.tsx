@@ -1,10 +1,7 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 import styles from './BalancesTable.module.css';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useMemo } from 'react';
-import { parseNum } from '~/utils/orderbook/OrderBookUtils';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 interface BalancesTableRowProps {
     balance: UserBalanceIF;
 }

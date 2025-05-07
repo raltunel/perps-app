@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
-import styles from './BasicMenu.module.css';
-import { FaChevronDown } from 'react-icons/fa';
+import { useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import styles from './BasicMenu.module.css';
 
 export interface BasicMenuItemIF {
     label: string;

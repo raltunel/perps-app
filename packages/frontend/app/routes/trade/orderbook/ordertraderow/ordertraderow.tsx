@@ -1,10 +1,9 @@
 import { LuSquareArrowOutUpRight } from 'react-icons/lu';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatDateToTime } from '~/utils/orderbook/OrderBookUtils';
 import styles from './ordertraderow.module.css';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { useMemo } from 'react';
 
 interface OrderTradeRowProps {
     trade: OrderBookTradeIF;

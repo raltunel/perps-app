@@ -5,7 +5,6 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
-
 const ssrEntry = './server/app.ts';
 
 export default defineConfig(
@@ -19,12 +18,12 @@ export default defineConfig(
         },
 
         plugins: [
-            reactRouter(),
             tsconfigPaths() as PluginOption,
+            reactRouter(),
             VitePWA({
                 registerType: 'autoUpdate',
                 workbox: {
-                    maximumFileSizeToCacheInBytes: 3000000,
+                    maximumFileSizeToCacheInBytes: 3_000_000,
                 },
                 devOptions: {
                     enabled:
