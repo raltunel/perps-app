@@ -67,13 +67,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {position.leverage.value && (
                     <span
                         className={styles.badge}
-                        style={{
-                            color: 'var(--text1)',
-                            // color:
-                            //     position.szi >= 0
-                            //         ? getBsColor().buy
-                            //         : getBsColor().sell,
-                        }}
+                        style={{ color: 'var(--text1)' }}
                     >
                         {position.leverage.value}x
                     </span>
@@ -100,6 +94,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {formatNum(coinPriceMap.get(position.coin) ?? 0)}
             </div>
             <div
+                onClick={shareModalCtrl.open}
                 className={`${styles.cell} ${styles.pnlCell}`}
                 style={{
                     color:
@@ -112,7 +107,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
-                <RiExternalLinkLine onClick={shareModalCtrl.open} />
+                <RiExternalLinkLine color='var(--text2)'  />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
