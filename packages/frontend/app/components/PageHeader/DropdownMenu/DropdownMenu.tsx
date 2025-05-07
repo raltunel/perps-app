@@ -6,12 +6,11 @@ import {
     FaTwitter,
     FaUserSecret,
 } from 'react-icons/fa';
-import styles from './DropdownMenu.module.css';
 import { IoIosInformationCircle } from 'react-icons/io';
+import styles from './DropdownMenu.module.css';
 import { useTutorial } from '~/hooks/useTutorial';
 
 const menuItems = [
-    { name: 'Tutorial', icon: <FaQuestionCircle /> },
     { name: 'Docs', icon: <FaFileAlt /> },
     { name: 'Twitter', icon: <FaTwitter /> },
     { name: 'Discord', icon: <FaDiscord /> },
@@ -22,10 +21,14 @@ const menuItems = [
 ];
 
 const DropdownMenu = () => {
-        const {
-          
-            handleRestartTutorial
-        } = useTutorial();
+    // Use the tutorial hook - the name stays the same!
+    const { handleRestartTutorial } = useTutorial();
+
+    const handleTutorialClick = () => {
+        console.log('Tutorial button clicked in DropdownMenu, restarting tutorial...');
+        handleRestartTutorial();
+    };
+
     return (
         <div className={styles.container}>
             {menuItems.map((item, index) => (
@@ -34,7 +37,11 @@ const DropdownMenu = () => {
                     <span>{item.icon}</span>
                 </div>
             ))}
-            <button className={styles.tutorialButton} onClick={handleRestartTutorial}>Tutorial <IoIosInformationCircle size={22} />
+            <button 
+                className={styles.tutorialButton} 
+                onClick={handleTutorialClick}
+            >
+                Tutorial <IoIosInformationCircle size={22} />
             </button>
             <div className={styles.version}>Version: 1.4</div>
             <button className={styles.logoutButton}>Log Out</button>

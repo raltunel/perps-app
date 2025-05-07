@@ -35,7 +35,7 @@ export default function Trade() {
         showTutorial,
         handleTutorialComplete,
         handleTutorialSkip,
-        handleRestartTutorial
+      
     } = useTutorial();
 
     useEffect(() => {
@@ -66,9 +66,9 @@ export default function Trade() {
                             className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
                         >
                             
-                                <button onClick={handleRestartTutorial}>
+                                {/* <button onClick={handleRestartTutorial}>
                                     Show Tutorial
-                                </button>
+                                </button> */}
                             
                             <ComboBoxContainer />
                             <div

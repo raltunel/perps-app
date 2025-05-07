@@ -16,6 +16,7 @@ import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { useDebugStore } from './stores/DebugStore';
+import { TutorialProvider } from './hooks/useTutorial';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -114,6 +115,9 @@ export default function App() {
         <>
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
+                    <TutorialProvider>
+
+                    
                     <div className='root-container'>
                         {/* Added error boundary for header */}
                         <ComponentErrorBoundary>
@@ -136,7 +140,8 @@ export default function App() {
                             <Notifications />
                         </ComponentErrorBoundary>
                     </div>
-                    <RuntimeDomManipulation />
+                        </TutorialProvider>
+                        <RuntimeDomManipulation />
                 </SdkProvider>
             </Layout>
         </>
