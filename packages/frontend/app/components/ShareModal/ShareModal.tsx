@@ -135,7 +135,7 @@ export default function ShareModal(props: propsIF) {
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            value={`Trade $${memPosition.coin} perps seamlessly on ${PERPS_TWITTER} using my referral code`}
+                            defaultValue={`Trade $${memPosition.coin} perps seamlessly on ${PERPS_TWITTER} using my referral code`}
                         />
                     </div>
                     <div className={styles.button_bank}>
