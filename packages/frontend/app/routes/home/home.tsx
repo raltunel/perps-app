@@ -152,7 +152,7 @@ export default function Home(): JSX.Element {
                 className={`${styles.left} ${!hasVisited ? styles.fadeInUp : ''}`}
             >
                 <h1>Trade Perps With Confidence</h1>
-                <p>Fast execution. Low fees. Up to 100x leverage.</p>
+                <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
                 <div className={styles.buttons}>
                     <Link to={`/trade/${symbol}`} className={styles.primary}>
                         Start Trading
