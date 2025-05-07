@@ -1,14 +1,14 @@
 import { motion } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FiSearch } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
+import { MdSearchOff } from 'react-icons/md';
 import { useNavigate } from 'react-router';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
-import { MdSearchOff } from 'react-icons/md';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;

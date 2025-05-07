@@ -15,7 +15,9 @@ export default function MoreDropdown() {
     return (
         <div className={styles.container}>
             {submenuData.map((menu, idx) => (
-                <a href={menu.link}>{menu.name}</a>
+                <a href={menu.link} key={idx}>
+                    {menu.name}
+                </a>
             ))}
         </div>
     );

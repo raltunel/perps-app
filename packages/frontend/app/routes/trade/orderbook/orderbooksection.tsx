@@ -1,11 +1,11 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
+import BasicMenu from '~/components/BasicMenu/BasicMenu';
+import Tabs from '~/components/Tabs/Tabs';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
-import Tabs from '~/components/Tabs/Tabs';
-import BasicMenu from '~/components/BasicMenu/BasicMenu';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 interface OrderBookSectionProps {
     symbol: string;
 }
@@ -187,18 +187,18 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
     );
-    const renderByMode = () => {
-        switch (orderBookMode) {
-            case 'tab':
-                return orderBookTabsComponent;
-            case 'stacked':
-                return stackedOrderBook;
-            case 'large':
-                return largeOrderBook;
-            default:
-                return orderBookTabsComponent;
-        }
-    };
+    // const renderByMode = () => {
+    //     switch (orderBookMode) {
+    //         case 'tab':
+    //             return orderBookTabsComponent;
+    //         case 'stacked':
+    //             return stackedOrderBook;
+    //         case 'large':
+    //             return largeOrderBook;
+    //         default:
+    //             return orderBookTabsComponent;
+    //     }
+    // };
 
     return (
         <>

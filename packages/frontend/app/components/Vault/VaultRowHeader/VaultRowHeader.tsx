@@ -60,7 +60,7 @@ export default function VaultRowHeader() {
 
     return (
         <div className={styles.container}>
-            {tableHeaders.map((header, idx) => (
+            {tableHeaders.map((header) => (
                 <div
                     key={JSON.stringify(header)}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]}`}

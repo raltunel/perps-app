@@ -1,9 +1,7 @@
 import React from 'react';
-import TradeHistoryTableHeader from './TradeHistoryTableHeader';
-import TradeHistoryTableRow, {
-    type TradeHistoryData,
-} from './TradeHistoryTableRow';
 import styles from './TradeHistoryTable.module.css';
+import TradeHistoryTableHeader from './TradeHistoryTableHeader';
+import TradeHistoryTableRow from './TradeHistoryTableRow';
 import { tradeHistoryData } from './data';
 
 interface TradeHistoryTableProps {

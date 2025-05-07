@@ -6,6 +6,7 @@
     display: grid;
     grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
+    position: relative;
 }
 
 .headerContainer {
@@ -40,7 +41,7 @@
 .tableBody {
     height: 100%;
     overflow-y: scroll;
-    padding-bottom: 1rem;
+    padding-bottom: 2rem;
 }
 .tableBody::-webkit-scrollbar {
     display: none;
@@ -75,11 +76,12 @@
 }
 
 .badge {
-    background: var(--dark3);
-    border-radius: 2px;
+    background: var(--accent1);
+    border-radius: 4px;
     padding: 2px 4px;
     display: inline-block;
-    font-size: var(--font-size-xs, 10px);
+    font-size: var(--font-size-s, 12px);
+    margin-left: 8px;
 }
 
 .actionButton {
@@ -116,8 +118,18 @@
 }
 .markPriceCell {
 }
+
 .pnlCell {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
 }
+
+.pnlCell > svg {
+    cursor: pointer;
+}
+
 .liqPriceCell {
 }
 .marginCell {
@@ -136,6 +148,32 @@
     justify-self: end;
     padding-right: 8px;
 }
+
+/* .coinCellRed{
+    background: linear-gradient(
+        to right,
+        rgba(255, 0, 0, 0.8) 0%,
+        rgba(255, 0, 0, 0.5) 5%,
+        rgba(255, 0, 0, 0.2) 14%,
+        transparent 10%
+      ) !important;
+          padding-left: 8px;
+          border-left: 1px solid var(--red);
+
+}
+
+.coinCellGreen{
+    background: linear-gradient(
+        to right,
+        rgba(7, 233, 108, 0.8) 0%,
+        rgba(11, 139, 2, 0.5) 5%,
+        rgba(255, 0, 0, 0.2) 14%,
+        transparent 10%
+      ) !important;
+          padding-left: 8px;
+        border-left: 1px solid var(--green);
+} */
+
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
@@ -216,4 +254,21 @@
         font-size: 11px;
         margin-right: 4px;
     }
+}
+
+.viewAllLink {
+    color: var(--accent1, #7371fc);
+    text-decoration: none;
+    font-size: var(--font-size-s, 12px);
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-left: 8px;
+    margin-top: 8px;
+    position: absolute;
+    bottom: 0.2rem;
+    left: 0;
+    width: 100%;
+    background: var(--dark2);
+    text-align: left;
+    padding: 0rem 1.7rem;
 }

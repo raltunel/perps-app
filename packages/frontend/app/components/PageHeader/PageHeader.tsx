@@ -275,7 +275,7 @@ export default function PageHeader() {
 
             {appSettingsModal.isOpen && (
                 <Modal close={appSettingsModal.close} position={'center'} title='Options'>
-                    <AppOptions modalControl={appSettingsModal} />
+                    <AppOptions />
                 </Modal>
             )}
         </>

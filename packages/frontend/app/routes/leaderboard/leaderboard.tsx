@@ -1,20 +1,20 @@
-import React, { memo, useMemo } from 'react';
-import type { Route } from '../../+types/root';
-import styles from './leaderboard.module.css';
-import { leaderboardData } from './data';
-import LeaderboardTable from '~/components/Leaderboard/LeaderboardTable/LeaderboardTable';
-import { LuSearch } from 'react-icons/lu';
-import { MdClose, MdExpand } from 'react-icons/md';
+import { memo, useMemo } from 'react';
 import {
     FaChevronDown,
     FaChevronLeft,
     FaChevronRight,
     FaChevronUp,
 } from 'react-icons/fa';
-import { useLeaderboard } from './useLeaderboard';
+import { LuSearch } from 'react-icons/lu';
+import { MdClose, MdExpand } from 'react-icons/md';
+import LeaderboardTable from '~/components/Leaderboard/LeaderboardTable/LeaderboardTable';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import type { Route } from '../../+types/root';
+import { leaderboardData } from './data';
+import styles from './leaderboard.module.css';
+import { useLeaderboard } from './useLeaderboard';
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
     return [
         { title: 'Perps - Leaderboard' },
         { name: 'description', content: 'Welcome to React Router!' },
@@ -36,7 +36,7 @@ const periods: { label: string; value: Period }[] = [
 
 const rowsOptions = [10, 20, 50, 100];
 
-function Leaderboard({ loaderData }: Route.ComponentProps) {
+function Leaderboard() {
     const {
         // State
         inputValue,
@@ -70,8 +70,6 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
         togglePeriodDropdown,
         toggleRowsDropdown,
         toggleFullScreen,
-        currentPage,
-        totalPages,
     } = useLeaderboard(leaderboardData);
 
     const isFullScreen = true;
@@ -230,9 +228,6 @@ function Leaderboard({ loaderData }: Route.ComponentProps) {
 }
 
 // Use a custom comparison function to avoid unnecessary re-renders
-const MemoizedLeaderboard = memo(Leaderboard, (prevProps, nextProps) => {
-    // If loaderData changes, we should re-render
-    return prevProps.loaderData === nextProps.loaderData;
-});
+const MemoizedLeaderboard = memo(Leaderboard);
 
 export default MemoizedLeaderboard;

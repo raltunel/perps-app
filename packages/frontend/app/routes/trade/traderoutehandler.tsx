@@ -42,7 +42,6 @@ export default function TradeRouteHandler() {
 
     useEffect(() => {
         checkSymbol();
-        marketId && console.log(marketId); // Logs the ticker from the URL
     }, [marketId]);
 
     return <></>;

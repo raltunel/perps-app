@@ -1,23 +1,15 @@
-import ScaleOrders from '~/components/Trade/OrderInput/ScaleOrders/ScaleOrders';
+import ShareModal from '~/components/ShareModal/ShareModal';
 import styles from './testpage.module.css';
+import { type useModalIF, useModal } from '~/hooks/useModal';
 
-interface propsIF {}
+export default function testpage() {
 
-// main react fn
-export default function testpage(props: propsIF) {
-    false && props;
+    const modalCtrl: useModalIF = useModal('open');
 
     return (
         <div className={styles.testpage}>
-            <div style={{ width: '400px' }}>
-                <ScaleOrders
-                    totalQuantity={parseFloat('0.2233')}
-                    minPrice={parseFloat('242423')}
-                    maxPrice={parseFloat('99993321')}
-                    // isModal
-                    onClose={() => console.log('close modal')}
-                />
-            </div>
+            <button onClick={modalCtrl.open}>Open Modal</button>
+            { modalCtrl.isOpen && <ShareModal close={modalCtrl.close} /> }
         </div>
     );
 }

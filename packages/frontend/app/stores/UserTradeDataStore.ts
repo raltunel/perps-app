@@ -3,14 +3,12 @@ import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
 
-const limit = 10;
 export interface UserTradeDataStore {
     userOrders: OrderDataIF[];
     userSymbolOrders: OrderDataIF[];
     setUserOrders: (userOrders: OrderDataIF[]) => void;
     setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => void;
     orderHistory: OrderDataIF[];
-    addOrderToHistory: (orderHistory: OrderDataIF[]) => void;
     setOrderHistory: (orderHistory: OrderDataIF[]) => void;
     filterOrderHistory: (
         orderHistory: OrderDataIF[],
@@ -30,57 +28,37 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     userOrders: [],
     userSymbolOrders: [],
     setUserOrders: (userOrders: OrderDataIF[]) => {
-        set({ userOrders: userOrders.slice(0, limit) });
+        set({ userOrders: userOrders });
         get().setUserSymbolOrders(
-            userOrders.filter((e) => e.coin === get().symbol).slice(0, limit),
+            userOrders.filter((e) => e.coin === get().symbol),
         );
     },
     setUserSymbolOrders: (userSymbolOrders: OrderDataIF[]) => {
         set({ userSymbolOrders });
     },
     orderHistory: [],
-    addOrderToHistory: (newOrders: OrderDataIF[]) => {
-        const newOrderHistory = [...newOrders, ...get().orderHistory].slice(
-            0,
-            OrderHistoryLimits.MAX,
-        );
-        newOrderHistory.sort((a, b) => b.timestamp - a.timestamp);
-        set({
-            userSymbolOrderHistory: [
-                ...newOrderHistory.filter((e) => e.coin === get().symbol),
-                ...get().userSymbolOrderHistory,
-            ].slice(0, OrderHistoryLimits.RENDERED),
-        });
-        set({ orderHistory: newOrderHistory });
-    },
     setOrderHistory: (orderHistory: OrderDataIF[]) => {
-        set({ orderHistory });
+        const sliced = orderHistory.slice(0, OrderHistoryLimits.MAX);
+        set({ orderHistory: sliced });
         set({
-            userSymbolOrderHistory: orderHistory
-                .filter((e) => e.coin === get().symbol)
-                .slice(0, OrderHistoryLimits.RENDERED),
+            userSymbolOrderHistory: sliced.filter(
+                (e) => e.coin === get().symbol,
+            ),
         });
     },
     filterOrderHistory: (orderHistory: OrderDataIF[], filterType?: string) => {
         if (!filterType) {
-            return orderHistory.slice(0, OrderHistoryLimits.RENDERED);
+            return orderHistory;
         }
         switch (filterType) {
             case 'all':
-                return orderHistory.slice(0, OrderHistoryLimits.RENDERED);
+                return orderHistory;
             case 'active':
-                return get().userSymbolOrderHistory.slice(
-                    0,
-                    OrderHistoryLimits.RENDERED,
-                );
+                return get().userSymbolOrderHistory;
             case 'long':
-                return orderHistory
-                    .filter((e) => e.side === 'buy')
-                    .slice(0, OrderHistoryLimits.RENDERED);
+                return orderHistory.filter((e) => e.side === 'buy');
             case 'short':
-                return orderHistory
-                    .filter((e) => e.side === 'sell')
-                    .slice(0, OrderHistoryLimits.RENDERED);
+                return orderHistory.filter((e) => e.side === 'sell');
         }
     },
     positions: [],
