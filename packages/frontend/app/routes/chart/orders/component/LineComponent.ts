@@ -189,10 +189,6 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [isChartReady]);
 
     useEffect(() => {
-        console.log({ isChartReady });
-    }, [isChartReady]);
-
-    useEffect(() => {
         const setupShapes = async () => {
             if (!chart || lines.length === 0) return;
 
