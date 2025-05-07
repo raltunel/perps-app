@@ -25,7 +25,10 @@ export const studyEventsUnsubscribe = (chart: any) => {
     chart?.unsubscribe('study_properties_changed', () => {});
 };
 
-export const intervalChangedSubscribe = (chart: any, setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>) => {
+export const intervalChangedSubscribe = (
+    chart: any,
+    setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
     chart
         .activeChart()
         .onIntervalChanged()

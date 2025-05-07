@@ -107,7 +107,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
-                <RiExternalLinkLine color='var(--text2)'  />
+                <RiExternalLinkLine color='var(--text2)' />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
