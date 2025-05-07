@@ -2,7 +2,7 @@ import styles from './Notifications.module.css';
 import Notification from './Notification';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import {
-    makeOID,
+    makeSlug,
     useNotificationStore,
     type notificationIF,
     type NotificationStoreIF,
@@ -44,7 +44,7 @@ export default function Notifications() {
         return unsubscribe;
     }, [debugWallet, info]);
 
-    const postNotification = useCallback((payload: any) => {
+    const postNotification = useCallback((payload) => {
         if (!payload || !payload.data) return;
 
         const notification = payload.data.notification;
@@ -59,7 +59,7 @@ export default function Notifications() {
                 title: title,
                 message: message,
                 icon: 'check',
-                oid: makeOID(14),
+                slug: makeSlug(14),
             });
         }
     }, []);

@@ -54,9 +54,7 @@ export default function Notification(props: propsIF) {
                     onClick={() => dismiss(data.oid)}
                 />
             </header>
-            <p>
-                {data.message} {data.oid}
-            </p>
+            <p>{data.message}</p>
         </section>
     );
 }

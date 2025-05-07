@@ -1,4 +1,4 @@
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -84,7 +84,7 @@ export default function DepositDropdown(props: propsIF) {
                             title: 'Deposit Pending',
                             message: 'Deposit 420,000 USDC',
                             icon: 'spinner',
-                            oid: 763158432574,
+                            slug: makeSlug(14),
                         })}
                     >
                         Deposit
@@ -94,7 +94,7 @@ export default function DepositDropdown(props: propsIF) {
                             title: 'Deposit Pending',
                             message: 'Deposit 420,000 USDC',
                             icon: 'spinner',
-                            oid: 7411987167197,
+                            slug: makeSlug(14),
                         })}
                     >
                         Withdraw

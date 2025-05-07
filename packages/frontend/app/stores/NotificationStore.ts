@@ -13,11 +13,11 @@ export interface notificationIF {
     icon: icons;
     // unique ID for the tx used to generate the card, used for
     // ... updating and removing cards
-    oid: number;
+    slug: number;
 }
 
-// fn to make an order ID number (later this will be supplied by the server)
-export function makeOID(digits: number): number {
+// fn to make an skug to ID each notifcation
+export function makeSlug(digits: number): number {
     const min: number = 10 ** (digits - 1);
     const max: number = 10 ** digits - 1;
     return Math.floor(Math.random() * (max - min + 1)) + min;
