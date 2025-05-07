@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './Tooltip.module.css';
 
 const isTouchDevice = () => {
@@ -6,7 +6,7 @@ const isTouchDevice = () => {
     return (
         'ontouchstart' in window ||
         navigator.maxTouchPoints > 0 ||
-        // @ts-ignore
+        // @ts-expect-error navigator.msMaxTouchPoints is not defined
         navigator.msMaxTouchPoints > 0
     );
 };

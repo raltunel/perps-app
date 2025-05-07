@@ -39,6 +39,8 @@ export default function ShareModal(props: propsIF) {
     const bgType =
         tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
 
+    const referralLink = `https://ambient.finance/v2/join/` + REFERRAL_CODE;
+
     return (
         <Modal title='' close={close}>
             <div className={styles.share_modal}>
@@ -115,10 +117,7 @@ export default function ShareModal(props: propsIF) {
                     </div>
                     <div className={styles.price}>
                         <div>Referral code:</div>
-                        <div>
-                            {`https://perps.ambient.finance/join/` +
-                                REFERRAL_CODE}
-                        </div>
+                        <div>{referralLink}</div>
                     </div>
                 </div>
                 <div className={styles.info}>
@@ -135,7 +134,7 @@ export default function ShareModal(props: propsIF) {
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            value={`Trade $${memPosition.coin} perps seamlessly on ${PERPS_TWITTER} using my referral code`}
+                            defaultValue={`Trade $${memPosition.coin} perps on ${PERPS_TWITTER} using my referral code`}
                         />
                     </div>
                     <div className={styles.button_bank}>
@@ -145,8 +144,31 @@ export default function ShareModal(props: propsIF) {
                         <Button size='medium'>
                             Copy Link <LuCopy />
                         </Button>
-                        <Button size='medium'>
-                            Share on X <RiTwitterFill />
+                        <Button
+                            size='medium'
+                            onClick={() => {
+                                const width = 550;
+                                const height = 420;
+                                const left =
+                                    window.screenX +
+                                    (window.outerWidth - width) / 2;
+                                const top =
+                                    window.screenY +
+                                    (window.outerHeight - height) / 2;
+                                if (inputRef.current)
+                                    window.open(
+                                        'https://x.com/intent/tweet?text=' +
+                                            encodeURIComponent(
+                                                inputRef.current.value,
+                                            ) +
+                                            ' ' +
+                                            encodeURIComponent(referralLink),
+                                        'tweetWindow',
+                                        `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`,
+                                    );
+                            }}
+                        >
+                            Share on 𝕏 <RiTwitterFill />
                         </Button>
                     </div>
                 </div>

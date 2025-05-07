@@ -33,6 +33,7 @@ export const fetchCandles = async (
 
         return json;
     } catch (error) {
+        console.error(error);
         return undefined;
     }
 };
@@ -58,6 +59,7 @@ export const fetchUserFillsHistory = async (user: string) => {
 
         return json;
     } catch (error) {
+        console.error(error);
         return undefined;
     }
 };

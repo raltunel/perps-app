@@ -33,10 +33,12 @@ import {
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
+    isChartReady: boolean;
 }
 
 export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
+    isChartReady: false,
 });
 
 export interface ChartContainerProps {
@@ -64,6 +66,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
     const { debugWallet } = useDebugStore();
+
+    const [isChartReady, setIsChartReady] = useState(false);
 
     useEffect(() => {
         const res = getChartLayout();
@@ -121,6 +125,17 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             chart.chart().refreshMarks();
         }
     }, [bsColor, chart]);
+
+    useEffect(() => {
+        let intervalId = undefined;
+        if (!isChartReady && chart) {
+            intervalId = setInterval(() => {
+                const isReady = chart.chart().dataReady();
+                setIsChartReady(isReady);
+            }, 200);
+        }
+        return () => clearInterval(intervalId);
+    }, [chart, isChartReady]);
 
     useEffect(() => {
         if (chart) {
@@ -243,6 +258,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (chart) {
+            setIsChartReady(false);
             const chartRef = chart.chart();
             chartRef.setSymbol(symbol);
             saveChartLayout(chart);
@@ -250,10 +266,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [symbol]);
 
     useEffect(() => {
+        setIsChartReady(false);
+    }, [debugWallet]);
+
+    useEffect(() => {
         if (!chart) return;
         drawingEvent(chart);
         studyEvents(chart);
-        intervalChangedSubscribe(chart);
+        intervalChangedSubscribe(chart, setIsChartReady);
     }, [chart]);
 
     useEffect(() => {
@@ -268,7 +288,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [debugWallet, chart, symbol]);
 
     return (
-        <TradingViewContext.Provider value={{ chart }}>
+        <TradingViewContext.Provider value={{ chart, isChartReady }}>
             {children}
         </TradingViewContext.Provider>
     );

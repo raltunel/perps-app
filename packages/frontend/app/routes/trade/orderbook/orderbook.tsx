@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useSdk } from '~/hooks/useSdk';
+import { useWorker } from '~/hooks/useWorker';
+import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -16,15 +20,9 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { TableState } from '~/utils/CommonIFs';
 import { motion } from 'framer-motion';
-import Spinner from '~/components/Spinners/Spinner';
-
 interface OrderBookProps {
     symbol: string;
     orderCount: number;

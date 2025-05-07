@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './VaultCard.module.css';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
+import styles from './VaultCard.module.css';
 
 interface VaultCardProps {
     name: string;
@@ -19,7 +19,6 @@ interface VaultCardProps {
 const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
     const {
         name,
-        icon,
         description,
         apr,
         totalDeposited,
