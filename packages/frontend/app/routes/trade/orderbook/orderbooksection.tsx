@@ -114,16 +114,17 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     ];
 
     // Available tabs for the order book section
-    const orderBookTabs = ['Order Book', 'Recent Trades'];
+    const orderBookTabs = ['Book', 'Trades'];
     const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
     const handleTabChange = (tab: string) => {
+        console.log('tab', tab);
         setActiveTab(tab);
     };
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Order Book':
+            case 'Book':
                 return orderBookComponent;
-            case 'Recent Trades':
+            case 'Trades':
                 return orderBookTrades;
 
             default:
@@ -135,7 +136,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         <div className={styles.orderBookSection}>
             <div className={styles.stackedContainer}>
                 <div className={styles.sectionHeader}>
-                    <div className={styles.sectionHeaderTitle}>Order Book</div>
+                    <div className={styles.sectionHeaderTitle}>Book</div>
                     <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                 </div>
                 <OrderBook symbol={symbol} orderCount={orderCountForStacked} />
@@ -153,9 +154,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <div className={styles.largeContainer}>
                 <div className={styles.childOfLargeContainer}>
                     <div className={styles.sectionHeader}>
-                        <div className={styles.sectionHeaderTitle}>
-                            Order Book
-                        </div>
+                        <div className={styles.sectionHeaderTitle}>Book</div>
                     </div>
                     <OrderBook symbol={symbol} orderCount={orderCount} />
                 </div>
@@ -183,6 +182,8 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={menuContent}
+                wide={true}
+                flex={true}
             />
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
