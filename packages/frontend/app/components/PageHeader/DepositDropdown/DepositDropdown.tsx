@@ -1,4 +1,4 @@
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { useNotificationStore, type NotificationStoreIF } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -15,7 +15,7 @@ interface propsIF {
 export default function DepositDropdown(props: propsIF) {
     const { isUserConnected, isDropdown } = props;
 
-    const notifications = useNotificationStore();
+    const notifications: NotificationStoreIF = useNotificationStore();
 
     const { accountOverview, selectedCurrency } = useTradeDataStore();
 
