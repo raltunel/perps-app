@@ -94,6 +94,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {formatNum(coinPriceMap.get(position.coin) ?? 0)}
             </div>
             <div
+                onClick={shareModalCtrl.open}
                 className={`${styles.cell} ${styles.pnlCell}`}
                 style={{
                     color:
@@ -106,10 +107,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             >
                 {formatNum(position.unrealizedPnl, 2, true, true)} (
                 {formatNum(position.returnOnEquity * 100, 1)}%)
-                <RiExternalLinkLine
-                    color='var(--text2)'
-                    onClick={shareModalCtrl.open}
-                />
+                <RiExternalLinkLine color='var(--text2)'  />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
                 {formatNum(position.liquidationPx)}
