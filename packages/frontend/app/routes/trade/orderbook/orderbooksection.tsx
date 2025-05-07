@@ -117,13 +117,14 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     const orderBookTabs = ['Book', 'Trades'];
     const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
     const handleTabChange = (tab: string) => {
+        console.log('tab', tab);
         setActiveTab(tab);
     };
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Order Book':
+            case 'Book':
                 return orderBookComponent;
-            case 'Recent Trades':
+            case 'Trades':
                 return orderBookTrades;
 
             default:
