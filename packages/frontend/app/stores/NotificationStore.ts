@@ -16,6 +16,9 @@ export interface notificationIF {
     slug: number;
 }
 
+// type to allow new notification creation without manual fingerprinting
+type notificatioSlugOptionalT = Omit<notificationIF, 'slug'> & { slug?: number };
+
 // fn to make an skug to ID each notifcation
 export function makeSlug(digits: number): number {
     const min: number = 10 ** (digits - 1);
@@ -26,7 +29,7 @@ export function makeSlug(digits: number): number {
 // shape of the return obj produced by this store
 export interface NotificationStoreIF {
     notifications: notificationIF[];
-    add: (data: notificationIF) => void;
+    add: (data: notificatioSlugOptionalT) => void;
     remove: (id: number) => void;
     clearAll: () => void;
 }
@@ -39,7 +42,7 @@ export const useNotificationStore = create<NotificationStoreIF>((set, get) => ({
     // raw data consumed by the app
     notifications: [],
     // fn to add a new population to state
-    add: (data: Omit<notificationIF, "slug"> & { slug?: number }): void =>
+    add: (data: notificatioSlugOptionalT): void =>
         set({
             notifications: [
                 ...get().notifications,
