@@ -67,13 +67,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {position.leverage.value && (
                     <span
                         className={styles.badge}
-                        style={{
-                            color: 'var(--text1)',
-                            // color:
-                            //     position.szi >= 0
-                            //         ? getBsColor().buy
-                            //         : getBsColor().sell,
-                        }}
+                        style={{ color: 'var(--text1)' }}
                     >
                         {position.leverage.value}x
                     </span>
