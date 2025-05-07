@@ -1,8 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
-import styles from './Notification.module.css';
-import { useEffect, useRef } from 'react';
 import type { notificationIF } from '~/stores/NotificationStore';
+import styles from './Notification.module.css';
 
 interface propsIF {
     data: notificationIF;
@@ -11,7 +11,6 @@ interface propsIF {
 
 export default function Notification(props: propsIF) {
     const { data, dismiss } = props;
-console.log(data);
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
 

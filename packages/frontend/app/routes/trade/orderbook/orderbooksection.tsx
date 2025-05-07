@@ -117,7 +117,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     const orderBookTabs = ['Book', 'Trades'];
     const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
     const handleTabChange = (tab: string) => {
-        console.log('tab', tab);
         setActiveTab(tab);
     };
     const renderTabContent = () => {
