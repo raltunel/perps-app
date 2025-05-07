@@ -1,32 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
-import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
+import TradeHistoryTable from '~/components/Trade/TradeHistoryTable/TradeHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import WebDataConsumer from '../trade/webdataconsumer';
-import styles from './orderHistory.module.css';
 import { WsChannels } from '~/utils/Constants';
+import type { UserFillIF } from '~/utils/UserDataIFs';
+import WebDataConsumer from '../trade/webdataconsumer';
+import styles from './tradeHistory.module.css';
 
-function OrderHistory() {
+function TradeHistory() {
     const { address } = useParams<{ address: string }>();
 
     const [isFetched, setIsFetched] = useState(false);
 
     const { debugWallet } = useDebugStore();
 
-    const { orderHistory, fetchedChannels } = useTradeDataStore();
+    const { userFills, fetchedChannels } = useTradeDataStore();
 
-    const orderHistoryFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
+    const tradeHistoryFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.USER_FILLS);
     }, [fetchedChannels]);
 
-    const [fetchedHistoryData, setFetchedHistoryData] = useState<OrderDataIF[]>(
+    const [fetchedHistoryData, setFetchedHistoryData] = useState<UserFillIF[]>(
         [],
     );
 
-    const { fetchOrderHistory } = useInfoApi();
+    const { fetchUserFills } = useInfoApi();
 
     // TODO: live update is disabled for now, because websocket snapshots were sending limited data
     const isCurrentUser = useMemo(() => {
@@ -43,22 +43,22 @@ function OrderHistory() {
 
     useEffect(() => {
         if (!isCurrentUser && address) {
-            fetchOrderHistory(address).then((data) => {
+            fetchUserFills(address).then((data) => {
                 setFetchedHistoryData(data);
                 setIsFetched(true);
             });
-        } else if (orderHistoryFetched) {
+        } else if (tradeHistoryFetched) {
             setIsFetched(true);
         }
-    }, [isCurrentUser, address, orderHistoryFetched]);
+    }, [isCurrentUser, address, tradeHistoryFetched]);
 
     const tableData = useMemo(() => {
         if (isCurrentUser) {
-            return orderHistory;
+            return userFills;
         } else {
             return fetchedHistoryData;
         }
-    }, [isCurrentUser, orderHistory, fetchedHistoryData]);
+    }, [isCurrentUser, userFills, fetchedHistoryData]);
 
     const isFullScreen = true;
 
@@ -70,10 +70,10 @@ function OrderHistory() {
     return (
         <div className={containerClassName}>
             {isCurrentUser && <WebDataConsumer />}
-            <header>Order History</header>
+            <header>Trade History</header>
 
             <div className={styles.content}>
-                <OrderHistoryTable
+                <TradeHistoryTable
                     data={tableData}
                     isFetched={isFetched}
                     pageMode={true}
@@ -82,4 +82,4 @@ function OrderHistory() {
         </div>
     );
 }
-export default OrderHistory;
+export default TradeHistory;

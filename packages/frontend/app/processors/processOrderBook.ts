@@ -6,10 +6,10 @@ import type {
 } from '../utils/orderbook/OrderBookIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
-export function processOrderBookMessage(
-    data: L2BookData,
-    slice?: number,
-): { sells: OrderBookRowIF[]; buys: OrderBookRowIF[] } {
+export function processOrderBookMessage(data: L2BookData): {
+    sells: OrderBookRowIF[];
+    buys: OrderBookRowIF[];
+} {
     const buysRaw = data.levels[0];
     const sellsRaw = data.levels[1];
 

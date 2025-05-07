@@ -32,5 +32,7 @@ export default [
 
     route('orderHistory/:address?', 'routes/orderHistory/orderHistory.tsx'),
 
+    route('tradeHistory/:address?', 'routes/tradeHistory/tradeHistory.tsx'),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;
