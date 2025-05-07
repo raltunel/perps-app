@@ -1,3 +1,4 @@
+
 html,
 body {
     overscroll-behavior-x: none;
@@ -6,10 +7,10 @@ body {
 
 .mainContainer {
     height: 100%;
-    
     display: grid;
     grid-template-rows: 10px minmax(0, 1fr);
 }
+
 .container {
     height: 100%;
     display: grid;
@@ -22,7 +23,6 @@ body {
     display: grid;
     height: 100%;
     border-radius: var(--main-border-radius);
-
     justify-content: center;
     align-items: center;
 }
@@ -33,7 +33,6 @@ body {
             --trade-module-width-desktop-small
         );
     gap: var(--main-gap);
-    /* background: var(--dark2); */
 }
 
 .containerTop.orderBookLarge {
@@ -41,11 +40,6 @@ body {
         1fr var(--order-book-width-desktop-large-doubled)
         var(--trade-module-width-desktop-large);
 }
-/* .containerTop div{
-  background: var(--dark2);
-  height: 100%;
-  border-radius: var(--main-border-radius);
-} */
 
 .containerBottom {
     width: 100%;
@@ -66,13 +60,12 @@ body {
     width: 100%;
     height: 100%;
     background: var(--dark2);
-
     border-radius: var(--main-border-radius);
-
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
+
 .containerTopLeft {
     height: 100%;
     display: grid;
@@ -85,7 +78,6 @@ body {
     background: var(--dark2);
     height: 100%;
     border-radius: var(--main-border-radius);
-    
 }
 
 .watchlist,
@@ -96,8 +88,6 @@ body {
     background: var(--dark2);
     height: 100%;
     border-radius: var(--main-border-radius);
-
-    /*  */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -113,17 +103,6 @@ body {
     );
 }
 
-/* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
-
-.tradeModules {
-    /* background: url('./tempImages/orderInput.png') !important;
-background-size: 100% 100%;
-background-position: center;
-background-repeat: no-repeat;
-filter: blur(2px); */
-}
-
-/* -----------------------END OF TEMP CSS CODE */
 .chart {
     max-height: 61vh;
     overflow: hidden;
@@ -134,6 +113,7 @@ filter: blur(2px); */
     overflow: hidden;
 }
 
+/* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
         grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
@@ -154,18 +134,53 @@ filter: blur(2px); */
     }
 }
 
-@media only screen and (max-width: 1080px) {
-    .containerTop,
+/* Tablet styles */
+@media only screen and (max-width: 1080px) and (min-width: 769px) {
+    .containerTop {
+        grid-template-columns: 1fr;
+    }
+    
     .containerTopLeft {
         grid-template-columns: 1fr;
     }
 
-    .orderBook,
-    .tradeModules {
+    .orderBook {
         display: none;
     }
 }
 
-
-
-
+/* Mobile styles */
+@media only screen and (max-width: 768px) {
+    /* Modify container layout */
+    .container {
+        grid-template-rows: 1fr;
+        height: 100vh;
+        gap: 0;
+    }
+    
+    .containerTop {
+        grid-template-columns: 1fr;
+        height: 100vh;
+        gap: 0;
+        border-radius: 0;
+    }
+    
+    /* Position OrderInput to take full screen */
+    .tradeModules {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        z-index: 100;
+        border-radius: 0;
+    }
+    
+    /* Hide everything else */
+    .containerTopLeft,
+    .orderBook,
+    .containerBottom {
+        display: none;
+    }
+}
