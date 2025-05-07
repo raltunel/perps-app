@@ -121,9 +121,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (chart) {
-            chart.chart().refreshMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
         }
-    }, [bsColor, chart]);
+    }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (chart) {
@@ -144,7 +144,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
 
                 saveChartLayout(chart);
-                chart.chart().refreshMarks();
+                showBuysSellsOnChart && chart.chart().refreshMarks();
             });
         }
     }, [chart]);
@@ -264,7 +264,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             getMarkFillData(symbol, debugWallet.address).then(() => {
                 if (chart) {
                     chart.chart().clearMarks();
-                    chart.chart().refreshMarks();
+                    showBuysSellsOnChart && chart.chart().refreshMarks();
                 }
             });
         }
