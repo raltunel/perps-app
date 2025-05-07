@@ -160,7 +160,14 @@
   }
 }
 
+@media (max-width: 768px) {
 
+.buttons{
+  display: flex;
+  justify-content: center;
+ 
+}
+}
 
 .floatingToken {
   animation-name: floatAcross;
