@@ -1,4 +1,7 @@
-import { useNotificationStore, type NotificationStoreIF } from '~/stores/NotificationStore';
+import {
+    useNotificationStore,
+    type NotificationStoreIF,
+} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -80,20 +83,24 @@ export default function DepositDropdown(props: propsIF) {
             {isUserConnected ? (
                 <div className={styles.actionButtons}>
                     <button
-                        onClick={() => notifications.add({
-                            title: 'Deposit Pending',
-                            message: 'Deposit 420,000 USDC',
-                            icon: 'spinner',
-                        })}
+                        onClick={() =>
+                            notifications.add({
+                                title: 'Deposit Pending',
+                                message: 'Deposit 420,000 USDC',
+                                icon: 'spinner',
+                            })
+                        }
                     >
                         Deposit
                     </button>
                     <button
-                        onClick={() => notifications.add({
-                            title: 'Deposit Pending',
-                            message: 'Deposit 420,000 USDC',
-                            icon: 'spinner',
-                        })}
+                        onClick={() =>
+                            notifications.add({
+                                title: 'Deposit Pending',
+                                message: 'Deposit 420,000 USDC',
+                                icon: 'spinner',
+                            })
+                        }
                     >
                         Withdraw
                     </button>

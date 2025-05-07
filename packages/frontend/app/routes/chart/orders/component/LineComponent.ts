@@ -102,7 +102,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                     setOrderLineItems([]);
                 }
             }
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
             orderLineItemsRef.current = [];
             setOrderLineItems([]);

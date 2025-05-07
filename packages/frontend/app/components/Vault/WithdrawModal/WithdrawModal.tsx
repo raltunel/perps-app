@@ -23,8 +23,7 @@ export default function WithdrawModal({
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
-    const { formatCurrency, validateAmount } =
-        useVaultManager();
+    const { formatCurrency, validateAmount } = useVaultManager();
 
     // Use a default unit if none is provided
     const unitValue = vault.unit || 'USD';
@@ -35,7 +34,6 @@ export default function WithdrawModal({
 
             setAmount(newValue);
             setError(null);
-         
         },
         [],
     );
