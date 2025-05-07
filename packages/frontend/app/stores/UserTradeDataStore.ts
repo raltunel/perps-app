@@ -1,7 +1,11 @@
-import { OrderHistoryLimits } from '~/utils/Constants';
+import { OrderHistoryLimits, TradeHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
-import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
+import type {
+    AccountOverviewIF,
+    UserBalanceIF,
+    UserFillIF,
+} from '~/utils/UserDataIFs';
 
 export interface UserTradeDataStore {
     userOrders: OrderDataIF[];
@@ -22,6 +26,8 @@ export interface UserTradeDataStore {
     setUserBalances: (userBalances: UserBalanceIF[]) => void;
     accountOverview: AccountOverviewIF;
     setAccountOverview: (accountOverview: AccountOverviewIF) => void;
+    userFills: UserFillIF[];
+    setUserFills: (userFills: UserFillIF[]) => void;
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
@@ -81,5 +87,10 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     },
     setAccountOverview: (accountOverview: AccountOverviewIF) => {
         set({ accountOverview });
+    },
+    userFills: [],
+    setUserFills: (userFills: UserFillIF[]) => {
+        const sliced = userFills.slice(0, TradeHistoryLimits.MAX);
+        set({ userFills: sliced });
     },
 });
