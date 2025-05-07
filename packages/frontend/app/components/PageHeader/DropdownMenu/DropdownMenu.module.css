@@ -88,3 +88,16 @@
 .toggleButton {
     display: none;
 }
+.tutorialButton{
+    width: 100%;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    color: var(--text1);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+   padding-right: 2px;
+   padding-left: 4px;
+}

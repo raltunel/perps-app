@@ -7,6 +7,8 @@ import {
     FaUserSecret,
 } from 'react-icons/fa';
 import styles from './DropdownMenu.module.css';
+import { IoIosInformationCircle } from 'react-icons/io';
+import { useTutorial } from '~/hooks/useTutorial';
 
 const menuItems = [
     { name: 'Tutorial', icon: <FaQuestionCircle /> },
@@ -20,6 +22,10 @@ const menuItems = [
 ];
 
 const DropdownMenu = () => {
+        const {
+          
+            handleRestartTutorial
+        } = useTutorial();
     return (
         <div className={styles.container}>
             {menuItems.map((item, index) => (
@@ -28,6 +34,8 @@ const DropdownMenu = () => {
                     <span>{item.icon}</span>
                 </div>
             ))}
+            <button className={styles.tutorialButton} onClick={handleRestartTutorial}>Tutorial <IoIosInformationCircle size={22} />
+            </button>
             <div className={styles.version}>Version: 1.4</div>
             <button className={styles.logoutButton}>Log Out</button>
         </div>
