@@ -55,7 +55,7 @@ export default function Notifications() {
             const message = notification.split(':')[1];
 
             // add to store
-            data.addFromWS({
+            data.add({
                 title: title,
                 message: message,
                 icon: 'check',

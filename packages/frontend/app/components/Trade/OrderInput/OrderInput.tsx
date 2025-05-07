@@ -537,7 +537,12 @@ export default function OrderInput() {
                         <ConfirmationModal
                             tx='buy'
                             onClose={() => {
-                                notifications.add('buyPending');
+                                notifications.add({
+                                    title: 'Buy / Long Order Pending',
+                                    message: 'Buying 0.0001 ETH at $2,300',
+                                    icon: 'spinner',
+                                    oid: 6846465876464568,
+                                });
                                 appSettingsModal.close();
                             }}
                         />
@@ -546,7 +551,12 @@ export default function OrderInput() {
                         <ConfirmationModal
                             tx='sell'
                             onClose={() => {
-                                notifications.add('sellPending');
+                                notifications.add({
+                                    title: 'Sell / Short Order Pending',
+                                    message: 'Selling 0.0001 ETH at $2,300',
+                                    icon: 'spinner',
+                                    oid: 6534141565135,
+                                });
                                 appSettingsModal.close();
                             }}
                         />
