@@ -124,9 +124,6 @@
     flex-direction: row;
     gap: 4px;
     align-items: center;
-}
-
-.pnlCell > svg {
     cursor: pointer;
 }
 
@@ -148,31 +145,6 @@
     justify-self: end;
     padding-right: 8px;
 }
-
-/* .coinCellRed{
-    background: linear-gradient(
-        to right,
-        rgba(255, 0, 0, 0.8) 0%,
-        rgba(255, 0, 0, 0.5) 5%,
-        rgba(255, 0, 0, 0.2) 14%,
-        transparent 10%
-      ) !important;
-          padding-left: 8px;
-          border-left: 1px solid var(--red);
-
-}
-
-.coinCellGreen{
-    background: linear-gradient(
-        to right,
-        rgba(7, 233, 108, 0.8) 0%,
-        rgba(11, 139, 2, 0.5) 5%,
-        rgba(255, 0, 0, 0.2) 14%,
-        transparent 10%
-      ) !important;
-          padding-left: 8px;
-        border-left: 1px solid var(--green);
-} */
 
 @media (max-width: 1400px) {
     .rowContainer,
