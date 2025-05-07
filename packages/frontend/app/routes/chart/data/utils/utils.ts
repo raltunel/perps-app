@@ -168,7 +168,7 @@ function rgbaFromHex(value: string) {
 export function interpolate(fromHexString: string, toHexString: string) {
     const fromRgba = rgbaFromHex(fromHexString);
     const toRgba = rgbaFromHex(toHexString);
-    const numberOfSteps = 11;
+    const numberOfSteps = 12;
     const results = [];
     const step = 1 / numberOfSteps;
 
