@@ -184,6 +184,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
                 onTabChange={handleTabChange}
                 rightContent={menuContent}
                 wide={true}
+                flex={true}
             />
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
