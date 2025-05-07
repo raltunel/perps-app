@@ -151,7 +151,7 @@ export default function Home(): JSX.Element {
             <div
                 className={`${styles.left} ${!hasVisited ? styles.fadeInUp : ''}`}
             >
-                <h1>Trade Perps With Confidence</h1>
+                <h1>Trade Perps With Ambient</h1>
                 <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
                 <div className={styles.buttons}>
                     <Link to={`/trade/${symbol}`} className={styles.primary}>
