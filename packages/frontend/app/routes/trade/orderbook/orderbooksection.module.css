@@ -8,6 +8,10 @@
     font-family: var(--font-family-main);
 }
 
+.orderBookSectionContainer {
+    width: 100%;
+}
+
 .orderBookSectionHeader {
     display: flex;
     flex-direction: row;

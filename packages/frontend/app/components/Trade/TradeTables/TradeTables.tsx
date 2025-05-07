@@ -57,10 +57,6 @@ export default function TradeTable() {
         };
     }, [fetchedChannels]);
 
-    useEffect(() => {
-        console.log('userFills', userFills);
-    }, [userFills]);
-
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
     };

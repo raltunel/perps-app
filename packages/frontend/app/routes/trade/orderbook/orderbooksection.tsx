@@ -114,7 +114,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
     ];
 
     // Available tabs for the order book section
-    const orderBookTabs = ['Order Book', 'Recent Trades'];
+    const orderBookTabs = ['Book', 'Trades'];
     const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -183,6 +183,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={menuContent}
+                wide={true}
             />
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>

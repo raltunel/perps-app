@@ -47,6 +47,10 @@
     cursor: pointer;
 }
 
+.wideTab {
+    padding: 4px 24px;
+}
+
 .tab:hover {
     color: var(--text1);
 }

@@ -10,6 +10,7 @@ interface TabProps {
     onClick: () => void;
     layoutId: string;
     notInteractive?: boolean;
+    wide?: boolean;
 }
 
 export function Tab(props: TabProps) {
@@ -19,11 +20,12 @@ export function Tab(props: TabProps) {
         onClick,
         layoutId,
         notInteractive = false,
+        wide = false,
     } = props;
 
     return (
         <button
-            className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
+            className={`${styles.tab} ${wide ? styles.wideTab : ''} ${isActive ? styles.activeTab : ''}`}
             style={{
                 color: notInteractive ? 'var(--text1)' : '',
                 cursor: notInteractive ? 'auto' : 'cursor',
@@ -50,6 +52,7 @@ export interface TabsProps {
     rightContent?: React.ReactNode;
     wrapperId?: string;
     layoutIdPrefix?: string;
+    wide?: boolean;
 }
 
 export default function Tabs(props: TabsProps) {
@@ -60,6 +63,7 @@ export default function Tabs(props: TabsProps) {
         rightContent,
         wrapperId,
         layoutIdPrefix = 'tabIndicator',
+        wide = false,
     } = props;
 
     const {
@@ -248,6 +252,7 @@ export default function Tabs(props: TabsProps) {
                                 onClick={() => handleTabClick(tabId)}
                                 notInteractive={tabs.length <= 1}
                                 layoutId={layoutId} // Pass the unique layoutId
+                                wide={wide}
                             />
                         );
                     })}
