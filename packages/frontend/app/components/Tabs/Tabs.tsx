@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './Tabs.module.css';
+import { WsChannels } from '~/utils/Constants';
 
 interface TabProps {
     label: string;
@@ -62,11 +63,15 @@ export default function Tabs(props: TabsProps) {
     } = props;
 
     const {
-        webDataFetched,
+        fetchedChannels,
         userBalances: { length: balancesCount },
         positions: { length: positionsCount },
         userOrders: { length: openOrdersCount },
     } = useTradeDataStore();
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {

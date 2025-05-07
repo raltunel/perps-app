@@ -96,7 +96,10 @@ export const debugWallets: DebugWallet[] = [
 
 export const OrderHistoryLimits = {
     MAX: 1000,
-    RENDERED: 50,
+};
+
+export const TradeHistoryLimits = {
+    MAX: 1000,
 };
 
 export * from './feeSchedule';

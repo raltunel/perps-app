@@ -8,6 +8,7 @@ import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
+import { WsChannels } from '~/utils/Constants';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -27,8 +28,12 @@ export default function PositionsTable(props: PositionsTableProps) {
         TableState.LOADING,
     );
 
-    const { positions, webDataFetched } = useTradeDataStore();
+    const { positions, fetchedChannels } = useTradeDataStore();
     const limit = 10;
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
     const positionsToShow = useMemo(() => {
         if (pageMode) {

@@ -9,6 +9,7 @@ import styles from './BalancesTable.module.css';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
+import { WsChannels } from '~/utils/Constants';
 
 type BalancesTableProps = {
     hideSmallBalances: boolean;
@@ -19,11 +20,15 @@ export default function BalancesTable(props: BalancesTableProps) {
 
     const smallBalanceThreshold = 10;
 
-    const { userBalances, webDataFetched } = useTradeDataStore();
+    const { userBalances, fetchedChannels } = useTradeDataStore();
 
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
     const [sortBy, setSortBy] = useState<UserBalanceSortBy>();
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
