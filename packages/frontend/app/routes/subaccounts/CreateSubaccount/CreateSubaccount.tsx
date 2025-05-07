@@ -3,6 +3,7 @@ import styles from './CreateSubaccount.module.css';
 import Modal from '~/components/Modal/Modal';
 import type { useModalIF } from '~/hooks/useModal';
 import { useKeydown } from '~/hooks/useKeydown';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 
 // interface for functional component props
 interface propsIF {
@@ -20,11 +21,22 @@ export default function CreateSubaccount(props: propsIF) {
     // string to link `<label>` and `<input>` fields
     const INPUT_ID_FOR_DOM = 'create_subaccount_input_field';
 
+    // logic to dispatch a notification for sub-account creation
+    const notifications = useNotificationStore();
+
     // fn to handle subaccount creation
     function createSubaccount(): void {
         if (inputRef.current) {
             const text: string = inputRef.current.value;
-            if (text.length) create(inputRef.current.value);
+            if (text.length) {
+                create(inputRef.current.value);
+                notifications.add({
+                    title: 'Sub Account Created',
+                    message: inputRef.current.value,
+                    icon: 'check',
+                    slug: makeSlug(14),
+                });
+            }
         }
         modalControl.close();
     }
