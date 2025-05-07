@@ -136,7 +136,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         <div className={styles.orderBookSection}>
             <div className={styles.stackedContainer}>
                 <div className={styles.sectionHeader}>
-                    <div className={styles.sectionHeaderTitle}>Order Book</div>
+                    <div className={styles.sectionHeaderTitle}>Book</div>
                     <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                 </div>
                 <OrderBook symbol={symbol} orderCount={orderCountForStacked} />
@@ -154,9 +154,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <div className={styles.largeContainer}>
                 <div className={styles.childOfLargeContainer}>
                     <div className={styles.sectionHeader}>
-                        <div className={styles.sectionHeaderTitle}>
-                            Order Book
-                        </div>
+                        <div className={styles.sectionHeaderTitle}>Book</div>
                     </div>
                     <OrderBook symbol={symbol} orderCount={orderCount} />
                 </div>
