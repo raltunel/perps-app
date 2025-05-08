@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
 import type { notificationIF } from '~/stores/NotificationStore';
@@ -32,6 +32,27 @@ export default function Notification(props: propsIF) {
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
 
+    // logic to add green syntax highlighting to Bought notifications
+    function formatMessage(message: string): ReactNode {
+        const fixedMessage: string = message.trim();
+        if (fixedMessage.startsWith('Bought')) {
+            const firstSpace: number = fixedMessage.indexOf(' ');
+            const secondSpace: number = fixedMessage.indexOf(' ', firstSpace + 1);
+            if (secondSpace !== -1) {
+                const firstPart: string = fixedMessage.substring(0, secondSpace);
+                const secondPart: string = fixedMessage.substring(secondSpace);
+                
+                return (
+                    <>
+                        <span style={{ color: 'var(--green)' }}>{firstPart}</span>
+                        {secondPart}
+                    </>
+                );
+            }
+        }
+        return fixedMessage;
+    }
+
     return (
         <section className={styles.notification}>
             <header>
@@ -53,7 +74,7 @@ export default function Notification(props: propsIF) {
                     onClick={() => dismiss(data.slug)}
                 />
             </header>
-            <p>{data.message}</p>
+            <p>{formatMessage(data.message)}</p>
         </section>
     );
 }
