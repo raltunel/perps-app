@@ -270,6 +270,22 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
     );
 
+    const getRandWidth = useCallback(
+        (index: number, inverse: boolean = false) => {
+            let rand;
+            if (inverse) {
+                rand =
+                    100 / orderCount +
+                    index * (100 / orderCount) +
+                    Math.random() * 20;
+            } else {
+                rand = 100 - index * (100 / orderCount) + Math.random() * 20;
+            }
+            return rand < 100 ? rand + '%' : '100%';
+        },
+        [orderCount],
+    );
+
     return (
         <div className={styles.orderBookContainer}>
             <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
@@ -342,12 +358,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
-                                    width={
-                                        100 -
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
+                                    width={getRandWidth(index)}
                                     height={'19px'}
                                 />
                             </div>
@@ -361,12 +372,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
-                                    width={
-                                        100 / orderCount +
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
+                                    width={getRandWidth(index, true)}
                                     height={'19px'}
                                 />
                             </div>
