@@ -212,6 +212,9 @@ export const createAnchoredText = async (
     borderColor: string,
     color?: string,
 ) => {
+
+    console.log('xxxx',{xLoc},priceToPixel(chart, yPrice));
+    
     const shape = await chart.activeChart().createAnchoredShape(
         {
             x: xLoc,

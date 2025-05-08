@@ -59,6 +59,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         const chartRef = chart.activeChart();
 
         const element = chartRef.getShapeById(id);
+
+        console.log('element.getProperties().text',element.getProperties().text);
+        
         if (element) chartRef.removeEntity(id);
     };
     const cleanupShapes = async () => {
@@ -195,7 +198,10 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             const currentCount = orderLineItemsRef.current.length;
             const newCount = lines.length;
 
+            
             if (currentCount > newCount) {
+                console.log('remooveeee');
+                
                 const toRemove = orderLineItemsRef.current.slice(newCount);
                 for (const shape of toRemove) {
                     removeShapeById(chart, shape.lineId);
@@ -211,6 +217,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             if (currentCount < newCount) {
                 for (let i = currentCount; i < newCount; i++) {
                     const line = lines[i];
+
+                    // console.log('line.textValue.type',line.textValue.type);
+                    
                     const shapeRefs: ChartShapeRefs = {
                         lineId: await addCustomOrderLine(
                             chart,
