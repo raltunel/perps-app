@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
+import CollateralPieChart from './CollateralChart/CollateralPieChart';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -64,7 +65,11 @@ export default function PerformancePanel() {
             <div className={styles.performanceContainer}>
                 <MetricsDisplay />
                 <motion.div {...animationConfig} className={styles.perfChart}>
-                    {activeTab.toLowerCase()}
+                    {activeTab === 'Performance' && <CollateralPieChart />}
+                    {activeTab === 'Account Value' && <CollateralPieChart />}
+                    {activeTab === 'Collateral' && <CollateralPieChart />}
+
+                    {/* {activeTab.toLowerCase()} */}
                 </motion.div>
             </div>
         );
@@ -76,8 +81,8 @@ export default function PerformancePanel() {
                 tabs={AVAILABLE_TABS}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
-                wrapperId="performanceTabs" 
-                layoutIdPrefix="performanceTabIndicator" 
+                wrapperId='performanceTabs'
+                layoutIdPrefix='performanceTabIndicator'
             />
             <AnimatePresence mode='wait'>
                 <div className={styles.tableContent} key={activeTab}>

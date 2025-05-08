@@ -1,0 +1,77 @@
+.collateralChartContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    width: 100%;
+    height: 100%;
+    gap: 16px;
+
+    background-color: var(--dark2);
+}
+
+.filterContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    gap: 8px;
+}
+
+.dataContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
+
+    width: 100%;
+}
+
+.legendContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 8px;
+}
+
+.legendItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    height: 30px;
+}
+
+.legendLabel {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.legendColor {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.vaultFilter {
+    display: flex;
+    align-items: center;
+    background-color: var(--dark2);
+
+    height: 30px;
+    width: 130px;
+
+    font-family: var(--font-family-main);
+}
+
+.dataLabel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
