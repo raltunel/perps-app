@@ -222,23 +222,26 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         }
     }, [selectedResolution, info]);
 
-    const midHeader = useCallback((id: string) => {
-        return (
-            <div id={id} className={styles.orderBookBlockMid}>
-                <div>Spread</div>
-                <div>{selectedResolution?.val}</div>
-                <div>
-                    {symbolInfo?.markPx &&
-                        selectedResolution?.val &&
-                        (
-                            (selectedResolution?.val / symbolInfo?.markPx) *
-                            100
-                        ).toFixed(3)}
-                    %
+    const midHeader = useCallback(
+        (id: string) => {
+            return (
+                <div id={id} className={styles.orderBookBlockMid}>
+                    <div>Spread</div>
+                    <div>{selectedResolution?.val}</div>
+                    <div>
+                        {symbolInfo?.markPx &&
+                            selectedResolution?.val &&
+                            (
+                                (selectedResolution?.val / symbolInfo?.markPx) *
+                                100
+                            ).toFixed(3)}
+                        %
+                    </div>
                 </div>
-            </div>
-        );
-    }, []);
+            );
+        },
+        [selectedResolution, symbolInfo],
+    );
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
@@ -332,7 +335,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <div className={styles.orderBookBlock}>
+                    <div
+                        className={styles.orderBookBlock}
+                        style={{ gap: '.26rem' }}
+                    >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
@@ -342,12 +348,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                         Math.random() * 20 +
                                         '%'
                                     }
+                                    height={'19px'}
                                 />
                             </div>
                         ))}
                     </div>
                     {midHeader('orderBookMidHeader2')}
-                    <div className={styles.orderBookBlock}>
+                    <div
+                        className={styles.orderBookBlock}
+                        style={{ gap: '.26rem' }}
+                    >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
@@ -357,6 +367,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                         Math.random() * 20 +
                                         '%'
                                     }
+                                    height={'19px'}
                                 />
                             </div>
                         ))}
