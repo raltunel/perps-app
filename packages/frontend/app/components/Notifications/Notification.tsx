@@ -1,8 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
-import styles from './Notification.module.css';
-import { useEffect, useRef } from 'react';
 import type { notificationIF } from '~/stores/NotificationStore';
+import styles from './Notification.module.css';
 
 interface propsIF {
     data: notificationIF;
@@ -11,7 +11,6 @@ interface propsIF {
 
 export default function Notification(props: propsIF) {
     const { data, dismiss } = props;
-
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
 
@@ -24,7 +23,7 @@ export default function Notification(props: propsIF) {
     // ... reset any time a notification disappears
     useEffect(() => {
         const autoDismiss: NodeJS.Timeout = setTimeout(
-            () => dismiss(data.oid),
+            () => dismiss(data.slug),
             DISMISS_AFTER - (Date.now() - createdAt.current),
         );
         return () => clearTimeout(autoDismiss);
@@ -51,12 +50,10 @@ export default function Notification(props: propsIF) {
                 <IoClose
                     className={styles.close}
                     size={ICON_SIZE}
-                    onClick={() => dismiss(data.oid)}
+                    onClick={() => dismiss(data.slug)}
                 />
             </header>
-            <p>
-                {data.message} {data.oid}
-            </p>
+            <p>{data.message}</p>
         </section>
     );
 }

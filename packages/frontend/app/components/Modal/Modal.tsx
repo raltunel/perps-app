@@ -1,4 +1,11 @@
-import React, { useEffect, useState, useRef, useCallback, useMemo, type ReactNode } from 'react';
+import React, {
+    useEffect,
+    useState,
+    useRef,
+    useCallback,
+    useMemo,
+    type ReactNode,
+} from 'react';
 import styles from './Modal.module.css';
 import { useMobile } from '~/hooks/useMediaQuery';
 import { MdClose } from 'react-icons/md';
@@ -80,7 +87,7 @@ function Modal(props: ModalProps) {
                 if (close) {
                     close();
                 }
-            }, 300); 
+            }, 300);
         } else {
             if (close) {
                 close();
@@ -89,23 +96,26 @@ function Modal(props: ModalProps) {
     }, [actualPosition, close]);
 
     // Memoize the outside click handler
-    const handleOutsideClick = useCallback((target: HTMLDivElement): void => {
-        // Don't close if keyboard is visible (to prevent accidental dismissal)
-        if (isKeyboardVisible) return;
-        
-        if (target.id === OUTSIDE_MODAL_DOM_ID && close) {
-            handleClose();
-        }
-    }, [OUTSIDE_MODAL_DOM_ID, close, handleClose, isKeyboardVisible]);
+    const handleOutsideClick = useCallback(
+        (target: HTMLDivElement): void => {
+            // Don't close if keyboard is visible (to prevent accidental dismissal)
+            if (isKeyboardVisible) return;
+
+            if (target.id === OUTSIDE_MODAL_DOM_ID && close) {
+                handleClose();
+            }
+        },
+        [OUTSIDE_MODAL_DOM_ID, close, handleClose, isKeyboardVisible],
+    );
 
     // return children without creating curtain behind modal
     // this allows us to make multiple non-exclusive modals at once
     if (!close) return children;
-    
+
     // Use requestAnimationFrame for smooth animations
     const updateDragPosition = useCallback((deltaY: number) => {
         if (!bottomSheetRef.current) return;
-        
+
         requestAnimationFrame(() => {
             if (bottomSheetRef.current) {
                 bottomSheetRef.current.style.transform = `translateY(${deltaY}px)`;
@@ -121,73 +131,83 @@ function Modal(props: ModalProps) {
             currentY: 0,
             isDragging: true,
         };
-        
+
         if (handleRef.current) {
             handleRef.current.classList.add(styles.dragging);
         }
     }, []);
 
     // Handle drag start - memoized
-    const handleDragStart = useCallback((e: React.TouchEvent | React.MouseEvent): void => {
-        // Don't allow dragging when keyboard is visible
-        // if (isKeyboardVisible || !bottomSheetRef.current) return;
-        if (!bottomSheetRef.current) return;
-        // First dismiss the keyboard if it's visible
-    if (isKeyboardVisible && document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-        // Small delay to allow keyboard to dismiss
-        setTimeout(() => {
-            setIsKeyboardVisible(false);
-        }, 50);
-    }
+    const handleDragStart = useCallback(
+        (e: React.TouchEvent | React.MouseEvent): void => {
+            // Don't allow dragging when keyboard is visible
+            // if (isKeyboardVisible || !bottomSheetRef.current) return;
+            if (!bottomSheetRef.current) return;
+            // First dismiss the keyboard if it's visible
+            if (
+                isKeyboardVisible &&
+                document.activeElement instanceof HTMLElement
+            ) {
+                document.activeElement.blur();
+                // Small delay to allow keyboard to dismiss
+                setTimeout(() => {
+                    setIsKeyboardVisible(false);
+                }, 50);
+            }
 
-        let clientY: number;
+            let clientY: number;
 
-        if ('touches' in e) {
-            // Touch event
-            clientY = e.touches[0].clientY;
-        } else {
-            // Mouse event
-            clientY = (e as React.MouseEvent).clientY;
-            // For mouse events, we need to add event listeners to document
-            document.addEventListener(
-                'mousemove',
-                handleDragMove as unknown as EventListener,
-            );
-            document.addEventListener(
-                'mouseup',
-                handleDragEnd as unknown as EventListener,
-            );
-        }
+            if ('touches' in e) {
+                // Touch event
+                clientY = e.touches[0].clientY;
+            } else {
+                // Mouse event
+                clientY = (e as React.MouseEvent).clientY;
+                // For mouse events, we need to add event listeners to document
+                document.addEventListener(
+                    'mousemove',
+                    handleDragMove as unknown as EventListener,
+                );
+                document.addEventListener(
+                    'mouseup',
+                    handleDragEnd as unknown as EventListener,
+                );
+            }
 
-        startDragging(clientY);
-    }, [startDragging, isKeyboardVisible]);
+            startDragging(clientY);
+        },
+        [startDragging, isKeyboardVisible],
+    );
 
     // Handle drag move - memoized
-    const handleDragMove = useCallback((e: React.TouchEvent | MouseEvent): void => {
-        if (!dragState.current.isDragging || !bottomSheetRef.current) return;
+    const handleDragMove = useCallback(
+        (e: React.TouchEvent | MouseEvent): void => {
+            if (!dragState.current.isDragging || !bottomSheetRef.current)
+                return;
 
-        let clientY: number;
+            let clientY: number;
 
-        if ('touches' in e) {
-            // Touch event
-            clientY = e.touches[0].clientY;
-        } else {
-            // Mouse event
-            clientY = (e as MouseEvent).clientY;
-        }
+            if ('touches' in e) {
+                // Touch event
+                clientY = e.touches[0].clientY;
+            } else {
+                // Mouse event
+                clientY = (e as MouseEvent).clientY;
+            }
 
-        // Calculate how far we've dragged
-        const deltaY = clientY - dragState.current.startY;
+            // Calculate how far we've dragged
+            const deltaY = clientY - dragState.current.startY;
 
-        // Don't allow dragging up beyond the top
-        if (deltaY < 0) return;
+            // Don't allow dragging up beyond the top
+            if (deltaY < 0) return;
 
-        dragState.current.currentY = deltaY;
+            dragState.current.currentY = deltaY;
 
-        // Apply the transformation using requestAnimationFrame
-        updateDragPosition(deltaY);
-    }, [updateDragPosition]);
+            // Apply the transformation using requestAnimationFrame
+            updateDragPosition(deltaY);
+        },
+        [updateDragPosition],
+    );
 
     // Handle drag end - memoized
     const handleDragEnd = useCallback((): void => {
@@ -232,74 +252,83 @@ function Modal(props: ModalProps) {
             if (window.visualViewport) {
                 const handler = () => {
                     // When keyboard opens, the viewport height becomes smaller than window inner height
-                    const keyboardVisible = window.visualViewport!.height < window.innerHeight;
-                    
+                    const keyboardVisible =
+                        window.visualViewport!.height < window.innerHeight;
+
                     if (keyboardVisible !== isKeyboardVisible) {
                         setIsKeyboardVisible(keyboardVisible);
-                        
+
                         // Scroll to active element when keyboard opens
                         if (keyboardVisible && document.activeElement) {
                             // Add a small delay to ensure the keyboard is fully visible
                             setTimeout(() => {
-                                (document.activeElement as HTMLElement).scrollIntoView({
+                                (
+                                    document.activeElement as HTMLElement
+                                ).scrollIntoView({
                                     behavior: 'smooth',
-                                    block: 'center'
+                                    block: 'center',
                                 });
                             }, 100);
                         }
                     }
                 };
-                
+
                 window.visualViewport.addEventListener('resize', handler);
-                return () => window.visualViewport!.removeEventListener('resize', handler);
+                return () =>
+                    window.visualViewport!.removeEventListener(
+                        'resize',
+                        handler,
+                    );
             }
-            
+
             // Fallback for older browsers using focus/blur events on input fields
             const handleFocus = () => setIsKeyboardVisible(true);
             const handleBlur = () => {
                 // Small delay to prevent flickering
                 setTimeout(() => setIsKeyboardVisible(false), 100);
             };
-            
+
             const addInputListeners = (element: HTMLElement) => {
                 const inputs = element.querySelectorAll('input, textarea');
-                inputs.forEach(input => {
+                inputs.forEach((input) => {
                     input.addEventListener('focus', handleFocus);
                     input.addEventListener('blur', handleBlur);
                 });
-                
+
                 return () => {
-                    inputs.forEach(input => {
+                    inputs.forEach((input) => {
                         input.removeEventListener('focus', handleFocus);
                         input.removeEventListener('blur', handleBlur);
                     });
                 };
             };
-            
+
             // Only add listeners if the content ref is available
             if (contentRef.current) {
                 return addInputListeners(contentRef.current);
             }
-            
+
             return undefined;
         };
-        
+
         return detectKeyboard();
     }, [isKeyboardVisible]);
 
     // Prevent background content from scrolling when modal is open
     useEffect(() => {
         document.body.style.overflow = 'hidden';
-        
+
         // Prevent iOS safari from allowing swipe-up gestures on the modal
         const preventDefaultTouchMove = (e: TouchEvent) => {
             if (modalRef.current?.contains(e.target as Node)) {
                 e.preventDefault();
             }
         };
-        
-        document.addEventListener('touchmove', preventDefaultTouchMove, { passive: false });
-        
+
+        document.addEventListener('touchmove', preventDefaultTouchMove, {
+            passive: false,
+        });
+
         return () => {
             document.body.style.overflow = '';
             document.removeEventListener('touchmove', preventDefaultTouchMove);
@@ -310,11 +339,14 @@ function Modal(props: ModalProps) {
     useEffect(() => {
         let animationTimeout: number;
         const EVENT_TYPE = 'keydown';
-        
+
         function handleEscape(evt: KeyboardEvent): void {
             if (evt.key === 'Escape' && close) {
                 // If keyboard is visible, just blur the active element
-                if (isKeyboardVisible && document.activeElement instanceof HTMLElement) {
+                if (
+                    isKeyboardVisible &&
+                    document.activeElement instanceof HTMLElement
+                ) {
                     document.activeElement.blur();
                     return;
                 }
@@ -332,7 +364,7 @@ function Modal(props: ModalProps) {
 
         // add the event listener to the DOM
         document.addEventListener(EVENT_TYPE, handleEscape);
-        
+
         // remove event listener from the DOM when component unmounts
         return () => {
             document.removeEventListener(EVENT_TYPE, handleEscape);
@@ -341,31 +373,44 @@ function Modal(props: ModalProps) {
     }, [actualPosition, close, handleClose, isKeyboardVisible]);
 
     // Blur any active element when tapping the modal background
-    const handleBackdropClick = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (e.target === e.currentTarget && document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur();
-        }
-    }, []);
+    const handleBackdropClick = useCallback(
+        (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            if (
+                e.target === e.currentTarget &&
+                document.activeElement instanceof HTMLElement
+            ) {
+                document.activeElement.blur();
+            }
+        },
+        [],
+    );
 
     // Memoize the modal header
-    const modalHeader = useMemo(() => (
-        <header>
-            <span />
-            <h3 id="modal-title">{title}</h3>
-            {!shouldUseBottomSheet ? 
-                <MdClose onClick={handleClose} color='var(--text2)' /> : 
-                <span/>
-            }
-        </header>
-    ), [title, shouldUseBottomSheet, handleClose]);
+    const modalHeader = useMemo(
+        () => (
+            <header>
+                <span />
+                <h3 id='modal-title'>{title}</h3>
+                {!shouldUseBottomSheet ? (
+                    <MdClose onClick={handleClose} color='var(--text2)' />
+                ) : (
+                    <span />
+                )}
+            </header>
+        ),
+        [title, shouldUseBottomSheet, handleClose],
+    );
 
     // Memoize the modal content
-    const modalContent = useMemo(() => (
-        <div ref={contentRef} className={styles.modalContent}>
-            {children}
-            <div className={styles.safeAreaSpacer}></div>
-        </div>
-    ), [children]);
+    const modalContent = useMemo(
+        () => (
+            <div ref={contentRef} className={styles.modalContent}>
+                {children}
+                <div className={styles.safeAreaSpacer}></div>
+            </div>
+        ),
+        [children],
+    );
 
     return (
         <div
@@ -377,27 +422,26 @@ function Modal(props: ModalProps) {
             id={OUTSIDE_MODAL_DOM_ID}
             className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''} ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
             style={positionStyles[actualPosition]}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='modal-title'
         >
             {actualPosition === 'bottomSheet' ? (
                 <div
                     ref={bottomSheetRef}
                     className={`${styles.bottomSheet} ${animation} ${isKeyboardVisible ? styles.keyboardActive : ''}`}
                 >
-                    
-                        <div
-                            ref={handleRef}
-                            className={styles.bottomSheetHandle}
-                            onTouchStart={handleDragStart}
-                            onTouchMove={handleDragMove}
-                            onTouchEnd={handleDragEnd}
-                            onMouseDown={handleDragStart}
-                        >
-                            <div className={styles.handle}></div>
-                        </div>
-                    
+                    <div
+                        ref={handleRef}
+                        className={styles.bottomSheetHandle}
+                        onTouchStart={handleDragStart}
+                        onTouchMove={handleDragMove}
+                        onTouchEnd={handleDragEnd}
+                        onMouseDown={handleDragStart}
+                    >
+                        <div className={styles.handle}></div>
+                    </div>
+
                     {modalHeader}
                     {modalContent}
                 </div>

@@ -7,35 +7,29 @@ import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
 
 function ReferralsTable() {
-
-
     const {
         currentItems,
         currentPage,
         totalPages,
         totalItems,
-        
+
         startIndex,
         endIndex,
         goToNextPage,
         goToPreviousPage,
         sortConfig,
-        handleSort
+        handleSort,
     } = useReferralsTable({
         data: referralData,
         itemsPerPage: 10,
     });
-
 
     const isPrevButtonDisabled = currentPage === 1;
     const isNextButtonDisabled = currentPage === totalPages;
 
     return (
         <div className={styles.tableWrapper}>
-            <ReferralsTableHeader 
-                sortConfig={sortConfig} 
-                onSort={handleSort} 
-            />
+            <ReferralsTableHeader sortConfig={sortConfig} onSort={handleSort} />
             <div className={styles.tableBody}>
                 {currentItems.map((referral, index) => (
                     <ReferralsTableRow
@@ -53,11 +47,12 @@ function ReferralsTable() {
                     </div>
                 )}
             </div>
-            
-          
+
             <div className={styles.paginationContainer}>
                 <div className={styles.pageInfo}>
-                {totalItems > 0 ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}` : '0-0 of 0'}
+                    {totalItems > 0
+                        ? `${startIndex + 1}-${Math.min(endIndex + 1, totalItems)} of ${totalItems}`
+                        : '0-0 of 0'}
                 </div>
 
                 <div className={styles.pageButtons}>
@@ -81,6 +76,5 @@ function ReferralsTable() {
         </div>
     );
 }
-
 
 export default memo(ReferralsTable);
