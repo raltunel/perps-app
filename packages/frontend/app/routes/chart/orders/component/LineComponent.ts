@@ -190,7 +190,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
     useEffect(() => {
         const setupShapes = async () => {
-            if (!chart || lines.length === 0) return;
+            if (!chart) return;
 
             const currentCount = orderLineItemsRef.current.length;
             const newCount = lines.length;
