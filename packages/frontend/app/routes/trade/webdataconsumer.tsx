@@ -5,7 +5,11 @@ import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { processUserOrder } from '~/processors/processOrderBook';
-import { processUserFills } from '~/processors/processUserFills';
+import {
+    processUserFills,
+    processUserTwapHistory,
+    processUserTwapSliceFills,
+} from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
@@ -93,6 +97,16 @@ export default function WebDataConsumer() {
             postUserFills,
         );
 
+        const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
+            { type: WsChannels.TWAP_SLICE_FILLS, user: debugWallet.address },
+            postUserTwapSliceFills,
+        );
+
+        const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
+            { type: WsChannels.TWAP_HISTORY, user: debugWallet.address },
+            postUserTwapHistory,
+        );
+
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
@@ -118,6 +132,8 @@ export default function WebDataConsumer() {
             unsubscribe();
             unsubscribeOrderHistory();
             unsubscribeUserFills();
+            unsubscribeUserTwapSliceFills();
+            unsubscribeUserTwapHistory();
         };
     }, [debugWallet.address, info]);
 
@@ -195,6 +211,30 @@ export default function WebDataConsumer() {
                 userFillsRef.current = [...fills, ...userFillsRef.current];
             }
             fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+        }
+    }, []);
+
+    const postUserTwapSliceFills = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const fills = processUserTwapSliceFills(data);
+            console.log('fills', fills);
+        }
+    }, []);
+
+    const postUserTwapHistory = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const history = processUserTwapHistory(data);
+            console.log('history', history);
         }
     }, []);
 

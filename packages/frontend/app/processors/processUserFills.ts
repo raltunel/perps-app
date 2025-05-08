@@ -162,7 +162,7 @@ export function processUserTwapHistory(
                 timestamp: h.state.timestamp,
                 user: h.state.user,
             },
-            status: h.status,
+            status: h.status.status,
             time: h.time,
         } as TwapHistoryIF);
     });
