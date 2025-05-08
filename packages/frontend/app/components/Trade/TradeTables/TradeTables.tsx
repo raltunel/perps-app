@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import BalancesTable from '../BalancesTable/BalancesTable';
@@ -13,13 +13,11 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
+import { WsChannels } from '~/utils/Constants';
 
 export interface FilterOption {
     id: string;
     label: string;
-}
-interface TradeTableProps {
-    initialTab?: string;
 }
 
 const availableTabs = [
@@ -39,15 +37,29 @@ const filterOptions: FilterOption[] = [
     { id: 'long', label: 'Long' },
     { id: 'short', label: 'Short' },
 ];
-export default function TradeTable(props: TradeTableProps) {
+export default function TradeTable() {
     const {
         selectedTradeTab,
         setSelectedTradeTab,
         orderHistory,
-        orderHistoryFetched,
+        fetchedChannels,
+        userFills,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
+        return {
+            orderHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_HISTORICAL_ORDERS,
+            ),
+            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+        };
+    }, [fetchedChannels]);
+
+    useEffect(() => {
+        console.log('userFills', userFills);
+    }, [userFills]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -96,7 +108,12 @@ export default function TradeTable(props: TradeTableProps) {
             case 'TWAP':
                 return <TwapTable />;
             case 'Trade History':
-                return <TradeHistoryTable />;
+                return (
+                    <TradeHistoryTable
+                        data={userFills}
+                        isFetched={tradeHistoryFetched}
+                    />
+                );
             case 'Funding History':
                 return <FundingHistoryTable />;
             case 'Order History':

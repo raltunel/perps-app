@@ -1,7 +1,6 @@
-import type { Environment } from '@perps-app/sdk';
 import { create } from 'zustand';
 
-import { wsEnvironments, debugWallets, wsUrls } from '~/utils/Constants';
+import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 
 export type DebugWallet = {
     label: string;
@@ -41,7 +40,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
                 | 'mainnet'
                 | 'testnet',
         }),
-    debugWallet: debugWallets[1],
+    debugWallet: debugWallets[2],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),

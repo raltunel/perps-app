@@ -1,9 +1,7 @@
 import React from 'react';
-import FundingHistoryTableHeader from './FundingHistoryTableHeader';
-import FundingHistoryTableRow, {
-    type FundingHistoryData,
-} from './FundingHistoryTableRow';
 import styles from './FundingHistoryTable.module.css';
+import FundingHistoryTableHeader from './FundingHistoryTableHeader';
+import FundingHistoryTableRow from './FundingHistoryTableRow';
 import { fundingHistoryData } from './data';
 
 interface FundingHistoryTableProps {

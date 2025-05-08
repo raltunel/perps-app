@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useSdk } from '~/hooks/useSdk';
+import { useWorker } from '~/hooks/useWorker';
+import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type {
@@ -16,15 +20,9 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { useSdk } from '~/hooks/useSdk';
-import { useWorker } from '~/hooks/useWorker';
-import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { TableState } from '~/utils/CommonIFs';
 import { motion } from 'framer-motion';
-import Spinner from '~/components/Spinners/Spinner';
-
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -224,23 +222,26 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         }
     }, [selectedResolution, info]);
 
-    const midHeader = useCallback((id: string) => {
-        return (
-            <div id={id} className={styles.orderBookBlockMid}>
-                <div>Spread</div>
-                <div>{selectedResolution?.val}</div>
-                <div>
-                    {symbolInfo?.markPx &&
-                        selectedResolution?.val &&
-                        (
-                            (selectedResolution?.val / symbolInfo?.markPx) *
-                            100
-                        ).toFixed(3)}
-                    %
+    const midHeader = useCallback(
+        (id: string) => {
+            return (
+                <div id={id} className={styles.orderBookBlockMid}>
+                    <div>Spread</div>
+                    <div>{selectedResolution?.val}</div>
+                    <div>
+                        {symbolInfo?.markPx &&
+                            selectedResolution?.val &&
+                            (
+                                (selectedResolution?.val / symbolInfo?.markPx) *
+                                100
+                            ).toFixed(3)}
+                        %
+                    </div>
                 </div>
-            </div>
-        );
-    }, []);
+            );
+        },
+        [selectedResolution, symbolInfo],
+    );
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
@@ -267,6 +268,22 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
             }, 1000);
         },
         [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+    );
+
+    const getRandWidth = useCallback(
+        (index: number, inverse: boolean = false) => {
+            let rand;
+            if (inverse) {
+                rand =
+                    100 / orderCount +
+                    index * (100 / orderCount) +
+                    Math.random() * 20;
+            } else {
+                rand = 100 - index * (100 / orderCount) + Math.random() * 20;
+            }
+            return rand < 100 ? rand + '%' : '100%';
+        },
+        [orderCount],
     );
 
     return (
@@ -334,31 +351,29 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     exit={{ opacity: 0, x: 10 }}
                     transition={{ duration: 0.2 }}
                 >
-                    <div className={styles.orderBookBlock}>
+                    <div
+                        className={styles.orderBookBlock}
+                        style={{ gap: '.26rem' }}
+                    >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
-                                    width={
-                                        100 -
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
+                                    width={getRandWidth(index)}
+                                    height={'19px'}
                                 />
                             </div>
                         ))}
                     </div>
                     {midHeader('orderBookMidHeader2')}
-                    <div className={styles.orderBookBlock}>
+                    <div
+                        className={styles.orderBookBlock}
+                        style={{ gap: '.26rem' }}
+                    >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
-                                    width={
-                                        100 / orderCount +
-                                        index * (100 / orderCount) +
-                                        Math.random() * 20 +
-                                        '%'
-                                    }
+                                    width={getRandWidth(index, true)}
+                                    height={'19px'}
                                 />
                             </div>
                         ))}

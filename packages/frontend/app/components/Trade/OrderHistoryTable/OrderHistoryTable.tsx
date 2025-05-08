@@ -78,8 +78,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 (page + 1) * rowsPerPage,
             );
         }
-        // TODO page logic will be implemented for external page
-        return sortedOrderHistory.slice(0, 10);
+        return sortedOrderHistory.slice(0, tableModeLimit);
     }, [sortedOrderHistory, pageMode, page, rowsPerPage]);
 
     useEffect(() => {

@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { LuChevronDown, LuChevronUp, LuMenu, LuSettings, LuWallet } from 'react-icons/lu';
+import {
+    LuChevronDown,
+    LuChevronUp,
+    LuMenu,
+    LuSettings,
+    LuWallet,
+} from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { type useModalIF, useModal } from '~/hooks/useModal';
@@ -186,9 +192,7 @@ export default function PageHeader() {
                 onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
             >
                 more
-                { isMoreDropdownOpen ? <LuChevronUp /> :<LuChevronDown />
-}
-
+                {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
             </button>
             {isMoreDropdownOpen && <MoreDropdown />}
         </section>
@@ -199,86 +203,87 @@ export default function PageHeader() {
     return (
         <>
             <section className={styles.mainContainer}>
-
-           
-            <header id={'pageHeader'} className={styles.container}>
-                <Link to='/'>
-                    <img
-                        src='/images/perpsLogo.svg'
-                        alt='Perps Logo'
-                        width='240px'
-                    />
-                </Link>
-                <nav
-                    className={`${styles.nav} ${
-                        isMenuOpen ? styles.showMenu : ''
-                    }`}
-                    ref={isMenuOpen ? mobileNavbarRef : null}
-                >
-                    <button
-                        onClick={() => setIsMenuOpen(false)}
-                        className={styles.mobileNavCloseButton}
+                <header id={'pageHeader'} className={styles.container}>
+                    <Link to='/' style={{ marginLeft: '10px' }}>
+                        <img
+                            src='/images/favicon.svg'
+                            alt='Perps Logo'
+                            width='90px'
+                            height='90px'
+                        />
+                    </Link>
+                    <nav
+                        className={`${styles.nav} ${
+                            isMenuOpen ? styles.showMenu : ''
+                        }`}
+                        ref={isMenuOpen ? mobileNavbarRef : null}
                     >
-                        <MdOutlineClose size={20} color='var(--text1)' />
-                    </button>
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            to={link.path}
-                            className={
-                                location.pathname.includes(link.path)
-                                    ? styles.activeNavLink
-                                    : styles.navLink
-                            }
-                            onClick={() => {
-                                if (isMenuOpen) setIsMenuOpen(false);
-                            }}
+                        <button
+                            onClick={() => setIsMenuOpen(false)}
+                            className={styles.mobileNavCloseButton}
                         >
-                            {link.name}
-                        </Link>
-                    ))}
-                    {moreDropdownDisplay}
-                </nav>
-                <div className={styles.rightSide}>
-                    {isUserConnected && depositDisplay}
-                    {isUserConnected && networksDisplay}
-                    {isUserConnected && rpcDisplay}
-                    {!isUserConnected && (
-                        <Button
-                            size='medium'
-                            selected
-                            onClick={() => setIsUserConnected(true)}
+                            <MdOutlineClose size={20} color='var(--text1)' />
+                        </button>
+                        {navLinks.map((link) => (
+                            <Link
+                                key={link.name}
+                                to={link.path}
+                                className={
+                                    location.pathname.includes(link.path)
+                                        ? styles.activeNavLink
+                                        : styles.navLink
+                                }
+                                onClick={() => {
+                                    if (isMenuOpen) setIsMenuOpen(false);
+                                }}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
+                        {moreDropdownDisplay}
+                    </nav>
+                    <div className={styles.rightSide}>
+                        {isUserConnected && depositDisplay}
+                        {isUserConnected && networksDisplay}
+                        {isUserConnected && rpcDisplay}
+                        {!isUserConnected && (
+                            <Button
+                                size='medium'
+                                selected
+                                onClick={() => setIsUserConnected(true)}
+                            >
+                                Connect
+                            </Button>
+                        )}
+                        {isUserConnected && walletDisplay}
+
+                        <button
+                            className={styles.internationalButton}
+                            onClick={appSettingsModal.open}
                         >
-                            Connect
-                        </Button>
-                    )}
-                    {isUserConnected && walletDisplay}
+                            <LuSettings size={20} />
+                        </button>
 
-                    <button
-                        className={styles.internationalButton}
-                        onClick={appSettingsModal.open}
-                    >
-                        <LuSettings size={20} />
-                    </button>
-
-                    <button
-                        className={styles.menuButtonMobile}
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <LuMenu size={20} />
-                    </button>
-                </div>
-            {dropdownMenuDisplay}
-            </header>
-               
-                </section>
+                        <button
+                            className={styles.menuButtonMobile}
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        >
+                            <LuMenu size={20} />
+                        </button>
+                    </div>
+                    {dropdownMenuDisplay}
+                </header>
+            </section>
 
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close} position={'center'} title='Options'>
-                    <AppOptions modalControl={appSettingsModal} />
+                <Modal
+                    close={appSettingsModal.close}
+                    position={'center'}
+                    title='Options'
+                >
+                    <AppOptions />
                 </Modal>
             )}
         </>
     );
 }
-
