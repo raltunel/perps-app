@@ -71,6 +71,16 @@ export interface UserFillsSubscription {
     user: string;
 }
 
+export interface UserTwapHistorySubscription {
+    type: 'userTwapHistory';
+    user: string;
+}
+
+export interface UserTwapSliceFillsSubscription {
+    type: 'userTwapSliceFills';
+    user: string;
+}
+
 export interface CandleSubscription {
     type: 'candle';
     coin: string;
@@ -521,4 +531,50 @@ export interface Balance {
     total: string;
     hold: string;
     entryNtl: string;
+}
+
+export interface TwapState {
+    coin: string;
+    executedNtl: string;
+    executedSz: string;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: string;
+    sz: string;
+    timestamp: number;
+    user: string;
+}
+
+export interface TwapFill {
+    coin: string;
+    closedPnl: string;
+    crossed: boolean;
+    dir: string;
+    fee: string;
+    feeToken: string;
+    hash: string;
+    oid: number;
+    px: string;
+    side: string;
+    startPosition: string;
+    sz: string;
+    tid: number;
+    time: number;
+}
+
+export interface TwapSliceFill {
+    fill: TwapFill;
+    twapId: number;
+}
+
+export interface TwapHistory {
+    state: TwapState;
+    status: string;
+    time: number;
+}
+
+export interface UserTwapHistoryData {
+    user: string;
+    history: TwapHistory[];
 }

@@ -61,8 +61,6 @@ export default function WebDataConsumer() {
     const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
     const fetchedChannelsRef = useRef<Set<string>>(new Set());
 
-    const { fetchOrderHistory } = useInfoApi();
-
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
         if (foundCoin) {
