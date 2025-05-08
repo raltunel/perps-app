@@ -129,7 +129,9 @@ export type Subscription =
     | UserNonFundingLedgerUpdatesSubscription
     | WebData2Subscription
     | NotificationSubscription
-    | UserHistoricalOrdersSubscription;
+    | UserHistoricalOrdersSubscription
+    | UserTwapSliceFillsSubscription
+    | UserTwapHistorySubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;
@@ -288,6 +290,16 @@ export interface UserHistoricalOrdersMsg {
     data: UserHistoricalOrdersData;
 }
 
+export interface UserTwapSliceFillsMsg {
+    channel: 'userTwapSliceFills';
+    data: UserTwapSliceFillsData;
+}
+
+export interface UserTwapHistoryMsg {
+    channel: 'userTwapHistory';
+    data: UserTwapHistoryData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -297,7 +309,9 @@ export type WsMsg =
     | UserFillsMsg
     | OtherWsMsg
     | NotificationMsg
-    | UserHistoricalOrdersMsg;
+    | UserHistoricalOrdersMsg
+    | UserTwapSliceFillsMsg
+    | UserTwapHistoryMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder
@@ -570,7 +584,7 @@ export interface TwapSliceFill {
 
 export interface TwapHistory {
     state: TwapState;
-    status: string;
+    status: { status: string };
     time: number;
 }
 
