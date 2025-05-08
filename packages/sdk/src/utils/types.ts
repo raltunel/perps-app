@@ -577,4 +577,11 @@ export interface TwapHistory {
 export interface UserTwapHistoryData {
     user: string;
     history: TwapHistory[];
+    isSnapshot: boolean;
+}
+
+export interface UserTwapSliceFillsData {
+    user: string;
+    twapSliceFills: TwapSliceFill[];
+    isSnapshot: boolean;
 }

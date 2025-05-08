@@ -70,7 +70,7 @@ export interface TwapStateIF {
     user: string;
 }
 
-export interface UserTwapHistoryIF {
+export interface TwapHistoryIF {
     state: TwapStateIF;
     status: string;
     time: number;
