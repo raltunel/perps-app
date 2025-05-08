@@ -55,4 +55,5 @@ export type UserFillSortBy =
     | 'sz'
     | 'value'
     | 'fee'
+    | 'closedPnl'
     | undefined;
