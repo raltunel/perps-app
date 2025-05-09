@@ -38,7 +38,7 @@
     background: var(--accent1, #7371fc);
     font-size: var(--font-size-m, 18px);
     color: var(--text1);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 .sectionWithButton button:hover {
     opacity: 0.8;

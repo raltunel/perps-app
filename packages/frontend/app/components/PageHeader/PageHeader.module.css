@@ -47,7 +47,7 @@
 .container nav a:hover,
 .moreButton:hover {
     color: var(--text1);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 .activeNavLink {
     color: var(--text1) !important;
@@ -231,7 +231,7 @@
         padding: var(--main-padding);
         gap: 32px;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-        transition: right 0.3s ease-in-out;
+        transition: right var(--ease-in-out-med);
         z-index: 1000;
     }
 
