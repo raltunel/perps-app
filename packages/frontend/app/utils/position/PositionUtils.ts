@@ -1,12 +1,13 @@
 import type { TableSortDirection } from "../CommonIFs";
 import type { PositionDataSortBy, PositionIF } from "./PositionIFs";
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-const { coinPriceMap } = useTradeDataStore();
+
 
 export const sortPositionData = (
     positionData: PositionIF[],
     sortBy: PositionDataSortBy,
     sortDirection: TableSortDirection,
+    coinPriceMap: Map<string, number>,
 ) => {
     if (sortDirection && sortBy) {
         switch (sortBy) {
@@ -18,6 +19,7 @@ export const sortPositionData = (
         );
 
         case 'size':
+           
                 return [...positionData].sort((a, b) =>
                     sortDirection === 'asc' ? a.szi - b.szi : b.szi - a.szi,
                 );
@@ -35,10 +37,8 @@ export const sortPositionData = (
                     : (b.entryPx ?? 0) - (a.entryPx ?? 0),
             );
             case 'markPrice':
-                return [...positionData].sort((a, b) =>
-                    sortDirection === 'asc'
-                        ? coinPriceMap.get(a.coin) ?? 0
-                        : coinPriceMap.get(b.coin) ?? 0
+                return [...positionData].sort((a, b) => 
+                    (coinPriceMap.get(a.coin) ?? 0) - (coinPriceMap.get(b.coin) ?? 0) * (sortDirection === 'asc' ? 1 : -1)
                 );
             case 'pnl':
                 return [...positionData].sort((a, b) =>
@@ -58,6 +58,13 @@ export const sortPositionData = (
                         ? (a.marginUsed ?? 0) - (b.marginUsed ?? 0)
                         : (b.marginUsed ?? 0) - (a.marginUsed ?? 0),
                 );
+
+                case 'funding':
+                    return [...positionData].sort((a, b) =>
+                        sortDirection === 'asc'
+                            ? (a.cumFunding.allTime ?? 0) - (b.cumFunding.allTime ?? 0)
+                            : (b.marginUsed ?? 0) - (a.marginUsed ?? 0),
+                    );
            
             default:
                 return positionData;
