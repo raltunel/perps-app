@@ -203,7 +203,7 @@ export default function PageHeader() {
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' style={{ marginLeft: '10px' }}>
+                <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -220,7 +220,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
-                    >
+                        >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
                     {navLinks.map((link) => (
@@ -235,6 +235,7 @@ export default function PageHeader() {
                             onClick={() => {
                                 if (isMenuOpen) setIsMenuOpen(false);
                             }}
+                            viewTransition
                         >
                             {link.name}
                         </Link>

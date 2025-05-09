@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { useSdk } from '~/hooks/useSdk';
 import { processTrades } from '~/processors/processOrderBook';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { TableState } from '~/utils/CommonIFs';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderbooktrades.module.css';
 import OrderTradeRow from './ordertraderow/ordertraderow';
-import { TableState } from '~/utils/CommonIFs';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
-import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 
 interface OrderBookTradesProps {
     symbol: string;

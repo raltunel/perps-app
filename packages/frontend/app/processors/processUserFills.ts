@@ -1,18 +1,16 @@
 import type {
-    TwapHistoryIF,
-    TwapSliceFillIF,
-    UserBalanceIF,
-    UserBalanceSortBy,
-    UserFillIF,
-    UserFillSortBy,
-} from '~/utils/UserDataIFs';
-import { parseNum } from '../utils/orderbook/OrderBookUtils';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import type {
     UserFillsData,
     UserTwapHistoryData,
     UserTwapSliceFillsData,
 } from '@perps-app/sdk/src/utils/types';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type {
+    TwapHistoryIF,
+    TwapSliceFillIF,
+    UserFillIF,
+    UserFillSortBy,
+} from '~/utils/UserDataIFs';
+import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
 export function processUserFills(data: UserFillsData): UserFillIF[] {
     const ret: UserFillIF[] = [];

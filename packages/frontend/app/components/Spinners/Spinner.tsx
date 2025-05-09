@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import styles from './Spinner.module.css';
 import { motion } from 'framer-motion';
+import styles from './Spinner.module.css';
 
 interface SpinnerProps {
     absolute?: boolean;
