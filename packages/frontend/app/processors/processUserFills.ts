@@ -93,6 +93,14 @@ export function sortUserFills(
                         return b.fee - a.fee;
                     }
                 });
+            case 'closedPnl':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.closedPnl - b.closedPnl;
+                    } else {
+                        return b.closedPnl - a.closedPnl;
+                    }
+                });
             default:
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
