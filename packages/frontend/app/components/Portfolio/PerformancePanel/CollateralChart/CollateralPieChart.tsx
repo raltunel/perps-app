@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import styles from './CollateralPieChart.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
-import { color } from 'framer-motion';
 import Button from '~/components/Button/Button';
 
 type PieData = { label: string; value: number };
@@ -85,7 +84,7 @@ const CollateralPieChart: React.FC = () => {
         arcs.forEach((arc) => {
             drawArc(ctx, arc, color(arc.data.label));
         });
-    }, []);
+    }, [pieData]);
 
     const filter = (
         <div className={styles.filterContainer}>

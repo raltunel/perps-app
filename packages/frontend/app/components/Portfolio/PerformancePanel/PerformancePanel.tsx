@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
+import PerformanceLineChart from './PerformanceChart/PerformanceLineChart';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -65,7 +66,7 @@ export default function PerformancePanel() {
             <div className={styles.performanceContainer}>
                 <MetricsDisplay />
                 <motion.div {...animationConfig} className={styles.perfChart}>
-                    {activeTab === 'Performance' && <CollateralPieChart />}
+                    {activeTab === 'Performance' && <PerformanceLineChart />}
                     {activeTab === 'Account Value' && <CollateralPieChart />}
                     {activeTab === 'Collateral' && <CollateralPieChart />}
 
