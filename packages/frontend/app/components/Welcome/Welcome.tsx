@@ -4,8 +4,8 @@ import styles from './Welcome.module.css';
 
 export function meta() {
     return [
-        { title: 'New React Router App' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Welcome | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 

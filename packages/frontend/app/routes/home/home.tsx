@@ -113,6 +113,13 @@ const tokenData: TokenData[] = [
     },
 ];
 
+export function meta() {
+    return [
+        { title: 'Home | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
+    ];
+}
+
 export default function Home(): JSX.Element {
     // const [hasVisited, setHasVisited] = useState(false);
 
