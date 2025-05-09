@@ -22,8 +22,9 @@ export default function subaccounts() {
         const handleKeyDown = (event: KeyboardEvent): void => {
             if (event.key === TARGET_KEY) {
                 const currentTime: number = new Date().getTime();
-                if (lastKeyPressTime.current && 
-                    (currentTime - lastKeyPressTime.current) <= INTERVAL
+                if (
+                    lastKeyPressTime.current &&
+                    currentTime - lastKeyPressTime.current <= INTERVAL
                 ) {
                     data.reset();
                     lastKeyPressTime.current = null;

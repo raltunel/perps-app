@@ -57,9 +57,12 @@ export const useAccounts = create<useAccountsIF>()(
             // ... data from local storage will re-hydrate if present
             ...MOCK_ACCOUNTS,
             // add a new sub-account
-            create: (name: string): void => set({
-                sub: get().sub.concat(new Account(name, ZERO_ADDRESS, ZERO_DOLLARS))
-            }),
+            create: (name: string): void =>
+                set({
+                    sub: get().sub.concat(
+                        new Account(name, ZERO_ADDRESS, ZERO_DOLLARS),
+                    ),
+                }),
             // reset to only the default mock data
             reset: (): void => set(MOCK_ACCOUNTS),
         }),

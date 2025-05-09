@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -10,6 +10,7 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
+import { TableState } from '~/utils/CommonIFs';
 
 const SymbolInfo: React.FC = () => {
     const { symbol, symbolInfo } = useTradeDataStore();
@@ -59,7 +60,7 @@ const SymbolInfo: React.FC = () => {
                     <SymbolSearch />
                 </div>
                 <div>
-                    {symbolInfo && symbolInfo.coin === symbol && (
+                    {symbolInfo && symbolInfo.coin === symbol ? (
                         <HorizontalScrollable
                             className={
                                 orderBookMode === 'large'
@@ -130,6 +131,63 @@ const SymbolInfo: React.FC = () => {
                                 />
                             </div>
                         </HorizontalScrollable>
+                    ) : (
+                        <>
+                            <HorizontalScrollable
+                                className={
+                                    orderBookMode === 'large'
+                                        ? styles.symbolInfoLimitorNarrow
+                                        : styles.symbolInfoLimitor
+                                }
+                            >
+                                <div
+                                    className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
+                                >
+                                    <SymbolInfoField
+                                        label='Mark'
+                                        valueClass={'w4'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Oracle'
+                                        valueClass={'w4'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='24h Change'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='24h Volume'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Open Interest'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Funding Rate'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Funding Countdown'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                </div>
+                            </HorizontalScrollable>
+                        </>
                     )}
                 </div>
             </div>

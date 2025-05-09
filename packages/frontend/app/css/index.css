@@ -24,11 +24,11 @@
 
     /* Other Colors */
     --green: #26a69a;
-    --green-dark: #26A69A59;
+    --green-dark: #26a69a59;
     --red: #ef5350;
     --red-dark: #ef535059;
     --orange: #e78a56;
-    --white: #FFFFFF;
+    --white: #ffffff;
 
     /* gaps */
     --main-gap: 8px;
@@ -44,8 +44,8 @@
 
     /* heights */
     --trade-tables-height-desktop: 281px;
-     /* should be 56px. 30px extra for the combo box container */
-    --header-height-desktop: 56px ;
+    /* should be 56px. 30px extra for the combo box container */
+    --header-height-desktop: 56px;
 
     --order-book-width-desktop-large-doubled: calc(
         var(--order-book-width-desktop-large) * 2
@@ -70,6 +70,16 @@
 
     /* z indexes */
     --navbar-dropdown-zindex: 99;
+
+    --skeleton-animation-duration: 1.5s;
+    --skeleton-background: linear-gradient(
+        90deg,
+        #f0f0f005 10%,
+        #e0e0e010 50%,
+        #f0f0f003 70%
+    );
+
+    --skeleton-height: 20px;
 }
 
 /* Custom Reset */

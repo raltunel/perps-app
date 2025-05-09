@@ -1,4 +1,9 @@
+import type { TwapHistoryIF } from '~/utils/UserDataIFs';
 import styles from './HistoryTwapTable.module.css';
+import { useMemo } from 'react';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 
 export interface TwapData {
     time: string;
@@ -13,54 +18,63 @@ export interface TwapData {
 }
 
 interface HistoryTwapTableRowProps {
-    twap: TwapData;
+    twap: TwapHistoryIF;
 }
 
 export default function HistoryTwapTableRow(props: HistoryTwapTableRowProps) {
     const { twap } = props;
+    const { formatNum } = useNumFormatter();
 
     const getStatusClass = (status: string) => {
         switch (status) {
-            case 'Activated':
+            case 'activated':
                 return styles.statusActivated;
-            case 'Terminated':
+            case 'terminated':
                 return styles.statusTerminated;
-            case 'Finished':
+            case 'finished':
                 return styles.statusFinished;
             default:
                 return '';
         }
     };
 
+    const avgPrice = useMemo(() => {
+        return twap.state.executedSz > 0
+            ? formatNum(twap.state.executedNtl / twap.state.executedSz)
+            : 0;
+    }, [twap.state.executedSz, twap.state.executedNtl]);
+
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.timeCell}`}>
-                {twap.time}
+                {formatTimestamp(twap.state.timestamp)}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
-                {twap.coin}
+                {twap.state.coin}
             </div>
             <div className={`${styles.cell} ${styles.totalSizeCell}`}>
-                {twap.totalSize}
+                {twap.state.sz} {twap.state.coin}
             </div>
             <div className={`${styles.cell} ${styles.executedSizeCell}`}>
-                {twap.executedSize || (
+                {twap.state.executedSz ? (
+                    <>
+                        {formatNum(twap.state.executedSz)} {twap.state.coin}
+                    </>
+                ) : (
                     <span className={styles.emptyValue}>--</span>
                 )}
             </div>
             <div className={`${styles.cell} ${styles.averagePriceCell}`}>
-                {twap.averagePrice || (
-                    <span className={styles.emptyValue}>--</span>
-                )}
+                {avgPrice || <span className={styles.emptyValue}>--</span>}
             </div>
             <div className={`${styles.cell} ${styles.totalRuntimeCell}`}>
-                {twap.totalRuntime}
+                {twap.state.minutes} minutes
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {twap.reduceOnly}
+                {twap.state.reduceOnly ? 'Yes' : 'No'}
             </div>
             <div className={`${styles.cell} ${styles.randomizeCell}`}>
-                {twap.randomize}
+                {twap.state.randomize ? 'Yes' : 'No'}
             </div>
             <div
                 className={`${styles.cell} ${styles.statusCell} ${getStatusClass(twap.status)}`}

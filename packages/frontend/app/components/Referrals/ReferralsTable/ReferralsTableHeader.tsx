@@ -66,7 +66,6 @@ function ReferralsTableHeader({
         [onSort],
     );
 
-  
     const headerCells = useMemo(() => {
         return tableHeadersConfig.map((header) => {
             const isActive = sortConfig?.key === header.key;
@@ -101,8 +100,7 @@ function ReferralsTableHeader({
 export default memo(ReferralsTableHeader, (prevProps, nextProps) => {
     if (!prevProps.sortConfig && !nextProps.sortConfig) return true;
     if (!prevProps.sortConfig || !nextProps.sortConfig) return false;
-    
-    
+
     return (
         prevProps.sortConfig.key === nextProps.sortConfig.key &&
         prevProps.sortConfig.direction === nextProps.sortConfig.direction
