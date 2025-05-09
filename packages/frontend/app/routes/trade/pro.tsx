@@ -2,8 +2,8 @@ import type { Route } from '../../+types/root';
 
 export function meta() {
     return [
-        { title: 'New React Router App' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Pro | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 

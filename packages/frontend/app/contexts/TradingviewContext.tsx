@@ -27,6 +27,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     widget,
+    type IBasicDataFeed,
     type IChartingLibraryWidget,
     type ResolutionString,
     type TradingTerminalFeatureset,
@@ -130,14 +131,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
-        let intervalId = undefined;
         if (!isChartReady && chart) {
-            intervalId = setInterval(() => {
+            const intervalId = setInterval(() => {
                 const isReady = chart.chart().dataReady();
                 setIsChartReady(isReady);
             }, 200);
+            return () => clearInterval(intervalId);
         }
-        return () => clearInterval(intervalId);
     }, [chart, isChartReady]);
 
     useEffect(() => {
@@ -169,7 +169,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     // ... finishes initialization
     useEffect(() => {
         const isCustomized = checkDefaultColors();
-        isCustomized || changeColors(getBsColor());
+        if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
     useEffect(() => {
@@ -182,7 +182,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: symbol,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(info) as any,
+            datafeed: createDataFeed(info) as IBasicDataFeed,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -238,6 +238,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 const priceScale = tvWidget
                     .activeChart()
                     .getPanes()
+                    // eslint-disable-next-line no-unexpected-multiline
                     [volumePaneIndex].getMainSourcePriceScale();
 
                 if (priceScale) {

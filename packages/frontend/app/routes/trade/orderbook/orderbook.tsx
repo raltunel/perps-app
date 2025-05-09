@@ -1,6 +1,8 @@
+import { motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
@@ -8,6 +10,7 @@ import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { TableState } from '~/utils/CommonIFs';
 import type {
     OrderBookMode,
     OrderBookRowIF,
@@ -20,9 +23,6 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
-import { TableState } from '~/utils/CommonIFs';
-import { motion } from 'framer-motion';
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
@@ -30,8 +30,6 @@ interface OrderBookProps {
 
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     // FIXME: data is not rendered on UI
-
-    const loaderPreview = true;
 
     const { info } = useSdk();
 

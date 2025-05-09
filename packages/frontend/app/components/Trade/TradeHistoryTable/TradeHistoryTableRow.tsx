@@ -1,9 +1,8 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
-import { HiOutlineExternalLink } from 'react-icons/hi';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface TradeHistoryTableRowProps {
     trade: UserFillIF;
@@ -11,18 +10,17 @@ interface TradeHistoryTableRowProps {
 }
 
 export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
-    const { trade, onViewOrderDetails } = props;
+    const { trade } = props;
 
     const { formatNum } = useNumFormatter();
 
     const { getBsColor } = useAppSettings();
 
-    const handleViewOrderDetails = () => {
-        // if (onViewOrderDetails && trade.hasOrderDetails) {
-        //     onViewOrderDetails(trade.time, trade.coin);
-        // }
-    };
-    ('');
+    // const handleViewOrderDetails = () => {
+    //     // if (onViewOrderDetails && trade.hasOrderDetails) {
+    //     //     onViewOrderDetails(trade.time, trade.coin);
+    //     // }
+    // };
 
     return (
         <div className={styles.rowContainer}>
