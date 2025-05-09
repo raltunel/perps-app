@@ -39,7 +39,7 @@
 }
 
 .ratioBar {
-    transition: width 0.3s ease-in-out;
+    transition: width var(--ease-in-out-med);
     position: absolute;
     top: 0;
     left: 0;

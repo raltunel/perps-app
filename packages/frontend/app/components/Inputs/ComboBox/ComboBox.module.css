@@ -30,7 +30,7 @@
 }
 
 .comboBoxIcon {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     transform: rotate(0deg);
 }
 
@@ -53,7 +53,7 @@
 }
 
 .comboBoxOptionsWrapper > div {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     padding: 0.25rem;
 }
 
@@ -76,9 +76,6 @@
 .sdkToggle,
 .currencySelector {
     user-select: none;
-    /* position: fixed; */
-    /* top: 1rem;
-    right: 20rem; */
     font-size: var(--font-size-s);
     z-index: 2;
     font-family: var(--font-family-main);
