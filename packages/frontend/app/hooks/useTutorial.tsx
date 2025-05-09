@@ -28,18 +28,18 @@ export const TutorialProvider: React.FC<{
 }) => {
   const [showTutorial, setShowTutorial] = useState<boolean>(false);
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState<boolean>(false);
+  const AUTO_SHOW_TUTORIAL = false; 
+
 
   // Initialize from localStorage on client-side
   useEffect(() => {
-    // Only run in browser environment
     if (typeof window === 'undefined') return;
-    
+  
     const tutorialCompleted = localStorage.getItem(tutorialKey);
     if (tutorialCompleted) {
       setHasCompletedTutorial(true);
-    } else {
-      // Show tutorial automatically for new users
-      setShowTutorial(true);
+    } else if (AUTO_SHOW_TUTORIAL) {
+      setShowTutorial(true); // Only show tutorial automatically if enabled
     }
   }, [tutorialKey]);
 
