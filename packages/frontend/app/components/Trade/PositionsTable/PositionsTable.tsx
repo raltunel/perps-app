@@ -9,14 +9,14 @@ import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { WsChannels } from '~/utils/Constants';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
 
 interface PositionsTableProps {
     pageMode?: boolean;
 }
-import { useMemo, useState } from 'react';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
-import { sortPositionData } from '~/utils/position/positionUtils';
+
 
 
 
@@ -94,7 +94,10 @@ export default function PositionsTable(props: PositionsTableProps) {
                 />
             ) : (
                 <>
-                    <PositionsTableHeader />
+                    <PositionsTableHeader  
+                    sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={handleSort} />
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>
