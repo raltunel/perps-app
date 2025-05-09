@@ -1,14 +1,12 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './symbolsearch.module.css';
-import { FaChevronDown } from 'react-icons/fa';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import SymbolList from './symbollist/symbollist';
+import { FaChevronDown } from 'react-icons/fa';
+import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import SymbolList from './symbollist/symbollist';
+import styles from './symbolsearch.module.css';
 
-interface SymbolInfoFieldProps {}
-
-const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
+const SymbolSearch: React.FunctionComponent = () => {
     const { symbol } = useTradeDataStore();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -16,7 +14,7 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
         setIsOpen(false);
     }, true);
 
-    const wrapperClickHandler = (e: React.MouseEvent<HTMLDivElement>) => {
+    const wrapperClickHandler = () => {
         setIsOpen(!isOpen);
     };
 
@@ -24,6 +22,8 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
         const match = symbol.match(/^k([A-Z]+)$/);
         return match ? match[1] : symbol;
     }, [symbol]);
+
+    const bgType = tokenBackgroundMap[symbolFileName.toUpperCase()] || 'light';
 
     return (
         <>
@@ -35,7 +35,12 @@ const SymbolSearch: React.FC<SymbolInfoFieldProps> = () => {
                     className={styles.symbolSearchContainer}
                     onClick={wrapperClickHandler}
                 >
-                    <div className={styles.symbolIcon}>
+                    <div
+                        className={styles.symbolIcon}
+                        style={{
+                            background: `var(--${bgType === 'light' ? 'text1' : 'dark1'})`,
+                        }}
+                    >
                         <img
                             src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`}
                             alt={symbolFileName}

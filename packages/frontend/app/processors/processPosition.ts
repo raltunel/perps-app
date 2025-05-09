@@ -1,8 +1,3 @@
-import type {
-    OrderBookTradeIF,
-    OrderDataIF,
-    OrderBookRowIF,
-} from '../utils/orderbook/OrderBookIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 import type { PositionIF } from '../utils/position/PositionIFs';
 

@@ -81,10 +81,6 @@ export const wsEnvironments = [
 
 export const debugWallets: DebugWallet[] = [
     {
-        label: 'Crazy Account',
-        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
-    },
-    {
         label: 'Crazy 2',
         address: '0x023a3d058020fb76cca98f01b3c48c8938a22355',
     },
@@ -100,10 +96,17 @@ export const debugWallets: DebugWallet[] = [
 
 export const OrderHistoryLimits = {
     MAX: 1000,
-    RENDERED: 50,
+};
+
+export const TradeHistoryLimits = {
+    MAX: 1000,
 };
 
 export * from './feeSchedule';
+
+export const TWITTER_CHARACTER_LIMIT = 240;
+
+export const PERPS_TWITTER = '@AmbientPerps';
 
 export enum WsChannels {
     ORDERBOOK = 'l2Book',

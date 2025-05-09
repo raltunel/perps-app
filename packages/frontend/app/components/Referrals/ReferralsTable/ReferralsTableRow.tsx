@@ -5,7 +5,9 @@ interface ReferralsTableRowProps {
     referral: ReferralData;
 }
 
-export default function ReferralsTableRow({ referral }: ReferralsTableRowProps) {
+export default function ReferralsTableRow({
+    referral,
+}: ReferralsTableRowProps) {
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.addressCell}`}>

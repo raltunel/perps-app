@@ -2,7 +2,6 @@ import styles from './Notifications.module.css';
 import Notification from './Notification';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import {
-    makeOID,
     useNotificationStore,
     type notificationIF,
     type NotificationStoreIF,
@@ -44,18 +43,21 @@ export default function Notifications() {
         return unsubscribe;
     }, [debugWallet, info]);
 
-    const postNotification = useCallback((payload: any) => {
-        if (backgroundFillNotifRef.current && payload.notification) {
+    const postNotification = useCallback((payload) => {
+        if (!payload || !payload.data) return;
+
+        const notification = payload.data.notification;
+
+        if (backgroundFillNotifRef.current && notification) {
             // split the payload into title and message
-            const title = payload.notification.split(':')[0];
-            const message = payload.notification.split(':')[1];
+            const title = notification.split(':')[0];
+            const message = notification.split(':')[1];
 
             // add to store
-            data.addFromWS({
+            data.add({
                 title: title,
                 message: message,
                 icon: 'check',
-                oid: makeOID(14),
             });
         }
     }, []);
