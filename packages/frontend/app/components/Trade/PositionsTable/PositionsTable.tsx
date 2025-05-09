@@ -3,16 +3,47 @@ import PositionsTableRow from './PositionsTableRow';
 import styles from './PositionsTable.module.css';
 import { positionsData } from './data';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useMemo, useState } from 'react';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import { sortPositionData } from '~/utils/position/positionUtils';
+
+
 
 export default function PositionsTable() {
     const { positions } = useTradeDataStore();
     const limit = 10;
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<PositionDataSortBy>();
+
+     const sortedPositions = useMemo(() => {
+            return sortPositionData(positions, sortBy, sortDirection);
+        }, [positions, sortBy, sortDirection]);
+
+            const handleSort = (key: string) => {
+                if (sortBy === key) {
+                    if (sortDirection === 'desc') {
+                        setSortDirection('asc');
+                    } else if (sortDirection === 'asc') {
+                        setSortDirection(undefined);
+                        setSortBy(undefined);
+                    } else {
+                        setSortDirection('desc');
+                    }
+                } else {
+                    setSortBy(key as PositionDataSortBy);
+                    setSortDirection('desc');
+                }
+            };
 
     return (
         <div className={styles.tableWrapper}>
-            <PositionsTableHeader />
+            <PositionsTableHeader 
+                sortBy={sortBy}
+                sortDirection={sortDirection}
+                sortClickHandler={handleSort} />
             <div className={styles.tableBody}>
-                {positions.slice(0, limit).map((position, index) => (
+                {sortedPositions.map((position, index) => (
                     <PositionsTableRow
                         key={`position-${index}`}
                         position={position}

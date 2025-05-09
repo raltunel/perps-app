@@ -1,5 +1,7 @@
 import SortIcon from '~/components/Vault/SortIcon';
 import styles from './PositionsTable.module.css';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
@@ -9,7 +11,17 @@ export interface HeaderCell {
     className: string;
 }
 
-export default function PositionsTableHeader() {
+interface PositionsTableHeaderProps {
+    sortBy: PositionDataSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: string) => void;
+}
+
+export default function PositionsTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: PositionsTableHeaderProps) {
     const handleSort = (key: string) => {
         console.log(`Sorting by: ${key}`);
     };
@@ -100,10 +112,20 @@ export default function PositionsTableHeader() {
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />}
                 </div>
             ))}
         </div>

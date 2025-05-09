@@ -15,6 +15,8 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
 
+    console.log('Position:', position);
+
     const getTpSl = () => {
         let ret = '';
         if (position.tp && position.tp > 0) {
