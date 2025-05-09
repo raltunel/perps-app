@@ -1,4 +1,8 @@
+import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
 import styles from './FillTwapTable.module.css';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export interface FillData {
     time: string;
@@ -12,11 +16,15 @@ export interface FillData {
 }
 
 interface FillTwapTableRowProps {
-    fill: FillData;
+    fill: TwapSliceFillIF;
 }
 
 export default function FillTwapTableRow(props: FillTwapTableRowProps) {
     const { fill } = props;
+
+    const { formatNum } = useNumFormatter();
+
+    const { getBsColor } = useAppSettings();
 
     // to determine direction class
     const getDirectionClass = (direction: string) => {
@@ -41,30 +49,36 @@ export default function FillTwapTableRow(props: FillTwapTableRowProps) {
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.timeCell}`}>
-                {fill.time}
+                {formatTimestamp(fill.time)}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {fill.coin}
             </div>
             <div
-                className={`${styles.cell} ${styles.directionCell} ${getDirectionClass(fill.direction)}`}
+                className={`${styles.cell} ${styles.directionCell}`}
+                style={{
+                    color:
+                        fill.side === 'buy'
+                            ? getBsColor().buy
+                            : getBsColor().sell,
+                }}
             >
-                {fill.direction}
+                {fill.dir}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
-                {fill.price}
+                {formatNum(fill.px)}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {fill.size}
+                {formatNum(fill.sz)} {fill.coin}
             </div>
             <div className={`${styles.cell} ${styles.tradeValueCell}`}>
-                {fill.tradeValue}
+                {formatNum(fill.px * fill.sz, 2, true, true)}
             </div>
-            <div className={`${styles.cell} ${styles.feeCell}`}>{fill.fee}</div>
-            <div
-                className={`${styles.cell} ${styles.closedPnlCell} ${getPnlClass(fill.closedPnl)}`}
-            >
-                {fill.closedPnl}
+            <div className={`${styles.cell} ${styles.feeCell}`}>
+                {formatNum(fill.fee, 2)}
+            </div>
+            <div className={`${styles.cell} ${styles.closedPnlCell}`}>
+                {formatNum(fill.closedPnl - fill.fee, 2, true, true)}
             </div>
         </div>
     );

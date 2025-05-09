@@ -25,3 +25,15 @@ export interface PositionIF {
     tp?: number;
     sl?: number;
 }
+
+export type PositionDataSortBy =
+    | 'coin'
+    | 'size'
+    | 'positionValue'
+    | 'entryPrice'
+    | 'markPrice'
+    | 'pnl'
+    | 'liqPrice'
+    | 'margin'
+    | 'funding'
+    | undefined;

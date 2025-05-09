@@ -55,4 +55,42 @@ export type UserFillSortBy =
     | 'sz'
     | 'value'
     | 'fee'
+    | 'closedPnl'
     | undefined;
+
+export interface TwapStateIF {
+    coin: string;
+    executedNtl: number;
+    executedSz: number;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    timestamp: number;
+    user: string;
+}
+
+export interface TwapHistoryIF {
+    state: TwapStateIF;
+    status: string;
+    time: number;
+}
+
+export interface TwapSliceFillIF {
+    coin: string;
+    closedPnl: number;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    feeToken: string;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    startPosition: number;
+    sz: number;
+    tid: number;
+    time: number;
+    twapId: number;
+}
