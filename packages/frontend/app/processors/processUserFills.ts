@@ -1,4 +1,6 @@
 import type {
+    TwapHistoryIF,
+    TwapSliceFillIF,
     UserBalanceIF,
     UserBalanceSortBy,
     UserFillIF,
@@ -6,7 +8,11 @@ import type {
 } from '~/utils/UserDataIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 import type { TableSortDirection } from '~/utils/CommonIFs';
-import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
+import type {
+    UserFillsData,
+    UserTwapHistoryData,
+    UserTwapSliceFillsData,
+} from '@perps-app/sdk/src/utils/types';
 
 export function processUserFills(data: UserFillsData): UserFillIF[] {
     const ret: UserFillIF[] = [];
@@ -118,4 +124,55 @@ export function sortUserFills(
             return b.time - a.time;
         }
     });
+}
+
+export function processUserTwapSliceFills(
+    data: UserTwapSliceFillsData,
+): TwapSliceFillIF[] {
+    const ret: TwapSliceFillIF[] = [];
+    data.twapSliceFills.forEach((f) => {
+        ret.push({
+            coin: f.fill.coin,
+            closedPnl: parseFloat(f.fill.closedPnl),
+            crossed: f.fill.crossed,
+            dir: f.fill.dir,
+            fee: parseFloat(f.fill.fee),
+            feeToken: f.fill.feeToken,
+            hash: f.fill.hash,
+            oid: f.fill.oid,
+            px: parseFloat(f.fill.px),
+            side: f.fill.side === 'A' ? 'sell' : 'buy',
+            startPosition: parseFloat(f.fill.startPosition),
+            sz: parseFloat(f.fill.sz),
+            tid: f.fill.tid,
+            time: f.fill.time,
+            twapId: f.twapId,
+        } as TwapSliceFillIF);
+    });
+    return ret;
+}
+
+export function processUserTwapHistory(
+    data: UserTwapHistoryData,
+): TwapHistoryIF[] {
+    const ret: TwapHistoryIF[] = [];
+    data.history.forEach((h) => {
+        ret.push({
+            state: {
+                coin: h.state.coin,
+                executedNtl: parseFloat(h.state.executedNtl),
+                executedSz: parseFloat(h.state.executedSz),
+                minutes: h.state.minutes,
+                randomize: h.state.randomize,
+                reduceOnly: h.state.reduceOnly,
+                side: h.state.side === 'A' ? 'sell' : 'buy',
+                sz: parseFloat(h.state.sz),
+                timestamp: h.state.timestamp,
+                user: h.state.user,
+            },
+            status: h.status.status,
+            time: h.time,
+        } as TwapHistoryIF);
+    });
+    return ret;
 }

@@ -117,4 +117,6 @@ export enum WsChannels {
     ACTIVE_COIN_DATA = 'activeAssetCtx',
     NOTIFICATION = 'notification',
     CANDLE = 'candle',
+    TWAP_HISTORY = 'userTwapHistory',
+    TWAP_SLICE_FILLS = 'userTwapSliceFills',
 }
