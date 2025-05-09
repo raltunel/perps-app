@@ -220,7 +220,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
-                        >
+                    >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
                     {navLinks.map((link) => (
