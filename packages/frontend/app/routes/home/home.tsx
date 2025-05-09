@@ -1,6 +1,6 @@
 // Optimized Hero Section
 import { type CSSProperties, type JSX } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigation } from 'react-router';
 import styles from './home.module.css';
 
 import { motion } from 'framer-motion';
@@ -129,7 +129,19 @@ export default function Home(): JSX.Element {
     //     }
     // }, []);
 
+    const navigation = useNavigation();
+
     const { symbol } = useTradeDataStore();
+
+    function TradeButton({ symbol }: { symbol: string }) {
+        const isNavigating = navigation.state !== 'idle';
+
+        return (
+            <Link to={`/trade/${symbol}`} className={styles.primary}>
+                {isNavigating ? 'Loading...' : 'Start Trading'}
+            </Link>
+        );
+    }
 
     return (
         <section className={styles.hero}>
@@ -158,9 +170,7 @@ export default function Home(): JSX.Element {
                 <h1>Trade Perps With Ambient</h1>
                 <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
                 <div className={styles.buttons}>
-                    <Link to={`/trade/${symbol}`} className={styles.primary}>
-                        Start Trading
-                    </Link>
+                    <TradeButton symbol={symbol} />
                     <button className={styles.secondary}>Learn More</button>
                 </div>
             </motion.div>
