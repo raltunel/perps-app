@@ -137,7 +137,11 @@ export default function Home(): JSX.Element {
         const isNavigating = navigation.state !== 'idle';
 
         return (
-            <Link to={`/trade/${symbol}`} className={styles.primary}>
+            <Link
+                to={`/trade/${symbol}`}
+                className={styles.primary}
+                viewTransition
+            >
                 {isNavigating ? 'Loading...' : 'Start Trading'}
             </Link>
         );
@@ -183,7 +187,7 @@ export default function Home(): JSX.Element {
             >
                 <div className={styles.mockupGlow} />
                 <div className={styles.mockupContainer}>
-                    <Link to={`/trade/${symbol}`}>
+                    <Link to={`/trade/${symbol}`} viewTransition>
                         <img
                             src='/images/mockup.png'
                             alt='Perps App'
