@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -29,11 +29,22 @@ export default function Trade() {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('order');
+    const [isMobile, setIsMobile] = useState(false);
 
-    // useEffect(() => {
-    //     const info = new Info({ environment: 'mock' });
-    //     console.log({ wsManager: info.wsManager });
-    // }, []);
+    // Check if mobile device
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        checkIfMobile();
+        window.addEventListener('resize', checkIfMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
 
     useEffect(() => {
         document.body.style.overscrollBehaviorX = 'none';
@@ -48,8 +59,105 @@ export default function Trade() {
     // ... route with no token symbol in the URL
     useEffect(() => {
         if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
-    }, [navigate]);
+    }, [navigate, marketId, symbol]);
 
+    // Mobile tab navigation - exactly matches the mockup
+    const MobileTabNavigation = () => {
+        return (
+            <div className={styles.mobileTabNav}>
+                <div className={styles.mobileTabBtns}>
+                    <button 
+                        className={`${styles.mobileTabBtn} ${activeTab === 'order' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('order')}
+                    >
+                        Order
+                    </button>
+                    <button 
+                        className={`${styles.mobileTabBtn} ${activeTab === 'chart' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('chart')}
+                    >
+                        Chart
+                    </button>
+                    <button 
+                        className={`${styles.mobileTabBtn} ${activeTab === 'book' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('book')}
+                    >
+                        Book
+                    </button>
+                    <button 
+                        className={`${styles.mobileTabBtn} ${activeTab === 'recent' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('recent')}
+                    >
+                        Recent
+                    </button>
+                    <button 
+                        className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''}`}
+                        onClick={() => setActiveTab('positions')}
+                    >
+                        Positions
+                    </button>
+                </div>
+            </div>
+        );
+    };
+
+    // For Book section on mobile, we'll use the OrderBookSection component but force it to show only the Order Book tab
+    const MobileOrderBookView = () => {
+        return (
+            <div className={styles.mobileOnlyOrderBook}>
+                <OrderBookSection symbol={symbol} mobileView={true} mobileContent="orderBook" />
+            </div>
+        );
+    };
+
+    // For Recent section on mobile, we'll use the OrderBookSection component but force it to show only the Recent Trades tab
+    const MobileRecentTradesView = () => {
+        return (
+            <div className={styles.mobileOnlyRecentTrades}>
+                <OrderBookSection symbol={symbol} mobileView={true} mobileContent="recentTrades" />
+            </div>
+        );
+    };
+
+    // Mobile view with tabs
+    if (isMobile && symbol) {
+        return (
+            <>
+                <TradeRouteHandler />
+                <WebDataConsumer />
+                <SymbolInfo />
+                <MobileTabNavigation />
+                
+                {/* Order section */}
+                <div className={`${styles.mobileSection} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}>
+                    <OrderInput />
+                </div>
+                
+                {/* Chart section */}
+                <div className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}>
+                    <TradingViewWrapper />
+                </div>
+                
+                {/* Book section - Shows ONLY Order Book */}
+                <div className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}>
+                    <MobileOrderBookView />
+                </div>
+                
+                {/* Recent trades section - Shows ONLY Recent Trades */}
+                <div className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}>
+                    <MobileRecentTradesView />
+                </div>
+                
+                {/* Positions section */}
+                <div className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}>
+                <TradeTable />
+
+                </div>
+            </>
+        );
+    }
+
+    // Desktop view (unchanged)
     return (
         <>
             <TradeRouteHandler />

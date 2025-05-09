@@ -6,11 +6,18 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
+
 interface OrderBookSectionProps {
     symbol: string;
+    mobileView?: boolean;
+    mobileContent?: 'orderBook' | 'recentTrades';
 }
 
-const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
+const OrderBookSection: React.FC<OrderBookSectionProps> = ({ 
+    symbol, 
+    mobileView = false, 
+    mobileContent = 'orderBook' 
+}) => {
     const [orderCount, setOrderCount] = useState(9);
     const [tradesCount, setTradesCount] = useState(25);
     const orderCountForStacked = useMemo(() => {
@@ -68,17 +75,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
                     setOrderCount(orderCount);
                 }
             }
-
-            // const watchlistSection = document.getElementById('watchlistSection');
-            // const symbolInfoSection = document.getElementById('symbolInfoSection');
-            // const tradeModulesSection = document.getElementById('tradeModulesSection');
-            // const chartSection = document.getElementById('chartSection');
-
-            // if(watchlistSection && symbolInfoSection && chartSection && tradeModulesSection){
-            //     const modulesHeight = 16 + watchlistSection.getBoundingClientRect().height + symbolInfoSection.getBoundingClientRect().height + chartSection.getBoundingClientRect().height;
-            //     orderBookSection.style.height = `${modulesHeight}px`;
-            //     tradeModulesSection.style.height = `${modulesHeight}px`;
-            // }
         }
     };
 
@@ -125,12 +121,25 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
                 return orderBookComponent;
             case 'Recent Trades':
                 return orderBookTrades;
-
             default:
                 return orderBookComponent;
         }
     };
 
+    // Mobile view - only render the requested content
+    if (mobileView) {
+        if (mobileContent === 'orderBook') {
+            return orderBookComponent
+                
+            ;
+        } else if (mobileContent === 'recentTrades') {
+            return orderBookTrades
+              
+            
+        }
+    }
+
+    // Desktop views
     const stackedOrderBook = (
         <div className={styles.orderBookSection}>
             <div className={styles.stackedContainer}>
@@ -175,6 +184,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
         </div>
     );
+    
     const orderBookTabsComponent = (
         <div className={styles.orderBookSectionContainer}>
             <Tabs
@@ -187,18 +197,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
     );
-    // const renderByMode = () => {
-    //     switch (orderBookMode) {
-    //         case 'tab':
-    //             return orderBookTabsComponent;
-    //         case 'stacked':
-    //             return stackedOrderBook;
-    //         case 'large':
-    //             return largeOrderBook;
-    //         default:
-    //             return orderBookTabsComponent;
-    //     }
-    // };
 
     return (
         <>
@@ -208,4 +206,5 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
         </>
     );
 };
+
 export default OrderBookSection;
