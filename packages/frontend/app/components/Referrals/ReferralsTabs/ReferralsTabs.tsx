@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './ReferralsTabs.module.css'
+import styles from './ReferralsTabs.module.css';
 
 import { motion } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
@@ -22,7 +22,7 @@ export default function RefferalsTabs(props: PropsIF) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Referrals':
-                return <ReferralsTable/>;
+                return <ReferralsTable />;
             case 'Reward History':
                 return <div>enter code</div>;
             default:
@@ -40,8 +40,8 @@ export default function RefferalsTabs(props: PropsIF) {
                 tabs={availableTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
-                wrapperId="referralsTabs" 
-                layoutIdPrefix="referralsTabIndicator" 
+                wrapperId='referralsTabs'
+                layoutIdPrefix='referralsTabIndicator'
             />
             <motion.div
                 className={styles.tableContent}

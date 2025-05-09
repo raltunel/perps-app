@@ -27,7 +27,7 @@ function PortfolioSend({
     availableAmount,
     networkFee = '$0.001',
     onSend,
-   
+
     isProcessing = false,
     portfolio,
 }: PortfolioSendProps) {
@@ -39,7 +39,6 @@ function PortfolioSend({
             (token) => token.symbol === (portfolio.unit || 'USDe'),
         ) || AVAILABLE_TOKENS[0],
     );
-
 
     const validateAmount = useCallback(
         (inputAmount: number, maxAmount: number) => {
@@ -80,7 +79,6 @@ function PortfolioSend({
     );
 
     const debouncedAmountChange = useDebouncedCallback((newValue: string) => {
-     
         setAmount(newValue);
         setError(null);
     }, 20);
@@ -165,7 +163,6 @@ function PortfolioSend({
 
     return (
         <div className={styles.container}>
-       
             <div className={styles.textContent}>
                 <h4>Send {selectedToken.symbol} on Fogo</h4>
                 <p>Send tokens to another address on Fogo.</p>

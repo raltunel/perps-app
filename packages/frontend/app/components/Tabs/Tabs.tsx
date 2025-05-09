@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './Tabs.module.css';
+import { WsChannels } from '~/utils/Constants';
 
 interface TabProps {
     label: string;
@@ -9,6 +10,8 @@ interface TabProps {
     onClick: () => void;
     layoutId: string;
     notInteractive?: boolean;
+    wide?: boolean;
+    flex?: boolean;
 }
 
 export function Tab(props: TabProps) {
@@ -18,11 +21,13 @@ export function Tab(props: TabProps) {
         onClick,
         layoutId,
         notInteractive = false,
+        wide = false,
+        flex = false,
     } = props;
 
     return (
         <button
-            className={`${styles.tab} ${isActive ? styles.activeTab : ''}`}
+            className={`${styles.tab} ${wide ? styles.wideTab : ''} ${flex ? styles.flexTab : ''} ${isActive ? styles.activeTab : ''}`}
             style={{
                 color: notInteractive ? 'var(--text1)' : '',
                 cursor: notInteractive ? 'auto' : 'cursor',
@@ -49,6 +54,8 @@ export interface TabsProps {
     rightContent?: React.ReactNode;
     wrapperId?: string;
     layoutIdPrefix?: string;
+    wide?: boolean;
+    flex?: boolean;
 }
 
 export default function Tabs(props: TabsProps) {
@@ -59,14 +66,20 @@ export default function Tabs(props: TabsProps) {
         rightContent,
         wrapperId,
         layoutIdPrefix = 'tabIndicator',
+        wide = false,
+        flex = false,
     } = props;
 
     const {
-        webDataFetched,
+        fetchedChannels,
         userBalances: { length: balancesCount },
         positions: { length: positionsCount },
         userOrders: { length: openOrdersCount },
     } = useTradeDataStore();
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
@@ -243,6 +256,8 @@ export default function Tabs(props: TabsProps) {
                                 onClick={() => handleTabClick(tabId)}
                                 notInteractive={tabs.length <= 1}
                                 layoutId={layoutId} // Pass the unique layoutId
+                                wide={wide}
+                                flex={flex}
                             />
                         );
                     })}
