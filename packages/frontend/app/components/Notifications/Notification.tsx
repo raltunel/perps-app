@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import { IoCheckmarkCircleOutline, IoClose } from 'react-icons/io5';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { notificationIF } from '~/stores/NotificationStore';
 import styles from './Notification.module.css';
 
@@ -13,6 +14,8 @@ export default function Notification(props: propsIF) {
     const { data, dismiss } = props;
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
+
+    const { getBsColor } = useAppSettings();
 
     // time period (ms) after which to auto-dismiss the notification
     const DISMISS_AFTER = 5000;
@@ -36,15 +39,37 @@ export default function Notification(props: propsIF) {
     function formatMessage(message: string): ReactNode {
         const fixedMessage: string = message.trim();
         if (fixedMessage.startsWith('Bought')) {
-            const firstSpace: number = fixedMessage.indexOf(' ');
-            const secondSpace: number = fixedMessage.indexOf(' ', firstSpace + 1);
-            if (secondSpace !== -1) {
-                const firstPart: string = fixedMessage.substring(0, secondSpace);
-                const secondPart: string = fixedMessage.substring(secondSpace);
-                
+            const firstSpace = fixedMessage.indexOf(' ');
+            const secondSpace = fixedMessage.indexOf(' ', firstSpace + 1);
+            const thirdSpace = fixedMessage.indexOf(' ', secondSpace + 1);
+
+            if (thirdSpace !== -1) {
+                const firstPart = fixedMessage.substring(0, thirdSpace);
+                const secondPart = fixedMessage.substring(thirdSpace);
+
                 return (
                     <>
-                        <span style={{ color: 'var(--green)' }}>{firstPart}</span>
+                        <span style={{ color: getBsColor().buy }}>
+                            {firstPart}
+                        </span>
+                        {secondPart}
+                    </>
+                );
+            }
+        } else if (fixedMessage.startsWith('Sold')) {
+            const firstSpace = fixedMessage.indexOf(' ');
+            const secondSpace = fixedMessage.indexOf(' ', firstSpace + 1);
+            const thirdSpace = fixedMessage.indexOf(' ', secondSpace + 1);
+
+            if (thirdSpace !== -1) {
+                const firstPart = fixedMessage.substring(0, thirdSpace);
+                const secondPart = fixedMessage.substring(thirdSpace);
+
+                return (
+                    <>
+                        <span style={{ color: getBsColor().sell }}>
+                            {firstPart}
+                        </span>
                         {secondPart}
                     </>
                 );
