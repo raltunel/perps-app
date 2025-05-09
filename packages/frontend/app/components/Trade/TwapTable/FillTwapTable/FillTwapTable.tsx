@@ -2,8 +2,17 @@ import FillTwapTableHeader from './FillTwapTableHeader';
 import FillTwapTableRow from './FillTwapTableRow';
 import styles from './FillTwapTable.module.css';
 import { fillData } from './data';
+import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
 
-export default function FillTwapTable() {
+interface FillTwapTableProps {
+    data: TwapSliceFillIF[];
+    isFetched: boolean;
+    selectedFilter?: string;
+}
+
+export default function FillTwapTable(props: FillTwapTableProps) {
+    const { data, isFetched, selectedFilter } = props;
+
     return (
         <div className={styles.tableWrapper}>
             <FillTwapTableHeader />

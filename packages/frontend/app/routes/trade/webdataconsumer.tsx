@@ -18,6 +18,8 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import type {
     AccountOverviewIF,
+    TwapSliceFillIF,
+    TwapHistoryIF,
     UserBalanceIF,
     UserFillIF,
 } from '~/utils/UserDataIFs';
@@ -42,6 +44,8 @@ export default function WebDataConsumer() {
         setFetchedChannels,
         setUserSymbolOrders,
         setUserFills,
+        setTwapHistory,
+        setTwapSliceFills,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -58,6 +62,8 @@ export default function WebDataConsumer() {
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
     const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
     const userFillsRef = useRef<UserFillIF[]>([]);
+    const twapHistoryRef = useRef<TwapHistoryIF[]>([]);
+    const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
@@ -113,6 +119,8 @@ export default function WebDataConsumer() {
             setUserBalances(userBalancesRef.current);
             setUserFills(userFillsRef.current);
             setOrderHistory(userOrderHistoryRef.current);
+            setTwapHistory(twapHistoryRef.current);
+            setTwapSliceFills(twapSliceFillsRef.current);
             if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
                 accountOverviewRef.current.balanceChange =
                     accountOverviewRef.current.balance -
@@ -222,7 +230,15 @@ export default function WebDataConsumer() {
             data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
-            console.log('fills', fills);
+            if (data.isSnapshot) {
+                twapSliceFillsRef.current = fills;
+            } else {
+                twapSliceFillsRef.current = [
+                    ...fills,
+                    ...twapSliceFillsRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
         }
     }, []);
 
@@ -234,7 +250,15 @@ export default function WebDataConsumer() {
             data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const history = processUserTwapHistory(data);
-            console.log('history', history);
+            if (data.isSnapshot) {
+                twapHistoryRef.current = history;
+            } else {
+                twapHistoryRef.current = [
+                    ...history,
+                    ...twapHistoryRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
         }
     }, []);
 

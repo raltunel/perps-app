@@ -102,7 +102,7 @@ export default function TradeTable() {
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
-                return <TwapTable />;
+                return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
                 return (
                     <TradeHistoryTable
