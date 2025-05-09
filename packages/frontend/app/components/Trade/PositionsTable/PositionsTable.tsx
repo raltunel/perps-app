@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Pagination from '~/components/Pagination/Pagination';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 import { TableState } from '~/utils/CommonIFs';
+import { WsChannels } from '~/utils/Constants';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
 import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import { WsChannels } from '~/utils/Constants';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
-import { sortPositionData } from '~/utils/position/PositionUtils';
-import { positionsData } from './data';
 
 interface PositionsTableProps {
     pageMode?: boolean;

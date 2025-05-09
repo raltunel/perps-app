@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styles from './SkeletonNode.module.css';
 
 interface SkeletonNodeProps {
