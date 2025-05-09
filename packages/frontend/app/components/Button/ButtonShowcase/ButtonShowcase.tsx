@@ -3,7 +3,7 @@ import styles from './ButtonShowcase.module.css';
 export function meta() {
     return [
         { title: 'BUTTON SHOWCASE' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 
