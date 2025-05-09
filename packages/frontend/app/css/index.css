@@ -80,6 +80,10 @@
     );
 
     --skeleton-height: 20px;
+
+    /* transitions */
+    --ease-in-out-fast: ease-in-out 0.2s;
+    --ease-in-out-med: ease-in-out 0.3s;
 }
 
 /* Custom Reset */
