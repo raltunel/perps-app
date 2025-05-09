@@ -1,8 +1,9 @@
 // Optimized Hero Section
-import { useEffect, useState, type CSSProperties, type JSX } from 'react';
+import { type CSSProperties, type JSX } from 'react';
 import { Link } from 'react-router';
 import styles from './home.module.css';
 
+import { motion } from 'framer-motion';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import btcImage from '../../assets/tokens/btc.svg';
 import daiImage from '../../assets/tokens/dai.svg';
@@ -113,20 +114,20 @@ const tokenData: TokenData[] = [
 ];
 
 export default function Home(): JSX.Element {
-    const [hasVisited, setHasVisited] = useState(false);
+    // const [hasVisited, setHasVisited] = useState(false);
 
-    useEffect(() => {
-        try {
-            const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
-            setHasVisited(visited);
+    // useEffect(() => {
+    //     try {
+    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
+    //         setHasVisited(visited);
 
-            if (!visited) {
-                sessionStorage.setItem('hasVisitedHome', 'true');
-            }
-        } catch (e) {
-            console.error('Session storage error:', e);
-        }
-    }, []);
+    //         if (!visited) {
+    //             sessionStorage.setItem('hasVisitedHome', 'true');
+    //         }
+    //     } catch (e) {
+    //         console.error('Session storage error:', e);
+    //     }
+    // }, []);
 
     const { symbol } = useTradeDataStore();
 
@@ -148,8 +149,11 @@ export default function Home(): JSX.Element {
                 />
             ))}
 
-            <div
-                className={`${styles.left} ${!hasVisited ? styles.fadeInUp : ''}`}
+            <motion.div
+                className={styles.left}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
             >
                 <h1>Trade Perps With Ambient</h1>
                 <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
@@ -159,10 +163,13 @@ export default function Home(): JSX.Element {
                     </Link>
                     <button className={styles.secondary}>Learn More</button>
                 </div>
-            </div>
+            </motion.div>
 
-            <div
-                className={`${styles.right} ${!hasVisited ? styles.fadeIn : ''}`}
+            <motion.div
+                className={styles.right}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
             >
                 <div className={styles.mockupGlow} />
                 <div className={styles.mockupContainer}>
@@ -177,7 +184,7 @@ export default function Home(): JSX.Element {
                         />
                     </Link>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 }
