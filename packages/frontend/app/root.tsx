@@ -116,32 +116,28 @@ export default function App() {
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
                     <TutorialProvider>
-
-                    
-                    <div className='root-container'>
-                        {/* Added error boundary for header */}
-                        <ComponentErrorBoundary>
-                            <header className='header'>
+                        <div className='root-container'>
+                            {/* Added error boundary for header */}
+                            <ComponentErrorBoundary>
                                 <PageHeader />
-                            </header>
-                        </ComponentErrorBoundary>
+                            </ComponentErrorBoundary>
 
-                        <main className='content'>
-                            {/*  Added Suspense for async content loading */}
-                            <Suspense fallback={<LoadingIndicator />}>
-                                <ComponentErrorBoundary>
-                                    <Outlet />
-                                </ComponentErrorBoundary>
-                            </Suspense>
-                        </main>
+                            <main className='content'>
+                                {/*  Added Suspense for async content loading */}
+                                <Suspense fallback={<LoadingIndicator />}>
+                                    <ComponentErrorBoundary>
+                                        <Outlet />
+                                    </ComponentErrorBoundary>
+                                </Suspense>
+                            </main>
 
-                        {/* Added error boundary for notifications */}
-                        <ComponentErrorBoundary>
-                            <Notifications />
-                        </ComponentErrorBoundary>
-                    </div>
-                        </TutorialProvider>
-                        <RuntimeDomManipulation />
+                            {/* Added error boundary for notifications */}
+                            <ComponentErrorBoundary>
+                                <Notifications />
+                            </ComponentErrorBoundary>
+                        </div>
+                    </TutorialProvider>
+                    <RuntimeDomManipulation />
                 </SdkProvider>
             </Layout>
         </>

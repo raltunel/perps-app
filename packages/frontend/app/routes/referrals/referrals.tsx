@@ -6,8 +6,8 @@ import styles from './referrals.module.css';
 // export function meta({}: Route.MetaArgs) {
 export function meta() {
     return [
-        { title: 'Perps - Referrals' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Referrals | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 
@@ -23,7 +23,7 @@ export default function Referrals() {
                 Referrals
                 <p>
                     Refer users to earn rewards. Affiliates earn greater
-                    rewards.  <a href='#'>Learn More</a>
+                    rewards. <a href='#'>Learn More</a>
                 </p>
             </header>
             <div className={styles.detailsContainer}>

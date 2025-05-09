@@ -16,7 +16,7 @@
     justify-content: center;
     cursor: pointer;
     border-radius: 0.2rem !important;
-    transition: all 0.2s ease-in-out;
+    transition: all var(--ease-in-out-fast);
     padding: 0.4rem;
 }
 

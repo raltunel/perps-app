@@ -3,10 +3,9 @@ body {
     overscroll-behavior-x: none;
     touch-action: pan-y;
 }
-
 .mainContainer {
     height: 100%;
-    
+
     display: grid;
     grid-template-rows: 10px minmax(0, 1fr);
 }
@@ -81,11 +80,11 @@ body {
     gap: var(--main-gap);
 }
 
-.watchlist, .symbolInfo{
+.watchlist,
+.symbolInfo {
     background: var(--dark2);
     height: 100%;
     border-radius: var(--main-border-radius);
-    
 }
 
 .watchlist,
@@ -111,6 +110,10 @@ body {
         100vh - var(--trade-tables-height-desktop) -
             var(--header-height-desktop) - var(--main-gap)
     );
+}
+
+.orderBook {
+    position: relative;
 }
 
 /* THIS IS JUST FOR DEVELOPMENT. REMOVE THIS AND THE FOLDER (TEMPIMAGES) ONCE WE HAVE THE ACTUAL COMPONENTS */
@@ -165,7 +168,3 @@ filter: blur(2px); */
         display: none;
     }
 }
-
-
-
-

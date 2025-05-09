@@ -1,5 +1,4 @@
 import { lazy, memo, Suspense } from 'react';
-import { MdOutlineClose } from 'react-icons/md';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
@@ -21,11 +20,10 @@ const PortfolioSend = lazy(
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function meta(args: Route.MetaArgs) {
+export function meta() {
     return [
-        { title: 'Perps - Portfolio' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Portfolio | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 
@@ -205,15 +203,6 @@ function Portfolio() {
                     title={'Fee Schedule'}
                 >
                     <div className={styles.fee_schedule_modal}>
-                        <header>
-                            <div />
-                            <h3>Fee Schedule</h3>
-                            <MdOutlineClose
-                                size={20}
-                                onClick={feeScheduleModalCtrl.close}
-                                style={{ cursor: 'pointer' }}
-                            />
-                        </header>
                         <section className={styles.fee_table}>
                             <h4>VIP Tiers</h4>
                             <header>

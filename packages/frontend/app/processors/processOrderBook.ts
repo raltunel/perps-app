@@ -1,15 +1,15 @@
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import type {
+    OrderBookRowIF,
     OrderBookTradeIF,
     OrderDataIF,
-    OrderBookRowIF,
 } from '../utils/orderbook/OrderBookIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
-export function processOrderBookMessage(
-    data: L2BookData,
-    slice?: number,
-): { sells: OrderBookRowIF[]; buys: OrderBookRowIF[] } {
+export function processOrderBookMessage(data: L2BookData): {
+    sells: OrderBookRowIF[];
+    buys: OrderBookRowIF[];
+} {
     const buysRaw = data.levels[0];
     const sellsRaw = data.levels[1];
 
@@ -41,12 +41,12 @@ export function processOrderBookMessage(
     });
     const ratioPivot = sellTotal > buyTotal ? sellTotal : buyTotal;
 
-    buysProcessed = buysProcessed.map((e, index) => {
+    buysProcessed = buysProcessed.map((e) => {
         e.ratio = e.total / ratioPivot;
         return e;
     });
 
-    sellsProcessed = sellsProcessed.map((e, index) => {
+    sellsProcessed = sellsProcessed.map((e) => {
         e.ratio = e.total / ratioPivot;
         return e;
     });

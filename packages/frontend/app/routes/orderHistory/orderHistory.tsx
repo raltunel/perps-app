@@ -7,6 +7,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './orderHistory.module.css';
+import { WsChannels } from '~/utils/Constants';
 
 function OrderHistory() {
     const { address } = useParams<{ address: string }>();
@@ -15,7 +16,11 @@ function OrderHistory() {
 
     const { debugWallet } = useDebugStore();
 
-    const { orderHistory, orderHistoryFetched } = useTradeDataStore();
+    const { orderHistory, fetchedChannels } = useTradeDataStore();
+
+    const orderHistoryFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
+    }, [fetchedChannels]);
 
     const [fetchedHistoryData, setFetchedHistoryData] = useState<OrderDataIF[]>(
         [],
@@ -23,15 +28,17 @@ function OrderHistory() {
 
     const { fetchOrderHistory } = useInfoApi();
 
+    // TODO: live update is disabled for now, because websocket snapshots were sending limited data
     const isCurrentUser = useMemo(() => {
-        if (address) {
-            return (
-                address.toLocaleLowerCase() ===
-                debugWallet.address.toLocaleLowerCase()
-            );
-        } else {
-            return true;
-        }
+        return false;
+        // if (address) {
+        //     return (
+        //         address.toLocaleLowerCase() ===
+        //         debugWallet.address.toLocaleLowerCase()
+        //     );
+        // } else {
+        //     return true;
+        // }
     }, [address, debugWallet.address]);
 
     useEffect(() => {

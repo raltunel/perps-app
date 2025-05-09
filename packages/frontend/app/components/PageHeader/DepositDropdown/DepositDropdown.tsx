@@ -1,6 +1,6 @@
 import {
     useNotificationStore,
-    type notificationSlugs,
+    type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { motion } from 'framer-motion';
+
 interface propsIF {
     isUserConnected: boolean;
     setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,9 +18,7 @@ interface propsIF {
 export default function DepositDropdown(props: propsIF) {
     const { isUserConnected, isDropdown } = props;
 
-    // hook to populate a new notification in the notification center on user click
-    const populateNotification: (s: notificationSlugs) => void =
-        useNotificationStore().add;
+    const notifications: NotificationStoreIF = useNotificationStore();
 
     const { accountOverview, selectedCurrency } = useTradeDataStore();
 
@@ -84,12 +83,24 @@ export default function DepositDropdown(props: propsIF) {
             {isUserConnected ? (
                 <div className={styles.actionButtons}>
                     <button
-                        onClick={() => populateNotification('depositPending')}
+                        onClick={() =>
+                            notifications.add({
+                                title: 'Deposit Pending',
+                                message: 'Deposit 420,000 USDC',
+                                icon: 'spinner',
+                            })
+                        }
                     >
                         Deposit
                     </button>
                     <button
-                        onClick={() => populateNotification('withdrawPending')}
+                        onClick={() =>
+                            notifications.add({
+                                title: 'Deposit Pending',
+                                message: 'Deposit 420,000 USDC',
+                                icon: 'spinner',
+                            })
+                        }
                     >
                         Withdraw
                     </button>

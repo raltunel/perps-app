@@ -30,3 +30,67 @@ export type UserBalanceSortBy =
     | 'buyingPower'
     | 'pnlValue'
     | undefined;
+
+export interface UserFillIF {
+    time: number;
+    coin: string;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    sz: number;
+    tid: number;
+    value: number;
+    closedPnl: number;
+}
+
+export type UserFillSortBy =
+    | 'time'
+    | 'coin'
+    | 'side'
+    | 'px'
+    | 'sz'
+    | 'value'
+    | 'fee'
+    | 'closedPnl'
+    | undefined;
+
+export interface TwapStateIF {
+    coin: string;
+    executedNtl: number;
+    executedSz: number;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    timestamp: number;
+    user: string;
+}
+
+export interface TwapHistoryIF {
+    state: TwapStateIF;
+    status: string;
+    time: number;
+}
+
+export interface TwapSliceFillIF {
+    coin: string;
+    closedPnl: number;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    feeToken: string;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    startPosition: number;
+    sz: number;
+    tid: number;
+    time: number;
+    twapId: number;
+}

@@ -48,7 +48,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
     text-align: start;
 }
 .content:hover {

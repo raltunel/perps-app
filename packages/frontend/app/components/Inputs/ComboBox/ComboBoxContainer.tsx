@@ -28,73 +28,68 @@ export default function ComboBoxContainer() {
     // }, []);
 
     const currencies = ['USD', 'BTC', 'ETH'];
-    
 
     return (
         <section className={styles.comboBoxContainers}>
-
-            
-        <div className={styles.wsUrlSelector}>
-            {sdkEnabled ? (
+            <div className={styles.wsUrlSelector}>
+                {sdkEnabled ? (
+                    <ComboBox
+                        value={wsEnvironment}
+                        options={wsEnvironments}
+                        fieldName='value'
+                        onChange={(value) => setWsEnvironment(value)}
+                    />
+                ) : (
+                    <ComboBox
+                        value={wsUrl}
+                        options={wsUrls}
+                        onChange={(value) => setWsUrl(value)}
+                    />
+                )}
+            </div>
+            <div className={styles.walletSelector}>
                 <ComboBox
-                    value={wsEnvironment}
-                    options={wsEnvironments}
-                    fieldName='value'
-                    onChange={(value) => setWsEnvironment(value)}
+                    value={debugWallet.label}
+                    options={debugWallets}
+                    fieldName='label'
+                    onChange={(value) =>
+                        setDebugWallet({
+                            label: value,
+                            address:
+                                debugWallets.find(
+                                    (wallet) => wallet.label === value,
+                                )?.address || '',
+                        })
+                    }
                 />
-            ) : (
+            </div>
+
+            <div className={styles.currencySelector}>
                 <ComboBox
-                    value={wsUrl}
-                    options={wsUrls}
-                    onChange={(value) => setWsUrl(value)}
+                    value={selectedCurrency}
+                    options={currencies}
+                    onChange={(value) => setSelectedCurrency(value)}
                 />
-            )}
-        </div>
-        <div className={styles.walletSelector}>
-            <ComboBox
-                value={debugWallet.label}
-                options={debugWallets}
-                fieldName='label'
-                onChange={(value) =>
-                    setDebugWallet({
-                        label: value,
-                        address:
-                            debugWallets.find(
-                                (wallet) => wallet.label === value,
-                            )?.address || '',
-                    })
-                }
-            />
-        </div>
-
-        <div className={styles.currencySelector}>
-            <ComboBox
-                value={selectedCurrency}
-                options={currencies}
-                onChange={(value) => setSelectedCurrency(value)}
-            />
             </div>
-           
 
-        <div
-            className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
-            onClick={() => setIsWsEnabled(!isWsEnabled)}
-        >
-            <div className={styles.wsToggleButton}>
-                {' '}
-                {isWsEnabled ? 'WS' : 'WS'}
+            <div
+                className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
+                onClick={() => setIsWsEnabled(!isWsEnabled)}
+            >
+                <div className={styles.wsToggleButton}>
+                    {' '}
+                    {isWsEnabled ? 'WS' : 'WS'}
+                </div>
             </div>
-        </div>
 
-        <div
-            className={`${styles.sdkToggle} ${sdkEnabled ? styles.active : styles.disabled}`}
-            onClick={() => setSdkEnabled(!sdkEnabled)}
-        >
-            <div className={styles.sdkToggleButton}>
-                {sdkEnabled ? 'SDK' : 'SDK'}
+            <div
+                className={`${styles.sdkToggle} ${sdkEnabled ? styles.active : styles.disabled}`}
+                onClick={() => setSdkEnabled(!sdkEnabled)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {sdkEnabled ? 'SDK' : 'SDK'}
+                </div>
             </div>
-            </div>
-            </section>
-
-    )
+        </section>
+    );
 }
