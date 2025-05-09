@@ -4,7 +4,7 @@ import { useTradeModuleStore } from '~/stores/TradeModuleStore';
 import styles from './trademodules.module.css';
 
 const TradeModules: React.FC = () => {
-    const { tradeSlot, setTradeSlot } = useTradeModuleStore();
+    const { setTradeSlot } = useTradeModuleStore();
     const { symbol } = useTradeDataStore();
 
     useEffect(() => {

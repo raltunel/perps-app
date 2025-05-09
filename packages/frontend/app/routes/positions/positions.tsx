@@ -5,8 +5,8 @@ import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './positions.module.css';
 export function meta() {
     return [
-        { title: 'Perps - Positions' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Positions | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 

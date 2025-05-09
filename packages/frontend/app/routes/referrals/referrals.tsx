@@ -6,8 +6,8 @@ import styles from './referrals.module.css';
 // export function meta({}: Route.MetaArgs) {
 export function meta() {
     return [
-        { title: 'Perps - Referrals' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Referrals | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 

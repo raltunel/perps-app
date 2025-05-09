@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -10,7 +10,6 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
-import { TableState } from '~/utils/CommonIFs';
 
 const SymbolInfo: React.FC = () => {
     const { symbol, symbolInfo } = useTradeDataStore();

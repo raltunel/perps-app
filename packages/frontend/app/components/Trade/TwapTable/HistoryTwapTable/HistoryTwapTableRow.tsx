@@ -1,9 +1,8 @@
-import type { TwapHistoryIF } from '~/utils/UserDataIFs';
-import styles from './HistoryTwapTable.module.css';
 import { useMemo } from 'react';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import type { TwapHistoryIF } from '~/utils/UserDataIFs';
+import styles from './HistoryTwapTable.module.css';
 
 export interface TwapData {
     time: string;

@@ -204,7 +204,7 @@ export default function PageHeader() {
         <>
             <section className={styles.mainContainer}>
                 <header id={'pageHeader'} className={styles.container}>
-                    <Link to='/' style={{ marginLeft: '10px' }}>
+                    <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
                         <img
                             src='/images/favicon.svg'
                             alt='Perps Logo'
@@ -236,6 +236,7 @@ export default function PageHeader() {
                                 onClick={() => {
                                     if (isMenuOpen) setIsMenuOpen(false);
                                 }}
+                                viewTransition
                             >
                                 {link.name}
                             </Link>

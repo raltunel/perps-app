@@ -1,8 +1,8 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
 import styles from './FillTwapTable.module.css';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export interface FillData {
     time: string;
@@ -26,25 +26,25 @@ export default function FillTwapTableRow(props: FillTwapTableRowProps) {
 
     const { getBsColor } = useAppSettings();
 
-    // to determine direction class
-    const getDirectionClass = (direction: string) => {
-        if (direction.includes('Long')) {
-            return styles.openLong;
-        } else if (direction.includes('Short')) {
-            return styles.openShort;
-        }
-        return '';
-    };
+    // // to determine direction class
+    // const getDirectionClass = (direction: string) => {
+    //     if (direction.includes('Long')) {
+    //         return styles.openLong;
+    //     } else if (direction.includes('Short')) {
+    //         return styles.openShort;
+    //     }
+    //     return '';
+    // };
 
-    // to determine PNL class
-    const getPnlClass = (pnl: string) => {
-        if (pnl.startsWith('-')) {
-            return styles.negative;
-        } else if (pnl !== '$0.00') {
-            return styles.positive;
-        }
-        return '';
-    };
+    // // to determine PNL class
+    // const getPnlClass = (pnl: string) => {
+    //     if (pnl.startsWith('-')) {
+    //         return styles.negative;
+    //     } else if (pnl !== '$0.00') {
+    //         return styles.positive;
+    //     }
+    //     return '';
+    // };
 
     return (
         <div className={styles.rowContainer}>

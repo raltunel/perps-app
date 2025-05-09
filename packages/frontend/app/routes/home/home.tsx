@@ -1,8 +1,9 @@
 // Optimized Hero Section
-import { useEffect, useState, type CSSProperties, type JSX } from 'react';
-import { Link } from 'react-router';
+import { type CSSProperties, type JSX } from 'react';
+import { Link, useNavigation } from 'react-router';
 import styles from './home.module.css';
 
+import { motion } from 'framer-motion';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import btcImage from '../../assets/tokens/btc.svg';
 import daiImage from '../../assets/tokens/dai.svg';
@@ -112,23 +113,46 @@ const tokenData: TokenData[] = [
     },
 ];
 
+export function meta() {
+    return [
+        { title: 'Home | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
+    ];
+}
+
 export default function Home(): JSX.Element {
-    const [hasVisited, setHasVisited] = useState(false);
+    // const [hasVisited, setHasVisited] = useState(false);
 
-    useEffect(() => {
-        try {
-            const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
-            setHasVisited(visited);
+    // useEffect(() => {
+    //     try {
+    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
+    //         setHasVisited(visited);
 
-            if (!visited) {
-                sessionStorage.setItem('hasVisitedHome', 'true');
-            }
-        } catch (e) {
-            console.error('Session storage error:', e);
-        }
-    }, []);
+    //         if (!visited) {
+    //             sessionStorage.setItem('hasVisitedHome', 'true');
+    //         }
+    //     } catch (e) {
+    //         console.error('Session storage error:', e);
+    //     }
+    // }, []);
+
+    const navigation = useNavigation();
 
     const { symbol } = useTradeDataStore();
+
+    function TradeButton({ symbol }: { symbol: string }) {
+        const isNavigating = navigation.state !== 'idle';
+
+        return (
+            <Link
+                to={`/trade/${symbol}`}
+                className={styles.primary}
+                viewTransition
+            >
+                {isNavigating ? 'Loading...' : 'Start Trading'}
+            </Link>
+        );
+    }
 
     return (
         <section className={styles.hero}>
@@ -148,25 +172,29 @@ export default function Home(): JSX.Element {
                 />
             ))}
 
-            <div
-                className={`${styles.left} ${!hasVisited ? styles.fadeInUp : ''}`}
+            <motion.div
+                className={styles.left}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
             >
                 <h1>Trade Perps With Ambient</h1>
                 <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
                 <div className={styles.buttons}>
-                    <Link to={`/trade/${symbol}`} className={styles.primary}>
-                        Start Trading
-                    </Link>
+                    <TradeButton symbol={symbol} />
                     <button className={styles.secondary}>Learn More</button>
                 </div>
-            </div>
+            </motion.div>
 
-            <div
-                className={`${styles.right} ${!hasVisited ? styles.fadeIn : ''}`}
+            <motion.div
+                className={styles.right}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
             >
                 <div className={styles.mockupGlow} />
                 <div className={styles.mockupContainer}>
-                    <Link to={`/trade/${symbol}`}>
+                    <Link to={`/trade/${symbol}`} viewTransition>
                         <img
                             src='/images/mockup.png'
                             alt='Perps App'
@@ -177,7 +205,7 @@ export default function Home(): JSX.Element {
                         />
                     </Link>
                 </div>
-            </div>
+            </motion.div>
         </section>
     );
 }
