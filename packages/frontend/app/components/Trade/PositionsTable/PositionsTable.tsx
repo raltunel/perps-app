@@ -9,15 +9,23 @@ import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { WsChannels } from '~/utils/Constants';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
+import { positionsData } from './data';
 
 interface PositionsTableProps {
     pageMode?: boolean;
 }
 
+
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode } = props;
     const navigate = useNavigate();
-
+    const { coinPriceMap } = useTradeDataStore();
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<PositionDataSortBy>();
+    
     const handleViewAll = () => {
         navigate(`/positions`);
     };
@@ -35,15 +43,19 @@ export default function PositionsTable(props: PositionsTableProps) {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
     }, [fetchedChannels]);
 
+    const sortedPositions = useMemo(() => {
+        return sortPositionData(positions, sortBy, sortDirection,coinPriceMap);
+    }, [positions, sortBy, sortDirection]);
+
     const positionsToShow = useMemo(() => {
         if (pageMode) {
-            return positions.slice(
+            return sortedPositions.slice(
                 page * rowsPerPage,
                 (page + 1) * rowsPerPage,
             );
         }
-        return positions.slice(0, limit);
-    }, [positions, page, rowsPerPage, pageMode]);
+        return sortedPositions.slice(0, limit);
+    }, [sortedPositions, page, rowsPerPage, pageMode]);
 
     useEffect(() => {
         if (webDataFetched) {
@@ -57,6 +69,24 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
     }, [positionsToShow, webDataFetched]);
 
+
+            const handleSort = (key: string) => {
+                
+                if (sortBy === key) {
+                    if (sortDirection === 'desc') {
+                        setSortDirection('asc');
+                    } else if (sortDirection === 'asc') {
+                        setSortDirection(undefined);
+                        setSortBy(undefined);
+                    } else {
+                        setSortDirection('desc');
+                    }
+                } else {
+                    setSortBy(key as PositionDataSortBy);
+                    setSortDirection('desc');
+                }
+            };
+
     return (
         <div className={styles.tableWrapper}>
             {tableState === TableState.LOADING ? (
@@ -66,7 +96,10 @@ export default function PositionsTable(props: PositionsTableProps) {
                 />
             ) : (
                 <>
-                    <PositionsTableHeader />
+                    <PositionsTableHeader  
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={handleSort} />
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>
