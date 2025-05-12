@@ -34,5 +34,12 @@ export default [
 
     route('tradeHistory/:address?', 'routes/tradeHistory/tradeHistory.tsx'),
 
+    route('twapHistory/:address?', 'routes/twapHistory/twapHistory.tsx'),
+
+    route(
+        'twapFillHistory/:address?',
+        'routes/twapFillHistory/twapFillHistory.tsx',
+    ),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

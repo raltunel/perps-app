@@ -138,7 +138,11 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                         sortDirection={sortDirection}
                         sortClickHandler={handleSort}
                     />
-                    <div className={styles.tableBody}>
+                    <div
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : ''
+                        }`}
+                    >
                         {tableState === TableState.FILLED && (
                             <>
                                 {tradesToShow.map((trade, index) => (
@@ -153,15 +157,18 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
 
                                 {sortedData.length > 0 && (
                                     <div className={styles.actionsContainer}>
-                                        {sortedData.length > tableModeLimit && (
-                                            <a
-                                                href='#'
-                                                className={styles.viewAllLink}
-                                                onClick={handleViewAll}
-                                            >
-                                                View All
-                                            </a>
-                                        )}
+                                        {sortedData.length > tableModeLimit &&
+                                            !pageMode && (
+                                                <a
+                                                    href='#'
+                                                    className={
+                                                        styles.viewAllLink
+                                                    }
+                                                    onClick={handleViewAll}
+                                                >
+                                                    View All
+                                                </a>
+                                            )}
                                         <a
                                             href='#'
                                             className={styles.exportLink}
