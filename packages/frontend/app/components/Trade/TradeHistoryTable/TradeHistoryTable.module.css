@@ -40,6 +40,11 @@
     overflow-y: scroll;
     padding-bottom: 1rem;
 }
+
+.tableBody.pageMode {
+    position: relative;
+}
+
 .tableBody::-webkit-scrollbar {
     display: none;
 }
@@ -113,6 +118,13 @@
     background-color: var(--dark2);
     width: 100%;
     padding-left: 1.4rem;
+}
+
+.pageMode .actionsContainer {
+    background-color: transparent;
+    padding-left: 0.5rem;
+    bottom: 1rem;
+    width: 20%;
 }
 
 /* Specific cell styles */

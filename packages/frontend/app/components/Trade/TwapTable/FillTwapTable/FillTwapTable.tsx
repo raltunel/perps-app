@@ -3,22 +3,33 @@ import FillTwapTableRow from './FillTwapTableRow';
 import styles from './FillTwapTable.module.css';
 import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
 import { TableState } from '~/utils/CommonIFs';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMemo, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
+import Pagination from '~/components/Pagination/Pagination';
+import { useNavigate } from 'react-router';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface FillTwapTableProps {
     data: TwapSliceFillIF[];
     isFetched: boolean;
     selectedFilter?: string;
+    pageMode?: boolean;
 }
 
 export default function FillTwapTable(props: FillTwapTableProps) {
-    const { data, isFetched, selectedFilter } = props;
+    const { data, isFetched, selectedFilter, pageMode } = props;
+
+    const navigate = useNavigate();
 
     const { symbol } = useTradeDataStore();
+
+    const { debugWallet } = useDebugStore();
+
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
 
     const tableModeLimit = 10;
 
@@ -26,8 +37,17 @@ export default function FillTwapTable(props: FillTwapTableProps) {
         TableState.LOADING,
     );
 
-    const handleViewAll = () => {
-        console.log('View all TWAPs');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(20);
+
+    const handleViewAll = (e: React.MouseEvent) => {
+        e.preventDefault();
+        navigate(`/twapFillHistory/${currentUserRef.current}`);
+    };
+
+    const handleExportCsv = (e: React.MouseEvent) => {
+        e.preventDefault();
+        console.log('export csv');
     };
 
     const filteredData = useMemo(() => {
@@ -49,8 +69,14 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     }, [filteredData]);
 
     const dataToShow = useMemo(() => {
+        if (pageMode) {
+            return sortedData.slice(
+                page * rowsPerPage,
+                (page + 1) * rowsPerPage,
+            );
+        }
         return sortedData.slice(0, tableModeLimit);
-    }, [sortedData]);
+    }, [sortedData, pageMode, page, rowsPerPage]);
 
     useEffect(() => {
         if (isFetched) {
@@ -71,7 +97,11 @@ export default function FillTwapTable(props: FillTwapTableProps) {
             ) : (
                 <>
                     <FillTwapTableHeader />
-                    <div className={styles.tableBody}>
+                    <div
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : ''
+                        }`}
+                    >
                         {tableState === TableState.FILLED && (
                             <>
                                 {dataToShow.map((fill, index) => (
@@ -83,15 +113,38 @@ export default function FillTwapTable(props: FillTwapTableProps) {
                             </>
                         )}
                         {tableState === TableState.EMPTY && <NoDataRow />}
+                        {sortedData.length > 0 && (
+                            <div className={styles.actionsContainer}>
+                                {sortedData.length > tableModeLimit &&
+                                    !pageMode && (
+                                        <a
+                                            href='#'
+                                            className={styles.viewAllLink}
+                                            onClick={handleViewAll}
+                                        >
+                                            View All
+                                        </a>
+                                    )}
+                                {pageMode && (
+                                    <a
+                                        href='#'
+                                        className={styles.exportLink}
+                                        onClick={handleExportCsv}
+                                    >
+                                        Export as CSV
+                                    </a>
+                                )}
+                            </div>
+                        )}
+                        {pageMode && (
+                            <Pagination
+                                totalCount={filteredData.length}
+                                onPageChange={setPage}
+                                rowsPerPage={rowsPerPage}
+                                onRowsPerPageChange={setRowsPerPage}
+                            />
+                        )}
                     </div>
-                    {filteredData.length > tableModeLimit && (
-                        <div
-                            className={styles.viewAllLink}
-                            onClick={handleViewAll}
-                        >
-                            View All
-                        </div>
-                    )}
                 </>
             )}
         </div>

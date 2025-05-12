@@ -41,6 +41,10 @@
     padding-bottom: 1rem;
 }
 
+.pageMode.tableBody {
+    position: relative;
+}
+
 .tableBody::-webkit-scrollbar {
     display: none;
 }
@@ -76,6 +80,46 @@
     padding: 3rem 0;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size, 14px);
+}
+
+.viewAllLink {
+    color: var(--accent1, #7371fc);
+    text-decoration: none;
+    font-size: var(--font-size-s, 12px);
+    margin-right: 16px;
+}
+
+.viewAllLink:hover {
+    text-decoration: underline;
+}
+
+.exportLink {
+    color: var(--accent1, #7371fc);
+    text-decoration: none;
+    font-size: var(--font-size-s, 12px);
+}
+
+.exportLink:hover {
+    text-decoration: underline;
+}
+
+.actionsContainer {
+    grid-column: 1 / -1;
+    display: flex;
+    padding: 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: var(--dark2);
+    width: 100%;
+    padding-left: 1.4rem;
+}
+
+.pageMode .actionsContainer {
+    background-color: transparent;
+    padding-left: 0.5rem;
+    bottom: 1rem;
+    width: 20%;
 }
 
 /* Specific cell classes */
