@@ -105,8 +105,15 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                               : 'var(--text2)',
                 }}
             >
-                {formatNum(position.unrealizedPnl, 2, true, true)} (
-                {formatNum(position.returnOnEquity * 100, 1)}%)
+                {formatNum(position.unrealizedPnl, 2, true, true, true)} (
+                {formatNum(
+                    position.returnOnEquity * 100,
+                    1,
+                    false,
+                    false,
+                    true,
+                )}
+                %)
                 <RiExternalLinkLine color='var(--text2)' />
             </div>
             <div className={`${styles.cell} ${styles.liqPriceCell}`}>
@@ -126,7 +133,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                               : 'var(--text2)',
                 }}
             >
-                {formatNum(position.cumFunding.allTime, 2, true, true)}
+                {formatNum(position.cumFunding.allTime, 2, true, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {getTpSl()}
