@@ -67,7 +67,7 @@ export default function TradeTable() {
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
-                handleTabChange('Balances');
+                handleTabChange('Positions');
             }
         }
     }, [page]);
