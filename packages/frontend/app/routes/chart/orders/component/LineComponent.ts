@@ -181,19 +181,23 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [chart]);
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined = undefined;
+        let timeoutId: NodeJS.Timeout | undefined = undefined;
 
-        setLocalChartReady(false);
-        cleanupShapes();
+        const init = async () => {
+            setLocalChartReady(false);
+            await cleanupShapes();
 
-        if (isChartReady) {
-            intervalId = setTimeout(() => {
-                setLocalChartReady(true);
-            }, 300);
-        }
+            if (isChartReady) {
+                timeoutId = setTimeout(() => {
+                    setLocalChartReady(true);
+                }, 500);
+            }
+        };
+
+        init();
 
         return () => {
-            clearInterval(intervalId);
+            clearTimeout(timeoutId);
         };
     }, [isChartReady]);
 
