@@ -106,31 +106,25 @@ export default function Trade() {
         );
     };
 
-    // For Book section on mobile, we'll use the OrderBookSection component but force it to show only the Order Book tab
-    const MobileOrderBookView = () => {
-        return (
-            <div className={styles.mobileOnlyOrderBook}>
-                <OrderBookSection
-                    symbol={symbol}
-                    mobileView={true}
-                    mobileContent='orderBook'
-                />
-            </div>
-        );
-    };
+    const mobileOrderBookView = (
+        <div className={styles.mobileOnlyOrderBook}>
+            <OrderBookSection
+                symbol={symbol}
+                mobileView={true}
+                mobileContent='orderBook'
+            />
+        </div>
+    );
 
-    // For Recent section on mobile, we'll use the OrderBookSection component but force it to show only the Recent Trades tab
-    const MobileRecentTradesView = () => {
-        return (
-            <div className={styles.mobileOnlyRecentTrades}>
-                <OrderBookSection
-                    symbol={symbol}
-                    mobileView={true}
-                    mobileContent='recentTrades'
-                />
-            </div>
-        );
-    };
+    const mobileRecentTradesView = (
+        <div className={styles.mobileOnlyRecentTrades}>
+            <OrderBookSection
+                symbol={symbol}
+                mobileView={true}
+                mobileContent='recentTrades'
+            />
+        </div>
+    );
 
     // Mobile view with tabs
     if (isMobile && symbol) {
@@ -159,14 +153,14 @@ export default function Trade() {
                 <div
                     className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                 >
-                    <MobileOrderBookView />
+                    {mobileOrderBookView}
                 </div>
 
                 {/* Recent trades section - Shows ONLY Recent Trades */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
                 >
-                    <MobileRecentTradesView />
+                    {mobileRecentTradesView}
                 </div>
 
                 {/* Positions section */}
@@ -179,7 +173,6 @@ export default function Trade() {
         );
     }
 
-    // Desktop view (unchanged)
     return (
         <>
             <TradeRouteHandler />
