@@ -20,17 +20,6 @@ export interface FilterOption {
     label: string;
 }
 
-const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
-    'Funding History',
-    'Order History',
-    'Deposits and Withdrawals',
-];
-
 const tradePageBlackListTabs = new Set([
     'Funding History',
     'Deposits and Withdrawals',
@@ -56,6 +45,19 @@ export default function TradeTable() {
     const { page } = usePage();
 
     const tabs = useMemo(() => {
+        if (!page) return [];
+
+        let availableTabs = [
+            'Balances',
+            'Positions',
+            'Open Orders',
+            'TWAP',
+            'Trade History',
+            'Funding History',
+            'Order History',
+            'Deposits and Withdrawals',
+        ];
+
         if (page === Pages.TRADE) {
             return availableTabs.filter(
                 (tab) => !tradePageBlackListTabs.has(tab),
