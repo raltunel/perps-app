@@ -52,6 +52,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
     const [localChartReady, setLocalChartReady] = useState(true);
 
+    const cleanupInProgressRef = useRef(false);
+
     const removeShapeById = async (
         chart: IChartingLibraryWidget,
         id: EntityId,
@@ -62,6 +64,12 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         if (element) chartRef.removeEntity(id);
     };
     const cleanupShapes = async () => {
+        if (cleanupInProgressRef.current) {
+            return;
+        }
+
+        cleanupInProgressRef.current = true;
+
         try {
             if (chart) {
                 const chartRef = chart.activeChart();
@@ -104,8 +112,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             }
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
-            orderLineItemsRef.current = [];
-            setOrderLineItems([]);
+            // console.warn('Cleanup failed:', error);
+        } finally {
+            cleanupInProgressRef.current = false;
         }
     };
 
