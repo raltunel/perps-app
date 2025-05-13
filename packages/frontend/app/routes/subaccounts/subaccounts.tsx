@@ -1,10 +1,17 @@
-import AccountsTable from './AccountsTable/AccountsTable';
-import styles from './subaccounts.module.css';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useEffect, useRef } from 'react';
 import Button from '~/components/Button/Button';
-import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
+import { useModal, type useModalIF } from '~/hooks/useModal';
 import { useAccounts, type useAccountsIF } from '~/stores/AccountsStore';
-import { useRef, useEffect } from 'react';
+import AccountsTable from './AccountsTable/AccountsTable';
+import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
+import styles from './subaccounts.module.css';
+
+export function meta() {
+    return [
+        { title: 'Sub-Accounts | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
+    ];
+}
 
 export default function subaccounts() {
     // logic to open and close subaccount creation modal
@@ -22,8 +29,9 @@ export default function subaccounts() {
         const handleKeyDown = (event: KeyboardEvent): void => {
             if (event.key === TARGET_KEY) {
                 const currentTime: number = new Date().getTime();
-                if (lastKeyPressTime.current && 
-                    (currentTime - lastKeyPressTime.current) <= INTERVAL
+                if (
+                    lastKeyPressTime.current &&
+                    currentTime - lastKeyPressTime.current <= INTERVAL
                 ) {
                     data.reset();
                     lastKeyPressTime.current = null;

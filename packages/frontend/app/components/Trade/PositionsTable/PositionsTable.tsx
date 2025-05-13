@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import Pagination from '~/components/Pagination/Pagination';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 import { TableState } from '~/utils/CommonIFs';
+import { WsChannels } from '~/utils/Constants';
+import type { PositionDataSortBy } from '~/utils/position/PositionIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
 import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -16,6 +20,9 @@ interface PositionsTableProps {
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode } = props;
     const navigate = useNavigate();
+    const { coinPriceMap } = useTradeDataStore();
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<PositionDataSortBy>();
 
     const handleViewAll = () => {
         navigate(`/positions`);
@@ -27,18 +34,26 @@ export default function PositionsTable(props: PositionsTableProps) {
         TableState.LOADING,
     );
 
-    const { positions, webDataFetched } = useTradeDataStore();
+    const { positions, fetchedChannels } = useTradeDataStore();
     const limit = 10;
+
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
+
+    const sortedPositions = useMemo(() => {
+        return sortPositionData(positions, sortBy, sortDirection, coinPriceMap);
+    }, [positions, sortBy, sortDirection]);
 
     const positionsToShow = useMemo(() => {
         if (pageMode) {
-            return positions.slice(
+            return sortedPositions.slice(
                 page * rowsPerPage,
                 (page + 1) * rowsPerPage,
             );
         }
-        return positions.slice(0, limit);
-    }, [positions, page, rowsPerPage, pageMode]);
+        return sortedPositions.slice(0, limit);
+    }, [sortedPositions, page, rowsPerPage, pageMode]);
 
     useEffect(() => {
         if (webDataFetched) {
@@ -52,6 +67,22 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
     }, [positionsToShow, webDataFetched]);
 
+    const handleSort = (key: string) => {
+        if (sortBy === key) {
+            if (sortDirection === 'desc') {
+                setSortDirection('asc');
+            } else if (sortDirection === 'asc') {
+                setSortDirection(undefined);
+                setSortBy(undefined);
+            } else {
+                setSortDirection('desc');
+            }
+        } else {
+            setSortBy(key as PositionDataSortBy);
+            setSortDirection('desc');
+        }
+    };
+
     return (
         <div className={styles.tableWrapper}>
             {tableState === TableState.LOADING ? (
@@ -61,7 +92,11 @@ export default function PositionsTable(props: PositionsTableProps) {
                 />
             ) : (
                 <>
-                    <PositionsTableHeader />
+                    <PositionsTableHeader
+                        sortBy={sortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={handleSort}
+                    />
                     <div className={styles.tableBody}>
                         {tableState === TableState.FILLED && (
                             <>

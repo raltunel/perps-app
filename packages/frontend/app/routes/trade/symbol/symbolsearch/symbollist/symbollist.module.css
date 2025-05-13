@@ -114,7 +114,7 @@
 }
 
 .symbolListSearchClose {
-    transition: all 0.2s ease-in-out;
+    transition: all var(--ease-in-out-fast);
     position: absolute;
     right: 0.5rem;
     top: 50%;
@@ -131,7 +131,7 @@
 .favIcon {
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
+    transition: all var(--ease-in-out-fast);
 }
 
 .favIcon svg {

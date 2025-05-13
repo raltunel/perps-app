@@ -36,7 +36,7 @@ export const useReferralsTable = ({
                 // Use the appropriate field for sorting based on the visible column
                 const sortKey = sortConfig.key;
                 let valueA, valueB;
-                
+
                 // Use the numeric values for sortable columns
                 switch (sortKey) {
                     case 'dateJoined':
@@ -59,7 +59,7 @@ export const useReferralsTable = ({
                         valueA = a[sortKey];
                         valueB = b[sortKey];
                 }
-                
+
                 if (valueA < valueB) {
                     return sortConfig.direction === 'asc' ? -1 : 1;
                 }
@@ -75,16 +75,19 @@ export const useReferralsTable = ({
     // Pagination calculations
     const totalItems = sortedData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
-    
+
     // Make sure current page is valid
-    const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages || 1);
+    const validCurrentPage = Math.min(
+        Math.max(1, currentPage),
+        totalPages || 1,
+    );
     if (validCurrentPage !== currentPage) {
         setCurrentPage(validCurrentPage);
     }
-    
+
     const startIndex = (validCurrentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems - 1);
-    
+
     // Get current items for display
     const currentItems = sortedData.slice(startIndex, endIndex + 1);
 
@@ -112,7 +115,8 @@ export const useReferralsTable = ({
             if (prevSortConfig && prevSortConfig.key === key) {
                 return {
                     key,
-                    direction: prevSortConfig.direction === 'asc' ? 'desc' : 'asc',
+                    direction:
+                        prevSortConfig.direction === 'asc' ? 'desc' : 'asc',
                 };
             }
             return { key, direction: 'asc' };

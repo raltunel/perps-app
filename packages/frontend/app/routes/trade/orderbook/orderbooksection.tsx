@@ -13,10 +13,10 @@ interface OrderBookSectionProps {
     mobileContent?: 'orderBook' | 'recentTrades';
 }
 
-const OrderBookSection: React.FC<OrderBookSectionProps> = ({ 
-    symbol, 
-    mobileView = false, 
-    mobileContent = 'orderBook' 
+const OrderBookSection: React.FC<OrderBookSectionProps> = ({
+    symbol,
+    mobileView = false,
+    mobileContent = 'orderBook',
 }) => {
     const [orderCount, setOrderCount] = useState(9);
     const [tradesCount, setTradesCount] = useState(25);
@@ -110,16 +110,16 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     ];
 
     // Available tabs for the order book section
-    const orderBookTabs = ['Order Book', 'Recent Trades'];
+    const orderBookTabs = ['Book', 'Trades'];
     const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Order Book':
+            case 'Book':
                 return orderBookComponent;
-            case 'Recent Trades':
+            case 'Trades':
                 return orderBookTrades;
             default:
                 return orderBookComponent;
@@ -129,13 +129,9 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     // Mobile view - only render the requested content
     if (mobileView) {
         if (mobileContent === 'orderBook') {
-            return orderBookComponent
-                
-            ;
+            return orderBookComponent;
         } else if (mobileContent === 'recentTrades') {
-            return orderBookTrades
-              
-            
+            return orderBookTrades;
         }
     }
 
@@ -144,7 +140,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         <div className={styles.orderBookSection}>
             <div className={styles.stackedContainer}>
                 <div className={styles.sectionHeader}>
-                    <div className={styles.sectionHeaderTitle}>Order Book</div>
+                    <div className={styles.sectionHeaderTitle}>Book</div>
                     <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                 </div>
                 <OrderBook symbol={symbol} orderCount={orderCountForStacked} />
@@ -162,9 +158,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
             <div className={styles.largeContainer}>
                 <div className={styles.childOfLargeContainer}>
                     <div className={styles.sectionHeader}>
-                        <div className={styles.sectionHeaderTitle}>
-                            Order Book
-                        </div>
+                        <div className={styles.sectionHeaderTitle}>Book</div>
                     </div>
                     <OrderBook symbol={symbol} orderCount={orderCount} />
                 </div>
@@ -184,7 +178,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
             <BasicMenu items={menuItems} icon={<BsThreeDots />} />
         </div>
     );
-    
+
     const orderBookTabsComponent = (
         <div className={styles.orderBookSectionContainer}>
             <Tabs
@@ -193,6 +187,8 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={menuContent}
+                wide={true}
+                flex={true}
             />
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>

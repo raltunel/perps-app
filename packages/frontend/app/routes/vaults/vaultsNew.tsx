@@ -1,11 +1,18 @@
 import { Link } from 'react-router';
-import styles from './vaultsNew.module.css';
 import VaultCard from '~/components/Vault/VaultCard/VaultCard';
+import styles from './vaultsNew.module.css';
 
 import Modal from '~/components/Modal/Modal';
-import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 import DepositModal from '~/components/Vault/DepositModal/DepositModal';
+import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 import { useVaultManager } from './useVaultManager';
+
+export function meta() {
+    return [
+        { title: 'Vaults | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
+    ];
+}
 
 export default function vaultsNew() {
     const {

@@ -48,7 +48,6 @@
     display: flex;
     justify-content: flex-start;
     align-items: flex-end;
-    /* flex-direction: row-reverse; */
     left: 0;
     padding: 16px 0;
 }
@@ -70,7 +69,7 @@
     color: var(--base-text1, #f0f0f8);
 
     font-size: var(--font-size-m, 18px);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 .confirmButton:hover {
     opacity: 0.8;

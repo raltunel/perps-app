@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -41,10 +42,20 @@ export default function TradeTable() {
         selectedTradeTab,
         setSelectedTradeTab,
         orderHistory,
-        orderHistoryFetched,
+        fetchedChannels,
+        userFills,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
+        return {
+            orderHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_HISTORICAL_ORDERS,
+            ),
+            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+        };
+    }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -91,9 +102,14 @@ export default function TradeTable() {
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
-                return <TwapTable />;
+                return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
-                return <TradeHistoryTable />;
+                return (
+                    <TradeHistoryTable
+                        data={userFills}
+                        isFetched={tradeHistoryFetched}
+                    />
+                );
             case 'Funding History':
                 return <FundingHistoryTable />;
             case 'Order History':
