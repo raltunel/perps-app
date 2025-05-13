@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
@@ -14,7 +14,7 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
-
+import { Pages, usePage } from '~/hooks/usePage';
 export interface FilterOption {
     id: string;
     label: string;
@@ -30,6 +30,11 @@ const availableTabs = [
     'Order History',
     'Deposits and Withdrawals',
 ];
+
+const tradePageBlackListTabs = new Set([
+    'Funding History',
+    'Deposits and Withdrawals',
+]);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -47,6 +52,25 @@ export default function TradeTable() {
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { page } = usePage();
+
+    const tabs = useMemo(() => {
+        if (page === Pages.TRADE) {
+            return availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        }
+        return availableTabs;
+    }, [page]);
+
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Balances');
+            }
+        }
+    }, [page]);
 
     const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
         return {
@@ -134,7 +158,7 @@ export default function TradeTable() {
     return (
         <div className={styles.tradeTableWrapper}>
             <Tabs
-                tabs={availableTabs}
+                tabs={tabs}
                 defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
