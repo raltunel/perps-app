@@ -40,3 +40,8 @@
     font-weight: 400;
     line-height: normal;
 }
+
+.row {
+    display: block; /* Makes the link fill the container width */
+    width: 100%; /* Ensures full width */
+}

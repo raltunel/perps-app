@@ -24,6 +24,7 @@ export default function MoreDropdown(props: propsIF) {
                 <Link
                     to={menu.link}
                     key={idx}
+                    className={styles.row}
                     viewTransition
                     onClick={() => setIsMoreDropdownOpen(false)}
                 >
