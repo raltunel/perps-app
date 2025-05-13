@@ -194,7 +194,9 @@ export default function PageHeader() {
                 more
                 {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
             </button>
-            {isMoreDropdownOpen && <MoreDropdown />}
+            {isMoreDropdownOpen && (
+                <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
+            )}
         </section>
     );
 
