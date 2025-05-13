@@ -191,7 +191,7 @@ export function interpolate(fromHexString: string, toHexString: string) {
 
 const defaultChartColors = [
     '#7371FC',
-    '#787B86',
+    '#626060',
     '#F23645',
     '#089981',
     '#FF9800',
