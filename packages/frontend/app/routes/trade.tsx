@@ -17,6 +17,8 @@ import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
+import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
+import { useTutorial } from '~/hooks/useTutorial';
 
 export function loader({ context }: Route.LoaderArgs) {
     return { message: context.VALUE_FROM_NETLIFY };
@@ -29,11 +31,12 @@ export default function Trade() {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
-
-    // useEffect(() => {
-    //     const info = new Info({ environment: 'mock' });
-    //     console.log({ wsManager: info.wsManager });
-    // }, []);
+    const {
+        showTutorial,
+        handleTutorialComplete,
+        handleTutorialSkip,
+      
+    } = useTutorial();
 
     useEffect(() => {
         document.body.style.overscrollBehaviorX = 'none';
@@ -62,6 +65,11 @@ export default function Trade() {
                         <div
                             className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
                         >
+                            
+                                {/* <button onClick={handleRestartTutorial}>
+                                    Show Tutorial
+                                </button> */}
+                            
                             <ComboBoxContainer />
                             <div
                                 id='watchlistSection'
@@ -94,7 +102,7 @@ export default function Trade() {
                         id={'bottomSection'}
                         className={styles.containerBottom}
                     >
-                        <div className={styles.table}>
+                        <div className={styles.table} id='tutorial-trade-table'>
                             <TradeTable />
                         </div>
                         <div className={styles.wallet}>
@@ -108,6 +116,16 @@ export default function Trade() {
                     </section>
                 </div>
             )}
+            {/* <TutorialController
+        isEnabled={showTutorial}
+        onComplete={handleTutorialComplete}
+        onSkip={handleTutorialSkip}
+            /> */}
+            <AdvancedTutorialController
+  isEnabled={showTutorial}
+  onComplete={handleTutorialComplete}
+  onSkip={handleTutorialSkip}
+/>
         </>
     );
 }

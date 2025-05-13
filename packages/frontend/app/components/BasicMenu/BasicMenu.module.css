@@ -20,7 +20,7 @@
 
 .menuContainer {
     position: absolute;
-    animation: menuAnimation 0.2s ease-in-out;
+    animation: menuAnimation var(--ease-in-out-fast);
     background: var(--dark4);
     border-radius: 0.5rem;
     z-index: 10;
@@ -54,7 +54,7 @@
 }
 
 .triggerWrapper {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     cursor: pointer;
     padding: 0 0.7rem;
     align-items: center;
@@ -68,7 +68,7 @@
 }
 
 .triggerWrapper svg {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     font-size: 1rem;
     color: var(--text2);
     min-width: 1.4rem;

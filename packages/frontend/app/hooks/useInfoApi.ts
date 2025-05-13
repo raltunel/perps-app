@@ -1,7 +1,15 @@
 import { processUserOrder } from '~/processors/processOrderBook';
-import { processUserFills } from '~/processors/processUserFills';
+import {
+    processUserFills,
+    processUserTwapHistory,
+    processUserTwapSliceFills,
+} from '~/processors/processUserFills';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import type { UserFillIF } from '~/utils/UserDataIFs';
+import type {
+    TwapHistoryIF,
+    TwapSliceFillIF,
+    UserFillIF,
+} from '~/utils/UserDataIFs';
 
 export type ApiCallConfig = {
     type: string;
@@ -13,6 +21,8 @@ export enum ApiEndpoints {
     HISTORICAL_ORDERS = 'historicalOrders',
     OPEN_ORDERS = 'frontendOpenOrders',
     USER_FILLS = 'userFills',
+    TWAP_HISTORY = 'twapHistory',
+    TWAP_SLICE_FILLS = 'userTwapSliceFills',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -78,5 +88,64 @@ export function useInfoApi() {
         return ret;
     };
 
-    return { fetchData, fetchOrderHistory, fetchUserFills };
+    const fetchTwapHistory = async (
+        address: string,
+    ): Promise<TwapHistoryIF[]> => {
+        const ret: TwapHistoryIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.TWAP_HISTORY,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            const processed = processUserTwapHistory({
+                history: data,
+                isSnapshot: true,
+                user: '',
+            });
+            if (processed.length > 0) {
+                ret.push(...processed);
+            }
+        }
+        return ret;
+    };
+
+    const fetchTwapSliceFills = async (
+        address: string,
+    ): Promise<TwapSliceFillIF[]> => {
+        const ret: TwapSliceFillIF[] = [];
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.TWAP_SLICE_FILLS,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            const processed = processUserTwapSliceFills({
+                user: address,
+                twapSliceFills: data,
+                isSnapshot: true,
+            });
+            if (processed.length > 0) {
+                ret.push(...processed);
+            }
+        }
+        return ret;
+    };
+
+    return {
+        fetchData,
+        fetchOrderHistory,
+        fetchUserFills,
+        fetchTwapHistory,
+        fetchTwapSliceFills,
+    };
 }

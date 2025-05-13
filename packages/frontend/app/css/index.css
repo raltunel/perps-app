@@ -70,6 +70,20 @@
 
     /* z indexes */
     --navbar-dropdown-zindex: 99;
+
+    --skeleton-animation-duration: 1.5s;
+    --skeleton-background: linear-gradient(
+        90deg,
+        #f0f0f005 10%,
+        #e0e0e010 50%,
+        #f0f0f003 70%
+    );
+
+    --skeleton-height: 20px;
+
+    /* transitions */
+    --ease-in-out-fast: ease-in-out 0.2s;
+    --ease-in-out-med: ease-in-out 0.3s;
 }
 
 /* Custom Reset */

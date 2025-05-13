@@ -15,8 +15,8 @@
     height: auto;
 
     transition:
-        max-height 0.3s ease-in-out,
-        opacity 0.3s ease-in-out;
+        max-height var(--ease-in-out-med),
+        opacity var(--ease-in-out-med);
     z-index: var(--navbar-dropdown-zindex);
 }
 
@@ -34,7 +34,7 @@
     font-weight: 400;
     line-height: normal;
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
     user-select: none;
 }
 .menuItem:hover {
@@ -87,4 +87,17 @@
 
 .toggleButton {
     display: none;
+}
+.tutorialButton {
+    width: 100%;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    color: var(--text1);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-right: 2px;
+    padding-left: 4px;
 }

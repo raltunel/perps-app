@@ -7,8 +7,10 @@
     align-items: center;
 }
 
+/* no need to override anymore */
+
 .symbolInfoContainer div {
-    height: auto !important;
+    /* height: auto !important; */
 }
 
 .symbolSelector {

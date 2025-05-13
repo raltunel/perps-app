@@ -1,3 +1,4 @@
+import SkeletonNode from '../SkeletonNode/SkeletonNode';
 import styles from './SkeletonTable.module.css';
 
 interface SkeletonTableProps {
@@ -30,14 +31,13 @@ const SkeletonTable: React.FC<SkeletonTableProps> = ({
                     >
                         {Array.from({ length: cols.length }).map(
                             (_, colIndex) => (
-                                <div
+                                <SkeletonNode
                                     key={colIndex}
-                                    className={styles.skeletonCell}
-                                    style={{
-                                        width: colRatiosWithTotal[colIndex]
+                                    width={
+                                        colRatiosWithTotal[colIndex]
                                             ? `${colRatiosWithTotal[colIndex]}%`
-                                            : (1 / columns) * 100 + '%',
-                                    }}
+                                            : (1 / columns) * 100 + '%'
+                                    }
                                 />
                             ),
                         )}

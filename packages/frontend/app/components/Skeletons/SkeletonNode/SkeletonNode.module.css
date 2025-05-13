@@ -1,0 +1,28 @@
+.skeletonNodeWrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: width var(--ease-in-out-med);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.skeletonNode {
+    transition: width var(--ease-in-out-med);
+    width: 100%;
+    height: 100%;
+    height: var(--skeleton-height);
+    border-radius: 4px;
+    background: var(--skeleton-background);
+    background-size: 200% 100%;
+    animation: shimmer var(--skeleton-animation-duration) infinite ease-in-out;
+}
