@@ -130,6 +130,9 @@ export default function App() {
                                     </ComponentErrorBoundary>
                                 </Suspense>
                             </main>
+                            <ComponentErrorBoundary>
+                                I AM MOBILE FOOTER
+                            </ComponentErrorBoundary>
 
                             {/* Added error boundary for notifications */}
                             <ComponentErrorBoundary>
