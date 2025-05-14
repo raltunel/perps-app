@@ -12,8 +12,6 @@
 
 .container header {
     color: #fff;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
     font-style: normal;
     font-weight: 300;

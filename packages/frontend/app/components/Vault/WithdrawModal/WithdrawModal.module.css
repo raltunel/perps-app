@@ -16,7 +16,6 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    font-family: var(--font-family-main, 'Lexend Deca');
 }
 .textContent h4 {
     color: var(--text1, #f0f0f8);
@@ -47,7 +46,6 @@
     border: none;
     background: transparent;
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
 }
 

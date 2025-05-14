@@ -11,7 +11,6 @@
     display: flex;
     padding-left: 2rem;
     align-items: center;
-    font-family: var(--font-family-main);
     animation: fadeIn 0.1s ease;
     white-space: nowrap;
 }
