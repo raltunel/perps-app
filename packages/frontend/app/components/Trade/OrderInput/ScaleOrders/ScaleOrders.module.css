@@ -265,8 +265,6 @@
 
 .errorMessage {
     color: var(--red, #ef5350);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;

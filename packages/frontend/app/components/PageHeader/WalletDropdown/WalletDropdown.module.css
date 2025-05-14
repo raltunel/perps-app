@@ -50,7 +50,6 @@
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark3, #0e0e14);
     color: var(--accent1, #7371fc);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;
@@ -89,7 +88,6 @@
     gap: var(--main-border-radius);
     color: var(--text1, #f0f0f8);
     text-align: center;
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;
@@ -123,7 +121,6 @@
     cursor: pointer;
 
     /* Main/M */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;
@@ -132,7 +129,6 @@
     color: var(--text1, #f0f0f8);
 
     /* Main/M */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;
@@ -154,7 +150,6 @@
     align-items: center;
     color: var(--text2, #6a6a6d);
     text-align: center;
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-font, 12px);
     font-style: normal;
     font-weight: 400;
@@ -203,7 +198,6 @@
 
 .tokenDisplayName {
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;
@@ -222,7 +216,6 @@
 .tokenDisplayRight h3 {
     color: var(--text1, #f0f0f8);
     text-align: right;
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;
@@ -232,7 +225,6 @@
 .tokenDisplayRight p {
     color: var(--text2, #6a6a6d);
     text-align: right;
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;

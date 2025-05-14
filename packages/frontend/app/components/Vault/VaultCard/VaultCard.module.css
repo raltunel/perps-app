@@ -32,7 +32,6 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    font-family: var(--font-family-main, 'Lexend Deca');
 }
 .headerTextContainer h3 {
     color: var(--text1, #f0f0f8);
@@ -69,8 +68,6 @@
     gap: auto;
 }
 .detailsItem {
-    font-family: var(--font-family-main, 'Lexend Deca');
-
     display: flex;
     flex-direction: column;
     gap: 4px;

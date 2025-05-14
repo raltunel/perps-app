@@ -12,8 +12,6 @@
 
 .container header {
     color: #fff;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
     font-style: normal;
     font-weight: 300;
@@ -184,8 +182,6 @@
 .footer {
     color: var(--text2, #bcbcc4);
     text-align: center;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;

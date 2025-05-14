@@ -122,9 +122,6 @@
 }
 .statusCell {
 }
-.orderIdCell {
-    font-family: monospace;
-}
 
 @media (max-width: 1400px) {
     .rowContainer,

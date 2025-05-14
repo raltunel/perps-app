@@ -33,8 +33,6 @@
 .container a {
     color: var(--text2, #6a6a6d);
 
-    /* Main/M */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
     font-style: normal;
     font-weight: 400;

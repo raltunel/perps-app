@@ -77,7 +77,6 @@
     border-radius: 8px;
     border: none;
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lato', sans-serif);
     font-size: var(--font-size-s, 12px);
     font-weight: 400;
     line-height: normal;

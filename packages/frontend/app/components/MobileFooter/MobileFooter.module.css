@@ -46,7 +46,6 @@
 .label {
     color: var(--text1, #f0f0f8);
     text-align: center;
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;

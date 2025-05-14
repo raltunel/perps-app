@@ -55,7 +55,6 @@
     color: var(--base-text1, #f0f0f8);
     text-align: center;
 
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;
@@ -82,7 +81,6 @@
     flex-direction: column;
 
     gap: 16px;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;
@@ -107,7 +105,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
     font-style: normal;
     font-weight: 400;
