@@ -14,10 +14,6 @@
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
-
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .infoRow {

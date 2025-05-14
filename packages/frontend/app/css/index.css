@@ -4,16 +4,16 @@
 :root {
     /* Dark Shades */
     --dark1: #06060c;
-    --dark2: #0e0e14;
-    --dark3: #16161c;
-    --dark4: #1e1e24;
-    --dark5: #23232a;
-    --dark6: #27272f;
+    --dark2: #111117;
+    --dark3: #1c1c22;
+    --dark4: #27272c;
+    --dark5: #323237;
+    --dark6: #3e3e42;
 
     /* Text Colors */
     --text1: #f0f0f8;
-    --text2: #6a6a6d;
-    --text3: #424246;
+    --text2: #bcbcc4;
+    --text3: #88888f;
 
     /* Accent Colors */
     --accent1: #7371fc;
@@ -29,6 +29,7 @@
     --red-dark: #ef535059;
     --orange: #e78a56;
     --white: #ffffff;
+    --gold: #ffb648;
 
     /* gaps */
     --main-gap: 8px;
@@ -58,6 +59,8 @@
     --trade-module-width-desktop-small: 280px;
 
     /* fonts */
+
+    --font-weight: 400;
     --font-family-main: 'Lexend Deca';
 
     --font-size-xs: 10px;
@@ -101,8 +104,9 @@ html {
 }
 
 body {
-    font-family: var(--font-sans, sans-serif);
-    line-height: 1.5;
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-weight: var(--font-weight, 400);
+    line-height: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--dark1);
