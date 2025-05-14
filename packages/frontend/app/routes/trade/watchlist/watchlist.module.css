@@ -13,6 +13,7 @@
     align-items: center;
     animation: fadeIn 0.1s ease;
     white-space: nowrap;
+   
 }
 
 .favIcon {
@@ -83,3 +84,4 @@
         max-width: calc(100vw - var(--main-gap) * 4 - 8.2rem);
     }
 }
+
