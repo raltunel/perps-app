@@ -30,10 +30,10 @@ export default function ActiveTwapTableRow(props: ActiveTwapTableRowProps) {
                 {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {formatNum(twap.sz)}
+                {formatNum(twap.sz)} {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.executedSizeCell}`}>
-                {formatNum(twap.executedSz)}
+                {formatNum(twap.executedSz)} {twap.coin}
             </div>
             <div className={`${styles.cell} ${styles.averagePriceCell}`}>
                 {formatNum(avgPx)}
