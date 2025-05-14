@@ -83,7 +83,10 @@
 
     border: 1px solid var(--dark3);
 }
-
+.wsToggle,
+.sdkToggle {
+    padding: 0 var(--main-padding);
+}
 .walletSelector {
     right: 38rem;
 }
