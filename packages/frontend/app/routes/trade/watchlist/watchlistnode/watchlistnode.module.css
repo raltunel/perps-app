@@ -1,0 +1,41 @@
+.watchListNodeContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+    margin-left: 0.5rem;
+}
+
+.watchListNodeContent {
+    flex-direction: row;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 0.2rem !important;
+    transition: all var(--ease-in-out-fast);
+    padding: 0.4rem;
+}
+
+.watchListNodeContent.active {
+    cursor: default;
+}
+
+.watchListNodeContent:not(.active):hover {
+    background-color: var(--dark4) !important;
+}
+
+.watchListNodeContainer div {
+    background-color: transparent !important;
+}
+
+.watchListNodeContainer div {
+    height: auto !important;
+}
+
+.symbolValue {
+    text-align: right;
+}

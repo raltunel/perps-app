@@ -1,0 +1,66 @@
+.orderBookSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    font-size: 0.8rem;
+}
+
+.orderBookSectionContainer {
+    width: 100%;
+}
+
+.orderBookSectionHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.sectionHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text2);
+    padding: 0.25rem 0;
+    padding-left: 0.5rem;
+}
+
+.stackedContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.sectionHeaderTitle {
+    width: 100%;
+}
+
+.largeContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+}
+
+.childOfLargeContainer {
+    flex: 1 1;
+}
+
+.menuContent {
+    display: flex;
+    justify-content: center;
+
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 8px;
+}

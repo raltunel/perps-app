@@ -1,0 +1,158 @@
+.rowContainer {
+    width: 100%;
+    height: 25px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
+    align-items: center;
+}
+
+.headerContainer {
+    background: var(--dark2);
+    width: 100%;
+    height: 24px;
+    padding-left: 8px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+
+    z-index: 10;
+}
+
+.tableWrapper {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    padding-bottom: 8px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.tableBody {
+    height: 100%;
+    overflow-y: scroll;
+    padding-bottom: 1rem;
+}
+.tableBody::-webkit-scrollbar {
+    display: none;
+}
+
+.cell {
+    font-size: var(--font-size-s, 12px);
+    color: var(--text1, #f0f0f8);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.headerCell {
+    color: var(--text2, #6a6a6d);
+    font-size: var(--font-size-xs, 10px);
+
+    font-weight: 400;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    cursor: default;
+    user-select: none;
+}
+
+.sortable {
+    cursor: pointer;
+}
+
+.sendButton {
+    background-color: transparent;
+    color: var(--accent1, #7371fc);
+    border: none;
+    font-size: var(--font-size-s, 12px);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+}
+
+.sendButton:hover {
+    color: var(--text1, #f0f0f8);
+}
+
+/* .coinCell {}
+  .totalBalanceCell {}
+  .availableBalanceCell {}
+  .usdcValueCell {}
+  .buyingPowerCell {}
+  .pnlCell {}
+  .contractCell {} */
+.actionCell {
+    text-align: right;
+    justify-self: end;
+}
+
+@media (max-width: 1200px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1.5fr 0.5fr;
+    }
+
+    .buyingPowerCell {
+        display: none;
+    }
+}
+
+@media (max-width: 900px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 1.5fr 1fr 1fr 1.5fr 0.5fr;
+    }
+
+    .availableBalanceCell {
+        display: none;
+    }
+}
+
+@media (max-width: 700px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 1.5fr 1fr 1.5fr 0.5fr;
+    }
+
+    .pnlCell {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 1fr 1fr 0.5fr;
+    }
+
+    .totalBalanceCell {
+        display: none;
+    }
+
+    .headerCell {
+        font-size: 0.7rem;
+    }
+
+    .sendButton {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.4rem;
+    }
+}
+
+.cell.positive {
+    color: var(--green);
+}
+
+.cell.negative {
+    color: var(--red);
+}

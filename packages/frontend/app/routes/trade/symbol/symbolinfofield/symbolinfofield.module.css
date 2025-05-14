@@ -1,0 +1,28 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.symbolInfoFieldWrapper {
+    float: left;
+}
+
+.symbolInfoField {
+    /* display: inline-block; */
+    animation: fadeIn 0.1s ease-in-out;
+    white-space: nowrap;
+}
+
+.symbolInfoFieldLabel {
+    color: var(--text2);
+    padding-right: 1rem;
+}
+
+.symbolInfoFieldValue {
+    color: var(--text1);
+    margin-top: 0.2rem;
+}

@@ -1,0 +1,65 @@
+/* top-level element returned by JSX file */
+.option_line {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    height: 24px;
+    font-size: var(--font-size-s);
+    color: var(--text1);
+}
+
+/* container for the active selection and the dropdown below it */
+.dropdown_container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    gap: 2px;
+    overflow-y: visible;
+}
+
+/* elem showing the active selection, opens or closes dropdown on click */
+.active_option {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 200px;
+    padding: 2px 8px;
+    background-color: var(--dark4);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.options_dropdown {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 4px 4px;
+    background-color: var(--dark6);
+    border-radius: 8px;
+    z-index: calc(var(--base-z-idx-app-options) + 1);
+}
+
+.options_dropdown > * {
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* general styling to apply if options are JSX rather than text  */
+.active_option *,
+.options_dropdown * {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* hover effects for clickable elems in the dropdown */
+.options_dropdown > *:hover {
+    cursor: pointer;
+    background-color: var(--dark4);
+}

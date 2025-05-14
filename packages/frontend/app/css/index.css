@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100;300;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+:root {
+    /* Dark Shades */
+    --dark1: #06060c;
+    --dark2: #111117;
+    --dark3: #1c1c22;
+    --dark4: #27272c;
+    --dark5: #323237;
+    --dark6: #3e3e42;
+
+    /* Text Colors */
+    --text1: #f0f0f8;
+    --text2: #bcbcc4;
+    --text3: #88888f;
+
+    /* Accent Colors */
+    --accent1: #7371fc;
+    --accent2: #e480ff;
+    --accent3: #5ffff2;
+    --accent4: #71b5fc;
+    --accent5: #cdc1ff;
+
+    /* Other Colors */
+    --green: #26a69a;
+    --green-dark: #26a69a59;
+    --red: #ef5350;
+    --red-dark: #ef535059;
+    --orange: #e78a56;
+    --white: #ffffff;
+    --gold: #ffb648;
+
+    /* gaps */
+    --main-gap: 8px;
+    --header-link-gap: 32px;
+    --main-padding: 8px;
+
+    --main-border-radius: 16px;
+    --half-border-radius: 8px;
+
+    /* widths */
+    --order-book-width-desktop-large: 280px;
+    --order-book-width-desktop-small: 220px;
+
+    /* heights */
+    --trade-tables-height-desktop: 281px;
+    /* should be 56px. 30px extra for the combo box container */
+    --header-height-desktop: 56px;
+
+    --order-book-width-desktop-large-doubled: calc(
+        var(--order-book-width-desktop-large) * 2
+    );
+    --order-book-width-desktop-small-doubled: calc(
+        var(--order-book-width-desktop-small) * 2
+    );
+
+    --trade-module-width-desktop-large: 350px;
+    --trade-module-width-desktop-small: 280px;
+
+    /* fonts */
+    --font-family-main: 'Lexend Deca';
+
+    --font-size-xs: 10px;
+    --font-size-s: 12px;
+    --font-size-m: 18px;
+    --font-size-l: 24px;
+    --font-size-xl: 36px;
+    --font-size-xxl: 64px;
+    --font-size-xxxl: 100px;
+
+    /* z indexes */
+    --navbar-dropdown-zindex: 99;
+
+    --skeleton-animation-duration: 1.5s;
+    --skeleton-background: linear-gradient(
+        90deg,
+        #f0f0f005 10%,
+        #e0e0e010 50%,
+        #f0f0f003 70%
+    );
+
+    --skeleton-height: 20px;
+
+    /* transitions */
+    --ease-in-out-fast: ease-in-out 0.2s;
+    --ease-in-out-med: ease-in-out 0.3s;
+}
+
+/* Custom Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    font-family: var(--font-family-main, 'Lexend Deca');
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--dark1);
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+ul[role='list'],
+ol[role='list'] {
+    list-style: none;
+}
+
+.content.error-boundary h1 {
+    color: var(--accent1);
+    opacity: 0.2;
+}
+.content.error-boundary p {
+    color: var(--accent1);
+}
+
+.content.error-boundary code {
+    color: var(--text2);
+}
+
+.w1 {
+    width: 1rem;
+}
+
+.w2 {
+    width: 2rem;
+}
+
+.w2-5 {
+    width: 2.5rem;
+}
+
+.w3 {
+    width: 3rem;
+}
+
+.w4 {
+    width: 4rem;
+}
+
+.w5 {
+    width: 5rem;
+}
+
+.w6 {
+    width: 6rem;
+}
+
+.w7 {
+    width: 7rem;
+}
+
+.w8 {
+    width: 8rem;
+}
+
+.w9 {
+    width: 9rem;
+}
+
+.w10 {
+    width: 10rem;
+}

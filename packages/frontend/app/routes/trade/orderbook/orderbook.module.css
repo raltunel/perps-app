@@ -1,0 +1,48 @@
+.orderBookBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.orderBookContainer {
+    width: 100%;
+    font-size: 0.8rem;
+}
+
+.orderBookBlockMid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.25rem;
+    background-color: var(--dark4);
+    margin: 0.25rem 0;
+    padding: 0 1rem;
+}
+
+.orderBookHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.25rem;
+    margin: 0.25rem 0;
+    padding: 0 0.5rem;
+    color: var(--text3);
+}
+
+.orderRowWrapper {
+    width: 100%;
+    position: relative;
+}
+
+.ratioBar {
+    transition: width var(--ease-in-out-med);
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    opacity: 0.2;
+}

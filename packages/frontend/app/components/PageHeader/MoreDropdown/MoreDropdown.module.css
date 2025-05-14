@@ -1,0 +1,45 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    width: 197px;
+    height: auto;
+    display: flex;
+    padding: 4px 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    border-radius: var(--half-border-radius, 8px);
+    background: var(--dark4, #0e0e14);
+    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+    transition:
+        opacity var(--ease-in-out-med),
+        visibility var(--ease-in-out-med);
+
+    /* ---------------------------- */
+
+    opacity: 1;
+    height: auto;
+    visibility: visible;
+    pointer-events: auto;
+    height: auto;
+
+    z-index: var(--navbar-dropdown-zindex);
+}
+
+.container a {
+    color: var(--text2, #6a6a6d);
+
+    font-size: var(--font-size-m, 18px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.row {
+    display: block; /* Makes the link fill the container width */
+    width: 100%; /* Ensures full width */
+}

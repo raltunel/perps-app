@@ -1,0 +1,46 @@
+.toggleContainer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.toggleSwitch {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    background-color: #16161c;
+    border: 1px solid #424246;
+    border-radius: 3.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.toggleSwitch:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(100, 102, 241, 0.4);
+}
+
+.toggleSwitchOn {
+    background-color: var(--accent1);
+    /* border-color: var(--accent1); */
+}
+
+.toggleLabel {
+    font-size: var(--font-size-s, 12px);
+
+    color: var(--text1, #f0f0f8);
+    cursor: pointer;
+    user-select: none;
+}
+
+.reverse {
+    flex-direction: row-reverse;
+}
+
+@media (max-width: 480px) {
+    .toggleLabel {
+        display: none;
+    }
+}
