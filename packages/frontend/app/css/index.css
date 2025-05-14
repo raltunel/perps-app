@@ -34,7 +34,9 @@
     /* gaps */
     --main-gap: 8px;
     --header-link-gap: 32px;
+
     --main-padding: 8px;
+    --big-padding: 16px;
 
     --main-border-radius: 16px;
     --half-border-radius: 8px;
