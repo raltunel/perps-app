@@ -42,9 +42,5 @@
 }
 .testnet {
     color: var(--core-accent1, #7371fc);
-
     font-size: var(--font-size-xs, 10px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

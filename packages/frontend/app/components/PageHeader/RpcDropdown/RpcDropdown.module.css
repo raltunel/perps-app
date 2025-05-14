@@ -29,11 +29,7 @@
 .viewMoreButton {
     color: var(--accent1, #7371fc);
     text-align: center;
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .container section {
     gap: 5px;
@@ -47,18 +43,10 @@
 
 .rpcRowContainer p {
     color: var(--text1, #f0f0f8);
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .container h3 {
     color: var(--text2, #6a6a6d);
-
     /* Main/S */
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
