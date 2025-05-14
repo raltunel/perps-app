@@ -7,9 +7,17 @@ import { processUserOrder } from '../../processors/processOrderBook';
 import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
 import { parseNum } from '../../utils/orderbook/OrderBookUtils';
-import type { OtherWsMsg } from '@perps-app/sdk/src/utils/types';
-import type { AccountOverviewIF, UserBalanceIF } from '../../utils/UserDataIFs';
+import type {
+    OtherWsMsg,
+    UserActiveTwap,
+} from '@perps-app/sdk/src/utils/types';
+import type {
+    AccountOverviewIF,
+    ActiveTwapIF,
+    UserBalanceIF,
+} from '../../utils/UserDataIFs';
 import { processUserBalance } from '../../processors/processUserBalance';
+import { processUserActiveTwap } from '~/processors/processUserFills';
 export type WebData2Input = OtherWsMsg;
 export type WebData2Output = {
     channel: string;
@@ -21,6 +29,7 @@ export type WebData2Output = {
         coinPriceMap: Map<string, number>;
         userBalances: UserBalanceIF[];
         accountOverview: AccountOverviewIF;
+        activeTwaps: ActiveTwapIF[];
     };
 };
 
@@ -34,6 +43,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
         const userBalances: UserBalanceIF[] = [];
+        const activeTwaps: ActiveTwapIF[] = [];
         const accountOverview: AccountOverviewIF = {
             balance: 0,
             unrealizedPnl: 0,
@@ -153,6 +163,14 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                     }
                 }
 
+                if (data.twapStates && data.twapStates.length > 0) {
+                    data.twapStates.forEach((twapState: UserActiveTwap) => {
+                        const processedTwapState =
+                            processUserActiveTwap(twapState);
+                        activeTwaps.push(processedTwapState);
+                    });
+                }
+
                 if (data.spotState && data.spotState.balances) {
                     data.spotState.balances.forEach((balance: any) => {
                         userBalances.push(
@@ -173,6 +191,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                 coinPriceMap,
                 userBalances,
                 accountOverview,
+                activeTwaps,
             },
         } as WebData2Output);
     } catch (error) {

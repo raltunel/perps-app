@@ -18,17 +18,21 @@ export default function TwapTable(props: Props) {
     const { initialTab = 'Active', selectedFilter } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
 
-    const { fetchedChannels, twapHistory, twapSliceFills } =
+    const { fetchedChannels, twapHistory, twapSliceFills, activeTwaps } =
         useTradeDataStore();
 
-    const { twapHistoryFetched, twapSliceFillsFetched } = useMemo(() => {
-        return {
-            twapHistoryFetched: fetchedChannels.has(WsChannels.TWAP_HISTORY),
-            twapSliceFillsFetched: fetchedChannels.has(
-                WsChannels.TWAP_SLICE_FILLS,
-            ),
-        };
-    }, [fetchedChannels]);
+    const { twapHistoryFetched, twapSliceFillsFetched, webDataFetched } =
+        useMemo(() => {
+            return {
+                twapHistoryFetched: fetchedChannels.has(
+                    WsChannels.TWAP_HISTORY,
+                ),
+                twapSliceFillsFetched: fetchedChannels.has(
+                    WsChannels.TWAP_SLICE_FILLS,
+                ),
+                webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
+            };
+        }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -37,7 +41,13 @@ export default function TwapTable(props: Props) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Active':
-                return <ActiveTwapTable />;
+                return (
+                    <ActiveTwapTable
+                        data={activeTwaps}
+                        isFetched={webDataFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
 
             case 'History':
                 return (
@@ -63,7 +73,13 @@ export default function TwapTable(props: Props) {
                 );
 
             default:
-                return <ActiveTwapTable />;
+                return (
+                    <ActiveTwapTable
+                        data={activeTwaps}
+                        isFetched={webDataFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
         }
     };
 
