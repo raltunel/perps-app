@@ -1,17 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
-import Pagination from '~/components/Pagination/Pagination';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useMemo } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserFills } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { TableState } from '~/utils/CommonIFs';
 import type { UserFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
-import styles from './TradeHistoryTable.module.css';
 import TradeHistoryTableHeader from './TradeHistoryTableHeader';
 import TradeHistoryTableRow from './TradeHistoryTableRow';
-import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 interface TradeHistoryTableProps {
     data: UserFillIF[];
     isFetched: boolean;
