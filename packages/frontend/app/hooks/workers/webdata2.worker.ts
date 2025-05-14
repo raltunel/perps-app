@@ -10,6 +10,7 @@ import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 import type {
     OtherWsMsg,
     UserActiveTwap,
+    UserActiveTwapData,
 } from '@perps-app/sdk/src/utils/types';
 import type {
     AccountOverviewIF,
@@ -164,10 +165,13 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                 }
 
                 if (data.twapStates && data.twapStates.length > 0) {
-                    data.twapStates.forEach((twapState: UserActiveTwap) => {
-                        const processedTwapState =
-                            processUserActiveTwap(twapState);
-                        activeTwaps.push(processedTwapState);
+                    data.twapStates.forEach((twapState: UserActiveTwapData) => {
+                        if (twapState && twapState[1]) {
+                            const processedTwapState = processUserActiveTwap(
+                                twapState[1],
+                            );
+                            activeTwaps.push(processedTwapState);
+                        }
                     });
                 }
 

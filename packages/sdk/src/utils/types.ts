@@ -612,3 +612,8 @@ export interface UserActiveTwap {
     timestamp: number;
     user: string;
 }
+
+export interface UserActiveTwapData {
+    0: number;
+    1: UserActiveTwap;
+}
