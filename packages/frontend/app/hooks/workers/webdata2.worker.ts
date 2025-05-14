@@ -17,7 +17,7 @@ import type {
     UserBalanceIF,
 } from '../../utils/UserDataIFs';
 import { processUserBalance } from '../../processors/processUserBalance';
-import { processUserActiveTwap } from '~/processors/processUserFills';
+import { processUserActiveTwap } from '../../processors/processUserFills';
 export type WebData2Input = OtherWsMsg;
 export type WebData2Output = {
     channel: string;

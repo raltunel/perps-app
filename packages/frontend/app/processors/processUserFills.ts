@@ -8,7 +8,7 @@ import type { TableSortDirection } from '~/utils/CommonIFs';
 import type {
     TwapHistoryIF,
     TwapSliceFillIF,
-    UserActiveTwapIF,
+    ActiveTwapIF,
     UserFillIF,
     UserFillSortBy,
 } from '~/utils/UserDataIFs';
@@ -177,7 +177,7 @@ export function processUserTwapHistory(
     return ret;
 }
 
-export function processUserActiveTwap(data: UserActiveTwap): UserActiveTwapIF {
+export function processUserActiveTwap(data: UserActiveTwap): ActiveTwapIF {
     return {
         coin: data.coin,
         executedNtl: parseFloat(data.executedNtl),
@@ -189,5 +189,5 @@ export function processUserActiveTwap(data: UserActiveTwap): UserActiveTwapIF {
         sz: parseFloat(data.sz),
         timestamp: data.timestamp,
         user: data.user,
-    } as UserActiveTwapIF;
+    } as ActiveTwapIF;
 }
