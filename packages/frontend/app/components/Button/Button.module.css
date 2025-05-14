@@ -8,9 +8,6 @@
     align-items: center;
     flex-direction: column;
     border-radius: var(--half-border-radius, 8px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     border: none;
     cursor: pointer;
 }

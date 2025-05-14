@@ -47,7 +47,6 @@
 .cell {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
-    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -56,7 +55,6 @@
 .headerCell {
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs, 10px);
-    font-weight: 400;
     display: flex;
     flex-direction: row;
     align-items: center;
