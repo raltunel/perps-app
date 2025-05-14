@@ -152,6 +152,10 @@ body {
 
 /* Mobile styles */
 @media only screen and (max-width: 768px) {
+    .symbolInfoContainer {
+        border-radius: var(--main-border-radius, 16px);
+        background: var(--dark2, #111117);
+    }
     .container {
         grid-template-rows: 1fr;
         height: 100vh;
@@ -211,7 +215,7 @@ body {
 
     .mobileSection {
         position: fixed;
-        top: 145px;
+        top: 150px;
         left: 0;
         width: 100%;
         height: calc(

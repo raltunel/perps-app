@@ -192,7 +192,9 @@ export default function Trade() {
             <>
                 <TradeRouteHandler />
                 <WebDataConsumer />
-                <MemoizedSymbolInfo />
+                <div className={styles.symbolInfoContainer}>
+                    <MemoizedSymbolInfo />
+                </div>
                 {MobileTabNavigation}
 
                 {/* Order section - only render when active or was active */}
