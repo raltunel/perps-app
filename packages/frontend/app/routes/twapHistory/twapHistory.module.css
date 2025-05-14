@@ -13,9 +13,6 @@
 .container header {
     color: #fff;
     font-size: var(--font-size-xl, 36px);
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
 }
 
 .content {

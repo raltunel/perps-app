@@ -18,9 +18,6 @@
 .title {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-xxl, 64px);
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
 }
 
 .grid {
@@ -49,13 +46,11 @@
     gap: 16px;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-fize-l, 24px);
-    font-weight: 400;
 }
 
 .description {
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
 }
 
 .button {
@@ -68,7 +63,6 @@
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
     text-decoration: none;
 }
 

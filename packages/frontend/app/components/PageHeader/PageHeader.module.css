@@ -22,11 +22,7 @@
 .container nav a,
 .moreButton {
     color: var(--text2, #6a6a6d);
-
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .moreButton {
@@ -143,11 +139,7 @@
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark2, #0e0e14);
     color: var(--accent1, #7371fc);
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .walletButton:hover {
@@ -170,9 +162,6 @@
 
     /* Main/S */
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .networkButton {

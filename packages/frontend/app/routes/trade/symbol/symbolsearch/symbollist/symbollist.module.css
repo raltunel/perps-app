@@ -82,7 +82,6 @@
 .headerCell {
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs, 10px);
-    font-weight: 400;
     display: flex;
     flex-direction: row;
     align-items: center;

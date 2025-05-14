@@ -32,11 +32,7 @@
 
 .container a {
     color: var(--text2, #6a6a6d);
-
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .row {

@@ -51,9 +51,6 @@
     background: var(--dark3, #0e0e14);
     color: var(--accent1, #7371fc);
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .walletButton:hover {
@@ -89,9 +86,6 @@
     color: var(--text1, #f0f0f8);
     text-align: center;
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .profileRightTop svg {
@@ -121,18 +115,8 @@
     cursor: pointer;
 
     /* Main/M */
-    font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-
     color: var(--text1, #f0f0f8);
-
-    /* Main/M */
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .accountButton {
@@ -151,9 +135,6 @@
     color: var(--text2, #6a6a6d);
     text-align: center;
     font-size: var(--font-size-font, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .tokensContainer {
@@ -199,9 +180,6 @@
 .tokenDisplayName {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     flex: 1 1 0;
 }
 
@@ -217,16 +195,10 @@
     color: var(--text1, #f0f0f8);
     text-align: right;
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .tokenDisplayRight p {
     color: var(--text2, #6a6a6d);
     text-align: right;
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

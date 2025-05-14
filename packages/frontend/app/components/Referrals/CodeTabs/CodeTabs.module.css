@@ -54,11 +54,7 @@
 .enterCodeContent h6 {
     color: var(--base-text1, #f0f0f8);
     text-align: center;
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .enterCodeContent input {
     display: flex;
@@ -79,12 +75,8 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-
     gap: 16px;
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .createCodeContent .walletLink {
     display: flex;
@@ -106,7 +98,4 @@
     justify-content: center;
     align-items: center;
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

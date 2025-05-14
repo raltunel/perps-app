@@ -13,9 +13,6 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .textContent h4 {
     color: var(--text1, #f0f0f8);
@@ -76,9 +73,6 @@
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     padding: 8px;
     border-radius: var(--half-border-radius, 8px);
     border: 1px solid var(--dark4, #27272c);
