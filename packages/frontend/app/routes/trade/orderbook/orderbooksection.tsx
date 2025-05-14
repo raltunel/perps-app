@@ -11,16 +11,21 @@ interface OrderBookSectionProps {
 }
 
 const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
-    const [orderCount, setOrderCount] = useState(9);
+    const [orderCount, setOrderCount] = useState(0);
     const [tradesCount, setTradesCount] = useState(25);
     const orderCountForStacked = useMemo(() => {
         return Math.ceil(orderCount / 2);
     }, [orderCount]);
 
-    const orderBookComponent = useMemo(
-        () => <OrderBook symbol={symbol} orderCount={orderCount} />,
-        [orderCount, symbol],
-    );
+    const orderBookComponent = useMemo(() => {
+        return orderCount > 0 ? (
+            <div className={styles.orderbookInTab}>
+                <OrderBook symbol={symbol} orderCount={orderCount} />
+            </div>
+        ) : (
+            <></>
+        );
+    }, [orderCount, symbol]);
     const orderBookTrades = useMemo(
         () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
         [tradesCount, symbol],
@@ -187,18 +192,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({ symbol }) => {
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
     );
-    // const renderByMode = () => {
-    //     switch (orderBookMode) {
-    //         case 'tab':
-    //             return orderBookTabsComponent;
-    //         case 'stacked':
-    //             return stackedOrderBook;
-    //         case 'large':
-    //             return largeOrderBook;
-    //         default:
-    //             return orderBookTabsComponent;
-    //     }
-    // };
 
     return (
         <>
