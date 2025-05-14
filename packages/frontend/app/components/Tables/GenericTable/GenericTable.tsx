@@ -126,7 +126,11 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             ) : (
                 <>
                     {renderHeader(sortDirection, handleSort, sortBy)}
-                    <div className={styles.tableBody}>
+                    <div
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : ''
+                        }`}
+                    >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
