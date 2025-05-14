@@ -42,11 +42,5 @@
 }
 .testnet {
     color: var(--core-accent1, #7371fc);
-
-    /* Main/XS */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xs, 10px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

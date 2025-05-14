@@ -8,12 +8,7 @@
 }
 .containerTitle {
     color: var(--text2, #bcbcc4);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .sliderWithValue {
@@ -140,7 +135,6 @@
     border: none;
     color: var(--text1);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
     text-align: center;
     outline: none;
 }

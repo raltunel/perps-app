@@ -22,12 +22,7 @@
 .container nav a,
 .moreButton {
     color: var(--text2, #6a6a6d);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .moreButton {
@@ -144,12 +139,7 @@
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark2, #0e0e14);
     color: var(--accent1, #7371fc);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .walletButton:hover {
@@ -171,11 +161,7 @@
     color: var(--text1, #f0f0f8);
 
     /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .networkButton {

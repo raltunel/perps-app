@@ -17,6 +17,7 @@ import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { useDebugStore } from './stores/DebugStore';
 import { TutorialProvider } from './hooks/useTutorial';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -130,6 +131,11 @@ export default function App() {
                                     </ComponentErrorBoundary>
                                 </Suspense>
                             </main>
+                            <ComponentErrorBoundary>
+                                <footer className='mobile-footer'>
+                                    <MobileFooter />
+                                </footer>
+                            </ComponentErrorBoundary>
 
                             {/* Added error boundary for notifications */}
                             <ComponentErrorBoundary>

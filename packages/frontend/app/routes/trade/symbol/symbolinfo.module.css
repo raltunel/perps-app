@@ -1,6 +1,5 @@
 .symbolInfoContainer {
     width: 100%;
-    font-family: var(--font-family-main);
     font-size: 0.8rem;
     display: flex;
     flex-direction: row;
@@ -66,5 +65,11 @@
     .symbolInfoLimitor,
     .symbolInfoLimitorNarrow {
         max-width: calc(100vw - var(--main-gap) * 4 - 9rem);
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .symbolSelector {
+        margin-left: 0 !important;
     }
 }

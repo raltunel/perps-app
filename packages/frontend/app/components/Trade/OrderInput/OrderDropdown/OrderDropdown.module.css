@@ -15,10 +15,7 @@
     border-radius: 8px;
     border: none;
     color: var(--text1, #f0f0f8);
-    font-family: var(--font-family-main, 'Lato', sans-serif);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
-    line-height: normal;
     cursor: pointer;
     flex-shrink: 0;
     gap: 8px;
@@ -68,9 +65,7 @@
     align-items: center;
     cursor: pointer;
     color: var(--text2, #bcbcc4);
-    font-family: var(--font-family-main, 'Lato', sans-serif);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
     transition: background-color 0.15s ease;
 }
 
@@ -88,7 +83,6 @@
     padding: 8px;
     text-align: center;
     color: var(---text2, #bcbcc4);
-    font-family: var(--Font-Family-Main, 'Lato', sans-serif);
     font-size: var(--Font-Size-Font-S, 12px);
     font-style: italic;
 }

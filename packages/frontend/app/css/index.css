@@ -59,6 +59,8 @@
     --trade-module-width-desktop-small: 280px;
 
     /* fonts */
+
+    --font-weight: 400;
     --font-family-main: 'Lexend Deca';
 
     --font-size-xs: 10px;
@@ -102,8 +104,9 @@ html {
 }
 
 body {
-    font-family: var(--font-sans, sans-serif);
-    line-height: 1.5;
+    font-family: var(--font-family-main, 'Lexend Deca');
+    font-weight: var(--font-weight, 400);
+    line-height: normal;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--dark1);
