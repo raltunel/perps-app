@@ -6,7 +6,6 @@
     display: grid;
     grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
-    position: relative;
 }
 
 .headerContainer {
@@ -42,6 +41,7 @@
     height: 100%;
     overflow-y: scroll;
     padding-bottom: 2rem;
+    position: relative;
 }
 .tableBody::-webkit-scrollbar {
     display: none;
