@@ -68,3 +68,9 @@
         max-width: calc(100vw - var(--main-gap) * 4 - 9rem);
     }
 }
+
+@media only screen and (max-width: 768px) {
+    .symbolSelector {
+        margin-left: 0 !important;
+    }
+}
