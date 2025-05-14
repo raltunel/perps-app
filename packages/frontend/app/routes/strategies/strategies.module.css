@@ -1,0 +1,38 @@
+.strategies_page {
+    display: flex;
+    flex-direction: column;
+    width: 1200px;
+    font-family: var(--font-family-main);
+    outline: 1px solid green;
+}
+
+.strategies_page > h2 {
+    font-size: var(--font-size-xl);
+    font-weight: 300;
+    color: var(--text1);
+}
+
+.strategies_blurb {
+    font-size: var(--font-size-m);
+    color: var(--text-2);
+}
+
+.strategies_learn_more {
+    font-size: var(--font-size-m);
+    color: var(--accent1);
+}
+
+.strategy_select {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.strategy_select > div {
+    display: flex;
+    flex-direction: row;
+}
+
+.strategy_select > label {
+    color: var(--text1);
+}
