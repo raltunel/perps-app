@@ -4,17 +4,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    border-radius: var(--main-border-radius);
 }
 
 /* no need to override anymore */
 
 .symbolInfoContainer div {
     /* height: auto !important; */
-}
-
-.symbolSelector {
-    /* flex-grow: auto; */
-    margin-left: 2rem !important;
 }
 
 .symbolInfoFieldsWrapper {
