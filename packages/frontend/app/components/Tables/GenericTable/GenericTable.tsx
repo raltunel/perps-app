@@ -5,6 +5,7 @@ import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
+import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 
 interface GenericTableProps<T, S> {
     data: T[];
@@ -51,8 +52,12 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     const [sortBy, setSortBy] = useState<S>();
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
 
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
+
+    useEffect(() => {
+        setPage(0);
+    }, [sortBy, sortDirection]);
 
     const sortedData = useMemo(() => {
         if (sortBy) {
@@ -121,7 +126,11 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             ) : (
                 <>
                     {renderHeader(sortDirection, handleSort, sortBy)}
-                    <div className={styles.tableBody}>
+                    <div
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : ''
+                        }`}
+                    >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
@@ -150,9 +159,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                         )}
 
                         {pageMode && (
-                            <Pagination
+                            <GenericTablePagination
                                 totalCount={sortedData.length}
-                                onPageChange={setPage}
+                                page={page}
+                                setPage={setPage}
                                 rowsPerPage={rowsPerPage}
                                 onRowsPerPageChange={setRowsPerPage}
                             />

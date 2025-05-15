@@ -47,15 +47,8 @@
 
     border-radius: var(--half-border-radius, 8px);
     background: var(--accent1, #7371fc);
-
     color: var(--text1, #f0f0f8);
-
-    /* Main/M */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .actionButtons button {
     outline: none;
@@ -71,14 +64,8 @@
 
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark3, #16161c);
-
     color: var(--text1, #f0f0f8);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .notConnectedContainer {
@@ -89,12 +76,7 @@
 .notConnectedText {
     color: var(--text1, #f0f0f8);
     text-align: center;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .overviewContainer {
     display: flex;
@@ -110,13 +92,7 @@
 .overviewContainer h3 {
     flex: 1 0 0;
     color: var(--text1, #f0f0f8);
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .overviewItem {
@@ -130,13 +106,7 @@
 .overviewLabel {
     color: var(--text2, #6a6a6d);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .tooltipContainer {
@@ -149,11 +119,5 @@
 .value {
     color: var(--text1, #f0f0f8);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
