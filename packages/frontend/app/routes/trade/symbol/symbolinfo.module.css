@@ -1,21 +1,16 @@
 .symbolInfoContainer {
     width: 100%;
-    font-family: var(--font-family-main);
     font-size: 0.8rem;
     display: flex;
     flex-direction: row;
     align-items: center;
+    border-radius: var(--main-border-radius);
 }
 
 /* no need to override anymore */
 
 .symbolInfoContainer div {
     /* height: auto !important; */
-}
-
-.symbolSelector {
-    /* flex-grow: auto; */
-    margin-left: 2rem !important;
 }
 
 .symbolInfoFieldsWrapper {
@@ -66,5 +61,11 @@
     .symbolInfoLimitor,
     .symbolInfoLimitorNarrow {
         max-width: calc(100vw - var(--main-gap) * 4 - 9rem);
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .symbolSelector {
+        margin-left: 0 !important;
     }
 }

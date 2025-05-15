@@ -440,7 +440,10 @@ export default function OrderInput() {
     return (
         <div className={styles.mainContainer}>
             <div className={styles.mainContent}>
-                <div className={styles.orderTypeDropdownContainer}>
+                <div
+                    className={styles.orderTypeDropdownContainer}
+                    id='tutorial-order-type'
+                >
                     <OrderDropdown
                         options={marketOrderTypes}
                         value={marketOrderType}

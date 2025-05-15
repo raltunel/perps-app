@@ -1,6 +1,6 @@
 /* top-level JSX element */
 .table_wrapper {
-    width: 800px;
+    width: 1000px;
     border-radius: var(--main-border-radius, 16px);
     background-color: var(--dark2, #0e0e14);
     display: flex;
@@ -10,7 +10,7 @@
 
     /* centralize the column spacing rule */
     /* this keeps header and data cells spaced consistently */
-    --accounts-table-column-spacing: 2fr 4fr 2fr 1fr;
+    --accounts-table-column-spacing: 3fr 5fr 2fr 1fr;
     --accounts-table-row-padding: 0px 8px;
 }
 

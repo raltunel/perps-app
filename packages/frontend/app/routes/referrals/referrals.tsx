@@ -23,7 +23,7 @@ export default function Referrals() {
                 Referrals
                 <p>
                     Refer users to earn rewards. Affiliates earn greater
-                    rewards. Learn More <a href='#'>Learn More</a>
+                    rewards. <a href='#'>Learn More</a>
                 </p>
             </header>
             <div className={styles.detailsContainer}>

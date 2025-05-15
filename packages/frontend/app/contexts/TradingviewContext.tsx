@@ -16,6 +16,7 @@ import {
 } from '~/routes/chart/data/utils/chartStorage';
 import {
     checkDefaultColors,
+    customThemes,
     getChartDefaultColors,
     getChartThemeColors,
     priceFormatterFactory,
@@ -199,6 +200,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             locale: 'en',
             theme: 'dark',
+            custom_themes: customThemes(),
             overrides: {
                 volumePaneSize: 'medium',
             },
