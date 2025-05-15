@@ -17,7 +17,7 @@
     transition:
         max-height var(--ease-in-out-med),
         opacity var(--ease-in-out-med);
-    z-index: var(--navbar-dropdown-zindex, 999);
+    z-index: var(--z-index-navbar-dropdown, 999);
 }
 
 .menuItem {

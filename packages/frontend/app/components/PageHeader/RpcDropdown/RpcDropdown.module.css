@@ -23,7 +23,7 @@
     height: auto;
     visibility: visible;
     pointer-events: auto;
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 
 .viewMoreButton {

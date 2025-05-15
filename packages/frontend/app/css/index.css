@@ -97,7 +97,7 @@
     --z-index-modal: 100;
     --z-index-toast: 200;
     --z-index-tooltip: 300;
-    --navbar-dropdown-zindex: 99;
+    --z-index-navbar-dropdown: 99;
 
     /* ------------------------------ */
     /* 🌫️ Shadows                    */
