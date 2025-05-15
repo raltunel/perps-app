@@ -3,7 +3,7 @@
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     border-radius: var(--half-border-radius);
     padding: 8px;
     width: 100%;
@@ -43,7 +43,7 @@
 }
 
 .rowSelector {
-    background-color: var(--dark2, #1a1b23);
+    background-color: var(--bg-dark2, #1a1b23);
     padding: 8px;
     display: flex;
     align-items: center;

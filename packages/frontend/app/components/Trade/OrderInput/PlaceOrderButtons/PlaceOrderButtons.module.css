@@ -37,7 +37,7 @@
     padding: 8px 0px;
     align-self: stretch;
     border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #27272c);
+    border: 1px solid var(--bg-dark4, #27272c);
 }
 
 .input_details > * {

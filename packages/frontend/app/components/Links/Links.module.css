@@ -34,7 +34,7 @@
     height: var(--home-link-height, 160px);
     padding: 16px;
     border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #0e0e14);
+    background: var(--bg-dark2, #0e0e14);
 }
 
 .header {

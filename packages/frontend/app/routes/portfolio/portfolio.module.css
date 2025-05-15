@@ -84,7 +84,7 @@
     align-items: center;
     flex: 1 0 0;
     border-radius: var(--Corner-Radius-Button, 8px);
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     color: var(--text1, #f0f0f8);
 
     font-size: var(--font-size-m, 18px);
@@ -119,7 +119,7 @@
     border-radius: var(--main-border-radius);
     color: var(--text1);
     gap: 16px;
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     user-select: none;
     -webkit-user-select: none;
     outline: 1px solid var(--text2);
@@ -179,7 +179,7 @@
 }
 
 .fee_table > ol > li:hover {
-    background-color: var(--dark5);
+    background-color: var(--bg-dark5);
     transition: background-color 0.1s ease-in;
 }
 

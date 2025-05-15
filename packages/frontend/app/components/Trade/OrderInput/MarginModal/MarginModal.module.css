@@ -31,9 +31,9 @@
 }
 .content {
     border-radius: var(--main-border-radius, 16px);
-    border: 1px solid var(--dark4);
+    border: 1px solid var(--bg-dark4);
     /* border: 1px solid var(--base-accent1, #7371FC); */
-    background: var(--dark4, #27272c);
+    background: var(--bg-dark4, #27272c);
     display: flex;
     padding: 16px;
     flex-direction: column;

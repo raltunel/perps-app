@@ -21,7 +21,7 @@
         visibility var(--ease-in-out-med);
 }
 .dropdownContainer {
-    background: var(--dark2, #0e0e14);
+    background: var(--bg-dark2, #0e0e14);
     position: absolute;
     top: 30px;
     right: 0;
@@ -63,7 +63,7 @@
     align-self: stretch;
 
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #16161c);
+    background: var(--bg-dark3, #16161c);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
 }
@@ -87,7 +87,7 @@
     align-self: stretch;
 
     border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #1e1e24);
+    border: 1px solid var(--bg-dark4, #1e1e24);
 }
 .overviewContainer h3 {
     flex: 1 0 0;

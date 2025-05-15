@@ -10,7 +10,7 @@
     flex-shrink: 0;
 
     border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #111117);
+    background: var(--bg-dark2, #111117);
 }
 
 .mainContent {
@@ -44,7 +44,7 @@
     align-self: stretch;
 
     border-radius: var(--half-border-radius, 8px);
-    border: 1px solid var(--dark4, #27272c);
+    border: 1px solid var(--bg-dark4, #27272c);
 }
 .inputDetailsDataContent {
     width: 100%;
@@ -73,7 +73,7 @@
     padding: 0px 4px 0px 8px;
     align-items: center;
     justify-content: space-between;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     border-radius: 8px;
     border: none;
     color: var(--text1, #f0f0f8);
@@ -117,7 +117,7 @@
     align-items: center;
     gap: 8px;
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     display: grid;
     grid-template-columns: 24px auto;
     align-items: center;

@@ -26,7 +26,7 @@
     align-items: center;
 
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
 

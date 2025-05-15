@@ -18,7 +18,7 @@
 .content {
     width: 100%;
     border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #111117);
+    background: var(--bg-dark2, #111117);
     display: flex;
     padding: 8px 16px;
     flex-direction: column;
@@ -36,7 +36,7 @@
 
 .searchContainer {
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     display: flex;
     width: 400px;
     height: 31px;
@@ -67,7 +67,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: var(--dark2, #1a1b23);
+    background-color: var(--bg-dark2, #1a1b23);
     cursor: pointer;
     position: relative;
     z-index: 999;
@@ -91,7 +91,7 @@
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     border-radius: var(--half-border-radius);
     padding: 8px;
     width: 100%;
@@ -130,7 +130,7 @@
 }
 
 .rowSelector {
-    background-color: var(--dark2, #1a1b23);
+    background-color: var(--bg-dark2, #1a1b23);
     padding: 8px;
     display: flex;
     align-items: center;

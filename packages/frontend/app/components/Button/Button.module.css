@@ -38,12 +38,12 @@
 }
 
 .unselected {
-    background: var(--dark3, #16161c);
+    background: var(--bg-dark3, #16161c);
     color: var(--text1, #f0f0f8);
 }
 
 .disabled {
-    background: var(--dark3, #16161c);
+    background: var(--bg-dark3, #16161c);
     color: var(--text3, #424246);
     cursor: not-allowed;
 }
@@ -67,7 +67,7 @@
             var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 0%,
             var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 100%
         ),
-        var(--dark3, #16161c);
+        var(--bg-dark3, #16161c);
 }
 
 /* Focus state */

@@ -4,7 +4,7 @@
     padding: 8px 16px 16px 16px;
     gap: 24px;
     color: var(--text1);
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     border-radius: var(--main-border-radius);
     user-select: none;
     -webkit-user-select: none;
@@ -13,7 +13,7 @@
 .text_entry > input {
     width: 100%;
     padding: 4px 8px;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
     border: none;
     border-radius: var(--half-border-radius);
     outline: none;
@@ -39,7 +39,7 @@
 }
 
 .modal_buttons > button:first-child {
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }
 
 .modal_buttons > button:last-child {

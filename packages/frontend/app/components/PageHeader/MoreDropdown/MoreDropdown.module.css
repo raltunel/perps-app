@@ -13,7 +13,7 @@
     align-items: flex-start;
     gap: 4px;
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark4, #0e0e14);
+    background: var(--bg-dark4, #0e0e14);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
     transition:
         opacity var(--ease-in-out-med),

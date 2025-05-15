@@ -6,7 +6,7 @@
     gap: 16px;
 
     border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #111117);
+    background: var(--bg-dark2, #111117);
     width: 350px;
     height: 290px;
 
@@ -79,10 +79,10 @@
     flex-direction: column;
     gap: 8px;
     padding: 8px;
-    background: var(--dark3);
+    background: var(--bg-dark3);
 
     border-radius: var(--half-border-radius, 8px);
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
 }
 .depositContainer h6 {
     font-size: var(--font-size-xs, 10px);
@@ -127,7 +127,7 @@
     background: var(--accent1);
 }
 .withdrawButton {
-    background: var(--dark3);
+    background: var(--bg-dark3);
 }
 /* Small screens (mobile) */
 @media (max-width: 480px) {

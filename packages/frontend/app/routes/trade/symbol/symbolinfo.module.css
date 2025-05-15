@@ -26,16 +26,14 @@
 .symbolInfoLimitor {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) -
-            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
-            12rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 12rem
     );
 }
 
 .symbolInfoLimitorNarrow {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) * 3 -
-            var(--trade-module-width-desktop-small) - var(--main-gap) * 4 -
-            15rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 15rem
     );
 }
 
@@ -43,7 +41,7 @@
     .symbolInfoLimitor {
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) -
-                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
                 12rem
         );
     }
@@ -51,7 +49,7 @@
     .symbolInfoLimitorNarrow {
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) * 3 -
-                var(--trade-module-width-desktop-large) - var(--main-gap) * 4 -
+                var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
                 15rem
         );
     }
@@ -60,7 +58,7 @@
 @media only screen and (max-width: 1080px) {
     .symbolInfoLimitor,
     .symbolInfoLimitorNarrow {
-        max-width: calc(100vw - var(--main-gap) * 4 - 9rem);
+        max-width: calc(100vw - var(--gap-s) * 4 - 9rem);
     }
 }
 
