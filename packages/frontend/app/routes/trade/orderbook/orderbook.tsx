@@ -28,6 +28,16 @@ interface OrderBookProps {
     orderCount: number;
 }
 
+const dummyOrder: OrderBookRowIF = {
+    coin: 'BTC',
+    px: 10000,
+    sz: 1,
+    type: 'buy',
+    ratio: 0.5,
+    n: 0,
+    total: 0,
+};
+
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     // FIXME: data is not rendered on UI
 
@@ -36,6 +46,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
+
+    const skeletonCount = useMemo(() => {
+        return orderCount < 20 ? orderCount : 20;
+    }, [orderCount]);
 
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
@@ -341,6 +355,17 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             <BasicDivider />
 
+            <div id='dummyOrderRow' className={styles.dummyOrderRow}>
+                <OrderRow
+                    rowIndex={0}
+                    order={dummyOrder}
+                    coef={1}
+                    resolution={filledResolution.current}
+                    userSlots={userBuySlots}
+                    clickListener={() => {}}
+                />
+            </div>
+
             {orderBookState === TableState.LOADING && (
                 <motion.div
                     className={styles.skeletonWrapper}
@@ -351,30 +376,40 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 >
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '.26rem' }}
+                        style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={getRandWidth(index)}
-                                    height={'19px'}
-                                />
-                            </div>
-                        ))}
+                        {Array.from({ length: skeletonCount }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
+                                    <SkeletonNode
+                                        width={getRandWidth(index)}
+                                        height={'16px'}
+                                    />
+                                </div>
+                            ),
+                        )}
                     </div>
                     {midHeader('orderBookMidHeader2')}
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '.26rem' }}
+                        style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={getRandWidth(index, true)}
-                                    height={'19px'}
-                                />
-                            </div>
-                        ))}
+                        {Array.from({ length: skeletonCount }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
+                                    <SkeletonNode
+                                        width={getRandWidth(index, true)}
+                                        height={'16px'}
+                                    />
+                                </div>
+                            ),
+                        )}
                     </div>
                 </motion.div>
             )}
@@ -419,7 +454,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             <div
                                                 className={styles.ratioBar}
                                                 style={{
-                                                    width: `${order.ratio * 100}%`,
+                                                    width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                                     backgroundColor:
                                                         order.type === 'sell'
                                                             ? getBsColor().sell
@@ -459,7 +494,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             <div
                                                 className={styles.ratioBar}
                                                 style={{
-                                                    width: `${order.ratio * 100}%`,
+                                                    width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                                     backgroundColor:
                                                         order.type === 'buy'
                                                             ? getBsColor().buy
