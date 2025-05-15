@@ -2,8 +2,8 @@ import Welcome from '~/components/Welcome/Welcome';
 import type { Route } from '../../+types/root';
 export function meta() {
     return [
-        { title: 'Perps - Points' },
-        { name: 'description', content: 'Welcome to React Router!' },
+        { title: 'Points | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
     ];
 }
 

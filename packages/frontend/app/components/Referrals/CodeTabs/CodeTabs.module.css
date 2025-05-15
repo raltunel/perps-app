@@ -38,7 +38,7 @@
     background: var(--accent1, #7371fc);
     font-size: var(--font-size-m, 18px);
     color: var(--text1);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 .sectionWithButton button:hover {
     opacity: 0.8;
@@ -54,12 +54,7 @@
 .enterCodeContent h6 {
     color: var(--base-text1, #f0f0f8);
     text-align: center;
-
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .enterCodeContent input {
     display: flex;
@@ -80,13 +75,8 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-
     gap: 16px;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .createCodeContent .walletLink {
     display: flex;
@@ -107,9 +97,5 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: var(--Font-Family-Main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

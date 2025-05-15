@@ -34,13 +34,8 @@
     justify-content: space-between;
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark4, #27272c);
-
     color: var(--text1);
-
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
     outline: none;
     border: none;
 }
@@ -69,7 +64,7 @@
     outline: none;
     border: 1px solid transparent;
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 
 .quantityButton.active,
@@ -98,9 +93,6 @@
     gap: 4px;
     color: var(--text1, #f0f0f8) !important;
     font-size: var(--font-size-s, 12px) !important;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .dropdownToggle {
@@ -265,12 +257,7 @@
 
 .errorMessage {
     color: var(--red, #ef5350);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .optionHeader {
     display: flex;
@@ -300,7 +287,7 @@
     color: var(--text1, #f0f0f8);
 
     font-size: var(--font-size-m, 18px);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 
 .actions button:hover {

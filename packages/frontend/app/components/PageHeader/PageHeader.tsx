@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
     LuChevronDown,
     LuChevronUp,
-    LuMenu,
     LuSettings,
     LuWallet,
 } from 'react-icons/lu';
@@ -194,7 +193,9 @@ export default function PageHeader() {
                 more
                 {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
             </button>
-            {isMoreDropdownOpen && <MoreDropdown />}
+            {isMoreDropdownOpen && (
+                <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
+            )}
         </section>
     );
 
@@ -202,78 +203,71 @@ export default function PageHeader() {
 
     return (
         <>
-            <section className={styles.mainContainer}>
-                <header id={'pageHeader'} className={styles.container}>
-                    <Link to='/' style={{ marginLeft: '10px' }}>
-                        <img
-                            src='/images/favicon.svg'
-                            alt='Perps Logo'
-                            width='90px'
-                            height='90px'
-                        />
-                    </Link>
-                    <nav
-                        className={`${styles.nav} ${
-                            isMenuOpen ? styles.showMenu : ''
-                        }`}
-                        ref={isMenuOpen ? mobileNavbarRef : null}
+            <header id={'pageHeader'} className={styles.container}>
+                <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
+                    <img
+                        src='/images/favicon.svg'
+                        alt='Perps Logo'
+                        width='90px'
+                        height='90px'
+                    />
+                </Link>
+                <nav
+                    className={`${styles.nav} ${
+                        isMenuOpen ? styles.showMenu : ''
+                    }`}
+                    ref={isMenuOpen ? mobileNavbarRef : null}
+                >
+                    <button
+                        onClick={() => setIsMenuOpen(false)}
+                        className={styles.mobileNavCloseButton}
                     >
-                        <button
-                            onClick={() => setIsMenuOpen(false)}
-                            className={styles.mobileNavCloseButton}
+                        <MdOutlineClose size={20} color='var(--text1)' />
+                    </button>
+                    {navLinks.map((link) => (
+                        <Link
+                            key={link.name}
+                            to={link.path}
+                            className={
+                                location.pathname.includes(link.path)
+                                    ? styles.activeNavLink
+                                    : styles.navLink
+                            }
+                            onClick={() => {
+                                if (isMenuOpen) setIsMenuOpen(false);
+                            }}
+                            viewTransition
                         >
-                            <MdOutlineClose size={20} color='var(--text1)' />
-                        </button>
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                to={link.path}
-                                className={
-                                    location.pathname.includes(link.path)
-                                        ? styles.activeNavLink
-                                        : styles.navLink
-                                }
-                                onClick={() => {
-                                    if (isMenuOpen) setIsMenuOpen(false);
-                                }}
-                            >
-                                {link.name}
-                            </Link>
-                        ))}
-                        {moreDropdownDisplay}
-                    </nav>
-                    <div className={styles.rightSide}>
-                        {isUserConnected && depositDisplay}
-                        {isUserConnected && networksDisplay}
-                        {isUserConnected && rpcDisplay}
-                        {!isUserConnected && (
-                            <Button
-                                size='medium'
-                                selected
-                                onClick={() => setIsUserConnected(true)}
-                            >
-                                Connect
-                            </Button>
-                        )}
-                        {isUserConnected && walletDisplay}
+                            {link.name}
+                        </Link>
+                    ))}
+                    {moreDropdownDisplay}
+                </nav>
+                <div className={styles.rightSide}>
+                    {isUserConnected && depositDisplay}
+                    {isUserConnected && networksDisplay}
+                    {isUserConnected && rpcDisplay}
+                    {!isUserConnected && (
+                        <Button
+                            size='medium'
+                            selected
+                            onClick={() => setIsUserConnected(true)}
+                        >
+                            Connect
+                        </Button>
+                    )}
+                    {isUserConnected && walletDisplay}
 
-                        <button
-                            className={styles.internationalButton}
-                            onClick={appSettingsModal.open}
-                        >
-                            <LuSettings size={20} />
-                        </button>
+                    <button
+                        className={styles.internationalButton}
+                        onClick={appSettingsModal.open}
+                    >
+                        <LuSettings size={20} />
+                    </button>
 
-                        <button
-                            className={styles.menuButtonMobile}
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            <LuMenu size={20} />
-                        </button>
-                    </div>
                     {dropdownMenuDisplay}
-                </header>
-            </section>
+                </div>
+            </header>
 
             {appSettingsModal.isOpen && (
                 <Modal

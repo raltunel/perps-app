@@ -16,6 +16,8 @@ import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { useDebugStore } from './stores/DebugStore';
+import { TutorialProvider } from './hooks/useTutorial';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -114,28 +116,33 @@ export default function App() {
         <>
             <Layout>
                 <SdkProvider environment={wsEnvironment}>
-                    <div className='root-container'>
-                        {/* Added error boundary for header */}
-                        <ComponentErrorBoundary>
-                            <header className='header'>
+                    <TutorialProvider>
+                        <div className='root-container'>
+                            {/* Added error boundary for header */}
+                            <ComponentErrorBoundary>
                                 <PageHeader />
-                            </header>
-                        </ComponentErrorBoundary>
+                            </ComponentErrorBoundary>
 
-                        <main className='content'>
-                            {/*  Added Suspense for async content loading */}
-                            <Suspense fallback={<LoadingIndicator />}>
-                                <ComponentErrorBoundary>
-                                    <Outlet />
-                                </ComponentErrorBoundary>
-                            </Suspense>
-                        </main>
+                            <main className='content'>
+                                {/*  Added Suspense for async content loading */}
+                                <Suspense fallback={<LoadingIndicator />}>
+                                    <ComponentErrorBoundary>
+                                        <Outlet />
+                                    </ComponentErrorBoundary>
+                                </Suspense>
+                            </main>
+                            <ComponentErrorBoundary>
+                                <footer className='mobile-footer'>
+                                    <MobileFooter />
+                                </footer>
+                            </ComponentErrorBoundary>
 
-                        {/* Added error boundary for notifications */}
-                        <ComponentErrorBoundary>
-                            <Notifications />
-                        </ComponentErrorBoundary>
-                    </div>
+                            {/* Added error boundary for notifications */}
+                            <ComponentErrorBoundary>
+                                <Notifications />
+                            </ComponentErrorBoundary>
+                        </div>
+                    </TutorialProvider>
                     <RuntimeDomManipulation />
                 </SdkProvider>
             </Layout>

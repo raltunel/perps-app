@@ -3,6 +3,8 @@ import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type {
     AccountOverviewIF,
+    TwapHistoryIF,
+    TwapSliceFillIF,
     UserBalanceIF,
     UserFillIF,
 } from '~/utils/UserDataIFs';
@@ -28,6 +30,10 @@ export interface UserTradeDataStore {
     setAccountOverview: (accountOverview: AccountOverviewIF) => void;
     userFills: UserFillIF[];
     setUserFills: (userFills: UserFillIF[]) => void;
+    twapHistory: TwapHistoryIF[];
+    setTwapHistory: (twapHistory: TwapHistoryIF[]) => void;
+    twapSliceFills: TwapSliceFillIF[];
+    setTwapSliceFills: (twapSliceFills: TwapSliceFillIF[]) => void;
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
@@ -92,5 +98,13 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     setUserFills: (userFills: UserFillIF[]) => {
         const sliced = userFills.slice(0, TradeHistoryLimits.MAX);
         set({ userFills: sliced });
+    },
+    twapHistory: [],
+    setTwapHistory: (twapHistory: TwapHistoryIF[]) => {
+        set({ twapHistory });
+    },
+    twapSliceFills: [],
+    setTwapSliceFills: (twapSliceFills: TwapSliceFillIF[]) => {
+        set({ twapSliceFills });
     },
 });

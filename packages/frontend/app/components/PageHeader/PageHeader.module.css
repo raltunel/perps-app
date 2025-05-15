@@ -1,13 +1,7 @@
-.mainContainer {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
 .container {
     width: 100%;
     height: 100%;
-
+    padding: 0px var(--main-padding);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -19,7 +13,6 @@
 .container nav {
     width: 100%;
     height: 100%;
-
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -29,12 +22,7 @@
 .container nav a,
 .moreButton {
     color: var(--text2, #6a6a6d);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-m, 18px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .moreButton {
@@ -47,16 +35,14 @@
     flex-direction: row;
     align-items: center;
     gap: 8px;
-    /* vertical-align: middle; */
 }
 .moreButton svg {
     margin: 8px 0;
 }
 .container nav a:hover,
 .moreButton:hover {
-    /* animation: bounce 0.5s ease; */
     color: var(--text1);
-    transition: all 0.3s ease-in-out;
+    transition: all var(--ease-in-out-med);
 }
 .activeNavLink {
     color: var(--text1) !important;
@@ -153,12 +139,7 @@
     border-radius: var(--half-border-radius, 8px);
     background: var(--dark2, #0e0e14);
     color: var(--accent1, #7371fc);
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .walletButton:hover {
@@ -180,11 +161,7 @@
     color: var(--text1, #f0f0f8);
 
     /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 
 .networkButton {
@@ -240,7 +217,7 @@
         padding: var(--main-padding);
         gap: 32px;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-        transition: right 0.3s ease-in-out;
+        transition: right var(--ease-in-out-med);
         z-index: 1000;
     }
 
