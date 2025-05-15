@@ -47,6 +47,10 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
 
+    const skeletonCount = useMemo(() => {
+        return orderCount < 20 ? orderCount : 20;
+    }, [orderCount]);
+
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     // added to pass true resolution to orderrow components
@@ -372,30 +376,40 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 >
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '.4rem' }}
+                        style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={getRandWidth(index)}
-                                    height={'15px'}
-                                />
-                            </div>
-                        ))}
+                        {Array.from({ length: skeletonCount }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
+                                    <SkeletonNode
+                                        width={getRandWidth(index)}
+                                        height={'16px'}
+                                    />
+                                </div>
+                            ),
+                        )}
                     </div>
                     {midHeader('orderBookMidHeader2')}
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '.4rem' }}
+                        style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <div key={index} className={styles.orderRowWrapper}>
-                                <SkeletonNode
-                                    width={getRandWidth(index, true)}
-                                    height={'15px'}
-                                />
-                            </div>
-                        ))}
+                        {Array.from({ length: skeletonCount }).map(
+                            (_, index) => (
+                                <div
+                                    key={index}
+                                    className={styles.orderRowWrapper}
+                                >
+                                    <SkeletonNode
+                                        width={getRandWidth(index, true)}
+                                        height={'16px'}
+                                    />
+                                </div>
+                            ),
+                        )}
                     </div>
                 </motion.div>
             )}
@@ -440,7 +454,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             <div
                                                 className={styles.ratioBar}
                                                 style={{
-                                                    width: `${order.ratio ?? 0 * 100}%`,
+                                                    width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                                     backgroundColor:
                                                         order.type === 'sell'
                                                             ? getBsColor().sell
@@ -480,7 +494,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             <div
                                                 className={styles.ratioBar}
                                                 style={{
-                                                    width: `${order.ratio ?? 0 * 100}%`,
+                                                    width: `${order.ratio ? order.ratio * 100 : 0}%`,
                                                     backgroundColor:
                                                         order.type === 'buy'
                                                             ? getBsColor().buy
