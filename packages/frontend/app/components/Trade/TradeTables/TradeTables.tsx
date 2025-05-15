@@ -124,7 +124,12 @@ export default function TradeTable() {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
-                return <PositionsTable />;
+                return (
+                    <PositionsTable
+                        isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
