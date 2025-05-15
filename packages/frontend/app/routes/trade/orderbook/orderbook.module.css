@@ -18,7 +18,7 @@
     align-items: center;
     width: 100%;
     gap: 0.25rem;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
     margin: 0.25rem 0;
     padding: 0 1rem;
 }

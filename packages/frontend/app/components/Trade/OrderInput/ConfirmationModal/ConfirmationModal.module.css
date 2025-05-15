@@ -59,7 +59,7 @@
     align-items: center;
     flex: 1 0 0;
 
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
 
     color: var(--base-text1, #f0f0f8);

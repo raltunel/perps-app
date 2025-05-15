@@ -9,7 +9,7 @@
 }
 
 .headerContainer {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     width: 100%;
     height: 24px;
     padding-left: 8px;

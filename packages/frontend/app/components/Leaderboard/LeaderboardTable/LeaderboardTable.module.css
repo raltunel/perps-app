@@ -9,7 +9,7 @@
 }
 
 .headerContainer {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     width: 100%;
     height: 24px;
     padding-left: 8px;
@@ -51,7 +51,7 @@
 }
 
 .tableBody::-webkit-scrollbar-track {
-    background: var(--dark3) !important;
+    background: var(--bg-dark3) !important;
 }
 
 .tableBody::-webkit-scrollbar-thumb {
