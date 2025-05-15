@@ -2,7 +2,6 @@ import SortIcon from '~/components/Vault/SortIcon';
 import styles from './PositionsTable.module.css';
 import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
 import type { TableSortDirection } from '~/utils/CommonIFs';
-import type { UserFillSortBy } from '~/utils/UserDataIFs';
 
 export interface HeaderCell {
     name: string;
@@ -14,7 +13,7 @@ export interface HeaderCell {
 interface PositionsTableHeaderProps {
     sortBy?: PositionDataSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: UserFillSortBy) => void;
+    sortClickHandler: (key: PositionDataSortBy) => void;
 }
 
 export default function PositionsTableHeader({
@@ -99,7 +98,7 @@ export default function PositionsTableHeader({
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
                     onClick={() => {
                         if (header.sortable) {
-                            sortClickHandler(header.key as UserFillSortBy);
+                            sortClickHandler(header.key as PositionDataSortBy);
                         }
                     }}
                 >

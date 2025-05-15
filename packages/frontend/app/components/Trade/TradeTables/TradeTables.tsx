@@ -126,7 +126,6 @@ export default function TradeTable() {
             case 'Positions':
                 return (
                     <PositionsTable
-                        data={userFills}
                         isFetched={tradeHistoryFetched}
                         selectedFilter={selectedFilter}
                     />

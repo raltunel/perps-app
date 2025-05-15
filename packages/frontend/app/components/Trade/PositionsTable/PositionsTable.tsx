@@ -8,20 +8,19 @@ import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
-import { sortUserFills } from '~/processors/processUserFills';
+import { sortPositionData } from '~/utils/position/PositionUtils';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 interface PositionsTableProps {
     pageMode?: boolean;
-    data: PositionIF[];
     isFetched: boolean;
     selectedFilter?: string;
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
-    const { pageMode, data, isFetched, selectedFilter } = props;
+    const { pageMode, isFetched, selectedFilter } = props;
     const { coinPriceMap } = useTradeDataStore();
     const { positions, fetchedChannels } = useTradeDataStore();
-    const limit = 10;
 
     const { debugWallet } = useDebugStore();
 
@@ -29,20 +28,34 @@ export default function PositionsTable(props: PositionsTableProps) {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
     }, [fetchedChannels]);
 
-    const viewAllLink = useMemo(() => {
-        return `/positions/${debugWallet.address}`;
-    }, [debugWallet.address]);
+    const viewAllLink = '/positions';
 
+    const { symbol } = useTradeDataStore();
+
+    const filteredData = useMemo(() => {
+        switch (selectedFilter) {
+            case 'all':
+                return positions;
+            case 'active':
+                return positions.filter((fill) => fill.coin === symbol);
+            case 'long':
+                return positions.filter((fill) => fill.szi > 0);
+            case 'short':
+                return positions.filter((fill) => fill.szi < 0);
+        }
+
+        return positions;
+    }, [positions, selectedFilter]);
     return (
         <>
             <GenericTable
-                data={positions as PositionIF[]}
+                data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>
                         <PositionsTableHeader
                             sortBy={sortBy as PositionDataSortBy}
                             sortDirection={sortDirection}
-                            sortClickHandler={sortClickHandler}
+                            sortClickHandler={sortClickHandler as any}
                         />
                     </>
                 )}
@@ -52,7 +65,19 @@ export default function PositionsTable(props: PositionsTableProps) {
                         position={position as unknown as PositionIF}
                     />
                 )}
-                sorterMethod={sortUserFills}
+                sorterMethod={(
+                    positions: PositionIF[],
+                    sortBy: PositionDataSortBy,
+                    sortDirection: TableSortDirection,
+                    _ignoredMap?: Record<string, number>,
+                ) =>
+                    sortPositionData(
+                        positions,
+                        sortBy,
+                        sortDirection,
+                        coinPriceMap,
+                    )
+                }
                 isFetched={isFetched}
                 pageMode={pageMode}
                 viewAllLink={viewAllLink}

@@ -121,6 +121,7 @@ export interface PositionIF {
     cumFunding: CumulativeFundingIF;
     tp?: number;
     sl?: number;
+    side?: string;
 }
 
 export type PositionDataSortBy =
