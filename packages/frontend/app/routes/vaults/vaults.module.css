@@ -46,12 +46,12 @@
     align-items: flex-start;
     gap: 16px;
     align-self: stretch;
-    border-radius: var(--main-border-radius, 16px);
+    border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #0e0e14);
 }
 
 .searchContainer {
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #16161c);
     display: flex;
     width: 404px;

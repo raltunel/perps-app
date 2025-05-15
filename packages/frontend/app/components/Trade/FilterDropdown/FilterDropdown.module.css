@@ -48,7 +48,7 @@
     width: 68px;
     background: var(--bg-dark4, #1e1e24);
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     padding: 4px 0px;
     z-index: 100;

@@ -10,7 +10,7 @@
     align-items: center;
     justify-content: center;
     min-height: 100%;
-    padding: var(--main-padding);
+    padding: var(--padding-s);
     color: var(--text1);
     background-color: var(--bg-dark2);
     text-align: center;
@@ -20,7 +20,7 @@
     max-width: 500px;
     margin: 0 auto;
     padding: var(--header-link-gap);
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
     background-color: var(--bg-dark3);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
@@ -57,7 +57,7 @@
 
 .actions {
     display: flex;
-    gap: var(--main-border-radius);
+    gap: var(--radius-m);
     justify-content: center;
     flex-wrap: wrap;
 }
@@ -67,7 +67,7 @@
     background: linear-gradient(90deg, var(--accent1), var(--accent4));
     color: var(--text1);
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     font-size: var(--font-size-m);
     font-weight: var(--notFound-font-weight-medium);
     cursor: pointer;
@@ -84,7 +84,7 @@
     background-color: var(--bg-dark5);
     color: var(--text1);
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     font-size: var(--notFound-font-size-button);
     font-weight: var(--notFound-font-weight-medium);
     cursor: pointer;

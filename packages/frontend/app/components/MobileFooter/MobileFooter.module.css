@@ -11,8 +11,7 @@
     z-index: 100;
     background: var(--bg-dark2, #111117);
 
-    border-radius: var(--main-border-radius, 16px)
-        var(--main-border-radius, 16px) 0 0;
+    border-radius: var(--radius-m, 16px) var(--radius-m, 16px) 0 0;
 }
 
 .navItem {

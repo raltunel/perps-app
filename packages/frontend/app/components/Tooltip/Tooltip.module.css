@@ -14,7 +14,7 @@
     pointer-events: none;
     will-change: transform;
     min-width: 130px;
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
 
     font-size: var(--font-size-s, 12px);
 }

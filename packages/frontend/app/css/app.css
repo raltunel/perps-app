@@ -26,8 +26,8 @@
     height: 100%;
     overflow-y: auto;
     /* background: var(--bg-dark3); */
-    padding: 0px var(--main-padding, 8px) var(--main-padding, 8px)
-        var(--main-padding, 8px);
+    padding: 0px var(--padding-s, 8px) var(--padding-s, 8px)
+        var(--padding-s, 8px);
 }
 
 /* Simple styling examples for header/footer */
@@ -37,7 +37,7 @@
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    padding: 0px var(--main-padding);
+    padding: 0px var(--padding-s);
 }
 
 .header a {

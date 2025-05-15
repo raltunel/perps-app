@@ -116,7 +116,7 @@
     flex-direction: column;
     min-width: 500px;
     padding: 8px 16px 16px;
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
     color: var(--text1);
     gap: 16px;
     background-color: var(--bg-dark3);
@@ -173,7 +173,7 @@
     padding: var(--fee_table_row_padding);
     gap: var(--fee_table_col_gap);
     justify-items: start;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     font-size: var(--font-size-s);
     transition: background-color 0.3s ease-out;
 }

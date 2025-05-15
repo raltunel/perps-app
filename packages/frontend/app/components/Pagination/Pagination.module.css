@@ -4,7 +4,7 @@
     top: calc(100% + 0.5rem);
     right: 0;
     background-color: var(--bg-dark3);
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     padding: 8px;
     width: 100%;
     z-index: 10;

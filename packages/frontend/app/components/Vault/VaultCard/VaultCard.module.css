@@ -5,7 +5,7 @@
     align-items: center;
     gap: 16px;
 
-    border-radius: var(--main-border-radius, 16px);
+    border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #111117);
     width: 350px;
     height: 290px;
@@ -81,7 +81,7 @@
     padding: 8px;
     background: var(--bg-dark3);
 
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #1c1c22);
 }
 .depositContainer h6 {

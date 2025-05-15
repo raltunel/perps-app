@@ -5,7 +5,7 @@
     gap: 24px;
     color: var(--text1);
     background-color: var(--bg-dark3);
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
     user-select: none;
     -webkit-user-select: none;
 }
@@ -15,7 +15,7 @@
     padding: 4px 8px;
     background-color: var(--bg-dark4);
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     outline: none;
     color: var(--text1);
     caret-color: var(--text1);
@@ -33,7 +33,7 @@
     padding-top: 12px;
     padding-bottom: 12px;
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     font-size: var(--font-size-m);
     color: var(--text1);
 }

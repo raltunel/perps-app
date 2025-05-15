@@ -49,7 +49,7 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
 }
 
 .comboBoxOptionsWrapper > div {
@@ -85,7 +85,7 @@
 }
 .wsToggle,
 .sdkToggle {
-    padding: 0 var(--main-padding);
+    padding: 0 var(--padding-s);
 }
 .walletSelector {
     right: 38rem;
@@ -135,7 +135,7 @@
     justify-content: flex-start;
 
     background-color: var(--bg-dark2);
-    border-radius: var(--main-border-radius);
+    border-radius: var(--radius-m);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -143,5 +143,5 @@
     gap: var(--gap-s);
     z-index: 9;
     font-size: var(--font-size-s) !important;
-    padding: 0 var(--main-padding);
+    padding: 0 var(--padding-s);
 }

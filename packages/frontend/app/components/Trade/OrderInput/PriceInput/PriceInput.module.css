@@ -3,7 +3,7 @@
     padding: 4px 8px;
     align-items: center;
     align-self: stretch;
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #1c1c22);
     font-size: var(--Font-Size-Font-S, 12px);
     height: 32px;

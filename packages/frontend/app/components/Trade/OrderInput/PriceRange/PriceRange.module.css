@@ -25,7 +25,7 @@
     justify-content: space-between;
     align-items: center;
 
-    border-radius: var(--half-border-radius, 8px);
+    border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #1c1c22);
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
