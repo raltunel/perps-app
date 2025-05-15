@@ -3,14 +3,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: var(--main-gap);
+    gap: var(--gap-s);
     position: absolute;
     top: 30px;
     right: 0;
     width: 278px;
     padding: 16px;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark3, #16161c);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark3, #16161c);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
     transition:
@@ -23,7 +23,7 @@
     height: auto;
     visibility: visible;
     pointer-events: auto;
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 
 .viewMoreButton {

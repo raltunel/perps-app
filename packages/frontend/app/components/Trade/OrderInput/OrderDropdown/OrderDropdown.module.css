@@ -11,7 +11,7 @@
     padding: 0px 4px 0px 8px;
     align-items: center;
     justify-content: space-between;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     border-radius: 8px;
     border: none;
     color: var(--text1, #f0f0f8);
@@ -48,7 +48,7 @@
     width: 100%;
     margin-top: 4px;
     padding: 0;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     border-radius: 4px;
     list-style: none;
     z-index: 10;
@@ -76,7 +76,7 @@
 
 .dropdownItem:hover {
     color: var(--text1);
-    background: var(--dark2);
+    background: var(--bg-dark2);
 }
 
 .noOptions {
