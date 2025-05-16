@@ -1,6 +1,28 @@
 .chartWrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+    display: grid;
+    grid-template-rows: 90% 10%;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 900px;
     height: 100%;
+}
+
+.chartContainer {
+    display: grid;
+    grid-template-columns: 5% 95%;
+
+    height: 300px;
+    width: 100%;
+}
+
+.xAxisContainer {
+    padding-left: 40px;
+}
+
+.tick text {
+    fill: #3333cc; /* blue text */
+    font-size: 14px; /* larger font */
+    font-weight: bold;
 }

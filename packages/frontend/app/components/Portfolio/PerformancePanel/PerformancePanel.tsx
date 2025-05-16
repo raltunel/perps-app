@@ -4,6 +4,7 @@ import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
 import PerformanceLineChart from './PerformanceChart/PerformanceLineChart';
+import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -66,8 +67,9 @@ export default function PerformancePanel() {
             <div className={styles.performanceContainer}>
                 <MetricsDisplay />
                 <motion.div {...animationConfig} className={styles.perfChart}>
+                    <PortfolioChartHeader />
                     {activeTab === 'Performance' && <PerformanceLineChart />}
-                    {activeTab === 'Account Value' && <CollateralPieChart />}
+                    {activeTab === 'Account Value' && <PerformanceLineChart />}
                     {activeTab === 'Collateral' && <CollateralPieChart />}
 
                     {/* {activeTab.toLowerCase()} */}
