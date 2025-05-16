@@ -45,7 +45,7 @@
     justify-content: flex-start;
     align-items: flex-end;
     left: 0;
-    padding: 16px 0;
+    padding: var(--padding-m) 0;
 }
 .confirmButton {
     width: 100%;
@@ -53,7 +53,7 @@
     border: none;
 
     display: flex;
-    padding: 12px 16px;
+    padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;

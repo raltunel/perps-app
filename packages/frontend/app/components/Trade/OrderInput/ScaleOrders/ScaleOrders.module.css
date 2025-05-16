@@ -6,7 +6,6 @@
     --dropdown-width: 110px;
     --scale-order-height: 330px;
     --order-row-height: 25px;
-    --button-height: 47px;
 
     width: 100%;
     min-height: var(--container-height);
@@ -31,7 +30,7 @@
     display: grid;
     /* based on figma design of 223px on 391px */
     grid-template-columns: 57% 43%;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .totalOrdersInput {

@@ -22,14 +22,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 16px;
+    padding: var(--padding-m);
 }
 .sectionWithButton button {
     outline: none;
     border: none;
     display: flex;
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;
