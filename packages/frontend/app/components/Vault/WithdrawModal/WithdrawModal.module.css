@@ -73,7 +73,7 @@
     align-items: flex-start;
     gap: 8px;
     align-self: stretch;
-    padding: 8px;
+    padding: var(--padding-s);
     border-radius: var(--radius-s, 8px);
     border: 1px solid var(--bg-dark4, #27272c);
 }

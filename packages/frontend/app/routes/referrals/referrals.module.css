@@ -90,7 +90,7 @@
     }
 
     .detailsContent {
-        padding: 8px 0;
+        padding: var(--padding-s) 0;
     }
 
     .detailsContent h6 {

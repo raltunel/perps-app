@@ -109,7 +109,7 @@
 .actionsContainer {
     grid-column: 1 / -1;
     display: flex;
-    padding: 8px;
+    padding: var(--padding-s);
     position: absolute;
     bottom: 0;
     left: 0;

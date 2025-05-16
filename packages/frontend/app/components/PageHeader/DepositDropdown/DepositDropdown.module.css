@@ -80,7 +80,7 @@
 }
 .overviewContainer {
     display: flex;
-    padding: 8px;
+    padding: var(--padding-s);
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;

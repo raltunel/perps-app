@@ -103,7 +103,7 @@
 .custom_text > textarea {
     height: 160px;
     width: 240px;
-    padding: 8px;
+    padding: var(--padding-s);
     color: var(--white);
     background-color: var(--bg-dark4);
     border: none;

@@ -80,7 +80,7 @@
 }
 
 .noOptions {
-    padding: 8px;
+    padding: var(--padding-s);
     text-align: center;
     color: var(---text2, #bcbcc4);
     font-size: var(--Font-Size-Font-S, 12px);
