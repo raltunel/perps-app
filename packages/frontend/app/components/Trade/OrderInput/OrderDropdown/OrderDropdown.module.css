@@ -8,7 +8,7 @@
 .dropdownToggle {
     display: flex;
     height: 100%;
-    padding: 0px 4px 0px 8px;
+    padding: var(--padding-dropdown);
     align-items: center;
     justify-content: space-between;
     background: var(--bg-dark3, #1c1c22);

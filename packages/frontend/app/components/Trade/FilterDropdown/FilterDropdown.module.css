@@ -15,7 +15,7 @@
     color: var(--text1);
     font-size: var(--font-size-s, 12px);
     gap: 8px;
-    padding: 0px 4px 0px 8px;
+    padding: var(--padding-dropdown);
     width: 68px;
     cursor: pointer;
     transition: all 0.2s ease;
