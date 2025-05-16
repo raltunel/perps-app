@@ -1,29 +1,211 @@
-import { useMemo } from 'react';
-import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
-import type { Route } from '../../+types/root';
+// Optimized Hero Section
+import { type CSSProperties, type JSX } from 'react';
+import { Link, useNavigation } from 'react-router';
 import styles from './home.module.css';
 
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
+import { motion } from 'framer-motion';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import btcImage from '../../assets/tokens/btc.svg';
+import daiImage from '../../assets/tokens/dai.svg';
+import ethImage from '../../assets/tokens/eth.svg';
+import usdtImage from '../../assets/tokens/usdt.svg';
+
+interface FloatingTokenProps {
+    src: string;
+    size?: number;
+    top?: string;
+    left?: string;
+    duration?: number;
+    delay?: number;
+    direction?: number;
 }
 
-export default function Home() {
-    const title = useMemo(() => `Ambient`, []);
-
-    const ogImage = useMemo(
-        () =>
-            `https://ogcdn.net/da4a0656-0565-4e39-bf07-21693b0e75f4/v1/BTC%20%2F%20USD/%23000000/Trade%20BTC%20Futures%20on%20Ambient/Trade%20Now/rgba(78%2C%2059%2C%20193%2C%201)/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fimages%2Ff4b4ae96-8d00-4542-be9a-aa88baa20b71.png%3Ftoken%3Dr8QAtZP22dg8D9xO49yyukxsP6vMYppjw5a1t-5PE1M%26height%3D500%26width%3D500%26expires%3D33280645642/rgba(82%2C%2071%2C%20179%2C%201)/linear-gradient(120deg%2C%20rgba(255%2C255%2C255%2C1)%2027%25%2C%20RGBA(62%2C%2051%2C%20147%2C%201)%2086%25)/https%3A%2F%2Fopengraph.b-cdn.net%2Fproduction%2Fimages%2F97217047-4d16-43c6-82d9-00def7bf6631.png%3Ftoken%3DpnvvvLULvCnOD2vp4i4ifsuEqIzLf8Q-TyveG-a3eQw%26height%3D510%26width%3D684%26expires%3D33280645584/og.png`,
-        [],
-    );
+function FloatingBgToken({
+    src,
+    size = 90,
+    top = '50%',
+    left = '50%',
+    duration = 60,
+    delay = 0,
+    direction = 1,
+}: FloatingTokenProps): JSX.Element {
     return (
-        <>
-            <title>{title}</title>
-            <meta property='og:image' content={ogImage} />
+        <div
+            className={styles.floatingToken}
+            style={
+                {
+                    position: 'absolute',
+                    top,
+                    left,
+                    width: size,
+                    height: size,
+                    opacity: 0.06,
+                    zIndex: 4,
+                    filter: 'blur(1px)',
+                    pointerEvents: 'none',
+                    animationDuration: `${duration}s`,
+                    animationDelay: `${delay}s`,
+                    animationDirection: direction === 1 ? 'normal' : 'reverse',
+                } as CSSProperties
+            }
+        >
+            <img src={src} alt='token-bg' width={size} height={size} />
+        </div>
+    );
+}
 
-            <div className={styles.container}>
-                <ButtonShowcase />
-                <div style={{ padding: '100px' }}></div>
-            </div>
-        </>
+// Token data interface and definition
+interface TokenData {
+    src: string;
+    size: number;
+    top: string;
+    left: string;
+    duration: number;
+    delay: number;
+    direction: number;
+}
+
+const tokenData: TokenData[] = [
+    {
+        src: btcImage,
+        size: 100,
+        top: '5%',
+        left: '-10%',
+        duration: 90,
+        delay: 0,
+        direction: 1,
+    },
+    {
+        src: ethImage,
+        size: 90,
+        top: '65%',
+        left: '-15%',
+        duration: 60,
+        delay: 3,
+        direction: -1,
+    },
+    {
+        src: usdtImage,
+        size: 130,
+        top: '85%',
+        left: '-10%',
+        duration: 60,
+        delay: 5,
+        direction: 1,
+    },
+    {
+        src: daiImage,
+        size: 95,
+        top: '30%',
+        left: '-12%',
+        duration: 60,
+        delay: 7,
+        direction: -1,
+    },
+    {
+        src: ethImage,
+        size: 85,
+        top: '20%',
+        left: '-5%',
+        duration: 60,
+        delay: 1.5,
+        direction: 1,
+    },
+];
+
+export function meta() {
+    return [
+        { title: 'Home | Ambient' },
+        { name: 'description', content: 'Trade Perps with Ambient' },
+    ];
+}
+
+export default function Home(): JSX.Element {
+    // const [hasVisited, setHasVisited] = useState(false);
+
+    // useEffect(() => {
+    //     try {
+    //         const visited = sessionStorage.getItem('hasVisitedHome') === 'true';
+    //         setHasVisited(visited);
+
+    //         if (!visited) {
+    //             sessionStorage.setItem('hasVisitedHome', 'true');
+    //         }
+    //     } catch (e) {
+    //         console.error('Session storage error:', e);
+    //     }
+    // }, []);
+
+    const navigation = useNavigation();
+
+    const { symbol } = useTradeDataStore();
+
+    function TradeButton({ symbol }: { symbol: string }) {
+        const isNavigating = navigation.state !== 'idle';
+
+        return (
+            <Link
+                to={`/trade/${symbol}`}
+                className={styles.primary}
+                viewTransition
+            >
+                {isNavigating ? 'Loading...' : 'Start Trading'}
+            </Link>
+        );
+    }
+
+    return (
+        <section className={styles.hero}>
+            <div className={styles.ambientGlow} />
+            <div className={styles.sweepLight} />
+
+            {tokenData.map((token, index) => (
+                <FloatingBgToken
+                    key={`token-${index}`}
+                    src={token.src}
+                    size={token.size}
+                    top={token.top}
+                    left={token.left}
+                    duration={token.duration}
+                    delay={token.delay}
+                    direction={token.direction}
+                />
+            ))}
+
+            <motion.div
+                className={styles.left}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+            >
+                <h1>Trade Perps With Ambient</h1>
+                <p>Fast execution. Zero taker fees. Up to 100x leverage.</p>
+                <div className={styles.buttons}>
+                    <TradeButton symbol={symbol} />
+                    <button className={styles.secondary}>Learn More</button>
+                </div>
+            </motion.div>
+
+            <motion.div
+                className={styles.right}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
+            >
+                <div className={styles.mockupGlow} />
+                <div className={styles.mockupContainer}>
+                    <Link to={`/trade/${symbol}`} viewTransition>
+                        <img
+                            src='/images/mockup.png'
+                            alt='Perps App'
+                            className={styles.mockup}
+                            width='600'
+                            height='400'
+                            loading='eager'
+                        />
+                    </Link>
+                </div>
+            </motion.div>
+        </section>
     );
 }

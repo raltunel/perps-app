@@ -3,7 +3,6 @@
     user-select: none;
     display: inline-block;
     height: auto !important;
-    
 }
 
 .comboBoxContainer > div {
@@ -15,7 +14,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem;
-   
+
     cursor: pointer;
 }
 
@@ -31,7 +30,7 @@
 }
 
 .comboBoxIcon {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     transform: rotate(0deg);
 }
 
@@ -40,7 +39,7 @@
 }
 
 .comboBoxOptionsWrapper {
-    background: var(--dark4);
+    background: var(--bg-dark4);
     position: absolute;
     top: 100%;
     left: 0;
@@ -50,16 +49,16 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    border-radius: 0.25rem;
+    border-radius: var(--radius-s);
 }
 
 .comboBoxOptionsWrapper > div {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     padding: 0.25rem;
 }
 
 .comboBoxOptionsWrapper > div:hover {
-    background: var(--dark3);
+    background: var(--bg-dark3);
 }
 
 .comboBoxOptionSelected {
@@ -77,19 +76,17 @@
 .sdkToggle,
 .currencySelector {
     user-select: none;
-    /* position: fixed; */
-    /* top: 1rem;
-    right: 20rem; */
     font-size: var(--font-size-s);
     z-index: 2;
-    font-family: var(--font-family-main);
-    background-color: var(--dark2);
-    border-radius: 4px ;
- 
-    border: 1px solid var(--dark3);
-    padding: 0 8px;
-}
+    background-color: var(--bg-dark2);
+    border-radius: 4px;
 
+    border: 1px solid var(--bg-dark3);
+}
+.wsToggle,
+.sdkToggle {
+    padding: 0 var(--padding-s);
+}
 .walletSelector {
     right: 38rem;
 }
@@ -133,21 +130,18 @@
     color: var(--red);
 }
 
-
-.comboBoxContainers{
+.comboBoxContainers {
     width: 100%;
     justify-content: flex-start;
-   
-    background-color: var(--dark2);
-    border-radius: var(--main-border-radius);
+
+    background-color: var(--bg-dark2);
+    border-radius: var(--radius-m);
     display: flex;
     flex-direction: row;
     align-items: center;
     height: 100%;
-    gap: 8px;
+    gap: var(--gap-s);
     z-index: 9;
     font-size: var(--font-size-s) !important;
-    padding: 0 2rem;
-   
-   
+    padding: 0 var(--padding-s);
 }

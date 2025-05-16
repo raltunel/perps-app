@@ -81,11 +81,7 @@ export const wsEnvironments = [
 
 export const debugWallets: DebugWallet[] = [
     {
-        label: 'Crazy 2',
-        address: '0x023a3d058020fb76cca98f01b3c48c8938a22355',
-    },
-    {
-        label: 'Benjamin Hyper',
+        label: 'benjamin',
         address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     },
     {
@@ -96,7 +92,10 @@ export const debugWallets: DebugWallet[] = [
 
 export const OrderHistoryLimits = {
     MAX: 1000,
-    RENDERED: 50,
+};
+
+export const TradeHistoryLimits = {
+    MAX: 1000,
 };
 
 export * from './feeSchedule';
@@ -114,4 +113,6 @@ export enum WsChannels {
     ACTIVE_COIN_DATA = 'activeAssetCtx',
     NOTIFICATION = 'notification',
     CANDLE = 'candle',
+    TWAP_HISTORY = 'userTwapHistory',
+    TWAP_SLICE_FILLS = 'userTwapSliceFills',
 }

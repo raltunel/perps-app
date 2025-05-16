@@ -1,106 +1,89 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import Pagination from '~/components/Pagination/Pagination';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { TableState } from '~/utils/CommonIFs';
+import { WsChannels } from '~/utils/Constants';
 import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
+import { useDebugStore } from '~/stores/DebugStore';
+import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 interface PositionsTableProps {
     pageMode?: boolean;
+    isFetched: boolean;
+    selectedFilter?: string;
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
-    const { pageMode } = props;
-    const navigate = useNavigate();
+    const { pageMode, isFetched, selectedFilter } = props;
+    const { coinPriceMap } = useTradeDataStore();
+    const { positions, fetchedChannels } = useTradeDataStore();
 
-    const handleViewAll = () => {
-        navigate(`/positions`);
-    };
+    const { debugWallet } = useDebugStore();
 
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(20);
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
 
-    const { positions, webDataFetched } = useTradeDataStore();
-    const limit = 10;
+    const viewAllLink = '/positions';
 
-    const positionsToShow = useMemo(() => {
-        if (pageMode) {
-            return positions.slice(
-                page * rowsPerPage,
-                (page + 1) * rowsPerPage,
-            );
+    const { symbol } = useTradeDataStore();
+
+    const filteredData = useMemo(() => {
+        switch (selectedFilter) {
+            case 'all':
+                return positions;
+            case 'active':
+                return positions.filter((fill) => fill.coin === symbol);
+            case 'long':
+                return positions.filter((fill) => fill.szi > 0);
+            case 'short':
+                return positions.filter((fill) => fill.szi < 0);
         }
-        return positions.slice(0, limit);
-    }, [positions, page, rowsPerPage, pageMode]);
 
-    useEffect(() => {
-        if (webDataFetched) {
-            if (positionsToShow.length > 0) {
-                setTableState(TableState.FILLED);
-            } else {
-                setTableState(TableState.EMPTY);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [positionsToShow, webDataFetched]);
-
+        return positions;
+    }, [positions, selectedFilter]);
     return (
-        <div className={styles.tableWrapper}>
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={7}
-                    colRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
-                />
-            ) : (
-                <>
-                    <PositionsTableHeader />
-                    <div className={styles.tableBody}>
-                        {tableState === TableState.FILLED && (
-                            <>
-                                {positionsToShow.map((position, index) => (
-                                    <PositionsTableRow
-                                        key={`position-${index}`}
-                                        position={position}
-                                    />
-                                ))}
-                                {positions.length > limit && !pageMode && (
-                                    <a
-                                        href='#'
-                                        className={styles.viewAllLink}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleViewAll();
-                                        }}
-                                    >
-                                        View All
-                                    </a>
-                                )}
-
-                                {pageMode && (
-                                    <>
-                                        <Pagination
-                                            totalCount={positions.length}
-                                            onPageChange={setPage}
-                                            rowsPerPage={rowsPerPage}
-                                            onRowsPerPageChange={setRowsPerPage}
-                                        />
-                                    </>
-                                )}
-                            </>
-                        )}
-
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-                    </div>
-                </>
-            )}
-        </div>
+        <>
+            <GenericTable
+                data={filteredData as any}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                    <>
+                        <PositionsTableHeader
+                            sortBy={sortBy as PositionDataSortBy}
+                            sortDirection={sortDirection}
+                            sortClickHandler={sortClickHandler as any}
+                        />
+                    </>
+                )}
+                renderRow={(position, index) => (
+                    <PositionsTableRow
+                        key={`position-${index}`}
+                        position={position as unknown as PositionIF}
+                    />
+                )}
+                sorterMethod={(
+                    positions: PositionIF[],
+                    sortBy: PositionDataSortBy,
+                    sortDirection: TableSortDirection,
+                    _ignoredMap?: Record<string, number>,
+                ) =>
+                    sortPositionData(
+                        positions,
+                        sortBy,
+                        sortDirection,
+                        coinPriceMap,
+                    )
+                }
+                isFetched={isFetched}
+                pageMode={pageMode}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+            />
+        </>
     );
 }

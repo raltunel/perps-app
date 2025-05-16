@@ -16,6 +16,7 @@ import {
 } from '~/routes/chart/data/utils/chartStorage';
 import {
     checkDefaultColors,
+    customThemes,
     getChartDefaultColors,
     getChartThemeColors,
     priceFormatterFactory,
@@ -27,6 +28,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
     widget,
+    type IBasicDataFeed,
     type IChartingLibraryWidget,
     type ResolutionString,
     type TradingTerminalFeatureset,
@@ -34,10 +36,12 @@ import {
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
+    isChartReady: boolean;
 }
 
 export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
+    isChartReady: false,
 });
 
 export interface ChartContainerProps {
@@ -65,6 +69,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
     const { debugWallet } = useDebugStore();
+
+    const [isChartReady, setIsChartReady] = useState(false);
 
     const { showBuysSellsOnChart } = useAppOptions();
 
@@ -126,6 +132,16 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
+        if (!isChartReady && chart) {
+            const intervalId = setInterval(() => {
+                const isReady = chart.chart().dataReady();
+                setIsChartReady(isReady);
+            }, 200);
+            return () => clearInterval(intervalId);
+        }
+    }, [chart, isChartReady]);
+
+    useEffect(() => {
         if (chart) {
             chart.subscribe('series_properties_changed', () => {
                 const activeColors = getChartDefaultColors();
@@ -154,7 +170,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     // ... finishes initialization
     useEffect(() => {
         const isCustomized = checkDefaultColors();
-        isCustomized || changeColors(getBsColor());
+        if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
     useEffect(() => {
@@ -167,7 +183,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: symbol,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(info) as any,
+            datafeed: createDataFeed(info) as IBasicDataFeed,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -184,6 +200,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             },
             locale: 'en',
             theme: 'dark',
+            custom_themes: customThemes(),
             overrides: {
                 volumePaneSize: 'medium',
             },
@@ -223,6 +240,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 const priceScale = tvWidget
                     .activeChart()
                     .getPanes()
+                    // eslint-disable-next-line no-unexpected-multiline
                     [volumePaneIndex].getMainSourcePriceScale();
 
                 if (priceScale) {
@@ -246,6 +264,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (chart) {
+            setIsChartReady(false);
             const chartRef = chart.chart();
             chartRef.setSymbol(symbol);
             saveChartLayout(chart);
@@ -253,10 +272,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [symbol]);
 
     useEffect(() => {
+        setIsChartReady(false);
+    }, [debugWallet]);
+
+    useEffect(() => {
         if (!chart) return;
         drawingEvent(chart);
         studyEvents(chart);
-        intervalChangedSubscribe(chart);
+        intervalChangedSubscribe(chart, setIsChartReady);
     }, [chart]);
 
     useEffect(() => {
@@ -278,7 +301,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [showBuysSellsOnChart]);
 
     return (
-        <TradingViewContext.Provider value={{ chart }}>
+        <TradingViewContext.Provider value={{ chart, isChartReady }}>
             {children}
         </TradingViewContext.Provider>
     );

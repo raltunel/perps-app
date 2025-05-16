@@ -5,7 +5,10 @@
     justify-content: center;
     width: 100%;
     font-size: 0.8rem;
-    font-family: var(--font-family-main);
+}
+
+.orderBookSectionContainer {
+    width: 100%;
 }
 
 .orderBookSectionHeader {

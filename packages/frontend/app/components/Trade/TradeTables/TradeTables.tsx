@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -13,22 +14,16 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
-
+import { Pages, usePage } from '~/hooks/usePage';
 export interface FilterOption {
     id: string;
     label: string;
 }
 
-const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
+const tradePageBlackListTabs = new Set([
     'Funding History',
-    'Order History',
     'Deposits and Withdrawals',
-];
+]);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -41,10 +36,52 @@ export default function TradeTable() {
         selectedTradeTab,
         setSelectedTradeTab,
         orderHistory,
-        orderHistoryFetched,
+        fetchedChannels,
+        userFills,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { page } = usePage();
+
+    const tabs = useMemo(() => {
+        if (!page) return [];
+
+        let availableTabs = [
+            'Balances',
+            'Positions',
+            'Open Orders',
+            'TWAP',
+            'Trade History',
+            'Funding History',
+            'Order History',
+            'Deposits and Withdrawals',
+        ];
+
+        if (page === Pages.TRADE) {
+            return availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        }
+        return availableTabs;
+    }, [page]);
+
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        }
+    }, [page]);
+
+    const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
+        return {
+            orderHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_HISTORICAL_ORDERS,
+            ),
+            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+        };
+    }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -87,13 +124,23 @@ export default function TradeTable() {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
-                return <PositionsTable />;
+                return (
+                    <PositionsTable
+                        isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
-                return <TwapTable />;
+                return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
-                return <TradeHistoryTable />;
+                return (
+                    <TradeHistoryTable
+                        data={userFills}
+                        isFetched={tradeHistoryFetched}
+                    />
+                );
             case 'Funding History':
                 return <FundingHistoryTable />;
             case 'Order History':
@@ -118,7 +165,7 @@ export default function TradeTable() {
     return (
         <div className={styles.tradeTableWrapper}>
             <Tabs
-                tabs={availableTabs}
+                tabs={tabs}
                 defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}

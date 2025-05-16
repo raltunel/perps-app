@@ -66,4 +66,4 @@ export const feeSchedules: feeSchedulesIF = {
             maker: '-0.003%',
         },
     ],
-}
+};
