@@ -1,51 +1,54 @@
 .container {
+    --container-min-width: 300px;
+    --container-width: 350px;
+    --container-height: 290px;
+    --logo-width-height: 60px;
+    --logo-padding: 7.5px;
+    --apr-display-width: 50px;
+
     display: flex;
-    padding: 16px;
+    padding: var(--padding-m);
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-
-    border-radius: var(--radius-m, 16px);
+    gap: var(--gap-m);
+    border-radius: var(--radius-m);
     background: var(--bg-dark2, #111117);
-    width: 350px;
-    height: 290px;
-
-    flex: 1 1 350px; /* Grow, shrink, and basis */
-    min-width: 300px;
-    max-width: 450px;
+    width: var(--container-width);
+    height: var(--container-height);
+    flex: 1 1 var(--container-width); /* Grow, shrink, and basis */
 }
 .headerContainer {
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 14px;
+    gap: var(--gap-m);
 }
 .headerTextContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start;
-    gap: 4px;
+    gap: var(--gap-xs);
     flex: 1 0 0;
 }
 .headerTextContainer h3 {
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-l, 24px);
+    font-size: var(--font-size-l);
 }
 .headerTextContainer h6 {
     color: var(--text2, #bcbcc4);
-    font-size: var(--font-szie-s, 12px);
+    font-size: var(--font-size-s);
 }
 .perpsMarkLogo {
     display: flex;
-    width: 45px;
-    height: 45px;
-    padding: 3.75px;
+    width: var(--logo-width-height);
+    height: var(--logo-width-height);
+    padding: var(--logo-padding);
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    border-radius: 45px;
+    border-radius: 50%;
     background: #000;
 }
 
@@ -57,36 +60,35 @@
 .detailsContainer {
     width: 100%;
     display: grid;
-    grid-template-columns: 50px 1fr 1fr;
+    grid-template-columns: var(--apr-display-width) 1fr 1fr;
     gap: auto;
 }
 .detailsItem {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .detailsItem h4 {
-    font-size: var(--font-size-xs, 10px);
+    font-size: var(--font-size-xs);
     color: var(--text2, #bcbcc4);
 }
 .detailsItem h5 {
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
     color: var(--text1, #f0f0f8);
 }
 .depositContainer {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
     padding: var(--padding-s);
     background: var(--bg-dark3);
-
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     background: var(--bg-dark3, #1c1c22);
 }
 .depositContainer h6 {
-    font-size: var(--font-size-xs, 10px);
-    color: var(--text2, #bcbcc4);
+    font-size: var(--font-size-xs);
+    color: var(--text2);
 }
 .depositContainer input {
     width: 100%;
@@ -101,19 +103,19 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .buttonContainer button {
     width: 100%;
     display: flex;
-    height: 47px;
-    padding: 12px 16px;
+    height: var(--button-height);
+    padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;
     flex: 1 0 0;
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m, 18px);
+    font-size: var(--font-size-m);
     outline: none;
     border: none;
     border-radius: 8px;
@@ -141,6 +143,6 @@
 @media (min-width: 481px) and (max-width: 1024px) {
     .vaultCard {
         flex-basis: calc(50% - 24px);
-        min-width: 300px;
+        min-width: var(--container-min-width);
     }
 }
