@@ -5,7 +5,7 @@
     align-items: flex-start;
     gap: 8px;
     flex-shrink: 0;
-    padding: 8px 16px 16px 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
 }
 
 .container header {

@@ -1,7 +1,7 @@
 .create_sub_account_modal {
     display: flex;
     flex-direction: column;
-    padding: 8px 16px 16px 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     gap: 24px;
     color: var(--text1);
     background-color: var(--bg-dark3);

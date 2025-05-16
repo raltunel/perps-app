@@ -70,7 +70,7 @@
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
     gap: 12px;
-    padding: 8px 16px;
+    padding: var(--padding-s) var(--padding-m);
     height: 40px;
     border-top: 1px solid var(--bg-dark3, #1c1c22);
     flex-shrink: 0;
