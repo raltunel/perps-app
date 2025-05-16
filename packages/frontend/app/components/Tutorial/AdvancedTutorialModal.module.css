@@ -67,7 +67,7 @@
 .stepIndicator {
     background-color: #2a2a3e;
     color: #fff;
-    padding: 4px 8px;
+    padding: var(--padding-xs) var(--padding-s);
     border-radius: 4px;
     font-size: 12px;
     margin-right: 8px;

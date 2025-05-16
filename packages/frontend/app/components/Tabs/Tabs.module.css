@@ -33,7 +33,7 @@
 }
 
 .tab {
-    padding: 4px 16px;
+    padding: var(--padding-xs) var(--padding-m) px;
     background: transparent;
     border: none;
     cursor: pointer;

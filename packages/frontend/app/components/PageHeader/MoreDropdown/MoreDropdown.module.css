@@ -8,7 +8,7 @@
     width: 197px;
     height: auto;
     display: flex;
-    padding: 4px 8px;
+    padding: var(--padding-xs) var(--padding-s);
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;

@@ -1,25 +1,34 @@
 .scaleOrdersContainer {
+    --container-height: 391px;
+    --total-order-height: 25px;
+    --quantity-button-height: 25px;
+    --dropdown-icon-height-wdith: 24px;
+    --dropdown-width: 110px;
+    --scale-order-height: 330px;
+    --order-row-height: 25px;
+    --button-height: 47px;
+
     width: 100%;
-    min-height: 391px;
+    min-height: var(--container-height);
 
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     border-radius: var(--radius-m, 16px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 .scaleOrdersContent {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .totalOrdersSection {
     width: calc(100% - 8px);
-    height: 25px;
+    height: var(--total-order-height);
     display: grid;
     /* based on figma design of 223px on 391px */
     grid-template-columns: 57% 43%;
@@ -30,7 +39,7 @@
     width: 100%;
     display: flex;
     height: 100%;
-    padding: 0px 8px;
+    padding: 0px var(--padding-s);
     justify-content: space-between;
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark4, #27272c);
@@ -44,15 +53,15 @@
     width: 100%;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: var(--gap-s);
     height: 100%;
 }
 
 .quantityButton {
     display: flex;
     width: 100%;
-    height: 25px;
-    padding: 1px 8px;
+    height: var(--quantity-button-height);
+    padding: 1px var(--padding-s);
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -77,9 +86,9 @@
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: var(--gap-s);
     align-items: center;
-    padding: 0 8px 0 8px;
+    padding: 0 var(--padding-s) 0 var(--padding-s);
 }
 
 .priceHeader,
@@ -90,7 +99,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     color: var(--text1, #f0f0f8) !important;
     font-size: var(--font-size-s, 12px) !important;
 }
@@ -99,15 +108,15 @@
     display: flex;
     align-items: center;
     cursor: pointer;
-    margin-left: 8px;
+    margin-left: var(--margin-s);
 }
 
 .flatIcon,
 .increasingIcon,
 .decreasingIcon,
 .dropdownIcon {
-    width: 24px;
-    height: 24px;
+    width: var(--dropdown-icon-height-wdith);
+    height: var(--dropdown-icon-height-wdith);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -133,14 +142,14 @@
     top: 100%;
     left: 0;
     width: 100%;
-    min-width: 110px;
+    min-width: var(--dropdown-width);
     z-index: 10;
     display: flex;
 
-    padding: 4px 0px;
+    padding: var(--padding-xs) 0px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: var(--gap-xs);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark5, #323237);
 }
@@ -148,10 +157,10 @@
 .dropdownItem {
     width: 100%;
     display: flex;
-    height: 25px;
-    padding: 0px 8px;
+    height: var(--quantity-button-height);
+    padding: 0px var(--padding-s);
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     flex-shrink: 0;
     /* border-radius: var(--radius-s, 8px); */
     color: var(--text2);
@@ -169,21 +178,21 @@
     display: flex;
     justify-content: end;
     color: var(--text1, #f0f0f8);
-    /* padding: 0 8px; */
 }
 
 .orderList {
+    background-color: yellow;
     width: 100%;
-    height: 330px;
+    height: var(--scale-order-height);
     overflow-y: auto;
     /* scrollbar-gutter: stable; */
     scrollbar-width: thin;
     scrollbar-color: var(--accent1) transparent;
 
-    margin-bottom: 15px;
+    margin-bottom: var(--margin-m);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .orderList::-webkit-scrollbar {
@@ -196,27 +205,27 @@
 
 .orderList::-webkit-scrollbar-thumb {
     background-color: var(--accent1);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 }
 
 .orderRow {
     width: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    height: 25px;
+    gap: var(--gap-s);
+    height: var(--order-row-height);
 }
 
 .orderRow input {
     width: 100%;
     height: 100%;
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     background: var(--bg-dark4, #27272c);
     display: flex;
-    padding: 0px 8px;
+    padding: 0px var(--padding-s);
     justify-content: space-between;
     align-items: center;
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
     color: var(--text1);
     outline: none;
     border: 1px solid transparent;
@@ -226,13 +235,13 @@
 }
 
 .ratioCell {
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
     background: var(--bg-dark4, #27272c);
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
 }
 .ratioCell:focus {
     border: 1px solid transparent !important;
@@ -244,10 +253,10 @@
 .priceInput,
 .ratioCell,
 .quantityInput {
-    height: 25px !important;
+    height: var(--order-row-height) !important;
 }
 .percentSign {
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
     color: var(--text1);
 }
 
@@ -256,37 +265,37 @@
 }
 
 .errorMessage {
-    color: var(--red, #ef5350);
-    font-size: var(--font-size-s, 12px);
+    color: var(--red);
+    font-size: var(--font-size-s);
 }
 .optionHeader {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 
 .actions {
     display: flex;
     justify-content: space-between;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .actions button {
-    height: 47px;
+    height: var(--button-height);
     border: none;
     outline: none;
     display: flex;
-    padding: 12px 16px;
+    padding: 12px var(--padding-m);
     flex-direction: column;
     justify-content: center;
     align-items: center;
     flex: 1 0 0;
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
 
     color: var(--text1, #f0f0f8);
 
-    font-size: var(--font-size-m, 18px);
+    font-size: var(--font-size-m);
     transition: all var(--ease-in-out-med);
 }
 
