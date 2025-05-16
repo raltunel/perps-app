@@ -29,7 +29,7 @@
     flex-grow: 1;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
-    padding-bottom: 2px;
+    padding-bottom: 1px;
     gap: var(--gap-xs);
     position: relative;
 }

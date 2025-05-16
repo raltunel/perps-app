@@ -30,8 +30,8 @@
 .modal_buttons > button {
     width: 200px;
     gap: 8px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: var(--padding-m);
+    padding-bottom: var(--padding-m);
     border: none;
     border-radius: var(--radius-s);
     font-size: var(--font-size-m);

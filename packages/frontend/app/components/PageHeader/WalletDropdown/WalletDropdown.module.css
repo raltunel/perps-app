@@ -17,7 +17,7 @@
     padding: var(--padding-m) var(--padding-s);
     border-radius: var(--radius-m);
     background: var(--bg-dark3, #16161c);
-    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--dropdown-box-shadow);
 
     height: 0;
     opacity: 0;

@@ -54,7 +54,7 @@
     flex-direction: column;
 
     gap: 4px;
-    padding-bottom: 8px;
+    padding-bottom: var(--padding-s);
 }
 
 .tokenLeft {

@@ -199,7 +199,7 @@
 /* Fallback for browsers that don't support env() */
 @supports not (padding-bottom: env(safe-area-inset-bottom)) {
     .bottomSheet {
-        padding-bottom: 16px;
+        padding-bottom: var(--padding-m);
     }
 
     .safeAreaSpacer {

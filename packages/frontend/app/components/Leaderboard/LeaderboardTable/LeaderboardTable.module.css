@@ -37,7 +37,7 @@
 .tableBody {
     height: 100%;
     overflow-y: auto;
-    padding-bottom: 1rem;
+    padding-bottom: var(--padding-m);
     padding-right: 8px;
 
     max-height: 294px;

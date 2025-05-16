@@ -93,26 +93,32 @@ function Portfolio() {
                                 <span>Total Net USD Value:</span>{' '}
                                 {formatCurrency(portfolio.totalValueUSD)}
                             </h6>
-                            <div className={styles.rowButton}>
-                                <button onClick={() => openModal('deposit')}>
-                                    Deposit
-                                </button>
-                                <button onClick={() => openModal('withdraw')}>
-                                    Withdraw
-                                </button>
+                            <div className={styles.buttonContainer}>
+                                <div className={styles.rowButton}>
+                                    <button
+                                        onClick={() => openModal('deposit')}
+                                    >
+                                        Deposit
+                                    </button>
+                                    <button
+                                        onClick={() => openModal('withdraw')}
+                                    >
+                                        Withdraw
+                                    </button>
+                                    <button
+                                        onClick={() => openModal('send')}
+                                        className={styles.sendMobile}
+                                    >
+                                        Send
+                                    </button>
+                                </div>
                                 <button
                                     onClick={() => openModal('send')}
-                                    className={styles.sendMobile}
+                                    className={styles.sendDesktop}
                                 >
                                     Send
                                 </button>
                             </div>
-                            <button
-                                onClick={() => openModal('send')}
-                                className={styles.sendDesktop}
-                            >
-                                Send
-                            </button>
                         </div>
                     </div>
 

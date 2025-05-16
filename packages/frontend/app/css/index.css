@@ -35,15 +35,12 @@
     --button-padding: var(--button-padding);
     /* ---------------------- */
 
-    /* --Dropdown top */
+    /* --Dropdown */
     --dropdown-top: 30px;
-
-    /* ---------------- */
-
-    /* ------------------------------ */
-    /* 🔤 Typography                  */
-    /* ------------------------------ */
-    --font-family-main: 'Lexend Deca';
+    --dropdown-box-shadow: var(--dropdown-box-shadow) /* ---------------- */
+        /* ------------------------------ */
+        /* 🔤 Typography                  */
+        /* ------------------------------ */ --font-family-main: 'Lexend Deca';
     --font-weight: 400;
 
     --font-size-xs: 10px;
