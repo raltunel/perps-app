@@ -15,7 +15,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    padding: 0px 4px;
+    padding: 0px var(--padding-xs);
     gap: 8px;
 }
 
