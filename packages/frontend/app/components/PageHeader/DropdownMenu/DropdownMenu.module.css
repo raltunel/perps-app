@@ -84,5 +84,5 @@
     align-items: center;
     justify-content: space-between;
     padding-right: 2px;
-    padding-left: 4px;
+    padding-left: var(--padding-xs);
 }

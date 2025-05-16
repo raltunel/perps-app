@@ -60,7 +60,7 @@
         rgba(17, 17, 24, 1),
         rgba(17, 17, 24, 0.7)
     );
-    padding-left: 8px;
+    padding-left: var(--padding-s);
 }
 
 .scrollArrowHidden {
