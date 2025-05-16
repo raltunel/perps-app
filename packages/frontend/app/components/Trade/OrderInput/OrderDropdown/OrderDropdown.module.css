@@ -11,13 +11,11 @@
     padding: 0px 4px 0px 8px;
     align-items: center;
     justify-content: space-between;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     border-radius: 8px;
     border: none;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
-    line-height: normal;
     cursor: pointer;
     flex-shrink: 0;
     gap: 8px;
@@ -50,7 +48,7 @@
     width: 100%;
     margin-top: 4px;
     padding: 0;
-    background: var(--dark3, #1c1c22);
+    background: var(--bg-dark3, #1c1c22);
     border-radius: 4px;
     list-style: none;
     z-index: 10;
@@ -68,7 +66,6 @@
     cursor: pointer;
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
-    font-weight: 400;
     transition: background-color 0.15s ease;
 }
 
@@ -79,7 +76,7 @@
 
 .dropdownItem:hover {
     color: var(--text1);
-    background: var(--dark2);
+    background: var(--bg-dark2);
 }
 
 .noOptions {
