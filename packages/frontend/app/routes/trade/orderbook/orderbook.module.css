@@ -61,10 +61,6 @@
     overflow: hidden;
 }
 
-.blankRow {
-    border-left: 8px solid color-mix(in srgb, var(--red) 20%, transparent);
-}
-
 .blankRowContent {
     width: 100%;
     height: 100%;

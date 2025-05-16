@@ -422,35 +422,50 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                             transition={{ duration: 0.2 }}
                         >
                             <div className={styles.orderBookBlock}>
-                                {Array.from({
-                                    length: sellPlaceHolderCount,
-                                }).map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className={
-                                            styles.orderRowWrapper +
-                                            ' ' +
-                                            styles.blankRow
-                                        }
-                                        style={{
-                                            borderColor: `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
-                                        }}
-                                    >
+                                {sellPlaceHolderCount === 1 ? (
+                                    <div className={styles.orderRowWrapper}>
                                         <div
                                             className={styles.blankRowContent}
                                             style={{
-                                                opacity:
-                                                    1 -
-                                                    (sellPlaceHolderCount -
-                                                        index) /
-                                                        sellPlaceHolderCount,
+                                                opacity: 1,
                                                 backgroundColor: `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
                                             }}
                                         >
                                             &nbsp;
                                         </div>
                                     </div>
-                                ))}
+                                ) : (
+                                    <>
+                                        {Array.from({
+                                            length: sellPlaceHolderCount,
+                                        }).map((_, index) => (
+                                            <div
+                                                key={index}
+                                                className={
+                                                    styles.orderRowWrapper +
+                                                    ' ' +
+                                                    styles.blankRow
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles.blankRowContent
+                                                    }
+                                                    style={{
+                                                        opacity:
+                                                            1 -
+                                                            (sellPlaceHolderCount -
+                                                                index) /
+                                                                sellPlaceHolderCount,
+                                                        backgroundColor: `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
+                                                    }}
+                                                >
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                                 {sells
                                     .slice(0, orderCount)
                                     .reverse()
@@ -537,9 +552,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             ' ' +
                                             styles.blankRow
                                         }
-                                        style={{
-                                            borderColor: `color-mix(in srgb, ${getBsColor().buy} 20%, transparent )`,
-                                        }}
                                     >
                                         <div
                                             className={styles.blankRowContent}
