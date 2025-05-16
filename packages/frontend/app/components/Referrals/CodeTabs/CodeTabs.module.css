@@ -58,7 +58,7 @@
 .enterCodeContent input {
     display: flex;
     height: 33px;
-    padding: 0px 8px;
+    padding: 0 var(--padding-s);
     align-items: center;
     gap: 4px;
     align-self: stretch;

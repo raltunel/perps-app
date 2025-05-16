@@ -184,7 +184,7 @@ body {
         z-index: 200;
         justify-content: center;
         align-items: center;
-        padding: 0 8px;
+        padding: 0 var(--padding-s);
     }
 
     .mobileTabBtns {
@@ -238,7 +238,7 @@ body {
     .mobileOrder.active {
         display: block;
         background: var(--bg-dark1);
-        padding: 0 8px;
+        padding: 0 var(--padding-s);
         overflow-y: auto !important;
     }
 
@@ -249,7 +249,7 @@ body {
         width: 100%;
         overflow-y: auto !important;
         background: var(--bg-dark1);
-        padding: 0 8px;
+        padding: 0 var(--padding-s);
     }
 
     /* Mobile order book section styling */

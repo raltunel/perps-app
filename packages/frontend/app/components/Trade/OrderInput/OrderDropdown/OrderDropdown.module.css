@@ -61,7 +61,7 @@
 .dropdownItem {
     display: flex;
     height: 15px;
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
     align-items: center;
     cursor: pointer;
     color: var(--text2, #bcbcc4);
