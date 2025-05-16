@@ -47,10 +47,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
 
-    const skeletonCount = useMemo(() => {
-        return orderCount < 20 ? orderCount : 20;
-    }, [orderCount]);
-
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     // added to pass true resolution to orderrow components
@@ -65,6 +61,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const { getBsColor } = useAppSettings();
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
+
+    const buyPlaceHolderCount = useMemo(() => {
+        return Math.max(orderCount - buys.length, 0);
+    }, [orderCount, buys]);
+
+    const sellPlaceHolderCount = useMemo(() => {
+        return Math.max(orderCount - sells.length, 0);
+    }, [orderCount, sells]);
+
     const {
         userOrders,
         userSymbolOrders,
@@ -378,38 +383,28 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                         className={styles.orderBookBlock}
                         style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: skeletonCount }).map(
-                            (_, index) => (
-                                <div
-                                    key={index}
-                                    className={styles.orderRowWrapper}
-                                >
-                                    <SkeletonNode
-                                        width={getRandWidth(index)}
-                                        height={'16px'}
-                                    />
-                                </div>
-                            ),
-                        )}
+                        {Array.from({ length: orderCount }).map((_, index) => (
+                            <div key={index} className={styles.orderRowWrapper}>
+                                <SkeletonNode
+                                    width={getRandWidth(index)}
+                                    height={'16px'}
+                                />
+                            </div>
+                        ))}
                     </div>
                     {midHeader('orderBookMidHeader2')}
                     <div
                         className={styles.orderBookBlock}
                         style={{ gap: '4px' }}
                     >
-                        {Array.from({ length: skeletonCount }).map(
-                            (_, index) => (
-                                <div
-                                    key={index}
-                                    className={styles.orderRowWrapper}
-                                >
-                                    <SkeletonNode
-                                        width={getRandWidth(index, true)}
-                                        height={'16px'}
-                                    />
-                                </div>
-                            ),
-                        )}
+                        {Array.from({ length: orderCount }).map((_, index) => (
+                            <div key={index} className={styles.orderRowWrapper}>
+                                <SkeletonNode
+                                    width={getRandWidth(index, true)}
+                                    height={'16px'}
+                                />
+                            </div>
+                        ))}
                     </div>
                 </motion.div>
             )}
@@ -427,6 +422,50 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                             transition={{ duration: 0.2 }}
                         >
                             <div className={styles.orderBookBlock}>
+                                {sellPlaceHolderCount === 1 ? (
+                                    <div className={styles.orderRowWrapper}>
+                                        <div
+                                            className={styles.blankRowContent}
+                                            style={{
+                                                opacity: 1,
+                                                backgroundColor: `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
+                                            }}
+                                        >
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {Array.from({
+                                            length: sellPlaceHolderCount,
+                                        }).map((_, index) => (
+                                            <div
+                                                key={index}
+                                                className={
+                                                    styles.orderRowWrapper +
+                                                    ' ' +
+                                                    styles.blankRow
+                                                }
+                                            >
+                                                <div
+                                                    className={
+                                                        styles.blankRowContent
+                                                    }
+                                                    style={{
+                                                        opacity:
+                                                            1 -
+                                                            (sellPlaceHolderCount -
+                                                                index) /
+                                                                sellPlaceHolderCount,
+                                                        backgroundColor: `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
+                                                    }}
+                                                >
+                                                    &nbsp;
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
                                 {sells
                                     .slice(0, orderCount)
                                     .reverse()
@@ -503,6 +542,30 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                             ></div>
                                         </div>
                                     ))}
+                                {Array.from({
+                                    length: buyPlaceHolderCount,
+                                }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className={
+                                            styles.orderRowWrapper +
+                                            ' ' +
+                                            styles.blankRow
+                                        }
+                                    >
+                                        <div
+                                            className={styles.blankRowContent}
+                                            style={{
+                                                opacity:
+                                                    1 -
+                                                    index / buyPlaceHolderCount,
+                                                backgroundColor: `color-mix(in srgb, ${getBsColor().buy} 20%, transparent )`,
+                                            }}
+                                        >
+                                            &nbsp;
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </motion.div>
                     </>

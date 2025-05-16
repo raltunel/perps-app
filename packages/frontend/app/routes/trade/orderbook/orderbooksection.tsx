@@ -24,10 +24,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         return Math.ceil(orderCount / 2);
     }, [orderCount]);
 
-    const orderBookComponent = useMemo(
-        () => <OrderBook symbol={symbol} orderCount={orderCount} />,
-        [orderCount, symbol],
-    );
+    const orderBookComponent = useMemo(() => {
+        return orderCount > 0 ? (
+            <div className={styles.orderbookInTab}>
+                <OrderBook symbol={symbol} orderCount={orderCount} />
+            </div>
+        ) : (
+            <></>
+        );
+    }, [orderCount, symbol]);
     const orderBookTrades = useMemo(
         () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
         [tradesCount, symbol],
