@@ -10,7 +10,6 @@
 
     width: 100%;
     min-height: var(--container-height);
-
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     border-radius: var(--radius-m, 16px);
     display: flex;
