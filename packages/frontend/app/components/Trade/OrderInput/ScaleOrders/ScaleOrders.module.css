@@ -180,7 +180,6 @@
 }
 
 .orderList {
-    background-color: yellow;
     width: 100%;
     height: var(--scale-order-height);
     overflow-y: auto;

@@ -42,7 +42,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 4px;
+    padding: var(--padding-xs);
     border-radius: var(--radius-s);
 }
 

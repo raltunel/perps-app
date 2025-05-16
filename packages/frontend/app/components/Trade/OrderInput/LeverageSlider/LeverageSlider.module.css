@@ -147,5 +147,5 @@
     border: none;
     background: var(--accent1);
     color: var(--text1);
-    padding: 4px;
+    padding: var(--padding-xs);
 }
