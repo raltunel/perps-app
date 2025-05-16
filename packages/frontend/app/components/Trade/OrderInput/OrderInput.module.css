@@ -1,15 +1,20 @@
 .mainContainer {
+    --dropdown-height: 32px;
+    --data-content-height: 16px;
+    --button-height: 25px;
+
     display: flex;
     width: 100%;
     height: 100%;
-    padding: 16px 8px 4px 8px;
+    padding: var(--padding-m) var(--padding-m) var(--padding-xs)
+        var(--padding-s);
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 8px;
+    gap: var(--gap-s);
     flex-shrink: 0;
 
-    border-radius: var(--radius-m, 16px);
+    border-radius: var(--radius-m);
     background: var(--bg-dark2, #111117);
 }
 
@@ -18,7 +23,7 @@
     flex-direction: column;
     width: 100%;
     height: 100%;
-    gap: 8px;
+    gap: var(--gap-s);
     overflow-y: scroll;
     /* subtract height of placeorderbuttons.tsx */
     height: calc(100% - 125px);
@@ -31,8 +36,8 @@
 
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    height: 32px;
+    gap: var(--gap-s);
+    height: var(--dropdown-height);
 }
 .inputDetailsDataContainer {
     width: 100%;
@@ -40,10 +45,11 @@
     padding: var(--padding-s) 0px;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    /* changed from 2px on figma to 4px */
+    gap: var(--gap-xs);
     align-self: stretch;
 
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     border: 1px solid var(--bg-dark4, #27272c);
 }
 .inputDetailsDataContent {
@@ -52,16 +58,16 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    font-size: var(--font-size-s, 12px);
-    padding: 0 8px;
-    height: 16px;
+    font-size: var(--font-size-s);
+    padding: var(--padding-s) 0;
+    height: var(--data-content-height);
 }
 .inputDetailsLabel {
     color: var(--text2);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .inputDetailValue {
     color: var(--text1);
@@ -70,17 +76,17 @@
 .isolatedButton {
     display: flex;
     height: 100%;
-    padding: 0px 4px 0px 8px;
+    padding: 0px var(--padding-xs) 0px var(--padding-s);
     align-items: center;
     justify-content: space-between;
     background: var(--bg-dark3, #1c1c22);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     border: none;
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
     cursor: pointer;
     flex-shrink: 0;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .isolatedButton svg {
@@ -94,28 +100,28 @@
 .priceDistributionContainer {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .priceDistributionContainer .inputDetailsLabel {
     color: var(--text2);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
-    font-size: var(--font-size-s, 12px);
+    gap: var(--gap-xs);
+    font-size: var(--font-size-s);
 }
 .priceDistributionContainer .actionButtonsContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .priceDistributionContainer .actionButtonsContainer button {
     width: 100%;
     display: flex;
-    height: 25px;
-    padding: 0px 8px;
+    height: var(--button-height);
+    padding: 0px var(--padding-s);
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #1c1c22);
     display: grid;
@@ -124,11 +130,12 @@
     outline: none;
     border: none;
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
 }
 
 @media (min-width: 1600px) {
     .mainContainer {
-        padding: 16px 16px 4px 16px;
+        padding: var(--padding-m) var(--padding-m) var(--padding-xs)
+            var(--padding-m);
     }
 }

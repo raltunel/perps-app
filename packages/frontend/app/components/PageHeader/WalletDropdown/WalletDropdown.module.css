@@ -1,6 +1,6 @@
 .container {
     --container-width: 331px;
-    --container-height: 179px;
+    --container-height: auto;
     --avatar-width-height: 50px;
     --button-height: 25px;
     --token-width-height: 30px;
@@ -75,6 +75,12 @@
     display: flex;
     width: var(--avatar-width-height);
     height: var(--avatar-width-height);
+    border-radius: 50%;
+}
+.imgContainer img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     border-radius: 50%;
 }
 

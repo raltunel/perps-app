@@ -40,7 +40,10 @@ export default function WalletDropdown(props: PropsIF) {
         >
             <section className={styles.profileContainer}>
                 <div className={styles.imgContainer}>
-                    <img src='' alt='' />
+                    <img
+                        src='https://forkast.news/wp-content/uploads/2022/03/NFT-Avatar.png'
+                        alt=''
+                    />
                 </div>
                 <div className={styles.profileRight}>
                     <div className={styles.profileRightTop}>
