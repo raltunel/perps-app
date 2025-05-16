@@ -10,7 +10,8 @@ interface PropsIF {
     isDropdown?: boolean;
 }
 
-const tokenImg = 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png';
+const tokenImg =
+    'https://images.seeklogo.com/logo-png/40/2/usd-coin-usdc-logo-png_seeklogo-408043.png';
 
 const TokenDisplay = () => {
     return (
