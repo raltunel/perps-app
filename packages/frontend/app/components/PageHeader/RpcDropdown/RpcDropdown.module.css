@@ -1,15 +1,17 @@
 .container {
+    --container-width: 278px;
+
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
     position: absolute;
-    top: 30px;
+    top: var(--dropdown-top);
     right: 0;
-    width: 278px;
-    padding: 16px;
-    border-radius: var(--radius-m, 16px);
+    width: var(--container-width);
+    padding: var(--padding-m);
+    border-radius: var(--radius-m);
     background: var(--bg-dark3, #16161c);
     box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
 
@@ -29,10 +31,10 @@
 .viewMoreButton {
     color: var(--accent1, #7371fc);
     text-align: center;
-    font-size: var(--font-size-s, 12px);
+    font-size: var(--font-size-s);
 }
 .container section {
-    gap: 5px;
+    gap: var(--gap-m);
 }
 .rpcRowContainer {
     display: flex;
