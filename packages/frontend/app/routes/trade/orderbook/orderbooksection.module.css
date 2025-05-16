@@ -70,9 +70,6 @@
 .orderbookInTab {
     height: calc(100% - 34px);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: -0.25rem;
 }
 
 .tabContent {
