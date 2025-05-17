@@ -73,10 +73,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                         document
                             .getElementById('orderBookHeader2')
                             ?.getBoundingClientRect()?.height || 0;
-                    otherHeightSum +=
-                        document
-                            .getElementById('orderBookMidHeader')
-                            ?.getBoundingClientRect()?.height || 0;
                     const orderCount = Math.floor(
                         (availableHeight - otherHeightSum) /
                             (orderRowHeightWithGaps * 2),
