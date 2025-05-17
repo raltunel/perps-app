@@ -43,6 +43,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const { info } = useSdk();
 
+    const orderRowHeight = useMemo(() => {
+        const dummyOrderRow = document.getElementById('dummyOrderRow');
+
+        return dummyOrderRow?.getBoundingClientRect().height || 16;
+    }, []);
+
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const [selectedResolution, setSelectedResolution] =
         useState<OrderRowResolutionIF | null>(null);
@@ -381,13 +387,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 >
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '4px' }}
+                        style={{ gap: 'var(--gap-xs)' }}
                     >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
                                     width={getRandWidth(index)}
-                                    height={'16px'}
+                                    height={orderRowHeight + 'px'}
                                 />
                             </div>
                         ))}
@@ -395,13 +401,13 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     {midHeader('orderBookMidHeader2')}
                     <div
                         className={styles.orderBookBlock}
-                        style={{ gap: '4px' }}
+                        style={{ gap: 'var(--gap-xs)' }}
                     >
                         {Array.from({ length: orderCount }).map((_, index) => (
                             <div key={index} className={styles.orderRowWrapper}>
                                 <SkeletonNode
                                     width={getRandWidth(index, true)}
-                                    height={'16px'}
+                                    height={orderRowHeight + 'px'}
                                 />
                             </div>
                         ))}
