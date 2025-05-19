@@ -1,8 +1,8 @@
 .rowContainer {
     width: 100%;
-    height: 25px;
+    height: var(--table-row-height);
     padding-left: var(--padding-s);
-    gap: 8px;
+    gap: var(--gap-s);
     display: grid;
     grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
     align-items: center;
@@ -11,9 +11,9 @@
 .headerContainer {
     background: var(--bg-dark2);
     width: 100%;
-    height: 24px;
+    height: var(--table-header-height);
     padding-left: var(--padding-s);
-    gap: 8px;
+    gap: var(--gap-s);
     display: grid;
     grid-template-columns: 1fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr;
     align-items: center;
@@ -28,7 +28,7 @@
     width: 100%;
     height: 100%;
     overflow-x: auto;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-s);
     padding-bottom: var(--padding-s);
 
     display: flex;
@@ -58,7 +58,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     cursor: default;
     user-select: none;
 }
@@ -222,7 +222,7 @@
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 0.8fr 1fr 0.8fr;
-        padding: 0 4px;
+        padding: 0 var(--padding-xs);
     }
 
     .directionCell {
@@ -230,14 +230,14 @@
     }
 
     .headerCell {
-        font-size: 9px;
+        font-size: var(--font-size-xs);
     }
 
     .cell {
-        font-size: 11px;
+        font-size: var(--font-size-s);
     }
 
     .cancelButton {
-        font-size: 11px;
+        font-size: var(--font-size-s);
     }
 }

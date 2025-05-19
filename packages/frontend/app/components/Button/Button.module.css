@@ -20,14 +20,14 @@
 
 .medium {
     min-width: 120px;
-    padding: 1px 8px;
+    padding: 1px var(--padding-s);
     font-size: var(--font-size-m, 18px);
 }
 
 .small {
     display: inline-flex;
     height: 25px;
-    padding: 1px 8px;
+    padding: 1px var(--padding-s);
     font-size: var(--font-size-s, 12px);
     flex-shrink: 0;
 }

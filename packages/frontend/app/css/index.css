@@ -80,6 +80,13 @@
     --radius-xl: 64px;
 
     /* ------------------------------ */
+    /*Tables              */
+
+    --table-row-height: 16px;
+    --table-header-height: 24px;
+    /* ------------------------------ */
+
+    /* ------------------------------ */
     /* 📐 Layout Sizes                */
     /* ------------------------------ */
     --order-book-width-desktop-large: 280px;

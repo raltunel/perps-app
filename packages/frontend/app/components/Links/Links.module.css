@@ -55,7 +55,7 @@
     justify-content: center;
     align-items: center;
     height: 25px;
-    padding: 1px 8px;
+    padding: 1px var(--padding-s);
     border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);

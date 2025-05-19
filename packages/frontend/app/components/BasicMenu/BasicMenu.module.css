@@ -45,7 +45,7 @@
 .menuItem {
     cursor: pointer;
     color: var(--text2);
-    padding: 0.25rem 0.5rem;
+    padding: var(--padding-xs) var(--padding-s);
 }
 
 .menuItem:hover {

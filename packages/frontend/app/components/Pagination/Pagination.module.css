@@ -70,7 +70,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0.25rem;
+    padding: var(--padding-xs);
     border-radius: 0.25rem;
 }
 
@@ -131,7 +131,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: var(--padding-m);
         margin-top: 48px;
     }
 

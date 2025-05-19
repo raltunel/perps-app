@@ -1,7 +1,6 @@
 .container {
     width: 100%;
 
-    /* padding: 2rem; */
     display: flex;
     flex-direction: column;
     gap: 64px;
@@ -218,7 +217,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: var(--padding-m);
         margin-top: 48px;
     }
 

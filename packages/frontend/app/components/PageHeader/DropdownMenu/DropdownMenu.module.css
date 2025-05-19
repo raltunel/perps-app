@@ -22,7 +22,7 @@
 
 .menuItem {
     display: flex;
-    padding: 2px 4px;
+    padding: 2px var(--padding-xs);
     justify-content: space-between;
     align-items: center;
     align-self: stretch;
