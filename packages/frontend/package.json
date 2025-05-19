@@ -33,6 +33,7 @@
     "devDependencies": {
         "@eslint/js": "^9.27.0",
         "@mjackson/node-fetch-server": "0.6.1",
+        "@netlify/vite-plugin-react-router": "^1.0.1",
         "@react-router/dev": "^7.6.0",
         "@types/express": "^5.0.2",
         "@types/node": "^20.17.32",

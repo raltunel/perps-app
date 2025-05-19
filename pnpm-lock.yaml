@@ -60,6 +60,9 @@ importers:
       '@mjackson/node-fetch-server':
         specifier: 0.6.1
         version: 0.6.1
+      '@netlify/vite-plugin-react-router':
+        specifier: ^1.0.1
+        version: 1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.17.48)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))
       '@react-router/dev':
         specifier: ^7.6.0
         version: 7.6.0(@types/node@20.17.48)(jiti@2.4.2)(lightningcss@1.29.1)(react-router@7.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(terser@5.39.2)(typescript@5.8.3)(vite@6.3.5(@types/node@20.17.48)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))(yaml@2.7.1)
@@ -1054,6 +1057,12 @@ packages:
   '@netlify/serverless-functions-api@1.36.0':
     resolution: {integrity: sha512-z6okREyK8in0486a22Oro0k+YsuyEjDXJt46FpgeOgXqKJ9ElM8QPll0iuLBkpbH33ENiNbIPLd1cuClRQnhiw==}
     engines: {node: '>=18.0.0'}
+
+  '@netlify/vite-plugin-react-router@1.0.1':
+    resolution: {integrity: sha512-JE32RJ6PamX6Yf2yyys7NLaKK4ppcDwuL6mk7NDZ7rt4EWUm+5bz/YjMcLz9uXyo1jDPlWjaUcqRC2MUZKt2DA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      vite: '>=5.0.0'
 
   '@noble/curves@1.8.2':
     resolution: {integrity: sha512-vnI7V6lFNe0tLAuJMu+2sX+FcL14TaCWy1qiczg1VwRmPrpQCdq5ESXQMqUc2tluRNf6irBXrWbl1mGN8uaU/g==}
@@ -4784,6 +4793,17 @@ snapshots:
       '@netlify/serverless-functions-api': 1.36.0
 
   '@netlify/serverless-functions-api@1.36.0': {}
+
+  '@netlify/vite-plugin-react-router@1.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(vite@6.3.5(@types/node@20.17.48)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1))':
+    dependencies:
+      '@react-router/node': 7.6.0(react-router@7.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(typescript@5.8.3)
+      isbot: 5.1.28
+      react-router: 7.6.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      vite: 6.3.5(@types/node@20.17.48)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.2)(yaml@2.7.1)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+      - typescript
 
   '@noble/curves@1.8.2':
     dependencies:
