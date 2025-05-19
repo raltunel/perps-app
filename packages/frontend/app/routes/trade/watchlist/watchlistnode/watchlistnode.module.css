@@ -38,4 +38,5 @@
 
 .symbolValue {
     text-align: right;
+    margin-left: var(--margin-xs);
 }
