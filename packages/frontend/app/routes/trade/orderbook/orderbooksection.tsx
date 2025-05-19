@@ -78,7 +78,10 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                             (orderRowHeightWithGaps * 2),
                     );
                     setOrderCount(orderCount);
-                    setTradesCount(Math.floor(availableHeight / 21));
+                    setTradesCount(
+                        Math.floor(availableHeight / orderRowHeightWithGaps) -
+                            2,
+                    );
                 } else {
                     const orderCount = Math.floor(availableHeight / 1000);
                     setOrderCount(orderCount);
