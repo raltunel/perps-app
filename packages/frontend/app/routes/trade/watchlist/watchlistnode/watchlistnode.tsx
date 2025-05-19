@@ -28,7 +28,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const nodeClickListener = () => {
         if (symbol.coin === storeSymbol) return;
         setStoreSymbol(symbol.coin);
-        navigate(`/trade/${symbol.coin}`);
+        navigate(`/trade/${symbol.coin}`, { viewTransition: true });
     };
 
     const shownVal = useMemo(() => {

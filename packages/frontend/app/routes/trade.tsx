@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, memo, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
@@ -110,7 +110,11 @@ export default function Trade() {
     }, []);
 
     useEffect(() => {
-        if (!marketId) navigate(`/trade/${symbol}`, { replace: true });
+        if (!marketId)
+            navigate(`/trade/${symbol}`, {
+                replace: true,
+                viewTransition: true,
+            });
     }, [navigate, marketId, symbol]);
 
     const { showTutorial, handleTutorialComplete, handleTutorialSkip } =

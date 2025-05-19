@@ -1,8 +1,8 @@
 import React, {
     createContext,
     useContext,
-    useState,
     useEffect,
+    useState,
     type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router';
@@ -110,7 +110,7 @@ export const useTutorial = (): TutorialContextType => {
 
         if (!isOnTradePage) {
             // Navigate to the trade page before showing tutorial
-            navigate('/trade');
+            navigate('/trade', { viewTransition: true });
 
             // Give a small delay to ensure navigation completes before showing tutorial
             setTimeout(() => {
