@@ -1,7 +1,7 @@
 import styles from './Button.module.css';
 
 interface ButtonProps {
-    size?: 'large' | 'medium' | 'small';
+    size?: 'large' | 'medium' | 'small' | number;
     selected?: boolean;
     disabled?: boolean;
     children: React.ReactNode;
@@ -26,12 +26,15 @@ const Button: React.FC<ButtonProps> = ({
     return (
         <button
             className={`
-        ${baseClasses} 
-        ${sizeClasses} 
-        ${selectedClasses} 
-        ${disabledClasses}
-        ${fullWidthClasses}
-      `}
+                ${baseClasses} 
+                ${typeof size === 'string' && sizeClasses} 
+                ${selectedClasses} 
+                ${disabledClasses}
+                ${fullWidthClasses}
+            `}
+            style={{
+                width: typeof size === 'number' ? size.toString() + 'px' : '',
+            }}
             disabled={disabled}
             onClick={onClick ?? undefined}
         >

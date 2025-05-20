@@ -1,8 +1,11 @@
 import Button from '~/components/Button/Button';
 import styles from './strategies.module.css';
-import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
+import OrderHistory from '../orderHistory/orderHistory';
+import { useNavigate } from 'react-router';
 
 export default function Strategies() {
+    const navigate = useNavigate();
+
     return (
         <div className={styles.strategies_page}>
             <h2>Strategies</h2>
@@ -28,10 +31,17 @@ export default function Strategies() {
                     >
                         Remove
                     </Button>
+                    <Button
+                        onClick={() => console.log('Editing strategy!')}
+                        size='medium'
+                        selected
+                    >
+                        Edit
+                    </Button>
                 </div>
                 <div className={styles.strategy_select_right}>
                     <Button
-                        onClick={() => console.log('Making new strategy!')}
+                        onClick={() => navigate('/strategies/new')}
                         size='medium'
                         selected
                     >
@@ -39,7 +49,7 @@ export default function Strategies() {
                     </Button>
                 </div>
             </div>
-            <OrderHistoryTable />
+            <OrderHistory />
         </div>
     );
 }
