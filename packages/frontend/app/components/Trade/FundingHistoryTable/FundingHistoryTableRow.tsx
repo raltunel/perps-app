@@ -1,57 +1,59 @@
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './FundingHistoryTable.module.css';
-
-export interface FundingHistoryData {
-    time: string;
-    coin: string;
-    size: string;
-    positionSide: 'Long' | 'Short';
-    payment: string;
-    rate: string;
-}
+import type { UserFundingIF } from '~/utils/UserDataIFs';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 
 interface FundingHistoryTableRowProps {
-    fundingHistory: FundingHistoryData;
+    fundingHistory: UserFundingIF;
 }
 
 export default function FundingHistoryTableRow(
     props: FundingHistoryTableRowProps,
 ) {
     const { fundingHistory } = props;
-
-    // Determine if payment is negative (starts with '-')
-    const isNegativePayment = fundingHistory.payment.startsWith('-');
+    const { formatNum } = useNumFormatter();
+    const { getBsColor } = useAppSettings();
 
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.timeCell}`}>
-                {fundingHistory.time}
+                {formatTimestamp(fundingHistory.time)}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {fundingHistory.coin}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {fundingHistory.size}
+                {formatNum(fundingHistory.szi)} {fundingHistory.coin}
             </div>
             <div
-                className={`${styles.cell} ${styles.positionSideCell} ${
-                    fundingHistory.positionSide === 'Long'
-                        ? styles.longPosition
-                        : styles.shortPosition
-                }`}
+                className={`${styles.cell} ${styles.positionSideCell}`}
+                style={{
+                    color:
+                        fundingHistory.szi > 0
+                            ? getBsColor().buy
+                            : fundingHistory.szi < 0
+                              ? getBsColor().sell
+                              : 'var(--text-default)',
+                }}
             >
-                {fundingHistory.positionSide}
+                {fundingHistory.szi > 0 ? 'Long' : 'Short'}
             </div>
             <div
-                className={`${styles.cell} ${styles.paymentCell} ${
-                    isNegativePayment
-                        ? styles.negativePayment
-                        : styles.positivePayment
-                }`}
+                className={`${styles.cell} ${styles.paymentCell}`}
+                style={{
+                    color:
+                        fundingHistory.usdc > 0
+                            ? getBsColor().buy
+                            : fundingHistory.usdc < 0
+                              ? getBsColor().sell
+                              : 'var(--text-default)',
+                }}
             >
-                {fundingHistory.payment}
+                {formatNum(fundingHistory.usdc, null, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.rateCell}`}>
-                {fundingHistory.rate}
+                {formatNum(fundingHistory.fundingRate * 100)}%
             </div>
         </div>
     );

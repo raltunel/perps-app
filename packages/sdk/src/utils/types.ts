@@ -300,6 +300,11 @@ export interface UserTwapHistoryMsg {
     data: UserTwapHistoryData;
 }
 
+export interface UserFundingsMsg {
+    channel: 'userFundings';
+    data: UserFundingsData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -598,4 +603,10 @@ export interface UserTwapSliceFillsData {
     user: string;
     twapSliceFills: TwapSliceFill[];
     isSnapshot: boolean;
+}
+
+export interface UserFundingsData {
+    user: string;
+    isSnapshot?: boolean;
+    fundings: UserFunding[];
 }
