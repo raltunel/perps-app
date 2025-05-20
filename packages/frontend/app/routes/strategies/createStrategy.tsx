@@ -79,11 +79,7 @@ export default function createStrategy() {
                 />
             </section>
             <section className={styles.create_strategy_buttons}>
-                <Button
-                    onClick={() => navigate('/strategies')}
-                    size={207}
-                    disabled
-                >
+                <Button onClick={() => navigate('/strategies')} size={207}>
                     Cancel
                 </Button>
                 <Button
