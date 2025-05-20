@@ -53,11 +53,12 @@
     border: none;
 
     display: flex;
+    /* css variable wont apply here */
+    height: 47px;
     padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 1 0 0;
 
     border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
