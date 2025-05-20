@@ -35,7 +35,7 @@
     color: var(--text1);
     cursor: pointer;
     font-size: var(--font-size-s, 12px);
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
     height: 32px;
 }
 .runningPriceMinutes span {

@@ -17,9 +17,9 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 0.25rem;
+    gap: var(--gap-xs);
     background-color: var(--bg-dark4);
-    margin: 0.25rem 0;
+    margin: var(--margin-xs) 0;
     padding: 0 1rem;
 }
 
@@ -28,9 +28,9 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    gap: 0.25rem;
-    margin: 0.25rem 0;
-    padding: 0 0.5rem;
+    gap: var(--gap-xs);
+    margin: var(--margin-xs) 0;
+    padding: 0 var(--padding-s);
     color: var(--text3);
 }
 

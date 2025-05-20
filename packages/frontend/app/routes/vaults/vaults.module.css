@@ -1,4 +1,11 @@
 .container {
+    --search-container-width: 404px;
+    --search-container-height: 31px;
+
+    --table-container-height: 66px;
+    --search-icon-width: 30px;
+    --filter-button-height: 25px;
+
     font-style: normal;
     line-height: normal;
     background-color: transparent;
@@ -6,23 +13,21 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: var(--gap-l);
 }
 .headerContainer {
     width: 100%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    /* background-color: yellow; */
-    /* height: 100px; */
 }
 .totalValueContainer {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .totalValueContainer h3 {
-    height: 47px;
+    height: var(--button-height);
     align-self: stretch;
     color: var(--text1, #e1eeee);
     font-size: var(--font-size-xl, 36px);
@@ -32,7 +37,7 @@
     font-size: var(--font-size-m, 18px);
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .learnMore {
@@ -41,28 +46,28 @@
 
 .tableContainer {
     display: flex;
-    padding: 16px;
+    padding: var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
+    gap: var(--gap-m);
     align-self: stretch;
-    border-radius: var(--radius-m, 16px);
-    background: var(--bg-dark2, #0e0e14);
+    border-radius: var(--radius-m);
+    background: var(--bg-dark2);
 }
 
 .searchContainer {
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     background: var(--bg-dark3, #16161c);
     display: flex;
-    width: 404px;
-    height: 31px;
-    padding: 0px 4px;
+    width: var(--search-container-width);
+    height: var(--search-container-height);
+    padding: 0px var(--padding-xs);
 
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .searchContainer .icon {
-    width: 30px;
+    width: var(--search-container-width);
     height: 100%;
     display: flex;
     justify-content: center;
@@ -80,7 +85,7 @@
     font-size: var(--font-size-s, 12px);
 }
 .tableContainer header {
-    height: 66px;
+    height: var(--table-container-height);
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -92,13 +97,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 32px;
+    gap: var(--gap-l);
 }
 .tableContainer header .rightSide .filterButtonsContainer {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: var(--gap-s, '8px');
+    gap: var(--gap-s);
 }
 
 .filterButton {
@@ -106,13 +111,13 @@
     outline: transparent;
     border: none;
     display: flex;
-    height: 25px;
-    padding: 1px 8px;
+    height: var(--filter-button-height);
+    padding: 1px var(padding-s);
     flex-direction: column;
     justify-content: center;
     align-items: center;
     font-size: var(--font-size-s, 12px);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
 }
 .activeFilterButton {
     color: var(--text1) !important;
@@ -127,32 +132,28 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 .sectionTitle {
     color: var(--text1, #f0f0f8);
 
-    font-size: var(--font-size-m, 18px);
+    font-size: var(--font-size-m);
 }
 .container {
     max-height: 100%;
-    /* height: 500px; */
-    /* background-color: red; */
-    /* overflow-y: hidden; */
 }
 .headerContainer {
-    padding: 16px;
+    padding: var(--padding-m);
     flex-shrink: 0;
 }
 
 .tableContainer {
     flex-grow: 1;
-    /* overflow-y: hidden;  */
 }
 @media only screen and (max-width: 968px) {
     .tableContainer header {
         flex-direction: column-reverse;
-        gap: 8px;
+        gap: var(--gap-s);
     }
 }
 

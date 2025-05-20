@@ -7,6 +7,7 @@ import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 import type { Route } from '../../+types/root';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
+import WebDataConsumer from '../trade/webdataconsumer';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -51,6 +52,7 @@ function Portfolio() {
     return (
         <>
             <div className={styles.container}>
+                <WebDataConsumer />
                 <header>Portfolio</header>
                 <div className={styles.column}>
                     <div className={styles.detailsContainer}>
@@ -93,26 +95,32 @@ function Portfolio() {
                                 <span>Total Net USD Value:</span>{' '}
                                 {formatCurrency(portfolio.totalValueUSD)}
                             </h6>
-                            <div className={styles.rowButton}>
-                                <button onClick={() => openModal('deposit')}>
-                                    Deposit
-                                </button>
-                                <button onClick={() => openModal('withdraw')}>
-                                    Withdraw
-                                </button>
+                            <div className={styles.buttonContainer}>
+                                <div className={styles.rowButton}>
+                                    <button
+                                        onClick={() => openModal('deposit')}
+                                    >
+                                        Deposit
+                                    </button>
+                                    <button
+                                        onClick={() => openModal('withdraw')}
+                                    >
+                                        Withdraw
+                                    </button>
+                                    <button
+                                        onClick={() => openModal('send')}
+                                        className={styles.sendMobile}
+                                    >
+                                        Send
+                                    </button>
+                                </div>
                                 <button
                                     onClick={() => openModal('send')}
-                                    className={styles.sendMobile}
+                                    className={styles.sendDesktop}
                                 >
                                     Send
                                 </button>
                             </div>
-                            <button
-                                onClick={() => openModal('send')}
-                                className={styles.sendDesktop}
-                            >
-                                Send
-                            </button>
                         </div>
                     </div>
 
@@ -120,7 +128,7 @@ function Portfolio() {
                         <MemoizedPerformancePanel />
 
                         <div className={styles.table}>
-                            <TradeTable />
+                            <TradeTable portfolioPage />
                         </div>
                     </section>
                 </div>

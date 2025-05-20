@@ -1,6 +1,7 @@
 :root {
     --home-link-width: 330px;
     --home-link-height: 160px;
+    --link-button-height: 25px;
 }
 .container {
     width: 100%;
@@ -32,7 +33,7 @@
     align-items: flex-start;
     width: var(--home-link-width, 360px);
     height: var(--home-link-height, 160px);
-    padding: 16px;
+    padding: var(--padding-m);
     border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #0e0e14);
 }
@@ -40,7 +41,7 @@
 .header {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-fize-l, 24px);
 }
@@ -54,8 +55,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 25px;
-    padding: 1px 8px;
+    height: var(--link-button-height);
+    padding: 1px var(--padding-s);
     border-radius: var(--radius-s, 8px);
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);

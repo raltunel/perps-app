@@ -4,7 +4,7 @@
     display: grid;
     grid-template-columns: 2.31fr 1.47fr 1.47fr 1.47fr 1.47fr 1.84fr 0.79fr;
 
-    padding-right: 8px;
+    padding-right: var(--padding-s);
     align-items: center;
 }
 .cell {
