@@ -2,8 +2,13 @@ import Button from '~/components/Button/Button';
 import styles from './createStrategy.module.css';
 import InputText from './InputText';
 import { useRef, type RefObject } from 'react';
+import { useStrategiesStore } from '~/stores/StrategiesStore';
+import { useNavigate } from 'react-router';
 
 export default function createStrategy() {
+    const makeStrategy = useStrategiesStore().add;
+    const navigate = useNavigate();
+
     const nameRef = useRef<string>('');
     const marketRef = useRef<string>('');
     const distanceRef = useRef<string>('');
@@ -75,24 +80,25 @@ export default function createStrategy() {
             </section>
             <section className={styles.create_strategy_buttons}>
                 <Button
-                    onClick={() => console.log('canceling strategy creation')}
+                    onClick={() => navigate('/strategies')}
                     size={207}
                     disabled
                 >
                     Cancel
                 </Button>
                 <Button
-                    onClick={() =>
-                        console.log({
+                    onClick={() => {
+                        makeStrategy({
                             name: nameRef.current,
                             market: marketRef.current,
-                            distance: distanceRef.current,
+                            distance: parseFloat(distanceRef.current),
                             distanceType: distanceTypeRef.current,
                             side: sideRef.current,
                             totalSize: totalSizeRef.current,
                             orderSize: orderSizeRef.current,
-                        })
-                    }
+                        });
+                        navigate('/strategies');
+                    }}
                     size='medium'
                     selected
                 >

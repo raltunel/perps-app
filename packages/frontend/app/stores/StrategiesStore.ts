@@ -5,10 +5,13 @@ interface strategyIF {
     name: string;
     market: string;
     distance: number;
-    distanceType: 'Ticks';
-    side: 'Both';
+    distanceType: string | 'Ticks';
+    side: string | 'Both';
     totalSize: string;
     orderSize: string;
+}
+
+interface strategyDecoratedIF extends strategyIF {
     pnl: string;
     volume: string;
     maxDrawdown: string;
@@ -19,7 +22,7 @@ interface strategyIF {
 // local storage key to persist data
 const LS_KEY = 'STRATEGIES';
 
-const MOCK_STRATEGIES: strategyIF[] = [
+const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     {
         name: 'My First Strategy',
         market: 'BTC',
@@ -37,7 +40,7 @@ const MOCK_STRATEGIES: strategyIF[] = [
 ];
 
 interface useStrategiesStoreIF {
-    data: strategyIF[];
+    data: strategyDecoratedIF[];
     add: (s: strategyIF) => void;
     remove: (n: string) => void;
     reset: () => void;
@@ -51,7 +54,21 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
             // ... data from local storage will re-hydrate if present
             data: MOCK_STRATEGIES,
             // add a new sub-account
-            add: (s: strategyIF): void => set({ data: [...get().data, s] }),
+            add: (s: strategyIF): void => {
+                set({
+                    data: [
+                        ...get().data,
+                        {
+                            ...s,
+                            pnl: '$0.00',
+                            volume: '$0.00',
+                            maxDrawdown: '0.00%',
+                            ordersPlaced: 0,
+                            runtime: 0,
+                        },
+                    ],
+                });
+            },
             remove: (n: string): void =>
                 set({
                     data: get().data.filter((d: strategyIF) => d.name !== n),
