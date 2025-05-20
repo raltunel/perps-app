@@ -7,6 +7,7 @@ import type {
     TwapSliceFillIF,
     UserBalanceIF,
     UserFillIF,
+    UserFundingIF,
 } from '~/utils/UserDataIFs';
 
 export interface UserTradeDataStore {
@@ -34,6 +35,8 @@ export interface UserTradeDataStore {
     setTwapHistory: (twapHistory: TwapHistoryIF[]) => void;
     twapSliceFills: TwapSliceFillIF[];
     setTwapSliceFills: (twapSliceFills: TwapSliceFillIF[]) => void;
+    userFundings: UserFundingIF[];
+    setUserFundings: (userFundings: UserFundingIF[]) => void;
 }
 
 export const createUserTradesSlice = (set: any, get: any) => ({
@@ -106,5 +109,9 @@ export const createUserTradesSlice = (set: any, get: any) => ({
     twapSliceFills: [],
     setTwapSliceFills: (twapSliceFills: TwapSliceFillIF[]) => {
         set({ twapSliceFills });
+    },
+    userFundings: [],
+    setUserFundings: (userFundings: UserFundingIF[]) => {
+        set({ userFundings });
     },
 });

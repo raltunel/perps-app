@@ -60,7 +60,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
 
     const sortedData = useMemo(() => {
         if (sortBy) {
-            return sorterMethod(data, sortBy, sortDirection);
+            return [...sorterMethod(data, sortBy, sortDirection)];
         }
         return data;
     }, [data, sortBy, sortDirection]);
@@ -126,9 +126,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 <>
                     {renderHeader(sortDirection, handleSort, sortBy)}
                     <div
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : ''
-                        }`}
+                        className={`${styles.tableBody} 
+                        ${pageMode ? styles.pageMode : styles.notPage}
+                        `}
                     >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
