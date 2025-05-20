@@ -11,8 +11,13 @@
     padding: 8px 9px 0px 9px;
     height: 100%;
 }
+
+.portfolioPage.tableContent {
+    height: calc(100% - 20px);
+}
+
 .tableControls {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
 }

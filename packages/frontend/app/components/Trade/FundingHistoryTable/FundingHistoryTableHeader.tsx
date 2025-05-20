@@ -1,60 +1,61 @@
+import type { UserFundingSortBy } from '~/utils/UserDataIFs';
 import styles from './FundingHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function FundingHistoryTableHeader() {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
+interface FundingHistoryTableHeaderProps {
+    sortBy?: UserFundingSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: UserFundingSortBy) => void;
+}
+
+export default function FundingHistoryTableHeader(
+    props: FundingHistoryTableHeaderProps,
+) {
+    const { sortBy, sortDirection, sortClickHandler } = props;
 
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
             key: 'time',
             sortable: true,
-            onClick: () => handleSort('time'),
             className: 'timeCell',
         },
         {
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            onClick: () => handleSort('coin'),
             className: 'coinCell',
         },
         {
             name: 'Size',
-            key: 'size',
+            key: 'szi',
             sortable: true,
-            onClick: () => handleSort('size'),
             className: 'sizeCell',
         },
         {
             name: 'Position Side',
             key: 'positionSide',
-            sortable: true,
-            onClick: () => handleSort('positionSide'),
+            sortable: false,
             className: 'positionSideCell',
         },
         {
             name: 'Payment',
-            key: 'payment',
+            key: 'usdc',
             sortable: true,
-            onClick: () => handleSort('payment'),
             className: 'paymentCell',
         },
         {
             name: 'Rate',
-            key: 'rate',
+            key: 'fundingRate',
             sortable: true,
-            onClick: () => handleSort('rate'),
             className: 'rateCell',
         },
     ];
@@ -65,10 +66,22 @@ export default function FundingHistoryTableHeader() {
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key as UserFundingSortBy);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>

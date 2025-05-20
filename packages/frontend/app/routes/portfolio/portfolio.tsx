@@ -7,6 +7,7 @@ import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 import type { Route } from '../../+types/root';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
+import WebDataConsumer from '../trade/webdataconsumer';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -51,6 +52,7 @@ function Portfolio() {
     return (
         <>
             <div className={styles.container}>
+                <WebDataConsumer />
                 <header>Portfolio</header>
                 <div className={styles.column}>
                     <div className={styles.detailsContainer}>
@@ -120,7 +122,7 @@ function Portfolio() {
                         <MemoizedPerformancePanel />
 
                         <div className={styles.table}>
-                            <TradeTable />
+                            <TradeTable portfolioPage />
                         </div>
                     </section>
                 </div>
