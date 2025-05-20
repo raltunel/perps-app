@@ -1,5 +1,7 @@
 import type {
     UserFillsData,
+    UserFunding,
+    UserFundingsData,
     UserTwapHistoryData,
     UserTwapSliceFillsData,
 } from '@perps-app/sdk/src/utils/types';
@@ -8,7 +10,9 @@ import type {
     TwapHistoryIF,
     TwapSliceFillIF,
     UserFillIF,
+    UserFundingIF,
     UserFillSortBy,
+    UserFundingSortBy,
 } from '~/utils/UserDataIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
@@ -173,4 +177,79 @@ export function processUserTwapHistory(
         } as TwapHistoryIF);
     });
     return ret;
+}
+
+export function processUserFundings(data: UserFunding[]): UserFundingIF[] {
+    const ret: UserFundingIF[] = [];
+    data.forEach((f) => {
+        ret.push({
+            time: f.time,
+            coin: f.coin,
+            usdc: parseFloat(f.usdc),
+            szi: parseFloat(f.szi),
+            fundingRate: parseFloat(f.fundingRate),
+        } as UserFundingIF);
+    });
+    return ret;
+}
+
+export function sortUserFundings(
+    fundings: UserFundingIF[],
+    sortBy: UserFundingSortBy,
+    sortDirection: TableSortDirection,
+) {
+    console.log('sortUserFundings', sortDirection, sortBy);
+    if (sortDirection && sortBy) {
+        switch (sortBy) {
+            case 'time':
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+            case 'coin':
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.coin.localeCompare(b.coin);
+                    } else {
+                        return b.coin.localeCompare(a.coin);
+                    }
+                });
+            case 'usdc':
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.usdc - b.usdc;
+                    } else {
+                        return b.usdc - a.usdc;
+                    }
+                });
+            case 'szi':
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.szi - b.szi;
+                    } else {
+                        return b.szi - a.szi;
+                    }
+                });
+            case 'fundingRate':
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.fundingRate - b.fundingRate;
+                    } else {
+                        return b.fundingRate - a.fundingRate;
+                    }
+                });
+            default:
+                return fundings.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+        }
+    }
+    return fundings;
 }

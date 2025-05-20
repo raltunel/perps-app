@@ -31,13 +31,20 @@ const filterOptions: FilterOption[] = [
     { id: 'long', label: 'Long' },
     { id: 'short', label: 'Short' },
 ];
-export default function TradeTable() {
+
+interface TradeTableProps {
+    portfolioPage?: boolean;
+}
+
+export default function TradeTable(props: TradeTableProps) {
+    const { portfolioPage } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
         orderHistory,
         fetchedChannels,
         userFills,
+        userFundings,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
@@ -74,14 +81,18 @@ export default function TradeTable() {
         }
     }, [page]);
 
-    const { orderHistoryFetched, tradeHistoryFetched } = useMemo(() => {
-        return {
-            orderHistoryFetched: fetchedChannels.has(
-                WsChannels.USER_HISTORICAL_ORDERS,
-            ),
-            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
-        };
-    }, [fetchedChannels]);
+    const { orderHistoryFetched, tradeHistoryFetched, fundingHistoryFetched } =
+        useMemo(() => {
+            return {
+                orderHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                ),
+                tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+                fundingHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_FUNDINGS,
+                ),
+            };
+        }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -89,17 +100,11 @@ export default function TradeTable() {
 
     const handleFilterChange = (selectedId: string) => {
         setSelectedFilter(selectedId);
-        // if (onFilterChange) {
-        //   onFilterChange([selectedId]);
-        // }
     };
 
     const handleToggleSmallBalances = (newState?: boolean) => {
         const newValue = newState !== undefined ? newState : !hideSmallBalances;
         setHideSmallBalances(newValue);
-        // if (onToggleSmallBalances) {
-        //   onToggleSmallBalances(newValue);
-        // }
     };
 
     const rightAlignedContent = (
@@ -142,7 +147,13 @@ export default function TradeTable() {
                     />
                 );
             case 'Funding History':
-                return <FundingHistoryTable />;
+                return (
+                    <FundingHistoryTable
+                        userFundings={userFundings}
+                        isFetched={fundingHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Order History':
                 return (
                     <OrderHistoryTable
@@ -173,7 +184,9 @@ export default function TradeTable() {
                 layoutIdPrefix='tradeTableTabsIndicator'
             />
             <motion.div
-                className={styles.tableContent}
+                className={`${styles.tableContent} ${
+                    portfolioPage ? styles.portfolioPage : ''
+                }`}
                 key={selectedTradeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

@@ -11,6 +11,11 @@
     padding: var(--padding-s) var(--padding-s) 0px var(--padding-s);
     height: 100%;
 }
+
+.portfolioPage.tableContent {
+    height: calc(100% - 20px);
+}
+
 .tableControls {
     display: flex;
     align-items: center;
