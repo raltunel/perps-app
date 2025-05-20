@@ -38,6 +38,8 @@ const MOCK_STRATEGIES: strategyIF[] = [
 
 interface useStrategiesStoreIF {
     data: strategyIF[];
+    add: (s: strategyIF) => void;
+    remove: (n: string) => void;
     reset: () => void;
 }
 
