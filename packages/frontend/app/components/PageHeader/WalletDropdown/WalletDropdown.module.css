@@ -1,16 +1,23 @@
 .container {
-    width: 100%;
-    height: 100%;
+    --container-width: 331px;
+    --container-height: auto;
+    --avatar-width-height: 50px;
+    --button-height: 25px;
+    --token-width-height: 30px;
+    --token-padding: 3.75px;
+
+    width: var(--container-width);
+    height: var(--container-height);
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
     position: absolute;
-    top: 30px;
+    top: var(--dropdown-top);
     right: 0;
-    padding: 16px 8px;
-    border-radius: var(--radius-m, 16px);
+    padding: var(--padding-m) var(--padding-s);
+    border-radius: var(--radius-m);
     background: var(--bg-dark3, #16161c);
-    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--dropdown-box-shadow);
 
     height: 0;
     opacity: 0;
@@ -43,9 +50,9 @@
     display: flex;
     flex-direction: row;
     height: 25px;
-    padding: 4px;
+    padding: var(--padding-xs);
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-s);
     flex-shrink: 0;
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark3, #0e0e14);
@@ -66,16 +73,20 @@
 
 .imgContainer {
     display: flex;
-    width: 50px;
-    height: 50px;
+    width: var(--avatar-width-height);
+    height: var(--avatar-width-height);
     border-radius: 50%;
-    background-color: red;
+}
+.imgContainer img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
 }
 
 .profileRight {
     display: flex;
     flex-direction: column;
-    /* gap: 8px; */
 }
 
 .profileRightTop {
@@ -99,13 +110,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: var(--padding-s);
 }
 
 .actionButtons button {
-    height: 25px;
+    height: var(--button-height);
     display: flex;
-    padding: 1px 8px;
+    padding: 1px var(--padding-s);
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -116,15 +127,15 @@
 
     /* Main/M */
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m, 18px);
+    font-size: var(--font-size-m);
 }
 
 .accountButton {
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     background: var(--bg-dark4, #1e1e24);
 }
 .logoutButton {
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     background: var(--accent1, #7371fc);
 }
 
@@ -139,12 +150,12 @@
 
 .tokensContainer {
     display: flex;
-    padding: 0px 4px;
+    padding: 0px var(--padding-xs);
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
+    gap: var(--gap-xs);
     align-self: stretch;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     background: var(--bg-dark4, #1e1e24);
 }
 
@@ -152,9 +163,9 @@
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 0px 8px 4px 8px;
+    padding: 0px var(--padding-s) var(--padding-xs) var(--padding-s);
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     align-self: stretch;
     border-bottom: 1px solid var(--bg-dark3, #16161c);
     height: 38px;
@@ -164,14 +175,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 
 .tokenDisplayImg {
     display: flex;
-    width: 30px;
-    height: 30px;
-    padding: 3.75px;
+    width: var(--token-width-height);
+    height: var(--token-width-height);
+    padding: var(--token-padding);
     border-radius: 50%;
     justify-content: center;
     align-items: center;

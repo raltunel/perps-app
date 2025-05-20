@@ -31,6 +31,16 @@
     --gold: #ffb648;
     --neon-yellow: #e9e980;
 
+    /* button */
+    --button-height: 47px;
+    --button-padding: 12px 16px;
+    /* ---------------------- */
+
+    /* --Dropdown */
+    --dropdown-top: 30px;
+    --dropdown-box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
+
+    /* ---------------- */
     /* ------------------------------ */
     /* 🔤 Typography                  */
     /* ------------------------------ */
@@ -59,6 +69,7 @@
     --padding-m: 16px;
     --padding-l: 32px;
     --padding-xl: 64px;
+    --padding-dropdown: 0px 4px 0px 8px;
 
     --gap-xs: 4px;
     --gap-s: 8px;
@@ -71,6 +82,13 @@
     --radius-m: 16px;
     --radius-l: 32px;
     --radius-xl: 64px;
+
+    /* ------------------------------ */
+    /*Tables              */
+
+    --table-row-height: 16px;
+    --table-header-height: 24px;
+    /* ------------------------------ */
 
     /* ------------------------------ */
     /* 📐 Layout Sizes                */

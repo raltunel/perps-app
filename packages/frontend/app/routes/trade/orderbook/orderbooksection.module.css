@@ -29,7 +29,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     color: var(--text2);
     padding: var(--padding-xs) 0;
-    padding-left: var(--padding-s);
 }
 
 .stackedContainer {
@@ -65,14 +64,4 @@
     justify-content: center;
     align-items: center;
     padding-bottom: var(--padding-s);
-}
-
-.orderbookInTab {
-    height: calc(100% - 34px);
-    display: flex;
-}
-
-.tabContent {
-    height: 100%;
-    width: 100%;
 }

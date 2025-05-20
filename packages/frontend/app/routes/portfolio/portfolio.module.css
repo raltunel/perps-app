@@ -1,12 +1,17 @@
 .container {
+    --container-width: 1280px;
+    --container-gap: 48px;
+    --table-height: 155px;
+    --fee-modal-width: 500px;
+
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 48px;
-    max-width: 1280px;
+    gap: var(--container-gap);
+    max-width: var(--container-width);
     margin: 0 auto;
 
-    padding-bottom: 1rem;
+    padding-bottom: var(--padding-m);
     overflow-y: hidden;
 }
 .container header {
@@ -17,13 +22,13 @@
     height: 100%;
     display: grid;
     grid-template-rows: 141px 1fr;
-    gap: 48px;
+    gap: var(--container-gap);
 }
 .detailsContainer {
     height: 100%;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .detailsContent {
     height: 100%;
@@ -52,9 +57,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: var(--gap-m);
     font-size: var(--font-size-m, 18px);
     text-align: center;
+}
+.buttonContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
 }
 .totalNetDisplay h6 {
     width: 100%;
@@ -72,39 +82,39 @@
     align-items: center;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .totalNetDisplay button {
     outline: none;
     border: none;
     display: flex;
-    padding: 12px 16px;
+    padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 1 0 0;
-    border-radius: var(--Corner-Radius-Button, 8px);
+    border-radius: var(--radius-s);
     background: var(--bg-dark3, #1c1c22);
     color: var(--text1, #f0f0f8);
 
-    font-size: var(--font-size-m, 18px);
-    max-height: 47px;
+    font-size: var(--font-size-m);
+    height: var(--button-height);
+    width: 100%;
 }
 
 .table {
-    height: 155;
+    height: var(--table-height);
     overflow-y: hidden;
 }
 
 .table > div {
-    height: 155px;
+    height: var(--table-height);
 }
 .mainContent {
     height: 100%;
 
     display: grid;
-    grid-template-rows: auto 155px;
-    gap: 8px;
+    grid-template-rows: auto var(--table-height);
+    gap: var(--gap-s);
 }
 .sendMobile,
 .netValueMobile {
@@ -114,11 +124,11 @@
 .fee_schedule_modal {
     display: flex;
     flex-direction: column;
-    min-width: 500px;
-    padding: 8px 16px 16px;
+    min-width: var(--fee-modal-width);
+    padding: var(--padding-s) var(--padding-m) var(--padding-m);
     border-radius: var(--radius-m);
     color: var(--text1);
-    gap: 16px;
+    gap: var(--gap-m);
     background-color: var(--bg-dark3);
     user-select: none;
     -webkit-user-select: none;
@@ -139,12 +149,12 @@
 .fee_table {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 
     /* this keeps consistent spacing in table header and data rows */
     --fee_table_col_spacing: 2fr 6fr 3fr 3fr;
     --fee_table_col_gap: 8px;
-    --fee_table_row_padding: 0 8px;
+    --fee_table_row_padding: 0 var(--padding-s);
 }
 
 .fee_table > h4 {
@@ -164,7 +174,7 @@
     display: flex;
     flex-direction: column;
     list-style-type: none;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 
 .fee_table > ol > li {
@@ -190,21 +200,21 @@
 @media (max-width: 768px) {
     .container {
         overflow-y: auto;
-        gap: 8px;
+        gap: var(--gap-s);
     }
     .detailsContainer {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--gap-s);
     }
     .detailsContent {
-        padding: 8px 0;
+        padding: var(--padding-s) 0;
     }
 
     .column {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--gap-s);
     }
 
     .sendDesktop,

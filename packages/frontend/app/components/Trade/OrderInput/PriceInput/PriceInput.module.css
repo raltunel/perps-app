@@ -1,6 +1,6 @@
 .priceInputContainer {
     width: 100%;
-    padding: 4px 8px;
+    padding: var(--padding-xs) var(--padding-s);
     align-items: center;
     align-self: stretch;
     border-radius: var(--radius-s, 8px);

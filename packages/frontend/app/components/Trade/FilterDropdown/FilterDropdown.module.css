@@ -15,7 +15,7 @@
     color: var(--text1);
     font-size: var(--font-size-s, 12px);
     gap: 8px;
-    padding: 0px 4px 0px 8px;
+    padding: var(--padding-dropdown);
     width: 68px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -50,14 +50,14 @@
     /* border: 1px solid rgba(255, 255, 255, 0.1); */
     border-radius: var(--radius-s, 8px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    padding: 4px 0px;
+    padding: var(--padding-xs) 0px;
     z-index: 100;
 }
 
 .optionRow {
     font-size: var(--font-size-s, 12px);
 
-    padding: 0px 8px;
+    padding: 0 var(--padding-s);
 
     transition: background-color 0.2s ease;
     cursor: pointer;

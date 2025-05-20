@@ -8,7 +8,7 @@
 .dropdownToggle {
     display: flex;
     height: 100%;
-    padding: 0px 4px 0px 8px;
+    padding: var(--padding-dropdown);
     align-items: center;
     justify-content: space-between;
     background: var(--bg-dark3, #1c1c22);
@@ -55,13 +55,13 @@
     max-height: 200px;
     overflow-y: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    padding-bottom: 8px;
+    padding-bottom: var(--padding-s);
 }
 
 .dropdownItem {
     display: flex;
     height: 15px;
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
     align-items: center;
     cursor: pointer;
     color: var(--text2, #bcbcc4);
@@ -80,7 +80,7 @@
 }
 
 .noOptions {
-    padding: 8px;
+    padding: var(--padding-s);
     text-align: center;
     color: var(---text2, #bcbcc4);
     font-size: var(--Font-Size-Font-S, 12px);
