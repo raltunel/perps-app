@@ -1,20 +1,46 @@
-.filterContainer {
+.headercontainer {
     display: flex;
-    flex-direction: row;
+
     align-items: center;
     justify-content: center;
+
     width: 100%;
+    height: 100%;
+
+    background-color: var(--dark2);
+}
+
+.header {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    align-items: center;
+    justify-content: center;
+
+    width: 50%;
     height: 50px;
-    gap: 8px;
 }
 
 .vaultFilter {
     display: flex;
+
     align-items: center;
+    justify-content: center;
+
     background-color: var(--dark2);
 
     height: 30px;
-    width: 130px;
+    width: 150px;
 
     font-family: var(--font-family-main);
+}
+
+.filterContainer {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
 }

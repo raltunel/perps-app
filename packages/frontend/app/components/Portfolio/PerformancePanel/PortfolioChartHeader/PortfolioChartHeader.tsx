@@ -26,37 +26,45 @@ const PortfolioChartHeader: React.FC = () => {
     }>({ label: '30D', value: '2592000' });
 
     return (
-        <div className={styles.filterContainer}>
-            <div className={styles.vaultFilter}>
-                <ComboBox
-                    value={selectedVault.label}
-                    options={vaultOptions}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setSelectedVault({
-                            label: value,
-                            value:
-                                vaultOptions.find((opt) => opt.label === value)
-                                    ?.value || '',
-                        })
-                    }
-                />
-            </div>
+        <div className={styles.headercontainer}>
+            <div className={styles.header}>
+                <div className={styles.filterContainer}>
+                    <div className={styles.vaultFilter}>
+                        <ComboBox
+                            value={selectedVault.label}
+                            options={vaultOptions}
+                            fieldName='label'
+                            onChange={(value) =>
+                                setSelectedVault({
+                                    label: value,
+                                    value:
+                                        vaultOptions.find(
+                                            (opt) => opt.label === value,
+                                        )?.value || '',
+                                })
+                            }
+                        />
+                    </div>
+                </div>
 
-            <div className={styles.vaultFilter}>
-                <ComboBox
-                    value={selectedPeriod.label}
-                    options={periodOptions}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setSelectedPeriod({
-                            label: value,
-                            value:
-                                vaultOptions.find((opt) => opt.label === value)
-                                    ?.value || '',
-                        })
-                    }
-                />
+                <div className={styles.filterContainer}>
+                    <div className={styles.vaultFilter}>
+                        <ComboBox
+                            value={selectedPeriod.label}
+                            options={periodOptions}
+                            fieldName='label'
+                            onChange={(value) =>
+                                setSelectedPeriod({
+                                    label: value,
+                                    value:
+                                        vaultOptions.find(
+                                            (opt) => opt.label === value,
+                                        )?.value || '',
+                                })
+                            }
+                        />
+                    </div>
+                </div>
             </div>
         </div>
     );
