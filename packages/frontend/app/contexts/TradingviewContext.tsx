@@ -70,9 +70,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { debugWallet } = useDebugStore();
 
-    const [isChartReady, setIsChartReady] = useState(false);
-
     const { showBuysSellsOnChart } = useAppOptions();
+
+    const [isChartReady, setIsChartReady] = useState(false);
 
     useEffect(() => {
         const res = getChartLayout();
