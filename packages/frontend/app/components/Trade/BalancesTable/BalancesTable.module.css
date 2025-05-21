@@ -1,7 +1,8 @@
 .rowContainer {
     width: 100%;
-    height: 25px;
-    padding-left: 8px;
+    height: var(--table-row-height);
+
+    padding-left: var(--padding-s);
     gap: 8px;
     display: grid;
     grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
@@ -11,8 +12,8 @@
 .headerContainer {
     background: var(--bg-dark2);
     width: 100%;
-    height: 24px;
-    padding-left: 8px;
+    height: var(--table-header-height);
+    padding-left: var(--padding-s);
     gap: 8px;
     display: grid;
     grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr;
@@ -29,7 +30,7 @@
     height: 100%;
     overflow-x: auto;
     border-radius: 0.5rem;
-    padding-bottom: 8px;
+    padding-bottom: var(--padding-s);
 
     display: flex;
     flex-direction: column;
@@ -38,7 +39,7 @@
 .tableBody {
     height: 100%;
     overflow-y: scroll;
-    padding-bottom: 1rem;
+    padding-bottom: var(--padding-m);
 }
 .tableBody::-webkit-scrollbar {
     display: none;

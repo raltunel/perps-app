@@ -1,31 +1,33 @@
 .place_order_buttons {
+    --container-height: 125px;
+    --input-detail-item-height: 16px;
+    --button-font-size: 16px;
+
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    height: 125px;
+    gap: var(--gap-s);
+    height: var(--container-height);
 }
 
 .buttons_wrapper {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .buttons_wrapper > button {
-    height: 47px;
     display: flex;
-    padding: 12px 16px;
+    padding: var(--button-padding);
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex: 1 0 0;
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m, 18px);
-    font-size: 16px;
+    font-size: var(--button-font-size);
     outline: none;
     border: none;
+    height: 47px !important;
 }
 
 .input_details {
@@ -33,10 +35,11 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
-    padding: 8px 0px;
+    /* change from 2px to 4px */
+    gap: var(--gap-xs);
+    padding: var(--padding-s) 0px;
     align-self: stretch;
-    border-radius: var(--radius-s, 8px);
+    border-radius: var(--radius-s);
     border: 1px solid var(--bg-dark4, #27272c);
 }
 
@@ -46,9 +49,9 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    font-size: var(--font-size-s, 12px);
-    padding: 0 8px;
-    height: 16px;
+    font-size: var(--font-size-s);
+    padding: 0 var(--padding-s);
+    height: var(--input-detail-item-height);
 }
 
 .detail_label {
@@ -56,7 +59,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 
 .detail_value {

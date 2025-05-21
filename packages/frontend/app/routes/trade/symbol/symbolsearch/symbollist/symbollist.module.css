@@ -5,7 +5,7 @@
     z-index: 1000;
     width: 50rem;
     background-color: var(--bg-dark3) !important;
-    padding: 0.5rem;
+    padding: var(--padding-s);
     border-radius: 0.4rem !important;
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
 }
@@ -43,7 +43,7 @@
     background-color: var(--bg-dark4);
     outline: none;
     border: none;
-    padding-left: 2rem;
+    padding-left: var(--padding-l);
     color: var(--text1);
 }
 

@@ -203,6 +203,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             custom_themes: customThemes(),
             overrides: {
                 volumePaneSize: 'medium',
+                'paneProperties.background': '#0e0e14',
+                'paneProperties.backgroundGradientStartColor': '#0e0e14',
+                'paneProperties.backgroundGradientEndColor': '#0e0e14',
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
@@ -223,11 +226,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         tvWidget.onChartReady(() => {
-            tvWidget.applyOverrides({
-                'paneProperties.background': '#0e0e14',
-                'paneProperties.backgroundType': 'solid',
-            });
-
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane

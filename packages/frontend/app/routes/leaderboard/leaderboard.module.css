@@ -1,7 +1,6 @@
 .container {
     width: 100%;
 
-    /* padding: 2rem; */
     display: flex;
     flex-direction: column;
     gap: 64px;
@@ -20,7 +19,7 @@
     border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #111117);
     display: flex;
-    padding: 8px 16px;
+    padding: var(--padding-s) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -40,7 +39,7 @@
     display: flex;
     width: 400px;
     height: 31px;
-    padding: 0px 4px;
+    padding: 0px var(--padding-xs);
     justify-content: center;
     align-items: center;
     gap: 4px;
@@ -93,7 +92,7 @@
     right: 0;
     background-color: var(--bg-dark3);
     border-radius: var(--radius-s);
-    padding: 8px;
+    padding: var(--padding-s);
     width: 100%;
     z-index: 10;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -102,7 +101,7 @@
 
 .dropdownItem {
     width: 100%;
-    padding: 8px;
+    padding: var(--padding-s);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     cursor: pointer;
@@ -131,7 +130,7 @@
 
 .rowSelector {
     background-color: var(--bg-dark2, #1a1b23);
-    padding: 8px;
+    padding: var(--padding-s);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -218,7 +217,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: var(--padding-m);
         margin-top: 48px;
     }
 
@@ -253,7 +252,7 @@
 }
 ÷ .dropdownItem {
     width: 100%;
-    padding: 8px;
+    padding: var(--padding-s);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     cursor: pointer;
