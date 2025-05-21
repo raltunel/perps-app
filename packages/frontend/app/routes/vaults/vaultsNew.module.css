@@ -42,7 +42,7 @@
         flex-direction: column;
         align-items: center;
         gap: 16px;
-        padding: 8px;
+        padding: var(--padding-s);
     }
 }
 /* Medium screens (tablets) */

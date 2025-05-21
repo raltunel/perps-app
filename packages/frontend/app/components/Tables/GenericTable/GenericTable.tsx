@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import Pagination from '~/components/Pagination/Pagination';
+import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 
 interface GenericTableProps<T, S> {
     data: T[];
@@ -61,7 +60,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
 
     const sortedData = useMemo(() => {
         if (sortBy) {
-            return sorterMethod(data, sortBy, sortDirection);
+            return [...sorterMethod(data, sortBy, sortDirection)];
         }
         return data;
     }, [data, sortBy, sortDirection]);
@@ -95,7 +94,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
         if (viewAllLink) {
-            navigate(viewAllLink);
+            navigate(viewAllLink, { viewTransition: true });
         }
     };
 
@@ -127,9 +126,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 <>
                     {renderHeader(sortDirection, handleSort, sortBy)}
                     <div
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : ''
-                        }`}
+                        className={`${styles.tableBody} 
+                        ${pageMode ? styles.pageMode : styles.notPage}
+                        `}
                     >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
