@@ -210,10 +210,10 @@ const PerformanceLineChart: React.FC = () => {
         <div className={styles.chartWrapper}>
             <div className={styles.chartContainer}>
                 <svg id='yAxis' height='300' />
-                <canvas ref={canvasRef} width='800' height='300' />
+                <canvas ref={canvasRef} width='850' height='300' />
             </div>
             <div className={styles.xAxisContainer}>
-                <svg id='xAxis' height='50' width='850' />
+                <svg id='xAxis' height='50' width='900' />
             </div>
         </div>
     );
