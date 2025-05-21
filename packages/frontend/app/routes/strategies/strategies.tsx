@@ -49,6 +49,67 @@ export default function Strategies() {
                     </Button>
                 </div>
             </div>
+            <div className={styles.strategy_details}>
+                <div className={styles.strategy_details_table}>
+                    <header>
+                        <span>Parameters</span>
+                    </header>
+                    <section>
+                        <div>
+                            <div>Market</div>
+                            <div>BTC</div>
+                        </div>
+                        <div>
+                            <div>Distance</div>
+                            <div>2</div>
+                        </div>
+                        <div>
+                            <div>Distance Type</div>
+                            <div>Ticks</div>
+                        </div>
+                        <div>
+                            <div>Side</div>
+                            <div>Both</div>
+                        </div>
+                        <div>
+                            <div>Total Size</div>
+                            <div>$100,000</div>
+                        </div>
+                        <div>
+                            <div>Order Size</div>
+                            <div>$10,000</div>
+                        </div>
+                    </section>
+                </div>
+                <div className={styles.strategy_details_table}>
+                    <header>
+                        <span>Performance</span>
+                    </header>
+                    <section>
+                        <div>
+                            <div>PNL</div>
+                            <div>$0.00</div>
+                        </div>
+                        <div>
+                            <div>Volume</div>
+                            <div>$0.00</div>
+                        </div>
+                        <div>
+                            <div>Max Drawdown</div>
+                            <div>0.00%</div>
+                        </div>
+                        <div>
+                            <div>Orders Placed</div>
+                            <div>0</div>
+                        </div>
+                        <div>
+                            <div>Runtime</div>
+                            <div>0 hours</div>
+                        </div>
+                    </section>
+                </div>
+                <div className={styles.strategy_details_graph}></div>
+            </div>
             <OrderHistory />
         </div>
     );
