@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { LuChevronDown, LuChevronUp, LuMenu, LuSettings, LuWallet } from 'react-icons/lu';
+import {
+    LuChevronDown,
+    LuChevronUp,
+    LuSettings,
+    LuWallet,
+} from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { type useModalIF, useModal } from '~/hooks/useModal';
@@ -186,11 +191,11 @@ export default function PageHeader() {
                 onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
             >
                 more
-                { isMoreDropdownOpen ? <LuChevronUp /> :<LuChevronDown />
-}
-
+                {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
             </button>
-            {isMoreDropdownOpen && <MoreDropdown />}
+            {isMoreDropdownOpen && (
+                <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
+            )}
         </section>
     );
 
@@ -198,15 +203,13 @@ export default function PageHeader() {
 
     return (
         <>
-            <section className={styles.mainContainer}>
-
-           
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/'>
+                <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
                     <img
-                        src='/images/perpsLogo.svg'
+                        src='/images/favicon.svg'
                         alt='Perps Logo'
-                        width='240px'
+                        width='90px'
+                        height='90px'
                     />
                 </Link>
                 <nav
@@ -233,6 +236,7 @@ export default function PageHeader() {
                             onClick={() => {
                                 if (isMenuOpen) setIsMenuOpen(false);
                             }}
+                            viewTransition
                         >
                             {link.name}
                         </Link>
@@ -261,24 +265,19 @@ export default function PageHeader() {
                         <LuSettings size={20} />
                     </button>
 
-                    <button
-                        className={styles.menuButtonMobile}
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    >
-                        <LuMenu size={20} />
-                    </button>
+                    {dropdownMenuDisplay}
                 </div>
-            {dropdownMenuDisplay}
             </header>
-               
-                </section>
 
             {appSettingsModal.isOpen && (
-                <Modal close={appSettingsModal.close} position={'center'} title='Options'>
-                    <AppOptions modalControl={appSettingsModal} />
+                <Modal
+                    close={appSettingsModal.close}
+                    position={'center'}
+                    title='Options'
+                >
+                    <AppOptions />
                 </Modal>
             )}
         </>
     );
 }
-

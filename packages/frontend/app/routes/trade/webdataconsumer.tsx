@@ -4,13 +4,27 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
+import { processUserOrder } from '~/processors/processOrderBook';
+import {
+    processUserFills,
+    processUserFundings,
+    processUserTwapHistory,
+    processUserTwapSliceFills,
+} from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
-import type { AccountOverviewIF, UserBalanceIF } from '~/utils/UserDataIFs';
+import type {
+    AccountOverviewIF,
+    TwapSliceFillIF,
+    TwapHistoryIF,
+    UserBalanceIF,
+    UserFillIF,
+    UserFundingIF,
+} from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
     const {
@@ -27,6 +41,14 @@ export default function WebDataConsumer() {
         setCoinPriceMap,
         setAccountOverview,
         accountOverview,
+        setOrderHistory,
+        fetchedChannels,
+        setFetchedChannels,
+        setUserSymbolOrders,
+        setUserFills,
+        setTwapHistory,
+        setTwapSliceFills,
+        setUserFundings,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -41,11 +63,17 @@ export default function WebDataConsumer() {
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
+    const userOrderHistoryRef = useRef<OrderDataIF[]>([]);
+    const userFillsRef = useRef<UserFillIF[]>([]);
+    const twapHistoryRef = useRef<TwapHistoryIF[]>([]);
+    const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
+    const userFundingsRef = useRef<UserFundingIF[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
 
     const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
+    const fetchedChannelsRef = useRef<Set<string>>(new Set());
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -56,19 +84,58 @@ export default function WebDataConsumer() {
 
     useEffect(() => {
         if (!info) return;
-
+        setFetchedChannels(new Set());
+        fetchedChannelsRef.current = new Set();
         setUserOrders([]);
+        setUserSymbolOrders([]);
+        setPositions([]);
+        positionsRef.current = [];
         openOrdersRef.current = [];
+        userFundingsRef.current = [];
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
             postWebData2,
         );
 
+        const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
+            {
+                type: WsChannels.USER_HISTORICAL_ORDERS,
+                user: debugWallet.address,
+            },
+            postUserHistoricalOrders,
+        );
+
+        const { unsubscribe: unsubscribeUserFills } = info.subscribe(
+            { type: WsChannels.USER_FILLS, user: debugWallet.address },
+            postUserFills,
+        );
+
+        const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
+            { type: WsChannels.TWAP_SLICE_FILLS, user: debugWallet.address },
+            postUserTwapSliceFills,
+        );
+
+        const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
+            { type: WsChannels.TWAP_HISTORY, user: debugWallet.address },
+            postUserTwapHistory,
+        );
+
+        const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
+            { type: WsChannels.USER_FUNDINGS, user: debugWallet.address },
+            postUserFundings,
+        );
+
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
             setUserBalances(userBalancesRef.current);
+            setUserFills(userFillsRef.current);
+            setOrderHistory(userOrderHistoryRef.current);
+            setTwapHistory(twapHistoryRef.current);
+            setTwapSliceFills(twapSliceFillsRef.current);
+            setUserFundings(userFundingsRef.current);
+
             if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
                 accountOverviewRef.current.balanceChange =
                     accountOverviewRef.current.balance -
@@ -80,11 +147,17 @@ export default function WebDataConsumer() {
             if (accountOverviewRef.current) {
                 setAccountOverview(accountOverviewRef.current);
             }
+            setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         }, 1000);
 
         return () => {
             clearInterval(userDataInterval);
             unsubscribe();
+            unsubscribeOrderHistory();
+            unsubscribeUserFills();
+            unsubscribeUserTwapSliceFills();
+            unsubscribeUserTwapHistory();
+            unsubscribeUserFundings();
         };
     }, [debugWallet.address, info]);
 
@@ -102,6 +175,7 @@ export default function WebDataConsumer() {
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
             }
+            fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
         [setCoins, setCoinPriceMap],
     );
@@ -110,6 +184,120 @@ export default function WebDataConsumer() {
         'webData2',
         handleWebData2WorkerResult,
     );
+
+    const postUserHistoricalOrders = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.orderHistory &&
+            data.orderHistory.length > 0 &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const orders: OrderDataIF[] = [];
+            data.orderHistory.forEach((order: any) => {
+                const processedOrder = processUserOrder(
+                    order.order,
+                    order.status,
+                );
+                if (processedOrder) {
+                    orders.push(processedOrder);
+                }
+            });
+            if (data.isSnapshot) {
+                orders.sort((a, b) => b.timestamp - a.timestamp);
+                userOrderHistoryRef.current = orders;
+            } else {
+                userOrderHistoryRef.current = [
+                    ...orders.sort((a, b) => b.timestamp - a.timestamp),
+                    ...userOrderHistoryRef.current,
+                ];
+                userOrderHistoryRef.current.sort(
+                    (a, b) => b.timestamp - a.timestamp,
+                );
+            }
+            fetchedChannelsRef.current.add(WsChannels.USER_HISTORICAL_ORDERS);
+        }
+    }, []);
+
+    const postUserFills = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const fills = processUserFills(data);
+            fills.sort((a, b) => b.time - a.time);
+            if (data.isSnapshot) {
+                userFillsRef.current = fills;
+            } else {
+                userFillsRef.current = [...fills, ...userFillsRef.current];
+            }
+            fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+        }
+    }, []);
+
+    const postUserTwapSliceFills = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const fills = processUserTwapSliceFills(data);
+            if (data.isSnapshot) {
+                twapSliceFillsRef.current = fills;
+            } else {
+                twapSliceFillsRef.current = [
+                    ...fills,
+                    ...twapSliceFillsRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
+        }
+    }, []);
+
+    const postUserTwapHistory = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const history = processUserTwapHistory(data);
+            if (data.isSnapshot) {
+                twapHistoryRef.current = history;
+            } else {
+                twapHistoryRef.current = [
+                    ...history,
+                    ...twapHistoryRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+        }
+    }, []);
+
+    const postUserFundings = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const fundings = processUserFundings(data.fundings);
+            fundings.sort((a, b) => b.time - a.time);
+            if (data.isSnapshot) {
+                userFundingsRef.current = fundings;
+            } else {
+                userFundingsRef.current = [
+                    ...fundings,
+                    ...userFundingsRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+        }
+    }, []);
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {

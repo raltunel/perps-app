@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './watchlistnode.module.css';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useNavigate } from 'react-router';
-import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface WatchListNodeProps {
     symbol: SymbolInfoIF;
@@ -15,7 +15,6 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const navigate = useNavigate();
 
     const { formatNum } = useNumFormatter();
-    const { selectedCurrency } = useTradeDataStore();
 
     const { symbol: storeSymbol, setSymbol: setStoreSymbol } =
         useTradeDataStore();
@@ -29,7 +28,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
     const nodeClickListener = () => {
         if (symbol.coin === storeSymbol) return;
         setStoreSymbol(symbol.coin);
-        navigate(`/trade/${symbol.coin}`);
+        navigate(`/trade/${symbol.coin}`, { viewTransition: true });
     };
 
     const shownVal = useMemo(() => {
@@ -56,7 +55,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
             >
                 <div className={styles.symbolName}>{symbol.coin}-USD</div>
                 <div
-                    className={`w3 ${styles.symbolValue}`}
+                    className={`${styles.symbolValue}`}
                     style={{
                         color:
                             change > 0
@@ -64,6 +63,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = ({ symbol, showMode }) => {
                                 : change < 0
                                   ? getBsColor().sell
                                   : 'var(--text1)',
+                        width: `${shownVal.length * 7}px`,
                     }}
                 >
                     {shownVal}

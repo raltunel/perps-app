@@ -30,3 +30,137 @@ export type UserBalanceSortBy =
     | 'buyingPower'
     | 'pnlValue'
     | undefined;
+
+export interface UserFillIF {
+    time: number;
+    coin: string;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    sz: number;
+    tid: number;
+    value: number;
+    closedPnl: number;
+}
+
+export type UserFillSortBy =
+    | 'time'
+    | 'coin'
+    | 'side'
+    | 'px'
+    | 'sz'
+    | 'value'
+    | 'fee'
+    | 'closedPnl'
+    | undefined;
+
+export interface TwapStateIF {
+    coin: string;
+    executedNtl: number;
+    executedSz: number;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    timestamp: number;
+    user: string;
+}
+
+export interface TwapHistoryIF {
+    state: TwapStateIF;
+    status: string;
+    time: number;
+}
+
+export interface TwapSliceFillIF {
+    coin: string;
+    closedPnl: number;
+    crossed: boolean;
+    dir: string;
+    fee: number;
+    feeToken: string;
+    hash: string;
+    oid: number;
+    px: number;
+    side: 'buy' | 'sell';
+    startPosition: number;
+    sz: number;
+    tid: number;
+    time: number;
+    twapId: number;
+}
+
+export interface PositionLeverageIF {
+    type: string;
+    value: number;
+}
+
+export interface CumulativeFundingIF {
+    allTime: number;
+    sinceChange: number;
+    sinceOpen: number;
+}
+
+export interface PositionIF {
+    coin: string;
+    entryPx: number;
+    leverage: PositionLeverageIF;
+    liquidationPx: number;
+    marginUsed: number;
+    maxLeverage: number;
+    positionValue: number;
+    returnOnEquity: number;
+    szi: number;
+    unrealizedPnl: number;
+    type: string;
+    cumFunding: CumulativeFundingIF;
+    tp?: number;
+    sl?: number;
+    side?: string;
+}
+
+export type PositionDataSortBy =
+    | 'coin'
+    | 'size'
+    | 'positionValue'
+    | 'entryPrice'
+    | 'markPrice'
+    | 'pnl'
+    | 'liqPrice'
+    | 'margin'
+    | 'funding'
+    | undefined;
+
+export interface UserFundingIF {
+    time: number;
+    coin: string;
+    usdc: number;
+    szi: number;
+    fundingRate: number;
+}
+
+export type UserFundingSortBy =
+    | 'time'
+    | 'coin'
+    | 'usdc'
+    | 'szi'
+    | 'fundingRate'
+    | undefined;
+
+export interface UserFundingResponseIF {
+    time: number;
+    hash: string;
+    delta: {
+        type: string;
+        coin: string;
+        usdc: string;
+        szi: string;
+        fundingRate: string;
+        nSzi?: boolean;
+    };
+}

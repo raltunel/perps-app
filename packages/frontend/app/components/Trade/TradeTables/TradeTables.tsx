@@ -1,36 +1,29 @@
-import { useState } from 'react';
 import { motion } from 'framer-motion';
-import styles from './TradeTable.module.css';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
-import FilterDropdown from '../FilterDropdown/FilterDropdown';
-import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
-import PositionsTable from '../PositionsTable/PositionsTable';
-import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
-import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
-import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
-import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
+import FilterDropdown from '../FilterDropdown/FilterDropdown';
+import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
+import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
+import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
+import PositionsTable from '../PositionsTable/PositionsTable';
+import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
+import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
-
+import styles from './TradeTable.module.css';
+import { Pages, usePage } from '~/hooks/usePage';
 export interface FilterOption {
     id: string;
     label: string;
 }
-interface TradeTableProps {
-    initialTab?: string;
-}
 
-const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
+const tradePageBlackListTabs = new Set([
     'Funding History',
-    'Order History',
     'Deposits and Withdrawals',
-];
+]);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -38,29 +31,80 @@ const filterOptions: FilterOption[] = [
     { id: 'long', label: 'Long' },
     { id: 'short', label: 'Short' },
 ];
+
+interface TradeTableProps {
+    portfolioPage?: boolean;
+}
+
 export default function TradeTable(props: TradeTableProps) {
-    const { initialTab = 'Balances' } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const { portfolioPage } = props;
+    const {
+        selectedTradeTab,
+        setSelectedTradeTab,
+        orderHistory,
+        fetchedChannels,
+        userFills,
+        userFundings,
+    } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
+    const { page } = usePage();
+
+    const tabs = useMemo(() => {
+        if (!page) return [];
+
+        let availableTabs = [
+            'Balances',
+            'Positions',
+            'Open Orders',
+            'TWAP',
+            'Trade History',
+            'Funding History',
+            'Order History',
+            'Deposits and Withdrawals',
+        ];
+
+        if (page === Pages.TRADE) {
+            return availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        }
+        return availableTabs;
+    }, [page]);
+
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        }
+    }, [page]);
+
+    const { orderHistoryFetched, tradeHistoryFetched, fundingHistoryFetched } =
+        useMemo(() => {
+            return {
+                orderHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                ),
+                tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+                fundingHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_FUNDINGS,
+                ),
+            };
+        }, [fetchedChannels]);
+
     const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
+        setSelectedTradeTab(tab);
     };
 
     const handleFilterChange = (selectedId: string) => {
         setSelectedFilter(selectedId);
-        // if (onFilterChange) {
-        //   onFilterChange([selectedId]);
-        // }
     };
 
     const handleToggleSmallBalances = (newState?: boolean) => {
         const newValue = newState !== undefined ? newState : !hideSmallBalances;
         setHideSmallBalances(newValue);
-        // if (onToggleSmallBalances) {
-        //   onToggleSmallBalances(newValue);
-        // }
     };
 
     const rightAlignedContent = (
@@ -71,7 +115,7 @@ export default function TradeTable(props: TradeTableProps) {
                 selectedOption={selectedFilter}
                 onChange={handleFilterChange}
             />
-            {activeTab === 'Balances' && (
+            {selectedTradeTab === 'Balances' && (
                 <ToggleSwitch
                     isOn={hideSmallBalances}
                     onToggle={handleToggleSmallBalances}
@@ -81,21 +125,43 @@ export default function TradeTable(props: TradeTableProps) {
     );
 
     const renderTabContent = () => {
-        switch (activeTab) {
+        switch (selectedTradeTab) {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
-                return <PositionsTable />;
+                return (
+                    <PositionsTable
+                        isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
-                return <TwapTable />;
+                return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
-                return <TradeHistoryTable />;
+                return (
+                    <TradeHistoryTable
+                        data={userFills}
+                        isFetched={tradeHistoryFetched}
+                    />
+                );
             case 'Funding History':
-                return <FundingHistoryTable />;
+                return (
+                    <FundingHistoryTable
+                        userFundings={userFundings}
+                        isFetched={fundingHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Order History':
-                return <OrderHistoryTable selectedFilter={selectedFilter} />;
+                return (
+                    <OrderHistoryTable
+                        selectedFilter={selectedFilter}
+                        data={orderHistory}
+                        isFetched={orderHistoryFetched}
+                    />
+                );
             case 'Deposits and Withdrawals':
                 return <DepositsWithdrawalsTable />;
             default:
@@ -110,16 +176,18 @@ export default function TradeTable(props: TradeTableProps) {
     return (
         <div className={styles.tradeTableWrapper}>
             <Tabs
-                tabs={availableTabs}
-                defaultTab={activeTab}
+                tabs={tabs}
+                defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
                 wrapperId='tradeTableTabs'
                 layoutIdPrefix='tradeTableTabsIndicator'
             />
             <motion.div
-                className={styles.tableContent}
-                key={activeTab}
+                className={`${styles.tableContent} ${
+                    portfolioPage ? styles.portfolioPage : ''
+                }`}
+                key={selectedTradeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

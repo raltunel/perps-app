@@ -6,9 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlist.module.css';
 import WatchListNode from './watchlistnode/watchlistnode';
 
-interface WatchListProps {}
-
-const WatchList: React.FC<WatchListProps> = ({}) => {
+const WatchList: React.FC = () => {
     const { favCoins } = useTradeDataStore();
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
@@ -17,7 +15,7 @@ const WatchList: React.FC<WatchListProps> = ({}) => {
 
     return (
         <div className={styles.watchListContainer}>
-            <TbHeartFilled className={styles.favIcon} />
+            <TbHeartFilled className={styles.favIcon} size={23} />
             <FiDollarSign
                 onClick={() => setWatchListMode('dollar')}
                 className={`${styles.watchListToolbarIcon} ${

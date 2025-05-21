@@ -2,7 +2,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
-import type { EntityId, IPaneApi } from '~/tv/charting_library';
+import type {
+    EntityId,
+    IChartingLibraryWidget,
+    IPaneApi,
+} from '~/tv/charting_library';
 import {
     addCustomOrderLine,
     createAnchoredMainText,
@@ -18,8 +22,6 @@ import {
     quantityTextFormatWithComma,
     type LineLabel,
 } from '../customOrderLineUtils';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
 
 export type LineData = {
     xLoc: number;
@@ -43,61 +45,78 @@ export type ChartShapeRefs = {
 };
 
 const LineComponent = ({ lines, orderType }: LineProps) => {
-    const { chart } = useTradingView();
+    const { chart, isChartReady } = useTradingView();
 
     const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
 
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
+    const [localChartReady, setLocalChartReady] = useState(true);
 
-    const { symbol } = useTradeDataStore();
-    const { debugWallet } = useDebugStore();
+    const cleanupInProgressRef = useRef(false);
 
+    const removeShapeById = async (
+        chart: IChartingLibraryWidget,
+        id: EntityId,
+    ) => {
+        const chartRef = chart.activeChart();
+
+        const element = chartRef.getShapeById(id);
+        if (element) chartRef.removeEntity(id);
+    };
     const cleanupShapes = async () => {
+        if (cleanupInProgressRef.current) {
+            return;
+        }
+
+        cleanupInProgressRef.current = true;
+
         try {
             if (chart) {
                 const chartRef = chart.activeChart();
-                const prevItems = orderLineItemsRef.current;
 
-                for (const order of prevItems) {
-                    const {
-                        lineId,
-                        textId,
-                        quantityTextId,
-                        cancelButtonTextId,
-                    } = order;
+                if (chartRef) {
+                    const prevItems = orderLineItemsRef.current;
 
-                    const element = chartRef.getShapeById(lineId);
-                    if (element) chartRef.removeEntity(lineId);
+                    for (const order of prevItems) {
+                        const {
+                            lineId,
+                            textId,
+                            quantityTextId,
+                            cancelButtonTextId,
+                        } = order;
 
-                    const elementText = chartRef.getShapeById(textId);
-                    if (elementText) chartRef.removeEntity(textId);
+                        const element = chartRef.getShapeById(lineId);
+                        if (element) chartRef.removeEntity(lineId);
 
-                    if (quantityTextId) {
-                        const quantityElementText =
-                            chartRef.getShapeById(quantityTextId);
-                        if (quantityElementText)
-                            chartRef.removeEntity(quantityTextId);
+                        const elementText = chartRef.getShapeById(textId);
+                        if (elementText) chartRef.removeEntity(textId);
+
+                        if (quantityTextId) {
+                            const quantityElementText =
+                                chartRef.getShapeById(quantityTextId);
+                            if (quantityElementText)
+                                chartRef.removeEntity(quantityTextId);
+                        }
+
+                        if (cancelButtonTextId) {
+                            const cancelButtonText =
+                                chartRef.getShapeById(cancelButtonTextId);
+                            if (cancelButtonText)
+                                chartRef.removeEntity(cancelButtonTextId);
+                        }
                     }
 
-                    if (cancelButtonTextId) {
-                        const cancelButtonText =
-                            chartRef.getShapeById(cancelButtonTextId);
-                        if (cancelButtonText)
-                            chartRef.removeEntity(cancelButtonTextId);
-                    }
+                    orderLineItemsRef.current = [];
+                    setOrderLineItems([]);
                 }
-
-                orderLineItemsRef.current = [];
-                setOrderLineItems([]);
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error: unknown) {
-            orderLineItemsRef.current = [];
-            setOrderLineItems([]);
-            console.error({ error });
+            // console.warn('Cleanup failed:', error);
+        } finally {
+            cleanupInProgressRef.current = false;
         }
     };
-
-    const [chartReady, setChartReady] = useState(true);
 
     const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
@@ -162,97 +181,105 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
     }, [chart]);
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined = undefined;
+        let timeoutId: NodeJS.Timeout | undefined = undefined;
 
-        const chartRef = chart?.activeChart();
-        setChartReady(false);
-        cleanupShapes();
-        if (!chartRef) return;
+        const init = async () => {
+            setLocalChartReady(false);
+            await cleanupShapes();
 
-        intervalId = setInterval(async () => {
-            const current = chartRef.symbol();
-            if (current.toLocaleLowerCase() === symbol.toLocaleLowerCase()) {
-                setTimeout(() => {
-                    setChartReady(true);
-                }, 2500);
-
-                clearInterval(intervalId);
+            if (isChartReady) {
+                timeoutId = setTimeout(() => {
+                    setLocalChartReady(true);
+                }, 500);
             }
-        }, 100);
+        };
+
+        init();
 
         return () => {
-            clearInterval(intervalId);
-            setChartReady(false);
+            clearTimeout(timeoutId);
         };
-    }, [symbol, debugWallet]);
+    }, [isChartReady]);
 
     useEffect(() => {
         const setupShapes = async () => {
-            if (!chart || lines.length === 0) return;
-            const shapeRefs: ChartShapeRefs[] = [];
+            if (!chart) return;
 
-            for (const line of lines) {
-                let cancelButtonTextId = undefined;
-                const lineId = await addCustomOrderLine(
-                    chart,
-                    line.yPrice,
-                    line.color,
-                );
-                const textId = await createAnchoredMainText(
-                    chart,
-                    line.xLoc,
-                    line.yPrice,
-                    line.textValue,
-                    line.color,
-                );
-                const quantityTextId = line.quantityTextValue
-                    ? await createQuantityAnchoredText(
-                          chart,
-                          getAnchoredQuantityTextLocation(
-                              chart,
-                              line.xLoc,
-                              line.textValue,
-                          ),
+            const currentCount = orderLineItemsRef.current.length;
+            const newCount = lines.length;
 
-                          line.yPrice,
-                          quantityTextFormatWithComma(line.quantityTextValue),
-                      )
-                    : undefined;
-
-                if (orderType === 'openOrder') {
-                    cancelButtonTextId = await createCancelAnchoredText(
-                        chart,
-                        getAnchoredCancelButtonTextLocation(
-                            chart,
-                            line.xLoc,
-                            line.textValue,
-                            line.quantityTextValue
-                                ? quantityTextFormatWithComma(
-                                      line.quantityTextValue,
-                                  )
-                                : undefined,
-                        ),
-                        line.yPrice,
-                    );
+            if (currentCount > newCount) {
+                const toRemove = orderLineItemsRef.current.slice(newCount);
+                for (const shape of toRemove) {
+                    removeShapeById(chart, shape.lineId);
+                    removeShapeById(chart, shape.textId);
+                    if (shape.quantityTextId)
+                        removeShapeById(chart, shape.quantityTextId);
+                    if (shape.cancelButtonTextId)
+                        removeShapeById(chart, shape.cancelButtonTextId);
                 }
-
-                shapeRefs.push({
-                    lineId,
-                    textId,
-                    quantityTextId,
-                    cancelButtonTextId,
-                });
+                orderLineItemsRef.current.length = newCount;
             }
 
-            orderLineItemsRef.current = shapeRefs;
-            setOrderLineItems(shapeRefs);
+            if (currentCount < newCount) {
+                for (let i = currentCount; i < newCount; i++) {
+                    const line = lines[i];
+                    const shapeRefs: ChartShapeRefs = {
+                        lineId: await addCustomOrderLine(
+                            chart,
+                            line.yPrice,
+                            line.color,
+                        ),
+                        textId: await createAnchoredMainText(
+                            chart,
+                            line.xLoc,
+                            line.yPrice,
+                            line.textValue,
+                            line.color,
+                        ),
+                        quantityTextId: line.quantityTextValue
+                            ? await createQuantityAnchoredText(
+                                  chart,
+                                  getAnchoredQuantityTextLocation(
+                                      chart,
+                                      line.xLoc,
+                                      line.textValue,
+                                  ),
+                                  line.yPrice,
+                                  quantityTextFormatWithComma(
+                                      line.quantityTextValue,
+                                  ),
+                              )
+                            : undefined,
+                        cancelButtonTextId:
+                            orderType === 'openOrder'
+                                ? await createCancelAnchoredText(
+                                      chart,
+                                      getAnchoredCancelButtonTextLocation(
+                                          chart,
+                                          line.xLoc,
+                                          line.textValue,
+                                          line.quantityTextValue
+                                              ? quantityTextFormatWithComma(
+                                                    line.quantityTextValue,
+                                                )
+                                              : undefined,
+                                      ),
+                                      line.yPrice,
+                                  )
+                                : undefined,
+                    };
+                    orderLineItemsRef.current.push(shapeRefs);
+                }
+            }
+
+            setOrderLineItems([...orderLineItemsRef.current]);
         };
 
-        if (chartReady) {
-            cleanupShapes();
+        if (localChartReady && isChartReady) {
             setupShapes();
         }
-    }, [chart, chartReady, lines.length]);
+    }, [chart, isChartReady, localChartReady, lines.length]);
 
     useEffect(() => {
         let isCancelled = false;
@@ -260,15 +287,20 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
         const updateSingleLine = (item: ChartShapeRefs, lineData: LineData) => {
             if (!chart) return;
+
+            const activeChart = chart.activeChart();
+
             const { lineId, textId, quantityTextId, cancelButtonTextId } = item;
             const pricePerPixel = priceToPixel(chart, lineData.yPrice);
 
-            const activeLabel = chart.activeChart().getShapeById(textId);
+            const activeLabel = activeChart.getShapeById(textId);
             if (activeLabel) {
                 const activeLabelText = formatLineLabel(lineData.textValue);
                 activeLabel.setProperties({
                     text: activeLabelText,
                     wordWrapWidth: estimateTextWidth(activeLabelText),
+                    linecolor: lineData.color,
+                    borderColor: lineData.color,
                 });
                 activeLabel.setAnchoredPosition({
                     x: lineData.xLoc,
@@ -280,9 +312,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                 const quantityText = quantityTextFormatWithComma(
                     lineData.quantityTextValue,
                 );
-                const activeQuantityLabel = chart
-                    .activeChart()
-                    .getShapeById(quantityTextId);
+                const activeQuantityLabel =
+                    activeChart.getShapeById(quantityTextId);
                 if (activeQuantityLabel) {
                     activeQuantityLabel.setAnchoredPosition({
                         x: getAnchoredQuantityTextLocation(
@@ -300,9 +331,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             }
 
             if (cancelButtonTextId) {
-                const activeCancelButtonLabel = chart
-                    .activeChart()
-                    .getShapeById(cancelButtonTextId);
+                const activeCancelButtonLabel =
+                    activeChart.getShapeById(cancelButtonTextId);
                 if (activeCancelButtonLabel) {
                     activeCancelButtonLabel.setAnchoredPosition({
                         x: getAnchoredCancelButtonTextLocation(
@@ -320,7 +350,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                 }
             }
 
-            const activeLine = chart.activeChart().getShapeById(lineId);
+            const activeLine = activeChart.getShapeById(lineId);
             if (activeLine) {
                 activeLine.setPoints([{ time: 10, price: lineData.yPrice }]);
                 activeLine.setProperties({
@@ -331,9 +361,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         };
 
         const updateTextPositionOnce = () => {
-            orderLineItems.forEach((item, i) =>
-                updateSingleLine(item, lines[i]),
-            );
+            orderLineItems.forEach((item, i) => {
+                updateSingleLine(item, lines[i]);
+            });
         };
 
         const startZoomInterval = () => {
@@ -351,9 +381,11 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
             !chart ||
             orderLineItems.length === 0 ||
             lines.length === 0 ||
-            orderLineItems.length !== lines.length
+            orderLineItems.length !== lines.length ||
+            !(localChartReady && isChartReady)
         )
             return;
+
         if (zoomChanged) {
             startZoomInterval();
         } else {
@@ -369,102 +401,111 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
         chart,
         JSON.stringify(lines),
         zoomChanged,
+        localChartReady,
+        isChartReady,
     ]);
 
     useEffect(() => {
         const handleMouseMove = (params: any) => {
             if (chart) {
-                const chartDiv = document.getElementById('tv_chart');
-                const iframe = chartDiv?.querySelector(
-                    'iframe',
-                ) as HTMLIFrameElement;
+                try {
+                    const chartDiv = document.getElementById('tv_chart');
+                    const iframe = chartDiv?.querySelector(
+                        'iframe',
+                    ) as HTMLIFrameElement;
 
-                iframe.style.cursor = 'pointer';
-                const iframeDoc = iframe.contentDocument;
+                    iframe.style.cursor = 'pointer';
+                    const iframeDoc = iframe.contentDocument;
 
-                if (iframeDoc) {
-                    const paneCanvas = iframeDoc.querySelector(
-                        'canvas[data-name="pane-canvas"]',
-                    );
+                    if (iframeDoc) {
+                        const paneCanvas = iframeDoc.querySelector(
+                            'canvas[data-name="pane-canvas"]',
+                        );
 
-                    const rect = paneCanvas?.getBoundingClientRect();
+                        const rect = paneCanvas?.getBoundingClientRect();
 
-                    if (rect) {
-                        const offsetX = params.offsetX - rect.left;
-                        const offsetY = params.offsetY - rect.top;
+                        if (rect && orderLineItems.length === lines.length) {
+                            const offsetX = params.offsetX - rect.left;
+                            const offsetY = params.offsetY - rect.top;
 
-                        for (let i = 0; i < orderLineItems.length; i++) {
-                            const element = orderLineItems[i];
-                            // const lineData = lines[i];
+                            for (let i = 0; i < orderLineItems.length; i++) {
+                                const element = orderLineItems[i];
+                                const timeScale = chart
+                                    .activeChart()
+                                    .getTimeScale();
+                                const chartWidth = Math.floor(
+                                    timeScale.width(),
+                                );
 
-                            const timeScale = chart
-                                .activeChart()
-                                .getTimeScale();
-                            const chartWidth = Math.floor(timeScale.width());
+                                const priceScalePane = chart
+                                    .activeChart()
+                                    .getPanes()[0] as IPaneApi;
 
-                            const priceScalePane = chart
-                                .activeChart()
-                                .getPanes()[0] as IPaneApi;
+                                const priceScale =
+                                    priceScalePane.getMainSourcePriceScale();
+                                if (priceScale) {
+                                    const chartHeight =
+                                        priceScalePane.getHeight();
 
-                            const priceScale =
-                                priceScalePane.getMainSourcePriceScale();
-                            if (priceScale) {
-                                const chartHeight = priceScalePane.getHeight();
+                                    const { textId, cancelButtonTextId } =
+                                        element;
+                                    if (cancelButtonTextId) {
+                                        const activeCancelButtonLabel = chart
+                                            .activeChart()
+                                            .getShapeById(cancelButtonTextId);
 
-                                const { textId, cancelButtonTextId } = element;
-                                if (cancelButtonTextId) {
-                                    const activeCancelButtonLabel = chart
-                                        .activeChart()
-                                        .getShapeById(cancelButtonTextId);
+                                        const activeLabel = chart
+                                            .activeChart()
+                                            .getShapeById(textId);
 
-                                    const activeLabel = chart
-                                        .activeChart()
-                                        .getShapeById(textId);
+                                        if (
+                                            activeCancelButtonLabel &&
+                                            activeLabel
+                                        ) {
+                                            const cancelButtonPoints =
+                                                activeCancelButtonLabel.getAnchoredPosition();
 
-                                    if (
-                                        activeCancelButtonLabel &&
-                                        activeLabel
-                                    ) {
-                                        const cancelButtonPoints =
-                                            activeCancelButtonLabel.getAnchoredPosition();
+                                            const textPoints =
+                                                activeLabel.getAnchoredPosition();
 
-                                        const textPoints =
-                                            activeLabel.getAnchoredPosition();
-
-                                        if (cancelButtonPoints && textPoints) {
-                                            const tempXForCancel =
-                                                cancelButtonPoints.x *
-                                                chartWidth;
-                                            const tempY =
-                                                cancelButtonPoints.y *
-                                                chartHeight;
-                                            const tempXForText =
-                                                textPoints.x * chartWidth;
-                                            const isInsideCancel =
-                                                isInsideTextBounds(
-                                                    offsetX,
-                                                    offsetY,
-                                                    tempXForText,
-                                                    tempXForCancel,
-                                                    tempY,
-                                                );
-                                            const elements =
-                                                iframeDoc.querySelectorAll(
-                                                    '.chart-markup-table.pane',
-                                                );
-
-                                            if (isInsideCancel) {
-                                                elements.forEach((item) => {
-                                                    item.classList.remove(
-                                                        'pane--cursor-ew-resize',
+                                            if (
+                                                cancelButtonPoints &&
+                                                textPoints
+                                            ) {
+                                                const tempXForCancel =
+                                                    cancelButtonPoints.x *
+                                                    chartWidth;
+                                                const tempY =
+                                                    cancelButtonPoints.y *
+                                                    chartHeight;
+                                                const tempXForText =
+                                                    textPoints.x * chartWidth;
+                                                const isInsideCancel =
+                                                    isInsideTextBounds(
+                                                        offsetX,
+                                                        offsetY,
+                                                        tempXForText,
+                                                        tempXForCancel,
+                                                        tempY,
+                                                    );
+                                                const elements =
+                                                    iframeDoc.querySelectorAll(
+                                                        '.chart-markup-table.pane',
                                                     );
 
-                                                    item.classList.add(
-                                                        'pane--cursor-pointer',
-                                                    );
-                                                });
+                                                if (isInsideCancel) {
+                                                    elements.forEach((item) => {
+                                                        item.classList.remove(
+                                                            'pane--cursor-ew-resize',
+                                                        );
 
-                                                return;
+                                                        item.classList.add(
+                                                            'pane--cursor-pointer',
+                                                        );
+                                                    });
+
+                                                    return;
+                                                }
                                             }
                                         }
                                     }
@@ -472,6 +513,9 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                             }
                         }
                     }
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error: unknown) {
+                    // console.error({ error });
                 }
             }
         };

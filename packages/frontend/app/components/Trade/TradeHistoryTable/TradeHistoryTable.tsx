@@ -1,19 +1,27 @@
-import React from 'react';
+import { useMemo } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { sortUserFills } from '~/processors/processUserFills';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { UserFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import TradeHistoryTableHeader from './TradeHistoryTableHeader';
-import TradeHistoryTableRow, {
-    type TradeHistoryData,
-} from './TradeHistoryTableRow';
-import styles from './TradeHistoryTable.module.css';
-import { tradeHistoryData } from './data';
-
+import TradeHistoryTableRow from './TradeHistoryTableRow';
 interface TradeHistoryTableProps {
+    data: UserFillIF[];
+    isFetched: boolean;
+    selectedFilter?: string;
     onViewOrderDetails?: (time: string, coin: string) => void;
     onViewAll?: () => void;
-    onExportCsv?: () => void;
+    pageMode?: boolean;
 }
 
 export default function TradeHistoryTable(props: TradeHistoryTableProps) {
-    const { onViewOrderDetails, onViewAll, onExportCsv } = props;
+    const { data, isFetched, selectedFilter, onViewOrderDetails, pageMode } =
+        props;
+
+    const { symbol } = useTradeDataStore();
+
+    const { debugWallet } = useDebugStore();
 
     const handleViewOrderDetails = (time: string, coin: string) => {
         if (onViewOrderDetails) {
@@ -21,60 +29,50 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
         }
     };
 
-    const handleViewAll = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (onViewAll) {
-            onViewAll();
+    const filteredData = useMemo(() => {
+        switch (selectedFilter) {
+            case 'all':
+                return data;
+            case 'active':
+                return data.filter((fill) => fill.coin === symbol);
+            case 'long':
+                return data.filter((fill) => fill.side === 'buy');
+            case 'short':
+                return data.filter((fill) => fill.side === 'sell');
         }
-    };
 
-    const handleExportCsv = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (onExportCsv) {
-            onExportCsv();
-        }
-    };
+        return data;
+    }, [data, selectedFilter]);
+
+    const viewAllLink = useMemo(() => {
+        return `/tradeHistory/${debugWallet.address}`;
+    }, [debugWallet.address]);
 
     return (
-        <div className={styles.tableWrapper}>
-            <TradeHistoryTableHeader />
-            <div className={styles.tableBody}>
-                {tradeHistoryData.map((trade, index) => (
+        <>
+            <GenericTable
+                data={filteredData}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                    <TradeHistoryTableHeader
+                        sortBy={sortBy as UserFillSortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={sortClickHandler}
+                    />
+                )}
+                renderRow={(trade, index) => (
                     <TradeHistoryTableRow
                         key={`trade-${index}`}
                         trade={trade}
                         onViewOrderDetails={handleViewOrderDetails}
                     />
-                ))}
-
-                {tradeHistoryData.length === 0 && (
-                    <div
-                        className={styles.rowContainer}
-                        style={{ justifyContent: 'center', padding: '2rem 0' }}
-                    >
-                        No trade history
-                    </div>
                 )}
-
-                {tradeHistoryData.length > 0 && (
-                    <div className={styles.actionsContainer}>
-                        <a
-                            href='#'
-                            className={styles.viewAllLink}
-                            onClick={handleViewAll}
-                        >
-                            View All
-                        </a>
-                        <a
-                            href='#'
-                            className={styles.exportLink}
-                            onClick={handleExportCsv}
-                        >
-                            Export as CSV
-                        </a>
-                    </div>
-                )}
-            </div>
-        </div>
+                sorterMethod={sortUserFills}
+                isFetched={isFetched}
+                pageMode={pageMode}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+            />
+        </>
     );
 }

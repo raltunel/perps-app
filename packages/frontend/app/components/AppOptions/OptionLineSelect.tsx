@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type JSX } from 'react';
-import styles from './OptionLineSelect.module.css';
 import { SlArrowDown } from 'react-icons/sl';
+import styles from './OptionLineSelect.module.css';
 
 interface dropdownOptionsIF {
     readable: string | JSX.Element;
@@ -41,7 +41,7 @@ export default function OptionLineSelect(props: propsIF) {
         // add event listener to DOM when component mounts
         // wait for menu to be opened before adding event listener, seems
         // ... to help things move faster
-        isOpen && document.addEventListener(TRIGGER, handleClickOutside);
+        if (isOpen) document.addEventListener(TRIGGER, handleClickOutside);
         // remove event listener from DOM when component dismounts
         return () => document.removeEventListener(TRIGGER, handleClickOutside);
     }, [isOpen]);
@@ -49,6 +49,7 @@ export default function OptionLineSelect(props: propsIF) {
     return (
         <li className={styles.option_line}>
             {text}
+
             <div
                 ref={dropdownRef}
                 onClick={() => setIsOpen(!isOpen)}

@@ -35,14 +35,13 @@ export default function TradeRouteHandler() {
             if (response && response.ok) {
                 setSymbol(urlSymbol);
             } else {
-                navigate('/trade/BTC');
+                navigate('/trade/BTC', { viewTransition: true });
             }
         }
     };
 
     useEffect(() => {
         checkSymbol();
-        marketId && console.log(marketId); // Logs the ticker from the URL
     }, [marketId]);
 
     return <></>;

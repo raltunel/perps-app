@@ -1,20 +1,22 @@
 /* top-level element returned by JSX file */
 .app_options {
+    --container-width: 400px;
+    --base-z-idx-app-options: 1;
+    --divider-height: 1px;
+
     display: flex;
     flex-direction: column;
-    padding: 8px 16px 16px;
-    gap: 8px;
-    min-width: 400px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m);
+    gap: var(--gap-s);
+    min-width: var(--container-width);
     user-select: none;
-    font-family: var(--font-family-main);
-    background-color: var(--dark3);
-    border-radius: 20px;
+    background-color: var(--bg-dark3);
+    border-radius: var(--radius-m);
 
     /*
         This approach to z-index allows children of this element to
         ... define a z-axis value relative to the value in this file.
     */
-    --base-z-idx-app-options: 1;
     z-index: var(--base-z-idx-app-options);
 }
 
@@ -32,13 +34,13 @@
     display: flex;
     flex-direction: column;
     list-style-type: none;
-    gap: 6px;
+    gap: var(--gap-s);
 }
 
 /* styling to make a <div> elem appear like an <hr> elem */
 .horizontal_divider {
-    height: 2px;
-    background-color: var(--dark6);
+    height: var(--divider-height);
+    background-color: var(--bg-dark6);
 }
 
 /* clickable to apply default settings at bottom of screen */
@@ -47,4 +49,11 @@
     cursor: pointer;
     font-size: var(--font-size-m);
     color: var(--accent1);
+}
+
+@media (max-width: 768px) {
+    .app_options {
+        width: auto;
+        max-width: 100%;
+    }
 }

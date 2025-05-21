@@ -1,19 +1,19 @@
 .rowContainer {
     width: 100%;
-    height: 25px;
-    padding-left: 8px;
-    gap: 8px;
+    height: var(--table-row-height);
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
     display: grid;
     grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
 }
 
 .headerContainer {
-    background: var(--dark2);
+    background: var(--bg-dark2);
     width: 100%;
-    height: 24px;
-    padding-left: 8px;
-    gap: 8px;
+    height: var(--table-header-height);
+    padding-left: var(--padding-s);
+    gap: var(--gap-s);
     display: grid;
     grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
     align-items: center;
@@ -28,8 +28,8 @@
     width: 100%;
     height: 100%;
     overflow-x: auto;
-    border-radius: 0.5rem;
-    padding-bottom: 8px;
+    border-radius: var(--radius-s);
+    padding-bottom: var(--padding-s);
 
     display: flex;
     flex-direction: column;
@@ -40,7 +40,8 @@
 .tableBody {
     height: 100%;
     overflow-y: scroll;
-    padding-bottom: 1rem;
+    padding-bottom: var(--padding-l);
+    position: relative;
 }
 .tableBody::-webkit-scrollbar {
     display: none;
@@ -49,7 +50,6 @@
 .cell {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
-    font-weight: 400;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -57,12 +57,11 @@
 
 .headerCell {
     color: var(--text2, #6a6a6d);
-    font-size: var(--font-size-xs, 10px);
-    font-weight: 400;
+    font-size: var(--font-size-xs);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     cursor: default;
 }
 
@@ -75,11 +74,12 @@
 }
 
 .badge {
-    background: var(--dark3);
-    border-radius: 2px;
-    padding: 2px 4px;
+    background: var(--accent1);
+    border-radius: var(--radius-xs);
+    padding: 2px var(--padding-xs);
     display: inline-block;
-    font-size: var(--font-size-xs, 10px);
+    font-size: var(--font-size-s);
+    margin-left: var(--gap-xs);
 }
 
 .actionButton {
@@ -105,7 +105,7 @@
 .coinCell {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 
 .sizeCell {
@@ -116,8 +116,15 @@
 }
 .markPriceCell {
 }
+
 .pnlCell {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-xs);
+    align-items: center;
+    cursor: pointer;
 }
+
 .liqPriceCell {
 }
 .marginCell {
@@ -134,8 +141,9 @@
 .headerContainer .closeCell {
     text-align: end;
     justify-self: end;
-    padding-right: 8px;
+    padding-right: var(--padding-s);
 }
+
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
@@ -197,7 +205,7 @@
     .rowContainer,
     .headerContainer {
         grid-template-columns: 0.8fr 1fr 1.2fr;
-        padding: 0 4px;
+        padding: 0 var(--padding-xs);
     }
 
     .positionValueCell {
@@ -205,15 +213,32 @@
     }
 
     .headerCell {
-        font-size: 9px;
+        font-size: var(--font-size-xs);
     }
 
     .cell {
-        font-size: 11px;
+        font-size: var(--font-size-s);
     }
 
     .actionButton {
-        font-size: 11px;
-        margin-right: 4px;
+        font-size: var(--font-size-s);
+        margin-right: var(--margin-xs);
     }
+}
+
+.viewAllLink {
+    color: var(--accent1, #7371fc);
+    text-decoration: none;
+    font-size: var(--font-size-s, 12px);
+    grid-column: 1 / -1;
+    text-align: center;
+    padding-left: var(--padding-s);
+    margin-top: 8px;
+    position: absolute;
+    bottom: 0.2rem;
+    left: 0;
+    width: 100%;
+    background: var(--bg-dark2);
+    text-align: left;
+    padding: 0rem 1.7rem;
 }

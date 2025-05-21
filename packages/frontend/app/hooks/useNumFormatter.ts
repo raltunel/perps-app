@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { RefObject } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 
 export function useNumFormatter() {
@@ -28,8 +26,6 @@ export function useNumFormatter() {
             const numVal = Math.abs(parseNum(num));
             if (numVal > 10000) {
                 return 0;
-            } else if (numVal > 1000) {
-                return 1;
             } else if (numVal > 100) {
                 return 2;
             } else if (numVal < 10 && numVal >= 0.01) {
@@ -95,6 +91,7 @@ export function useNumFormatter() {
             precision?: number | OrderRowResolutionIF | null,
             currencyConversion: boolean = false,
             showDollarSign: boolean = false,
+            addPlusSignIfPositive: boolean = false,
         ) => {
             const formatType = numFormat.value;
 
@@ -123,17 +120,22 @@ export function useNumFormatter() {
                     maximumFractionDigits: getDefaultPrecision(num),
                 });
             }
-
+            let result = '';
             if (currencyConversion) {
-                return fillWithCurrencyChar(
+                result = fillWithCurrencyChar(
                     selectedCurrency,
                     formattedNum,
                     showDollarSign,
                 );
             } else {
-                return formattedNum;
+                result = formattedNum;
             }
-            // }
+
+            if (addPlusSignIfPositive && Number(num) > 0) {
+                result = '+' + result;
+            }
+
+            return result;
         },
         [
             numFormat,

@@ -1,72 +1,71 @@
-import React from 'react';
+import { useMemo } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { sortUserFundings } from '~/processors/processUserFills';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { UserFundingIF, UserFundingSortBy } from '~/utils/UserDataIFs';
 import FundingHistoryTableHeader from './FundingHistoryTableHeader';
-import FundingHistoryTableRow, {
-    type FundingHistoryData,
-} from './FundingHistoryTableRow';
-import styles from './FundingHistoryTable.module.css';
-import { fundingHistoryData } from './data';
+import FundingHistoryTableRow from './FundingHistoryTableRow';
 
 interface FundingHistoryTableProps {
-    onViewAll?: () => void;
-    onExportCsv?: () => void;
+    userFundings: UserFundingIF[];
+    pageMode?: boolean;
+    isFetched: boolean;
+    selectedFilter?: string;
 }
 
 export default function FundingHistoryTable(props: FundingHistoryTableProps) {
-    const { onViewAll, onExportCsv } = props;
+    const { pageMode, isFetched, selectedFilter, userFundings } = props;
 
-    const handleViewAll = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (onViewAll) {
-            onViewAll();
-        }
-    };
+    const { symbol } = useTradeDataStore();
 
-    const handleExportCsv = (e: React.MouseEvent) => {
-        e.preventDefault();
-        if (onExportCsv) {
-            onExportCsv();
+    const { debugWallet } = useDebugStore();
+
+    const filteredData = useMemo(() => {
+        switch (selectedFilter) {
+            case 'all':
+                return userFundings;
+            case 'active':
+                return userFundings.filter(
+                    (funding) => funding.coin === symbol,
+                );
+            case 'long':
+                return userFundings.filter((funding) => funding.szi > 0);
+            case 'short':
+                return userFundings.filter((funding) => funding.szi < 0);
         }
-    };
+
+        return userFundings;
+    }, [userFundings, selectedFilter, symbol]);
+
+    const viewAllLink = useMemo(() => {
+        return `/fundingHistory/${debugWallet.address}`;
+    }, [debugWallet.address]);
 
     return (
-        <div className={styles.tableWrapper}>
-            <FundingHistoryTableHeader />
-            <div className={styles.tableBody}>
-                {fundingHistoryData.map((history, index) => (
+        <>
+            <GenericTable<UserFundingIF, UserFundingSortBy>
+                data={filteredData}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                    <FundingHistoryTableHeader
+                        sortBy={sortBy as UserFundingSortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={sortClickHandler}
+                    />
+                )}
+                renderRow={(fundingHistory, index) => (
                     <FundingHistoryTableRow
                         key={`funding-history-${index}`}
-                        fundingHistory={history}
+                        fundingHistory={fundingHistory}
                     />
-                ))}
-
-                {fundingHistoryData.length === 0 && (
-                    <div
-                        className={styles.rowContainer}
-                        style={{ justifyContent: 'center', padding: '2rem 0' }}
-                    >
-                        No funding history
-                    </div>
                 )}
-
-                {fundingHistoryData.length > 0 && (
-                    <div className={styles.linksContainer}>
-                        <a
-                            href='#'
-                            className={styles.viewAllLink}
-                            onClick={handleViewAll}
-                        >
-                            View All
-                        </a>
-                        <a
-                            href='#'
-                            className={styles.exportCsvLink}
-                            onClick={handleExportCsv}
-                        >
-                            Export as CSV
-                        </a>
-                    </div>
-                )}
-            </div>
-        </div>
+                sorterMethod={sortUserFundings}
+                isFetched={isFetched}
+                pageMode={pageMode}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[1, 1, 1, 1, 1, 1]}
+            />
+        </>
     );
 }

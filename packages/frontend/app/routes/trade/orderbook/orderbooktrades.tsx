@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import { useSdk } from '~/hooks/useSdk';
 import { processTrades } from '~/processors/processOrderBook';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { TableState } from '~/utils/CommonIFs';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderBookTradeIF } from '~/utils/orderbook/OrderBookIFs';
 import styles from './orderbooktrades.module.css';
@@ -20,6 +22,10 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
 }) => {
     const { info } = useSdk();
     const { trades, setTrades } = useOrderBookStore();
+
+    const [tableState, setTableState] = useState<TableState>(
+        TableState.LOADING,
+    );
 
     const { orderBookMode } = useAppSettings();
 
@@ -57,6 +63,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                 } else {
                     setTrades(wsTrades.slice(0, tradesCountRef.current));
                 }
+                setTableState(TableState.FILLED);
             }
         },
         [tradesCount, info],
@@ -65,6 +72,8 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     useEffect(() => {
         if (!info) return;
         if (!symbol || symbol.length === 0) return;
+
+        setTableState(TableState.LOADING);
 
         const { unsubscribe } = info.subscribe(
             {
@@ -84,6 +93,8 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
         [trades],
     );
 
+    const loaderLen = 20;
+
     return (
         <div className={styles.orderTradesContainer}>
             <div className={styles.orderTradesHeader}>
@@ -93,17 +104,33 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
             </div>
 
             <BasicDivider />
-            {trades.length > 0 && trades[0].coin === symbol && (
-                <>
-                    <div
-                        className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}
-                    >
-                        {trades.map((trade) => (
-                            <OrderTradeRow key={trade.tid} trade={trade} />
-                        ))}
-                    </div>
-                </>
+            {tableState === TableState.LOADING && (
+                <div
+                    className={`${styles.orderTradesList} ${styles.orderTradesListLoading} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}
+                >
+                    {Array.from({ length: loaderLen }).map((_, index) => (
+                        <SkeletonNode
+                            height={'19px'}
+                            wrapperStyle={{
+                                opacity: 1 - index / loaderLen,
+                            }}
+                        />
+                    ))}
+                </div>
             )}
+            {tableState === TableState.FILLED &&
+                trades.length > 0 &&
+                trades[0].coin === symbol && (
+                    <>
+                        <div
+                            className={`${styles.orderTradesList} ${orderBookMode === 'stacked' ? styles.orderTradesListStacked : ''}`}
+                        >
+                            {trades.map((trade) => (
+                                <OrderTradeRow key={trade.tid} trade={trade} />
+                            ))}
+                        </div>
+                    </>
+                )}
         </div>
     );
 };

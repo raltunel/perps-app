@@ -1,21 +1,23 @@
 .container {
+    --container-width: 278px;
+
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: var(--main-gap);
+    gap: var(--gap-s);
     position: absolute;
-    top: 30px;
+    top: var(--dropdown-top);
     right: 0;
-    width: 278px;
-    padding: 16px;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark3, #16161c);
-    box-shadow: 0px 0px 12px 0px rgba(0, 0, 0, 0.25);
+    width: var(--container-width);
+    padding: var(--padding-m);
+    border-radius: var(--radius-m);
+    background: var(--bg-dark3, #16161c);
+    box-shadow: var(--dropdown-box-shadow);
 
     transition:
-        opacity 0.3s ease-in-out,
-        visibility 0.3s ease-in-out;
+        opacity var(--ease-in-out-med),
+        visibility var(--ease-in-out-med);
 
     /* ---------------------------- */
 
@@ -23,22 +25,16 @@
     height: auto;
     visibility: visible;
     pointer-events: auto;
-    z-index: var(--navbar-dropdown-zindex);
+    z-index: var(--z-index-navbar-dropdown);
 }
 
 .viewMoreButton {
     color: var(--accent1, #7371fc);
     text-align: center;
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
-    font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
+    font-size: var(--font-size-s);
 }
 .container section {
-    gap: 5px;
+    gap: var(--gap-m);
 }
 .rpcRowContainer {
     display: flex;
@@ -49,21 +45,10 @@
 
 .rpcRowContainer p {
     color: var(--text1, #f0f0f8);
-
-    /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }
 .container h3 {
     color: var(--text2, #6a6a6d);
-
     /* Main/S */
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-s, 12px);
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
 }

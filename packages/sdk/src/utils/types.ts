@@ -71,6 +71,16 @@ export interface UserFillsSubscription {
     user: string;
 }
 
+export interface UserTwapHistorySubscription {
+    type: 'userTwapHistory';
+    user: string;
+}
+
+export interface UserTwapSliceFillsSubscription {
+    type: 'userTwapSliceFills';
+    user: string;
+}
+
 export interface CandleSubscription {
     type: 'candle';
     coin: string;
@@ -119,7 +129,9 @@ export type Subscription =
     | UserNonFundingLedgerUpdatesSubscription
     | WebData2Subscription
     | NotificationSubscription
-    | UserHistoricalOrdersSubscription;
+    | UserHistoricalOrdersSubscription
+    | UserTwapSliceFillsSubscription
+    | UserTwapHistorySubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;
@@ -278,6 +290,21 @@ export interface UserHistoricalOrdersMsg {
     data: UserHistoricalOrdersData;
 }
 
+export interface UserTwapSliceFillsMsg {
+    channel: 'userTwapSliceFills';
+    data: UserTwapSliceFillsData;
+}
+
+export interface UserTwapHistoryMsg {
+    channel: 'userTwapHistory';
+    data: UserTwapHistoryData;
+}
+
+export interface UserFundingsMsg {
+    channel: 'userFundings';
+    data: UserFundingsData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -287,7 +314,9 @@ export type WsMsg =
     | UserFillsMsg
     | OtherWsMsg
     | NotificationMsg
-    | UserHistoricalOrdersMsg;
+    | UserHistoricalOrdersMsg
+    | UserTwapSliceFillsMsg
+    | UserTwapHistoryMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder
@@ -521,4 +550,63 @@ export interface Balance {
     total: string;
     hold: string;
     entryNtl: string;
+}
+
+export interface TwapState {
+    coin: string;
+    executedNtl: string;
+    executedSz: string;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: string;
+    sz: string;
+    timestamp: number;
+    user: string;
+}
+
+export interface TwapFill {
+    coin: string;
+    closedPnl: string;
+    crossed: boolean;
+    dir: string;
+    fee: string;
+    feeToken: string;
+    hash: string;
+    oid: number;
+    px: string;
+    side: string;
+    startPosition: string;
+    sz: string;
+    tid: number;
+    time: number;
+}
+
+export interface TwapSliceFill {
+    fill: TwapFill;
+    twapId: number;
+}
+
+export interface TwapHistory {
+    state: TwapState;
+    status: { status: string };
+    time: number;
+}
+
+export interface UserTwapHistoryData {
+    user: string;
+    history: TwapHistory[];
+    isSnapshot: boolean;
+}
+
+export interface UserTwapSliceFillsData {
+    user: string;
+    twapSliceFills: TwapSliceFill[];
+    isSnapshot: boolean;
+}
+
+export interface UserFundingsData {
+    user: string;
+    isSnapshot?: boolean;
+    fundings: UserFunding[];
 }

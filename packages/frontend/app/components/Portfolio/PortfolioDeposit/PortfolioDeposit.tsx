@@ -23,7 +23,7 @@ interface PortfolioDepositProps {
 function PortfolioDeposit({
     portfolio,
     onDeposit,
-   
+
     isProcessing = false,
 }: PortfolioDepositProps) {
     const [amount, setAmount] = useState<string>('');
@@ -37,10 +37,7 @@ function PortfolioDeposit({
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-
-
     const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-       
         setAmount(newValue);
         setError(null);
     }, 20);
@@ -143,7 +140,6 @@ function PortfolioDeposit({
 
     return (
         <div className={styles.container}>
-        
             <div className={styles.textContent}>
                 <h4>
                     Deposit {selectedToken.symbol} to {portfolio.name}

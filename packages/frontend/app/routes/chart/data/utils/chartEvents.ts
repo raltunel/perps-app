@@ -25,11 +25,15 @@ export const studyEventsUnsubscribe = (chart: any) => {
     chart?.unsubscribe('study_properties_changed', () => {});
 };
 
-export const intervalChangedSubscribe = (chart: any) => {
+export const intervalChangedSubscribe = (
+    chart: any,
+    setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>,
+) => {
     chart
         .activeChart()
         .onIntervalChanged()
         .subscribe(null, (interval: number, timeframeObj: any) => {
+            setIsChartReady(false);
             saveChartLayout(chart);
         });
 };
