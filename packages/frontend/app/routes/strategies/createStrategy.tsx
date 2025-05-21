@@ -4,6 +4,11 @@ import InputText from './InputText';
 import { useRef, type RefObject } from 'react';
 import { useStrategiesStore } from '~/stores/StrategiesStore';
 import { useNavigate } from 'react-router';
+import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
+import {
+    type NotificationStoreIF,
+    useNotificationStore,
+} from '~/stores/NotificationStore';
 
 export default function createStrategy() {
     const makeStrategy = useStrategiesStore().add;
@@ -20,6 +25,11 @@ export default function createStrategy() {
     function handleInput(field: RefObject<string>, val: string) {
         field.current = val;
     }
+
+    // logic to dispatch a notification for sub-account creation
+    const notifications: NotificationStoreIF = useNotificationStore();
+    // state data for subaccounts
+    const subAccounts: useAccountsIF = useAccounts();
 
     return (
         <div className={styles.create_strategy_page}>
@@ -92,6 +102,12 @@ export default function createStrategy() {
                             side: sideRef.current,
                             totalSize: totalSizeRef.current,
                             orderSize: orderSizeRef.current,
+                        });
+                        subAccounts.create(nameRef.current);
+                        notifications.add({
+                            title: 'Sub Account Created',
+                            message: `Made new Sub-Account ${nameRef.current}`,
+                            icon: 'check',
                         });
                         navigate('/strategies');
                     }}
