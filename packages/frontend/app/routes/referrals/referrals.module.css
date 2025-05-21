@@ -6,7 +6,7 @@
     max-width: 1280px;
     margin: 0 auto;
     margin-top: 96px;
-    padding-bottom: 1rem;
+    padding-bottom: var(--padding-m);
     /* overflow-y: hidden; */
     max-height: calc(100vh - 300px);
 }
@@ -90,7 +90,7 @@
     }
 
     .detailsContent {
-        padding: 8px 0;
+        padding: var(--padding-s) 0;
     }
 
     .detailsContent h6 {

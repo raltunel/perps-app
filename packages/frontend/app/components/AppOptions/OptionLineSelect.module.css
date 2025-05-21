@@ -1,11 +1,15 @@
 /* top-level element returned by JSX file */
 .option_line {
+    --option-line-height: 32px;
+    --active-option-width: 170px;
+    --active-option-height: 32px;
+
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    height: 24px;
+    height: var(--option-line-height);
     font-size: var(--font-size-s);
     color: var(--text1);
 }
@@ -16,7 +20,7 @@
     display: flex;
     flex-direction: column;
     height: inherit;
-    gap: 2px;
+    gap: var(--gap-s);
     overflow-y: visible;
 }
 
@@ -27,10 +31,11 @@
     flex-wrap: nowrap;
     justify-content: space-between;
     align-items: center;
-    width: 200px;
-    padding: 2px 8px;
-    background-color: var(--dark4);
-    border-radius: 8px;
+    width: var(--active-option-width);
+    height: var(--active-option-height);
+    padding: 0 var(--padding-xs) 0 var(--padding-s);
+    background-color: var(--bg-dark4);
+    border-radius: var(--radius-s);
     cursor: pointer;
 }
 
@@ -38,15 +43,15 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 4px 4px;
-    background-color: var(--dark6);
-    border-radius: 8px;
+    padding: var(--padding-xs) var(--padding-xs);
+    background-color: var(--bg-dark6);
+    border-radius: var(--radius-s);
     z-index: calc(var(--base-z-idx-app-options) + 1);
 }
 
 .options_dropdown > * {
-    padding: 2px 8px;
-    border-radius: 6px;
+    padding: 0 var(--padding-s);
+    border-radius: var(--radius-xs);
 }
 
 /* general styling to apply if options are JSX rather than text  */
@@ -61,5 +66,5 @@
 /* hover effects for clickable elems in the dropdown */
 .options_dropdown > *:hover {
     cursor: pointer;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }

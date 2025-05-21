@@ -25,9 +25,9 @@
 .content {
     height: 100%;
     overflow-y: auto;
-    /* background: var(--dark3); */
-    padding: 0px var(--main-padding, 8px) var(--main-padding, 8px)
-        var(--main-padding, 8px);
+    /* background: var(--bg-dark3); */
+    padding: 0px var(--padding-s, 8px) var(--padding-s, 8px)
+        var(--padding-s, 8px);
 }
 
 /* Simple styling examples for header/footer */
@@ -37,7 +37,7 @@
     flex-direction: row;
     align-items: center;
     gap: 16px;
-    padding: 0px var(--main-padding);
+    padding: 0px var(--padding-s);
 }
 
 .header a {
@@ -55,7 +55,7 @@
         align-items: center;
         justify-content: center;
         height: 56px;
-        background-color: var(--dark2, #222);
+        background-color: var(--bg-dark2, #222);
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         position: fixed;
         bottom: 0;

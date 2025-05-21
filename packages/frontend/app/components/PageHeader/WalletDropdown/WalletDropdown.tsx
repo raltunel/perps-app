@@ -10,7 +10,8 @@ interface PropsIF {
     isDropdown?: boolean;
 }
 
-const tokenImg = 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png';
+const tokenImg =
+    'https://images.seeklogo.com/logo-png/40/2/usd-coin-usdc-logo-png_seeklogo-408043.png';
 
 const TokenDisplay = () => {
     return (
@@ -39,7 +40,10 @@ export default function WalletDropdown(props: PropsIF) {
         >
             <section className={styles.profileContainer}>
                 <div className={styles.imgContainer}>
-                    <img src='' alt='' />
+                    <img
+                        src='https://forkast.news/wp-content/uploads/2022/03/NFT-Avatar.png'
+                        alt=''
+                    />
                 </div>
                 <div className={styles.profileRight}>
                     <div className={styles.profileRightTop}>

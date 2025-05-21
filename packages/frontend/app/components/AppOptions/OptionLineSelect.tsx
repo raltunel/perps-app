@@ -49,6 +49,7 @@ export default function OptionLineSelect(props: propsIF) {
     return (
         <li className={styles.option_line}>
             {text}
+
             <div
                 ref={dropdownRef}
                 onClick={() => setIsOpen(!isOpen)}

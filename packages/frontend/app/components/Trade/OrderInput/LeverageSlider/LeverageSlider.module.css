@@ -15,7 +15,7 @@
     justify-content: space-between;
     width: 100%;
     gap: 16px;
-    padding-left: 4px;
+    padding-left: var(--padding-xs);
 }
 
 .sliderContainer {
@@ -37,7 +37,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }
 
 .sliderActive {
@@ -112,9 +112,9 @@
     align-items: center;
     justify-content: center;
     align-items: center;
-    background-color: var(--dark3);
+    background-color: var(--bg-dark3);
     border-radius: 8px;
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
 }
 
 .valueInput {
@@ -147,5 +147,5 @@
     border: none;
     background: var(--accent1);
     color: var(--text1);
-    padding: 4px;
+    padding: var(--padding-xs);
 }
