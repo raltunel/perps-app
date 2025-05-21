@@ -3,9 +3,9 @@
 
     display: flex;
     flex-direction: column;
-    gap: 64px;
+    gap: var(--gap-m);
     margin: 0 auto;
-    margin-top: 48px;
+    margin-top: var(--margin-l-plus);
     overflow-x: hidden;
 }
 
@@ -22,7 +22,7 @@
     padding: var(--padding-s) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .pageInfo {
@@ -31,7 +31,7 @@
 
 .fullScreen {
     margin-top: 0 !important;
-    gap: 8px !important;
+    gap: var(--gap-s) !important;
 }
 
 .fullScreen .searchRow {
@@ -57,14 +57,14 @@
 }
 @media (min-width: 1580px) {
     .container {
-        margin-top: 96px;
+        margin-top: var(--margin-xxl);
     }
 }
 
 @media (max-width: 768px) {
     .container {
         padding: var(--padding-m);
-        margin-top: 48px;
+        margin-top: var(--margin-l-plus);
     }
 
     .searchRow {
