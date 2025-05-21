@@ -62,26 +62,34 @@
     --margin-s: 8px;
     --margin-m: 16px;
     --margin-l: 32px;
+    --margin-l-plus: 48px;
     --margin-xl: 64px;
+    --margin-xxl: 96px;
 
     --padding-xs: 4px;
     --padding-s: 8px;
     --padding-m: 16px;
     --padding-l: 32px;
+    --padding-l-plus: 48px;
     --padding-xl: 64px;
+    --padding-xxl: 96px;
     --padding-dropdown: 0px 4px 0px 8px;
 
     --gap-xs: 4px;
     --gap-s: 8px;
     --gap-m: 16px;
     --gap-l: 32px;
+    --gap-l-plus: 48px;
     --gap-xl: 64px;
+    --gap-xxl: 96px;
 
     --radius-xs: 4px;
     --radius-s: 8px;
     --radius-m: 16px;
     --radius-l: 32px;
+    --radius-l-plus: 48px;
     --radius-xl: 64px;
+    --radius-xxl: 96px;
 
     /* ------------------------------ */
     /*Tables              */
