@@ -372,6 +372,3 @@ export function sortUserFundings(
     }
     return fundings;
 }
-function formatNum(executedSz: number): number {
-    throw new Error('Function not implemented.');
-}
