@@ -151,3 +151,16 @@ export type UserFundingSortBy =
     | 'szi'
     | 'fundingRate'
     | undefined;
+
+export interface UserFundingResponseIF {
+    time: number;
+    hash: string;
+    delta: {
+        type: string;
+        coin: string;
+        usdc: string;
+        szi: string;
+        fundingRate: string;
+        nSzi?: boolean;
+    };
+}

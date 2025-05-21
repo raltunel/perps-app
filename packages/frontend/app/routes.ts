@@ -41,5 +41,10 @@ export default [
         'routes/twapFillHistory/twapFillHistory.tsx',
     ),
 
+    route(
+        'fundingHistory/:address?',
+        'routes/fundingHistory/fundingHistory.tsx',
+    ),
+
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;
