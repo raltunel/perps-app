@@ -135,6 +135,7 @@ export function sortTwapHistory(
     if (sortDirection && sortBy) {
         switch (sortBy) {
             case 'time':
+                console.log(sortBy);
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
                         return a.state.timestamp - b.state.timestamp;
@@ -228,6 +229,85 @@ export function sortTwapHistory(
                         return b.status.localeCompare(a.status);
                     }
                 });
+            default:
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+        }
+    }
+    return fills.sort((a, b) => {
+        if (sortDirection === 'asc') {
+            return a.time - b.time;
+        } else {
+            return b.time - a.time;
+        }
+    });
+}
+
+export function sortTwapFillHistory(
+    fills: TwapSliceFillIF[],
+    sortBy: UserFillSortBy,
+    sortDirection: TableSortDirection,
+) {
+    if (sortDirection && sortBy) {
+        switch (sortBy) {
+            case 'time':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+            case 'coin':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.coin.localeCompare(b.coin);
+                    } else {
+                        return b.coin.localeCompare(a.coin);
+                    }
+                });
+            case 'side':
+                return fills.sort((a, b) => {
+                    const aRank = a.side === 'buy' ? 0 : 1;
+                    const bRank = b.side === 'buy' ? 0 : 1;
+                    return sortDirection === 'asc'
+                        ? aRank - bRank
+                        : bRank - aRank;
+                });
+            case 'px':
+                return [...fills].sort((a, b) => {
+                    return sortDirection === 'asc' ? a.px - b.px : b.px - a.px;
+                });
+
+            case 'sz':
+                return [...fills].sort((a, b) => {
+                    return sortDirection === 'asc' ? a.sz - b.sz : b.sz - a.sz;
+                });
+            case 'value':
+                return [...fills].sort((a, b) => {
+                    const aVal = a.px * a.sz;
+                    const bVal = b.px * b.sz;
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+
+            case 'fee':
+                return [...fills].sort((a, b) => {
+                    return sortDirection === 'asc'
+                        ? a.fee - b.fee
+                        : b.fee - a.fee;
+                });
+            case 'closedPnl':
+                return [...fills].sort((a, b) => {
+                    const aVal = a.closedPnl - a.fee;
+                    const bVal = b.closedPnl - b.fee;
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+
             default:
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
