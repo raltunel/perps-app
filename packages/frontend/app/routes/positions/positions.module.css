@@ -22,7 +22,7 @@
     padding: var(--padding-s) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .pageInfo {
@@ -31,7 +31,7 @@
 
 .fullScreen {
     margin-top: 0 !important;
-    gap: 8px !important;
+    gap: var(--gap-s) !important;
 }
 
 .fullScreen .searchRow {
