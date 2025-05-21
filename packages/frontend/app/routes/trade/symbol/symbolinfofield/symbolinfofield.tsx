@@ -2,6 +2,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './symbolinfofield.module.css';
 
 import { motion } from 'framer-motion';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 
 interface SymbolInfoFieldProps {
     label: string;
@@ -9,6 +10,7 @@ interface SymbolInfoFieldProps {
     lastWsChange?: number;
     type?: 'positive' | 'negative';
     valueClass?: string;
+    skeleton?: boolean;
 }
 
 const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
@@ -17,6 +19,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
     lastWsChange,
     type,
     valueClass,
+    skeleton = false,
 }) => {
     const { getBsColor } = useAppSettings();
 
@@ -31,6 +34,13 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
     };
 
     const renderValue = () => {
+        if (skeleton) {
+            return (
+                <div className={`${styles.symbolInfoFieldValue} ${valueClass}`}>
+                    <SkeletonNode height='20px' width='70%' />
+                </div>
+            );
+        }
         if (lastWsChange) {
             return (
                 <motion.div

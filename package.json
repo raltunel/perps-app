@@ -1,6 +1,6 @@
 {
     "name": "perps-app-monorepo",
-    "version": "0.0.1",
+    "version": "0.0.4",
     "private": true,
     "type": "module",
     "scripts": {
@@ -9,8 +9,12 @@
         "prettier": "prettier --write .",
         "update-submodules": "git submodule update --remote --recursive --merge"
     },
+    "lint-staged": {
+        "**/*": "prettier --write --ignore-unknown"
+    },
     "devDependencies": {
         "husky": "^9.1.7",
+        "lint-staged": "^15.5.2",
         "prettier": "^3.5.3"
     },
     "dependencies": {

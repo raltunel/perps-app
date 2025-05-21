@@ -1,66 +1,67 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import type { UserFillIF } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
-import { HiOutlineExternalLink } from 'react-icons/hi';
-
-export interface TradeHistoryData {
-    time: string;
-    coin: string;
-    direction: 'Long' | 'Short';
-    price: string;
-    size: string;
-    tradeValue: string;
-    fee: string;
-    closedPnl: string;
-    hasOrderDetails?: boolean;
-}
 
 interface TradeHistoryTableRowProps {
-    trade: TradeHistoryData;
+    trade: UserFillIF;
     onViewOrderDetails?: (time: string, coin: string) => void;
 }
 
 export default function TradeHistoryTableRow(props: TradeHistoryTableRowProps) {
-    const { trade, onViewOrderDetails } = props;
+    const { trade } = props;
 
-    const handleViewOrderDetails = () => {
-        if (onViewOrderDetails && trade.hasOrderDetails) {
-            onViewOrderDetails(trade.time, trade.coin);
-        }
-    };
+    const { formatNum } = useNumFormatter();
+
+    const { getBsColor } = useAppSettings();
+
+    // const handleViewOrderDetails = () => {
+    //     // if (onViewOrderDetails && trade.hasOrderDetails) {
+    //     //     onViewOrderDetails(trade.time, trade.coin);
+    //     // }
+    // };
 
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.timeCell}`}>
-                {trade.time}
-                {trade.hasOrderDetails && (
+                {formatTimestamp(trade.time)}
+                {/* {trade.hasOrderDetails && (
                     <HiOutlineExternalLink
                         className={styles.orderIcon}
                         onClick={handleViewOrderDetails}
                         title='View Order Details'
                     />
-                )}
+                )} */}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {trade.coin}
             </div>
             <div
-                className={`${styles.cell} ${styles.directionCell} ${trade.direction === 'Long' ? styles.longDirection : styles.shortDirection}`}
+                className={`${styles.cell} ${styles.directionCell}`}
+                style={{
+                    color:
+                        trade.side === 'buy'
+                            ? getBsColor().buy
+                            : getBsColor().sell,
+                }}
             >
-                {trade.direction}
+                {trade.dir}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
-                {trade.price}
+                {formatNum(trade.px)}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {trade.size}
+                {formatNum(trade.sz)}
             </div>
             <div className={`${styles.cell} ${styles.tradeValueCell}`}>
-                {trade.tradeValue}
+                {formatNum(trade.value, null, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.feeCell}`}>
-                {trade.fee}
+                {formatNum(trade.fee)}
             </div>
             <div className={`${styles.cell} ${styles.closedPnlCell}`}>
-                {trade.closedPnl}
+                {formatNum(trade.closedPnl, 2, true, true)}
             </div>
         </div>
     );

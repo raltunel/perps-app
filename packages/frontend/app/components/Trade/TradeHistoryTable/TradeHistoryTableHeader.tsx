@@ -1,74 +1,73 @@
+import type { UserFillSortBy } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function TradeHistoryTableHeader() {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
+interface TradeHistoryTableHeaderProps {
+    sortBy?: UserFillSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: UserFillSortBy) => void;
+}
 
+export default function TradeHistoryTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: TradeHistoryTableHeaderProps) {
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
             key: 'time',
             sortable: true,
-            onClick: () => handleSort('time'),
             className: 'timeCell',
         },
         {
             name: 'Coin',
             key: 'coin',
-            sortable: false,
-            onClick: undefined,
+            sortable: true,
             className: 'coinCell',
         },
         {
             name: 'Direction',
-            key: 'direction',
-            sortable: false,
-            onClick: undefined,
+            key: 'side',
+            sortable: true,
             className: 'directionCell',
         },
         {
             name: 'Price',
-            key: 'price',
-            sortable: false,
-            onClick: undefined,
+            key: 'px',
+            sortable: true,
             className: 'priceCell',
         },
         {
             name: 'Size',
-            key: 'size',
-            sortable: false,
-            onClick: undefined,
+            key: 'sz',
+            sortable: true,
             className: 'sizeCell',
         },
         {
             name: 'Trade Value',
-            key: 'tradeValue',
+            key: 'value',
             sortable: true,
-            onClick: () => handleSort('tradeValue'),
             className: 'tradeValueCell',
         },
         {
             name: 'Fee',
             key: 'fee',
-            sortable: false,
-            onClick: undefined,
+            sortable: true,
             className: 'feeCell',
         },
         {
             name: 'Closed PNL',
             key: 'closedPnl',
             sortable: true,
-            onClick: () => handleSort('closedPnl'),
             className: 'closedPnlCell',
         },
     ];
@@ -78,11 +77,23 @@ export default function TradeHistoryTableHeader() {
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key as UserFillSortBy);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>

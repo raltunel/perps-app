@@ -1,21 +1,21 @@
 .create_sub_account_modal {
     display: flex;
     flex-direction: column;
-    padding: 8px 16px 16px 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     gap: 24px;
     color: var(--text1);
-    background-color: var(--dark3);
-    border-radius: var(--main-border-radius);
+    background-color: var(--bg-dark3);
+    border-radius: var(--radius-m);
     user-select: none;
     -webkit-user-select: none;
 }
 
 .text_entry > input {
     width: 100%;
-    padding: 4px 8px;
-    background-color: var(--dark4);
+    padding: var(--padding-xs) var(--padding-s);
+    background-color: var(--bg-dark4);
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     outline: none;
     color: var(--text1);
     caret-color: var(--text1);
@@ -30,17 +30,16 @@
 .modal_buttons > button {
     width: 200px;
     gap: 8px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: var(--padding-m);
+    padding-bottom: var(--padding-m);
     border: none;
-    border-radius: var(--half-border-radius);
+    border-radius: var(--radius-s);
     font-size: var(--font-size-m);
-    font-weight: 400;
     color: var(--text1);
 }
 
 .modal_buttons > button:first-child {
-    background-color: var(--dark4);
+    background-color: var(--bg-dark4);
 }
 
 .modal_buttons > button:last-child {

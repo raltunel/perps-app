@@ -307,7 +307,7 @@ export function formatLineLabel(label: LineLabel): string {
                 label.triggerCondition,
                 label.orderType,
             );
-            return ` ${label.orderType} ${label.price}${triggerConditionText}   `;
+            return ` ${label.orderType} ${label.price} ${triggerConditionText}   `;
         }
         case 'Liq':
             return label.text;

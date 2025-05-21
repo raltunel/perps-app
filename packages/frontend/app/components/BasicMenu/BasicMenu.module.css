@@ -20,8 +20,8 @@
 
 .menuContainer {
     position: absolute;
-    animation: menuAnimation 0.2s ease-in-out;
-    background: var(--dark4);
+    animation: menuAnimation var(--ease-in-out-fast);
+    background: var(--bg-dark4);
     border-radius: 0.5rem;
     z-index: 10;
 }
@@ -45,16 +45,16 @@
 .menuItem {
     cursor: pointer;
     color: var(--text2);
-    padding: 0.25rem 0.5rem;
+    padding: var(--padding-xs) var(--padding-s);
 }
 
 .menuItem:hover {
     color: var(--text1);
-    background: var(--dark3);
+    background: var(--bg-dark3);
 }
 
 .triggerWrapper {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     cursor: pointer;
     padding: 0 0.7rem;
     align-items: center;
@@ -68,7 +68,7 @@
 }
 
 .triggerWrapper svg {
-    transition: ease-in-out 0.2s;
+    transition: var(--ease-in-out-fast);
     font-size: 1rem;
     color: var(--text2);
     min-width: 1.4rem;

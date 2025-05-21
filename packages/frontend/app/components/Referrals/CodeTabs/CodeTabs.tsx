@@ -49,7 +49,6 @@ export default function CodeTabs(props: Props) {
     );
     const claimContent = (
         <section className={styles.sectionWithButton}>
-            
             <div className={styles.claimContent}>
                 <p>Claim $0.00 in rewards</p>
             </div>

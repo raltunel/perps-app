@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -13,22 +14,16 @@ import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
-
+import { Pages, usePage } from '~/hooks/usePage';
 export interface FilterOption {
     id: string;
     label: string;
 }
 
-const availableTabs = [
-    'Balances',
-    'Positions',
-    'Open Orders',
-    'TWAP',
-    'Trade History',
+const tradePageBlackListTabs = new Set([
     'Funding History',
-    'Order History',
     'Deposits and Withdrawals',
-];
+]);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -36,15 +31,68 @@ const filterOptions: FilterOption[] = [
     { id: 'long', label: 'Long' },
     { id: 'short', label: 'Short' },
 ];
-export default function TradeTable() {
+
+interface TradeTableProps {
+    portfolioPage?: boolean;
+}
+
+export default function TradeTable(props: TradeTableProps) {
+    const { portfolioPage } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
         orderHistory,
-        orderHistoryFetched,
+        fetchedChannels,
+        userFills,
+        userFundings,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
+
+    const { page } = usePage();
+
+    const tabs = useMemo(() => {
+        if (!page) return [];
+
+        let availableTabs = [
+            'Balances',
+            'Positions',
+            'Open Orders',
+            'TWAP',
+            'Trade History',
+            'Funding History',
+            'Order History',
+            'Deposits and Withdrawals',
+        ];
+
+        if (page === Pages.TRADE) {
+            return availableTabs.filter(
+                (tab) => !tradePageBlackListTabs.has(tab),
+            );
+        }
+        return availableTabs;
+    }, [page]);
+
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        }
+    }, [page]);
+
+    const { orderHistoryFetched, tradeHistoryFetched, fundingHistoryFetched } =
+        useMemo(() => {
+            return {
+                orderHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                ),
+                tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+                fundingHistoryFetched: fetchedChannels.has(
+                    WsChannels.USER_FUNDINGS,
+                ),
+            };
+        }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -52,17 +100,11 @@ export default function TradeTable() {
 
     const handleFilterChange = (selectedId: string) => {
         setSelectedFilter(selectedId);
-        // if (onFilterChange) {
-        //   onFilterChange([selectedId]);
-        // }
     };
 
     const handleToggleSmallBalances = (newState?: boolean) => {
         const newValue = newState !== undefined ? newState : !hideSmallBalances;
         setHideSmallBalances(newValue);
-        // if (onToggleSmallBalances) {
-        //   onToggleSmallBalances(newValue);
-        // }
     };
 
     const rightAlignedContent = (
@@ -87,15 +129,31 @@ export default function TradeTable() {
             case 'Balances':
                 return <BalancesTable hideSmallBalances={hideSmallBalances} />;
             case 'Positions':
-                return <PositionsTable />;
+                return (
+                    <PositionsTable
+                        isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Open Orders':
                 return <OpenOrdersTable selectedFilter={selectedFilter} />;
             case 'TWAP':
-                return <TwapTable />;
+                return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
-                return <TradeHistoryTable />;
+                return (
+                    <TradeHistoryTable
+                        data={userFills}
+                        isFetched={tradeHistoryFetched}
+                    />
+                );
             case 'Funding History':
-                return <FundingHistoryTable />;
+                return (
+                    <FundingHistoryTable
+                        userFundings={userFundings}
+                        isFetched={fundingHistoryFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
             case 'Order History':
                 return (
                     <OrderHistoryTable
@@ -118,7 +176,7 @@ export default function TradeTable() {
     return (
         <div className={styles.tradeTableWrapper}>
             <Tabs
-                tabs={availableTabs}
+                tabs={tabs}
                 defaultTab={selectedTradeTab}
                 onTabChange={handleTabChange}
                 rightContent={rightAlignedContent}
@@ -126,7 +184,9 @@ export default function TradeTable() {
                 layoutIdPrefix='tradeTableTabsIndicator'
             />
             <motion.div
-                className={styles.tableContent}
+                className={`${styles.tableContent} ${
+                    portfolioPage ? styles.portfolioPage : ''
+                }`}
                 key={selectedTradeTab}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}

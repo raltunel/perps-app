@@ -6,7 +6,6 @@ interface NativeSelectProps {
 }
 
 const NativeSelect: React.FC<NativeSelectProps> = ({
-    value,
     options,
     fieldName,
     onChange,

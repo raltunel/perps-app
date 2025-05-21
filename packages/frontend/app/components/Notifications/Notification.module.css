@@ -6,9 +6,8 @@
     align-items: stretch;
     width: 380px;
     height: 90px;
-    padding: 16px;
-    font-family: var(--font-family-main);
-    background-color: var(--dark3);
+    padding: var(--padding-m);
+    background-color: var(--bg-dark3);
     border-radius: 16px;
     user-select: none;
 }

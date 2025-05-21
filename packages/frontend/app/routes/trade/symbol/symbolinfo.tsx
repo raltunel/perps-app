@@ -55,11 +55,14 @@ const SymbolInfo: React.FC = () => {
             <title>{title}</title>
             <meta property='og:image' content={ogImage} />
             <div className={styles.symbolInfoContainer}>
-                <div className={styles.symbolSelector}>
+                <div
+                    className={styles.symbolSelector}
+                    id='tutorial-pool-explorer'
+                >
                     <SymbolSearch />
                 </div>
                 <div>
-                    {symbolInfo && symbolInfo.coin === symbol && (
+                    {symbolInfo && symbolInfo.coin === symbol ? (
                         <HorizontalScrollable
                             className={
                                 orderBookMode === 'large'
@@ -69,6 +72,7 @@ const SymbolInfo: React.FC = () => {
                         >
                             <div
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
+                                id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
                                     label='Mark'
@@ -130,6 +134,63 @@ const SymbolInfo: React.FC = () => {
                                 />
                             </div>
                         </HorizontalScrollable>
+                    ) : (
+                        <>
+                            <HorizontalScrollable
+                                className={
+                                    orderBookMode === 'large'
+                                        ? styles.symbolInfoLimitorNarrow
+                                        : styles.symbolInfoLimitor
+                                }
+                            >
+                                <div
+                                    className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
+                                >
+                                    <SymbolInfoField
+                                        label='Mark'
+                                        valueClass={'w4'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Oracle'
+                                        valueClass={'w4'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='24h Change'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='24h Volume'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Open Interest'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Funding Rate'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                    <SymbolInfoField
+                                        label='Funding Countdown'
+                                        valueClass={'w7'}
+                                        value={''}
+                                        skeleton={true}
+                                    />
+                                </div>
+                            </HorizontalScrollable>
+                        </>
                     )}
                 </div>
             </div>
