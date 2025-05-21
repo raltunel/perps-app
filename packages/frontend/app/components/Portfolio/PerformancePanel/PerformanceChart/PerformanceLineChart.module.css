@@ -14,12 +14,14 @@
     grid-template-columns: 50px 850px;
 
     align-items: center;
-    justify-content: center;
+    justify-content: start;
 
     height: 300px;
     width: 100%;
+
+    padding-left: 10px;
 }
 
 .xAxisContainer {
-    padding-left: 50px;
+    padding-left: 60px;
 }

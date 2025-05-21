@@ -50,7 +50,9 @@ const PerformanceLineChart: React.FC = () => {
             const min =
                 Math.ceil((yScale.domain()[0] + padding) / factor) * factor;
             const max =
-                Math.floor((yScale.domain()[1] - padding) / factor) * factor;
+                Math.round((yScale.domain()[1] - padding) / factor) * factor;
+
+            console.log(factor, min, max, yScale.domain()[1] - padding);
 
             const diffFactor = Math.abs(max - min) / 4;
 
