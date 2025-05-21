@@ -132,16 +132,11 @@ export function sortTwapHistory(
     sortBy: UserFillSortBy,
     sortDirection: TableSortDirection,
 ) {
-    console.log('here');
     if (sortDirection && sortBy) {
         switch (sortBy) {
             case 'time':
                 return fills.sort((a, b) => {
                     if (sortDirection === 'asc') {
-                        console.log(
-                            'a.state.timestamp - b.state.timestamp;',
-                            a.state.timestamp - b.state.timestamp,
-                        );
                         return a.state.timestamp - b.state.timestamp;
                     } else {
                         return b.time - a.time;
@@ -164,35 +159,42 @@ export function sortTwapHistory(
                     }
                 });
             case 'px':
-                return fills.sort((a, b) => {
-                    const aSz = a.state.executedSz
-                        ? formatNum(a.state.executedSz)
-                        : 0;
-                    const bSz = b.state.executedSz
-                        ? formatNum(b.state.executedSz)
-                        : 0;
+                return [...fills].sort((a, b) => {
+                    const toNum = (px?: number): number | null =>
+                        px != null && px > 0 ? px : null;
 
-                    const diff = aSz - bSz;
+                    const aNum = toNum(a.state.executedSz);
+                    const bNum = toNum(b.state.executedSz);
 
-                    return sortDirection === 'asc' ? diff : -diff;
+                    if (aNum === null && bNum === null) return 0;
+                    if (aNum === null) return sortDirection === 'asc' ? 1 : -1;
+                    if (bNum === null) return sortDirection === 'asc' ? -1 : 1;
+                    return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
                 });
+
             case 'sz':
-                return fills.sort((a, b) => {
-                    if (sortDirection === 'asc') {
-                        return (
-                            formatNum(
-                                a.state.executedNtl / a.state.executedSz,
-                            ) -
-                            formatNum(b.state.executedNtl / b.state.executedSz)
-                        );
-                    } else {
-                        return (
-                            formatNum(
-                                b.state.executedNtl / b.state.executedSz,
-                            ) -
-                            formatNum(a.state.executedNtl / a.state.executedSz)
-                        );
-                    }
+                return [...fills].sort((a, b) => {
+                    const getAvg = (
+                        nt: number | undefined,
+                        sz: number | undefined,
+                    ): number | null => {
+                        if (nt == null || sz == null || sz <= 0) return null;
+                        return nt / sz;
+                    };
+
+                    const aVal = getAvg(
+                        a.state.executedNtl,
+                        a.state.executedSz,
+                    );
+                    const bVal = getAvg(
+                        b.state.executedNtl,
+                        b.state.executedSz,
+                    );
+
+                    if (aVal === null && bVal === null) return 0;
+                    if (aVal === null) return sortDirection === 'asc' ? 1 : -1;
+                    if (bVal === null) return sortDirection === 'asc' ? -1 : 1;
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
                 });
             case 'value':
                 return fills.sort((a, b) => {
@@ -200,6 +202,30 @@ export function sortTwapHistory(
                         return a.state.minutes - b.state.minutes;
                     } else {
                         return b.state.minutes - a.state.minutes;
+                    }
+                });
+
+            case 'fee':
+                return [...fills].sort((a, b) => {
+                    const aVal = a.state.reduceOnly ? 1 : 0;
+                    const bVal = b.state.reduceOnly ? 1 : 0;
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+
+            case 'closedPnl':
+                return [...fills].sort((a, b) => {
+                    const aVal = a.state.randomize ? 1 : 0;
+                    const bVal = b.state.randomize ? 1 : 0;
+                    // asc: 0’s first, then 1’s; desc: 1’s first, then 0’s
+                    return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+
+            case 'status':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.status.localeCompare(b.status);
+                    } else {
+                        return b.status.localeCompare(a.status);
                     }
                 });
             default:
@@ -213,7 +239,6 @@ export function sortTwapHistory(
         }
     }
     return fills.sort((a, b) => {
-        console.log('here');
         if (sortDirection === 'asc') {
             return a.time - b.time;
         } else {

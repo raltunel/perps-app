@@ -70,6 +70,12 @@ export default function HistoryTwapTableHeader({
             sortable: true,
             className: 'closedPnlCell',
         },
+        {
+            name: 'Status',
+            key: 'status',
+            sortable: true,
+            className: 'statusCell',
+        },
     ];
 
     return (
@@ -85,7 +91,15 @@ export default function HistoryTwapTableHeader({
                     }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>
