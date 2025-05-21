@@ -198,7 +198,6 @@ export function sortUserFundings(
     sortBy: UserFundingSortBy,
     sortDirection: TableSortDirection,
 ) {
-    console.log('sortUserFundings', sortDirection, sortBy);
     if (sortDirection && sortBy) {
         switch (sortBy) {
             case 'time':
