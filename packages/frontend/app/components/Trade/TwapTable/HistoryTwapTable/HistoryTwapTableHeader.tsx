@@ -1,82 +1,74 @@
+import type { TableSortDirection } from '~/utils/CommonIFs';
 import styles from './HistoryTwapTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { UserFillSortBy } from '~/utils/UserDataIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function HistoryTwapTableHeader() {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
+interface HistoryTwapTableHeaderProps {
+    sortBy?: UserFillSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: UserFillSortBy) => void;
+}
 
+export default function HistoryTwapTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: HistoryTwapTableHeaderProps) {
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
             key: 'time',
             sortable: true,
-            onClick: () => handleSort('time'),
             className: 'timeCell',
         },
         {
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            onClick: () => handleSort('coin'),
             className: 'coinCell',
         },
         {
-            name: 'Total Size',
-            key: 'totalSize',
+            name: 'Direction',
+            key: 'side',
             sortable: true,
-            onClick: () => handleSort('totalSize'),
-            className: 'totalSizeCell',
+            className: 'directionCell',
         },
         {
-            name: 'Executed Size',
-            key: 'executedSize',
+            name: 'Price',
+            key: 'px',
             sortable: true,
-            onClick: () => handleSort('executedSize'),
-            className: 'executedSizeCell',
+            className: 'priceCell',
         },
         {
-            name: 'Average Price',
-            key: 'averagePrice',
+            name: 'Size',
+            key: 'sz',
             sortable: true,
-            onClick: () => handleSort('averagePrice'),
-            className: 'averagePriceCell',
+            className: 'sizeCell',
         },
         {
-            name: 'Total Runtime',
-            key: 'totalRuntime',
+            name: 'Trade Value',
+            key: 'value',
             sortable: true,
-            onClick: () => handleSort('totalRuntime'),
-            className: 'totalRuntimeCell',
+            className: 'tradeValueCell',
         },
         {
-            name: 'Reduce Only',
-            key: 'reduceOnly',
+            name: 'Fee',
+            key: 'fee',
             sortable: true,
-            onClick: () => handleSort('reduceOnly'),
-            className: 'reduceOnlyCell',
+            className: 'feeCell',
         },
         {
-            name: 'Randomize',
-            key: 'randomize',
+            name: 'Closed PNL',
+            key: 'closedPnl',
             sortable: true,
-            onClick: () => handleSort('randomize'),
-            className: 'randomizeCell',
-        },
-        {
-            name: 'Status',
-            key: 'status',
-            sortable: true,
-            onClick: () => handleSort('status'),
-            className: 'statusCell',
+            className: 'closedPnlCell',
         },
     ];
 
@@ -86,7 +78,11 @@ export default function HistoryTwapTableHeader() {
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key as UserFillSortBy);
+                        }
+                    }}
                 >
                     {header.name}
                     {header.sortable && <SortIcon />}

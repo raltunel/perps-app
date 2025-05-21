@@ -123,6 +123,100 @@ export function sortUserFills(
         }
     });
 }
+export function sortTwapHistory(
+    fills: TwapHistoryIF[],
+    sortBy: UserFillSortBy,
+    sortDirection: TableSortDirection,
+) {
+    console.log('here');
+    if (sortDirection && sortBy) {
+        switch (sortBy) {
+            case 'time':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        console.log(
+                            'a.state.timestamp - b.state.timestamp;',
+                            a.state.timestamp - b.state.timestamp,
+                        );
+                        return a.state.timestamp - b.state.timestamp;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+            case 'coin':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.state.coin.localeCompare(b.state.coin);
+                    } else {
+                        return b.state.coin.localeCompare(a.state.coin);
+                    }
+                });
+            case 'side':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.state.sz - b.state.sz;
+                    } else {
+                        return b.state.sz - a.state.sz;
+                    }
+                });
+            case 'px':
+                return fills.sort((a, b) => {
+                    const aSz = a.state.executedSz
+                        ? formatNum(a.state.executedSz)
+                        : 0;
+                    const bSz = b.state.executedSz
+                        ? formatNum(b.state.executedSz)
+                        : 0;
+
+                    const diff = aSz - bSz;
+
+                    return sortDirection === 'asc' ? diff : -diff;
+                });
+            case 'sz':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return (
+                            formatNum(
+                                a.state.executedNtl / a.state.executedSz,
+                            ) -
+                            formatNum(b.state.executedNtl / b.state.executedSz)
+                        );
+                    } else {
+                        return (
+                            formatNum(
+                                b.state.executedNtl / b.state.executedSz,
+                            ) -
+                            formatNum(a.state.executedNtl / a.state.executedSz)
+                        );
+                    }
+                });
+            case 'value':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.state.minutes - b.state.minutes;
+                    } else {
+                        return b.state.minutes - a.state.minutes;
+                    }
+                });
+            default:
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+        }
+    }
+    return fills.sort((a, b) => {
+        console.log('here');
+        if (sortDirection === 'asc') {
+            return a.time - b.time;
+        } else {
+            return b.time - a.time;
+        }
+    });
+}
 
 export function processUserTwapSliceFills(
     data: UserTwapSliceFillsData,
@@ -173,4 +267,7 @@ export function processUserTwapHistory(
         } as TwapHistoryIF);
     });
     return ret;
+}
+function formatNum(executedSz: number): number {
+    throw new Error('Function not implemented.');
 }
