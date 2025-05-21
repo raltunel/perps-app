@@ -1,7 +1,7 @@
 .create_sub_account_modal {
     display: flex;
     flex-direction: column;
-    padding: 8px 16px 16px 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     gap: 24px;
     color: var(--text1);
     background-color: var(--bg-dark3);
@@ -12,7 +12,7 @@
 
 .text_entry > input {
     width: 100%;
-    padding: 4px 8px;
+    padding: var(--padding-xs) var(--padding-s);
     background-color: var(--bg-dark4);
     border: none;
     border-radius: var(--radius-s);
@@ -30,8 +30,8 @@
 .modal_buttons > button {
     width: 200px;
     gap: 8px;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    padding-top: var(--padding-m);
+    padding-bottom: var(--padding-m);
     border: none;
     border-radius: var(--radius-s);
     font-size: var(--font-size-m);

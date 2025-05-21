@@ -24,10 +24,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         return Math.ceil(orderCount / 2);
     }, [orderCount]);
 
-    const orderBookComponent = useMemo(
-        () => <OrderBook symbol={symbol} orderCount={orderCount} />,
-        [orderCount, symbol],
-    );
+    const orderBookComponent = useMemo(() => {
+        return orderCount > 0 ? (
+            <div className={styles.orderbookInTab}>
+                <OrderBook symbol={symbol} orderCount={orderCount} />
+            </div>
+        ) : (
+            <></>
+        );
+    }, [orderCount, symbol]);
     const orderBookTrades = useMemo(
         () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
         [tradesCount, symbol],
@@ -68,16 +73,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                         document
                             .getElementById('orderBookHeader2')
                             ?.getBoundingClientRect()?.height || 0;
-                    otherHeightSum +=
-                        document
-                            .getElementById('orderBookMidHeader')
-                            ?.getBoundingClientRect()?.height || 0;
                     const orderCount = Math.floor(
                         (availableHeight - otherHeightSum) /
                             (orderRowHeightWithGaps * 2),
                     );
                     setOrderCount(orderCount);
-                    setTradesCount(Math.floor(availableHeight / 21));
+                    setTradesCount(
+                        Math.floor(availableHeight / orderRowHeightWithGaps) -
+                            2,
+                    );
                 } else {
                     const orderCount = Math.floor(availableHeight / 1000);
                     setOrderCount(orderCount);

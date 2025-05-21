@@ -135,3 +135,19 @@ export type PositionDataSortBy =
     | 'margin'
     | 'funding'
     | undefined;
+
+export interface UserFundingIF {
+    time: number;
+    coin: string;
+    usdc: number;
+    szi: number;
+    fundingRate: number;
+}
+
+export type UserFundingSortBy =
+    | 'time'
+    | 'coin'
+    | 'usdc'
+    | 'szi'
+    | 'fundingRate'
+    | undefined;

@@ -35,7 +35,7 @@
     align-items: flex-start;
     width: var(--home-link-width, 360px);
     height: var(--home-link-height, 160px);
-    padding: 16px;
+    padding: var(--padding-m);
     border-radius: var(--radius-m, 16px);
     background: var(--bg-dark2, #0e0e14);
 }

@@ -29,7 +29,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 16px 16px 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
 }
 
 .outside_modal header h3 {
@@ -128,19 +128,6 @@
     border-radius: 2px;
 }
 
-/* Add a spacer at the bottom to ensure content isn't hidden */
-.safeAreaSpacer {
-    height: env(safe-area-inset-bottom, 16px);
-
-    /* Add extra space for keyboard */
-    height: calc(env(safe-area-inset-bottom, 16px) + 16px);
-}
-
-/* For the keyboard-active case, increase the spacer */
-.keyboardActive .safeAreaSpacer {
-    height: calc(env(safe-area-inset-bottom, 16px) + 36px);
-}
-
 /* Animations */
 .slideUp {
     transform: translateY(0);
@@ -196,17 +183,32 @@
     }
 }
 
-/* Fallback for browsers that don't support env() */
-@supports not (padding-bottom: env(safe-area-inset-bottom)) {
-    .bottomSheet {
-        padding-bottom: 16px;
-    }
-
+@media (max-width: 768px) {
+    /* Add a spacer at the bottom to ensure content isn't hidden */
     .safeAreaSpacer {
-        height: 32px; /* Extra padding when env() not supported */
+        height: env(safe-area-inset-bottom, 16px);
+
+        /* Add extra space for keyboard */
+        height: calc(env(safe-area-inset-bottom, 16px) + 16px);
     }
 
+    /* For the keyboard-active case, increase the spacer */
     .keyboardActive .safeAreaSpacer {
-        height: 48px;
+        height: calc(env(safe-area-inset-bottom, 16px) + 36px);
+    }
+
+    /* Fallback for browsers that don't support env() */
+    @supports not (padding-bottom: env(safe-area-inset-bottom)) {
+        .bottomSheet {
+            padding-bottom: var(--padding-m);
+        }
+
+        .safeAreaSpacer {
+            height: 32px; /* Extra padding when env() not supported */
+        }
+
+        .keyboardActive .safeAreaSpacer {
+            height: 48px;
+        }
     }
 }

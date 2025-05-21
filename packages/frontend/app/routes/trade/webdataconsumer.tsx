@@ -7,6 +7,7 @@ import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { processUserOrder } from '~/processors/processOrderBook';
 import {
     processUserFills,
+    processUserFundings,
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
@@ -22,6 +23,7 @@ import type {
     TwapHistoryIF,
     UserBalanceIF,
     UserFillIF,
+    UserFundingIF,
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
@@ -46,6 +48,7 @@ export default function WebDataConsumer() {
         setUserFills,
         setTwapHistory,
         setTwapSliceFills,
+        setUserFundings,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -64,6 +67,7 @@ export default function WebDataConsumer() {
     const userFillsRef = useRef<UserFillIF[]>([]);
     const twapHistoryRef = useRef<TwapHistoryIF[]>([]);
     const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
+    const userFundingsRef = useRef<UserFundingIF[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
@@ -87,6 +91,7 @@ export default function WebDataConsumer() {
         setPositions([]);
         positionsRef.current = [];
         openOrdersRef.current = [];
+        userFundingsRef.current = [];
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
@@ -116,6 +121,11 @@ export default function WebDataConsumer() {
             postUserTwapHistory,
         );
 
+        const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
+            { type: WsChannels.USER_FUNDINGS, user: debugWallet.address },
+            postUserFundings,
+        );
+
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
@@ -124,6 +134,8 @@ export default function WebDataConsumer() {
             setOrderHistory(userOrderHistoryRef.current);
             setTwapHistory(twapHistoryRef.current);
             setTwapSliceFills(twapSliceFillsRef.current);
+            setUserFundings(userFundingsRef.current);
+
             if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
                 accountOverviewRef.current.balanceChange =
                     accountOverviewRef.current.balance -
@@ -145,6 +157,7 @@ export default function WebDataConsumer() {
             unsubscribeUserFills();
             unsubscribeUserTwapSliceFills();
             unsubscribeUserTwapHistory();
+            unsubscribeUserFundings();
         };
     }, [debugWallet.address, info]);
 
@@ -262,6 +275,27 @@ export default function WebDataConsumer() {
                 ];
             }
             fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+        }
+    }, []);
+
+    const postUserFundings = useCallback((payload: any) => {
+        const data = payload.data;
+        if (
+            data &&
+            data.user &&
+            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+        ) {
+            const fundings = processUserFundings(data.fundings);
+            fundings.sort((a, b) => b.time - a.time);
+            if (data.isSnapshot) {
+                userFundingsRef.current = fundings;
+            } else {
+                userFundingsRef.current = [
+                    ...fundings,
+                    ...userFundingsRef.current,
+                ];
+            }
+            fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
         }
     }, []);
 

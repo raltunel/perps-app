@@ -15,7 +15,7 @@
     justify-content: space-between;
     width: 100%;
     gap: 16px;
-    padding-left: 4px;
+    padding-left: var(--padding-xs);
 }
 
 .sliderContainer {
@@ -114,7 +114,7 @@
     align-items: center;
     background-color: var(--bg-dark3);
     border-radius: 8px;
-    padding: 0 8px;
+    padding: 0 var(--padding-s);
 }
 
 .valueInput {
@@ -147,5 +147,5 @@
     border: none;
     background: var(--accent1);
     color: var(--text1);
-    padding: 4px;
+    padding: var(--padding-xs);
 }
