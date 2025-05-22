@@ -24,12 +24,12 @@
 .modal_buttons {
     display: flex;
     flex-direction: row;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .modal_buttons > button {
     width: 200px;
-    gap: 8px;
+    gap: var(--gap-s);
     padding-top: var(--padding-m);
     padding-bottom: var(--padding-m);
     border: none;

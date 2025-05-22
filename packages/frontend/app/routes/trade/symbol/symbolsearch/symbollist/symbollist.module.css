@@ -25,7 +25,7 @@
     width: 100%;
     border: none;
     position: relative;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--marign-s);
 }
 
 .symbolListSearchIcon {
@@ -60,7 +60,7 @@
 .headerContainer {
     display: grid;
     grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
-    gap: 0.5rem;
+    gap: var(--gap-s);
     align-items: center;
     position: sticky;
 }
@@ -68,9 +68,9 @@
 .rowContainer {
     display: grid;
     grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
-    gap: 0.5rem;
+    gap: var(--gap-s);
     align-items: center;
-    margin: 0.5rem;
+    margin: var(--margin-s);
 }
 
 .rowContainer:hover {
@@ -85,7 +85,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     cursor: default;
     user-select: none;
 }
@@ -102,7 +102,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .symbolListWrapper .leverageLabel {
@@ -149,9 +149,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    gap: var(--gap-s);
+    margin-top: var(--margin-l);
+    margin-bottom: var(--margin-l);
     color: var(--text2);
 }
 

@@ -1,6 +1,6 @@
 .chasePriceContainer {
     width: 100%;
-    gap: 8px;
+    gap: var(--gap-s);
     display: flex;
     flex-direction: column;
 }

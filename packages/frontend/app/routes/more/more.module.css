@@ -23,7 +23,7 @@
 .grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: var(--gap-m);
     justify-content: center;
     align-items: center;
 }
@@ -43,7 +43,7 @@
 .header {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-fize-l, 24px);
 }
@@ -68,7 +68,7 @@
 
 @media (max-width: 768px) {
     .container {
-        gap: 16px;
+        gap: var(--gap-m);
     }
     .grid {
         flex-direction: column;
@@ -82,6 +82,6 @@
 
     .title {
         font-size: var(--font-size-l, 24px);
-        margin-bottom: 16px;
+        margin-bottom: var(--margin-m);
     }
 }
