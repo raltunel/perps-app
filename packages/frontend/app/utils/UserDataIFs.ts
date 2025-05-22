@@ -95,6 +95,76 @@ export interface TwapSliceFillIF {
     twapId: number;
 }
 
+export interface PositionLeverageIF {
+    type: string;
+    value: number;
+}
+
+export interface CumulativeFundingIF {
+    allTime: number;
+    sinceChange: number;
+    sinceOpen: number;
+}
+
+export interface PositionIF {
+    coin: string;
+    entryPx: number;
+    leverage: PositionLeverageIF;
+    liquidationPx: number;
+    marginUsed: number;
+    maxLeverage: number;
+    positionValue: number;
+    returnOnEquity: number;
+    szi: number;
+    unrealizedPnl: number;
+    type: string;
+    cumFunding: CumulativeFundingIF;
+    tp?: number;
+    sl?: number;
+    side?: string;
+}
+
+export type PositionDataSortBy =
+    | 'coin'
+    | 'size'
+    | 'positionValue'
+    | 'entryPrice'
+    | 'markPrice'
+    | 'pnl'
+    | 'liqPrice'
+    | 'margin'
+    | 'funding'
+    | undefined;
+
+export interface UserFundingIF {
+    time: number;
+    coin: string;
+    usdc: number;
+    szi: number;
+    fundingRate: number;
+}
+
+export type UserFundingSortBy =
+    | 'time'
+    | 'coin'
+    | 'usdc'
+    | 'szi'
+    | 'fundingRate'
+    | undefined;
+
+export interface UserFundingResponseIF {
+    time: number;
+    hash: string;
+    delta: {
+        type: string;
+        coin: string;
+        usdc: string;
+        szi: string;
+        fundingRate: string;
+        nSzi?: boolean;
+    };
+}
+
 export interface ActiveTwapIF {
     coin: string;
     executedNtl: number;

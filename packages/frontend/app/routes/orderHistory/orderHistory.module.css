@@ -1,7 +1,6 @@
 .container {
     width: 100%;
 
-    /* padding: 2rem; */
     display: flex;
     flex-direction: column;
     gap: 64px;
@@ -12,20 +11,15 @@
 
 .container header {
     color: #fff;
-
-    font-family: var(--font-family-main, 'Lexend Deca');
     font-size: var(--font-size-xl, 36px);
-    font-style: normal;
-    font-weight: 300;
-    line-height: normal;
 }
 
 .content {
     width: 100%;
-    border-radius: var(--main-border-radius, 16px);
-    background: var(--dark2, #111117);
+    border-radius: var(--radius-m, 16px);
+    background: var(--bg-dark2, #111117);
     display: flex;
-    padding: 8px 16px;
+    padding: var(--padding-s) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
@@ -69,7 +63,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 1rem;
+        padding: var(--padding-m);
         margin-top: 48px;
     }
 
