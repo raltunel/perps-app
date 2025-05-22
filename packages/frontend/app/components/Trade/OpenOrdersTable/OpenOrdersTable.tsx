@@ -1,21 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useMemo } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { TableState } from '~/utils/CommonIFs';
 import type {
     OrderDataIF,
     OrderDataSortBy,
 } from '~/utils/orderbook/OrderBookIFs';
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
-import styles from './OpenOrdersTable.module.css';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { openOrdersData } from './data';
-import { WsChannels } from '~/utils/Constants';
-import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import { useDebugStore } from '~/stores/DebugStore';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
