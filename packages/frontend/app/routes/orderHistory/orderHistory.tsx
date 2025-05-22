@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
+import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import WebDataConsumer from '../trade/webdataconsumer';
-import styles from './orderHistory.module.css';
 import { WsChannels } from '~/utils/Constants';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 function OrderHistory() {
     const { address } = useParams<{ address: string }>();
@@ -60,26 +59,14 @@ function OrderHistory() {
         }
     }, [isCurrentUser, orderHistory, fetchedHistoryData]);
 
-    const isFullScreen = true;
-
-    // Memoize the container class name
-    const containerClassName = useMemo(() => {
-        return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
-    }, [isFullScreen]);
-
     return (
-        <div className={containerClassName}>
-            {isCurrentUser && <WebDataConsumer />}
-            <header>Order History</header>
-
-            <div className={styles.content}>
-                <OrderHistoryTable
-                    data={tableData}
-                    isFetched={isFetched}
-                    pageMode={true}
-                />
-            </div>
-        </div>
+        <ExternalPage title='Order History'>
+            <OrderHistoryTable
+                data={tableData}
+                isFetched={isFetched}
+                pageMode={true}
+            />
+        </ExternalPage>
     );
 }
 export default OrderHistory;
