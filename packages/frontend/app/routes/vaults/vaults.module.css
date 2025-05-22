@@ -167,6 +167,6 @@
     }
 
     .tableContainer header .rightSide {
-        gap: 4px;
+        gap: var(--gap-xs);
     }
 }

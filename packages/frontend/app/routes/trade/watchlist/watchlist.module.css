@@ -21,14 +21,14 @@
 
 .favIcon {
     color: var(--red);
-    margin-right: 1rem;
+    margin-right: var(--margin-m);
 }
 
 .watchListToolbarIcon {
     cursor: pointer;
     color: var(--text2);
     /* padding: .5rem; */
-    margin-left: 0.5rem;
+    margin-left: var(--gap-s);
 }
 
 .watchListToolbarIcon.active {
@@ -36,7 +36,7 @@
 }
 
 .percentIcon {
-    margin-right: 1rem;
+    margin-right: var(--margin-m);
 }
 
 .watchListNodesWrapper {

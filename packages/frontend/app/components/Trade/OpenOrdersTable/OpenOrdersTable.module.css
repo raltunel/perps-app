@@ -106,7 +106,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding-left: var(--padding-s);
-    margin-top: 8px;
+    margin-top: var(--margin-s);
 }
 
 .viewAllLink:hover {

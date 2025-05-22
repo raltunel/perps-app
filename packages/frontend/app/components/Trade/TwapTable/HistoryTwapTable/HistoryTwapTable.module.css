@@ -79,7 +79,7 @@
 .viewAllLink {
     color: var(--accent1, #7371fc);
     font-size: var(--font-size-s, 12px);
-    margin-top: 8px;
+    margin-top: var(--margin-s);
     padding-left: var(--padding-s);
     text-decoration: none;
     cursor: pointer;

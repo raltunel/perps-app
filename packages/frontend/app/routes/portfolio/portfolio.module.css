@@ -152,7 +152,7 @@
 
     /* this keeps consistent spacing in table header and data rows */
     --fee_table_col_spacing: 2fr 6fr 3fr 3fr;
-    --fee_table_col_gap: 8px;
+    --fee_table_col_gap: var(--gap-s);
     --fee_table_row_padding: 0 var(--padding-s);
 }
 
