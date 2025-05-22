@@ -2,13 +2,13 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .reduceToggleContent {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
 }
@@ -19,7 +19,7 @@
 .chasingIntervalContainer {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .inputDetailsDataContent {
@@ -37,7 +37,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .inputDetailValue {
     color: var(--text1);

@@ -16,7 +16,7 @@
     align-items: center;
     cursor: pointer;
     padding: 0px var(--padding-xs);
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .icon {
