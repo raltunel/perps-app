@@ -55,7 +55,6 @@ export default function FillTwapTable(props: FillTwapTableProps) {
         console.log('export csv');
     };
 
-    console.log(data);
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
             case 'all':
