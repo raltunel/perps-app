@@ -82,14 +82,14 @@
 
 .orderIcon {
     color: var(--text2, #6a6a6d);
-    margin-right: 4px;
+    margin-right: var(--margin-xs);
 }
 
 .viewAllLink {
     color: var(--accent1, #7371fc);
     text-decoration: none;
     font-size: var(--font-size-s, 12px);
-    margin-right: 16px;
+    margin-right: var(--margin-m);
 }
 
 .viewAllLink:hover {
