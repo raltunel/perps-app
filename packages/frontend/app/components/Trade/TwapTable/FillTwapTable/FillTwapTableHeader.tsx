@@ -1,74 +1,73 @@
 import styles from './FillTwapTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { UserFillSortBy } from '~/utils/UserDataIFs';
 
 export interface HeaderCell {
     name: string;
     key: string;
     sortable: boolean;
-    onClick: (() => void) | undefined;
     className: string;
 }
 
-export default function FillTwapTableHeader() {
-    const handleSort = (key: string) => {
-        console.log(`Sorting by: ${key}`);
-    };
+interface FillTwapTableHeaderProps {
+    sortBy?: UserFillSortBy;
+    sortDirection: TableSortDirection;
+    sortClickHandler: (key: UserFillSortBy) => void;
+}
 
+export default function FillTwapTableHeader({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: FillTwapTableHeaderProps) {
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
             key: 'time',
             sortable: true,
-            onClick: () => handleSort('time'),
             className: 'timeCell',
         },
         {
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            onClick: () => handleSort('coin'),
             className: 'coinCell',
         },
         {
             name: 'Direction',
-            key: 'direction',
+            key: 'side',
             sortable: true,
-            onClick: () => handleSort('direction'),
             className: 'directionCell',
         },
         {
             name: 'Price',
-            key: 'price',
+            key: 'px',
             sortable: true,
-            onClick: () => handleSort('price'),
             className: 'priceCell',
         },
         {
             name: 'Size',
-            key: 'size',
+            key: 'sz',
             sortable: true,
-            onClick: () => handleSort('size'),
             className: 'sizeCell',
         },
         {
             name: 'Trade Value',
-            key: 'tradeValue',
+            key: 'value',
             sortable: true,
-            onClick: () => handleSort('tradeValue'),
             className: 'tradeValueCell',
         },
         {
             name: 'Fee',
             key: 'fee',
             sortable: true,
-            onClick: () => handleSort('fee'),
             className: 'feeCell',
         },
         {
             name: 'Closed PNL',
             key: 'closedPnl',
             sortable: true,
-            onClick: () => handleSort('closedPnl'),
             className: 'closedPnlCell',
         },
     ];
@@ -79,10 +78,22 @@ export default function FillTwapTableHeader() {
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
-                    onClick={header.onClick}
+                    onClick={() => {
+                        if (header.sortable) {
+                            sortClickHandler(header.key as UserFillSortBy);
+                        }
+                    }}
                 >
                     {header.name}
-                    {header.sortable && <SortIcon />}
+                    {header.sortable && (
+                        <SortIcon
+                            sortDirection={
+                                sortDirection && header.key === sortBy
+                                    ? sortDirection
+                                    : undefined
+                            }
+                        />
+                    )}
                 </div>
             ))}
         </div>

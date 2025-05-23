@@ -56,6 +56,8 @@ export type UserFillSortBy =
     | 'value'
     | 'fee'
     | 'closedPnl'
+    | 'status'
+    | 'tradeValue'
     | undefined;
 
 export interface TwapStateIF {
