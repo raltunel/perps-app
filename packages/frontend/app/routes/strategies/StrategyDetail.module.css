@@ -1,0 +1,92 @@
+.strategies_page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 1200px;
+    font-family: var(--font-family-main);
+    outline: 1px solid green;
+}
+
+.strategies_page > h2 {
+    font-size: var(--font-size-xl);
+    font-weight: 300;
+    color: var(--text1);
+}
+
+.strategies_blurb {
+    font-size: var(--font-size-m);
+    color: var(--text-2);
+}
+
+.strategies_learn_more {
+    font-size: var(--font-size-m);
+    color: var(--accent1);
+}
+
+.strategy_select {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.strategy_select > div {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+}
+
+.strategy_select > label {
+    color: var(--text1);
+}
+
+.strategy_details {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    background-color: var(--bg-dark2);
+    border-radius: 16px;
+}
+
+.strategy_details > div {
+    width: 448px;
+}
+
+.strategy_details_table {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 0;
+    font-size: var(--font-size-s);
+}
+
+/* these two parts create the grey-purple underline effect */
+.strategy_details_table > header {
+    border-bottom: 1px solid var(--bg-dark4);
+    margin-bottom: -1px;
+}
+.strategy_details_table > header > span {
+    padding: 0 16px;
+    border-bottom: 1px solid var(--accent1);
+    margin-bottom: -1px;
+}
+
+.strategy_details_table > section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 8px;
+}
+
+.strategy_details_table > section > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.strategy_details_table > section > div > div:first-child {
+    color: var(--text2);
+}
+
+.strategy_details_graph {
+    background-color: grey;
+}

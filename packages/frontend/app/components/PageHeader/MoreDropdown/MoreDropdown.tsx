@@ -8,21 +8,22 @@ interface propsIF {
 export default function MoreDropdown(props: propsIF) {
     const { setIsMoreDropdownOpen } = props;
     const submenuData = [
-        { name: 'Testnet', link: '/testnet' },
-        { name: 'Explorer', link: '/explorer' },
-        { name: 'Sub-Accounts', link: '/subaccounts' },
-        { name: 'API', link: '/api' },
-        { name: 'Multi-Sig', link: '/multi-sig' },
-        { name: 'Funding Comparison', link: '/funding-comparison' },
-        { name: 'Stats', link: '/stats' },
-        { name: 'Docs', link: '/docs' },
+        { name: 'Testnet', path: '/testnet' },
+        { name: 'Explorer', path: '/explorer' },
+        { name: 'Sub-Accounts', path: '/subaccounts' },
+        { name: 'API', path: '/api' },
+        { name: 'Multi-Sig', path: '/multi-sig' },
+        { name: 'Funding Comparison', path: '/funding-comparison' },
+        { name: 'Stats', path: '/stats' },
+        { name: 'Docs', path: '/docs' },
+        { name: 'Strategies', path: '/strategies' },
     ];
 
     return (
         <div className={styles.container}>
             {submenuData.map((menu, idx) => (
                 <Link
-                    to={menu.link}
+                    to={menu.path}
                     key={idx}
                     className={styles.row}
                     viewTransition
