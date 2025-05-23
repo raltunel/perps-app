@@ -40,6 +40,8 @@ export default [
 
     route('twapHistory/:address?', 'routes/twapHistory/twapHistory.tsx'),
 
+    route('openOrders/:address?', 'routes/openOrders/openOrders.tsx'),
+
     route(
         'twapFillHistory/:address?',
         'routes/twapFillHistory/twapFillHistory.tsx',

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -31,6 +31,8 @@ interface GenericTableProps<T, S> {
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
+    const id = useId();
+
     const {
         data,
         renderHeader,
@@ -52,11 +54,52 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         TableState.LOADING,
     );
 
+    useEffect(() => {
+        let scrollEvent = null;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+        const actionsContainer = document.getElementById(
+            `${id}-actionsContainer`,
+        ) as HTMLElement;
+        const headerContainer = document.getElementById(
+            `${id}-headerContainer`,
+        ) as HTMLElement;
+
+        if (tableBody) {
+            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
+                const target = e.target as HTMLElement;
+                const bottomNotShadowed =
+                    target.scrollTop + target.clientHeight >=
+                    target.scrollHeight;
+                if (bottomNotShadowed) {
+                    actionsContainer?.classList.add(styles.notShadowed);
+                } else {
+                    actionsContainer?.classList.remove(styles.notShadowed);
+                }
+
+                const topShadowed = target.scrollTop > 0;
+                if (topShadowed) {
+                    headerContainer?.classList.add(styles.shadowed);
+                } else {
+                    headerContainer?.classList.remove(styles.shadowed);
+                }
+            });
+        }
+
+        return () => {
+            if (scrollEvent) {
+                tableBody.removeEventListener('scroll', scrollEvent);
+            }
+        };
+    }, [tableState]);
+
+
     const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         defaultSortDirection ?? 'desc',
     );
-
+    
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
@@ -130,8 +173,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 />
             ) : (
                 <>
-                    {renderHeader(sortDirection, handleSort, sortBy)}
+                    <span
+                        className={styles.headerContainer}
+                        id={`${id}-headerContainer`}
+                    >
+                        {renderHeader(sortDirection, handleSort, sortBy)}
+                    </span>
                     <div
+                        id={`${id}-tableBody`}
                         className={`${styles.tableBody} 
                         ${pageMode ? styles.pageMode : styles.notPage}
                         `}
@@ -140,7 +189,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
                         {sortedData.length > 0 && (
-                            <div className={styles.actionsContainer}>
+                            <div
+                                id={`${id}-actionsContainer`}
+                                className={styles.actionsContainer}
+                            >
                                 {sortedData.length > slicedLimit &&
                                     !pageMode && (
                                         <a
