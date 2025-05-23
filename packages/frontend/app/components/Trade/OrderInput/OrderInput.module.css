@@ -31,14 +31,16 @@
 .mainContent::-webkit-scrollbar {
     display: none;
 }
+
 .orderTypeDropdownContainer {
     width: 100%;
-
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     gap: var(--gap-s);
     height: var(--dropdown-height);
 }
+
 .inputDetailsDataContainer {
     width: 100%;
     display: flex;
@@ -95,6 +97,19 @@
 
 .isolatedButton:hover svg {
     color: var(--text1);
+}
+
+.trade_type_toggle {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: var(--dropdown-height);
+    background-color: var(--bg-dark3, #1c1c22);
+    color: var(--text1, #f0f0f8);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    border: none;
 }
 
 .priceDistributionContainer {

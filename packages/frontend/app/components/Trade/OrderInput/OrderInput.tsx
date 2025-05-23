@@ -28,6 +28,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { PiSquaresFour } from 'react-icons/pi';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -454,6 +455,9 @@ export default function OrderInput() {
                         className={styles.isolatedButton}
                     >
                         Isolated <FiChevronDown size={24} />
+                    </button>
+                    <button className={styles.trade_type_toggle}>
+                        <PiSquaresFour />
                     </button>
                 </div>
 
