@@ -37,7 +37,7 @@
     padding: var(--padding-xs) var(--padding-s);
     border-radius: 4px;
     font-size: 12px;
-    margin-right: 8px;
+    margin-right: var(--margin-s);
 }
 
 .title {
@@ -81,7 +81,7 @@
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin: 0 0 16px;
+    margin: 0 0 var(--margin-m);
 }
 
 .dot {

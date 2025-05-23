@@ -70,7 +70,7 @@
     padding: var(--padding-xs) var(--padding-s);
     border-radius: 4px;
     font-size: 12px;
-    margin-right: 8px;
+    margin-right: var(--margin-s);
 }
 
 .title {

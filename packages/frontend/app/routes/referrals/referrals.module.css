@@ -35,7 +35,7 @@
 .detailsContent {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .detailsContent h6 {
@@ -52,13 +52,13 @@
     height: 100%;
     display: grid;
     grid-template-columns: 1fr 3fr;
-    gap: 8px;
+    gap: var(--gap-s);
 
     height: 346px;
 }
 @media (max-width: 1568px) {
     .container {
-        margin-top: 16px;
+        margin-top: var(--margin-m);
     }
 }
 @media (max-width: 768px) {
@@ -72,7 +72,7 @@
     .tableContainer {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--gap-s);
         max-height: none;
         height: auto;
     }
@@ -85,7 +85,7 @@
     .detailsContainer {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: var(--gap-s);
         align-items: flex-start;
     }
 

@@ -3,8 +3,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-    gap: 4px;
+    gap: var(--gap-xs);
+    gap: var(--gap-xs);
 }
 
 .orderBookContainer {
@@ -20,7 +20,7 @@
     gap: var(--gap-xs);
     background-color: var(--bg-dark4);
     margin: var(--margin-xs) 0;
-    padding: 0 1rem;
+    padding: 0 var(--padding-m);
 }
 
 .orderBookHeader {

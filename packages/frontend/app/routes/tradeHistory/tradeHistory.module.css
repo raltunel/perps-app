@@ -31,7 +31,7 @@
 
 .fullScreen {
     margin-top: 0 !important;
-    gap: 8px !important;
+    gap: var(--gap-s) !important;
 }
 
 .fullScreen .searchRow {
