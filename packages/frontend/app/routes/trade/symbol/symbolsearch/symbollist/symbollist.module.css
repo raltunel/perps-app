@@ -1,13 +1,16 @@
 .symbolListWrapper {
+    --symbol-list-height: 16rem;
+    --symbol-list-width: 50rem;
+
     position: absolute;
     top: 130%;
     left: 0;
     z-index: 1000;
-    width: 50rem;
+    width: var(--symbol-list-width);
     background-color: var(--bg-dark3) !important;
     padding: var(--padding-s);
     border-radius: 0.4rem !important;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: var(--dropdown-box-shadow);
 }
 
 .symbolListWrapper div {
@@ -15,7 +18,7 @@
 }
 
 .symbolList {
-    max-height: 16rem;
+    max-height: var(--symbol-list-height);
     overflow-y: auto;
     border-radius: 0 !important;
     scrollbar-width: none;
