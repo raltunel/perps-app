@@ -93,6 +93,8 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
                 viewAllLink={viewAllLink}
                 skeletonRows={7}
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+                defaultSortBy={'time'}
+                defaultSortDirection={'desc'}
             />
         </>
     );

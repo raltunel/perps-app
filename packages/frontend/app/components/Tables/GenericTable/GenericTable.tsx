@@ -26,6 +26,8 @@ interface GenericTableProps<T, S> {
     slicedLimit?: number;
     pageMode?: boolean;
     viewAllLink?: string;
+    defaultSortBy?: S;
+    defaultSortDirection?: TableSortDirection;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
@@ -40,6 +42,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         skeletonColRatios = [2, 1, 1.5, 1.5, 1.5, 1.5, 1, 1, 1],
         slicedLimit = 10,
         viewAllLink,
+        defaultSortBy,
+        defaultSortDirection,
     } = props;
 
     const navigate = useNavigate();
@@ -48,8 +52,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         TableState.LOADING,
     );
 
-    const [sortBy, setSortBy] = useState<S>();
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
+        defaultSortDirection ?? 'desc',
+    );
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -81,7 +87,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 setSortDirection('asc');
             } else if (sortDirection === 'asc') {
                 setSortDirection(undefined);
-                setSortBy(undefined);
+                setSortBy(undefined as S);
             } else {
                 setSortDirection('desc');
             }

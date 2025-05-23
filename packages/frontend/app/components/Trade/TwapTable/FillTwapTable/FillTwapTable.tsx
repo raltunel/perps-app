@@ -118,6 +118,8 @@ export default function FillTwapTable(props: FillTwapTableProps) {
                 viewAllLink={viewAllLink}
                 skeletonRows={7}
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+                defaultSortBy={'time'}
+                defaultSortDirection={'desc'}
             />
         </>
     );
