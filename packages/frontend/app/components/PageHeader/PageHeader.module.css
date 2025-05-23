@@ -8,7 +8,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 32px;
+    gap: var(--gap-l);
     position: relative;
 }
 
@@ -36,10 +36,10 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .moreButton svg {
-    margin: 8px 0;
+    margin: var(--margin-s) 0;
 }
 .container nav a:hover,
 .moreButton:hover {
@@ -156,7 +156,7 @@
     height: var(--menu-button-height-width);
     padding: var(--padding-xs);
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
 
@@ -177,7 +177,7 @@
     height: var(--menu-button-height-width);
     padding: var(--padding-xs);
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     border-radius: var(--radius-s, 8px);
     background: var(--bg-dark2, #0e0e14);
 
@@ -217,7 +217,7 @@
         flex-direction: column !important;
         align-items: flex-end !important;
         padding: var(--padding-s);
-        gap: 32px;
+        gap: var(--gap-l);
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
         transition: right var(--ease-in-out-med);
         z-index: 1000;

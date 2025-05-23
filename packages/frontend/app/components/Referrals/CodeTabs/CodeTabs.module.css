@@ -14,7 +14,7 @@
 .tableControls {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .sectionWithButton {
@@ -46,7 +46,7 @@
 .enterCodeContent {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 
     align-items: flex-start;
 }
@@ -61,7 +61,7 @@
     height: 33px;
     padding: 0 var(--padding-s);
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     align-self: stretch;
     border-radius: 8px;
     background: var(--bg-dark4, #27272c);
@@ -75,14 +75,14 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--gap-m);
     font-size: var(--font-size-s, 12px);
 }
 .createCodeContent .walletLink {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 .createCodeContent a {
     color: var(--accent1);
