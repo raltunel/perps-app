@@ -489,6 +489,20 @@ export default function OrderInput() {
                         {/* empty <div> helps with spacing */}
                         <div />
                     </header>
+                    <ul className={styles.launchpad_clickables}>
+                        {marketOrderTypes.map((mo: OrderTypeOption) => (
+                            <li
+                                key={JSON.stringify(mo)}
+                                onClick={() => console.log(mo)}
+                            >
+                                <div>icon goes here</div>
+                                <div>
+                                    <h4>{mo.label}</h4>
+                                    <p>{mo.blurb}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             ) : (
                 <>

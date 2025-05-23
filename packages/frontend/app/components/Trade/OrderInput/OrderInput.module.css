@@ -169,6 +169,18 @@
     cursor: pointer;
 }
 
+.launchpad_clickables {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    list-style-type: none;
+}
+
+.launchpad_clickables > li {
+    display: flex;
+    flex-direction: row;
+}
+
 @media (min-width: 1600px) {
     .mainContainer {
         padding: var(--padding-m) var(--padding-m) var(--padding-xs)
