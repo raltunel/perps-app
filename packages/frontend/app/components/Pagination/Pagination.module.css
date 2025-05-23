@@ -71,7 +71,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--padding-xs);
-    border-radius: 0.25rem;
+    border-radius: var(--radius-xs);
 }
 
 .pageButton:hover {
