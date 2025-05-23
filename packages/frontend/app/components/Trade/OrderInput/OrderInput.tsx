@@ -29,6 +29,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import { PiSquaresFour } from 'react-icons/pi';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -477,7 +478,18 @@ export default function OrderInput() {
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
-                <div>Launchpad!</div>
+                <div className={styles.launchpad}>
+                    <header>
+                        <div>
+                            <MdKeyboardArrowLeft
+                                onClick={() => setShowLaunchpad(false)}
+                            />
+                        </div>
+                        <h3>Order Types</h3>
+                        {/* empty <div> helps with spacing */}
+                        <div />
+                    </header>
+                </div>
             ) : (
                 <>
                     {' '}

@@ -148,6 +148,27 @@
     font-size: var(--font-size-s);
 }
 
+.launchpad {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.launchpad > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.launchpad > header > div {
+    width: 20px;
+}
+
+.launchpad > header > div > svg {
+    cursor: pointer;
+}
+
 @media (min-width: 1600px) {
     .mainContainer {
         padding: var(--padding-m) var(--padding-m) var(--padding-xs)
