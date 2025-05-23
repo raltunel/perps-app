@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -29,8 +29,7 @@ interface GenericTableProps<T, S> {
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
-    const tableBodyRef = useRef<HTMLDivElement>(null);
-    const actionsContainerRef = useRef<HTMLDivElement>(null);
+    const id = useId();
 
     const {
         data,
@@ -47,42 +46,49 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
 
     const navigate = useNavigate();
 
+    const [tableState, setTableState] = useState<TableState>(
+        TableState.LOADING,
+    );
+
     useEffect(() => {
         let scrollEvent = null;
-        if (tableBodyRef.current && actionsContainerRef.current) {
-            scrollEvent = tableBodyRef.current.addEventListener(
-                'scroll',
-                (e: Event) => {
-                    const target = e.target as HTMLElement;
-                    const isAtBottom =
-                        target.scrollTop + target.clientHeight >=
-                        target.scrollHeight;
-                    if (isAtBottom) {
-                        actionsContainerRef.current?.classList.add(
-                            styles.atBottom,
-                        );
-                    } else {
-                        actionsContainerRef.current?.classList.remove(
-                            styles.atBottom,
-                        );
-                    }
-                },
-            );
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+        const actionsContainer = document.getElementById(
+            `${id}-actionsContainer`,
+        ) as HTMLElement;
+        const headerContainer = document.getElementById(
+            `${id}-headerContainer`,
+        ) as HTMLElement;
+
+        if (tableBody) {
+            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
+                const target = e.target as HTMLElement;
+                const bottomNotShadowed =
+                    target.scrollTop + target.clientHeight >=
+                    target.scrollHeight;
+                if (bottomNotShadowed) {
+                    actionsContainer?.classList.add(styles.notShadowed);
+                } else {
+                    actionsContainer?.classList.remove(styles.notShadowed);
+                }
+
+                const topShadowed = target.scrollTop > 0;
+                if (topShadowed) {
+                    headerContainer?.classList.add(styles.shadowed);
+                } else {
+                    headerContainer?.classList.remove(styles.shadowed);
+                }
+            });
         }
 
         return () => {
             if (scrollEvent) {
-                tableBodyRef.current?.removeEventListener(
-                    'scroll',
-                    scrollEvent,
-                );
+                tableBody.removeEventListener('scroll', scrollEvent);
             }
         };
-    }, [tableBodyRef.current, actionsContainerRef.current]);
-
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
+    }, [tableState]);
 
     const [sortBy, setSortBy] = useState<S>();
     const [sortDirection, setSortDirection] = useState<TableSortDirection>();
@@ -160,9 +166,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 />
             ) : (
                 <>
-                    {renderHeader(sortDirection, handleSort, sortBy)}
+                    <span
+                        className={styles.headerContainer}
+                        id={`${id}-headerContainer`}
+                    >
+                        {renderHeader(sortDirection, handleSort, sortBy)}
+                    </span>
                     <div
-                        ref={tableBodyRef}
+                        id={`${id}-tableBody`}
                         className={`${styles.tableBody} 
                         ${pageMode ? styles.pageMode : styles.notPage}
                         `}
@@ -172,7 +183,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                         {tableState === TableState.EMPTY && <NoDataRow />}
                         {sortedData.length > 0 && (
                             <div
-                                ref={actionsContainerRef}
+                                id={`${id}-actionsContainer`}
                                 className={styles.actionsContainer}
                             >
                                 {sortedData.length > slicedLimit &&
