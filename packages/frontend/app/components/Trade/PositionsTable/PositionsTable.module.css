@@ -90,7 +90,7 @@
     cursor: pointer;
     transition: color 0.2s ease;
     white-space: nowrap;
-    margin-right: 8px;
+    margin-right: var(--margin-s);
 }
 
 .actionButton:hover {
@@ -233,7 +233,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding-left: var(--padding-s);
-    margin-top: 8px;
+    margin-top: var(--margin-s);
     position: absolute;
     bottom: 0.2rem;
     left: 0;

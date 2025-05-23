@@ -2,7 +2,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: var(--gap-l);
 
     width: 100%;
     max-width: 1200px; /* Add a max-width to constrain the content */
@@ -12,7 +12,7 @@
 .container header {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--gap-m);
     color: var(--text1, #e1eeee);
     font-size: var(--font-size-xl, 36px);
 }
@@ -25,7 +25,7 @@
 
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: var(--gap-l);
     align-self: stretch;
     flex-wrap: wrap;
 }
@@ -41,7 +41,7 @@
     .content {
         flex-direction: column;
         align-items: center;
-        gap: 16px;
+        gap: var(--gap-m);
         padding: var(--padding-s);
     }
 }

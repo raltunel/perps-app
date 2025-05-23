@@ -37,6 +37,7 @@ export default function Notification(props: propsIF) {
 
     // logic to add green syntax highlighting to Bought notifications
     function formatMessage(message: string): ReactNode {
+        if (!message) return;
         const fixedMessage: string = message.trim();
         if (fixedMessage.startsWith('Bought')) {
             const firstSpace = fixedMessage.indexOf(' ');
