@@ -492,7 +492,6 @@ export default function OrderInput() {
                 </div>
             ) : (
                 <>
-                    {' '}
                     <div className={styles.mainContent}>
                         <div
                             className={styles.orderTypeDropdownContainer}
