@@ -493,7 +493,10 @@ export default function OrderInput() {
                         {marketOrderTypes.map((mo: OrderTypeOption) => (
                             <li
                                 key={JSON.stringify(mo)}
-                                onClick={() => console.log(mo)}
+                                onClick={() => {
+                                    handleMarketOrderTypeChange(mo.value);
+                                    setShowLaunchpad(false);
+                                }}
                             >
                                 <div>icon goes here</div>
                                 <div>
