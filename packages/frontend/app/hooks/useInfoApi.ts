@@ -1,3 +1,4 @@
+import type { OpenOrderRawData } from '@perps-app/sdk/src/utils/types';
 import { processUserOrder } from '~/processors/processOrderBook';
 import {
     processUserFills,
@@ -177,6 +178,28 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchOpenOrders = async (address: string): Promise<OrderDataIF[]> => {
+        const ret: OrderDataIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.OPEN_ORDERS,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            data.forEach((o: OpenOrderRawData) => {
+                const processedOrder = processUserOrder(o, 'open');
+                if (processedOrder) {
+                    ret.push(processedOrder);
+                }
+            });
+        }
+        return ret;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -184,5 +207,6 @@ export function useInfoApi() {
         fetchTwapHistory,
         fetchTwapSliceFills,
         fetchFundingHistory,
+        fetchOpenOrders,
     };
 }
