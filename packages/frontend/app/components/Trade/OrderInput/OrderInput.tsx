@@ -32,21 +32,55 @@ import { PiSquaresFour } from 'react-icons/pi';
 export interface OrderTypeOption {
     value: string;
     label: string;
+    blurb: string;
+}
+
+export interface ChaseOption {
+    value: string;
+    label: string;
 }
 
 export type MarginMode = 'cross' | 'isolated' | null;
 
 const marketOrderTypes: OrderTypeOption[] = [
-    { value: 'market', label: 'Market' },
-    { value: 'limit', label: 'Limit' },
-    { value: 'scale', label: 'Scale' },
-    { value: 'stop_limit', label: 'Stop Limit' },
-    { value: 'stop_market', label: 'Stop Market' },
-    { value: 'twap', label: 'TWAP' },
-    { value: 'chase_limit', label: 'Chase Limit' },
+    {
+        value: 'market',
+        label: 'Market',
+        blurb: 'Buy/sell at the current price',
+    },
+    {
+        value: 'limit',
+        label: 'Limit',
+        blurb: 'Buy/Sell at a specific price or better',
+    },
+    {
+        value: 'scale',
+        label: 'Scale',
+        blurb: 'Multiple orders at incrementing prices',
+    },
+    {
+        value: 'stop_limit',
+        label: 'Stop Limit',
+        blurb: 'Triggers a limit order at a set price',
+    },
+    {
+        value: 'stop_market',
+        label: 'Stop Market',
+        blurb: 'Triggers a market order at a set price',
+    },
+    {
+        value: 'twap',
+        label: 'TWAP',
+        blurb: 'Distributes trades across a specified time period',
+    },
+    {
+        value: 'chase_limit',
+        label: 'Chase Limit',
+        blurb: 'Adjusts limit price to follow the market',
+    },
 ];
 
-const chaseOptionTypes: OrderTypeOption[] = [
+const chaseOptionTypes: ChaseOption[] = [
     { value: 'bid1ask1', label: 'Bid1/Ask1' },
     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 ];
