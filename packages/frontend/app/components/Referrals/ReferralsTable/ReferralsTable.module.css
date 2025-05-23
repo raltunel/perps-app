@@ -27,7 +27,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-s);
     overflow: hidden;
     /* Set a specific height that fits your design */
     height: 303px;

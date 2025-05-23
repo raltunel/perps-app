@@ -12,7 +12,7 @@
     padding: var(--padding-dropdown);
 
     background: var(--bg-dark4, #27272c);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     cursor: pointer;
     transition: border-color 0.2s ease;
 }
@@ -45,7 +45,7 @@
     overflow-y: auto;
     background: var(--bg-dark4, #27272c);
     border: 1px solid var(--border-color, #2a2a2a);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     z-index: 100;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     animation: fadeIn 0.2s ease;
