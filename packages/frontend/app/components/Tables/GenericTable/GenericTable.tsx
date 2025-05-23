@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -29,6 +29,9 @@ interface GenericTableProps<T, S> {
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
+    const tableBodyRef = useRef<HTMLDivElement>(null);
+    const actionsContainerRef = useRef<HTMLDivElement>(null);
+
     const {
         data,
         renderHeader,
@@ -43,6 +46,39 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     } = props;
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        let scrollEvent = null;
+        if (tableBodyRef.current && actionsContainerRef.current) {
+            scrollEvent = tableBodyRef.current.addEventListener(
+                'scroll',
+                (e: Event) => {
+                    const target = e.target as HTMLElement;
+                    const isAtBottom =
+                        target.scrollTop + target.clientHeight >=
+                        target.scrollHeight;
+                    if (isAtBottom) {
+                        actionsContainerRef.current?.classList.add(
+                            styles.atBottom,
+                        );
+                    } else {
+                        actionsContainerRef.current?.classList.remove(
+                            styles.atBottom,
+                        );
+                    }
+                },
+            );
+        }
+
+        return () => {
+            if (scrollEvent) {
+                tableBodyRef.current?.removeEventListener(
+                    'scroll',
+                    scrollEvent,
+                );
+            }
+        };
+    }, [tableBodyRef.current, actionsContainerRef.current]);
 
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
@@ -126,6 +162,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 <>
                     {renderHeader(sortDirection, handleSort, sortBy)}
                     <div
+                        ref={tableBodyRef}
                         className={`${styles.tableBody} 
                         ${pageMode ? styles.pageMode : styles.notPage}
                         `}
@@ -134,7 +171,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
                         {sortedData.length > 0 && (
-                            <div className={styles.actionsContainer}>
+                            <div
+                                ref={actionsContainerRef}
+                                className={styles.actionsContainer}
+                            >
                                 {sortedData.length > slicedLimit &&
                                     !pageMode && (
                                         <a

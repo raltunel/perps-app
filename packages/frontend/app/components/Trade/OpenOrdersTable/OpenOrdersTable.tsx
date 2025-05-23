@@ -13,7 +13,7 @@ interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
     onViewAll?: () => void;
-    selectedFilter: string;
+    selectedFilter?: string;
     isFetched: boolean;
     pageMode?: boolean;
 }
@@ -32,6 +32,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const { symbol } = useTradeDataStore();
 
     const filteredOrders = useMemo(() => {
+        if (!selectedFilter) {
+            return data;
+        }
+
         switch (selectedFilter) {
             case 'all':
                 return data;
