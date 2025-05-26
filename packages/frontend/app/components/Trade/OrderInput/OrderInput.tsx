@@ -28,9 +28,12 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { PiSquaresFour } from 'react-icons/pi';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { GoZap } from 'react-icons/go';
+import { RiBarChartHorizontalLine } from 'react-icons/ri';
+import { LuOctagonX } from 'react-icons/lu';
+import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -56,37 +59,37 @@ const marketOrderTypes: OrderTypeOption[] = [
         value: 'limit',
         label: 'Limit',
         blurb: 'Buy/Sell at a specific price or better',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'scale',
         label: 'Scale',
         blurb: 'Multiple orders at incrementing prices',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'stop_limit',
         label: 'Stop Limit',
         blurb: 'Triggers a limit order at a set price',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'stop_market',
         label: 'Stop Market',
         blurb: 'Triggers a market order at a set price',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'twap',
         label: 'TWAP',
         blurb: 'Distributes trades across a specified time period',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'chase_limit',
         label: 'Chase Limit',
         blurb: 'Adjusts limit price to follow the market',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
+        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
     },
 ];
 
