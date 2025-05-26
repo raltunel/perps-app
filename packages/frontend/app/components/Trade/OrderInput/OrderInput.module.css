@@ -160,6 +160,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    font-size: var(--font-size-m);
 }
 
 .launchpad > header > div {
@@ -183,7 +184,7 @@
 .launchpad_clickables > li {
     display: flex;
     flex-direction: column;
-    /* flex-wrap: nowrap; */
+    flex-wrap: nowrap;
     width: 100%;
     padding: 8px;
     border-radius: var(--radius-s);
@@ -193,6 +194,9 @@
 .name_and_icon {
     display: flex;
     flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--gap-m);
 }
 
 .name_and_icon > h4 {

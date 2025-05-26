@@ -35,6 +35,7 @@ export interface OrderTypeOption {
     value: string;
     label: string;
     blurb: string;
+    icon: JSX.Element;
 }
 
 export interface ChaseOption {
@@ -49,36 +50,43 @@ const marketOrderTypes: OrderTypeOption[] = [
         value: 'market',
         label: 'Market',
         blurb: 'Buy/sell at the current price',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'limit',
         label: 'Limit',
         blurb: 'Buy/Sell at a specific price or better',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'scale',
         label: 'Scale',
         blurb: 'Multiple orders at incrementing prices',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'stop_limit',
         label: 'Stop Limit',
         blurb: 'Triggers a limit order at a set price',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'stop_market',
         label: 'Stop Market',
         blurb: 'Triggers a market order at a set price',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'twap',
         label: 'TWAP',
         blurb: 'Distributes trades across a specified time period',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
     {
         value: 'chase_limit',
         label: 'Chase Limit',
         blurb: 'Adjusts limit price to follow the market',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
 ];
 
@@ -500,7 +508,7 @@ export default function OrderInput() {
                                 }}
                             >
                                 <div className={styles.name_and_icon}>
-                                    <GoZap color={'var(--accent1)'} size={25} />
+                                    {mo.icon}
                                     <h4>{mo.label}</h4>
                                 </div>
                                 <div>
