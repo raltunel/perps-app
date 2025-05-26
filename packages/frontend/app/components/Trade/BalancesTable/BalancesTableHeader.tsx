@@ -14,7 +14,7 @@ export interface HeaderCell {
 interface BalancesTableHeaderProps {
     sortBy: UserBalanceSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: UserBalanceSortBy) => void;
 }
 
 export default function BalancesTableHeader({
@@ -83,7 +83,7 @@ export default function BalancesTableHeader({
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
                         if (header.sortable) {
-                            sortClickHandler(header.key);
+                            sortClickHandler(header.key as UserBalanceSortBy);
                         }
                     }}
                 >
