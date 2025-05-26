@@ -9,6 +9,8 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
+import { section } from 'framer-motion/client';
+import { BsStars } from 'react-icons/bs';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
@@ -126,6 +128,17 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
         );
     }, [searchQuery, sortedSymbols]);
 
+    const filterTabs = (
+        <section className={styles.filterTabsContainer}>
+            {/* color to simulate active tab */}
+            <button style={{ color: 'var(--text1)' }}>All Coins</button>
+            <button className={styles.filterNewButton}>
+                New <BsStars color='var(--accent1)' size={14} />
+            </button>
+            <button>Trending</button>
+        </section>
+    );
+
     return (
         <>
             <motion.div
@@ -136,7 +149,10 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                 transition={{ duration: 0.2 }}
             >
                 <div className={styles.symbolListSearch}>
-                    <FiSearch className={styles.symbolListSearchIcon} />
+                    <FiSearch
+                        className={styles.symbolListSearchIcon}
+                        size={15}
+                    />
                     <input
                         autoFocus
                         type='text'
@@ -149,9 +165,11 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                         <IoCloseOutline
                             className={styles.symbolListSearchClose}
                             onClick={() => setSearchQuery('')}
+                            size={18}
                         />
                     )}
                 </div>
+                {filterTabs}
 
                 <SymbolListTableHeader
                     sortClickHandler={sortClickHandler}
