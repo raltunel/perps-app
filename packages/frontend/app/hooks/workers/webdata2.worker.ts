@@ -6,7 +6,10 @@ import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
 import { processUserOrder } from '../../processors/processOrderBook';
 import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
-import { parseNum } from '../../utils/orderbook/OrderBookUtils';
+import {
+    parseNum,
+    genRandomActiveTwap,
+} from '../../utils/orderbook/OrderBookUtils';
 import type {
     OtherWsMsg,
     UserActiveTwap,
@@ -44,7 +47,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
         const userBalances: UserBalanceIF[] = [];
-        const activeTwaps: ActiveTwapIF[] = [];
+        const activeTwaps: ActiveTwapIF[] = [genRandomActiveTwap()];
         const accountOverview: AccountOverviewIF = {
             balance: 0,
             unrealizedPnl: 0,

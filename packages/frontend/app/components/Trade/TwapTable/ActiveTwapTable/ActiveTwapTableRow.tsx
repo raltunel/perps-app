@@ -1,6 +1,7 @@
 import type { ActiveTwapIF } from '~/utils/UserDataIFs';
 import styles from './ActiveTwapTable.module.css';
 import {
+    formatDiffAsCountdown,
     formatMinuteValue,
     formatTimestamp,
 } from '~/utils/orderbook/OrderBookUtils';
@@ -24,6 +25,8 @@ export default function ActiveTwapTableRow(props: ActiveTwapTableRowProps) {
         return twap.executedNtl / twap.executedSz;
     }, [twap.executedNtl, twap.executedSz]);
 
+    const runningTime = Math.floor((Date.now() - twap.timestamp) / 1000);
+
     return (
         <div className={styles.rowContainer}>
             <div className={`${styles.cell} ${styles.coinCell}`}>
@@ -38,7 +41,11 @@ export default function ActiveTwapTableRow(props: ActiveTwapTableRowProps) {
             <div className={`${styles.cell} ${styles.averagePriceCell}`}>
                 {formatNum(avgPx)}
             </div>
-            <div className={`${styles.cell} ${styles.runningTimeCell}`}>
+            <div
+                key={runningTime}
+                className={`${styles.cell} ${styles.runningTimeCell}`}
+            >
+                {formatDiffAsCountdown(runningTime)} /{' '}
                 {formatMinuteValue(twap.minutes)}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
