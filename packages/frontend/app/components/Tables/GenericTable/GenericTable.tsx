@@ -35,6 +35,7 @@ interface GenericTableProps<T, S> {
     viewAllLink?: string;
     defaultSortBy?: S;
     defaultSortDirection?: TableSortDirection;
+    heightOverride?: string;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
@@ -53,6 +54,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         viewAllLink,
         defaultSortBy,
         defaultSortDirection,
+        heightOverride = '100%',
     } = props;
 
     const navigate = useNavigate();
@@ -174,7 +176,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     }, [dataToShow, isFetched]);
 
     return (
-        <div className={styles.tableWrapper}>
+        <div className={styles.tableWrapper} style={{ height: heightOverride }}>
             {tableState === TableState.LOADING ? (
                 <SkeletonTable
                     rows={skeletonRows}
@@ -204,7 +206,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                             >
                                 {sortedData.length > slicedLimit &&
                                     !pageMode &&
-                                    viewAllLink && (
+                                    viewAllLink &&
+                                    viewAllLink.length > 0 && (
                                         <a
                                             href='#'
                                             className={styles.viewAllLink}

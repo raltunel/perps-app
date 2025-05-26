@@ -56,6 +56,7 @@ export interface TabsProps {
     layoutIdPrefix?: string;
     wide?: boolean;
     flex?: boolean;
+    staticHeight?: string;
 }
 
 export default function Tabs(props: TabsProps) {
@@ -68,6 +69,7 @@ export default function Tabs(props: TabsProps) {
         layoutIdPrefix = 'tabIndicator',
         wide = false,
         flex = false,
+        staticHeight = 'auto',
     } = props;
 
     const {
@@ -228,6 +230,7 @@ export default function Tabs(props: TabsProps) {
         <div
             {...(wrapperId ? { id: wrapperId } : {})}
             className={styles.tabsContainer}
+            style={{ height: staticHeight }}
         >
             <div
                 className={`${styles.tabsWrapper} ${canScrollLeft ? styles.showLeftFade : ''} ${canScrollRight ? styles.showRightFade : ''}`}
