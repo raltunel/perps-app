@@ -500,7 +500,7 @@ export default function OrderInput() {
                                 }}
                             >
                                 <div className={styles.name_and_icon}>
-                                    <GoZap color={'var(--accent1)'} />
+                                    <GoZap color={'var(--accent1)'} size={25} />
                                     <h4>{mo.label}</h4>
                                 </div>
                                 <div>
