@@ -18,6 +18,7 @@ import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -50,11 +51,6 @@ class ComponentErrorBoundary extends React.Component<
         }
         return this.props.children;
     }
-}
-
-// Added loading component for async operations
-function LoadingIndicator() {
-    return <div className='loading-indicator'>Loading...</div>;
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

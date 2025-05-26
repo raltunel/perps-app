@@ -40,6 +40,7 @@ export default function PageHeader() {
         { name: 'Referrals', path: '/referrals' },
         // { name: 'Points', path: '/points' },
         { name: 'Leaderboard', path: '/leaderboard' },
+        // { name: 'Strategies', path: '/strategies' },
     ];
 
     const dropdownMenuRef = useOutsideClick<HTMLDivElement>(() => {

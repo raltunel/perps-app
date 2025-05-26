@@ -56,7 +56,7 @@
 
 .tableBody::-webkit-scrollbar-thumb {
     background: var(--accent1) !important;
-    border-radius: 4px !important;
+    border-radius: var(--radius-xs) !important;
 }
 
 .tableBody::-webkit-scrollbar-thumb:hover {
