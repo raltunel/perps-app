@@ -120,6 +120,7 @@ export default function FillTwapTable(props: FillTwapTableProps) {
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
                 defaultSortBy={'time'}
                 defaultSortDirection={'desc'}
+                heightOverride={`${pageMode ? '100%' : '90%'}`}
             />
         </>
     );
