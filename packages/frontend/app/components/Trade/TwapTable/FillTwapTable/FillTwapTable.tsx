@@ -10,6 +10,13 @@ import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
 import styles from './FillTwapTable.module.css';
 import FillTwapTableHeader from './FillTwapTableHeader';
 import FillTwapTableRow from './FillTwapTableRow';
+import type { TwapHistoryIF, UserFillSortBy } from '~/utils/UserDataIFs';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import {
+    sortTwapFillHistory,
+    sortTwapHistory,
+} from '~/processors/processUserFills';
+import { sortPositionData } from '~/utils/position/PositionUtils';
 
 interface FillTwapTableProps {
     data: TwapSliceFillIF[];
@@ -39,12 +46,9 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
-    const handleViewAll = (e: React.MouseEvent) => {
-        e.preventDefault();
-        navigate(`/twapFillHistory/${currentUserRef.current}`, {
-            viewTransition: true,
-        });
-    };
+    const viewAllLink = useMemo(() => {
+        return `/twapFillHistory/${currentUserRef.current}`;
+    }, [debugWallet.address]);
 
     const handleExportCsv = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -92,62 +96,31 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     }, [isFetched, dataToShow]);
 
     return (
-        <div className={styles.tableWrapper}>
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable rows={7} colRatios={[2, 1, 1, 1, 1, 1, 1, 1]} />
-            ) : (
-                <>
-                    <FillTwapTableHeader />
-                    <div
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : ''
-                        }`}
-                    >
-                        {tableState === TableState.FILLED && (
-                            <>
-                                {dataToShow.map((fill, index) => (
-                                    <FillTwapTableRow
-                                        key={`fill-${index}`}
-                                        fill={fill}
-                                    />
-                                ))}
-                            </>
-                        )}
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-                        {sortedData.length > 0 && (
-                            <div className={styles.actionsContainer}>
-                                {sortedData.length > tableModeLimit &&
-                                    !pageMode && (
-                                        <a
-                                            href='#'
-                                            className={styles.viewAllLink}
-                                            onClick={handleViewAll}
-                                        >
-                                            View All
-                                        </a>
-                                    )}
-                                {pageMode && (
-                                    <a
-                                        href='#'
-                                        className={styles.exportLink}
-                                        onClick={handleExportCsv}
-                                    >
-                                        Export as CSV
-                                    </a>
-                                )}
-                            </div>
-                        )}
-                        {pageMode && (
-                            <Pagination
-                                totalCount={filteredData.length}
-                                onPageChange={setPage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={setRowsPerPage}
-                            />
-                        )}
-                    </div>
-                </>
-            )}
-        </div>
+        <>
+            <GenericTable
+                data={filteredData as any}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                    <FillTwapTableHeader
+                        sortBy={sortBy as UserFillSortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={sortClickHandler}
+                    />
+                )}
+                renderRow={(fill, index) => (
+                    <FillTwapTableRow
+                        key={`fill-${index}`}
+                        fill={fill as any}
+                    />
+                )}
+                sorterMethod={sortTwapFillHistory}
+                isFetched={isFetched}
+                pageMode={pageMode}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+                defaultSortBy={'time'}
+                defaultSortDirection={'desc'}
+            />
+        </>
     );
 }

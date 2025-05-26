@@ -53,7 +53,7 @@
     position: absolute;
     width: 3px;
     height: 8px;
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     top: 50%;
     transform: translate(-50%, -50%);
     border: 2px solid;
@@ -123,7 +123,7 @@
     justify-content: center;
     align-items: center;
     background-color: var(--bg-dark3);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     padding: 0 var(--padding-s);
 }
 
