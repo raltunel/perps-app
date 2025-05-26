@@ -194,6 +194,7 @@ export default function TradeTable(props: TradeTableProps) {
                 rightContent={rightAlignedContent}
                 wrapperId='tradeTableTabs'
                 layoutIdPrefix='tradeTableTabsIndicator'
+                staticHeight={`var(--trade-tables-tabs-height)`}
             />
             <motion.div
                 className={`${styles.tableContent} ${

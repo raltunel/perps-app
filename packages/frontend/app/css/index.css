@@ -114,6 +114,7 @@
     );
 
     --trade-tables-height-desktop: 281px;
+    --trade-tables-tabs-height: 25px;
     --header-height-desktop: 56px;
 
     /* ------------------------------ */
