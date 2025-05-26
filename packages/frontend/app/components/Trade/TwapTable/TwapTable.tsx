@@ -73,6 +73,7 @@ export default function TwapTable(props: Props) {
                 tabs={availableTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
+                staticHeight={`var(--trade-tables-tabs-height)`}
             />
             <motion.div
                 className={styles.tableContent}

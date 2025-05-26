@@ -24,26 +24,6 @@
     z-index: 10;
 }
 
-.tableWrapper {
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    border-radius: var(--radius-s);
-    padding-bottom: var(--padding-s);
-
-    display: flex;
-    flex-direction: column;
-}
-
-.tableBody {
-    height: 100%;
-    overflow-y: scroll;
-    padding-bottom: var(--padding-m);
-}
-.tableBody::-webkit-scrollbar {
-    display: none;
-}
-
 .cell {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
@@ -83,43 +63,11 @@
     color: var(--green, #4cd471);
 }
 
-.viewAllLink {
-    color: var(--accent1, #7371fc);
-    text-decoration: none;
-    font-size: var(--font-size-s, 12px);
-    margin-right: 12px;
-}
-
-.exportCsvLink {
-    color: var(--accent1, #7371fc);
-    text-decoration: none;
-    font-size: var(--font-size-s, 12px);
-}
-
 .linksContainer {
     grid-column: 1 / -1;
     display: flex;
     padding-left: var(--padding-s);
     margin-top: var(--margin-s);
-}
-
-.viewAllLink:hover,
-.exportCsvLink:hover {
-    text-decoration: underline;
-}
-
-/* Specific cell styles */
-.timeCell {
-}
-.coinCell {
-}
-.sizeCell {
-}
-.positionSideCell {
-}
-.paymentCell {
-}
-.rateCell {
 }
 
 @media (max-width: 900px) {
