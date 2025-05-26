@@ -30,6 +30,7 @@ import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import { PiSquaresFour } from 'react-icons/pi';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { GoZap } from 'react-icons/go';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -473,7 +474,7 @@ export default function OrderInput() {
 
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    const [showLaunchpad, setShowLaunchpad] = useState<boolean>(false);
+    const [showLaunchpad, setShowLaunchpad] = useState<boolean>(true);
 
     return (
         <div className={styles.mainContainer}>
@@ -498,9 +499,11 @@ export default function OrderInput() {
                                     setShowLaunchpad(false);
                                 }}
                             >
-                                <div>icon goes here</div>
-                                <div>
+                                <div className={styles.name_and_icon}>
+                                    <GoZap color={'var(--accent1)'} />
                                     <h4>{mo.label}</h4>
+                                </div>
+                                <div>
                                     <p>{mo.blurb}</p>
                                 </div>
                             </li>

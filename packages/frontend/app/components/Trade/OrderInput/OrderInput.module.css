@@ -152,6 +152,7 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    user-select: none;
 }
 
 .launchpad > header {
@@ -173,12 +174,35 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    width: 100%;
     list-style-type: none;
+    gap: var(--gap-s);
+    cursor: pointer;
 }
 
 .launchpad_clickables > li {
     display: flex;
+    flex-direction: column;
+    /* flex-wrap: nowrap; */
+    width: 100%;
+    padding: 8px;
+    border-radius: var(--radius-s);
+    background-color: var(--bg-dark3);
+}
+
+.name_and_icon {
+    display: flex;
     flex-direction: row;
+}
+
+.name_and_icon > h4 {
+    font-size: var(--font-size-m);
+    color: var(--text1);
+}
+
+.launchpad_clickables > li p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
 }
 
 @media (min-width: 1600px) {
