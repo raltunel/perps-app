@@ -72,4 +72,8 @@ export type OrderDataSortBy =
     | 'status'
     | 'triggerCondition'
     | 'oid'
+    | 'reduceOnly'
+    | 'triggerConditions'
+    | 'tpsl'
+    | 'cancel'
     | undefined;

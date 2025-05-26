@@ -24,27 +24,6 @@
     z-index: 10;
 }
 
-.tableWrapper {
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    border-radius: var(--radius-s);
-    padding-bottom: var(--padding-s);
-
-    display: flex;
-    flex-direction: column;
-}
-
-.tableBody {
-    height: 100%;
-    overflow-y: scroll;
-    padding-bottom: var(--padding-m);
-}
-
-.tableBody::-webkit-scrollbar {
-    display: none;
-}
-
 .cell {
     font-size: var(--font-size-s);
     color: var(--text1);
@@ -74,40 +53,6 @@
     padding: 3rem 0;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size, 14px);
-}
-
-.viewAllLink {
-    color: var(--accent1, #7371fc);
-    font-size: var(--font-size-s, 12px);
-    margin-top: var(--margin-s);
-    padding-left: var(--padding-s);
-    text-decoration: none;
-    cursor: pointer;
-    display: inline-block;
-}
-
-.viewAllLink:hover {
-    color: var(--text1, #f0f0f8);
-}
-
-/* Specific cell classes */
-.timeCell {
-}
-.coinCell {
-}
-.totalSizeCell {
-}
-.executedSizeCell {
-}
-.averagePriceCell {
-}
-.totalRuntimeCell {
-}
-.reduceOnlyCell {
-}
-.randomizeCell {
-}
-.statusCell {
 }
 
 /* Status styles */
