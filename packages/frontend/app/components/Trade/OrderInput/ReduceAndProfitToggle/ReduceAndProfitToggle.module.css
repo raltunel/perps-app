@@ -11,6 +11,7 @@
     gap: var(--gap-m);
     font-size: var(--font-size-s, 12px);
     color: var(--text1);
+    cursor: pointer;
 }
 .toggleLabel {
     color: var(--text1, #f0f0f8);
