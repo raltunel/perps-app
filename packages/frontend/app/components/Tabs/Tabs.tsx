@@ -94,6 +94,7 @@ export default function Tabs(props: TabsProps) {
         tab: string | { id: string; label: string },
     ): string => {
         let label = typeof tab === 'string' ? tab : tab.label;
+        console.log(label);
         if (label === 'Balances' && webDataFetched && balancesCount > 0) {
             label = `Balances (${balancesCount})`;
         } else if (
@@ -108,7 +109,7 @@ export default function Tabs(props: TabsProps) {
             openOrdersCount > 0
         ) {
             label = `Open Orders (${openOrdersCount})`;
-        } else if (label === 'Twap' && webDataFetched && activeTwapsCount > 0) {
+        } else if (label === 'TWAP' && webDataFetched && activeTwapsCount > 0) {
             label = `Twap (${activeTwapsCount})`;
         }
         return label;
