@@ -34,8 +34,8 @@
 
 .orderTypeDropdownContainer {
     width: 100%;
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 1fr 25px;
     justify-content: space-between;
     gap: var(--gap-s);
     height: var(--dropdown-height);
@@ -160,6 +160,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    padding: var(--padding-s);
     font-size: var(--font-size-m);
 }
 
