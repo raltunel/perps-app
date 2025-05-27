@@ -9,7 +9,6 @@ import { LuSearch } from 'react-icons/lu';
 import { MdClose, MdExpand } from 'react-icons/md';
 import LeaderboardTable from '~/components/Leaderboard/LeaderboardTable/LeaderboardTable';
 import useOutsideClick from '~/hooks/useOutsideClick';
-import type { Route } from '../../+types/root';
 import { leaderboardData } from './data';
 import styles from './leaderboard.module.css';
 import { useLeaderboard } from './useLeaderboard';
@@ -19,10 +18,6 @@ export function meta() {
         { title: 'Leaderboard | Ambient' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 type Period = '30D' | '7D' | '24H';
