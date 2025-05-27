@@ -19,14 +19,7 @@ import {
 export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
-            onResult([
-                {
-                    symbol: userInput,
-                    description: 'Sample Symbol',
-                    exchange: exchange,
-                    type: symbolType,
-                },
-            ]);
+            onResult([]);
         },
 
         onReady: (cb: any) => {

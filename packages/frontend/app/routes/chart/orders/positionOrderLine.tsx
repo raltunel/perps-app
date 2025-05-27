@@ -33,32 +33,38 @@ const PositionOrderLine = () => {
         }
 
         const newLines: LineData[] = filteredPositions.flatMap((order) => {
+            const lines: LineData[] = [];
+
             const pnl = Number(order.pnl.toFixed(2));
-            const orderTextValuePNL = { type: 'PNL', pnl: pnl } as LineLabel;
-            const orderTextValueLiq = {
-                type: 'Liq',
-                text: ' Liq. Price',
-            } as LineLabel;
 
-            const pnlLine: LineData = {
-                xLoc: 0.1,
-                yPrice: order.price,
-                textValue: orderTextValuePNL,
-                quantityTextValue: order.szi,
-                color: pnl > 0 ? buyColor : sellColor,
-                type: 'PNL',
-            };
+            if (order.price > 0) {
+                const pnlLine: LineData = {
+                    xLoc: 0.1,
+                    yPrice: order.price,
+                    textValue: { type: 'PNL', pnl } as LineLabel,
+                    quantityTextValue: order.szi,
+                    color: pnl > 0 ? buyColor : sellColor,
+                    type: 'PNL',
+                };
+                lines.push(pnlLine);
+            }
 
-            const liqLine: LineData = {
-                xLoc: 0.2,
-                yPrice: order.liqPrice,
-                textValue: orderTextValueLiq,
-                quantityTextValue: undefined,
-                color: sellColor,
-                type: 'LIQ',
-            };
+            if (order.liqPrice > 0) {
+                const liqLine: LineData = {
+                    xLoc: 0.2,
+                    yPrice: order.liqPrice,
+                    textValue: {
+                        type: 'Liq',
+                        text: ' Liq. Price',
+                    } as LineLabel,
+                    quantityTextValue: undefined,
+                    color: sellColor,
+                    type: 'LIQ',
+                };
+                lines.push(liqLine);
+            }
 
-            return [pnlLine, liqLine];
+            return lines;
         });
 
         setLines(newLines);
