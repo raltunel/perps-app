@@ -1,4 +1,6 @@
 .container {
+    --menu-item-height: 23px;
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -21,6 +23,7 @@
 }
 
 .menuItem {
+    height: var(--menu-item-height);
     display: flex;
     padding: 2px var(--padding-xs);
     justify-content: space-between;
