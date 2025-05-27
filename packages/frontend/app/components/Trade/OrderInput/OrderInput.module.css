@@ -178,7 +178,6 @@
     width: 100%;
     list-style-type: none;
     gap: var(--gap-s);
-    cursor: pointer;
 }
 
 .launchpad_clickables > li {
@@ -187,8 +186,10 @@
     flex-wrap: nowrap;
     width: 100%;
     padding: 8px;
+    gap: var(--gap-s);
     border-radius: var(--radius-s);
     background-color: var(--bg-dark3);
+    cursor: pointer;
 }
 
 .name_and_icon {
