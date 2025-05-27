@@ -34,7 +34,7 @@
 .orderTypeDropdownContainer {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 25px;
+    grid-template-columns: 1fr 1fr 32px;
     justify-content: space-between;
     gap: var(--gap-s);
     height: var(--dropdown-height);
