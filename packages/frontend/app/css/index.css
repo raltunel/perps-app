@@ -114,6 +114,7 @@
     );
 
     --trade-tables-height-desktop: 281px;
+    --trade-tables-tabs-height: 25px;
     --header-height-desktop: 56px;
 
     /* ------------------------------ */
@@ -207,6 +208,10 @@ a {
 
 button {
     cursor: pointer;
+    transition: filter 0.3s ease-in-out;
+}
+button:hover {
+    filter: brightness(0.8);
 }
 
 ul[role='list'],

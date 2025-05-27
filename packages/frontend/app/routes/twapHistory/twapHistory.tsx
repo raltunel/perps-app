@@ -25,13 +25,6 @@ function TwapHistory() {
         }
     }, [address]);
 
-    const isFullScreen = true;
-
-    // Memoize the container class name
-    const containerClassName = useMemo(() => {
-        return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
-    }, [isFullScreen]);
-
     return (
         <ExternalPage title='TWAP History'>
             <HistoryTwapTable
