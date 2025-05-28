@@ -77,6 +77,7 @@ export default function Tabs(props: TabsProps) {
         userBalances: { length: balancesCount },
         positions: { length: positionsCount },
         userOrders: { length: openOrdersCount },
+        activeTwaps: { length: activeTwapsCount },
     } = useTradeDataStore();
 
     const webDataFetched = useMemo(() => {
@@ -107,6 +108,8 @@ export default function Tabs(props: TabsProps) {
             openOrdersCount > 0
         ) {
             label = `Open Orders (${openOrdersCount})`;
+        } else if (label === 'TWAP' && webDataFetched && activeTwapsCount > 0) {
+            label = `Twap (${activeTwapsCount})`;
         }
         return label;
     };

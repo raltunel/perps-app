@@ -21,7 +21,7 @@ interface GenericTableProps<T, S> {
         sortBy?: S,
     ) => React.ReactNode;
     renderRow: (row: T, index: number) => React.ReactNode;
-    sorterMethod: (
+    sorterMethod?: (
         data: T[],
         sortBy: S,
         sortDirection: TableSortDirection,
@@ -119,11 +119,11 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     }, [sortBy, sortDirection]);
 
     const sortedData = useMemo(() => {
-        if (sortBy) {
+        if (sortBy && sorterMethod) {
             return [...sorterMethod(data, sortBy, sortDirection)];
         }
         return data;
-    }, [data, sortBy, sortDirection]);
+    }, [data, sortBy, sortDirection, sorterMethod]);
 
     const dataToShow = useMemo(() => {
         if (pageMode) {
@@ -205,9 +205,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                                 className={styles.actionsContainer}
                             >
                                 {sortedData.length > slicedLimit &&
+                                    !pageMode &&
                                     viewAllLink &&
-                                    viewAllLink.length > 0 &&
-                                    !pageMode && (
+                                    viewAllLink.length > 0 && (
                                         <a
                                             href='#'
                                             className={styles.viewAllLink}
