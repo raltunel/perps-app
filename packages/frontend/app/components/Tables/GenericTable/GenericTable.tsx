@@ -83,14 +83,12 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
     }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
-    //── pagination + table state ─────────────────────────────────────────
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
-    // reset page when sorting changes
     useEffect(() => {
         setPage(0);
     }, [sortBy, sortDirection]);
@@ -120,7 +118,6 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
     }, [isFetched, dataToShow]);
 
-    //── sorting handler cycles desc → asc → none ────────────────────────
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
         let nextDir: TableSortDirection | undefined;
