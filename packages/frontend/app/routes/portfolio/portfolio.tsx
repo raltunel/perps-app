@@ -4,10 +4,9 @@ import PerformancePanel from '~/components/Portfolio/PerformancePanel/Performanc
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
-import type { Route } from '../../+types/root';
+import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
-import WebDataConsumer from '../trade/webdataconsumer';
 
 const PortfolioDeposit = lazy(
     () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
@@ -26,10 +25,6 @@ export function meta() {
         { title: 'Portfolio | Ambient' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 function Portfolio() {
