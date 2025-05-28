@@ -27,10 +27,10 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
     ];
 
     const periodOptions = [
-        { label: '24H', value: 'day' },
-        { label: '7D', value: 'week' },
-        { label: '30D', value: 'month' },
-        { label: 'All-time', value: 'allTime' },
+        { label: '24H', value: 'Day' },
+        { label: '7D', value: 'Week' },
+        { label: '30D', value: 'Month' },
+        { label: 'All-time', value: 'AllTime' },
     ];
 
     return (

@@ -77,12 +77,12 @@ export default function PerformancePanel() {
     const [selectedVault, setSelectedVault] = useState<{
         label: string;
         value: string;
-    }>({ label: 'Perps + Vaults', value: 'all' });
+    }>({ label: 'Perps', value: 'perp' });
 
     const [selectedPeriod, setSelectedPeriod] = useState<{
         label: string;
         value: string;
-    }>({ label: '24H', value: 'day' });
+    }>({ label: 'All-time', value: 'AllTime' });
 
     const TabContent_ = !activeTab ? (
         LoadingContent

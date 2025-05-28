@@ -41,11 +41,12 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     useEffect(() => {
         if (debugWallet.address && !isLineDataFetched) {
             fetchUserPortfolio(debugWallet.address).then((data) => {
-                const key = selectedVault.value === 'perps' ? 'perps' : '';
+                const key =
+                    selectedVault.value === 'perp'
+                        ? 'perp' + selectedPeriod.value
+                        : selectedPeriod.value.toLowerCase();
 
-                const userPositionData = data.get(
-                    key + selectedPeriod.value,
-                ) as UserPositionIF;
+                const userPositionData = data.get(key) as UserPositionIF;
 
                 if (userPositionData.accountValueHistory) {
                     const accountValueHistory =
@@ -85,6 +86,8 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             lineData={
                 activeTab === 'Account Value' ? accountValueHistory : pnlHistory
             }
+            curve={'step'}
+            chartName={'activeTab'}
         />
     ) : (
         activeTab === 'Collateral' && <CollateralPieChart />
