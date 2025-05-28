@@ -29,10 +29,11 @@ interface GenericTableProps<T, S> {
     defaultSortBy?: S;
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
+    storageKey: string;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
-    const id = useId();
+    const id = props.storageKey;
     const navigate = useNavigate();
 
     const {
@@ -51,21 +52,29 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         heightOverride = '100%',
     } = props;
 
+    function safeParse<T>(value: string | null, fallback: T): T {
+        if (!value || value === 'undefined') return fallback;
+        try {
+            return JSON.parse(value) as T;
+        } catch {
+            return fallback;
+        }
+    }
+
     const sortByKey = `GenericTable:${id}:sortBy`;
     const sortDirKey = `GenericTable:${id}:sortDir`;
 
     const [sortBy, setSortBy] = useState<S>(() => {
         const stored = localStorage.getItem(sortByKey);
-        return stored
-            ? (JSON.parse(stored) as S)
-            : (defaultSortBy ?? (undefined as S));
+        return safeParse<S>(stored, props.defaultSortBy as S);
     });
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         () => {
             const stored = localStorage.getItem(sortDirKey);
-            return stored
-                ? (JSON.parse(stored) as TableSortDirection)
-                : (defaultSortDirection ?? 'desc');
+            return safeParse<TableSortDirection>(
+                stored,
+                props.defaultSortDirection as TableSortDirection,
+            );
         },
     );
 
@@ -74,12 +83,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
     }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
+    //── pagination + table state ─────────────────────────────────────────
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
+    // reset page when sorting changes
     useEffect(() => {
         setPage(0);
     }, [sortBy, sortDirection]);
@@ -109,6 +120,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
     }, [isFetched, dataToShow]);
 
+    //── sorting handler cycles desc → asc → none ────────────────────────
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
         let nextDir: TableSortDirection | undefined;
@@ -138,6 +150,29 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         e.preventDefault();
         console.log('Exporting CSV');
     };
+
+    const checkShadow = useCallback(() => {
+        const body = document.getElementById(`${id}-tableBody`);
+        const actions = document.getElementById(`${id}-actionsContainer`);
+        if (!body || !actions) return;
+
+        if (body.scrollTop + body.clientHeight >= body.scrollHeight) {
+            actions.classList.add(styles.notShadowed);
+        } else {
+            actions.classList.remove(styles.notShadowed);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        checkShadow();
+        const body = document.getElementById(`${id}-tableBody`);
+        if (!body) return;
+
+        body.addEventListener('scroll', checkShadow);
+        return () => {
+            body.removeEventListener('scroll', checkShadow);
+        };
+    }, [tableState, checkShadow, id]);
 
     return (
         <div className={styles.tableWrapper} style={{ height: heightOverride }}>
