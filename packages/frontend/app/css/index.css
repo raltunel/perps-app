@@ -116,7 +116,7 @@
     --trade-tables-min-height-desktop: 180px;
 
     --trade-tables-height-desktop: max(
-        30vh,
+        23vh,
         var(--trade-tables-min-height-desktop)
     );
     --trade-tables-tabs-height: 25px;
