@@ -50,7 +50,18 @@
 .sortable {
     cursor: pointer;
 }
-
+.tpslCell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+.tpslCell button {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
 .cancelButton {
     background-color: transparent;
     color: var(--accent1, #7371fc);

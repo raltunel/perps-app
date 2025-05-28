@@ -6,6 +6,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
 import styles from './PositionsTable.module.css';
+import { LuPen } from 'react-icons/lu';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -137,6 +138,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {getTpSl()}
+                <button>
+                    <LuPen color='var(--text1)' size={10} />
+                </button>
             </div>
             <div className={`${styles.cell} ${styles.closeCell}`}>
                 <div className={styles.actionContainer}>
