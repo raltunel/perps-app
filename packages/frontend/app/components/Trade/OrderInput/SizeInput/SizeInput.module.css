@@ -12,7 +12,7 @@
 
     display: grid;
     grid-template-columns: auto 1fr 50px;
-    gap: 4px;
+    gap: var(--gap-xs);
 }
 .sizeInputContainer input {
     background-color: transparent;
@@ -31,7 +31,7 @@
     justify-content: flex-end;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 .tokenButton svg {
     fill: var(--text2);

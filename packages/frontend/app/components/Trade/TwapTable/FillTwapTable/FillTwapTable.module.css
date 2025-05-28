@@ -24,31 +24,6 @@
     z-index: 10;
 }
 
-.tableWrapper {
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    border-radius: var(--radius-s);
-    padding-bottom: var(--padding-s);
-
-    display: flex;
-    flex-direction: column;
-}
-
-.tableBody {
-    height: 70%;
-    overflow-y: scroll;
-    padding-bottom: var(--padding-m);
-}
-
-.pageMode.tableBody {
-    position: relative;
-}
-
-.tableBody::-webkit-scrollbar {
-    display: none;
-}
-
 .cell {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
@@ -63,61 +38,12 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     cursor: default;
 }
 
 .sortable {
     cursor: pointer;
-}
-
-.emptyState {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem 0;
-    color: var(--text2, #6a6a6d);
-    font-size: var(--font-size, 14px);
-}
-
-.viewAllLink {
-    color: var(--accent1, #7371fc);
-    text-decoration: none;
-    font-size: var(--font-size-s, 12px);
-    margin-right: 16px;
-}
-
-.viewAllLink:hover {
-    text-decoration: underline;
-}
-
-.exportLink {
-    color: var(--accent1, #7371fc);
-    text-decoration: none;
-    font-size: var(--font-size-s, 12px);
-}
-
-.exportLink:hover {
-    text-decoration: underline;
-}
-
-.actionsContainer {
-    grid-column: 1 / -1;
-    display: flex;
-    padding: var(--padding-s);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    background-color: var(--bg-dark2);
-    width: 100%;
-    padding-left: var(--padding-l);
-}
-
-.pageMode .actionsContainer {
-    background-color: transparent;
-    padding-left: var(--padding-s);
-    bottom: 1rem;
-    width: 20%;
 }
 
 /* Specific cell classes */

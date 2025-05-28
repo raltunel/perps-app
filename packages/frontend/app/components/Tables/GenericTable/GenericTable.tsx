@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -26,9 +33,14 @@ interface GenericTableProps<T, S> {
     slicedLimit?: number;
     pageMode?: boolean;
     viewAllLink?: string;
+    defaultSortBy?: S;
+    defaultSortDirection?: TableSortDirection;
+    heightOverride?: string;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
+    const id = useId();
+
     const {
         data,
         renderHeader,
@@ -40,6 +52,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         skeletonColRatios = [2, 1, 1.5, 1.5, 1.5, 1.5, 1, 1, 1],
         slicedLimit = 10,
         viewAllLink,
+        defaultSortBy,
+        defaultSortDirection,
+        heightOverride = '100%',
     } = props;
 
     const navigate = useNavigate();
@@ -48,8 +63,53 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         TableState.LOADING,
     );
 
-    const [sortBy, setSortBy] = useState<S>();
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
+    const checkShadow = useCallback(() => {
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+        const actionsContainer = document.getElementById(
+            `${id}-actionsContainer`,
+        ) as HTMLElement;
+
+        if (!tableBody || !actionsContainer) {
+            return;
+        }
+
+        const bottomNotShadowed =
+            tableBody.scrollTop + tableBody.clientHeight >=
+            tableBody.scrollHeight;
+        if (bottomNotShadowed) {
+            actionsContainer?.classList.add(styles.notShadowed);
+        } else {
+            actionsContainer?.classList.remove(styles.notShadowed);
+        }
+    }, []);
+
+    useEffect(() => {
+        checkShadow();
+
+        let scrollEvent = null;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+
+        if (tableBody) {
+            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
+                checkShadow();
+            });
+        }
+
+        return () => {
+            if (scrollEvent) {
+                tableBody.removeEventListener('scroll', scrollEvent);
+            }
+        };
+    }, [tableState]);
+
+    const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
+        defaultSortDirection ?? 'desc',
+    );
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -81,7 +141,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 setSortDirection('asc');
             } else if (sortDirection === 'asc') {
                 setSortDirection(undefined);
-                setSortBy(undefined);
+                setSortBy(undefined as S);
             } else {
                 setSortDirection('desc');
             }
@@ -116,7 +176,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     }, [dataToShow, isFetched]);
 
     return (
-        <div className={styles.tableWrapper}>
+        <div className={styles.tableWrapper} style={{ height: heightOverride }}>
             {tableState === TableState.LOADING ? (
                 <SkeletonTable
                     rows={skeletonRows}
@@ -124,8 +184,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 />
             ) : (
                 <>
-                    {renderHeader(sortDirection, handleSort, sortBy)}
+                    <span
+                        className={styles.headerContainer}
+                        id={`${id}-headerContainer`}
+                    >
+                        {renderHeader(sortDirection, handleSort, sortBy)}
+                    </span>
                     <div
+                        id={`${id}-tableBody`}
                         className={`${styles.tableBody} 
                         ${pageMode ? styles.pageMode : styles.notPage}
                         `}
@@ -134,8 +200,13 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
                         {sortedData.length > 0 && (
-                            <div className={styles.actionsContainer}>
+                            <div
+                                id={`${id}-actionsContainer`}
+                                className={styles.actionsContainer}
+                            >
                                 {sortedData.length > slicedLimit &&
+                                    viewAllLink &&
+                                    viewAllLink.length > 0 &&
                                     !pageMode && (
                                         <a
                                             href='#'

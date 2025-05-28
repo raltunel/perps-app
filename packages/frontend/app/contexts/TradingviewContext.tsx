@@ -22,6 +22,7 @@ import {
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
+import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -69,10 +70,23 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { debugWallet } = useDebugStore();
 
+    const { showBuysSellsOnChart } = useAppOptions();
+
     const [isChartReady, setIsChartReady] = useState(false);
 
     useEffect(() => {
         const res = getChartLayout();
+        if (res) {
+            const defaultTimeScaleSettings = {
+                m_barSpacing: 6,
+                m_rightOffset: 10,
+                rightOffsetPercentage: 5,
+                usePercentageRightOffset: false,
+            };
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (res.chartLayout as any).charts[0].timeScale =
+                defaultTimeScaleSettings;
+        }
         setChartState(res);
     }, []);
 
@@ -124,9 +138,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (chart) {
-            chart.chart().refreshMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
         }
-    }, [bsColor, chart]);
+    }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (!isChartReady && chart) {
@@ -157,7 +171,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
 
                 saveChartLayout(chart);
-                chart.chart().refreshMarks();
+                showBuysSellsOnChart && chart.chart().refreshMarks();
             });
         }
     }, [chart]);
@@ -200,6 +214,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             custom_themes: customThemes(),
             overrides: {
                 volumePaneSize: 'medium',
+                'paneProperties.background': '#0e0e14',
+                'paneProperties.backgroundGradientStartColor': '#0e0e14',
+                'paneProperties.backgroundGradientEndColor': '#0e0e14',
             },
             custom_css_url: './../tradingview-overrides.css',
             loading_screen: { backgroundColor: '#0e0e14' },
@@ -220,11 +237,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         tvWidget.onChartReady(() => {
-            tvWidget.applyOverrides({
-                'paneProperties.background': '#0e0e14',
-                'paneProperties.backgroundType': 'solid',
-            });
-
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
@@ -284,11 +296,18 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             getMarkFillData(symbol, debugWallet.address).then(() => {
                 if (chart) {
                     chart.chart().clearMarks();
-                    chart.chart().refreshMarks();
+                    showBuysSellsOnChart && chart.chart().refreshMarks();
                 }
             });
         }
     }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            showBuysSellsOnChart || chart.chart().clearMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
+        }
+    }, [showBuysSellsOnChart]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady }}>

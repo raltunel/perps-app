@@ -15,7 +15,7 @@
 .modalContent {
     background-color: #1a1a2e;
     color: #fff;
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     width: 400px;
     max-width: 90%;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
@@ -35,9 +35,9 @@
     background-color: #2a2a3e;
     color: #fff;
     padding: var(--padding-xs) var(--padding-s);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     font-size: 12px;
-    margin-right: 8px;
+    margin-right: var(--margin-s);
 }
 
 .title {
@@ -81,7 +81,7 @@
     display: flex;
     justify-content: center;
     gap: 6px;
-    margin: 0 0 16px;
+    margin: 0 0 var(--margin-m);
 }
 
 .dot {
@@ -107,7 +107,7 @@
     background-color: #2a2a3e;
     color: #fff;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     padding: var(--padding-s) var(--padding-m);
     cursor: pointer;
     font-size: 14px;

@@ -610,3 +610,22 @@ export interface UserFundingsData {
     isSnapshot?: boolean;
     fundings: UserFunding[];
 }
+
+export interface OpenOrderRawData {
+    coin: string;
+    side: string;
+    limitPx: string;
+    sz: string;
+    oid: number;
+    timestamp: number;
+    triggerCondition: string;
+    isTrigger: boolean;
+    triggerPx: string;
+    children: any[];
+    isPositionTpsl: boolean;
+    reduceOnly: boolean;
+    orderType: string;
+    origSz: string;
+    tif: string;
+    cloid: string;
+}

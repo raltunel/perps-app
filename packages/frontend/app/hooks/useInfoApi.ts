@@ -1,6 +1,8 @@
+import type { OpenOrderRawData } from '@perps-app/sdk/src/utils/types';
 import { processUserOrder } from '~/processors/processOrderBook';
 import {
     processUserFills,
+    processUserFundings,
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
@@ -9,6 +11,8 @@ import type {
     TwapHistoryIF,
     TwapSliceFillIF,
     UserFillIF,
+    UserFundingIF,
+    UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
 
 export type ApiCallConfig = {
@@ -23,6 +27,7 @@ export enum ApiEndpoints {
     USER_FILLS = 'userFills',
     TWAP_HISTORY = 'twapHistory',
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
+    FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
 }
 
@@ -142,6 +147,60 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchFundingHistory = async (
+        address: string,
+    ): Promise<UserFundingIF[]> => {
+        const ret: UserFundingIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.FUNDING_HISTORY,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        const preProcessed = data.map((d: UserFundingResponseIF) => {
+            return {
+                time: d.time,
+                coin: d.delta.coin,
+                usdc: d.delta.usdc,
+                szi: d.delta.szi,
+                fundingRate: d.delta.fundingRate,
+            };
+        });
+
+        if (preProcessed && preProcessed.length > 0) {
+            const processed = processUserFundings(preProcessed);
+            if (processed.length > 0) {
+                ret.push(...processed);
+            }
+        }
+        return ret;
+    };
+
+    const fetchOpenOrders = async (address: string): Promise<OrderDataIF[]> => {
+        const ret: OrderDataIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.OPEN_ORDERS,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            data.forEach((o: OpenOrderRawData) => {
+                const processedOrder = processUserOrder(o, 'open');
+                if (processedOrder) {
+                    ret.push(processedOrder);
+                }
+            });
+        }
+        return ret;
+    };
+
     const fetchUserPortfolio = async (
         address: string,
     ): Promise<Map<string, {}>> => {
@@ -174,6 +233,8 @@ export function useInfoApi() {
         fetchUserFills,
         fetchTwapHistory,
         fetchTwapSliceFills,
+        fetchFundingHistory,
+        fetchOpenOrders,
         fetchUserPortfolio,
     };
 }

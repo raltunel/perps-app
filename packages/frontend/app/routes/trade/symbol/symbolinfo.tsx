@@ -75,17 +75,20 @@ const SymbolInfo: React.FC = () => {
                                 id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Mark'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.markPx)}
                                     lastWsChange={symbolInfo?.lastPriceChange}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Oracle'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.oraclePx)}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='24h Change'
                                     valueClass={'w7'}
                                     value={get24hChangeString().str}
@@ -98,6 +101,7 @@ const SymbolInfo: React.FC = () => {
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='24h Volume'
                                     valueClass={'w7'}
                                     value={
@@ -106,6 +110,7 @@ const SymbolInfo: React.FC = () => {
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Open Interest'
                                     valueClass={'w7'}
                                     value={
@@ -118,6 +123,7 @@ const SymbolInfo: React.FC = () => {
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Funding Rate'
                                     valueClass={'w7'}
                                     value={
@@ -128,6 +134,7 @@ const SymbolInfo: React.FC = () => {
                                     type={'positive'}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Funding Countdown'
                                     valueClass={'w7'}
                                     value={getTimeUntilNextHour()}

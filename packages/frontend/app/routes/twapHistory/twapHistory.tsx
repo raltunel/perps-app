@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 import HistoryTwapTable from '~/components/Trade/TwapTable/HistoryTwapTable/HistoryTwapTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import type { TwapHistoryIF } from '~/utils/UserDataIFs';
-import styles from './twapHistory.module.css';
+import ExternalPage from '~/components/ExternalPage/ExternalPage';
 
 function TwapHistory() {
     const { address } = useParams<{ address: string }>();
@@ -25,25 +25,14 @@ function TwapHistory() {
         }
     }, [address]);
 
-    const isFullScreen = true;
-
-    // Memoize the container class name
-    const containerClassName = useMemo(() => {
-        return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
-    }, [isFullScreen]);
-
     return (
-        <div className={containerClassName}>
-            <header>TWAP History</header>
-
-            <div className={styles.content}>
-                <HistoryTwapTable
-                    data={fetchedHistoryData}
-                    isFetched={isFetched}
-                    pageMode={true}
-                />
-            </div>
-        </div>
+        <ExternalPage title='TWAP History'>
+            <HistoryTwapTable
+                data={fetchedHistoryData}
+                isFetched={isFetched}
+                pageMode={true}
+            />
+        </ExternalPage>
     );
 }
 export default TwapHistory;

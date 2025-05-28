@@ -22,7 +22,7 @@
     position: absolute;
     animation: menuAnimation var(--ease-in-out-fast);
     background: var(--bg-dark4);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-s);
     z-index: 10;
 }
 

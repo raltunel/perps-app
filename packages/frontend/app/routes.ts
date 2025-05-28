@@ -6,6 +6,10 @@ export default [
 
     route('trade/:marketId?', 'routes/trade.tsx'),
 
+    route('strategies', 'routes/strategies/strategies.tsx'),
+    route('strategies/new', 'routes/strategies/createStrategy.tsx'),
+    route('strategies/:address?', 'routes/strategies/StrategyDetail.tsx'),
+
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaultsNew.tsx'),
 
@@ -36,9 +40,16 @@ export default [
 
     route('twapHistory/:address?', 'routes/twapHistory/twapHistory.tsx'),
 
+    route('openOrders/:address?', 'routes/openOrders/openOrders.tsx'),
+
     route(
         'twapFillHistory/:address?',
         'routes/twapFillHistory/twapFillHistory.tsx',
+    ),
+
+    route(
+        'fundingHistory/:address?',
+        'routes/fundingHistory/fundingHistory.tsx',
     ),
 
     route('*', 'routes/notFound/notFound.tsx'),

@@ -1,4 +1,8 @@
 .symbolSearchBackdrop {
+    --search-container-height: 40px;
+    --search-container-width: 160px;
+
+    --symbol-width-height: 30px;
     position: relative;
 }
 
@@ -6,17 +10,25 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
+    gap: var(--gap-s);
+
+    font-size: var(--font-size-l);
     user-select: none;
-    min-width: 10rem;
+    min-width: var(--search-container-width);
+    height: var(--search-container-height);
     cursor: pointer;
+    padding: 0 var(--padding-s);
+    border-radius: var(--radius-s);
 }
 
+.symbolSearchContainer:hover {
+    background-color: var(--bg-dark3);
+    transition: all 0.3s ease-in-out;
+}
 .symbolIcon {
-    width: 1.4rem;
-    height: 1.4rem;
-    border-radius: 16px;
+    width: var(--symbol-width-height);
+    height: var(--symbol-width-height);
+    border-radius: var(--radius-m);
 }
 
 .symbolName {
@@ -26,7 +38,7 @@
 .comboBoxIcon {
     transition: var(--ease-in-out-fast);
     transform: rotate(0deg);
-    font-size: 0.7rem;
+    font-size: var(--font-size-s);
     opacity: 0.3;
 }
 

@@ -45,6 +45,7 @@ export default function TradeTable(props: TradeTableProps) {
         fetchedChannels,
         userFills,
         userFundings,
+        userOrders,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
@@ -81,18 +82,23 @@ export default function TradeTable(props: TradeTableProps) {
         }
     }, [page]);
 
-    const { orderHistoryFetched, tradeHistoryFetched, fundingHistoryFetched } =
-        useMemo(() => {
-            return {
-                orderHistoryFetched: fetchedChannels.has(
-                    WsChannels.USER_HISTORICAL_ORDERS,
-                ),
-                tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
-                fundingHistoryFetched: fetchedChannels.has(
-                    WsChannels.USER_FUNDINGS,
-                ),
-            };
-        }, [fetchedChannels]);
+    const {
+        orderHistoryFetched,
+        tradeHistoryFetched,
+        fundingHistoryFetched,
+        webDataFetched,
+    } = useMemo(() => {
+        return {
+            orderHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_HISTORICAL_ORDERS,
+            ),
+            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+            fundingHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_FUNDINGS,
+            ),
+            webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
+        };
+    }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -136,7 +142,13 @@ export default function TradeTable(props: TradeTableProps) {
                     />
                 );
             case 'Open Orders':
-                return <OpenOrdersTable selectedFilter={selectedFilter} />;
+                return (
+                    <OpenOrdersTable
+                        selectedFilter={selectedFilter}
+                        isFetched={webDataFetched}
+                        data={userOrders}
+                    />
+                );
             case 'TWAP':
                 return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
@@ -182,6 +194,7 @@ export default function TradeTable(props: TradeTableProps) {
                 rightContent={rightAlignedContent}
                 wrapperId='tradeTableTabs'
                 layoutIdPrefix='tradeTableTabsIndicator'
+                staticHeight={`var(--trade-tables-tabs-height)`}
             />
             <motion.div
                 className={`${styles.tableContent} ${

@@ -56,6 +56,8 @@ export type UserFillSortBy =
     | 'value'
     | 'fee'
     | 'closedPnl'
+    | 'status'
+    | 'tradeValue'
     | undefined;
 
 export interface TwapStateIF {
@@ -151,6 +153,19 @@ export type UserFundingSortBy =
     | 'szi'
     | 'fundingRate'
     | undefined;
+
+export interface UserFundingResponseIF {
+    time: number;
+    hash: string;
+    delta: {
+        type: string;
+        coin: string;
+        usdc: string;
+        szi: string;
+        fundingRate: string;
+        nSzi?: boolean;
+    };
+}
 
 interface PositionValueIF {
     [0]: number;

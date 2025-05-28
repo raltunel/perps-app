@@ -24,13 +24,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .symbol_icon {
     width: 30px;
     height: 30px;
-    border-radius: 16px;
+    border-radius: var(--radius-m);
 }
 
 .symbol {
@@ -53,7 +53,7 @@
 .prices {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .price {
@@ -116,7 +116,7 @@
 .button_bank {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .button_bank > button {

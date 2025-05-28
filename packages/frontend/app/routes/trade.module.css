@@ -191,7 +191,7 @@ body {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         width: 100%;
-        gap: 8px;
+        gap: var(--gap-s);
     }
 
     .mobileTabBtn {
@@ -204,7 +204,7 @@ body {
         cursor: pointer;
         position: relative;
         transition: color 0.2s ease;
-        border-radius: 8px;
+        border-radius: var(--radius-s);
         color: var(--text2);
         font-size: var(--font-size-s, 12px);
     }

@@ -1,0 +1,10 @@
+.text_input {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.text_input > label {
+    flex-wrap: nowrap;
+}

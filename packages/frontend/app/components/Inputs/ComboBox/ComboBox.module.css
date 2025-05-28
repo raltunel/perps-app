@@ -12,7 +12,7 @@
 .comboBoxValueContainer {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--gap-xs);
     padding: var(--padding-xs);
 
     cursor: pointer;
@@ -79,7 +79,7 @@
     font-size: var(--font-size-s);
     z-index: 2;
     background-color: var(--bg-dark2);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 
     border: 1px solid var(--bg-dark3);
 }

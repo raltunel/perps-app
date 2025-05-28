@@ -1,55 +1,89 @@
 .symbolListWrapper {
+    --symbol-list-height: 256px;
+    --symbol-list-width: 708px;
+    --symbol-list-input-height: 31px;
+    --table-header-height: 24px;
+    --row-container-height: 17px;
+
     position: absolute;
     top: 130%;
     left: 0;
     z-index: 1000;
-    width: 50rem;
-    background-color: var(--bg-dark3) !important;
+    display: flex;
+    flex-direction: column;
+    width: var(--symbol-list-width);
+    background-color: var(--bg-dark3);
     padding: var(--padding-s);
-    border-radius: 0.4rem !important;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.3);
-}
-
-.symbolListWrapper div {
-    background-color: transparent !important;
+    border-radius: var(--radius-m) !important;
+    box-shadow: var(--dropdown-box-shadow);
+    gap: var(--gap-s);
 }
 
 .symbolList {
-    max-height: 16rem;
+    display: flex;
+    flex-direction: column;
+    height: var(--symbol-list-height);
     overflow-y: auto;
     border-radius: 0 !important;
     scrollbar-width: none;
+    gap: var(--gap-xs) !important;
 }
 
 .symbolListSearch {
     width: 100%;
+    height: var(--symbol-list-input-height);
     border: none;
-    position: relative;
-    margin-bottom: 0.5rem;
+    display: grid;
+    grid-template-columns: 15px auto 15px;
+    align-items: center;
+    background: var(--bg-dark4);
+    border-radius: var(--radius-s);
+    padding: 0px var(--padding-xs);
+    gap: var(--gap-xs);
 }
 
 .symbolListSearchIcon {
-    position: absolute;
-    left: 0.6rem;
-    top: 50%;
     color: var(--text2);
-    transform: translateY(-50%);
 }
 
 .symbolListSearch input {
+    background-color: transparent;
     width: 100%;
-    padding: 0.2rem;
-    border-radius: 0.4rem;
-    background-color: var(--bg-dark4);
     outline: none;
     border: none;
-    padding-left: var(--padding-l);
     color: var(--text1);
+    display: flex;
+    align-items: center;
+    font-size: var(--font-size-s);
 }
 
 .symbolListItem {
     cursor: pointer;
     color: var(--text1);
+}
+.filterTabsContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.filterTabsContainer button {
+    padding: var(--padding-xs) var(--padding-s);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+    background-color: transparent;
+    outline: none;
+    border: none;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+}
+
+.filterNewButton {
+    color: var(--accent1);
 }
 
 .symbolListItem:hover {
@@ -58,19 +92,21 @@
 }
 
 .headerContainer {
+    height: var(--table-header-height);
     display: grid;
     grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
-    gap: 0.5rem;
+    gap: var(--gap-s);
     align-items: center;
     position: sticky;
 }
 
 .rowContainer {
     display: grid;
+    height: var(--row-container-height);
     grid-template-columns: 1.7fr 1fr 1.5fr 1fr 1fr 1fr;
-    gap: 0.5rem;
+    gap: var(--gap-s);
     align-items: center;
-    margin: 0.5rem;
+    padding: 0px var(--padding-s) 0px var(--padding-xs);
 }
 
 .rowContainer:hover {
@@ -85,7 +121,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
     cursor: default;
     user-select: none;
 }
@@ -102,7 +138,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .symbolListWrapper .leverageLabel {
@@ -114,13 +150,15 @@
 
 .symbolListSearchClose {
     transition: all var(--ease-in-out-fast);
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1rem;
     color: var(--text2);
     cursor: pointer;
+}
+.fundingCell,
+.volumeCell,
+.openInterestCell {
+    width: 100%;
+    text-align: right;
+    justify-content: flex-end;
 }
 
 .symbolListSearchClose:hover {
@@ -149,9 +187,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    gap: var(--gap-s);
+    margin-top: var(--margin-l);
+    margin-bottom: var(--margin-l);
     color: var(--text2);
 }
 

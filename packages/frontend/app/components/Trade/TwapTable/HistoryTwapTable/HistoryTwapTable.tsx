@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import Pagination from '~/components/Pagination/Pagination';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { sortTwapHistory } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
-import type { TwapHistoryIF } from '~/utils/UserDataIFs';
-import styles from './HistoryTwapTable.module.css';
+import type { TwapHistoryIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import HistoryTwapTableHeader from './HistoryTwapTableHeader';
 import HistoryTwapTableRow from './HistoryTwapTableRow';
 interface HistoryTwapTableProps {
@@ -20,30 +18,16 @@ interface HistoryTwapTableProps {
 export default function HistoryTwapTable(props: HistoryTwapTableProps) {
     const { data, isFetched, selectedFilter, pageMode } = props;
 
-    const navigate = useNavigate();
-
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
-
     const { symbol } = useTradeDataStore();
-
-    const tableModeLimit = 10;
-
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(20);
 
     const { debugWallet } = useDebugStore();
 
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const handleViewAll = (e: React.MouseEvent) => {
-        e.preventDefault();
-        navigate(`/twapHistory/${currentUserRef.current}`, {
-            viewTransition: true,
-        });
-    };
+    const viewAllLink = useMemo(() => {
+        return `/twapHistory/${currentUserRef.current}`;
+    }, [debugWallet.address]);
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
@@ -59,75 +43,33 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
         return data;
     }, [data, selectedFilter, symbol]);
 
-    const sortedData = useMemo(() => {
-        return filteredData;
-    }, [filteredData]);
-
-    const dataToShow = useMemo(() => {
-        if (pageMode) {
-            return sortedData.slice(
-                page * rowsPerPage,
-                (page + 1) * rowsPerPage,
-            );
-        }
-        return sortedData.slice(0, tableModeLimit);
-    }, [sortedData, pageMode, page, rowsPerPage]);
-
-    useEffect(() => {
-        if (isFetched) {
-            if (dataToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [isFetched, dataToShow]);
-
     return (
-        <div className={styles.tableWrapper}>
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={7}
-                    colRatios={[2, 1, 1.5, 1.5, 1.5, 1.5, 1, 1, 1]}
-                />
-            ) : (
-                <>
-                    <HistoryTwapTableHeader />
-                    <div className={styles.tableBody}>
-                        {tableState === TableState.FILLED && (
-                            <>
-                                {dataToShow.map((twap, index) => (
-                                    <HistoryTwapTableRow
-                                        key={`twap-${index}`}
-                                        twap={twap}
-                                    />
-                                ))}
-                            </>
-                        )}
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-                    </div>
-
-                    {filteredData.length > tableModeLimit && !pageMode && (
-                        <div
-                            className={styles.viewAllLink}
-                            onClick={handleViewAll}
-                        >
-                            View All
-                        </div>
-                    )}
-
-                    {pageMode && (
-                        <Pagination
-                            totalCount={filteredData.length}
-                            onPageChange={setPage}
-                            rowsPerPage={rowsPerPage}
-                            onRowsPerPageChange={setRowsPerPage}
-                        />
-                    )}
-                </>
-            )}
-        </div>
+        <>
+            <GenericTable
+                data={filteredData as any}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                    <HistoryTwapTableHeader
+                        sortBy={sortBy as UserFillSortBy}
+                        sortDirection={sortDirection}
+                        sortClickHandler={sortClickHandler}
+                    />
+                )}
+                renderRow={(twap, index) => (
+                    <HistoryTwapTableRow
+                        key={`twap-${index}`}
+                        twap={twap as any}
+                    />
+                )}
+                sorterMethod={sortTwapHistory}
+                isFetched={isFetched}
+                pageMode={pageMode}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+                defaultSortBy={'time'}
+                defaultSortDirection={'desc'}
+                heightOverride={`${pageMode ? '100%' : '90%'}`}
+            />
+        </>
     );
 }

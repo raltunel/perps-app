@@ -112,7 +112,7 @@ const OpenOrderLine = () => {
                 };
             });
 
-        setLines(newLines);
+        setLines(newLines.filter((i) => i.yPrice > 0));
     }, [
         chart,
         JSON.stringify(userSymbolOrders),

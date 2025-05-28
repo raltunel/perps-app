@@ -47,19 +47,19 @@
 
 .left h1 {
     font-size: 2.7rem;
-    margin-bottom: 1rem;
+    margin-bottom: var(--margin-m);
     line-height: 1.2;
 }
 
 .left p {
     font-size: 1.25rem;
     opacity: 0.85;
-    margin-bottom: 2rem;
+    margin-bottom: var(--margin-l);
 }
 
 .buttons {
     display: flex;
-    gap: 1rem;
+    gap: var(--gap-m);
     flex-wrap: wrap;
 }
 
@@ -180,7 +180,7 @@
 
     .left {
         max-width: 100%;
-        margin-bottom: 2rem;
+        margin-bottom: var(--margin-l);
     }
 
     .left h1 {

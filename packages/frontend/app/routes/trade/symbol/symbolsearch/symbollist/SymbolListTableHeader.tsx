@@ -51,21 +51,21 @@ export default function SymbolListTableHeader({
             key: 'funding',
             sortable: true,
             onClick: () => handleSort('funding'),
-            className: 'fundingCell',
+            className: styles.fundingCell,
         },
         {
             name: 'Volume',
             key: 'volume',
             sortable: true,
             onClick: () => handleSort('volume'),
-            className: 'volumeCell',
+            className: styles.volumeCell,
         },
         {
             name: 'Open Interest',
             key: 'openInterest',
             sortable: true,
             onClick: () => handleSort('openInterest'),
-            className: 'openInterestCell',
+            className: styles.openInterestCell,
         },
     ];
 
@@ -75,7 +75,7 @@ export default function SymbolListTableHeader({
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} 
-          ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+          ${header.className} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={header.onClick}
                 >
                     {header.name}
