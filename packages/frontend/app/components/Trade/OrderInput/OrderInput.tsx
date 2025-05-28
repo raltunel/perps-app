@@ -485,7 +485,7 @@ export default function OrderInput() {
 
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    const [showLaunchpad, setShowLaunchpad] = useState<boolean>(false);
+    const [showLaunchpad, setShowLaunchpad] = useState<boolean>(true);
 
     return (
         <div className={styles.mainContainer}>
