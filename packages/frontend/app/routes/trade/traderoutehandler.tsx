@@ -7,34 +7,38 @@ import { WsChannels } from '~/utils/Constants';
 export default function TradeRouteHandler() {
     const { marketId } = useParams<{ marketId: string }>(); // Get marketId from URL
 
-    const { symbol, setSymbol } = useTradeDataStore();
+    const { setSymbol } = useTradeDataStore();
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const getSymbolFromLS = () => {
         const activeSymbol = getLS('activeCoin');
         if (activeSymbol) {
             setSymbol(activeSymbol);
         } else {
             setSymbol('BTC');
         }
-    }, []);
+    };
 
     const checkSymbol = async () => {
         const urlSymbol = marketId;
 
-        if (urlSymbol && urlSymbol.length > 0 && urlSymbol !== symbol) {
+        if (urlSymbol === undefined || urlSymbol === null || urlSymbol === '') {
+            return getSymbolFromLS();
+        } else {
             const response = await fetch(`https://api.hyperliquid.xyz/info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type: WsChannels.ORDERBOOK,
-                    coin: urlSymbol,
+                    coin: urlSymbol.toUpperCase(),
                 }),
             });
 
-            if (response && response.ok) {
-                setSymbol(urlSymbol);
+            const data = await response.json();
+            if (data && data.levels) {
+                setSymbol(urlSymbol.toUpperCase());
             } else {
+                setSymbol('BTC');
                 navigate('/trade/BTC', { viewTransition: true });
             }
         }
