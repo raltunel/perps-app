@@ -121,3 +121,11 @@
     color: var(--text2);
     font-size: var(--font-size-s);
 }
+
+.expectedProfitText {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    color: var(--green);
+    font-size: var(--font-size-s);
+}

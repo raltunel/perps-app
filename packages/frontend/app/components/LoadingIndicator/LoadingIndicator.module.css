@@ -1,31 +1,3 @@
-:local {
-    --chart-max-width: 400px;
-    --chart-height: 180px;
-    --chart-height-medium: 140px;
-    --chart-height-mobile: 100px;
-    --candle-width: 8px;
-    --candle-width-medium: 6px;
-    --candle-width-mobile: 4px;
-    --candle-height: 36px;
-    --candle-height-medium: 28px;
-    --candle-height-mobile: 20px;
-    --candles-padding: 30px;
-    --candles-padding-medium: 25px;
-    --candles-padding-mobile: 20px;
-    --indicators-gap: 48px;
-    --indicators-gap-medium: 36px;
-    --indicators-gap-mobile: 24px;
-    --volume-bar-width: 6px;
-    --volume-bar-width-medium: 5px;
-    --volume-bar-width-mobile: 3px;
-    --volume-bars-height: 56px;
-    --volume-bars-height-medium: 48px;
-    --volume-bars-height-mobile: 32px;
-    --volume-bars-gap: 5px;
-    --volume-bars-gap-medium: 4px;
-    --volume-bars-gap-mobile: 2px;
-}
-
 .loadingContainer {
     position: fixed;
     inset: 0;
@@ -48,9 +20,9 @@
 .chartContainer {
     position: relative;
     width: 100%;
-    max-width: var(--chart-max-width);
-    height: var(--chart-height);
-    margin-bottom: var(--margin-xl);
+    max-width: 400px;
+    height: 180px;
+    margin-bottom: 40px;
     border-radius: var(--radius-s);
     background-color: var(--bg-dark2);
     overflow: hidden;
@@ -59,18 +31,18 @@
 /* For medium sized screens */
 @media (max-width: 768px) {
     .chartContainer {
-        max-width: calc(var(--chart-max-width) - 80px);
-        height: var(--chart-height-medium);
-        margin-bottom: var(--margin-l);
+        max-width: 320px;
+        height: 140px;
+        margin-bottom: 32px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .chartContainer {
-        max-width: calc(var(--chart-max-width) - 120px);
-        height: var(--chart-height-mobile);
-        margin-bottom: var(--margin-m);
+        max-width: 280px;
+        height: 100px;
+        margin-bottom: 24px;
     }
 }
 
@@ -112,38 +84,38 @@
     height: 60%;
     display: flex;
     justify-content: space-between;
-    padding: 0 var(--candles-padding);
+    padding: 0 30px;
     align-items: flex-end;
 }
 
 .candle {
-    width: var(--candle-width);
-    height: var(--candle-height);
-    border-radius: var(--radius-xs);
+    width: 8px;
+    height: 36px;
+    border-radius: 1px;
     animation: pulseOpacity 2s infinite;
 }
 
 /* For medium sized screens */
 @media (max-width: 768px) {
     .candlesContainer {
-        padding: 0 var(--candles-padding-medium);
+        padding: 0 25px;
     }
 
     .candle {
-        width: var(--candle-width-medium);
-        height: var(--candle-height-medium);
+        width: 6px;
+        height: 28px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .candlesContainer {
-        padding: 0 var(--candles-padding-mobile);
+        padding: 0 20px;
     }
 
     .candle {
-        width: var(--candle-width-mobile);
-        height: var(--candle-height-mobile);
+        width: 4px;
+        height: 20px;
     }
 }
 
@@ -158,32 +130,32 @@
 @keyframes pulseOpacity {
     0%,
     100% {
-        opacity: calc(var(--opacity-hover) - 0.15);
+        opacity: 0.7;
     }
     50% {
-        opacity: calc(var(--opacity-disabled) - 0.1);
+        opacity: 0.4;
     }
 }
 
 .marketIndicators {
     display: flex;
-    gap: var(--indicators-gap);
-    margin-bottom: var(--margin-l);
+    gap: 48px;
+    margin-bottom: 32px;
 }
 
 /* For medium sized screens */
 @media (max-width: 768px) {
     .marketIndicators {
-        gap: var(--indicators-gap-medium);
-        margin-bottom: calc(var(--margin-l) - 4px);
+        gap: 36px;
+        margin-bottom: 28px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .marketIndicators {
-        gap: var(--indicators-gap-mobile);
-        margin-bottom: var(--margin-m);
+        gap: 24px;
+        margin-bottom: 16px;
     }
 }
 
@@ -196,14 +168,14 @@
 .indicatorLabel {
     display: flex;
     align-items: center;
-    margin-bottom: var(--margin-xs);
+    margin-bottom: 4px;
 }
 
 .icon {
     display: inline-block;
-    width: var(--font-size-l);
-    height: var(--font-size-l);
-    margin-right: calc(var(--margin-xs) + 2px);
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
     background-size: contain;
     background-repeat: no-repeat;
 }
@@ -211,18 +183,18 @@
 /* For medium sized screens */
 @media (max-width: 768px) {
     .icon {
-        width: var(--font-size-m);
-        height: var(--font-size-m);
-        margin-right: var(--margin-xs);
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .icon {
-        width: var(--font-size-s);
-        height: var(--font-size-s);
-        margin-right: var(--margin-xs);
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
     }
 }
 
@@ -257,52 +229,52 @@
 .volumeBars {
     display: flex;
     align-items: flex-end;
-    height: var(--volume-bars-height);
-    gap: var(--volume-bars-gap);
-    margin-bottom: var(--margin-l);
+    height: 56px;
+    gap: 5px;
+    margin-bottom: 32px;
     width: 100%;
-    max-width: var(--chart-max-width);
+    max-width: 400px;
     justify-content: center;
 }
 
 /* For medium sized screens */
 @media (max-width: 768px) {
     .volumeBars {
-        height: var(--volume-bars-height-medium);
-        gap: var(--volume-bars-gap-medium);
-        margin-bottom: calc(var(--margin-l) - 4px);
-        max-width: calc(var(--chart-max-width) - 80px);
+        height: 48px;
+        gap: 4px;
+        margin-bottom: 28px;
+        max-width: 320px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .volumeBars {
-        height: var(--volume-bars-height-mobile);
-        margin-bottom: var(--margin-m);
-        gap: var(--volume-bars-gap-mobile);
-        max-width: calc(var(--chart-max-width) - 120px);
+        height: 32px;
+        margin-bottom: 20px;
+        gap: 2px;
+        max-width: 280px;
     }
 }
 
 .volumeBar {
-    width: var(--volume-bar-width);
-    min-height: var(--radius-xs);
-    border-radius: calc(var(--radius-xs) / 4) calc(var(--radius-xs) / 4) 0 0;
+    width: 6px;
+    min-height: 4px;
+    border-radius: 1px 1px 0 0;
     animation: barPulse 1.5s infinite alternate;
 }
 
 /* For medium sized screens */
 @media (max-width: 768px) {
     .volumeBar {
-        width: var(--volume-bar-width-medium);
+        width: 5px;
     }
 }
 
 /* For mobile screens */
 @media (max-width: 480px) {
     .volumeBar {
-        width: var(--volume-bar-width-mobile);
+        width: 3px;
     }
 }
 
@@ -317,7 +289,7 @@
 
 .loadingText {
     color: var(--text1);
-    font-size: var(--font-size-l);
+    font-size: var(--font-size-l); /* Increased from font-size-m */
     font-family: var(--font-family-main);
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -341,17 +313,17 @@
 /* Handle landscape mobile orientation */
 @media (max-height: 480px) and (orientation: landscape) {
     .chartContainer {
-        height: calc(var(--chart-height-mobile) - 10px);
-        margin-bottom: var(--margin-m);
+        height: 90px;
+        margin-bottom: 16px;
     }
 
     .marketIndicators {
-        margin-bottom: var(--margin-s);
+        margin-bottom: 12px;
     }
 
     .volumeBars {
-        height: var(--font-size-l);
-        margin-bottom: var(--margin-s);
+        height: 24px;
+        margin-bottom: 12px;
     }
 
     .loadingText {

@@ -116,6 +116,11 @@ export default function TakeProfitsModal(props: PropIF) {
                         </button>
                     </div>
                 </div>
+                {formData.gain && (
+                    <span className={styles.expectedProfitText}>
+                        Expected Profit:{' '}
+                    </span>
+                )}
 
                 <div className={styles.formRow}>
                     <div className={styles.inputWithoutDropdown}>
@@ -145,6 +150,11 @@ export default function TakeProfitsModal(props: PropIF) {
                         </button>
                     </div>
                 </div>
+                {formData.loss && (
+                    <span className={styles.expectedProfitText}>
+                        Expected Profit
+                    </span>
+                )}
             </section>
 
             <section className={styles.toggleContainer}>
