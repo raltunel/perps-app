@@ -1,19 +1,14 @@
 import { useMemo } from 'react';
 import PositionsTable from '~/components/Trade/PositionsTable/PositionsTable';
-import type { Route } from '../../+types/root';
-import WebDataConsumer from '../trade/webdataconsumer';
-import styles from './positions.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
+import WebDataConsumer from '../trade/webdataconsumer';
+import styles from './positions.module.css';
 export function meta() {
     return [
         { title: 'Positions | Ambient' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 function Positions() {
