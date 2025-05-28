@@ -3,7 +3,6 @@ import styles from './OrderHistoryTable.module.css';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { LuPen } from 'react-icons/lu';
 interface OrderHistoryTableRowProps {
     order: OrderDataIF;
 }
@@ -58,9 +57,6 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}
-                <button>
-                    <LuPen color='var(--text1)' size={10} />
-                </button>
             </div>
             <div className={`${styles.cell} ${styles.statusCell}`}>
                 {order.status}

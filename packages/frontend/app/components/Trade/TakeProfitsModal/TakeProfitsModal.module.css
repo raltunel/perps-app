@@ -1,3 +1,14 @@
+.container {
+    --container-width: 439px;
+    --input-height: 32px;
+
+    width: var(--container-width);
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+}
+
 .infoContainer {
     width: 100%;
     display: flex;
@@ -17,4 +28,96 @@
 }
 .value {
     color: var(--text1);
+}
+
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+}
+.formRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-s);
+}
+
+.inputWithDropdown,
+.inputWithoutDropdown {
+    width: 100%;
+    height: var(--input-height);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-dark4);
+    height: var(--input-height);
+    padding: var(--padding-xs) var(--padding-s);
+    border-radius: var(--radius-s);
+}
+.formRow input {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--gap-s);
+    background: var(--bg-dark4);
+
+    font-size: var(--font-size-s);
+    color: var(--text1);
+    outline: none;
+    border: none;
+}
+.formRow input::placeholder {
+    color: var(--text2);
+}
+
+.inputWithDropdown button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 40px;
+    gap: var(--gap-s);
+    background-color: transparent;
+    outline: none;
+    border: none;
+    color: var(--text1);
+}
+.toggleContainer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+.confirmButton {
+    display: flex;
+    padding: var(--button-padding);
+    height: var(--button-height);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+
+    outline: none;
+    border: none;
+
+    border-radius: var(--radius-s);
+    background: var(--accent1, #7371fc);
+    color: var(--text1, #f0f0f8);
+    font-size: var(--font-size-m);
+    transition: all 0.3s ease-in-out;
+}
+.disabled {
+    /* disbaled is dark3  in figma but that's the same as the modal bg */
+    background: var(--bg-dark2);
+    color: var(--text2);
+    pointer-events: none;
+}
+.textInfo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    color: var(--text2);
+    font-size: var(--font-size-s);
 }
