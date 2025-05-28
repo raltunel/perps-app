@@ -3,6 +3,8 @@ import styles from './symbolinfofield.module.css';
 
 import { motion } from 'framer-motion';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 
 interface SymbolInfoFieldProps {
     label: string;
@@ -11,6 +13,7 @@ interface SymbolInfoFieldProps {
     type?: 'positive' | 'negative';
     valueClass?: string;
     skeleton?: boolean;
+    tooltipContent?: string;
 }
 
 const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
@@ -20,6 +23,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
     type,
     valueClass,
     skeleton = false,
+    tooltipContent,
 }) => {
     const { getBsColor } = useAppSettings();
 
@@ -76,7 +80,16 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
     return (
         <div className={styles.symbolInfoFieldWrapper}>
             <div className={`${styles.symbolInfoField}`}>
-                <div className={styles.symbolInfoFieldLabel}>{label}</div>
+                <div className={styles.symbolInfoFieldLabel}>
+                    {label}
+                    {tooltipContent && (
+                        <div className={styles.tooltip}>
+                            <Tooltip content={tooltipContent} position='right'>
+                                <AiOutlineQuestionCircle size={13} />
+                            </Tooltip>
+                        </div>
+                    )}
+                </div>
                 {renderValue()}
             </div>
         </div>

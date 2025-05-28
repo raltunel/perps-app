@@ -7,6 +7,9 @@
     }
 }
 .watchListContainer {
+    --svg-width-height: 25px;
+    --svg-padding: 4.5px;
+
     width: 100%;
     height: 100%;
     display: flex;
@@ -47,6 +50,17 @@
     gap: var(--gap-m);
 }
 
+.watchListToolbarIcon,
+.favIcon {
+    padding: var(--svg-padding);
+    border-radius: var(--radius-s);
+    width: var(--svg-width-height);
+    height: var(--svg-width-height);
+}
+.watchListToolbarIcon:hover,
+.favIcon:hover {
+    background: var(--bg-dark3);
+}
 .watchListLimitor {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) -
