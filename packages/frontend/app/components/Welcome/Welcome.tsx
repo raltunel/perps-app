@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import type { Route } from '../../+types/root';
 import styles from './Welcome.module.css';
 
 export function meta() {
@@ -7,10 +6,6 @@ export function meta() {
         { title: 'Welcome | Ambient' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 interface WelcomeProps {
