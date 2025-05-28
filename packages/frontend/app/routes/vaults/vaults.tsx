@@ -4,15 +4,10 @@ import { FiSearch } from 'react-icons/fi';
 import VaultRow from '~/components/Vault/VaultRow/VaultRow';
 import VaultRowHeader from '~/components/Vault/VaultRowHeader/VaultRowHeader';
 import VaultTimeframe from '~/components/Vault/VaultTimeframe/VaultTimeframe';
-import type { Route } from '../../+types/root';
 import { protocolVaults } from './data';
 import styles from './vaults.module.css';
 
 // this is the old version (replaced by vaultsNew)
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
-}
 
 export default function Vaults() {
     const [searchQuery, setSearchQuery] = useState('');

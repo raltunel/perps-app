@@ -1,5 +1,5 @@
-import React from 'react';
 import styles from './ToggleSwitch.module.css';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export interface ToggleSwitchProps {
     isOn: boolean;
@@ -30,9 +30,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
                 <span className={styles.toggleLabel}>{label}</span>
             )}
             <div
-                className={`${styles.toggleSwitch} ${
-                    isOn ? styles.toggleSwitchOn : ''
-                }`}
+                className={`${styles.toggleSwitch} ${isOn ? styles.toggleSwitchOn : ''}`}
                 onClick={handleToggle}
                 role='switch'
                 aria-checked={isOn}
@@ -43,7 +41,26 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
                         e.preventDefault();
                     }
                 }}
-            />
+            >
+                <AnimatePresence>
+                    {isOn && (
+                        <motion.span
+                            key='checkmark'
+                            initial={{ scale: 0.3, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.3, opacity: 0 }}
+                            transition={{
+                                type: 'spring',
+                                stiffness: 350,
+                                damping: 20,
+                            }}
+                            className={styles.checkmark}
+                        >
+                            ✓
+                        </motion.span>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }

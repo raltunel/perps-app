@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './SizeInput.module.css';
+import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 
 interface PropsIF {
     value: string;
@@ -11,7 +12,9 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     useTotalSize: boolean;
-    symbol?: string;
+    symbol: string;
+    selectedMode: OrderBookMode;
+    setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
 }
 export default function SizeInput(props: PropsIF) {
     const {
@@ -23,6 +26,8 @@ export default function SizeInput(props: PropsIF) {
         ariaLabel,
         useTotalSize,
         symbol,
+        selectedMode,
+        setSelectedMode,
     } = props;
 
     const {
@@ -69,7 +74,18 @@ export default function SizeInput(props: PropsIF) {
                 placeholder='Enter Size'
             />
             <button className={styles.tokenButton}>
-                {symbol ? symbol : 'ETH'} <FaChevronDown />
+                {/* {symbol ? symbol : 'ETH'} <FaChevronDown /> */}
+                <ComboBox
+                    value={
+                        selectedMode === 'symbol' ? symbol.toUpperCase() : 'USD'
+                    }
+                    options={[symbol.toUpperCase(), 'USD']}
+                    onChange={(value) =>
+                        setSelectedMode(
+                            value === symbol.toUpperCase() ? 'symbol' : 'usd',
+                        )
+                    }
+                />
             </button>
         </div>
     );
