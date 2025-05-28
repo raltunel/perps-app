@@ -30,13 +30,13 @@ export default function TradeRouteHandler() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     type: WsChannels.ORDERBOOK,
-                    coin: urlSymbol.toUpperCase(),
+                    coin: urlSymbol,
                 }),
             });
 
             const data = await response.json();
             if (data && data.levels) {
-                setSymbol(urlSymbol.toUpperCase());
+                setSymbol(urlSymbol);
             } else {
                 setSymbol('BTC');
                 navigate('/trade/BTC', { viewTransition: true });
