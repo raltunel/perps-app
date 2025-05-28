@@ -2,28 +2,36 @@ import React, { useState } from 'react';
 import styles from './PortfolioChartHeader.module.css';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 
-const PortfolioChartHeader: React.FC = () => {
+type PortfolioHeaderIF = {
+    selectedVault: { label: string; value: string };
+    setSelectedVault: React.Dispatch<
+        React.SetStateAction<{ label: string; value: string }>
+    >;
+    selectedPeriod: { label: string; value: string };
+    setSelectedPeriod: React.Dispatch<
+        React.SetStateAction<{ label: string; value: string }>
+    >;
+};
+
+const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
+    const {
+        selectedVault,
+        setSelectedVault,
+        selectedPeriod,
+        setSelectedPeriod,
+    } = props;
+
     const vaultOptions = [
         { label: 'Perps', value: 'perps' },
-        { label: 'Vaults', value: 'vaults' },
         { label: 'Perps + Vaults', value: 'all' },
     ];
 
     const periodOptions = [
-        { label: '1D', value: '86400' },
-        { label: '7D', value: '604800' },
-        { label: '30D', value: '2592000' },
+        { label: '24H', value: 'day' },
+        { label: '7D', value: 'week' },
+        { label: '30D', value: 'month' },
+        { label: 'All-time', value: 'allTime' },
     ];
-
-    const [selectedVault, setSelectedVault] = useState<{
-        label: string;
-        value: string;
-    }>({ label: 'Perps', value: 'perps' });
-
-    const [selectedPeriod, setSelectedPeriod] = useState<{
-        label: string;
-        value: string;
-    }>({ label: '30D', value: '2592000' });
 
     return (
         <div className={styles.headercontainer}>

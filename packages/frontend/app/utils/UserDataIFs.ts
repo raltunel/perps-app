@@ -151,3 +151,16 @@ export type UserFundingSortBy =
     | 'szi'
     | 'fundingRate'
     | undefined;
+
+interface PositionValueIF {
+    [0]: number;
+    [1]: string;
+}
+
+export interface UserPositionIF {
+    accountValueHistory: PositionValueIF[];
+    pnlHistory: PositionValueIF[];
+    vlm: string;
+}
+
+export type PositionTimeframeKey = 'day' | 'week' | 'month' | 'allTime';

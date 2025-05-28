@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
-import PerformanceLineChart from './PerformanceChart/PerformanceLineChart';
 import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
+import PerformanceLineChart from './PerformanceChart/PerformanceLineChart';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -37,6 +37,16 @@ const MetricsDisplay = React.memo(() => (
 export default function PerformancePanel() {
     const [activeTab, setActiveTab] = useState('');
 
+    const [isLineDataFetched, setIsLineDataFetched] = useState(false);
+
+    const [accountValueHistory, setAccountValueHistory] = useState<
+        { time: number; value: number }[] | undefined
+    >();
+
+    const [pnlHistory, setPnlHistory] = useState<
+        { time: number; value: number }[] | undefined
+    >();
+
     useEffect(() => {
         // Initialize tab as empty, then change to Performance after 2 seconds
         const timer = setTimeout(() => {
@@ -60,6 +70,16 @@ export default function PerformancePanel() {
         [],
     );
 
+    const [selectedVault, setSelectedVault] = useState<{
+        label: string;
+        value: string;
+    }>({ label: 'Perps + Vaults', value: 'all' });
+
+    const [selectedPeriod, setSelectedPeriod] = useState<{
+        label: string;
+        value: string;
+    }>({ label: '24H', value: 'day' });
+
     const TabContent = useMemo(() => {
         if (!activeTab) return LoadingContent;
 
@@ -67,9 +87,26 @@ export default function PerformancePanel() {
             <div className={styles.performanceContainer}>
                 <MetricsDisplay />
                 <motion.div {...animationConfig} className={styles.perfChart}>
-                    <PortfolioChartHeader />
-                    {activeTab === 'Performance' && <PerformanceLineChart />}
-                    {activeTab === 'Account Value' && <PerformanceLineChart />}
+                    <PortfolioChartHeader
+                        selectedVault={selectedVault}
+                        setSelectedVault={setSelectedVault}
+                        selectedPeriod={selectedPeriod}
+                        setSelectedPeriod={setSelectedPeriod}
+                    />
+                    {(activeTab === 'Performance' ||
+                        activeTab === 'Account Value') && (
+                        <PerformanceLineChart
+                            activeTab={activeTab}
+                            selectedVault={selectedVault}
+                            selectedPeriod={selectedPeriod}
+                            setIsLineDataFetched={setIsLineDataFetched}
+                            isLineDataFetched={isLineDataFetched}
+                            setAccountValueHistory={setAccountValueHistory}
+                            setPnlHistory={setPnlHistory}
+                            pnlHistory={pnlHistory}
+                            accountValueHistory={accountValueHistory}
+                        />
+                    )}
                     {activeTab === 'Collateral' && <CollateralPieChart />}
 
                     {/* {activeTab.toLowerCase()} */}
