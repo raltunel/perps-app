@@ -58,9 +58,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
         // Scales
         if (minDate && maxDate && lineData) {
+            const diff = maxDate - minDate;
+
+            const padding = diff / 40;
+
             const xScale = d3
                 .scaleTime()
-                .domain([new Date(minDate), new Date(maxDate)])
+                .domain([
+                    new Date(minDate - padding),
+                    new Date(maxDate + padding),
+                ])
                 .range([0, canvasWidth]);
 
             setXScale(() => xScale);

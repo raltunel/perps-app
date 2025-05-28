@@ -4,7 +4,7 @@ import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
 import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
-import PerformanceLineChart from './PerformanceChart/PerformanceLineChart';
+import TabChartContext from './PerformanceChart/TabChartContext';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -60,6 +60,10 @@ export default function PerformancePanel() {
         setActiveTab(tab);
     }, []);
 
+    const handleLineDataFetched = (isDataFetched: boolean) => {
+        setIsLineDataFetched(() => isDataFetched);
+    };
+
     const LoadingContent = useMemo(
         () => (
             <div className={styles.loadingContainer}>
@@ -80,40 +84,35 @@ export default function PerformancePanel() {
         value: string;
     }>({ label: '24H', value: 'day' });
 
-    const TabContent = useMemo(() => {
-        if (!activeTab) return LoadingContent;
+    const TabContent_ = !activeTab ? (
+        LoadingContent
+    ) : (
+        <div className={styles.performanceContainer}>
+            <MetricsDisplay />
+            <motion.div {...animationConfig} className={styles.perfChart}>
+                <PortfolioChartHeader
+                    selectedVault={selectedVault}
+                    setSelectedVault={setSelectedVault}
+                    selectedPeriod={selectedPeriod}
+                    setSelectedPeriod={setSelectedPeriod}
+                />
 
-        return (
-            <div className={styles.performanceContainer}>
-                <MetricsDisplay />
-                <motion.div {...animationConfig} className={styles.perfChart}>
-                    <PortfolioChartHeader
-                        selectedVault={selectedVault}
-                        setSelectedVault={setSelectedVault}
-                        selectedPeriod={selectedPeriod}
-                        setSelectedPeriod={setSelectedPeriod}
-                    />
-                    {(activeTab === 'Performance' ||
-                        activeTab === 'Account Value') && (
-                        <PerformanceLineChart
-                            activeTab={activeTab}
-                            selectedVault={selectedVault}
-                            selectedPeriod={selectedPeriod}
-                            setIsLineDataFetched={setIsLineDataFetched}
-                            isLineDataFetched={isLineDataFetched}
-                            setAccountValueHistory={setAccountValueHistory}
-                            setPnlHistory={setPnlHistory}
-                            pnlHistory={pnlHistory}
-                            accountValueHistory={accountValueHistory}
-                        />
-                    )}
-                    {activeTab === 'Collateral' && <CollateralPieChart />}
+                <TabChartContext
+                    activeTab={activeTab}
+                    selectedVault={selectedVault}
+                    selectedPeriod={selectedPeriod}
+                    handleLineDataFetched={handleLineDataFetched}
+                    isLineDataFetched={isLineDataFetched}
+                    setAccountValueHistory={setAccountValueHistory}
+                    setPnlHistory={setPnlHistory}
+                    pnlHistory={pnlHistory}
+                    accountValueHistory={accountValueHistory}
+                />
 
-                    {/* {activeTab.toLowerCase()} */}
-                </motion.div>
-            </div>
-        );
-    }, [activeTab, LoadingContent]);
+                {/* {activeTab.toLowerCase()} */}
+            </motion.div>
+        </div>
+    );
 
     return (
         <div className={styles.container}>
@@ -126,7 +125,7 @@ export default function PerformancePanel() {
             />
             <AnimatePresence mode='wait'>
                 <div className={styles.tableContent} key={activeTab}>
-                    {TabContent}
+                    {TabContent_}
                 </div>
             </AnimatePresence>
         </div>

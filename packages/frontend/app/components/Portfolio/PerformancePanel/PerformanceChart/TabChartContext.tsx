@@ -3,13 +3,14 @@ import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { UserPositionIF } from '~/utils/UserDataIFs';
+import CollateralPieChart from '../CollateralChart/CollateralPieChart';
 
-export interface PerformanceLineChart {
+export interface TabChartContext {
     activeTab: string;
     selectedVault: { label: string; value: string };
     selectedPeriod: { label: string; value: string };
     isLineDataFetched: boolean;
-    setIsLineDataFetched: React.Dispatch<React.SetStateAction<boolean>>;
+    handleLineDataFetched: (isDataFetched: boolean) => void;
     pnlHistory: { time: number; value: number }[] | undefined;
     setPnlHistory: React.Dispatch<
         React.SetStateAction<{ time: number; value: number }[] | undefined>
@@ -20,13 +21,13 @@ export interface PerformanceLineChart {
     >;
 }
 
-const PerformanceLineChart: React.FC<PerformanceLineChart> = (props) => {
+const TabChartContext: React.FC<TabChartContext> = (props) => {
     const {
         activeTab,
         selectedVault,
         selectedPeriod,
         isLineDataFetched,
-        setIsLineDataFetched,
+        handleLineDataFetched,
         pnlHistory,
         setPnlHistory,
         accountValueHistory,
@@ -38,7 +39,6 @@ const PerformanceLineChart: React.FC<PerformanceLineChart> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     useEffect(() => {
-        console.log(debugWallet.address && !isLineDataFetched);
         if (debugWallet.address && !isLineDataFetched) {
             fetchUserPortfolio(debugWallet.address).then((data) => {
                 const key = selectedVault.value === 'perps' ? 'perps' : '';
@@ -74,22 +74,21 @@ const PerformanceLineChart: React.FC<PerformanceLineChart> = (props) => {
                     setPnlHistory(() => pnlHistory);
                 }
 
-                setIsLineDataFetched(() => true);
+                handleLineDataFetched(true);
             });
         }
     }, [debugWallet.address, isLineDataFetched]);
 
-    return isLineDataFetched &&
-        ((activeTab === 'Performance' && pnlHistory) ||
-            (activeTab === 'Account Value' && accountValueHistory)) ? (
+    return (activeTab === 'Performance' && pnlHistory) ||
+        (activeTab === 'Account Value' && accountValueHistory) ? (
         <LineChart
             lineData={
                 activeTab === 'Account Value' ? accountValueHistory : pnlHistory
             }
         />
     ) : (
-        <></>
+        activeTab === 'Collateral' && <CollateralPieChart />
     );
 };
 
-export default PerformanceLineChart;
+export default TabChartContext;
