@@ -7,10 +7,10 @@ await fsp
     .catch(() => {});
 
 // Create necessary SPA structure
-await fsp.mkdir('dist/client', { recursive: true });
+await fsp.mkdir('build/client', { recursive: true });
 
 // Copy client build artifacts to Netlify publish directory
-await fsp.cp('dist/client', 'build', {
+await fsp.cp('build/client', 'build', {
     recursive: true,
     filter: (src) => !src.includes('server'), // Exclude any residual server files
 });

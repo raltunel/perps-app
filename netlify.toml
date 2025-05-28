@@ -1,6 +1,6 @@
 [build]
   base = "packages/frontend"
-  publish = "dist/client"
+  publish = "build/client"
   command = "pnpm build"
 
 [dev]
