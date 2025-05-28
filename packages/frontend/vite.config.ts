@@ -9,10 +9,6 @@ const appDescription = 'A modern, performant app for perpetual contracts.';
 export default defineConfig({
     build: {
         ssr: false, // Explicitly disable SSR
-        outDir: 'dist/client', // Clear client output directory
-        rollupOptions: {
-            input: 'src/client.tsx', // Point to client entry (if different)
-        },
     },
     plugins: [
         tsconfigPaths() as PluginOption,
