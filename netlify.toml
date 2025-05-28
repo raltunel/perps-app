@@ -1,7 +1,7 @@
 [build]
   base = "packages/frontend"
   publish = "build/client"
-  command = "vite build"
+  command = "pnpm build"
 
 [dev]
 command = "npm run dev"
