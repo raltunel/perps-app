@@ -15,16 +15,20 @@
     transition: all 0.2s ease;
     user-select: none;
     flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toggleSwitch:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(100, 102, 241, 0.4);
-}
-
-.toggleSwitchOn {
-    background-color: var(--accent1);
-    /* border-color: var(--accent1); */
+.checkmark {
+    color: var(--accent1);
+    font-size: var(--font-size-s);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
 }
 
 .toggleLabel {

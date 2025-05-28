@@ -34,6 +34,7 @@ import { GoZap } from 'react-icons/go';
 import { RiBarChartHorizontalLine } from 'react-icons/ri';
 import { LuOctagonX } from 'react-icons/lu';
 import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -135,7 +136,7 @@ export default function OrderInput() {
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 2;
+    const minimumInputValue = 1;
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
@@ -147,6 +148,8 @@ export default function OrderInput() {
 
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
+
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
@@ -466,6 +469,8 @@ export default function OrderInput() {
         ariaLabel: 'Size input',
         useTotalSize,
         symbol,
+        selectedMode,
+        setSelectedMode,
     };
 
     const positionSizeProps = {
