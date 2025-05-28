@@ -6,7 +6,6 @@
 [dev]
 command = "npm run dev"
 framework = "vite"
-autoLaunch = false # Prevent SSR dev server
 
 # Set immutable caching for static files, because they have fingerprinted filenames
 
