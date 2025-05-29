@@ -89,16 +89,27 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
             }
         }
     };
-
     useEffect(() => {
-        window.addEventListener('resize', () => {
-            setTimeout(() => {
+        // Use a ref to track the timeout ID
+        const timeoutRef = { current: null as NodeJS.Timeout | null };
+
+        const handleResize = () => {
+            // Clear previous timeout to avoid overlapping executions
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => {
                 calculateOrderCount();
             }, 50);
-        });
+        };
 
-        calculateOrderCount();
-    }, []);
+        window.addEventListener('resize', handleResize);
+        calculateOrderCount(); // Initial call
+
+        // Cleanup: Remove listener + clear timeout
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, []); // Empty dependency array = runs once on mount
 
     const menuItems = [
         {

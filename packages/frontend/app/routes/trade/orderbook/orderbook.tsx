@@ -237,11 +237,14 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            setTimeout(() => {
+            const timeoutId = setTimeout(() => {
                 filledResolution.current = selectedResolution;
             }, 200);
 
-            return unsubscribe;
+            return () => {
+                unsubscribe();
+                clearTimeout(timeoutId);
+            };
         }
     }, [selectedResolution, info]);
 
@@ -286,9 +289,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 setObChosenAmount(amount);
             }
 
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
+            return () => {
+                clearTimeout(timeout);
+            };
         },
         [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
     );

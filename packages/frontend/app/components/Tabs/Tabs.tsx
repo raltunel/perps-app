@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './Tabs.module.css';
 import { WsChannels } from '~/utils/Constants';
+import styles from './Tabs.module.css';
 
 interface TabProps {
     label: string;
@@ -109,7 +109,7 @@ export default function Tabs(props: TabsProps) {
         ) {
             label = `Open Orders (${openOrdersCount})`;
         } else if (label === 'TWAP' && webDataFetched && activeTwapsCount > 0) {
-            label = `Twap (${activeTwapsCount})`;
+            label = `TWAP (${activeTwapsCount})`;
         }
         return label;
     };
