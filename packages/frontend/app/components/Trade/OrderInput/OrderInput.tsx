@@ -489,10 +489,13 @@ export default function OrderInput() {
         totalOrders: priceRangeTotalOrders,
     };
 
+    // logic to dispatch a notification on demand
     const notifications: NotificationStoreIF = useNotificationStore();
 
+    // bool to handle toggle of order type launchpad mode
     const [showLaunchpad, setShowLaunchpad] = useState<boolean>(true);
 
+    // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
     return (
