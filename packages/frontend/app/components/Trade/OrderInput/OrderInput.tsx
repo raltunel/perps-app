@@ -28,6 +28,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -87,7 +88,7 @@ export default function OrderInput() {
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 2;
+    const minimumInputValue = 1;
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
@@ -99,6 +100,8 @@ export default function OrderInput() {
 
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
+
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
@@ -418,6 +421,8 @@ export default function OrderInput() {
         ariaLabel: 'Size input',
         useTotalSize,
         symbol,
+        selectedMode,
+        setSelectedMode,
     };
 
     const positionSizeProps = {

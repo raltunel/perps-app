@@ -68,7 +68,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
             )}
             {showReduceToggle && (
-                <div className={styles.reduceToggleContent}>
+                <div
+                    className={styles.reduceToggleContent}
+                    onClick={() => handleToggleReduceOnly()}
+                >
                     <ToggleSwitch
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
@@ -78,7 +81,10 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
             )}
             {showTakeProfitToggle && (
-                <div className={styles.reduceToggleContent}>
+                <div
+                    className={styles.reduceToggleContent}
+                    onClick={() => handleToggleProfitOnly()}
+                >
                     <ToggleSwitch
                         isOn={isTakeProfitEnabled}
                         onToggle={handleToggleProfitOnly}

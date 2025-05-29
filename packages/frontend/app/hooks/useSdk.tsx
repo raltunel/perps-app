@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { useIsClient } from './useIsClient';
 import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
 
@@ -14,38 +20,43 @@ export const SdkProvider: React.FC<{
     children: React.ReactNode;
 }> = ({ environment, children }) => {
     const isClient = useIsClient();
-    const info = useRef<Info | null>(null);
-    const exchange = useRef<Exchange | null>(null);
+
+    const [info, setInfo] = useState<Info | null>(null);
+    const [exchange, setExchange] = useState<Exchange | null>(null);
+
+    // commit to trigger deployment
 
     useEffect(() => {
         if (!isClient) return;
-        if (!info.current) {
-            info.current = new Info({
-                environment,
-                skipWs: false,
-                // isDebug: true, // TODO: remove in prod
-            });
-        } else {
-            info.current.setEnvironment(environment);
-        }
-        if (!exchange.current) {
-            exchange.current = new Exchange(
-                {},
-                {
+        if (!info) {
+            setInfo(
+                new Info({
                     environment,
-                    accountAddress: DEMO_USER,
+                    skipWs: false,
                     // isDebug: true, // TODO: remove in prod
-                },
+                }),
             );
         } else {
-            exchange.current.setEnvironment(environment);
+            info.setEnvironment(environment);
+        }
+        if (!exchange) {
+            setExchange(
+                new Exchange(
+                    {},
+                    {
+                        environment,
+                        accountAddress: DEMO_USER,
+                        // isDebug: true, // TODO: remove in prod
+                    },
+                ),
+            );
+        } else {
+            exchange.setEnvironment(environment);
         }
     }, [isClient, environment]);
 
     return (
-        <SdkContext.Provider
-            value={{ info: info.current, exchange: exchange.current }}
-        >
+        <SdkContext.Provider value={{ info: info, exchange: exchange }}>
             {children}
         </SdkContext.Provider>
     );
