@@ -551,10 +551,11 @@ export default function OrderInput() {
                             >
                                 Isolated <FiChevronDown size={24} />
                             </button>
-                            <button className={styles.trade_type_toggle}>
-                                <PiSquaresFour
-                                    onClick={() => setShowLaunchpad(true)}
-                                />
+                            <button
+                                className={styles.trade_type_toggle}
+                                onClick={() => setShowLaunchpad(true)}
+                            >
+                                <PiSquaresFour />
                             </button>
                         </div>
 
