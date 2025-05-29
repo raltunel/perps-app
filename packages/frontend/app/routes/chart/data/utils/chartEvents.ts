@@ -1,17 +1,18 @@
+import type { IChartingLibraryWidget } from '~/tv/charting_library';
 import { saveChartLayout } from './chartStorage';
 
-export const drawingEvent = (chart: any) => {
-    chart?.subscribe('drawing_event', (id: any, type: any) => {
+export const drawingEvent = (chart: IChartingLibraryWidget) => {
+    chart?.subscribe('drawing_event', () => {
         saveChartLayout(chart);
     });
 };
 
-export const drawingEventUnsubscribe = (chart: any) => {
+export const drawingEventUnsubscribe = (chart: IChartingLibraryWidget) => {
     chart?.unsubscribe('drawing_event', () => {});
 };
 
-export const studyEvents = (chart: any) => {
-    chart?.subscribe('study_event', (id: any, type: any) => {
+export const studyEvents = (chart: IChartingLibraryWidget) => {
+    chart?.subscribe('study_event', () => {
         saveChartLayout(chart);
     });
 
@@ -20,33 +21,53 @@ export const studyEvents = (chart: any) => {
     });
 };
 
-export const studyEventsUnsubscribe = (chart: any) => {
+export const studyEventsUnsubscribe = (chart: IChartingLibraryWidget) => {
     chart?.unsubscribe('study_event', () => {});
     chart?.unsubscribe('study_properties_changed', () => {});
 };
 
 export const intervalChangedSubscribe = (
-    chart: any,
+    chart: IChartingLibraryWidget,
     setIsChartReady: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
     chart
         .activeChart()
         .onIntervalChanged()
-        .subscribe(null, (interval: number, timeframeObj: any) => {
+        .subscribe(null, () => {
             setIsChartReady(false);
             saveChartLayout(chart);
         });
 };
 
-export const intervalChangedUnsubscribe = (chart: any) => {
+export const intervalChangedUnsubscribe = (chart: IChartingLibraryWidget) => {
     chart
         .activeChart()
         .onIntervalChanged()
-        .unsubscribe(null, (interval: number, timeframeObj: any) => {
+        .unsubscribe(null, () => {
             (timeframeObj.timeframe = {
                 value: '12M',
                 type: 'period-back',
             }),
                 saveChartLayout(chart);
+        });
+};
+
+export const visibleRangeChangedSubscribe = (chart: IChartingLibraryWidget) => {
+    chart
+        .activeChart()
+        .onVisibleRangeChanged()
+        .subscribe(null, () => {
+            saveChartLayout(chart);
+        });
+};
+
+export const visibleRangeChangedUnsubscribe = (
+    chart: IChartingLibraryWidget,
+) => {
+    chart
+        .activeChart()
+        .onVisibleRangeChanged()
+        .unsubscribe(null, () => {
+            saveChartLayout(chart);
         });
 };

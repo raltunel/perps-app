@@ -1,7 +1,7 @@
 import { useChartStore } from '~/stores/TradingviewChartStore';
 
 export const saveChartLayout = (tvWidget: any) => {
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
         try {
             tvWidget.save((state: object) => {
                 const chartState = {
@@ -15,6 +15,8 @@ export const saveChartLayout = (tvWidget: any) => {
             console.error(error);
         }
     }, 100);
+
+    return () => clearTimeout(timeoutId);
 };
 
 export const getChartLayout = () => {

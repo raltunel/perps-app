@@ -9,7 +9,7 @@
 }
 .tableContent {
     padding: var(--padding-s) var(--padding-s) 0px var(--padding-s);
-    height: 100%;
+    height: calc(100% - var(--trade-tables-tabs-height));
 }
 
 .portfolioPage.tableContent {
