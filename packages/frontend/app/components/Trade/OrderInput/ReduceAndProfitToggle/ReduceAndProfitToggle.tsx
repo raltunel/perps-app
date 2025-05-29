@@ -71,7 +71,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
                     <input
-                        type='text'
+                        type='number'
                         value={formData.tpPrice}
                         onChange={(e) =>
                             handleInputChange('tpPrice', e.target.value)
@@ -81,7 +81,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
                 <div className={styles.inputWithDropdown}>
                     <input
-                        type='text'
+                        type='number'
                         value={formData.gain}
                         onChange={(e) =>
                             handleInputChange('gain', e.target.value)
@@ -105,7 +105,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             <div className={styles.formRow}>
                 <div className={styles.inputWithoutDropdown}>
                     <input
-                        type='text'
+                        type='number'
                         value={formData.slPrice}
                         onChange={(e) =>
                             handleInputChange('slPrice', e.target.value)
@@ -115,7 +115,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
                 <div className={styles.inputWithDropdown}>
                     <input
-                        type='text'
+                        type='number'
                         value={formData.loss}
                         onChange={(e) =>
                             handleInputChange('loss', e.target.value)
