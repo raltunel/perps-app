@@ -1,7 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { LineData } from './LineComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import { drawLabel } from '../orderLineUtils';
+import {
+    drawLabel,
+    type LabelLocation,
+    type LabelType,
+} from '../orderLineUtils';
 import {
     formatLineLabel,
     getPricetoPixel,
@@ -18,6 +22,8 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
 
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
+    const [drawnLabels, setDrawnLabels] = useState<LineData[]>([]);
+
     useEffect(() => {
         if (!chart || !isChartReady) return;
         if (!ctx) return;
@@ -27,7 +33,7 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
         const draw = () => {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-            lines.forEach((line) => {
+            const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(chart, line.yPrice).pixel;
                 const timeScale = chart.activeChart().getTimeScale();
                 const chartWidth = Math.floor(timeScale.width());
@@ -35,6 +41,7 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
 
                 const labelOptions = [
                     {
+                        type: 'Main' as LabelType,
                         text: formatLineLabel(line.textValue),
                         backgroundColor: '#D1D1D1',
                         textColor: '#3C91FF',
@@ -43,6 +50,7 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
                     ...(line.quantityTextValue
                         ? [
                               {
+                                  type: 'Quantity' as LabelType,
                                   text: quantityTextFormatWithComma(
                                       line.quantityTextValue,
                                   ),
@@ -55,6 +63,7 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
                     ...(line.type === 'LIMIT'
                         ? [
                               {
+                                  type: 'Cancel' as LabelType,
                                   text: 'X',
                                   backgroundColor: '#000000',
                                   textColor: '#FFFFFF',
@@ -64,12 +73,19 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
                         : []),
                 ];
 
-                drawLabel(ctx, {
+                const labelLocations = drawLabel(ctx, {
                     x: xPixel,
                     y: yPricePixel,
                     labelOptions: labelOptions,
                 });
+
+                return {
+                    ...line,
+                    labelLocations,
+                };
             });
+
+            setDrawnLabels(linesWithLabels);
 
             animationFrameId = requestAnimationFrame(draw);
         };
@@ -78,6 +94,82 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
 
         return () => cancelAnimationFrame(animationFrameId);
     }, [chart, isChartReady, lines, ctx]);
+
+    function findCancelLabelAtPosition(
+        x: number,
+        y: number,
+        drawnLabels: LineData[],
+    ): { label: LabelLocation; parentLine: (typeof drawnLabels)[0] } | null {
+        for (let i = drawnLabels.length - 1; i >= 0; i--) {
+            const labelLocs = drawnLabels[i].labelLocations;
+            if (!labelLocs) continue;
+
+            for (const loc of labelLocs) {
+                if (loc.type === 'Cancel') {
+                    const startX = loc.x;
+                    const endX = loc.x + loc.width;
+                    const startY = loc.y;
+                    const endY = loc.y + loc.height;
+
+                    if (x >= startX && x <= endX && y >= startY && y <= endY) {
+                        return { label: loc, parentLine: drawnLabels[i] };
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleMouseDown = (params: any) => {
+            if (chart) {
+                const chartDiv = document.getElementById('tv_chart');
+                const iframe = chartDiv?.querySelector(
+                    'iframe',
+                ) as HTMLIFrameElement;
+
+                const iframeDoc = iframe.contentDocument;
+
+                if (iframeDoc) {
+                    const paneCanvas = iframeDoc.querySelector(
+                        'canvas[data-name="pane-canvas"]',
+                    );
+
+                    const rect = paneCanvas?.getBoundingClientRect();
+
+                    if (rect) {
+                        const offsetX = params.clientX - rect.left;
+                        const offsetY = params.clientY - rect.top;
+
+                        const found = findCancelLabelAtPosition(
+                            offsetX,
+                            offsetY,
+                            drawnLabels,
+                        );
+
+                        if (found) {
+                            console.log(found.parentLine);
+                        }
+                    }
+                }
+            }
+        };
+        if (chart) {
+            chart.subscribe('mouse_down', handleMouseDown);
+        }
+        return () => {
+            if (chart) {
+                try {
+                    chart.unsubscribe('mouse_down', handleMouseDown);
+
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error: unknown) {
+                    // console.error({ error });
+                }
+            }
+        };
+    }, [chart, JSON.stringify(drawnLabels)]);
 
     return null;
 };

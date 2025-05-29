@@ -3,6 +3,7 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 
 import type { EntityId, IChartingLibraryWidget } from '~/tv/charting_library';
 import { addCustomOrderLine, type LineLabel } from '../customOrderLineUtils';
+import type { LabelLocation } from '../orderLineUtils';
 
 export type LineData = {
     xLoc: number;
@@ -11,6 +12,7 @@ export type LineData = {
     quantityTextValue?: number;
     color: string;
     type: 'PNL' | 'LIMIT' | 'LIQ';
+    labelLocations?: LabelLocation[];
 };
 
 interface LineProps {
