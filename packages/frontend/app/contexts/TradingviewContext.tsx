@@ -9,6 +9,8 @@ import {
     intervalChangedUnsubscribe,
     studyEvents,
     studyEventsUnsubscribe,
+    visibleRangeChangedSubscribe,
+    visibleRangeChangedUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
 import {
     getChartLayout,
@@ -76,17 +78,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         const res = getChartLayout();
-        if (res) {
-            const defaultTimeScaleSettings = {
-                m_barSpacing: 6,
-                m_rightOffset: 10,
-                rightOffsetPercentage: 5,
-                usePercentageRightOffset: false,
-            };
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (res.chartLayout as any).charts[0].timeScale =
-                defaultTimeScaleSettings;
-        }
         setChartState(res);
     }, []);
 
@@ -266,6 +257,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 drawingEventUnsubscribe(chart);
                 studyEventsUnsubscribe(chart);
                 intervalChangedUnsubscribe(chart);
+                visibleRangeChangedUnsubscribe(chart);
                 chart.remove();
             }
         };
@@ -289,6 +281,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         drawingEvent(chart);
         studyEvents(chart);
         intervalChangedSubscribe(chart, setIsChartReady);
+        visibleRangeChangedSubscribe(chart);
     }, [chart]);
 
     useEffect(() => {
