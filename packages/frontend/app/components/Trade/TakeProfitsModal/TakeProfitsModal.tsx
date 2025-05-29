@@ -21,7 +21,6 @@ interface PropIF {
 export default function TakeProfitsModal(props: PropIF) {
     const { closeTPModal, position } = props;
 
-    console.log({ position });
     const [formData, setFormData] = useState<TPSLFormData>({
         tpPrice: position.tp ? position.tp.toString() : '',
         slPrice: position.sl ? position.sl.toString() : '',

@@ -2,6 +2,8 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import styles from './ReduceAndProfitToggle.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useState } from 'react';
+import { BsChevronDown } from 'react-icons/bs';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -14,7 +16,27 @@ interface PropsIF {
     handleToggleIsChasingInterval: (newState?: boolean) => void;
     marketOrderType: string;
 }
+interface TPSLFormData {
+    tpPrice: string;
+    slPrice: string;
+    gain: string;
+    loss: string;
+    gainCurrency: '$' | '%';
+    lossCurrency: '$' | '%';
+    configureAmount: boolean;
+    limitPrice: boolean;
+}
 export default function ReduceAndProfitToggle(props: PropsIF) {
+    const [formData, setFormData] = useState<TPSLFormData>({
+        tpPrice: '',
+        slPrice: '',
+        gain: '',
+        loss: '',
+        gainCurrency: '$',
+        lossCurrency: '$',
+        configureAmount: false,
+        limitPrice: false,
+    });
     const {
         isReduceOnlyEnabled,
         isTakeProfitEnabled,
@@ -26,6 +48,95 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         isChasingIntervalEnabled,
         handleToggleIsChasingInterval,
     } = props;
+
+    const handleInputChange = (
+        field: keyof TPSLFormData,
+        value: string | boolean,
+    ) => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
+
+    const handleCurrencyToggle = (field: 'gainCurrency' | 'lossCurrency') => {
+        setFormData((prev) => ({
+            ...prev,
+            [field]: prev[field] === '$' ? '%' : '$',
+        }));
+    };
+
+    const formDisplay = (
+        <section className={styles.formContainer}>
+            <div className={styles.formRow}>
+                <div className={styles.inputWithoutDropdown}>
+                    <input
+                        type='text'
+                        value={formData.tpPrice}
+                        onChange={(e) =>
+                            handleInputChange('tpPrice', e.target.value)
+                        }
+                        placeholder='0.00'
+                    />
+                </div>
+                <div className={styles.inputWithDropdown}>
+                    <input
+                        type='text'
+                        value={formData.gain}
+                        onChange={(e) =>
+                            handleInputChange('gain', e.target.value)
+                        }
+                        placeholder='0.00'
+                    />
+                    <button
+                        onClick={() => handleCurrencyToggle('gainCurrency')}
+                    >
+                        <span>{formData.gainCurrency}</span>
+                        <BsChevronDown size={16} />
+                    </button>
+                </div>
+            </div>
+            {formData.gain && (
+                <span className={styles.expectedProfitText}>
+                    Expected Profit:{' '}
+                </span>
+            )}
+
+            <div className={styles.formRow}>
+                <div className={styles.inputWithoutDropdown}>
+                    <input
+                        type='text'
+                        value={formData.slPrice}
+                        onChange={(e) =>
+                            handleInputChange('slPrice', e.target.value)
+                        }
+                        placeholder='0.00'
+                    />
+                </div>
+                <div className={styles.inputWithDropdown}>
+                    <input
+                        type='text'
+                        value={formData.loss}
+                        onChange={(e) =>
+                            handleInputChange('loss', e.target.value)
+                        }
+                        placeholder='0.00'
+                    />
+                    <button
+                        onClick={() => handleCurrencyToggle('lossCurrency')}
+                    >
+                        <span>{formData.lossCurrency}</span>
+                        <BsChevronDown size={16} />
+                    </button>
+                </div>
+            </div>
+            {formData.loss && (
+                <span className={styles.expectedProfitText}>
+                    Expected Profit
+                </span>
+            )}
+        </section>
+    );
 
     const showTakeProfitToggle = ['market', 'limit'].includes(marketOrderType);
     const showReduceToggle = marketOrderType !== 'chase_limit';
@@ -96,6 +207,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 </div>
             )}
             {chasingIntervalToggle}
+            {isTakeProfitEnabled && formDisplay}
         </div>
     );
 }
