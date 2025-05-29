@@ -16,7 +16,6 @@ export default function LeverageSlider({
     className = '',
     minimumInputValue = 1,
     maximumInputValue = 100,
-    generateRandomMaximumInput,
 }: LeverageSliderProps) {
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -367,26 +366,7 @@ export default function LeverageSlider({
     return (
         <div className={`${styles.leverageSliderContainer} ${className}`}>
             <h3 className={styles.containerTitle}>Leverage</h3>
-            <div className={styles.randomMaxContainer}>
-                <span>
-                    Max: {isNaN(maximumInputValue) ? '0' : maximumInputValue}x
-                </span>
-                <button
-                    type='button'
-                    onClick={() => {
-                        console.log('Button clicked');
-                        if (typeof generateRandomMaximumInput === 'function') {
-                            generateRandomMaximumInput();
-                        } else {
-                            console.error(
-                                'generateRandomMaximumInput is not a function',
-                            );
-                        }
-                    }}
-                >
-                    generate random Max
-                </button>
-            </div>
+
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
