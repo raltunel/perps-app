@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useReducer } from 'react';
+import { useCallback, useMemo, useReducer, useState } from 'react';
 
 // Define the types we need
 export interface PortfolioData {
@@ -126,7 +126,7 @@ export function usePortfolioManager() {
         }));
 
         // Clear content after animation completes
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             setModalState({
                 isOpen: false,
                 content: null,
@@ -134,6 +134,8 @@ export function usePortfolioManager() {
             });
             setIsProcessing(false); // Reset processing state when modal is fully closed
         }, 300);
+
+        clearTimeout(timeout);
     }, []);
 
     // Portfolio operations with optimized state management
