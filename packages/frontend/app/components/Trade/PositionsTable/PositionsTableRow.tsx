@@ -4,11 +4,17 @@ import { type useModalIF, useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
+import type { PositionIF } from '~/utils/UserDataIFs';
 import styles from './PositionsTable.module.css';
+import { LuPen } from 'react-icons/lu';
+import { useState } from 'react';
+import Modal from '~/components/Modal/Modal';
+import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
+    openTPModal: () => void;
+    closeTPModal: () => void;
 }
 
 export default function PositionsTableRow(props: PositionsTableRowProps) {
@@ -16,6 +22,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
     const { coinPriceMap } = useTradeDataStore();
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
+
+    const modalCtrl: useModalIF = useModal('closed');
+    const [modalContent, setModalContent] = useState<string>('share');
 
     const getTpSl = () => {
         let ret = '';
@@ -54,8 +63,31 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         paddingLeft: '8px',
         borderLeft: `1px solid ${baseColor}`,
     };
+    const openShareModal = () => {
+        setModalContent('share');
+        modalCtrl.open();
+    };
 
-    const shareModalCtrl: useModalIF = useModal('closed');
+    const openTpSlModal = () => {
+        setModalContent('tpsl');
+        modalCtrl.open();
+    };
+
+    const renderModalContent = () => {
+        if (modalContent === 'share') {
+            return <ShareModal close={modalCtrl.close} position={position} />;
+        } else if (modalContent === 'tpsl') {
+            return (
+                <Modal close={modalCtrl.close} title='TP/SL for Position'>
+                    <TakeProfitsModal
+                        closeTPModal={modalCtrl.close}
+                        position={position}
+                    />
+                </Modal>
+            );
+        }
+        return null;
+    };
 
     return (
         <div className={styles.rowContainer}>
@@ -94,7 +126,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 {formatNum(coinPriceMap.get(position.coin) ?? 0)}
             </div>
             <div
-                onClick={shareModalCtrl.open}
+                onClick={openShareModal}
                 className={`${styles.cell} ${styles.pnlCell}`}
                 style={{
                     color:
@@ -137,6 +169,9 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {getTpSl()}
+                <button onClick={openTpSlModal}>
+                    <LuPen color='var(--text1)' size={10} />
+                </button>
             </div>
             <div className={`${styles.cell} ${styles.closeCell}`}>
                 <div className={styles.actionContainer}>
@@ -144,9 +179,7 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                     <button className={styles.actionButton}>Market</button>
                 </div>
             </div>
-            {shareModalCtrl.isOpen && (
-                <ShareModal close={shareModalCtrl.close} position={position} />
-            )}
+            {modalCtrl.isOpen && renderModalContent()}
         </div>
     );
 }

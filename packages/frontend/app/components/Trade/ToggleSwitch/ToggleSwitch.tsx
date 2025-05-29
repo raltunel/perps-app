@@ -6,6 +6,7 @@ export interface ToggleSwitchProps {
     onToggle: (newState?: boolean) => void;
     label?: string;
     hideLabel?: boolean;
+    reverse?: boolean;
 }
 
 export default function ToggleSwitch(props: ToggleSwitchProps) {
@@ -14,6 +15,7 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
         onToggle,
         label = 'Hide Small Balances',
         hideLabel = false,
+        reverse,
     } = props;
 
     const handleToggle = () => {
@@ -21,7 +23,9 @@ export default function ToggleSwitch(props: ToggleSwitchProps) {
     };
 
     return (
-        <div className={styles.toggleContainer}>
+        <div
+            className={`${styles.toggleContainer} ${reverse ? styles.reverse : ''}`}
+        >
             {!hideLabel && label && (
                 <span className={styles.toggleLabel}>{label}</span>
             )}
