@@ -14,8 +14,6 @@
 }
 
 .symbolInfoFieldsWrapper {
-    /* flex-grow: auto; */
-    /* max-width: calc(100% - 10rem); */
     display: grid;
     grid-template-columns: repeat(7, auto) !important;
     gap: var(--gap-m);

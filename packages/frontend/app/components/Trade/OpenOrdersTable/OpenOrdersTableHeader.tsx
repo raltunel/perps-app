@@ -5,7 +5,7 @@ import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
-    key: string;
+    key: OrderDataSortBy;
     sortable: boolean;
     className: string;
 }
@@ -13,7 +13,7 @@ export interface HeaderCell {
 interface OpenOrdersTableHeaderProps {
     sortBy: OrderDataSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: OrderDataSortBy) => void;
 }
 
 export default function OpenOrdersTableHeader({

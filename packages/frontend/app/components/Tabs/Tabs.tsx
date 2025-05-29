@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './Tabs.module.css';
 import { WsChannels } from '~/utils/Constants';
+import styles from './Tabs.module.css';
 
 interface TabProps {
     label: string;
@@ -56,6 +56,7 @@ export interface TabsProps {
     layoutIdPrefix?: string;
     wide?: boolean;
     flex?: boolean;
+    staticHeight?: string;
 }
 
 export default function Tabs(props: TabsProps) {
@@ -68,6 +69,7 @@ export default function Tabs(props: TabsProps) {
         layoutIdPrefix = 'tabIndicator',
         wide = false,
         flex = false,
+        staticHeight = 'auto',
     } = props;
 
     const {
@@ -75,6 +77,7 @@ export default function Tabs(props: TabsProps) {
         userBalances: { length: balancesCount },
         positions: { length: positionsCount },
         userOrders: { length: openOrdersCount },
+        activeTwaps: { length: activeTwapsCount },
     } = useTradeDataStore();
 
     const webDataFetched = useMemo(() => {
@@ -105,6 +108,8 @@ export default function Tabs(props: TabsProps) {
             openOrdersCount > 0
         ) {
             label = `Open Orders (${openOrdersCount})`;
+        } else if (label === 'TWAP' && webDataFetched && activeTwapsCount > 0) {
+            label = `TWAP (${activeTwapsCount})`;
         }
         return label;
     };
@@ -225,6 +230,7 @@ export default function Tabs(props: TabsProps) {
         <div
             {...(wrapperId ? { id: wrapperId } : {})}
             className={styles.tabsContainer}
+            style={{ height: staticHeight }}
         >
             <div
                 className={`${styles.tabsWrapper} ${canScrollLeft ? styles.showLeftFade : ''} ${canScrollRight ? styles.showRightFade : ''}`}

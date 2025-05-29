@@ -19,10 +19,24 @@
 
 .symbolInfoFieldLabel {
     color: var(--text2);
-    padding-right: 1rem;
+    padding-right: var(--padding-m);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+.tooltip {
+    width: 15px;
+    animation: fadeIn 0.1s ease-in-out;
+}
+.tooltip svg {
+    display: none;
 }
 
 .symbolInfoFieldValue {
     color: var(--text1);
     margin-top: 0.2rem;
+}
+.symbolInfoField:hover .tooltip svg {
+    display: flex;
 }

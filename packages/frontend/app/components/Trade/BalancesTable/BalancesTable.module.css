@@ -25,26 +25,6 @@
     z-index: 10;
 }
 
-.tableWrapper {
-    width: 100%;
-    height: 100%;
-    overflow-x: auto;
-    border-radius: var(--radius-s);
-    padding-bottom: var(--padding-s);
-
-    display: flex;
-    flex-direction: column;
-}
-
-.tableBody {
-    height: 100%;
-    overflow-y: scroll;
-    padding-bottom: var(--padding-m);
-}
-.tableBody::-webkit-scrollbar {
-    display: none;
-}
-
 .cell {
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
