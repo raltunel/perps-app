@@ -35,6 +35,7 @@ import { RiBarChartHorizontalLine } from 'react-icons/ri';
 import { LuOctagonX } from 'react-icons/lu';
 import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
+import { useKeydown } from '~/hooks/useKeydown';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -492,15 +493,18 @@ export default function OrderInput() {
 
     const [showLaunchpad, setShowLaunchpad] = useState<boolean>(true);
 
+    useKeydown('Escape', () => setShowLaunchpad(false));
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
                 <div className={styles.launchpad}>
                     <header>
-                        <div>
-                            <MdKeyboardArrowLeft
-                                onClick={() => setShowLaunchpad(false)}
-                            />
+                        <div
+                            className={styles.exit_launchpad}
+                            onClick={() => setShowLaunchpad(false)}
+                            >
+                            <MdKeyboardArrowLeft />
                         </div>
                         <h3>Order Types</h3>
                         {/* empty <div> helps with spacing */}

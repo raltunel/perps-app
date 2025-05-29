@@ -160,16 +160,31 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-s);
+    padding: var(--padding-s) 0px;
     font-size: var(--font-size-m);
 }
 
 .launchpad > header > div {
-    width: 20px;
+    width: 24px;
 }
 
-.launchpad > header > div > svg {
+.exit_launchpad {
     cursor: pointer;
+}
+
+.exit_launchpad {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    --exit-launchpad-box-size: 24px;
+    width: var(--exit-launchpad-box-size);
+    height: var(--exit-launchpad-box-size);
+    border-radius: var(--radius-xs);
+}
+
+.exit_launchpad:hover {
+    background-color: var(--bg-dark3);
 }
 
 .launchpad_clickables {
@@ -182,6 +197,7 @@
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--accent1) transparent;
+    scrollbar-gutter: auto;
 }
 
 .launchpad_clickables::-webkit-scrollbar {
