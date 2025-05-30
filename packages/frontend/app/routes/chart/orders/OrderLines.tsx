@@ -83,7 +83,7 @@ export default function OrderLines({ overlayCanvasRef }: OrderLinesProps) {
 
     return (
         <>
-            <LineComponent key='pnl' lines={combinedData} />;
+            <LineComponent key='pnl' lines={combinedData} />
             <LabelComponent
                 key='pnl-label'
                 lines={combinedData}
