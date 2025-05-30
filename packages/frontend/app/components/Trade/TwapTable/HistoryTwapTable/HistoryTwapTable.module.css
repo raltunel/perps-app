@@ -25,6 +25,7 @@
 }
 
 .cell {
+    width: 100%;
     font-size: var(--font-size-s);
     color: var(--text1);
     white-space: nowrap;
@@ -33,6 +34,7 @@
 }
 
 .headerCell {
+    width: 100%;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs);
     display: flex;
@@ -69,6 +71,34 @@
 /* Empty values */
 .emptyValue {
     color: var(--text2, #6a6a6d);
+}
+
+.totalSizeCell {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end !important;
+}
+
+.executedSizeCell {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end !important;
+}
+
+.averagePriceCell,
+.reduceOnlyCell,
+.randomizeCell {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+.coinCell,
+.totalRuntimeCell,
+.reduceOnlyCell,
+.randomizeCell {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 @media (max-width: 1200px) {
