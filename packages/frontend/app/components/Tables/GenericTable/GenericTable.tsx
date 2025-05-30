@@ -66,6 +66,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
 
     const isClient = useIsClient();
 
+    const [rowLimit, setRowLimit] = useState(slicedLimit);
+
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
             `${id}-tableBody`,
@@ -78,8 +80,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             return;
         }
 
+        // 2px offset has been added to handle edge scrolling cases
         const bottomNotShadowed =
-            tableBody.scrollTop + tableBody.clientHeight >=
+            tableBody.scrollTop + tableBody.clientHeight + 2 >=
             tableBody.scrollHeight;
         if (bottomNotShadowed) {
             actionsContainer?.classList.add(styles.notShadowed);
@@ -88,8 +91,28 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
     }, []);
 
+    const calculateRowCount = () => {
+        const rowHeight = 25;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+
+        if (!tableBody) {
+            return;
+        }
+
+        const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
+
+        if (rowCount > slicedLimit) {
+            setRowLimit(rowCount);
+        } else {
+            setRowLimit(slicedLimit);
+        }
+    };
+
     useEffect(() => {
         checkShadow();
+        calculateRowCount();
 
         let scrollEvent = null;
         const tableBody = document.getElementById(
@@ -115,6 +138,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
         const resizeEvent = () => {
             checkShadow();
+            calculateRowCount();
         };
         window.addEventListener('resize', resizeEvent);
 
@@ -151,8 +175,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 (page + 1) * rowsPerPage,
             );
         }
-        return sortedData.slice(0, slicedLimit);
-    }, [sortedData, pageMode, page, rowsPerPage]);
+        checkShadow();
+        return sortedData.slice(0, rowLimit);
+    }, [sortedData, pageMode, page, rowsPerPage, rowLimit]);
 
     const handleSort = (key: S) => {
         if (sortBy === key) {
