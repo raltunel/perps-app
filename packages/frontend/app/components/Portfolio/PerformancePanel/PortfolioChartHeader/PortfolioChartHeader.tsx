@@ -22,7 +22,7 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
     } = props;
 
     const vaultOptions = [
-        { label: 'Perps', value: 'perps' },
+        { label: 'Perps', value: 'perp' },
         { label: 'Perps + Vaults', value: 'all' },
     ];
 
@@ -65,7 +65,7 @@ const PortfolioChartHeader: React.FC<PortfolioHeaderIF> = (props) => {
                                 setSelectedPeriod({
                                     label: value,
                                     value:
-                                        vaultOptions.find(
+                                        periodOptions.find(
                                             (opt) => opt.label === value,
                                         )?.value || '',
                                 })

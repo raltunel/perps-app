@@ -19,6 +19,8 @@ export interface TabChartContext {
     setAccountValueHistory: React.Dispatch<
         React.SetStateAction<{ time: number; value: number }[] | undefined>
     >;
+    userProfileLineData: any;
+    setUserProfileLineData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
@@ -32,65 +34,93 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         setPnlHistory,
         accountValueHistory,
         setAccountValueHistory,
+        userProfileLineData,
+        setUserProfileLineData,
     } = props;
 
     const { debugWallet } = useDebugStore();
 
     const { fetchUserPortfolio } = useInfoApi();
 
+    const [parsedKey, setParsedKey] = useState<string>();
+
+    const parseUserProfileData = (data: any, key: string) => {
+        const userPositionData = data.get(key) as UserPositionIF;
+
+        if (userPositionData.accountValueHistory) {
+            const accountValueHistory =
+                userPositionData.accountValueHistory.map((accountValue) => {
+                    return {
+                        time: accountValue[0],
+                        value: Number(accountValue[1]),
+                    };
+                });
+
+            setAccountValueHistory(() => accountValueHistory);
+        }
+
+        if (userPositionData.pnlHistory) {
+            const pnlHistory = userPositionData.pnlHistory.map((pnlValue) => {
+                return {
+                    time: pnlValue[0],
+                    value: Number(pnlValue[1]),
+                };
+            });
+
+            setPnlHistory(() => pnlHistory);
+        }
+
+        setParsedKey(() => key);
+    };
+
     useEffect(() => {
         if (debugWallet.address && !isLineDataFetched) {
             fetchUserPortfolio(debugWallet.address).then((data) => {
-                const key =
-                    selectedVault.value === 'perp'
-                        ? 'perp' + selectedPeriod.value
-                        : selectedPeriod.value.toLowerCase();
-
-                const userPositionData = data.get(key) as UserPositionIF;
-
-                if (userPositionData.accountValueHistory) {
-                    const accountValueHistory =
-                        userPositionData.accountValueHistory.map(
-                            (accountValue) => {
-                                return {
-                                    time: accountValue[0],
-                                    value: Number(accountValue[1]),
-                                };
-                            },
-                        );
-
-                    setAccountValueHistory(() => accountValueHistory);
-                }
-
-                if (userPositionData.pnlHistory) {
-                    const pnlHistory = userPositionData.pnlHistory.map(
-                        (pnlValue) => {
-                            return {
-                                time: pnlValue[0],
-                                value: Number(pnlValue[1]),
-                            };
-                        },
-                    );
-
-                    setPnlHistory(() => pnlHistory);
-                }
+                setUserProfileLineData(() => data);
 
                 handleLineDataFetched(true);
             });
         }
     }, [debugWallet.address, isLineDataFetched]);
 
-    return (activeTab === 'Performance' && pnlHistory) ||
-        (activeTab === 'Account Value' && accountValueHistory) ? (
-        <LineChart
-            lineData={
-                activeTab === 'Account Value' ? accountValueHistory : pnlHistory
-            }
-            curve={'step'}
-            chartName={'activeTab'}
-        />
-    ) : (
-        activeTab === 'Collateral' && <CollateralPieChart />
+    useEffect(() => {
+        const key =
+            selectedVault.value === 'perp'
+                ? 'perp' + selectedPeriod.value
+                : selectedPeriod.value === 'AllTime'
+                  ? 'allTime'
+                  : selectedPeriod.value.toLowerCase();
+
+        if (key !== parsedKey && userProfileLineData) {
+            parseUserProfileData(userProfileLineData, key);
+        }
+    }, [
+        userProfileLineData,
+        selectedVault.value,
+        selectedPeriod.value,
+        activeTab,
+    ]);
+
+    return (
+        <>
+            {activeTab === 'Performance' && pnlHistory && (
+                <LineChart
+                    lineData={pnlHistory}
+                    curve={'step'}
+                    chartName={selectedVault.value + selectedPeriod.value}
+                />
+            )}
+
+            {activeTab === 'Account Value' && accountValueHistory && (
+                <LineChart
+                    lineData={accountValueHistory}
+                    curve={'step'}
+                    chartName={selectedVault.value + selectedPeriod.value}
+                />
+            )}
+
+            {activeTab === 'Collateral' && <CollateralPieChart />}
+        </>
     );
 };
 

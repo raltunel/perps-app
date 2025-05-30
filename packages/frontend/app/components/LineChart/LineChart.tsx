@@ -66,6 +66,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 current -= tickDiff;
             }
 
+            console.log(d3.ticks(yScale.domain()[0], yScale.domain()[1], 5));
+
             return ticks;
         }
 
@@ -105,25 +107,41 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const maxPrice = d3.max(lineData, (d) => d.value);
 
         if (minPrice !== undefined && maxPrice !== undefined) {
-            const factor = Math.pow(10, Math.floor(Math.log10(maxPrice))) / 10;
-
             const diff = maxPrice - minPrice;
 
             const padding = diff / 15;
 
-            const roundedMax =
-                Math.ceil((maxPrice + padding) / factor) * factor;
-            const roundedMin =
-                Math.floor((minPrice - padding) / factor) * factor;
+            const ticks = d3.ticks(minPrice - padding, maxPrice + padding, 5);
 
-            const yScale = d3
-                .scaleLinear()
-                .domain([roundedMin, roundedMax])
-                .range([canvasHeight, 0]);
+            setTicks(() => ticks);
 
-            setYScale(() => yScale);
+            const roundedMax = d3.max(
+                d3.ticks(minPrice - padding, maxPrice + padding, 5),
+            );
+            const roundedMin = d3.min(
+                d3.ticks(minPrice - padding, maxPrice + padding, 5),
+            );
+
+            if (roundedMax !== undefined && roundedMin !== undefined) {
+                const topBoundaryCanFit =
+                    maxPrice +
+                    padding *
+                        (maxPrice + padding - roundedMax < padding ? 2 : 1);
+
+                const bottomBoundaryCanFit =
+                    minPrice -
+                    padding *
+                        (minPrice - padding - roundedMin < padding ? 2 : 1);
+
+                const yScale = d3
+                    .scaleLinear()
+                    .domain([bottomBoundaryCanFit, topBoundaryCanFit])
+                    .range([canvasHeight, 0]);
+
+                setYScale(() => yScale);
+            }
         }
-    }, [lineData]);
+    }, [lineData, chartName]);
 
     useEffect(() => {
         const svgXAxis = d3.select('#xAxis');
@@ -134,6 +152,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const fontSize = 'var(--font-size-s)';
 
         if (xScale) {
+            svgXAxis.select('g').remove();
+
             svgXAxis
                 .append('g')
                 .call(d3.axisBottom(xScale).ticks(7))
@@ -151,10 +171,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-size', fontSize);
         }
 
-        if (yScale) {
-            const ticks = formatYAxisTicks();
-
-            setTicks(() => ticks);
+        if (yScale && ticks) {
+            svgYAxis.select('g').remove();
 
             svgYAxis
                 .append('g')
@@ -172,7 +190,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-family', font)
                 .style('font-size', fontSize);
         }
-    }, [yScale !== undefined, xScale !== undefined, numFormat]);
+    }, [yScale, xScale, numFormat, lineData, chartName, ticks]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -182,7 +200,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         if (!context) return;
 
         if (ticks) {
-            let textMeasure = context.measureText(ticks[0].toString()).width;
+            let textMeasure = 30;
 
             ticks?.forEach((tick) => {
                 textMeasure = Math.max(
@@ -191,9 +209,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 );
             });
 
-            setYAxisPadding(() => textMeasure + 40);
+            setYAxisPadding(() => textMeasure + 30);
         }
-    }, [ticks, chartName]);
+    }, [ticks, chartName, lineData]);
 
     useEffect(() => {
         if (yScale && xScale && lineData) {
@@ -220,28 +238,22 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.lineWidth = 2;
             context.strokeStyle = '#7371fc';
             context.stroke();
-        }
-    }, [yScale !== undefined, xScale !== undefined, lineData]);
-
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        if (yScale && xScale) {
-            ctx.beginPath();
 
             ticks?.forEach((tick) => {
-                ctx.moveTo(xScale(xScale.domain()[0]), yScale(tick));
-                ctx.lineTo(xScale(xScale.domain()[1]), yScale(tick));
+                context.moveTo(xScale(xScale.domain()[0]), yScale(tick));
+                context.lineTo(xScale(xScale.domain()[1]), yScale(tick));
             });
-            ctx.strokeStyle = 'rgba(189,189,189,0.15)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
+            context.strokeStyle = 'rgba(189,189,189,0.15)';
+            context.lineWidth = 2;
+            context.stroke();
         }
-    }, [yScale !== undefined, xScale !== undefined, ticks, lineData]);
+    }, [
+        yScale !== undefined,
+        xScale !== undefined,
+        lineData,
+        chartName,
+        ticks,
+    ]);
 
     return (
         <div className={styles.chartWrapper}>

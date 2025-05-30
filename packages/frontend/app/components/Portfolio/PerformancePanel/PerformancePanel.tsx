@@ -47,6 +47,8 @@ export default function PerformancePanel() {
         { time: number; value: number }[] | undefined
     >();
 
+    const [userProfileLineData, setUserProfileLineData] = useState<any>();
+
     useEffect(() => {
         // Initialize tab as empty, then change to Performance after 2 seconds
         const timer = setTimeout(() => {
@@ -107,6 +109,8 @@ export default function PerformancePanel() {
                     setPnlHistory={setPnlHistory}
                     pnlHistory={pnlHistory}
                     accountValueHistory={accountValueHistory}
+                    userProfileLineData={userProfileLineData}
+                    setUserProfileLineData={setUserProfileLineData}
                 />
 
                 {/* {activeTab.toLowerCase()} */}
