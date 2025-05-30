@@ -506,7 +506,7 @@ export default function OrderInput() {
                         <div
                             className={styles.exit_launchpad}
                             onClick={() => setShowLaunchpad(false)}
-                            >
+                        >
                             <MdKeyboardArrowLeft />
                         </div>
                         <h3>Order Types</h3>

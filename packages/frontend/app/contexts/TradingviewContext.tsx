@@ -19,6 +19,7 @@ import {
 import {
     checkDefaultColors,
     customThemes,
+    defaultDrawingToolColors,
     getChartDefaultColors,
     getChartThemeColors,
     priceFormatterFactory,
@@ -248,6 +249,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     priceScale.setMode(0);
                 }
             }
+
+            tvWidget.applyOverrides(defaultDrawingToolColors());
 
             setChart(tvWidget);
         });
