@@ -28,6 +28,7 @@ export enum ApiEndpoints {
     TWAP_HISTORY = 'twapHistory',
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     FUNDING_HISTORY = 'userFunding',
+    USER_PORTFOLIO = 'portfolio',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -200,6 +201,32 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchUserPortfolio = async (
+        address: string,
+    ): Promise<Map<string, {}>> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.USER_PORTFOLIO,
+                user: address,
+            }),
+        });
+
+        const obj = new Map<string, {}>();
+
+        const data = await response.json();
+        if (data && data.length > 0) {
+            for (const [timeframe, position] of data) {
+                obj.set(timeframe, {
+                    ...position,
+                });
+            }
+        }
+
+        return obj;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -208,5 +235,6 @@ export function useInfoApi() {
         fetchTwapSliceFills,
         fetchFundingHistory,
         fetchOpenOrders,
+        fetchUserPortfolio,
     };
 }
