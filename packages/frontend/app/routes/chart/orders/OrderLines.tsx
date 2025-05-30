@@ -8,9 +8,14 @@ import type { IPaneApi } from '~/tv/charting_library';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    canvasSize: any;
 };
 
-export default function OrderLines({ overlayCanvasRef }: OrderLinesProps) {
+export default function OrderLines({
+    overlayCanvasRef,
+    canvasSize,
+}: OrderLinesProps) {
     const { chart } = useTradingView();
 
     const openLines = useOpenOrderLines();
@@ -89,6 +94,7 @@ export default function OrderLines({ overlayCanvasRef }: OrderLinesProps) {
                 lines={combinedData}
                 overlayCanvasRef={overlayCanvasRef}
                 zoomChanged={zoomChanged}
+                canvasSize={canvasSize}
             />
         </>
     );

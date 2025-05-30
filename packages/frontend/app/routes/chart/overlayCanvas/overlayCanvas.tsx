@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import OrderLines from '../orders/OrderLines';
 
@@ -6,6 +6,7 @@ const OverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart } = useTradingView();
 
+    const [canvasSize, setCanvasSize] = useState();
     useEffect(() => {
         if (!chart) return;
 
@@ -30,7 +31,8 @@ const OverlayCanvas: React.FC = () => {
             newCanvas.style.left = '0';
             newCanvas.style.pointerEvents = 'none';
             newCanvas.style.zIndex = '5';
-
+            newCanvas.width = paneCanvas.width;
+            newCanvas.height = paneCanvas.height;
             paneCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
         }
@@ -41,16 +43,23 @@ const OverlayCanvas: React.FC = () => {
             const width = paneCanvas.width;
             const height = paneCanvas.height;
 
-            canvas.width = width;
-            canvas.height = height;
-            canvas.style.width = `${width}px`;
-            canvas.style.height = `${height}px`;
+            if (width !== canvas.width || height !== canvas.height) {
+                canvas.width = width;
+                canvas.style.width = `${width}px`;
+            }
+
+            if (height !== canvas.height) {
+                canvas.height = height;
+                canvas.style.height = `${height}px`;
+            }
         };
 
         updateCanvasSize();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const observer = new ResizeObserver((result: any) => {
+            // updateCanvasSize();
 
-        const observer = new ResizeObserver(() => {
-            updateCanvasSize();
+            setCanvasSize(result);
         });
 
         observer.observe(paneCanvas);
@@ -64,7 +73,7 @@ const OverlayCanvas: React.FC = () => {
         };
     }, [chart]);
 
-    return <OrderLines overlayCanvasRef={canvasRef} />;
+    return <OrderLines overlayCanvasRef={canvasRef} canvasSize={canvasSize} />;
 };
 
 export default OverlayCanvas;

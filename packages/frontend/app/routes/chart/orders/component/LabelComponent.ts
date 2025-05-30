@@ -16,12 +16,15 @@ interface LabelProps {
     lines: LineData[];
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
     zoomChanged: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    canvasSize: any;
 }
 
 const LabelComponent = ({
     lines,
     overlayCanvasRef,
     zoomChanged,
+    canvasSize,
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
 
@@ -35,6 +38,20 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
+            if (overlayCanvasRef.current) {
+                const width = overlayCanvasRef.current.width;
+                const height = overlayCanvasRef.current.height;
+
+                if (
+                    width !== canvasSize[0].contentRect.width ||
+                    height !== canvasSize[0].contentRect.height
+                ) {
+                    overlayCanvasRef.current.width =
+                        canvasSize[0].contentRect.width;
+                    overlayCanvasRef.current.height =
+                        canvasSize[0].contentRect.height;
+                }
+            }
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
             const linesWithLabels = lines.map((line) => {
@@ -93,11 +110,13 @@ const LabelComponent = ({
         };
 
         if (zoomChanged && animationFrameId === null) {
-            const animate = () => {
-                draw();
+            if (animationFrameId === null) {
+                const animate = () => {
+                    draw();
+                    animationFrameId = requestAnimationFrame(animate);
+                };
                 animationFrameId = requestAnimationFrame(animate);
-            };
-            animationFrameId = requestAnimationFrame(animate);
+            }
         } else {
             draw();
         }
@@ -107,7 +126,14 @@ const LabelComponent = ({
                 cancelAnimationFrame(animationFrameId);
             }
         };
-    }, [chart, isChartReady, JSON.stringify(lines), ctx, zoomChanged]);
+    }, [
+        chart,
+        isChartReady,
+        JSON.stringify(lines),
+        ctx,
+        zoomChanged,
+        canvasSize,
+    ]);
 
     function findCancelLabelAtPosition(
         x: number,
