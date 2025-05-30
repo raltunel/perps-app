@@ -12,6 +12,7 @@ import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
+import { useIsClient } from '~/hooks/useIsClient';
 
 interface GenericTableProps<T, S> {
     data: T[];
@@ -21,7 +22,7 @@ interface GenericTableProps<T, S> {
         sortBy?: S,
     ) => React.ReactNode;
     renderRow: (row: T, index: number) => React.ReactNode;
-    sorterMethod: (
+    sorterMethod?: (
         data: T[],
         sortBy: S,
         sortDirection: TableSortDirection,
@@ -62,6 +63,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
+
+    const isClient = useIsClient();
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -106,6 +109,22 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         };
     }, [tableState]);
 
+    useEffect(() => {
+        if (!isClient) {
+            return;
+        }
+        const resizeEvent = () => {
+            checkShadow();
+        };
+        window.addEventListener('resize', resizeEvent);
+
+        return () => {
+            if (isClient) {
+                window.removeEventListener('resize', resizeEvent);
+            }
+        };
+    }, [isClient]);
+
     const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         defaultSortDirection ?? 'desc',
@@ -119,11 +138,11 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     }, [sortBy, sortDirection]);
 
     const sortedData = useMemo(() => {
-        if (sortBy) {
+        if (sortBy && sorterMethod) {
             return [...sorterMethod(data, sortBy, sortDirection)];
         }
         return data;
-    }, [data, sortBy, sortDirection]);
+    }, [data, sortBy, sortDirection, sorterMethod]);
 
     const dataToShow = useMemo(() => {
         if (pageMode) {
@@ -205,9 +224,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                                 className={styles.actionsContainer}
                             >
                                 {sortedData.length > slicedLimit &&
+                                    !pageMode &&
                                     viewAllLink &&
-                                    viewAllLink.length > 0 &&
-                                    !pageMode && (
+                                    viewAllLink.length > 0 && (
                                         <a
                                             href='#'
                                             className={styles.viewAllLink}

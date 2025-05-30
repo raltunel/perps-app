@@ -167,6 +167,32 @@ export interface UserFundingResponseIF {
     };
 }
 
+export interface ActiveTwapIF {
+    coin: string;
+    executedNtl: number;
+    executedSz: number;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    timestamp: number;
+    user: string;
+}
+
+export type ActiveTwapSortBy =
+    | 'coin'
+    | 'executedNtl'
+    | 'executedSz'
+    | 'minutes'
+    | 'randomize'
+    | 'reduceOnly'
+    | 'side'
+    | 'sz'
+    | 'timestamp'
+    | 'user'
+    | undefined;
+
 interface PositionValueIF {
     [0]: number;
     [1]: string;

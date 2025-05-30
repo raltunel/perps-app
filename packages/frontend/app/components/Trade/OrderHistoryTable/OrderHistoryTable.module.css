@@ -45,6 +45,18 @@
 .sortable {
     cursor: pointer;
 }
+.tpslCell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+.tpslCell button {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
 
 @media (max-width: 1400px) {
     .rowContainer,

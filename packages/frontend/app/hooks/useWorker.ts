@@ -1,7 +1,7 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
-import webData2Worker from './workers/webdata2.worker.ts?worker';
 import orderbookWorker from './workers/orderbook.worker.ts?worker';
+import webData2Worker from './workers/webdata2.worker.ts?worker';
 
 export const WORKERS = {
     webData2: webData2Worker,
@@ -79,13 +79,16 @@ export const useWorker = <T>(
         }
     }, [workerKey]);
 
-    const postMessage = useCallback((message: T) => {
-        if (workerRef.current) {
-            workerRef.current.postMessage(message);
-        } else {
-            console.warn('useWorker: Cannot post message, no worker.');
-        }
-    }, []); // relies on the stable ref so no deps here
+    const postMessage = useCallback(
+        (message: T) => {
+            if (workerRef.current) {
+                workerRef.current.postMessage(message);
+            } else {
+                console.warn('useWorker: Cannot post message, no worker.');
+            }
+        },
+        [workerKey],
+    ); // relies on the stable ref so no deps here
 
     return postMessage;
 };
