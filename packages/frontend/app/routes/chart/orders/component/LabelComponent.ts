@@ -15,9 +15,14 @@ import {
 interface LabelProps {
     lines: LineData[];
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    zoomChanged: boolean;
 }
 
-const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
+const LabelComponent = ({
+    lines,
+    overlayCanvasRef,
+    zoomChanged,
+}: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
 
     const ctx = overlayCanvasRef.current?.getContext('2d');
@@ -25,10 +30,9 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
     const [drawnLabels, setDrawnLabels] = useState<LineData[]>([]);
 
     useEffect(() => {
-        if (!chart || !isChartReady) return;
-        if (!ctx) return;
+        if (!chart || !isChartReady || !ctx) return;
 
-        let animationFrameId: number;
+        let animationFrameId: number | null = null;
 
         const draw = () => {
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -76,7 +80,7 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
                 const labelLocations = drawLabel(ctx, {
                     x: xPixel,
                     y: yPricePixel,
-                    labelOptions: labelOptions,
+                    labelOptions,
                 });
 
                 return {
@@ -86,14 +90,24 @@ const LabelComponent = ({ lines, overlayCanvasRef }: LabelProps) => {
             });
 
             setDrawnLabels(linesWithLabels);
-
-            animationFrameId = requestAnimationFrame(draw);
         };
 
-        animationFrameId = requestAnimationFrame(draw);
+        if (zoomChanged && animationFrameId === null) {
+            const animate = () => {
+                draw();
+                animationFrameId = requestAnimationFrame(animate);
+            };
+            animationFrameId = requestAnimationFrame(animate);
+        } else {
+            draw();
+        }
 
-        return () => cancelAnimationFrame(animationFrameId);
-    }, [chart, isChartReady, lines, ctx]);
+        return () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+    }, [chart, isChartReady, JSON.stringify(lines), ctx, zoomChanged]);
 
     function findCancelLabelAtPosition(
         x: number,
