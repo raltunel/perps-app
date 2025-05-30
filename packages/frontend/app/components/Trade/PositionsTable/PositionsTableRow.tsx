@@ -10,6 +10,8 @@ import { LuPen } from 'react-icons/lu';
 import { useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
+import { useNavigate } from 'react-router';
+import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -18,6 +20,8 @@ interface PositionsTableRowProps {
 }
 
 export default function PositionsTableRow(props: PositionsTableRowProps) {
+    const navigate = useNavigate();
+
     const { position } = props;
     const { coinPriceMap } = useTradeDataStore();
     const { formatNum } = useNumFormatter();
@@ -73,9 +77,22 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         modalCtrl.open();
     };
 
+    const openLeverageModal = () => {
+        setModalContent('leverage');
+        modalCtrl.open();
+    };
+
     const renderModalContent = () => {
         if (modalContent === 'share') {
             return <ShareModal close={modalCtrl.close} position={position} />;
+        } else if (modalContent === 'leverage') {
+            return (
+                <LeverageSliderModal
+                    currentLeverage={position.leverage.value}
+                    maxLeverage={position.maxLeverage}
+                    onClose={modalCtrl.close}
+                />
+            );
         } else if (modalContent === 'tpsl') {
             return (
                 <Modal close={modalCtrl.close} title='TP/SL for Position'>
@@ -86,8 +103,15 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 </Modal>
             );
         }
+
         return null;
     };
+
+    const handleCoinClick = () => {
+        // Navigate to the market page for this coin
+        navigate(`/trade/${position.coin.toLowerCase()}`);
+    };
+    console.log(position);
 
     return (
         <div className={styles.rowContainer}>
@@ -95,10 +119,16 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 className={`${styles.cell} ${styles.coinCell}`}
                 style={gradientStyle}
             >
-                <span style={{ color: baseColor }}>{position.coin}</span>
+                <span
+                    style={{ color: baseColor, cursor: 'pointer' }}
+                    onClick={handleCoinClick}
+                >
+                    {position.coin}
+                </span>
                 {position.leverage.value && (
                     <span
                         className={styles.badge}
+                        onClick={openLeverageModal}
                         style={{
                             color: baseColor,
                             backgroundColor: hexToRgba(baseColor, 0.15),
