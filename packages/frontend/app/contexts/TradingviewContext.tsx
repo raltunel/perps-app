@@ -134,17 +134,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
-        if (!chart) return;
-
-        const intervalId = setInterval(() => {
-            const isReady = chart.chart().dataReady();
-            if (isReady) {
-                setIsChartReady(true);
-            }
-        }, 200);
-
-        return () => clearInterval(intervalId);
-    }, [chart]);
+        if (!isChartReady && chart) {
+            const intervalId = setInterval(() => {
+                const isReady = chart.chart().dataReady();
+                setIsChartReady(isReady);
+            }, 200);
+            return () => clearInterval(intervalId);
+        }
+    }, [chart, isChartReady]);
 
     useEffect(() => {
         if (chart) {

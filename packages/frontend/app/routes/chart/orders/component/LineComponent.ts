@@ -54,6 +54,8 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
     const cleanupInProgressRef = useRef(false);
 
+    const intervalsRef = useRef<number[]>([]);
+
     const removeShapeById = async (
         chart: IChartingLibraryWidget,
         id: EntityId,
@@ -283,7 +285,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
     useEffect(() => {
         let isCancelled = false;
-        const intervals: number[] = [];
+        intervalsRef.current = [];
 
         const updateSingleLine = (item: ChartShapeRefs, lineData: LineData) => {
             if (!chart) return;
@@ -373,7 +375,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
                         updateSingleLine(item, lines[i]);
                     }
                 }, 10) as unknown as number;
-                intervals.push(interval);
+                intervalsRef.current.push(interval);
             });
         };
 
@@ -394,7 +396,7 @@ const LineComponent = ({ lines, orderType }: LineProps) => {
 
         return () => {
             isCancelled = true;
-            intervals.forEach(clearInterval);
+            intervalsRef.current.forEach(clearInterval);
         };
     }, [
         JSON.stringify(orderLineItems),
