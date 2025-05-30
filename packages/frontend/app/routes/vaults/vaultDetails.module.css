@@ -31,6 +31,10 @@
     background: var(--bg-dark2);
 }
 
+.vaultCard.zeroPadding {
+    padding: 0;
+}
+
 .vaultCardTitle {
     font-size: var(--font-size-m);
     color: var(--text2);
@@ -39,4 +43,10 @@
 .vaultCardContent {
     font-size: var(--font-size-l);
     color: var(--text1);
+}
+
+.aprLabel {
+    font-size: var(--font-size-m);
+    padding: 0 calc(var(--padding-s));
+    border-radius: calc(var(--radius-s) / 2);
 }
