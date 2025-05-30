@@ -58,6 +58,16 @@
     cursor: pointer;
 }
 
+.sizeCell,
+.filledSizeCell,
+.orderValueCell,
+.priceCell,
+.tpslCell,
+.orderIdCell {
+    display: flex;
+    justify-content: flex-end;
+}
+
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {

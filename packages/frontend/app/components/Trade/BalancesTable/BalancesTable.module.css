@@ -61,6 +61,18 @@
 .sendButton:hover {
     color: var(--text1, #f0f0f8);
 }
+.totalBalanceCell,
+.buyingPowerCell,
+.availableBalanceCell,
+.usdcValueCell {
+    text-align: right;
+    justify-self: end;
+}
+.pnlCell,
+.contractCell {
+    text-align: center;
+    justify-self: center;
+}
 
 /* .coinCell {}
   .totalBalanceCell {}
