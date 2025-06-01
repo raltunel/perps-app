@@ -53,6 +53,7 @@ body {
     height: 100%;
     border-radius: var(--radius-m);
     overflow-y: hidden;
+    min-height: var(--trade-tables-min-height-desktop);
 }
 
 .wallet {
@@ -63,6 +64,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
+    overflow: hidden;
 }
 
 .containerTopLeft {

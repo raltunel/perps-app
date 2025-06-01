@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
+import CollateralPieChart from './CollateralChart/CollateralPieChart';
+import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
+import TabChartContext from './PerformanceChart/TabChartContext';
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
 const PERFORMANCE_METRICS = [
@@ -34,6 +37,18 @@ const MetricsDisplay = React.memo(() => (
 export default function PerformancePanel() {
     const [activeTab, setActiveTab] = useState('');
 
+    const [isLineDataFetched, setIsLineDataFetched] = useState(false);
+
+    const [accountValueHistory, setAccountValueHistory] = useState<
+        { time: number; value: number }[] | undefined
+    >();
+
+    const [pnlHistory, setPnlHistory] = useState<
+        { time: number; value: number }[] | undefined
+    >();
+
+    const [userProfileLineData, setUserProfileLineData] = useState<any>();
+
     useEffect(() => {
         // Initialize tab as empty, then change to Performance after 2 seconds
         const timer = setTimeout(() => {
@@ -47,6 +62,10 @@ export default function PerformancePanel() {
         setActiveTab(tab);
     }, []);
 
+    const handleLineDataFetched = (isDataFetched: boolean) => {
+        setIsLineDataFetched(() => isDataFetched);
+    };
+
     const LoadingContent = useMemo(
         () => (
             <div className={styles.loadingContainer}>
@@ -57,18 +76,47 @@ export default function PerformancePanel() {
         [],
     );
 
-    const TabContent = useMemo(() => {
-        if (!activeTab) return LoadingContent;
+    const [selectedVault, setSelectedVault] = useState<{
+        label: string;
+        value: string;
+    }>({ label: 'Perps', value: 'perp' });
 
-        return (
-            <div className={styles.performanceContainer}>
-                <MetricsDisplay />
-                <motion.div {...animationConfig} className={styles.perfChart}>
-                    {activeTab.toLowerCase()}
-                </motion.div>
-            </div>
-        );
-    }, [activeTab, LoadingContent]);
+    const [selectedPeriod, setSelectedPeriod] = useState<{
+        label: string;
+        value: string;
+    }>({ label: 'All-time', value: 'AllTime' });
+
+    const TabContent_ = !activeTab ? (
+        LoadingContent
+    ) : (
+        <div className={styles.performanceContainer}>
+            <MetricsDisplay />
+            <motion.div {...animationConfig} className={styles.perfChart}>
+                <PortfolioChartHeader
+                    selectedVault={selectedVault}
+                    setSelectedVault={setSelectedVault}
+                    selectedPeriod={selectedPeriod}
+                    setSelectedPeriod={setSelectedPeriod}
+                />
+
+                <TabChartContext
+                    activeTab={activeTab}
+                    selectedVault={selectedVault}
+                    selectedPeriod={selectedPeriod}
+                    handleLineDataFetched={handleLineDataFetched}
+                    isLineDataFetched={isLineDataFetched}
+                    setAccountValueHistory={setAccountValueHistory}
+                    setPnlHistory={setPnlHistory}
+                    pnlHistory={pnlHistory}
+                    accountValueHistory={accountValueHistory}
+                    userProfileLineData={userProfileLineData}
+                    setUserProfileLineData={setUserProfileLineData}
+                />
+
+                {/* {activeTab.toLowerCase()} */}
+            </motion.div>
+        </div>
+    );
 
     return (
         <div className={styles.container}>
@@ -81,7 +129,7 @@ export default function PerformancePanel() {
             />
             <AnimatePresence mode='wait'>
                 <div className={styles.tableContent} key={activeTab}>
-                    {TabContent}
+                    {TabContent_}
                 </div>
             </AnimatePresence>
         </div>

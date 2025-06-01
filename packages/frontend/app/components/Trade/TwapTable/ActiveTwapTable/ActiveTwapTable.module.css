@@ -46,6 +46,7 @@
 }
 
 .cell {
+    width: 100%;
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
     white-space: nowrap;
@@ -54,6 +55,7 @@
 }
 
 .headerCell {
+    width: 100%;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs);
     display: flex;
@@ -77,25 +79,17 @@
 }
 
 /* Specific cell classes */
-.coinCell {
-}
 
-.sizeCell {
-}
-
-.executedSizeCell {
-}
+.sizeCell,
+.executedSizeCell,
 .averagePriceCell {
+    display: flex;
+    justify-content: flex-end;
 }
 .runningTimeCell {
+    display: flex;
+    justify-content: center;
 }
-.reduceOnlyCell {
-}
-.creationTimeCell {
-}
-.terminateCell {
-}
-
 .terminateButton {
     background-color: transparent;
     color: var(--accent1, #7371fc);
