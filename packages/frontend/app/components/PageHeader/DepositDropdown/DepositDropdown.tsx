@@ -9,6 +9,7 @@ import { useMemo } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { motion } from 'framer-motion';
+import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 
 interface propsIF {
     isUserConnected: boolean;
@@ -19,6 +20,8 @@ export default function DepositDropdown(props: propsIF) {
     const { isUserConnected, isDropdown } = props;
 
     const notifications: NotificationStoreIF = useNotificationStore();
+    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
+        usePortfolioModals();
 
     const { accountOverview, selectedCurrency } = useTradeDataStore();
 
@@ -77,89 +80,96 @@ export default function DepositDropdown(props: propsIF) {
     );
 
     return (
-        <div
-            className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
-        >
-            {isUserConnected ? (
-                <div className={styles.actionButtons}>
-                    <button
-                        onClick={() =>
-                            notifications.add({
-                                title: 'Deposit Pending',
-                                message: 'Deposit 420,000 USDC',
-                                icon: 'spinner',
-                            })
-                        }
-                    >
-                        Deposit
-                    </button>
-                    <button
-                        onClick={() =>
-                            notifications.add({
-                                title: 'Deposit Pending',
-                                message: 'Deposit 420,000 USDC',
-                                icon: 'spinner',
-                            })
-                        }
-                    >
-                        Withdraw
-                    </button>
-                </div>
-            ) : (
-                <div className={styles.notConnectedContainer}>
-                    <p className={styles.notConnectedText}>
-                        Connect your wallet to start trading with zero gas.
-                    </p>
-                    <button className={styles.connectButton}>
-                        Connect Wallet
-                    </button>
-                </div>
-            )}
-            <div className={styles.overviewContainer}>
-                <h3>Account Overview</h3>
-                {overviewData.map((data, idx) => (
-                    <div key={idx} className={styles.overviewItem}>
-                        <div className={styles.tooltipContainer}>
-                            <p className={styles.overviewLabel}>{data.label}</p>
-                            <Tooltip
-                                content={data?.tooltipContent}
-                                position='right'
-                            >
-                                {tooltipSvg}
-                            </Tooltip>
-                        </div>
-                        {data.change ? (
-                            <motion.p
-                                key={data.change}
-                                className={styles.value}
-                                initial={{
-                                    color:
-                                        data.change > 0
-                                            ? getBsColor().buy
-                                            : getBsColor().sell,
-                                }}
-                                animate={{
-                                    color: 'var(--text1)',
-                                }}
-                                transition={{
-                                    duration: 0.3,
-                                    ease: 'easeInOut',
-                                }}
-                            >
-                                {data.value}
-                            </motion.p>
-                        ) : (
-                            <p
-                                className={styles.value}
-                                style={{ color: data.color }}
-                            >
-                                {data.value}
-                            </p>
-                        )}
+        <>
+            <div
+                className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
+            >
+                {isUserConnected ? (
+                    <div className={styles.actionButtons}>
+                        <button
+                            onClick={() => {
+                                notifications.add({
+                                    title: 'Deposit Pending',
+                                    message: 'Deposit 420,000 USDC',
+                                    icon: 'spinner',
+                                });
+                                openDepositModal();
+                            }}
+                        >
+                            Deposit
+                        </button>
+                        <button
+                            onClick={() => {
+                                notifications.add({
+                                    title: 'Withdraw Pending',
+                                    message: 'Withdraw 420,000 USDC',
+                                    icon: 'spinner',
+                                });
+                                openWithdrawModal();
+                            }}
+                        >
+                            Withdraw
+                        </button>
                     </div>
-                ))}
+                ) : (
+                    <div className={styles.notConnectedContainer}>
+                        <p className={styles.notConnectedText}>
+                            Connect your wallet to start trading with zero gas.
+                        </p>
+                        <button className={styles.connectButton}>
+                            Connect Wallet
+                        </button>
+                    </div>
+                )}
+                <div className={styles.overviewContainer}>
+                    <h3>Account Overview</h3>
+                    {overviewData.map((data, idx) => (
+                        <div key={idx} className={styles.overviewItem}>
+                            <div className={styles.tooltipContainer}>
+                                <p className={styles.overviewLabel}>
+                                    {data.label}
+                                </p>
+                                <Tooltip
+                                    content={data?.tooltipContent}
+                                    position='right'
+                                >
+                                    {tooltipSvg}
+                                </Tooltip>
+                            </div>
+                            {data.change ? (
+                                <motion.p
+                                    key={data.change}
+                                    className={styles.value}
+                                    initial={{
+                                        color:
+                                            data.change > 0
+                                                ? getBsColor().buy
+                                                : getBsColor().sell,
+                                    }}
+                                    animate={{
+                                        color: 'var(--text1)',
+                                    }}
+                                    transition={{
+                                        duration: 0.3,
+                                        ease: 'easeInOut',
+                                    }}
+                                >
+                                    {data.value}
+                                </motion.p>
+                            ) : (
+                                <p
+                                    className={styles.value}
+                                    style={{ color: data.color }}
+                                >
+                                    {data.value}
+                                </p>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-        </div>
+            {PortfolioModalsRenderer}
+        </>
     );
 }
 
