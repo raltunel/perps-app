@@ -85,7 +85,7 @@
     position: absolute;
     width: var(--sliderknob-width);
     height: var(--sliderknob-width);
-    background-color: transparent;
+    background-color: var(--bg-dark3);
     border-radius: 50%;
     top: 50%;
     transform: translate(-18%, -50%);
@@ -99,9 +99,6 @@
 .sliderKnob.dragging {
     cursor: grabbing;
     transition: none;
-}
-.sliderKnob:active {
-    background: var(--bg-accent1);
 }
 
 .maxPositionContainer {
@@ -126,7 +123,7 @@
 }
 
 .valueLabel {
-    padding: 0 var(--padding-m);
+    padding: 0 var(--padding-xs);
     position: absolute;
     transform: translateX(-50%);
 

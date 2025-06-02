@@ -236,7 +236,9 @@ export default function LeverageSliderModal({
                                     key={index}
                                     onClick={() => setValue(tickValue)}
                                     className={`${styles.valueLabel} ${isActive ? styles.active : styles.inactive}`}
-                                    style={{ left: `${position}%` }}
+                                    style={{
+                                        left: `calc(${position}% * 0.96 + 1%)`,
+                                    }}
                                 >
                                     {tickValue}×
                                 </div>
