@@ -3,6 +3,7 @@ import styles from './OpenOrdersTable.module.css';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { LuPen } from 'react-icons/lu';
 
 export interface OpenOrderData {
     time: string;
@@ -79,6 +80,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {order.isTrigger ? formatNum(order.triggerPx || 0) : '--'}
+                <button>
+                    <LuPen color='var(--text1)' size={10} />
+                </button>
             </div>
             <div className={`${styles.cell} ${styles.cancelCell}`}>
                 <button className={styles.cancelButton} onClick={handleCancel}>

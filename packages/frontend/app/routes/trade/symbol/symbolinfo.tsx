@@ -1,5 +1,3 @@
-'use client';
-
 import { useMemo } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';

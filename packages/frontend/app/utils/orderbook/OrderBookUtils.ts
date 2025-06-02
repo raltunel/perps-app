@@ -1,5 +1,6 @@
 import type { TableSortDirection } from '../CommonIFs';
 import type { SymbolInfoIF } from '../SymbolInfoIFs';
+import type { ActiveTwapIF } from '../UserDataIFs';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -87,6 +88,17 @@ export const getTimeUntilNextHour = () => {
     return `00:${minutes}:${seconds}`;
 };
 
+export const formatDiffAsCountdown = (diff: number) => {
+    const hours = Math.floor(diff / 3600)
+        .toString()
+        .padStart(2, '0');
+    const minutes = Math.floor((diff % 3600) / 60)
+        .toString()
+        .padStart(2, '0');
+    const seconds = (diff % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+};
+
 export const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
     return date.toLocaleString(undefined, {
@@ -98,6 +110,16 @@ export const formatTimestamp = (timestamp: number) => {
         second: '2-digit',
         hour12: false,
     });
+};
+
+export const formatMinuteValue = (value: number) => {
+    if (value <= 60) {
+        return `${value} minutes`;
+    } else if (value <= 1440) {
+        return `${Math.floor(value / 60)} hours`;
+    } else {
+        return `${Math.floor(value / 1440)} days`;
+    }
 };
 
 const decimalPrecision = (precisionNumber: number) => {
@@ -222,4 +244,29 @@ export const sortOrderData = (
         }
     }
     return orderData;
+};
+
+export const genRandomActiveTwap = (): ActiveTwapIF => {
+    const now = new Date();
+
+    return {
+        coin: 'MOODENG',
+        side: 'buy',
+        executedNtl: 229419.626593,
+        executedSz: 729036.0,
+        minutes: 1440,
+        randomize: false,
+        reduceOnly: false,
+        sz: 4394047,
+        timestamp: new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            1,
+            0,
+            0,
+            0,
+        ).getTime(),
+        user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
+    };
 };

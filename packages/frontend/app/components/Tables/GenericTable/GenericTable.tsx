@@ -5,6 +5,7 @@ import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
+import { useIsClient } from '~/hooks/useIsClient';
 
 interface GenericTableProps<T, S> {
     data: T[];
@@ -14,7 +15,7 @@ interface GenericTableProps<T, S> {
         sortBy?: S,
     ) => React.ReactNode;
     renderRow: (row: T, index: number) => React.ReactNode;
-    sorterMethod: (
+    sorterMethod?: (
         data: T[],
         sortBy: S,
         sortDirection: TableSortDirection,
@@ -86,6 +87,92 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
+
+    const isClient = useIsClient();
+
+    const [rowLimit, setRowLimit] = useState(slicedLimit);
+
+    const checkShadow = useCallback(() => {
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+        const actionsContainer = document.getElementById(
+            `${id}-actionsContainer`,
+        ) as HTMLElement;
+
+        if (!tableBody || !actionsContainer) {
+            return;
+        }
+
+        // 2px offset has been added to handle edge scrolling cases
+        const bottomNotShadowed =
+            tableBody.scrollTop + tableBody.clientHeight + 2 >=
+            tableBody.scrollHeight;
+        if (bottomNotShadowed) {
+            actionsContainer?.classList.add(styles.notShadowed);
+        } else {
+            actionsContainer?.classList.remove(styles.notShadowed);
+        }
+    }, []);
+
+    const calculateRowCount = () => {
+        const rowHeight = 25;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+
+        if (!tableBody) {
+            return;
+        }
+
+        const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
+
+        if (rowCount > slicedLimit) {
+            setRowLimit(rowCount);
+        } else {
+            setRowLimit(slicedLimit);
+        }
+    };
+
+    useEffect(() => {
+        checkShadow();
+        calculateRowCount();
+
+        let scrollEvent = null;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+
+        if (tableBody) {
+            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
+                checkShadow();
+            });
+        }
+
+        return () => {
+            if (scrollEvent) {
+                tableBody.removeEventListener('scroll', scrollEvent);
+            }
+        };
+    }, [tableState]);
+
+    useEffect(() => {
+        if (!isClient) {
+            return;
+        }
+        const resizeEvent = () => {
+            checkShadow();
+            calculateRowCount();
+        };
+        window.addEventListener('resize', resizeEvent);
+
+        return () => {
+            if (isClient) {
+                window.removeEventListener('resize', resizeEvent);
+            }
+        };
+    }, [isClient]);
+
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
 
@@ -93,10 +180,12 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         setPage(0);
     }, [sortBy, sortDirection]);
 
-    const sortedData = useMemo(
-        () => (sortBy ? [...sorterMethod(data, sortBy, sortDirection)] : data),
-        [data, sortBy, sortDirection],
-    );
+    const sortedData = useMemo(() => {
+        if (sortBy && sorterMethod) {
+            return [...sorterMethod(data, sortBy, sortDirection)];
+        }
+        return data;
+    }, [data, sortBy, sortDirection, sorterMethod]);
 
     const dataToShow = useMemo(() => {
         if (pageMode) {
@@ -105,8 +194,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 (page + 1) * rowsPerPage,
             );
         }
-        return sortedData.slice(0, slicedLimit);
-    }, [sortedData, pageMode, page, rowsPerPage]);
+        checkShadow();
+        return sortedData.slice(0, rowLimit);
+    }, [sortedData, pageMode, page, rowsPerPage, rowLimit]);
 
     useEffect(() => {
         if (!isFetched) {
@@ -147,18 +237,6 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         e.preventDefault();
         console.log('Exporting CSV');
     };
-
-    const checkShadow = useCallback(() => {
-        const body = document.getElementById(`${id}-tableBody`);
-        const actions = document.getElementById(`${id}-actionsContainer`);
-        if (!body || !actions) return;
-
-        if (body.scrollTop + body.clientHeight >= body.scrollHeight) {
-            actions.classList.add(styles.notShadowed);
-        } else {
-            actions.classList.remove(styles.notShadowed);
-        }
-    }, [id]);
 
     useEffect(() => {
         checkShadow();
@@ -201,9 +279,10 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                                 id={`${id}-actionsContainer`}
                                 className={styles.actionsContainer}
                             >
-                                {!pageMode &&
-                                    sortedData.length > slicedLimit &&
-                                    viewAllLink && (
+                                {sortedData.length > slicedLimit &&
+                                    !pageMode &&
+                                    viewAllLink &&
+                                    viewAllLink.length > 0 && (
                                         <a
                                             href='#'
                                             className={styles.viewAllLink}

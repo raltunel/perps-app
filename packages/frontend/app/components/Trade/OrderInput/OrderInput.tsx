@@ -28,7 +28,22 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { GoZap } from 'react-icons/go';
+import { RiBarChartHorizontalLine } from 'react-icons/ri';
+import { LuOctagonX } from 'react-icons/lu';
+import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
+import { useKeydown } from '~/hooks/useKeydown';
 export interface OrderTypeOption {
+    value: string;
+    label: string;
+    blurb: string;
+    icon: JSX.Element;
+}
+
+export interface ChaseOption {
     value: string;
     label: string;
 }
@@ -36,16 +51,51 @@ export interface OrderTypeOption {
 export type MarginMode = 'cross' | 'isolated' | null;
 
 const marketOrderTypes: OrderTypeOption[] = [
-    { value: 'market', label: 'Market' },
-    { value: 'limit', label: 'Limit' },
-    { value: 'scale', label: 'Scale' },
-    { value: 'stop_limit', label: 'Stop Limit' },
-    { value: 'stop_market', label: 'Stop Market' },
-    { value: 'twap', label: 'TWAP' },
-    { value: 'chase_limit', label: 'Chase Limit' },
+    {
+        value: 'market',
+        label: 'Market',
+        blurb: 'Buy/sell at the current price',
+        icon: <GoZap color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'limit',
+        label: 'Limit',
+        blurb: 'Buy/Sell at a specific price or better',
+        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'stop_market',
+        label: 'Stop Market',
+        blurb: 'Triggers a market order at a set price',
+        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'stop_limit',
+        label: 'Stop Limit',
+        blurb: 'Triggers a limit order at a set price',
+        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'twap',
+        label: 'TWAP',
+        blurb: 'Distributes trades across a specified time period',
+        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'scale',
+        label: 'Scale',
+        blurb: 'Multiple orders at incrementing prices',
+        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
+    },
+    {
+        value: 'chase_limit',
+        label: 'Chase Limit',
+        blurb: 'Adjusts limit price to follow the market',
+        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+    },
 ];
 
-const chaseOptionTypes: OrderTypeOption[] = [
+const chaseOptionTypes: ChaseOption[] = [
     { value: 'bid1ask1', label: 'Bid1/Ask1' },
     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 ];
@@ -87,7 +137,7 @@ export default function OrderInput() {
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 2;
+    const minimumInputValue = 1;
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
@@ -99,6 +149,8 @@ export default function OrderInput() {
 
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
+
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
@@ -418,6 +470,8 @@ export default function OrderInput() {
         ariaLabel: 'Size input',
         useTotalSize,
         symbol,
+        selectedMode,
+        setSelectedMode,
     };
 
     const positionSizeProps = {
@@ -435,134 +489,201 @@ export default function OrderInput() {
         totalOrders: priceRangeTotalOrders,
     };
 
+    // logic to dispatch a notification on demand
     const notifications: NotificationStoreIF = useNotificationStore();
+
+    // bool to handle toggle of order type launchpad mode
+    const [showLaunchpad, setShowLaunchpad] = useState<boolean>(false);
+
+    // hook to bind action to close launchpad to the DOM
+    useKeydown('Escape', () => setShowLaunchpad(false));
 
     return (
         <div className={styles.mainContainer}>
-            <div className={styles.mainContent}>
-                <div
-                    className={styles.orderTypeDropdownContainer}
-                    id='tutorial-order-type'
-                >
-                    <OrderDropdown
-                        options={marketOrderTypes}
-                        value={marketOrderType}
-                        onChange={handleMarketOrderTypeChange}
-                    />
-                    <button
-                        onClick={() => openModalWithContent('margin')}
-                        className={styles.isolatedButton}
-                    >
-                        Isolated <FiChevronDown size={24} />
-                    </button>
-                </div>
-
-                <LeverageSlider {...leverageSliderProps} />
-
-                <div className={styles.inputDetailsDataContainer}>
-                    {inputDetailsData.map((data, idx) => (
+            {showLaunchpad ? (
+                <div className={styles.launchpad}>
+                    <header>
                         <div
-                            key={idx}
-                            className={styles.inputDetailsDataContent}
+                            className={styles.exit_launchpad}
+                            onClick={() => setShowLaunchpad(false)}
                         >
-                            <div className={styles.inputDetailsLabel}>
-                                <span>{data.label}</span>
-                                <Tooltip
-                                    content={data?.tooltipLabel}
-                                    position='right'
-                                >
-                                    <AiOutlineQuestionCircle size={13} />
-                                </Tooltip>
-                            </div>
-                            <span className={styles.inputDetailValue}>
-                                {data.value}
-                            </span>
+                            <MdKeyboardArrowLeft />
                         </div>
-                    ))}
+                        <h3>Order Types</h3>
+                        {/* empty <div> helps with spacing */}
+                        <div />
+                    </header>
+                    <ul className={styles.launchpad_clickables}>
+                        {marketOrderTypes.map((mo: OrderTypeOption) => (
+                            <li
+                                key={JSON.stringify(mo)}
+                                onClick={() => {
+                                    handleMarketOrderTypeChange(mo.value);
+                                    setShowLaunchpad(false);
+                                }}
+                            >
+                                <div className={styles.name_and_icon}>
+                                    {mo.icon}
+                                    <h4>{mo.label}</h4>
+                                </div>
+                                <div>
+                                    <p>{mo.blurb}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
+            ) : (
+                <>
+                    <div className={styles.mainContent}>
+                        <div
+                            className={styles.orderTypeDropdownContainer}
+                            id='tutorial-order-type'
+                        >
+                            <OrderDropdown
+                                options={marketOrderTypes}
+                                value={marketOrderType}
+                                onChange={handleMarketOrderTypeChange}
+                            />
+                            <button
+                                onClick={() => openModalWithContent('margin')}
+                                className={styles.isolatedButton}
+                            >
+                                Isolated <FiChevronDown size={24} />
+                            </button>
+                            <button
+                                className={styles.trade_type_toggle}
+                                onClick={() => setShowLaunchpad(true)}
+                            >
+                                <PiSquaresFour />
+                            </button>
+                        </div>
 
-                {marketOrderType === 'chase_limit' && (
-                    <ChasePrice {...chasePriceProps} />
-                )}
+                        <LeverageSlider {...leverageSliderProps} />
 
-                {showStopPriceComponent && <StopPrice {...stopPriceProps} />}
-                {showPriceInputComponent && <PriceInput {...priceInputProps} />}
-                <SizeInput {...sizeInputProps} />
-                <PositionSize {...positionSizeProps} />
+                        <div className={styles.inputDetailsDataContainer}>
+                            {inputDetailsData.map((data, idx) => (
+                                <div
+                                    key={idx}
+                                    className={styles.inputDetailsDataContent}
+                                >
+                                    <div className={styles.inputDetailsLabel}>
+                                        <span>{data.label}</span>
+                                        <Tooltip
+                                            content={data?.tooltipLabel}
+                                            position='right'
+                                        >
+                                            <AiOutlineQuestionCircle
+                                                size={13}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                    <span className={styles.inputDetailValue}>
+                                        {data.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
 
-                {showPriceRangeComponent && <PriceRange {...priceRangeProps} />}
-                {marketOrderType === 'scale' && priceDistributionButtons}
-                {marketOrderType === 'twap' && <RunningTime />}
+                        {marketOrderType === 'chase_limit' && (
+                            <ChasePrice {...chasePriceProps} />
+                        )}
 
-                <ReduceAndProfitToggle {...reduceAndProfitToggleProps} />
-            </div>
+                        {showStopPriceComponent && (
+                            <StopPrice {...stopPriceProps} />
+                        )}
+                        {showPriceInputComponent && (
+                            <PriceInput {...priceInputProps} />
+                        )}
+                        <SizeInput {...sizeInputProps} />
+                        <PositionSize {...positionSizeProps} />
 
-            <PlaceOrderButtons
-                orderMarketPrice={marketOrderType}
-                openModalWithContent={openModalWithContent}
-                orderValue={orderValue}
-                leverage={leverage}
-            />
+                        {showPriceRangeComponent && (
+                            <PriceRange {...priceRangeProps} />
+                        )}
+                        {marketOrderType === 'scale' &&
+                            priceDistributionButtons}
+                        {marketOrderType === 'twap' && <RunningTime />}
 
-            {appSettingsModal.isOpen && (
-                <Modal
-                    close={appSettingsModal.close}
-                    title={
-                        modalContent === 'margin'
-                            ? 'Margin Mode'
-                            : modalContent === 'scale'
-                              ? 'Scale Options'
-                              : modalContent === 'confirm_buy'
-                                ? 'Confirm Buy Order'
-                                : modalContent === 'confirm_sell'
-                                  ? 'Confirm Sell Order'
-                                  : ''
-                    }
-                >
-                    {modalContent === 'margin' && (
-                        <MarginModal
-                            handleMarginModeChange={handleMarginModeChange}
-                            handleMarginModeConfirm={handleMarginModeConfirm}
-                            activeMargin={activeMargin}
+                        <ReduceAndProfitToggle
+                            {...reduceAndProfitToggleProps}
                         />
-                    )}
+                    </div>
+                    <PlaceOrderButtons
+                        orderMarketPrice={marketOrderType}
+                        openModalWithContent={openModalWithContent}
+                        orderValue={orderValue}
+                        leverage={leverage}
+                    />
+                    {appSettingsModal.isOpen && (
+                        <Modal
+                            close={appSettingsModal.close}
+                            title={
+                                modalContent === 'margin'
+                                    ? 'Margin Mode'
+                                    : modalContent === 'scale'
+                                      ? 'Scale Options'
+                                      : modalContent === 'confirm_buy'
+                                        ? 'Confirm Buy Order'
+                                        : modalContent === 'confirm_sell'
+                                          ? 'Confirm Sell Order'
+                                          : ''
+                            }
+                        >
+                            {modalContent === 'margin' && (
+                                <MarginModal
+                                    handleMarginModeChange={
+                                        handleMarginModeChange
+                                    }
+                                    handleMarginModeConfirm={
+                                        handleMarginModeConfirm
+                                    }
+                                    activeMargin={activeMargin}
+                                />
+                            )}
 
-                    {modalContent === 'scale' && (
-                        <ScaleOrders
-                            totalQuantity={parseFloat(priceRangeTotalOrders)}
-                            minPrice={parseFloat(priceRangeMin)}
-                            maxPrice={parseFloat(priceRangeMax)}
-                            isModal
-                            onClose={appSettingsModal.close}
-                        />
+                            {modalContent === 'scale' && (
+                                <ScaleOrders
+                                    totalQuantity={parseFloat(
+                                        priceRangeTotalOrders,
+                                    )}
+                                    minPrice={parseFloat(priceRangeMin)}
+                                    maxPrice={parseFloat(priceRangeMax)}
+                                    isModal
+                                    onClose={appSettingsModal.close}
+                                />
+                            )}
+                            {modalContent === 'confirm_buy' && (
+                                <ConfirmationModal
+                                    tx='buy'
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Buy / Long Order Pending',
+                                            message:
+                                                'Buying 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        appSettingsModal.close();
+                                    }}
+                                />
+                            )}
+                            {modalContent === 'confirm_sell' && (
+                                <ConfirmationModal
+                                    tx='sell'
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Sell / Short Order Pending',
+                                            message:
+                                                'Selling 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        appSettingsModal.close();
+                                    }}
+                                />
+                            )}
+                        </Modal>
                     )}
-                    {modalContent === 'confirm_buy' && (
-                        <ConfirmationModal
-                            tx='buy'
-                            onClose={() => {
-                                notifications.add({
-                                    title: 'Buy / Long Order Pending',
-                                    message: 'Buying 0.0001 ETH at $2,300',
-                                    icon: 'spinner',
-                                });
-                                appSettingsModal.close();
-                            }}
-                        />
-                    )}
-                    {modalContent === 'confirm_sell' && (
-                        <ConfirmationModal
-                            tx='sell'
-                            onClose={() => {
-                                notifications.add({
-                                    title: 'Sell / Short Order Pending',
-                                    message: 'Selling 0.0001 ETH at $2,300',
-                                    icon: 'spinner',
-                                });
-                                appSettingsModal.close();
-                            }}
-                        />
-                    )}
-                </Modal>
+                </>
             )}
         </div>
     );
