@@ -7,9 +7,10 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import styles from './PositionsTable.module.css';
 import { LuPen } from 'react-icons/lu';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
+import Tooltip from '~/components/Tooltip/Tooltip';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -89,6 +90,14 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         return null;
     };
 
+    const fundingToShow = useMemo(() => {
+        return position.cumFunding.sinceOpen * -1;
+    }, [position.cumFunding.sinceOpen]);
+
+    const fundingTooltipMsg = useMemo(() => {
+        return `All-time: ${formatNum(position.cumFunding.allTime * -1, 2, true, true, true)} Since change: ${formatNum(position.cumFunding.sinceChange * -1, 2, true, true, true)}`;
+    }, [position.cumFunding.allTime, position.cumFunding.sinceChange]);
+
     return (
         <div className={styles.rowContainer}>
             <div
@@ -158,14 +167,16 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 className={`${styles.cell} ${styles.fundingCell}`}
                 style={{
                     color:
-                        position.cumFunding.allTime > 0
+                        fundingToShow > 0
                             ? getBsColor().buy
-                            : position.cumFunding.allTime < 0
+                            : fundingToShow < 0
                               ? getBsColor().sell
                               : 'var(--text2)',
                 }}
             >
-                {formatNum(position.cumFunding.allTime, 2, true, true, true)}
+                <Tooltip content={fundingTooltipMsg} isFixed maxWidth='400px'>
+                    {formatNum(fundingToShow, 2, true, true, true)}
+                </Tooltip>
             </div>
             <div className={`${styles.cell} ${styles.tpslCell}`}>
                 {getTpSl()}
