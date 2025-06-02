@@ -282,9 +282,9 @@ export default function Trade() {
                             </div>
                         </div>
 
-                        <div id='orderBookSection' className={styles.orderBook}>
+                        {/* <div id='orderBookSection' className={styles.orderBook}>
                             <MemoizedOrderBookSection symbol={symbol} />
-                        </div>
+                        </div> */}
                         <div
                             id='tradeModulesSection'
                             className={styles.tradeModules}
