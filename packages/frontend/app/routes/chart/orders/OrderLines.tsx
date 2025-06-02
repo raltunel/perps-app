@@ -88,9 +88,9 @@ export default function OrderLines({
 
     return (
         <>
-            <LineComponent key='pnl' lines={combinedData} />
+            <LineComponent key='lines' lines={combinedData} />
             <LabelComponent
-                key='pnl-label'
+                key='labels'
                 lines={combinedData}
                 overlayCanvasRef={overlayCanvasRef}
                 zoomChanged={zoomChanged}

@@ -63,8 +63,9 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
 export const getPricetoPixel = (
     chart: IChartingLibraryWidget,
     price: number,
+    chartHeight?: number,
 ) => {
-    const textHeight = 15;
+    const textHeight = 24;
     let pixel = 0;
 
     const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
@@ -72,7 +73,9 @@ export const getPricetoPixel = (
     const priceScale = priceScalePane.getMainSourcePriceScale();
     if (priceScale) {
         const priceRange = priceScale.getVisiblePriceRange();
-        const chartHeight = priceScalePane.getHeight();
+        const chartHeightTemp = chartHeight
+            ? chartHeight
+            : priceScalePane.getHeight();
 
         if (!priceRange) return { pixel: 0, chartHeight: 0 };
 
@@ -87,19 +90,19 @@ export const getPricetoPixel = (
             const priceDifference = logMaxPrice - logMinPrice;
             const relativePrice = logPrice - logMinPrice;
             const pixelCoordinate =
-                (relativePrice / priceDifference) * chartHeight;
+                (relativePrice / priceDifference) * chartHeightTemp;
 
-            pixel = chartHeight - pixelCoordinate - textHeight / 2;
+            pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
         } else {
             const priceDifference = maxPrice - minPrice;
             const relativePrice = price - minPrice;
             const pixelCoordinate =
-                (relativePrice / priceDifference) * chartHeight;
+                (relativePrice / priceDifference) * chartHeightTemp;
 
-            pixel = chartHeight - pixelCoordinate - textHeight / 2;
+            pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
         }
 
-        return { pixel: pixel, chartHeight: chartHeight };
+        return { pixel: pixel, chartHeight: chartHeightTemp };
     }
 
     return { pixel: 0, chartHeight: 0 };

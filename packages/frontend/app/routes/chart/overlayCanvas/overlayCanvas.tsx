@@ -6,7 +6,8 @@ const OverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart } = useTradingView();
 
-    const [canvasSize, setCanvasSize] = useState();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [canvasSize, setCanvasSize] = useState<any>();
     useEffect(() => {
         if (!chart) return;
 
@@ -43,23 +44,24 @@ const OverlayCanvas: React.FC = () => {
             const width = paneCanvas.width;
             const height = paneCanvas.height;
 
-            if (width !== canvas.width || height !== canvas.height) {
-                canvas.width = width;
-                canvas.style.width = `${width}px`;
-            }
+            canvas.width = width;
+            canvas.style.width = `${width}px`;
 
-            if (height !== canvas.height) {
-                canvas.height = height;
-                canvas.style.height = `${height}px`;
-            }
+            canvas.height = height;
+            canvas.style.height = `${height}px`;
         };
 
         updateCanvasSize();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const observer = new ResizeObserver((result: any) => {
-            // updateCanvasSize();
-
-            setCanvasSize(result);
+            if (result) {
+                setCanvasSize({
+                    styleWidth: result[0].contentRect.width,
+                    styleHeight: result[0].contentRect.height,
+                    width: paneCanvas.width,
+                    height: paneCanvas.height,
+                });
+            }
         });
 
         observer.observe(paneCanvas);

@@ -39,23 +39,27 @@ const LabelComponent = ({
 
         const draw = () => {
             if (overlayCanvasRef.current) {
-                const width = overlayCanvasRef.current.width;
-                const height = overlayCanvasRef.current.height;
+                const width = overlayCanvasRef.current.style.width;
+                const height = overlayCanvasRef.current.style.height;
 
                 if (
-                    width !== canvasSize[0].contentRect.width ||
-                    height !== canvasSize[0].contentRect.height
+                    width !== canvasSize.styleWidth ||
+                    height !== canvasSize.styleWidth
                 ) {
-                    overlayCanvasRef.current.width =
-                        canvasSize[0].contentRect.width;
-                    overlayCanvasRef.current.height =
-                        canvasSize[0].contentRect.height;
+                    overlayCanvasRef.current.style.width = `${canvasSize.styleWidth}px`;
+                    overlayCanvasRef.current.style.height = `${canvasSize.styleHeight}px`;
+                    overlayCanvasRef.current.width = canvasSize.width;
+                    overlayCanvasRef.current.height = canvasSize.height;
                 }
             }
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
             const linesWithLabels = lines.map((line) => {
-                const yPricePixel = getPricetoPixel(chart, line.yPrice).pixel;
+                const yPricePixel = getPricetoPixel(
+                    chart,
+                    line.yPrice,
+                    canvasSize.height,
+                ).pixel;
                 const timeScale = chart.activeChart().getTimeScale();
                 const chartWidth = Math.floor(timeScale.width());
                 const xPixel = chartWidth * line.xLoc;

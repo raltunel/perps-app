@@ -25,9 +25,9 @@ export function drawLabel(
     ctx: CanvasRenderingContext2D,
     { x, y, labelOptions }: DrawSegmentedRectOptions,
 ) {
-    const height = 15;
+    const height = 24;
     ctx.save();
-    ctx.font = 'bold 10px sans-serif';
+    ctx.font = 'bold 12px sans-serif';
     const padding = 4;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
