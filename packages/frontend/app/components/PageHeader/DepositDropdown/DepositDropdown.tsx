@@ -116,7 +116,9 @@ export default function DepositDropdown(props: propsIF) {
             className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
         >
             {isUserConnected ? (
-                <div className={styles.actionButtons}>
+                <div
+                    className={`${styles.actionButtons} ${!isDropdown ? styles.dropdownActionButtons : ''}`}
+                >
                     <button
                         onClick={() =>
                             notifications.add({
@@ -153,53 +155,57 @@ export default function DepositDropdown(props: propsIF) {
                     </button>
                 </div>
             )}
-            <div
-                ref={scrollRef}
-                className={`${styles.overviewContainer} ${isScrolledToBottom ? styles.scrolledToBottom : ''}`}
-            >
-                <h3>Account Overview</h3>
-                {overviewData.map((data, idx) => (
-                    <div key={idx} className={styles.overviewItem}>
-                        <div className={styles.tooltipContainer}>
-                            <p className={styles.overviewLabel}>{data.label}</p>
-                            <Tooltip
-                                content={data?.tooltipContent}
-                                position='right'
-                            >
-                                {tooltipSvg}
-                            </Tooltip>
+            {isUserConnected && (
+                <div
+                    ref={scrollRef}
+                    className={`${styles.overviewContainer} ${isScrolledToBottom ? styles.scrolledToBottom : ''}`}
+                >
+                    <h3>Account Overview</h3>
+                    {overviewData.map((data, idx) => (
+                        <div key={idx} className={styles.overviewItem}>
+                            <div className={styles.tooltipContainer}>
+                                <p className={styles.overviewLabel}>
+                                    {data.label}
+                                </p>
+                                <Tooltip
+                                    content={data?.tooltipContent}
+                                    position='right'
+                                >
+                                    {tooltipSvg}
+                                </Tooltip>
+                            </div>
+                            {data.change ? (
+                                <motion.p
+                                    key={data.change}
+                                    className={styles.value}
+                                    initial={{
+                                        color:
+                                            data.change > 0
+                                                ? getBsColor().buy
+                                                : getBsColor().sell,
+                                    }}
+                                    animate={{
+                                        color: 'var(--text1)',
+                                    }}
+                                    transition={{
+                                        duration: 0.3,
+                                        ease: 'easeInOut',
+                                    }}
+                                >
+                                    {data.value}
+                                </motion.p>
+                            ) : (
+                                <p
+                                    className={styles.value}
+                                    style={{ color: data.color }}
+                                >
+                                    {data.value}
+                                </p>
+                            )}
                         </div>
-                        {data.change ? (
-                            <motion.p
-                                key={data.change}
-                                className={styles.value}
-                                initial={{
-                                    color:
-                                        data.change > 0
-                                            ? getBsColor().buy
-                                            : getBsColor().sell,
-                                }}
-                                animate={{
-                                    color: 'var(--text1)',
-                                }}
-                                transition={{
-                                    duration: 0.3,
-                                    ease: 'easeInOut',
-                                }}
-                            >
-                                {data.value}
-                            </motion.p>
-                        ) : (
-                            <p
-                                className={styles.value}
-                                style={{ color: data.color }}
-                            >
-                                {data.value}
-                            </p>
-                        )}
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

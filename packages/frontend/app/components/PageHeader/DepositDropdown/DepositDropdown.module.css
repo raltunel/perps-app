@@ -1,7 +1,7 @@
 .container {
     --container-width: 303px;
     --container-height: 300px;
-    --overview-container-height: 80px;
+    --overview-container-height: 60%;
 
     width: auto;
     height: auto;
@@ -14,6 +14,7 @@
 }
 .container,
 .dropdownContainer {
+    height: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
@@ -35,6 +36,11 @@
 .actionButtons {
     display: flex;
     flex-direction: column;
+    gap: var(--gap-s);
+}
+.dropdownActionButtons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--gap-s);
 }
 
@@ -74,8 +80,10 @@
 }
 
 .notConnectedContainer {
+    height: 100%;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     gap: var(--radius-s);
 }
 .notConnectedText {
@@ -98,13 +106,13 @@
     position: relative;
 
     /* Default state - show fade */
-    mask: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+    /* mask: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
     -webkit-mask: linear-gradient(
         to bottom,
         black 0%,
         black 70%,
         transparent 100%
-    );
+    ); */
 
     transition:
         mask 0.2s ease,
@@ -150,12 +158,4 @@
     color: var(--text1, #f0f0f8);
     text-align: center;
     font-size: var(--font-size-s, 12px);
-}
-
-@media (min-width: 1600px) {
-    .overviewContainer {
-        height: auto;
-        mask: none;
-        -webkit-mask: none;
-    }
 }
