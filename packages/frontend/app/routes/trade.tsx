@@ -21,7 +21,7 @@ import { useTutorial } from '~/hooks/useTutorial';
 const MemoizedOrderInput = memo(OrderInput);
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
-const MemoizedOrderBookSection = memo(OrderBookSection);
+// const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
 
 type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
@@ -152,36 +152,36 @@ export default function Trade() {
         );
     }, [activeTab, switchTab]);
 
-    // Mobile views with lazy loading
-    const mobileOrderBookView = useMemo(
-        () => (
-            <div className={styles.mobileOnlyOrderBook}>
-                {(activeTab === 'book' || visibilityRefs.current.book) && (
-                    <MemoizedOrderBookSection
-                        symbol={symbol}
-                        mobileView={true}
-                        mobileContent='orderBook'
-                    />
-                )}
-            </div>
-        ),
-        [symbol, activeTab],
-    );
+    // // Mobile views with lazy loading
+    // const mobileOrderBookView = useMemo(
+    //     () => (
+    //         <div className={styles.mobileOnlyOrderBook}>
+    //             {(activeTab === 'book' || visibilityRefs.current.book) && (
+    //                 <MemoizedOrderBookSection
+    //                     symbol={symbol}
+    //                     mobileView={true}
+    //                     mobileContent='orderBook'
+    //                 />
+    //             )}
+    //         </div>
+    //     ),
+    //     [symbol, activeTab],
+    // );
 
-    const mobileRecentTradesView = useMemo(
-        () => (
-            <div className={styles.mobileOnlyRecentTrades}>
-                {(activeTab === 'recent' || visibilityRefs.current.recent) && (
-                    <MemoizedOrderBookSection
-                        symbol={symbol}
-                        mobileView={true}
-                        mobileContent='recentTrades'
-                    />
-                )}
-            </div>
-        ),
-        [symbol, activeTab],
-    );
+    // const mobileRecentTradesView = useMemo(
+    //     () => (
+    //         <div className={styles.mobileOnlyRecentTrades}>
+    //             {(activeTab === 'recent' || visibilityRefs.current.recent) && (
+    //                 <MemoizedOrderBookSection
+    //                     symbol={symbol}
+    //                     mobileView={true}
+    //                     mobileContent='recentTrades'
+    //                 />
+    //             )}
+    //         </div>
+    //     ),
+    //     [symbol, activeTab],
+    // );
 
     // Mobile view
     if (isMobile && symbol) {
@@ -219,22 +219,22 @@ export default function Trade() {
                 </div>
 
                 {/* Book section - Shows ONLY Order Book */}
-                <div
+                {/* <div
                     className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                     style={{ display: activeTab === 'book' ? 'block' : 'none' }}
                 >
                     {activeTab === 'book' && mobileOrderBookView}
-                </div>
+                </div> */}
 
                 {/* Recent trades section - Shows ONLY Recent Trades */}
-                <div
+                {/* <div
                     className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
                     style={{
                         display: activeTab === 'recent' ? 'block' : 'none',
                     }}
                 >
                     {activeTab === 'recent' && mobileRecentTradesView}
-                </div>
+                </div> */}
 
                 {/* Positions section */}
                 <div
@@ -282,9 +282,9 @@ export default function Trade() {
                             </div>
                         </div>
 
-                        {/* <div id='orderBookSection' className={styles.orderBook}>
-                            <MemoizedOrderBookSection symbol={symbol} />
-                        </div> */}
+                        <div id='orderBookSection' className={styles.orderBook}>
+                            {/* <MemoizedOrderBookSection symbol={symbol} /> */}
+                        </div>
                         <div
                             id='tradeModulesSection'
                             className={styles.tradeModules}
