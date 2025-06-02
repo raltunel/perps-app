@@ -1,10 +1,23 @@
 .text_input {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 200px 200px 1fr;
+    align-items: center;
+    gap: var(--gap-m);
+    height: 32px;
+    user-select: none;
 }
 
-.text_input > label {
-    flex-wrap: nowrap;
+.text_input > input {
+    padding: 4px 8px;
+    background-color: var(--bg-dark3);
+    border: none;
+    outline: none;
+    border-radius: var(--radius-s);
+    color: var(--text1);
+}
+
+.text_input > p {
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    user-select: none;
 }

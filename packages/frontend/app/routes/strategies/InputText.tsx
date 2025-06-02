@@ -14,6 +14,7 @@ export default function InputText(props: propsIF) {
     const {
         label,
         inputId,
+        blurb,
         handleChange,
         initialVal = '',
         placeholder = '',
@@ -30,6 +31,7 @@ export default function InputText(props: propsIF) {
                     handleChange(e.currentTarget.value)
                 }
             />
+            <p>{blurb}</p>
         </div>
     );
 }
