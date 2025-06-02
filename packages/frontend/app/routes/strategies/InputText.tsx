@@ -35,18 +35,18 @@ export default function InputText(props: propsIF) {
                 />
             }
             { Array.isArray(data.input) &&
-                <div>
+                <div className={styles.dropdown}>
                     <button onClick={() => setIsOpen(!isOpen)}>
                         Hi there!
                     </button>
                     { isOpen &&
-                        <ol>
+                        <ul>
                             {data.input.map(
                                 (inp: string) => (<li>
                                     {inp}
                                 </li>)
                             )}
-                        </ol>
+                        </ul>
                     }
                 </div>
             }
