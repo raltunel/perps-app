@@ -35,9 +35,20 @@ export default function InputText(props: propsIF) {
                 />
             }
             { Array.isArray(data.input) &&
-                <button onClick={() => setIsOpen(!isOpen)}>
-                    Hi there!
-                </button>
+                <div>
+                    <button onClick={() => setIsOpen(!isOpen)}>
+                        Hi there!
+                    </button>
+                    { isOpen &&
+                        <ol>
+                            {data.input.map(
+                                (inp: string) => (<li>
+                                    {inp}
+                                </li>)
+                            )}
+                        </ol>
+                    }
+                </div>
             }
             <p>{data.blurb}</p>
         </div>
