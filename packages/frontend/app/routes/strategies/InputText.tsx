@@ -4,7 +4,6 @@ import type { textInputIF } from './createStrategy';
 
 interface propsIF {
     data: textInputIF;
-    inputId: string;
     handleChange: (text: string) => void;
     initialVal?: string;
 }
@@ -12,16 +11,19 @@ interface propsIF {
 export default function InputText(props: propsIF) {
     const {
         data,
-        inputId,
         handleChange,
         initialVal = '',
     } = props;
 
+    const idForDOM: string = 'CREATE_STRATEGY_'
+        + data.label.toUpperCase().replace(' ', '_');
+
     return (
         <div className={styles.text_input}>
-            <label htmlFor={inputId}>{data.label}</label>
+            <label htmlFor={idForDOM}>{data.label}</label>
             <input
                 type='text'
+                id={idForDOM}
                 defaultValue={initialVal}
                 placeholder={data.placeholder}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>

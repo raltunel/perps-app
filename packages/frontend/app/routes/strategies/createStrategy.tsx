@@ -84,45 +84,38 @@ export default function createStrategy() {
             <section className={styles.create_strategy_inputs}>
                 <InputText
                     data={inputData.name}
-                    inputId='CREATE_STRATEGY_STRATEGY_NAME'
                     handleChange={(text: string) => handleInput(nameRef, text)}
                 />
                 <InputText
                     data={inputData.market}
-                    inputId='CREATE_STRATEGY_MARKET'
                     handleChange={(text: string) =>
                         handleInput(marketRef, text)
                     }
                 />
                 <InputText
                     data={inputData.distance}
-                    inputId='CREATE_STRATEGY_DISTANCE'
                     handleChange={(text: string) =>
                         handleInput(distanceRef, text)
                     }
                 />
                 <InputText
                     data={inputData.distanceType}
-                    inputId='CREATE_STRATEGY_DISTANCE_TYPE'
                     handleChange={(text: string) =>
                         handleInput(distanceTypeRef, text)
                     }
                 />
                 <InputText
                     data={inputData.side}
-                    inputId='CREATE_STRATEGY_SIDE'
                     handleChange={(text: string) => handleInput(sideRef, text)}
                 />
                 <InputText
                     data={inputData.totalSize}
-                    inputId='CREATE_STRATEGY_TOTAL_SIZE'
                     handleChange={(text: string) =>
                         handleInput(totalSizeRef, text)
                     }
                 />
                 <InputText
                     data={inputData.orderSize}
-                    inputId='CREATE_STRATEGY_ORDER_SIZE'
                     handleChange={(text: string) =>
                         handleInput(orderSizeRef, text)
                     }
