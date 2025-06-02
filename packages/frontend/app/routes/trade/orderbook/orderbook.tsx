@@ -45,7 +45,6 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
-
         return dummyOrderRow?.getBoundingClientRect().height || 16;
     }, []);
 
@@ -67,6 +66,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const { getBsColor } = useAppSettings();
 
     const { buys, sells, setOrderBook } = useOrderBookStore();
+
+    const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const buyPlaceHolderCount = useMemo(() => {
         return Math.max(orderCount - buys.length, 0);
@@ -156,7 +157,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 }
             });
         return slots;
-    }, [userSymbolOrders, filledResolution.current, JSON.stringify(buySlots)]);
+    }, [userSymbolOrders, buySlots.join(',')]);
 
     const userSellSlots: Set<string> = useMemo(() => {
         if (!filledResolution.current) {
@@ -195,14 +196,15 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 }
             });
         return slots;
-    }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
+    }, [userSymbolOrders, sellSlots.join(',')]);
 
     const handleOrderBookWorkerResult = useCallback(
         ({ data }: { data: OrderBookOutput }) => {
             setOrderBook(data.buys, data.sells);
             setOrderBookState(TableState.FILLED);
+            filledResolution.current = selectedResolution;
         },
-        [setOrderBook],
+        [selectedResolution],
     );
 
     const postOrderBookRaw = useWorker<OrderBookOutput>(
@@ -237,13 +239,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            const timeoutId = setTimeout(() => {
-                filledResolution.current = selectedResolution;
-            }, 200);
-
             return () => {
                 unsubscribe();
-                clearTimeout(timeoutId);
             };
         }
     }, [selectedResolution, info]);
@@ -271,6 +268,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
+            if (rowLockTimeoutRef.current) {
+                clearTimeout(rowLockTimeoutRef.current);
+            }
             lockOrderBook.current = true;
             if (type === OrderRowClickTypes.PRICE) {
                 setObChosenPrice(order.px);
@@ -289,12 +289,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 setObChosenAmount(amount);
             }
 
-            const timeout = setTimeout(() => {
+            rowLockTimeoutRef.current = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
-            return () => {
-                clearTimeout(timeout);
-            };
         },
         [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
     );
