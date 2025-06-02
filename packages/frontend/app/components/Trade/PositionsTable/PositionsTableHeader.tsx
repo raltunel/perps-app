@@ -26,67 +26,67 @@ export default function PositionsTableHeader({
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            className: 'coinCell',
+            className: styles.coinCell,
         },
         {
             name: 'Size',
             key: 'size',
             sortable: true,
-            className: 'sizeCell',
+            className: styles.sizeCell,
         },
         {
             name: 'Position Value',
             key: 'positionValue',
             sortable: true,
-            className: 'positionValueCell',
+            className: styles.positionValueCell,
         },
         {
             name: 'Entry Price',
             key: 'entryPrice',
             sortable: true,
-            className: 'entryPriceCell',
+            className: styles.entryPriceCell,
         },
         {
             name: 'Mark Price',
             key: 'markPrice',
             sortable: true,
-            className: 'markPriceCell',
+            className: styles.markPriceCell,
         },
         {
             name: 'PNL (ROE%)',
             key: 'pnl',
             sortable: true,
-            className: 'pnlCell',
+            className: styles.pnlCell,
         },
         {
             name: 'Liq. Price',
             key: 'liqPrice',
             sortable: true,
-            className: 'liqPriceCell',
+            className: styles.liqPriceCell,
         },
         {
             name: 'Margin',
             key: 'margin',
             sortable: true,
-            className: 'marginCell',
+            className: styles.marginCell,
         },
         {
             name: 'Funding',
             key: 'funding',
             sortable: true,
-            className: 'fundingCell',
+            className: styles.fundingCell,
         },
         {
             name: 'TP/SL',
             key: 'tpsl',
             sortable: false,
-            className: 'tpslCell',
+            className: styles.tpslCell,
         },
         {
             name: 'Close',
             key: 'close',
             sortable: false,
-            className: 'closeCell',
+            className: styles.closeCell,
         },
     ];
 
@@ -95,7 +95,7 @@ export default function PositionsTableHeader({
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
+                    className={`${styles.cell} ${styles.headerCell} ${header.className} ${header.sortable ? styles.sortable : ''}`}
                     onClick={() => {
                         if (header.sortable) {
                             sortClickHandler(header.key as PositionDataSortBy);
