@@ -60,9 +60,8 @@ const LabelComponent = ({
                     line.yPrice,
                     canvasSize.height,
                 ).pixel;
-                const timeScale = chart.activeChart().getTimeScale();
-                const chartWidth = Math.floor(timeScale.width());
-                const xPixel = chartWidth * line.xLoc;
+
+                const xPixel = canvasSize.width * line.xLoc;
 
                 const labelOptions = [
                     {
@@ -89,7 +88,7 @@ const LabelComponent = ({
                         ? [
                               {
                                   type: 'Cancel' as LabelType,
-                                  text: 'X',
+                                  text: ' X ',
                                   backgroundColor: '#000000',
                                   textColor: '#FFFFFF',
                                   borderColor: '#3C91FF',
@@ -183,8 +182,14 @@ const LabelComponent = ({
                     const rect = paneCanvas?.getBoundingClientRect();
 
                     if (rect) {
-                        const offsetX = params.clientX - rect.left;
-                        const offsetY = params.clientY - rect.top;
+                        const cssOffsetX = params.clientX - rect.left;
+                        const cssOffsetY = params.clientY - rect.top;
+
+                        const scaleY = canvasSize.height / rect.height;
+                        const scaleX = canvasSize.width / rect.width;
+
+                        const offsetX = cssOffsetX * scaleX;
+                        const offsetY = cssOffsetY * scaleY;
 
                         const found = findCancelLabelAtPosition(
                             offsetX,
@@ -193,7 +198,7 @@ const LabelComponent = ({
                         );
 
                         if (found) {
-                            console.log(found.parentLine);
+                            console.log(found.parentLine.textValue);
                         }
                     }
                 }
