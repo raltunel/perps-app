@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
 import type { textInputIF } from './createStrategy';
 
@@ -18,6 +18,8 @@ export default function InputText(props: propsIF) {
     const idForDOM: string = 'CREATE_STRATEGY_'
         + data.label.toUpperCase().replace(' ', '_');
 
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
     return (
         <div className={styles.text_input}>
             <label htmlFor={idForDOM}>{data.label}</label>
@@ -33,9 +35,7 @@ export default function InputText(props: propsIF) {
                 />
             }
             { Array.isArray(data.input) &&
-                <button
-                    
-                >
+                <button onClick={() => setIsOpen(!isOpen)}>
                     Hi there!
                 </button>
             }
