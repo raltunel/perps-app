@@ -25,6 +25,7 @@
 }
 
 .cell {
+    width: 100%;
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
     white-space: nowrap;
@@ -33,6 +34,7 @@
 }
 
 .headerCell {
+    width: 100%;
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs);
     display: flex;
@@ -68,6 +70,14 @@
     color: var(--text1);
 }
 
+.priceCell,
+.sizeCell,
+.tradeValueCell,
+.feeCell,
+.closedPnlCell {
+    display: flex;
+    justify-content: flex-end;
+}
 @media (max-width: 1200px) {
     .rowContainer,
     .headerContainer {

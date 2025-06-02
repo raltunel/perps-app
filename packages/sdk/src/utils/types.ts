@@ -627,7 +627,6 @@ export interface UserActiveTwap {
 export interface UserActiveTwapData {
     0: number;
     1: UserActiveTwap;
-
 }
 export interface OpenOrderRawData {
     coin: string;
