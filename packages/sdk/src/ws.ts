@@ -294,6 +294,7 @@ export class WebsocketManager {
     };
 
     private onClose = () => {
+        console.log('onClose');
         this.log('onClose');
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {

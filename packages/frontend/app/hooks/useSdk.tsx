@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useIsClient } from './useIsClient';
 import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 type SdkContextType = {
     info: Info | null;
@@ -23,6 +24,8 @@ export const SdkProvider: React.FC<{
 
     const [info, setInfo] = useState<Info | null>(null);
     const [exchange, setExchange] = useState<Exchange | null>(null);
+
+    const { internetConnected } = useTradeDataStore();
 
     // commit to trigger deployment
 
@@ -53,7 +56,11 @@ export const SdkProvider: React.FC<{
         } else {
             exchange.setEnvironment(environment);
         }
-    }, [isClient, environment]);
+        if (!internetConnected) {
+            setInfo(null);
+            setExchange(null);
+        }
+    }, [isClient, environment, internetConnected]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>
