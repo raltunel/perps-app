@@ -188,7 +188,7 @@ export default function Trade() {
         return (
             <>
                 <TradeRouteHandler />
-                <WebDataConsumer />
+                {/* <WebDataConsumer /> */}
                 <div className={styles.symbolInfoContainer}>
                     <MemoizedSymbolInfo />
                 </div>
@@ -255,7 +255,7 @@ export default function Trade() {
     return (
         <>
             <TradeRouteHandler />
-            <WebDataConsumer />
+            {/* <WebDataConsumer /> */}
             {symbol && (
                 <div className={styles.container}>
                     <section
