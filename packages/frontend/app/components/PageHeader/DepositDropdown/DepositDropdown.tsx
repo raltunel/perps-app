@@ -5,18 +5,21 @@ import {
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { motion } from 'framer-motion';
+import { useApp } from '~/contexts/AppContext';
 
 interface propsIF {
-    isUserConnected: boolean;
-    setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
     isDropdown?: boolean;
 }
+
 export default function DepositDropdown(props: propsIF) {
-    const { isUserConnected, isDropdown } = props;
+    const { isDropdown } = props;
+
+    // Get connection state from context
+    const { isUserConnected, setIsUserConnected } = useApp();
 
     const notifications: NotificationStoreIF = useNotificationStore();
 
@@ -25,6 +28,34 @@ export default function DepositDropdown(props: propsIF) {
     const { getBsColor } = useAppSettings();
 
     const { formatNum } = useNumFormatter();
+
+    // Scroll fade logic
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } =
+                    scrollRef.current;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5; // 5px tolerance
+                setIsScrolledToBottom(isAtBottom);
+            }
+        };
+
+        const scrollElement = scrollRef.current;
+        if (scrollElement) {
+            scrollElement.addEventListener('scroll', handleScroll);
+            // Check initial state
+            handleScroll();
+        }
+
+        return () => {
+            if (scrollElement) {
+                scrollElement.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
 
     const overviewData = useMemo(
         () => [
@@ -76,6 +107,10 @@ export default function DepositDropdown(props: propsIF) {
         [accountOverview, selectedCurrency],
     );
 
+    const handleConnectWallet = () => {
+        setIsUserConnected(true);
+    };
+
     return (
         <div
             className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
@@ -110,12 +145,18 @@ export default function DepositDropdown(props: propsIF) {
                     <p className={styles.notConnectedText}>
                         Connect your wallet to start trading with zero gas.
                     </p>
-                    <button className={styles.connectButton}>
+                    <button
+                        className={styles.connectButton}
+                        onClick={handleConnectWallet}
+                    >
                         Connect Wallet
                     </button>
                 </div>
             )}
-            <div className={styles.overviewContainer}>
+            <div
+                ref={scrollRef}
+                className={`${styles.overviewContainer} ${isScrolledToBottom ? styles.scrolledToBottom : ''}`}
+            >
                 <h3>Account Overview</h3>
                 {overviewData.map((data, idx) => (
                     <div key={idx} className={styles.overviewItem}>
