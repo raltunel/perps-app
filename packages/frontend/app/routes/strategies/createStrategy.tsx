@@ -10,6 +10,50 @@ import {
     useNotificationStore,
 } from '~/stores/NotificationStore';
 
+export interface textInputIF {
+    label: string;
+    placeholder: string;
+    blurb: string;
+};
+
+const inputData = {
+    name: {
+        label: 'Strategy Name',
+        placeholder: 'Name',
+        blurb: 'Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.',
+    },
+    market: {
+        label: 'Market',
+        placeholder: 'BTC',
+        blurb: 'Select the market where you want to deploy this trading  strategy. Different markets have varying volatility and liquidity characteristics.',
+    },
+    distance: {
+        label: 'Distance',
+        placeholder: 'Distance',
+        blurb: 'Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.',
+    },
+    distanceType: {
+        label: 'Distance Type',
+        placeholder: 'Ticks',
+        blurb: 'Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.'
+    },
+    side: {
+        label: 'Side',
+        placeholder: 'Both',
+        blurb: 'Specify whether the strategy should place buy orders, sell orders, or  both. "Both" enables market making on both sides of the order book.',
+    },
+    totalSize: {
+        label: 'Total Size',
+        placeholder: 'Total Size',
+        blurb: 'Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.',
+    },
+    orderSize: {
+        label: 'Order Size',
+        placeholder: 'Order Size',
+        blurb: 'Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.',
+    },
+}
+
 export default function createStrategy() {
     const makeStrategy = useStrategiesStore().add;
     const navigate = useNavigate();
@@ -39,60 +83,46 @@ export default function createStrategy() {
             <h2>New Strategy</h2>
             <section className={styles.create_strategy_inputs}>
                 <InputText
-                    label='Strategy Name'
+                    data={inputData.name}
                     inputId='CREATE_STRATEGY_STRATEGY_NAME'
-                    placeholder='Name'
-                    blurb='Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.'
                     handleChange={(text: string) => handleInput(nameRef, text)}
                 />
                 <InputText
-                    label='Market'
+                    data={inputData.market}
                     inputId='CREATE_STRATEGY_MARKET'
-                    placeholder='BTC'
-                    blurb='Select the market where you want to deploy this trading  strategy. Different markets have varying volatility and liquidity characteristics.'
                     handleChange={(text: string) =>
                         handleInput(marketRef, text)
                     }
                 />
                 <InputText
-                    label='Distance'
+                    data={inputData.distance}
                     inputId='CREATE_STRATEGY_DISTANCE'
-                    placeholder='Distance'
-                    blurb='Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.'
                     handleChange={(text: string) =>
                         handleInput(distanceRef, text)
                     }
                 />
                 <InputText
-                    label='Distance Type'
+                    data={inputData.distanceType}
                     inputId='CREATE_STRATEGY_DISTANCE_TYPE'
-                    placeholder='Ticks'
-                    blurb='Choose how the distance is measured. Ticks provide precise control,  while percentage offers proportional scaling with price movements.'
                     handleChange={(text: string) =>
                         handleInput(distanceTypeRef, text)
                     }
                 />
                 <InputText
-                    label='Side'
+                    data={inputData.side}
                     inputId='CREATE_STRATEGY_SIDE'
-                    placeholder='Both'
-                    blurb='Specify whether the strategy should place buy orders, sell orders, or  both. "Both" enables market making on both sides of the order book.'
                     handleChange={(text: string) => handleInput(sideRef, text)}
                 />
                 <InputText
-                    label='Total Size'
+                    data={inputData.totalSize}
                     inputId='CREATE_STRATEGY_TOTAL_SIZE'
-                    placeholder='Total Size'
-                    blurb='Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.'
                     handleChange={(text: string) =>
                         handleInput(totalSizeRef, text)
                     }
                 />
                 <InputText
-                    label='Order Size'
+                    data={inputData.orderSize}
                     inputId='CREATE_STRATEGY_ORDER_SIZE'
-                    placeholder='Order Size'
-                    blurb='Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.'
                     handleChange={(text: string) =>
                         handleInput(orderSizeRef, text)
                     }

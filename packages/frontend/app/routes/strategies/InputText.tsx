@@ -1,37 +1,34 @@
 import type { ChangeEvent } from 'react';
 import styles from './InputText.module.css';
+import type { textInputIF } from './createStrategy';
 
 interface propsIF {
-    label: string;
-    blurb: string;
+    data: textInputIF;
     inputId: string;
     handleChange: (text: string) => void;
     initialVal?: string;
-    placeholder?: string;
 }
 
 export default function InputText(props: propsIF) {
     const {
-        label,
+        data,
         inputId,
-        blurb,
         handleChange,
         initialVal = '',
-        placeholder = '',
     } = props;
 
     return (
         <div className={styles.text_input}>
-            <label htmlFor={inputId}>{label}</label>
+            <label htmlFor={inputId}>{data.label}</label>
             <input
                 type='text'
                 defaultValue={initialVal}
-                placeholder={placeholder}
+                placeholder={data.placeholder}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     handleChange(e.currentTarget.value)
                 }
             />
-            <p>{blurb}</p>
+            <p>{data.blurb}</p>
         </div>
     );
 }
