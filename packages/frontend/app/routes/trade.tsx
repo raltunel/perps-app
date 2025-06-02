@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+// import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -19,7 +19,7 @@ import { useTutorial } from '~/hooks/useTutorial';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedOrderInput = memo(OrderInput);
-const MemoizedTradeTable = memo(TradeTable);
+// const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
@@ -243,10 +243,10 @@ export default function Trade() {
                         display: activeTab === 'positions' ? 'block' : 'none',
                     }}
                 >
-                    {(activeTab === 'positions' ||
+                    {/* {(activeTab === 'positions' ||
                         visibilityRefs.current.positions) && (
                         <MemoizedTradeTable />
-                    )}
+                    )} */}
                 </div>
             </>
         );
@@ -297,7 +297,7 @@ export default function Trade() {
                         className={styles.containerBottom}
                     >
                         <div className={styles.table} id='tutorial-trade-table'>
-                            <MemoizedTradeTable />
+                            {/* <MemoizedTradeTable /> */}
                         </div>
                         <div className={styles.wallet}>
                             <DepositDropdown
