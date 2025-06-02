@@ -1,7 +1,7 @@
 import Button from '~/components/Button/Button';
 import styles from './createStrategy.module.css';
 import InputText from './InputText';
-import { useRef, type RefObject } from 'react';
+import { useRef, type MutableRefObject } from 'react';
 import { useStrategiesStore } from '~/stores/StrategiesStore';
 import { useNavigate } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
@@ -22,7 +22,10 @@ export default function createStrategy() {
     const totalSizeRef = useRef<string>('');
     const orderSizeRef = useRef<string>('');
 
-    function handleInput(field: RefObject<string>, val: string) {
+    // TODO:    write a function to validate inputs on change and
+    // TODO:    ... and enable disable the CTA accordingly
+
+    function handleInput(field: MutableRefObject<string>, val: string): void {
         field.current = val;
     }
 
