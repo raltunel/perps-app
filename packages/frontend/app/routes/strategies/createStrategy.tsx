@@ -99,33 +99,47 @@ export default function createStrategy() {
                 />
             </section>
             <section className={styles.create_strategy_buttons}>
-                <Button onClick={() => navigate('/strategies')} size={207}>
-                    Cancel
-                </Button>
                 <Button
-                    onClick={() => {
-                        makeStrategy({
-                            name: nameRef.current,
-                            market: marketRef.current,
-                            distance: parseFloat(distanceRef.current),
-                            distanceType: distanceTypeRef.current,
-                            side: sideRef.current,
-                            totalSize: totalSizeRef.current,
-                            orderSize: orderSizeRef.current,
-                        });
-                        subAccounts.create(nameRef.current);
-                        notifications.add({
-                            title: 'Sub Account Created',
-                            message: `Made new Sub-Account ${nameRef.current}`,
-                            icon: 'check',
-                        });
-                        navigate('/strategies');
-                    }}
-                    size='medium'
-                    selected
+                    // size='medium'
+                    size={100}
+                    onClick={() => console.log('RESET FORM')}
                 >
-                    Create
+                    Reset
                 </Button>
+                <div className={styles.buttons_right}>
+                    <Button
+                        // size='medium'
+                        size={100}
+                        onClick={() => navigate('/strategies')}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            makeStrategy({
+                                name: nameRef.current,
+                                market: marketRef.current,
+                                distance: parseFloat(distanceRef.current),
+                                distanceType: distanceTypeRef.current,
+                                side: sideRef.current,
+                                totalSize: totalSizeRef.current,
+                                orderSize: orderSizeRef.current,
+                            });
+                            subAccounts.create(nameRef.current);
+                            notifications.add({
+                                title: 'Sub Account Created',
+                                message: `Made new Sub-Account ${nameRef.current}`,
+                                icon: 'check',
+                            });
+                            navigate('/strategies');
+                        }}
+                        // size='medium'
+                        size={100}
+                        selected
+                    >
+                        Create
+                    </Button>
+                </div>
             </section>
         </div>
     );
