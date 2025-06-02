@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
+// import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
@@ -20,7 +20,7 @@ import { useTutorial } from '~/hooks/useTutorial';
 // Memoize components that don't need frequent re-renders
 const MemoizedOrderInput = memo(OrderInput);
 const MemoizedTradeTable = memo(TradeTable);
-const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
+// const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
 
@@ -206,7 +206,7 @@ export default function Trade() {
                 </div>
 
                 {/* Chart section */}
-                <div
+                {/* <div
                     className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
                     style={{
                         display: activeTab === 'chart' ? 'block' : 'none',
@@ -216,7 +216,7 @@ export default function Trade() {
                         visibilityRefs.current.chart) && (
                         <MemoizedTradingViewWrapper />
                     )}
-                </div>
+                </div> */}
 
                 {/* Book section - Shows ONLY Order Book */}
                 <div
@@ -278,7 +278,7 @@ export default function Trade() {
                                 <MemoizedSymbolInfo />
                             </div>
                             <div id='chartSection' className={styles.chart}>
-                                <MemoizedTradingViewWrapper />
+                                {/* <MemoizedTradingViewWrapper /> */}
                             </div>
                         </div>
 
