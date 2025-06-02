@@ -42,12 +42,14 @@ export default function createStrategy() {
                     label='Strategy Name'
                     inputId='CREATE_STRATEGY_STRATEGY_NAME'
                     placeholder='Name'
+                    blurb='Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.'
                     handleChange={(text: string) => handleInput(nameRef, text)}
                 />
                 <InputText
                     label='Market'
                     inputId='CREATE_STRATEGY_MARKET'
                     placeholder='BTC'
+                    blurb='Select the market where you want to deploy this trading  strategy. Different markets have varying volatility and liquidity characteristics.'
                     handleChange={(text: string) =>
                         handleInput(marketRef, text)
                     }
@@ -56,6 +58,7 @@ export default function createStrategy() {
                     label='Distance'
                     inputId='CREATE_STRATEGY_DISTANCE'
                     placeholder='Distance'
+                    blurb='Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.'
                     handleChange={(text: string) =>
                         handleInput(distanceRef, text)
                     }
@@ -64,6 +67,7 @@ export default function createStrategy() {
                     label='Distance Type'
                     inputId='CREATE_STRATEGY_DISTANCE_TYPE'
                     placeholder='Ticks'
+                    blurb='Choose how the distance is measured. Ticks provide precise control,  while percentage offers proportional scaling with price movements.'
                     handleChange={(text: string) =>
                         handleInput(distanceTypeRef, text)
                     }
@@ -72,12 +76,14 @@ export default function createStrategy() {
                     label='Side'
                     inputId='CREATE_STRATEGY_SIDE'
                     placeholder='Both'
+                    blurb='Specify whether the strategy should place buy orders, sell orders, or  both. "Both" enables market making on both sides of the order book.'
                     handleChange={(text: string) => handleInput(sideRef, text)}
                 />
                 <InputText
                     label='Total Size'
                     inputId='CREATE_STRATEGY_TOTAL_SIZE'
                     placeholder='Total Size'
+                    blurb='Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.'
                     handleChange={(text: string) =>
                         handleInput(totalSizeRef, text)
                     }
@@ -86,6 +92,7 @@ export default function createStrategy() {
                     label='Order Size'
                     inputId='CREATE_STRATEGY_ORDER_SIZE'
                     placeholder='Order Size'
+                    blurb='Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.'
                     handleChange={(text: string) =>
                         handleInput(orderSizeRef, text)
                     }

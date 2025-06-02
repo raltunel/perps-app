@@ -3,6 +3,7 @@ import styles from './InputText.module.css';
 
 interface propsIF {
     label: string;
+    blurb: string;
     inputId: string;
     handleChange: (text: string) => void;
     initialVal?: string;
