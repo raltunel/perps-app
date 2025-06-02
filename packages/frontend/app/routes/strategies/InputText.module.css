@@ -7,7 +7,7 @@
     user-select: none;
 }
 
-.text_input > input {
+.text_input > input,button {
     padding: 4px 8px;
     background-color: var(--bg-dark3);
     border: none;

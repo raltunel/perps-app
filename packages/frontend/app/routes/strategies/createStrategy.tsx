@@ -12,44 +12,44 @@ import {
 
 export interface textInputIF {
     label: string;
-    placeholder: string;
+    input: string|string[];
     blurb: string;
 };
 
 const inputData = {
     name: {
         label: 'Strategy Name',
-        placeholder: 'Name',
+        input: 'Name',
         blurb: 'Choose a descriptive name for your trading strategy. This will help you identify and manage your strategies effectively.',
     },
     market: {
         label: 'Market',
-        placeholder: 'BTC',
+        input: ['BTC', 'ETH', 'SOL'],
         blurb: 'Select the market where you want to deploy this trading  strategy. Different markets have varying volatility and liquidity characteristics.',
     },
     distance: {
         label: 'Distance',
-        placeholder: 'Distance',
+        input: 'Distance',
         blurb: 'Define the distance parameter for your strategy. This determines how far from the current price your orders will be placed.',
     },
     distanceType: {
         label: 'Distance Type',
-        placeholder: 'Ticks',
+        input: ['Ticks', '%'],
         blurb: 'Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.'
     },
     side: {
         label: 'Side',
-        placeholder: 'Both',
+        input: ['Both', 'Above', 'Below'],
         blurb: 'Specify whether the strategy should place buy orders, sell orders, or  both. "Both" enables market making on both sides of the order book.',
     },
     totalSize: {
         label: 'Total Size',
-        placeholder: 'Total Size',
+        input: 'Total Size',
         blurb: 'Set the total amount of capital to allocate to this strategy. This represents the maximum exposure across all active orders.',
     },
     orderSize: {
         label: 'Order Size',
-        placeholder: 'Order Size',
+        input: 'Order Size',
         blurb: 'Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.',
     },
 }

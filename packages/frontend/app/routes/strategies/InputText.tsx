@@ -21,15 +21,24 @@ export default function InputText(props: propsIF) {
     return (
         <div className={styles.text_input}>
             <label htmlFor={idForDOM}>{data.label}</label>
-            <input
-                type='text'
-                id={idForDOM}
-                defaultValue={initialVal}
-                placeholder={data.placeholder}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    handleChange(e.currentTarget.value)
-                }
-            />
+            { typeof data.input === 'string' &&
+                <input
+                    type='text'
+                    id={idForDOM}
+                    defaultValue={initialVal}
+                    placeholder={data.input}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        handleChange(e.currentTarget.value)
+                    }
+                />
+            }
+            { Array.isArray(data.input) &&
+                <button
+                    
+                >
+                    Hi there!
+                </button>
+            }
             <p>{data.blurb}</p>
         </div>
     );
