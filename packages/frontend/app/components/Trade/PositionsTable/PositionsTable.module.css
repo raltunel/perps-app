@@ -25,6 +25,7 @@
 }
 
 .cell {
+    width: 100%;
     font-size: var(--font-size-s, 12px);
     color: var(--text1, #f0f0f8);
     white-space: nowrap;
@@ -33,6 +34,8 @@
 }
 
 .headerCell {
+    width: 100%;
+
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-xs);
     display: flex;
@@ -57,6 +60,7 @@
     display: inline-block;
     font-size: var(--font-size-s);
     margin-left: var(--gap-xs);
+    cursor: pointer;
 }
 
 .actionButton {
@@ -85,15 +89,6 @@
     gap: var(--gap-xs);
 }
 
-.sizeCell {
-}
-.positionValueCell {
-}
-.entryPriceCell {
-}
-.markPriceCell {
-}
-
 .pnlCell {
     display: flex;
     flex-direction: row;
@@ -102,13 +97,17 @@
     cursor: pointer;
 }
 
-.liqPriceCell {
-}
-.marginCell {
-}
-.fundingCell {
-}
 .tpslCell {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+.tpslCell button {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    cursor: pointer;
 }
 .closeCell {
     text-align: right;
@@ -118,9 +117,27 @@
 .headerContainer .closeCell {
     text-align: end;
     justify-self: end;
-    padding-right: var(--padding-s);
+    /* padding-right: var(--padding-s); */
 }
 
+.sizeCell,
+.positionValueCell,
+.entryPriceCell,
+.markPriceCell,
+.pnlCell,
+.liqPriceCell,
+.marginCell,
+.fundingCell {
+    text-align: center;
+    justify-self: center;
+    display: flex;
+    justify-content: flex-end;
+}
+.tpslCell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {

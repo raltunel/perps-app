@@ -1,11 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -37,10 +30,12 @@ interface GenericTableProps<T, S> {
     defaultSortBy?: S;
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
+    storageKey: string;
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
-    const id = useId();
+    const id = props.storageKey;
+    const navigate = useNavigate();
 
     const {
         data,
@@ -58,13 +53,44 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         heightOverride = '100%',
     } = props;
 
-    const navigate = useNavigate();
+    function safeParse<T>(value: string | null, fallback: T): T {
+        if (!value || value === 'undefined') return fallback;
+        try {
+            return JSON.parse(value) as T;
+        } catch {
+            return fallback;
+        }
+    }
+
+    const sortByKey = `GenericTable:${id}:sortBy`;
+    const sortDirKey = `GenericTable:${id}:sortDir`;
+
+    const [sortBy, setSortBy] = useState<S>(() => {
+        const stored = localStorage.getItem(sortByKey);
+        return safeParse<S>(stored, props.defaultSortBy as S);
+    });
+    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
+        () => {
+            const stored = localStorage.getItem(sortDirKey);
+            return safeParse<TableSortDirection>(
+                stored,
+                props.defaultSortDirection as TableSortDirection,
+            );
+        },
+    );
+
+    useEffect(() => {
+        localStorage.setItem(sortByKey, JSON.stringify(sortBy));
+        localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
+    }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
     const [tableState, setTableState] = useState<TableState>(
         TableState.LOADING,
     );
 
     const isClient = useIsClient();
+
+    const [rowLimit, setRowLimit] = useState(slicedLimit);
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -78,8 +104,9 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             return;
         }
 
+        // 2px offset has been added to handle edge scrolling cases
         const bottomNotShadowed =
-            tableBody.scrollTop + tableBody.clientHeight >=
+            tableBody.scrollTop + tableBody.clientHeight + 2 >=
             tableBody.scrollHeight;
         if (bottomNotShadowed) {
             actionsContainer?.classList.add(styles.notShadowed);
@@ -88,8 +115,28 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
     }, []);
 
+    const calculateRowCount = () => {
+        const rowHeight = 25;
+        const tableBody = document.getElementById(
+            `${id}-tableBody`,
+        ) as HTMLElement;
+
+        if (!tableBody) {
+            return;
+        }
+
+        const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
+
+        if (rowCount > slicedLimit) {
+            setRowLimit(rowCount);
+        } else {
+            setRowLimit(slicedLimit);
+        }
+    };
+
     useEffect(() => {
         checkShadow();
+        calculateRowCount();
 
         let scrollEvent = null;
         const tableBody = document.getElementById(
@@ -115,6 +162,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
         const resizeEvent = () => {
             checkShadow();
+            calculateRowCount();
         };
         window.addEventListener('resize', resizeEvent);
 
@@ -124,11 +172,6 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             }
         };
     }, [isClient]);
-
-    const [sortBy, setSortBy] = useState<S>(defaultSortBy ?? (undefined as S));
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>(
-        defaultSortDirection ?? 'desc',
-    );
 
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(20);
@@ -151,48 +194,60 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                 (page + 1) * rowsPerPage,
             );
         }
-        return sortedData.slice(0, slicedLimit);
-    }, [sortedData, pageMode, page, rowsPerPage]);
+        checkShadow();
+        return sortedData.slice(0, rowLimit);
+    }, [sortedData, pageMode, page, rowsPerPage, rowLimit]);
+
+    useEffect(() => {
+        if (!isFetched) {
+            setTableState(TableState.LOADING);
+        } else if (dataToShow.length === 0) {
+            setTableState(TableState.EMPTY);
+        } else {
+            setTableState(TableState.FILLED);
+        }
+    }, [isFetched, dataToShow]);
 
     const handleSort = (key: S) => {
+        let nextBy: S | undefined;
+        let nextDir: TableSortDirection | undefined;
+
         if (sortBy === key) {
-            if (sortDirection === 'desc') {
-                setSortDirection('asc');
-            } else if (sortDirection === 'asc') {
-                setSortDirection(undefined);
-                setSortBy(undefined as S);
-            } else {
-                setSortDirection('desc');
-            }
+            nextDir =
+                sortDirection === 'desc'
+                    ? 'asc'
+                    : sortDirection === 'asc'
+                      ? undefined
+                      : 'desc';
+            nextBy = nextDir ? key : undefined;
         } else {
-            setSortBy(key as S);
-            setSortDirection('desc');
+            nextBy = key;
+            nextDir = 'desc';
         }
+
+        setSortBy(nextBy as S);
+        setSortDirection(nextDir!);
     };
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        if (viewAllLink) {
-            navigate(viewAllLink, { viewTransition: true });
-        }
+        viewAllLink && navigate(viewAllLink, { viewTransition: true });
     };
-
     const handleExportCsv = (e: React.MouseEvent) => {
         e.preventDefault();
         console.log('Exporting CSV');
     };
 
     useEffect(() => {
-        if (isFetched) {
-            if (dataToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [dataToShow, isFetched]);
+        checkShadow();
+        const body = document.getElementById(`${id}-tableBody`);
+        if (!body) return;
+
+        body.addEventListener('scroll', checkShadow);
+        return () => {
+            body.removeEventListener('scroll', checkShadow);
+        };
+    }, [tableState, checkShadow, id]);
 
     return (
         <div className={styles.tableWrapper} style={{ height: heightOverride }}>
@@ -204,20 +259,21 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
             ) : (
                 <>
                     <span
-                        className={styles.headerContainer}
                         id={`${id}-headerContainer`}
+                        className={styles.headerContainer}
                     >
                         {renderHeader(sortDirection, handleSort, sortBy)}
                     </span>
                     <div
                         id={`${id}-tableBody`}
-                        className={`${styles.tableBody} 
-                        ${pageMode ? styles.pageMode : styles.notPage}
-                        `}
+                        className={`${styles.tableBody} ${
+                            pageMode ? styles.pageMode : styles.notPage
+                        }`}
                     >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
                         {tableState === TableState.EMPTY && <NoDataRow />}
+
                         {sortedData.length > 0 && (
                             <div
                                 id={`${id}-actionsContainer`}

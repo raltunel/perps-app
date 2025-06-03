@@ -26,55 +26,55 @@ export default function HistoryTwapTableHeader({
             name: 'Time',
             key: 'time',
             sortable: true,
-            className: 'timeCell',
+            className: styles.timeCell,
         },
         {
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            className: 'coinCell',
+            className: styles.coinCell,
         },
         {
             name: 'Total Size',
             key: 'side',
             sortable: true,
-            className: 'directionCell',
+            className: styles.totalSizeCell,
         },
         {
             name: 'Executed Size',
             key: 'px',
             sortable: true,
-            className: 'priceCell',
+            className: styles.executedSizeCell,
         },
         {
             name: 'Average Price',
             key: 'sz',
             sortable: true,
-            className: 'sizeCell',
+            className: styles.averagePriceCell,
         },
         {
             name: 'Total Runtime',
             key: 'value',
             sortable: true,
-            className: 'tradeValueCell',
+            className: styles.totalRuntimeCell,
         },
         {
             name: 'Reduce Only',
             key: 'fee',
             sortable: true,
-            className: 'feeCell',
+            className: styles.reduceOnlyCell,
         },
         {
             name: 'Randomize',
             key: 'closedPnl',
             sortable: true,
-            className: 'closedPnlCell',
+            className: styles.randomizeCell,
         },
         {
             name: 'Status',
             key: 'status',
             sortable: true,
-            className: 'statusCell',
+            className: styles.statusCell,
         },
     ];
 
@@ -83,7 +83,7 @@ export default function HistoryTwapTableHeader({
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
+                    className={`${styles.cell} ${styles.headerCell} ${header.className} ${header.sortable ? styles.sortable : ''}`}
                     onClick={() => {
                         if (header.sortable) {
                             sortClickHandler(header.key as UserFillSortBy);

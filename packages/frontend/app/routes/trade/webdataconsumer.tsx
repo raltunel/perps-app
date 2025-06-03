@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useInfoApi } from '~/hooks/useInfoApi';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -19,12 +17,12 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import type {
     AccountOverviewIF,
-    TwapSliceFillIF,
+    ActiveTwapIF,
     TwapHistoryIF,
+    TwapSliceFillIF,
     UserBalanceIF,
     UserFillIF,
     UserFundingIF,
-    ActiveTwapIF,
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {

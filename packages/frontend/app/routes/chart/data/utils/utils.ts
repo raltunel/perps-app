@@ -242,3 +242,77 @@ export function customThemes() {
         dark: darkTheme,
     } as CustomThemes;
 }
+
+function hexToRgba(hex: string, alpha = 1) {
+    hex = hex.replace(/^#/, '');
+
+    if (hex.length === 3) {
+        hex = hex
+            .split('')
+            .map((c) => c + c)
+            .join('');
+    }
+
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+export function defaultDrawingToolColors() {
+    const accentColor = getComputedStyle(
+        document.documentElement,
+    ).getPropertyValue('--accent1');
+
+    const accentColorHover = hexToRgba(accentColor, 0.3);
+
+    return {
+        'scalesProperties.axisHighlightColor': accentColorHover,
+        'linetoolarrowmarker.backgroundColor': accentColorHover,
+        'scalesProperties.axisLineToolLabelBackgroundColorActive': accentColor,
+        'scalesProperties.axisLineToolLabelBackgroundColorCommon': accentColor,
+        'linetooltrendline.linecolor': accentColor,
+        'linetoolray.linecolor': accentColor,
+        'linetoolray.textcolor': accentColor,
+        'linetoolextended.linecolor': accentColor,
+        'linetool5pointspattern.color': accentColor,
+        'linetoolabcd.color': accentColor,
+        'linetoolarc.color': accentColor,
+        'linetoolarrow.linecolor': accentColor,
+        'linetoolarrowmarkdown.color': accentColor,
+        'linetoolcomment.backgroundColor': accentColor,
+        'linetoolcomment.borderColor': accentColor,
+        'linetoolcrossline.linecolor': accentColor,
+        'linetoolcypherpattern.backgroundColor': accentColor,
+        'linetoolcypherpattern.color': accentColor,
+        'linetoolextended.textcolor': accentColor,
+        'linetool5pointspattern.backgroundColor': accentColor,
+        'linetoolhorzline.linecolor': accentColor,
+        'linetoolhorzline.textcolor': accentColor,
+        'linetoolhorzray.linecolor': accentColor,
+        'linetoolhorzray.textcolor': accentColor,
+        'linetoolicon.color': accentColor,
+        'linetoolinfoline.linecolor': accentColor,
+        'linetoolinfoline.textcolor': accentColor,
+        'linetoolpath.lineColor': accentColor,
+        'linetoolprediction.linecolor': accentColor,
+        'linetoolprediction.linewidth': accentColor,
+        'linetoolprediction.sourceBackColor': accentColor,
+        'linetoolprediction.sourceStrokeColor': accentColor,
+        'linetoolprediction.targetBackColor': accentColor,
+        'linetoolprediction.targetStrokeColor': accentColor,
+        'linetoolpricelabel.backgroundColor': accentColor,
+        'linetoolpricelabel.borderColor': accentColor,
+        'linetoolsignpost.plateColor': accentColor,
+        'linetooltext.color': accentColor,
+        'linetooltextabsolute.color': accentColor,
+        'linetooltrendangle.linecolor': accentColor,
+        'linetooltrendline.textcolor': accentColor,
+        'linetoolvertline.linecolor': accentColor,
+        'linetoolvertline.textcolor': accentColor,
+        'controlPoint.color': accentColor,
+        'controlPoint.hoverColor': accentColorHover,
+    };
+}

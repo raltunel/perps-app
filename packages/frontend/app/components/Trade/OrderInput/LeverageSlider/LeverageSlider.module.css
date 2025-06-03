@@ -83,8 +83,7 @@
 
 .sliderKnob:active {
     cursor: grabbing;
-    width: 0;
-    height: 0;
+    transform: translate(-10%, -50%) scale(1.1);
 }
 
 .labelContainer {
