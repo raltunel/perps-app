@@ -29,6 +29,7 @@ export default function OrderLines({
     const animationFrameRef = useRef<number>(0);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
+    const [localChartReady, setLocalChartReady] = useState(true);
 
     useEffect(() => {
         if (!chart) return;
@@ -88,14 +89,21 @@ export default function OrderLines({
 
     return (
         <>
-            <LineComponent key='lines' lines={combinedData} />
-            <LabelComponent
-                key='labels'
+            <LineComponent
+                key='lines'
                 lines={combinedData}
-                overlayCanvasRef={overlayCanvasRef}
-                zoomChanged={zoomChanged}
-                canvasSize={canvasSize}
+                localChartReady={localChartReady}
+                setLocalChartReady={setLocalChartReady}
             />
+            {localChartReady && (
+                <LabelComponent
+                    key='labels'
+                    lines={combinedData}
+                    overlayCanvasRef={overlayCanvasRef}
+                    zoomChanged={zoomChanged}
+                    canvasSize={canvasSize}
+                />
+            )}
         </>
     );
 }

@@ -17,19 +17,24 @@ export type LineData = {
 
 interface LineProps {
     lines: LineData[];
+    localChartReady: boolean;
+    setLocalChartReady: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export type ChartShapeRefs = {
     lineId: EntityId;
 };
 
-const LineComponent = ({ lines }: LineProps) => {
+const LineComponent = ({
+    lines,
+    localChartReady,
+    setLocalChartReady,
+}: LineProps) => {
     const { chart, isChartReady } = useTradingView();
 
     const orderLineItemsRef = useRef<ChartShapeRefs[]>([]);
 
     const [orderLineItems, setOrderLineItems] = useState<ChartShapeRefs[]>([]);
-    const [localChartReady, setLocalChartReady] = useState(true);
 
     const cleanupInProgressRef = useRef(false);
 

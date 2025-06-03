@@ -44,12 +44,6 @@ const OverlayCanvas: React.FC = () => {
             const width = paneCanvas.width;
             const height = paneCanvas.height;
 
-            console.log(
-                'paneCanvas.width,paneCanvas.height',
-                paneCanvas.width,
-                paneCanvas.height,
-            );
-
             canvas.width = width;
             canvas.style.width = `${width}px`;
 

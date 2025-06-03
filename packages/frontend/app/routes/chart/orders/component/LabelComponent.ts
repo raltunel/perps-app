@@ -38,6 +38,9 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
+            let heightAttr = canvasSize.height;
+            let widthAttr = canvasSize.width;
+
             if (overlayCanvasRef.current) {
                 const chartDiv = document.getElementById('tv_chart');
                 const iframe = chartDiv?.querySelector(
@@ -53,16 +56,13 @@ const LabelComponent = ({
                     const width = overlayCanvasRef.current.style.width;
                     const height = overlayCanvasRef.current.style.height;
 
+                    heightAttr = paneCanvas.height;
+                    widthAttr = paneCanvas.width;
+
                     if (
                         width !== canvasSize.styleWidth ||
                         height !== canvasSize.styleWidth
                     ) {
-                        console.log(
-                            'paneCanvas.width,paneCanvas.height',
-                            paneCanvas.width,
-                            paneCanvas.height,
-                        );
-
                         overlayCanvasRef.current.style.width = `${canvasSize.styleWidth}px`;
                         overlayCanvasRef.current.style.height = `${canvasSize.styleHeight}px`;
                         overlayCanvasRef.current.width = paneCanvas.width;
@@ -76,10 +76,10 @@ const LabelComponent = ({
                 const yPricePixel = getPricetoPixel(
                     chart,
                     line.yPrice,
-                    canvasSize.height,
+                    heightAttr,
                 ).pixel;
 
-                const xPixel = canvasSize.width * line.xLoc;
+                const xPixel = widthAttr * line.xLoc;
 
                 const labelOptions = [
                     {
@@ -195,16 +195,16 @@ const LabelComponent = ({
                 if (iframeDoc) {
                     const paneCanvas = iframeDoc.querySelector(
                         'canvas[data-name="pane-canvas"]',
-                    );
+                    ) as HTMLCanvasElement;
 
                     const rect = paneCanvas?.getBoundingClientRect();
 
-                    if (rect) {
+                    if (rect && paneCanvas) {
                         const cssOffsetX = params.clientX - rect.left;
                         const cssOffsetY = params.clientY - rect.top;
 
-                        const scaleY = canvasSize.height / rect.height;
-                        const scaleX = canvasSize.width / rect.width;
+                        const scaleY = paneCanvas.height / rect.height;
+                        const scaleX = paneCanvas.width / rect.width;
 
                         const offsetX = cssOffsetX * scaleX;
                         const offsetY = cssOffsetY * scaleY;
