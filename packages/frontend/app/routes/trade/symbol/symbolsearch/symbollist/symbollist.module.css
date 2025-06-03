@@ -4,6 +4,7 @@
     --symbol-list-input-height: 31px;
     --table-header-height: 24px;
     --row-container-height: 17px;
+    --leverage-pill-height: 15px;
 
     position: absolute;
     top: 130%;
@@ -142,10 +143,14 @@
 }
 
 .symbolListWrapper .leverageLabel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     color: var(--text1);
     background: var(--accent1) !important;
-    padding: 0 0.2rem !important;
-    border-radius: 0.2rem !important;
+    padding: var(--padding-xs);
+    border-radius: var(--radius-xs) !important;
+    height: var(--leverage-pill-height);
 }
 
 .symbolListSearchClose {
