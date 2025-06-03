@@ -21,6 +21,7 @@ import { useDebugStore } from './stores/DebugStore';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import { useTradeDataStore } from './stores/TradeDataStore';
 import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import { AppProvider } from './contexts/AppContext';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -131,37 +132,38 @@ export default function App() {
     return (
         <>
             <Layout>
-                <SdkProvider environment={wsEnvironment}>
-                    {!internetConnected && <NoConnectionIndicator />}
-                    <TutorialProvider>
-                        <div className='root-container'>
-                            {/* Added error boundary for header */}
-                            <ComponentErrorBoundary>
-                                <PageHeader />
-                            </ComponentErrorBoundary>
+                <AppProvider>
+                    <SdkProvider environment={wsEnvironment}>
+                      {!internetConnected && <NoConnectionIndicator />}
+                      <TutorialProvider>
+                            <div className='root-container'>
+                                {/* Added error boundary for header */}
+                                <ComponentErrorBoundary>
+                                    <PageHeader />
+                                </ComponentErrorBoundary>
+                                <main className='content'>
+                                    {/*  Added Suspense for async content loading */}
+                                    <Suspense fallback={<LoadingIndicator />}>
+                                        <ComponentErrorBoundary>
+                                            <Outlet />
+                                        </ComponentErrorBoundary>
+                                    </Suspense>
+                                </main>
+                                <ComponentErrorBoundary>
+                                    <footer className='mobile-footer'>
+                                        <MobileFooter />
+                                    </footer>
+                                </ComponentErrorBoundary>
 
-                            <main className='content'>
-                                {/*  Added Suspense for async content loading */}
-                                <Suspense fallback={<LoadingIndicator />}>
-                                    <ComponentErrorBoundary>
-                                        <Outlet />
-                                    </ComponentErrorBoundary>
-                                </Suspense>
-                            </main>
-                            <ComponentErrorBoundary>
-                                <footer className='mobile-footer'>
-                                    <MobileFooter />
-                                </footer>
-                            </ComponentErrorBoundary>
-
-                            {/* Added error boundary for notifications */}
-                            <ComponentErrorBoundary>
-                                <Notifications />
-                            </ComponentErrorBoundary>
-                        </div>
-                    </TutorialProvider>
-                    <RuntimeDomManipulation />
-                </SdkProvider>
+                                {/* Added error boundary for notifications */}
+                                <ComponentErrorBoundary>
+                                    <Notifications />
+                                </ComponentErrorBoundary>
+                            </div>
+                        </TutorialProvider>
+                        <RuntimeDomManipulation />
+                    </SdkProvider>
+                </AppProvider>
             </Layout>
         </>
     );
