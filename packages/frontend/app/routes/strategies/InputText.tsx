@@ -19,6 +19,7 @@ export default function InputText(props: propsIF) {
         + data.label.toUpperCase().replace(' ', '_');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [selection, setSelection] = useState<string>(data.input[0]);
 
     return (
         <div className={styles.text_input}>
@@ -37,15 +38,21 @@ export default function InputText(props: propsIF) {
             { Array.isArray(data.input) &&
                 <div className={styles.dropdown}>
                     <button onClick={() => setIsOpen(!isOpen)}>
-                        Hi there!
+                        {selection}
                     </button>
                     { isOpen &&
                         <ul>
-                            {data.input.map(
-                                (inp: string) => (<li>
+                            { data.input.map((inp: string) => (
+                                <li
+                                    key={inp}
+                                    onClick={() => {
+                                        setSelection(inp);
+                                        setIsOpen(false);
+                                    }}
+                                >
                                     {inp}
-                                </li>)
-                            )}
+                                </li>
+                            ))}
                         </ul>
                     }
                 </div>
