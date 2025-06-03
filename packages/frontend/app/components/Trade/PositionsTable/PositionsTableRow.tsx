@@ -1,18 +1,18 @@
+import { useMemo, useState } from 'react';
+import { LuPen } from 'react-icons/lu';
 import { RiExternalLinkLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router';
+import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
+import Tooltip from '~/components/Tooltip/Tooltip';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
-import styles from './PositionsTable.module.css';
-import { LuPen } from 'react-icons/lu';
-import { useMemo, useState } from 'react';
-import Modal from '~/components/Modal/Modal';
-import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
-import { useNavigate } from 'react-router';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
-import Tooltip from '~/components/Tooltip/Tooltip';
+import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
+import styles from './PositionsTable.module.css';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -112,7 +112,6 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         // Navigate to the market page for this coin
         navigate(`/trade/${position.coin.toLowerCase()}`);
     };
-    console.log(position);
     const fundingToShow = useMemo(() => {
         return position.cumFunding.sinceOpen * -1;
     }, [position.cumFunding.sinceOpen]);
