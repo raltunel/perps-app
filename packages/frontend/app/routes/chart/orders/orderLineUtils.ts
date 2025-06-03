@@ -29,7 +29,7 @@ export function drawLabel(
     const height = 15 * dpr;
 
     ctx.save();
-    ctx.font = `bold ${12}px sans-serif`;
+    ctx.font = `bold ${10 * dpr}px sans-serif`;
     const padding = 4;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
