@@ -48,6 +48,7 @@ export default function InputText(props: propsIF) {
                                 <li
                                     key={inp}
                                     onClick={() => {
+                                        handleChange(inp);
                                         setSelection(inp);
                                         setIsOpen(false);
                                     }}

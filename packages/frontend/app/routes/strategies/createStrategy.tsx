@@ -148,6 +148,15 @@ export default function createStrategy() {
                                 totalSize: totalSizeRef.current,
                                 orderSize: orderSizeRef.current,
                             });
+                            console.log({
+                                name: nameRef.current,
+                                market: marketRef.current,
+                                distance: parseFloat(distanceRef.current),
+                                distanceType: distanceTypeRef.current,
+                                side: sideRef.current,
+                                totalSize: totalSizeRef.current,
+                                orderSize: orderSizeRef.current,
+                            });
                             subAccounts.create(nameRef.current);
                             notifications.add({
                                 title: 'Sub Account Created',
