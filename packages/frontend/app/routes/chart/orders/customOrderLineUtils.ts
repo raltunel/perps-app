@@ -65,7 +65,7 @@ export const getPricetoPixel = (
     price: number,
     chartHeight?: number,
 ) => {
-    const textHeight = 24;
+    const textHeight = 20;
     let pixel = 0;
 
     const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
