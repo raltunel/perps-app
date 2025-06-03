@@ -56,11 +56,14 @@ export const SdkProvider: React.FC<{
         } else {
             exchange.setEnvironment(environment);
         }
-        if (!internetConnected) {
-            setInfo(null);
-            setExchange(null);
+    }, [isClient, environment]);
+
+    useEffect(() => {
+        if (!isClient) return;
+        if (internetConnected) {
+            info?.wsManager?.reconnect();
         }
-    }, [isClient, environment, internetConnected]);
+    }, [internetConnected, isClient]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>

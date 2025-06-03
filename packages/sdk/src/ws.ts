@@ -294,7 +294,6 @@ export class WebsocketManager {
     };
 
     private onClose = () => {
-        console.log('onClose');
         this.log('onClose');
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {
@@ -343,15 +342,23 @@ export class WebsocketManager {
         }
     }
 
-    public setBaseUrl(newBaseUrl: string) {
+    public setBaseUrl(newBaseUrl: string, isReconnect: boolean = false) {
         this.log('Setting new base URL:', newBaseUrl);
-        if (this.baseUrl === newBaseUrl) {
+        if (this.baseUrl === newBaseUrl && !isReconnect) {
             this.log(
                 'New base URL is the same as the current one. No action taken.',
             );
             return;
         }
 
+        this.stashSubscriptions();
+
+        this.baseUrl = newBaseUrl;
+
+        this.connect();
+    }
+
+    private stashSubscriptions = () => {
         const oldSubscriptions = { ...this.allSubscriptions };
 
         this.stop();
@@ -367,11 +374,7 @@ export class WebsocketManager {
         }
         this.allSubscriptions = {};
         this.activeSubscriptions = {};
-
-        this.baseUrl = newBaseUrl;
-
-        this.connect();
-    }
+    };
 
     public subscribe(
         subscription: Subscription,
@@ -487,5 +490,12 @@ export class WebsocketManager {
 
     public isWsReady() {
         return this.wsReady;
+    }
+
+    public reconnect() {
+        this.stashSubscriptions();
+        setTimeout(() => {
+            this.connect();
+        }, 2000);
     }
 }
