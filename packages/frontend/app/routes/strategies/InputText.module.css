@@ -10,6 +10,10 @@
 
 .text_input > input,
 .dropdown > button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
     padding: 4px 8px;
     background-color: var(--bg-dark3);

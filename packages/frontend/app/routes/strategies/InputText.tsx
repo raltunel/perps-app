@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
 import type { textInputIF } from './createStrategy';
+import { LuChevronDown } from 'react-icons/lu';
 
 interface propsIF {
     data: textInputIF;
@@ -38,7 +39,8 @@ export default function InputText(props: propsIF) {
             { Array.isArray(data.input) &&
                 <div className={styles.dropdown}>
                     <button onClick={() => setIsOpen(!isOpen)}>
-                        {selection}
+                        <div>{selection}</div>
+                        <LuChevronDown />
                     </button>
                     { isOpen &&
                         <ul>
