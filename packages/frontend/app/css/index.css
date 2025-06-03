@@ -224,7 +224,25 @@ button {
     cursor: pointer;
     transition: filter 0.3s ease-in-out;
 }
-button:hover {
+button {
+    position: relative;
+    overflow: hidden;
+    color: var(--text1);
+    z-index: 1;
+    background: inherit;
+    border: none;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    z-index: -1;
+    transition: filter 0.3s ease;
+}
+
+button:hover::before {
     filter: brightness(0.8);
 }
 
