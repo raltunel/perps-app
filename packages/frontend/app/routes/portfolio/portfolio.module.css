@@ -101,6 +101,13 @@
     width: 100%;
 }
 
+.rowButton button:hover,
+.buttonContainer button:hover {
+    background: var(--accent1) !important;
+    opacity: 1 !important;
+    transition: all 0.3s ease-in-out;
+    filter: brightness(1) !important;
+}
 .table {
     height: var(--table-height);
     overflow-y: hidden;
