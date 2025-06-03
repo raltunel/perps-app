@@ -65,7 +65,9 @@ export const getPricetoPixel = (
     price: number,
     chartHeight?: number,
 ) => {
-    const textHeight = 24;
+    const isMac = navigator.userAgent.includes('Macintosh');
+
+    const textHeight = isMac ? 30 : 24;
     let pixel = 0;
 
     const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
