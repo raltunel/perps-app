@@ -20,11 +20,13 @@ import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { useApp } from '~/contexts/AppContext';
 export default function PageHeader() {
+    const { isUserConnected, setIsUserConnected } = useApp();
+
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
     const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
-    const [isUserConnected, setIsUserConnected] = useState(false);
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
