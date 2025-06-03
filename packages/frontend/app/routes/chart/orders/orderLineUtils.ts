@@ -25,12 +25,11 @@ export function drawLabel(
     ctx: CanvasRenderingContext2D,
     { x, y, labelOptions }: DrawSegmentedRectOptions,
 ) {
-    const isMac = navigator.userAgent.includes('Macintosh');
-
-    const height = isMac ? 30 : 24;
+    const dpr = window.devicePixelRatio || 1;
+    const height = 20 * dpr;
 
     ctx.save();
-    ctx.font = 'bold 12px sans-serif';
+    ctx.font = `bold ${11 * dpr}px sans-serif`;
     const padding = 4;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
