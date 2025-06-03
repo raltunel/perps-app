@@ -8,6 +8,7 @@ import {
     bsColorSets,
     useAppSettings,
     type colorSetIF,
+    type colorSetNames,
 } from '~/stores/AppSettingsStore';
 import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import styles from './AppOptions.module.css';
@@ -151,7 +152,7 @@ export default function AppOptions() {
                                         </div>
                                     </>
                                 ),
-                                set: () => setBsColor(text),
+                                set: () => setBsColor(text as colorSetNames),
                             };
                         },
                     )}

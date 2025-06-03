@@ -30,7 +30,7 @@
     width: 100%;
     gap: var(--gap-xs);
     margin: var(--margin-xs) 0;
-    padding: 0 var(--padding-s);
+    padding: 0 var(--padding-xs);
     color: var(--text3);
 }
 
