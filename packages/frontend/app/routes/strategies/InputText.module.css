@@ -1,6 +1,7 @@
 .text_input {
     display: grid;
-    grid-template-columns: 200px 200px 1fr;
+    --create-strategy-input-width: 200px;
+    grid-template-columns: 200px var(--create-strategy-input-width) 1fr;
     align-items: center;
     gap: var(--gap-m);
     height: 32px;
@@ -12,6 +13,7 @@
     width: 100%;
     padding: 4px 8px;
     background-color: var(--bg-dark3);
+    font-size: var(--font-size-s);
     border: none;
     outline: none;
     border-radius: var(--radius-s);
@@ -20,8 +22,22 @@
 
 .dropdown > ul {
     position: absolute;
+    display: flex;
+    flex-direction: column;
+    margin-top: 2px;
+    width: var(--create-strategy-input-width);
+    gap: var(--padding-xs);
+    padding: var(--padding-s);
+    font-size: var(--font-size-s);
+    color: var(--dark2);
     list-style: none;
-    background-color: green;
+    border-radius: var(--radius-s);
+    background-color: var(--bg-dark4);
+}
+
+.dropdown > ul > li {
+    cursor: pointer;
+    color: var(--text2);
 }
 
 .text_input > p {
