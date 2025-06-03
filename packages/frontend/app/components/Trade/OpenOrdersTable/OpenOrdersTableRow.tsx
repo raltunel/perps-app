@@ -1,9 +1,9 @@
-import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
-import styles from './OpenOrdersTable.module.css';
-import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import { LuPen } from 'react-icons/lu';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import { LuPen } from 'react-icons/lu';
+import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import styles from './OpenOrdersTable.module.css';
 
 export interface OpenOrderData {
     time: string;

@@ -62,7 +62,7 @@ export default function SymbolListTableRow(props: SymbolListTableRowProps) {
                         onClick={handleFavClick}
                     />
                 )}
-                <div className={styles.symbolName}>{symbol.coin} - USD</div>
+                <div className={styles.symbolName}>{symbol.coin}-USD</div>
                 <div className={styles.leverageLabel}>
                     {symbol.maxLeverage}x
                 </div>

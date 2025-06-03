@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import BasicMenu from '~/components/BasicMenu/BasicMenu';
 import Tabs from '~/components/Tabs/Tabs';
@@ -13,6 +13,9 @@ interface OrderBookSectionProps {
     mobileContent?: 'orderBook' | 'recentTrades';
 }
 
+const ORDER_ROW_HEIGHT_FALLBACK = 16;
+const ORDER_ROW_GAP = 5;
+
 const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     symbol,
     mobileView = false,
@@ -20,186 +23,178 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
 }) => {
     const [orderCount, setOrderCount] = useState(9);
     const [tradesCount, setTradesCount] = useState(25);
-    const orderCountForStacked = useMemo(() => {
-        return Math.ceil(orderCount / 2);
-    }, [orderCount]);
 
-    const orderBookComponent = useMemo(() => {
-        return orderCount > 0 ? (
-            <div className={styles.orderbookInTab}>
-                <OrderBook symbol={symbol} orderCount={orderCount} />
-            </div>
-        ) : (
-            <></>
-        );
-    }, [orderCount, symbol]);
-    const orderBookTrades = useMemo(
-        () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
-        [tradesCount, symbol],
-    );
     const { orderBookMode, setOrderBookMode } = useAppSettings();
     const orderBookModeRef = useRef(orderBookMode);
 
-    const calculateOrderCount = () => {
-        const orderBookSection = document.getElementById('orderBookSection');
-
-        const dummyOrderRow = document.getElementById('dummyOrderRow');
-
-        const orderRowHeight =
-            dummyOrderRow?.getBoundingClientRect().height || 16;
-
-        const orderRowHeightWithGaps = orderRowHeight + 5;
-
-        if (orderBookSection) {
-            let availableHeight =
-                orderBookSection.getBoundingClientRect().height;
-            if (
-                window.innerHeight / availableHeight < 1.5 &&
-                window.innerHeight < 1000
-            ) {
-                availableHeight = window.innerHeight / 1.5;
-            }
-            if (availableHeight > 0) {
-                if (orderBookModeRef.current !== 'stacked') {
-                    let otherHeightSum =
-                        document
-                            .getElementById('orderBookTabs')
-                            ?.getBoundingClientRect()?.height || 0;
-                    otherHeightSum +=
-                        document
-                            .getElementById('orderBookHeader1')
-                            ?.getBoundingClientRect()?.height || 0;
-                    otherHeightSum +=
-                        document
-                            .getElementById('orderBookHeader2')
-                            ?.getBoundingClientRect()?.height || 0;
-                    const orderCount = Math.floor(
-                        (availableHeight - otherHeightSum) /
-                            (orderRowHeightWithGaps * 2),
-                    );
-                    setOrderCount(orderCount);
-                    setTradesCount(
-                        Math.floor(availableHeight / orderRowHeightWithGaps) -
-                            2,
-                    );
-                } else {
-                    const orderCount = Math.floor(availableHeight / 1000);
-                    setOrderCount(orderCount);
-                }
-            }
-        }
-    };
+    // Sync ref with state
     useEffect(() => {
-        // Use a ref to track the timeout ID
-        const timeoutRef = { current: null as NodeJS.Timeout | null };
+        orderBookModeRef.current = orderBookMode;
+    }, [orderBookMode]);
+
+    const orderCountForStacked = useMemo(
+        () => Math.ceil(orderCount / 2),
+        [orderCount],
+    );
+
+    const menuItems = useMemo(
+        () => [
+            { label: 'Tab', listener: () => setOrderBookMode('tab') },
+            { label: 'Stacked', listener: () => setOrderBookMode('stacked') },
+            { label: 'Large', listener: () => setOrderBookMode('large') },
+        ],
+        [setOrderBookMode],
+    );
+
+    const orderBookComponent = useMemo(
+        () =>
+            orderCount > 0 ? (
+                <div className={styles.orderbookInTab}>
+                    <OrderBook symbol={symbol} orderCount={orderCount} />
+                </div>
+            ) : null,
+        [orderCount, symbol],
+    );
+
+    const orderBookTradesComponent = useMemo(
+        () => <OrderBookTrades symbol={symbol} tradesCount={tradesCount} />,
+        [tradesCount, symbol],
+    );
+
+    const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
+    const [activeTab, setActiveTab] = useState(orderBookTabs[0]);
+
+    const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+
+    const renderTabContent = useCallback(() => {
+        if (activeTab === 'Trades') return orderBookTradesComponent;
+        return orderBookComponent;
+    }, [activeTab, orderBookComponent, orderBookTradesComponent]);
+
+    // Height calculation logic
+    const calculateOrderCount = useCallback(() => {
+        const orderBookSection = document.getElementById('orderBookSection');
+        const dummyOrderRow = document.getElementById('dummyOrderRow');
+        const orderRowHeight =
+            dummyOrderRow?.getBoundingClientRect().height ||
+            ORDER_ROW_HEIGHT_FALLBACK;
+        const orderRowHeightWithGaps = orderRowHeight + ORDER_ROW_GAP;
+
+        if (!orderBookSection) return;
+
+        let availableHeight = orderBookSection.getBoundingClientRect().height;
+        if (
+            window.innerHeight / availableHeight < 1.5 &&
+            window.innerHeight < 1000
+        ) {
+            availableHeight = window.innerHeight / 1.5;
+        }
+
+        if (availableHeight <= 0) return;
+
+        if (orderBookModeRef.current !== 'stacked') {
+            let otherHeightSum = 0;
+            ['orderBookTabs', 'orderBookHeader1', 'orderBookHeader2'].forEach(
+                (id) => {
+                    const el = document.getElementById(id);
+                    if (el) otherHeightSum += el.getBoundingClientRect().height;
+                },
+            );
+            const calculatedOrderCount = Math.floor(
+                (availableHeight - otherHeightSum) /
+                    (orderRowHeightWithGaps * 2),
+            );
+            if (orderCount !== calculatedOrderCount)
+                setOrderCount(calculatedOrderCount);
+            setTradesCount(
+                Math.floor(availableHeight / orderRowHeightWithGaps) - 2,
+            );
+        } else {
+            const calculatedOrderCount = Math.floor(availableHeight / 1000);
+            if (orderCount !== calculatedOrderCount)
+                setOrderCount(calculatedOrderCount);
+        }
+    }, [orderCount]);
+
+    // Resize effect
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout | null = null;
 
         const handleResize = () => {
-            // Clear previous timeout to avoid overlapping executions
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(() => {
-                calculateOrderCount();
-            }, 50);
+            if (timeoutId) clearTimeout(timeoutId);
+            timeoutId = setTimeout(calculateOrderCount, 50);
         };
 
         window.addEventListener('resize', handleResize);
-        calculateOrderCount(); // Initial call
+        calculateOrderCount();
 
-        // Cleanup: Remove listener + clear timeout
         return () => {
             window.removeEventListener('resize', handleResize);
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (timeoutId) clearTimeout(timeoutId);
         };
-    }, []); // Empty dependency array = runs once on mount
+    }, [calculateOrderCount]);
 
-    const menuItems = [
-        {
-            label: 'Tab',
-            listener: () => {
-                setOrderBookMode('tab');
-            },
-        },
-        {
-            label: 'Stacked',
-            listener: () => {
-                setOrderBookMode('stacked');
-            },
-        },
-        {
-            label: 'Large',
-            listener: () => {
-                setOrderBookMode('large');
-            },
-        },
-    ];
-
-    // Available tabs for the order book section
-    const orderBookTabs = ['Book', 'Trades'];
-    const [activeTab, setActiveTab] = useState<string>(orderBookTabs[0]);
-    const handleTabChange = (tab: string) => {
-        setActiveTab(tab);
-    };
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case 'Book':
-                return orderBookComponent;
-            case 'Trades':
-                return orderBookTrades;
-            default:
-                return orderBookComponent;
-        }
-    };
-
-    // Mobile view - only render the requested content
-    if (mobileView) {
-        if (mobileContent === 'orderBook') {
-            return orderBookComponent;
-        } else if (mobileContent === 'recentTrades') {
-            return orderBookTrades;
-        }
-    }
-
-    // Desktop views
-    const stackedOrderBook = (
-        <div className={styles.orderBookSection}>
-            <div className={styles.stackedContainer}>
-                <div className={styles.sectionHeader}>
-                    <div className={styles.sectionHeaderTitle}>Book</div>
-                    <BasicMenu items={menuItems} icon={<BsThreeDots />} />
-                </div>
-                <OrderBook symbol={symbol} orderCount={orderCountForStacked} />
-                <div className={styles.sectionHeader}>
-                    <div className={styles.sectionHeaderTitle}>Trades</div>
-                    <BasicMenu items={menuItems} icon={<BsThreeDots />} />
-                </div>
-                {orderBookTrades}
+    // Menu content
+    const menuContent = useMemo(
+        () => (
+            <div className={styles.menuContent}>
+                <BasicMenu items={menuItems} icon={<BsThreeDots />} />
             </div>
-        </div>
+        ),
+        [menuItems],
     );
 
-    const largeOrderBook = (
-        <div className={styles.orderBookSection}>
-            <div className={styles.largeContainer}>
-                <div className={styles.childOfLargeContainer}>
+    const stackedOrderBook = useMemo(
+        () => (
+            <div className={styles.orderBookSection}>
+                <div className={styles.stackedContainer}>
                     <div className={styles.sectionHeader}>
                         <div className={styles.sectionHeaderTitle}>Book</div>
+                        <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                     </div>
-                    <OrderBook symbol={symbol} orderCount={orderCount} />
-                </div>
-                <div className={styles.childOfLargeContainer}>
+                    <OrderBook
+                        symbol={symbol}
+                        orderCount={orderCountForStacked}
+                    />
                     <div className={styles.sectionHeader}>
                         <div className={styles.sectionHeaderTitle}>Trades</div>
                         <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                     </div>
-                    {orderBookTrades}
+                    {orderBookTradesComponent}
                 </div>
             </div>
-        </div>
+        ),
+        [orderCountForStacked, symbol],
     );
 
-    const menuContent = (
-        <div className={styles.menuContent}>
-            <BasicMenu items={menuItems} icon={<BsThreeDots />} />
-        </div>
+    const largeOrderBook = useMemo(
+        () => (
+            <div className={styles.orderBookSection}>
+                <div className={styles.largeContainer}>
+                    <div className={styles.childOfLargeContainer}>
+                        <div className={styles.sectionHeader}>
+                            <div className={styles.sectionHeaderTitle}>
+                                Book
+                            </div>
+                        </div>
+                        <OrderBook symbol={symbol} orderCount={orderCount} />
+                    </div>
+                    <div className={styles.childOfLargeContainer}>
+                        <div className={styles.sectionHeader}>
+                            <div className={styles.sectionHeaderTitle}>
+                                Trades
+                            </div>
+                            <BasicMenu
+                                items={menuItems}
+                                icon={<BsThreeDots />}
+                            />
+                        </div>
+                        {orderBookTradesComponent}
+                    </div>
+                </div>
+            </div>
+        ),
+        [orderCount, symbol],
     );
 
     const orderBookTabsComponent = (
@@ -210,13 +205,20 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 rightContent={menuContent}
-                wide={true}
-                flex={true}
+                wide
+                flex
             />
             <div className={styles.tabContent}>{renderTabContent()}</div>
         </div>
     );
 
+    // Mobile view logic
+    if (mobileView) {
+        if (mobileContent === 'orderBook') return orderBookComponent;
+        if (mobileContent === 'recentTrades') return orderBookTradesComponent;
+    }
+
+    // Desktop view logic
     return (
         <>
             {orderBookMode === 'tab' && orderBookTabsComponent}
