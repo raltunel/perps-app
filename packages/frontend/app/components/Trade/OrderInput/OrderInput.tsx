@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
+import { GoZap } from 'react-icons/go';
+import { LuOctagonX } from 'react-icons/lu';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { RiBarChartHorizontalLine } from 'react-icons/ri';
+import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useKeydown } from '~/hooks/useKeydown';
 import { useModal, type useModalIF } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
@@ -10,6 +17,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -28,14 +36,6 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { GoZap } from 'react-icons/go';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { LuOctagonX } from 'react-icons/lu';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
-import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { useKeydown } from '~/hooks/useKeydown';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -50,7 +50,7 @@ export interface ChaseOption {
 
 export type MarginMode = 'cross' | 'isolated' | null;
 
-const marketOrderTypes: OrderTypeOption[] = [
+const marketOrderTypes = [
     {
         value: 'market',
         label: 'Market',
@@ -95,7 +95,7 @@ const marketOrderTypes: OrderTypeOption[] = [
     },
 ];
 
-const chaseOptionTypes: ChaseOption[] = [
+const chaseOptionTypes = [
     { value: 'bid1ask1', label: 'Bid1/Ask1' },
     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 ];
@@ -115,7 +115,7 @@ const positionSizeOptions = [
     { value: 100, label: '100%' },
 ];
 
-export default function OrderInput() {
+function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
     const [modalContent, setModalContent] = useState<
@@ -172,37 +172,21 @@ export default function OrderInput() {
 
     const useTotalSize = ['twap', 'chase_limit'].includes(marketOrderType);
 
-    const inputDetailsData = [
-        {
-            label: 'Available to Trade',
-            tooltipLabel: 'available to trade',
-            value: '0.00',
-        },
-        {
-            label: 'Current Position',
-            tooltipLabel: 'current position',
-            value: `0.000 ${symbol}`,
-        },
-    ];
-
-    useEffect(() => {
-        /* -----------------------------------------------------------------------------------------------
-        this code block has been commented out for now
-        it was used to set the size of the order based on the clicked orderbook slot 
-        */
-
-        // if (obChosenAmount > 0) {
-        //     setSize(formatNumWithOnlyDecimals(obChosenAmount));
-        //     handleTypeChange();
-        // }
-
-        /* ----------------------------------------------------------------------------------------------- */
-
-        if (obChosenPrice > 0) {
-            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
-            handleTypeChange();
-        }
-    }, [obChosenAmount, obChosenPrice]);
+    const inputDetailsData = useMemo(
+        () => [
+            {
+                label: 'Available to Trade',
+                tooltipLabel: 'available to trade',
+                value: '0.00',
+            },
+            {
+                label: 'Current Position',
+                tooltipLabel: 'current position',
+                value: `0.000 ${symbol}`,
+            },
+        ],
+        [],
+    );
 
     const orderValue = useMemo(() => {
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
@@ -242,6 +226,25 @@ export default function OrderInput() {
         }
     };
 
+    useEffect(() => {
+        /* -----------------------------------------------------------------------------------------------
+        this code block has been commented out for now
+        it was used to set the size of the order based on the clicked orderbook slot 
+        */
+
+        // if (obChosenAmount > 0) {
+        //     setSize(formatNumWithOnlyDecimals(obChosenAmount));
+        //     handleTypeChange();
+        // }
+
+        /* ----------------------------------------------------------------------------------------------- */
+
+        if (obChosenPrice > 0) {
+            setPrice(formatNumWithOnlyDecimals(obChosenPrice));
+            handleTypeChange();
+        }
+    }, [obChosenAmount, obChosenPrice, handleTypeChange]);
+
     const openModalWithContent = (
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
@@ -249,14 +252,14 @@ export default function OrderInput() {
         appSettingsModal.open();
     };
 
-    const handleMarketOrderTypeChange = (value: string) => {
+    const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
         console.log(`Order type changed to: ${value}`);
-    };
-    const handleMarginModeChange = (mode: MarginMode) => {
+    }, []);
+    const handleMarginModeChange = useCallback((mode: MarginMode) => {
         setActiveMargin(mode);
         console.log(`Mode changed to: ${mode}`);
-    };
+    }, []);
 
     const handleMarginModeConfirm = () => {
         if (activeMargin) {
@@ -269,16 +272,16 @@ export default function OrderInput() {
         console.log(`Leverage changed to: ${value}x`);
     };
 
-    // SIZE INPUT-----------------------------
-    const handleSizeChange = (
-        event: React.ChangeEvent<HTMLInputElement> | string,
-    ) => {
-        if (typeof event === 'string') {
-            setSize(event);
-        } else {
-            setSize(event.target.value);
-        }
-    };
+    const handleSizeChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement> | string) => {
+            if (typeof event === 'string') {
+                setSize(event);
+            } else {
+                setSize(event.target.value);
+            }
+        },
+        [],
+    );
 
     const handleSizeBlur = () => {
         console.log('Input lost focus');
@@ -393,101 +396,150 @@ export default function OrderInput() {
         }
     };
 
-    // JSX RETURNS -----------------------------------
-    const priceDistributionButtons = (
-        <div className={styles.priceDistributionContainer}>
-            <div className={styles.inputDetailsLabel}>
-                <span>Price Distribution</span>
-                <Tooltip content={'price distribution'} position='right'>
-                    <AiOutlineQuestionCircle size={13} />
-                </Tooltip>
+    const priceDistributionButtons = useMemo(
+        () => (
+            <div className={styles.priceDistributionContainer}>
+                <div className={styles.priceDistributionContainer}>
+                    <div className={styles.inputDetailsLabel}>
+                        <span>Price Distribution</span>
+                        <Tooltip
+                            content={'price distribution'}
+                            position='right'
+                        >
+                            <AiOutlineQuestionCircle size={13} />
+                        </Tooltip>
+                    </div>
+                    <div className={styles.actionButtonsContainer}>
+                        <button onClick={() => openModalWithContent('scale')}>
+                            <img src={flatSvg} alt='flat price distribution' />
+                            Flat
+                        </button>
+                        <button onClick={() => openModalWithContent('scale')}>
+                            <img src={evenSvg} alt='even price distribution' />
+                            Evenly Split
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div className={styles.actionButtonsContainer}>
-                <button onClick={() => openModalWithContent('scale')}>
-                    <img src={flatSvg} alt='flat price distribution' />
-                    Flat
-                </button>
-                <button onClick={() => openModalWithContent('scale')}>
-                    <img src={evenSvg} alt='even price distribution' />
-                    Evenly Split
-                </button>
-            </div>
-        </div>
+        ),
+        [styles.priceDistributionContainer],
     );
+
     // -----------------------------PROPS----------------------------------------
-    const reduceAndProfitToggleProps = {
-        isReduceOnlyEnabled,
-        isTakeProfitEnabled,
-        handleToggleProfitOnly,
-        handleToggleReduceOnly,
-        marketOrderType,
-        isRandomizeEnabled,
-        handleToggleRandomize,
-        isChasingIntervalEnabled,
-        handleToggleIsChasingInterval: handleToggleChasingInterval,
-    };
+    const reduceAndProfitToggleProps = useMemo(
+        () => ({
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleIsChasingInterval: handleToggleChasingInterval,
+        }),
+        [
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleChasingInterval,
+        ],
+    );
 
-    const leverageSliderProps = {
-        options: leverageOptions,
-        value: leverage,
-        onChange: handleLeverageChange,
-        minimumInputValue: minimumInputValue,
-        maximumInputValue: tempMaximumLeverageInput,
-        generateRandomMaximumInput: generateRandomMaximumInput,
-    };
+    const leverageSliderProps = useMemo(
+        () => ({
+            options: leverageOptions,
+            value: leverage,
+            onChange: handleLeverageChange,
+            minimumInputValue: minimumInputValue,
+            maximumInputValue: tempMaximumLeverageInput,
+            generateRandomMaximumInput: generateRandomMaximumInput,
+        }),
+        [leverage, handleLeverageChange],
+    );
 
-    const chasePriceProps = {
-        chaseOption,
-        chaseOptionTypes,
-        handleChaseOptionChange,
-    };
+    const chasePriceProps = useMemo(
+        () => ({
+            chaseOption,
+            chaseOptionTypes,
+            handleChaseOptionChange,
+        }),
+        [chaseOption, handleChaseOptionChange],
+    );
 
-    const stopPriceProps = {
-        value: stopPrice,
-        onChange: handleStopPriceChange,
-        onBlur: handleStopPriceBlur,
-        onKeyDown: handleStopPriceKeyDown,
-        className: 'custom-input',
-        ariaLabel: 'stop price input',
-    };
+    const stopPriceProps = useMemo(
+        () => ({
+            value: stopPrice,
+            onChange: handleStopPriceChange,
+            onBlur: handleStopPriceBlur,
+            onKeyDown: handleStopPriceKeyDown,
+            className: 'custom-input',
+            ariaLabel: 'stop price input',
+        }),
+        [stopPrice, handleStopPriceChange],
+    );
 
-    const priceInputProps = {
-        value: price,
-        onChange: handlePriceChange,
-        onBlur: handlePriceBlur,
-        onKeyDown: handlePriceKeyDown,
-        className: 'custom-input',
-        ariaLabel: 'Price input',
-        showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
-    };
+    const priceInputProps = useMemo(
+        () => ({
+            value: price,
+            onChange: handlePriceChange,
+            onBlur: handlePriceBlur,
+            onKeyDown: handlePriceKeyDown,
+            className: 'custom-input',
+            ariaLabel: 'Price input',
+            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+        }),
+        [price, handlePriceChange],
+    );
 
-    const sizeInputProps = {
-        value: size,
-        onChange: handleSizeChange,
-        onBlur: handleSizeBlur,
-        onKeyDown: handleSizeKeyDown,
-        className: 'custom-input',
-        ariaLabel: 'Size input',
-        useTotalSize,
-        symbol,
-        selectedMode,
-        setSelectedMode,
-    };
+    const sizeInputProps = useMemo(
+        () => ({
+            value: size,
+            onChange: handleSizeChange,
+            onBlur: handleSizeBlur,
+            onKeyDown: handleSizeKeyDown,
+            className: 'custom-input',
+            ariaLabel: 'Size input',
+            useTotalSize,
+            symbol,
+            selectedMode,
+            setSelectedMode,
+        }),
+        [size, handleSizeChange],
+    );
 
-    const positionSizeProps = {
-        options: positionSizeOptions,
-        value: positionSize,
-        onChange: handlePositionSizeChange,
-    };
+    const positionSizeProps = useMemo(
+        () => ({
+            options: positionSizeOptions,
+            value: positionSize,
+            onChange: handlePositionSizeChange,
+        }),
+        [positionSize, handlePositionSizeChange],
+    );
 
-    const priceRangeProps = {
-        minValue: priceRangeMin,
-        maxValue: priceRangeMax,
-        handleChangeMin: handleMinPriceRange,
-        handleChangeMax: handleMaxPriceRange,
-        handleChangetotalOrders: handleTotalordersPriceRange,
-        totalOrders: priceRangeTotalOrders,
-    };
+    const priceRangeProps = useMemo(
+        () => ({
+            minValue: priceRangeMin,
+            maxValue: priceRangeMax,
+            handleChangeMin: handleMinPriceRange,
+            handleChangeMax: handleMaxPriceRange,
+            handleChangetotalOrders: handleTotalordersPriceRange,
+            totalOrders: priceRangeTotalOrders,
+        }),
+        [
+            priceRangeMin,
+            priceRangeMax,
+            handleMinPriceRange,
+            handleMaxPriceRange,
+            handleTotalordersPriceRange,
+            priceRangeTotalOrders,
+        ],
+    );
 
     // logic to dispatch a notification on demand
     const notifications: NotificationStoreIF = useNotificationStore();
@@ -688,3 +740,5 @@ export default function OrderInput() {
         </div>
     );
 }
+
+export default React.memo(OrderInput);
