@@ -1,16 +1,18 @@
+import { useMemo, useState } from 'react';
+import { LuPen } from 'react-icons/lu';
 import { RiExternalLinkLine } from 'react-icons/ri';
+import { useNavigate } from 'react-router';
+import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
+import Tooltip from '~/components/Tooltip/Tooltip';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
-import styles from './PositionsTable.module.css';
-import { LuPen } from 'react-icons/lu';
-import { useMemo, useState } from 'react';
-import Modal from '~/components/Modal/Modal';
+import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
-import Tooltip from '~/components/Tooltip/Tooltip';
+import styles from './PositionsTable.module.css';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -19,6 +21,8 @@ interface PositionsTableRowProps {
 }
 
 export default function PositionsTableRow(props: PositionsTableRowProps) {
+    const navigate = useNavigate();
+
     const { position } = props;
     const { coinPriceMap } = useTradeDataStore();
     const { formatNum } = useNumFormatter();
@@ -74,9 +78,22 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
         modalCtrl.open();
     };
 
+    const openLeverageModal = () => {
+        setModalContent('leverage');
+        modalCtrl.open();
+    };
+
     const renderModalContent = () => {
         if (modalContent === 'share') {
             return <ShareModal close={modalCtrl.close} position={position} />;
+        } else if (modalContent === 'leverage') {
+            return (
+                <LeverageSliderModal
+                    currentLeverage={position.leverage.value}
+                    maxLeverage={position.maxLeverage}
+                    onClose={modalCtrl.close}
+                />
+            );
         } else if (modalContent === 'tpsl') {
             return (
                 <Modal close={modalCtrl.close} title='TP/SL for Position'>
@@ -87,9 +104,14 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 </Modal>
             );
         }
+
         return null;
     };
 
+    const handleCoinClick = () => {
+        // Navigate to the market page for this coin
+        navigate(`/trade/${position.coin.toLowerCase()}`);
+    };
     const fundingToShow = useMemo(() => {
         return position.cumFunding.sinceOpen * -1;
     }, [position.cumFunding.sinceOpen]);
@@ -104,11 +126,20 @@ export default function PositionsTableRow(props: PositionsTableRowProps) {
                 className={`${styles.cell} ${styles.coinCell}`}
                 style={gradientStyle}
             >
-                {position.coin}
+                <span
+                    style={{ color: baseColor, cursor: 'pointer' }}
+                    onClick={handleCoinClick}
+                >
+                    {position.coin}
+                </span>
                 {position.leverage.value && (
                     <span
                         className={styles.badge}
-                        style={{ color: 'var(--text1)' }}
+                        onClick={openLeverageModal}
+                        style={{
+                            color: baseColor,
+                            backgroundColor: hexToRgba(baseColor, 0.15),
+                        }}
                     >
                         {position.leverage.value}x
                     </span>

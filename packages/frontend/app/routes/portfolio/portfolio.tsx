@@ -1,4 +1,4 @@
-import { lazy, memo, Suspense } from 'react';
+import { memo } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
@@ -7,16 +7,7 @@ import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
-
-const PortfolioDeposit = lazy(
-    () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
-);
-const PortfolioWithdraw = lazy(
-    () => import('~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw'),
-);
-const PortfolioSend = lazy(
-    () => import('~/components/Portfolio/PortfolioSend/PortfolioSend'),
-);
+import { usePortfolioModals } from './usePortfolioModals';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -28,20 +19,15 @@ export function meta() {
 }
 
 function Portfolio() {
-    const {
-        portfolio,
-        selectedPortfolio,
-        isProcessing,
-        modalState,
-        formatCurrency,
-        openModal,
-        closeModal,
-        processDeposit,
-        processWithdraw,
-        processSend,
-    } = usePortfolioManager();
+    const { portfolio, formatCurrency } = usePortfolioManager();
 
-    // logic to open and close the fee schedule modal
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        openSendModal,
+        PortfolioModalsRenderer,
+    } = usePortfolioModals();
+
     const feeScheduleModalCtrl: useModalIF = useModal('closed');
 
     return (
@@ -71,7 +57,6 @@ function Portfolio() {
                                 {portfolio.fees.taker}% / {portfolio.fees.maker}
                                 %
                             </h3>
-                            {/* <Link to='/'>View fee schedule</Link> */}
                             <div
                                 className={styles.view_detail_clickable}
                                 onClick={feeScheduleModalCtrl.open}
@@ -92,25 +77,21 @@ function Portfolio() {
                             </h6>
                             <div className={styles.buttonContainer}>
                                 <div className={styles.rowButton}>
-                                    <button
-                                        onClick={() => openModal('deposit')}
-                                    >
+                                    <button onClick={openDepositModal}>
                                         Deposit
                                     </button>
-                                    <button
-                                        onClick={() => openModal('withdraw')}
-                                    >
+                                    <button onClick={openWithdrawModal}>
                                         Withdraw
                                     </button>
                                     <button
-                                        onClick={() => openModal('send')}
+                                        onClick={openSendModal}
                                         className={styles.sendMobile}
                                     >
                                         Send
                                     </button>
                                 </div>
                                 <button
-                                    onClick={() => openModal('send')}
+                                    onClick={openSendModal}
                                     className={styles.sendDesktop}
                                 >
                                     Send
@@ -129,77 +110,8 @@ function Portfolio() {
                 </div>
             </div>
 
-            {modalState.isOpen && selectedPortfolio && (
-                <Modal
-                    close={closeModal}
-                    position='center'
-                    title={
-                        modalState.content === 'deposit'
-                            ? 'Deposit '
-                            : modalState.content === 'withdraw'
-                              ? 'Withdraw '
-                              : modalState.content === 'send'
-                                ? 'Send '
-                                : ''
-                    }
-                >
-                    <Suspense fallback={<div>Loading...</div>}>
-                        {modalState.content === 'deposit' && (
-                            <PortfolioDeposit
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                                onDeposit={processDeposit}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                            />
-                        )}
+            {PortfolioModalsRenderer}
 
-                        {modalState.content === 'withdraw' && (
-                            <PortfolioWithdraw
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                                onWithdraw={processWithdraw}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                            />
-                        )}
-
-                        {modalState.content === 'send' && (
-                            <PortfolioSend
-                                availableAmount={
-                                    selectedPortfolio.availableBalance
-                                }
-                                tokenType={selectedPortfolio.unit}
-                                networkFee={
-                                    selectedPortfolio.unit === 'USD'
-                                        ? '$0.001'
-                                        : '0.0001 BTC'
-                                }
-                                onSend={processSend}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                            />
-                        )}
-                    </Suspense>
-                </Modal>
-            )}
             {feeScheduleModalCtrl.isOpen && (
                 <Modal
                     close={feeScheduleModalCtrl.close}
