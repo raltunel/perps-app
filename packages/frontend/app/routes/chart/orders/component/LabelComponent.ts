@@ -39,17 +39,35 @@ const LabelComponent = ({
 
         const draw = () => {
             if (overlayCanvasRef.current) {
-                const width = overlayCanvasRef.current.style.width;
-                const height = overlayCanvasRef.current.style.height;
+                const chartDiv = document.getElementById('tv_chart');
+                const iframe = chartDiv?.querySelector(
+                    'iframe',
+                ) as HTMLIFrameElement;
+                const iframeDoc =
+                    iframe?.contentDocument || iframe?.contentWindow?.document;
 
-                if (
-                    width !== canvasSize.styleWidth ||
-                    height !== canvasSize.styleWidth
-                ) {
-                    overlayCanvasRef.current.style.width = `${canvasSize.styleWidth}px`;
-                    overlayCanvasRef.current.style.height = `${canvasSize.styleHeight}px`;
-                    overlayCanvasRef.current.width = canvasSize.width;
-                    overlayCanvasRef.current.height = canvasSize.height;
+                if (iframeDoc) {
+                    const paneCanvas = iframeDoc.querySelector(
+                        'canvas[data-name="pane-canvas"]',
+                    ) as HTMLCanvasElement;
+                    const width = overlayCanvasRef.current.style.width;
+                    const height = overlayCanvasRef.current.style.height;
+
+                    if (
+                        width !== canvasSize.styleWidth ||
+                        height !== canvasSize.styleWidth
+                    ) {
+                        console.log(
+                            'paneCanvas.width,paneCanvas.height',
+                            paneCanvas.width,
+                            paneCanvas.height,
+                        );
+
+                        overlayCanvasRef.current.style.width = `${canvasSize.styleWidth}px`;
+                        overlayCanvasRef.current.style.height = `${canvasSize.styleHeight}px`;
+                        overlayCanvasRef.current.width = paneCanvas.width;
+                        overlayCanvasRef.current.height = paneCanvas.height;
+                    }
                 }
             }
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);

@@ -41,19 +41,13 @@ const OverlayCanvas: React.FC = () => {
         const canvas = canvasRef.current;
 
         const updateCanvasSize = () => {
-            const paneCanvasNew = iframeDoc.querySelector(
-                'canvas[data-name="pane-canvas"]',
-            ) as HTMLCanvasElement;
-
             const width = paneCanvas.width;
             const height = paneCanvas.height;
 
-            console.log('paneCanvassss', width, height);
-
             console.log(
-                'paneCanvassssNEW',
-                paneCanvasNew.width,
-                paneCanvasNew.height,
+                'paneCanvas.width,paneCanvas.height',
+                paneCanvas.width,
+                paneCanvas.height,
             );
 
             canvas.width = width;
