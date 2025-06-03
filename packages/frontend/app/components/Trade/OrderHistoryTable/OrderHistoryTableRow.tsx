@@ -1,8 +1,8 @@
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import styles from './OrderHistoryTable.module.css';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
-import useNumFormatter from '~/hooks/useNumFormatter';
+import styles from './OrderHistoryTable.module.css';
 interface OrderHistoryTableRowProps {
     order: OrderDataIF;
 }

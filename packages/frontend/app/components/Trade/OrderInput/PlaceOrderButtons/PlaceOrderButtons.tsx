@@ -1,3 +1,4 @@
+import React, { useCallback, useMemo } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -18,107 +19,142 @@ interface MarketInfoItem {
     value: string;
 }
 
-export default function PlaceOrderButtons(props: propsIF) {
+const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     const { orderMarketPrice, openModalWithContent, orderValue, leverage } =
         props;
 
-    // logic to change the active color pair
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
 
-    const showLiquidationPrice: boolean = [
-        'market',
-        'limit',
-        'stop_limit',
-        'stop_market',
-    ].includes(orderMarketPrice);
+    const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
+    const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
 
-    const marketInfoData: MarketInfoItem[] = [
-        showLiquidationPrice && {
-            label: 'Liquidation Price',
-            tooltipLabel: 'liquidation price',
-            value: '-',
-        },
-        orderMarketPrice === 'scale' && {
-            label: 'Avg. Entry Price',
-            tooltipLabel: 'average entry price',
-            value: '-',
-        },
-        {
-            label: 'Order Value',
-            tooltipLabel: 'order value',
-            value: `${orderValue ? formatNum(orderValue, null, true, true) : 'N/A'}`,
-        },
-        {
-            label: 'Margin Required',
-            tooltipLabel: 'margin required',
-            value: orderValue
-                ? `${formatNum(orderValue / leverage, null, true, true)}`
-                : 'N/A',
-        },
-    ].filter(Boolean) as MarketInfoItem[];
+    const showLiquidationPrice = useMemo(
+        () =>
+            ['market', 'limit', 'stop_limit', 'stop_market'].includes(
+                orderMarketPrice,
+            ),
+        [orderMarketPrice],
+    );
 
-    const twapInfoData: MarketInfoItem[] = [
-        {
-            label: 'Frequency',
-            tooltipLabel: 'frequency',
-            value: '30 seconds',
-        },
-        {
-            label: 'Run Time',
-            tooltipLabel: 'run time',
-            value: '30 minutes',
-        },
-        {
-            label: 'Number of Orders',
-            tooltipLabel: 'number of orders',
-            value: '61',
-        },
-    ];
+    const marketInfoData: MarketInfoItem[] = useMemo(() => {
+        const arr: (MarketInfoItem | false)[] = [
+            showLiquidationPrice && {
+                label: 'Liquidation Price',
+                tooltipLabel: 'liquidation price',
+                value: '-',
+            },
+            orderMarketPrice === 'scale' && {
+                label: 'Avg. Entry Price',
+                tooltipLabel: 'average entry price',
+                value: '-',
+            },
+            {
+                label: 'Order Value',
+                tooltipLabel: 'order value',
+                value: orderValue
+                    ? formatNum(orderValue, null, true, true)
+                    : 'N/A',
+            },
+            {
+                label: 'Margin Required',
+                tooltipLabel: 'margin required',
+                value: orderValue
+                    ? formatNum(orderValue / leverage, null, true, true)
+                    : 'N/A',
+            },
+        ];
+        return arr.filter(Boolean) as MarketInfoItem[];
+    }, [
+        showLiquidationPrice,
+        orderMarketPrice,
+        orderValue,
+        leverage,
+        formatNum,
+    ]);
 
-    const limitInfoData: MarketInfoItem[] = [
-        {
-            label: 'Chasing Interval',
-            tooltipLabel: 'chasing interval',
-            value: 'Per 1s',
-        },
-        {
-            label: 'Size per suborder',
-            tooltipLabel: 'size per suborder',
-            value: '0.000 ETH',
-        },
-    ];
+    const twapInfoData: MarketInfoItem[] = useMemo(
+        () => [
+            {
+                label: 'Frequency',
+                tooltipLabel: 'frequency',
+                value: '30 seconds',
+            },
+            {
+                label: 'Run Time',
+                tooltipLabel: 'run time',
+                value: '30 minutes',
+            },
+            {
+                label: 'Number of Orders',
+                tooltipLabel: 'number of orders',
+                value: '61',
+            },
+        ],
+        [],
+    );
 
-    const infoDataMap: Record<string, MarketInfoItem[]> = {
-        twap: twapInfoData,
-        chase_limit: limitInfoData,
-    };
+    const limitInfoData: MarketInfoItem[] = useMemo(
+        () => [
+            {
+                label: 'Chasing Interval',
+                tooltipLabel: 'chasing interval',
+                value: 'Per 1s',
+            },
+            {
+                label: 'Size per suborder',
+                tooltipLabel: 'size per suborder',
+                value: '0.000 ETH',
+            },
+        ],
+        [],
+    );
 
-    const dataToUse = infoDataMap[orderMarketPrice] || marketInfoData;
+    const infoDataMap: Record<string, MarketInfoItem[]> = useMemo(
+        () => ({
+            twap: twapInfoData,
+            chase_limit: limitInfoData,
+        }),
+        [twapInfoData, limitInfoData],
+    );
+
+    const dataToUse = useMemo(
+        () => infoDataMap[orderMarketPrice] || marketInfoData,
+        [infoDataMap, orderMarketPrice, marketInfoData],
+    );
+
+    const handleBuyClick = useCallback(
+        () => openModalWithContent('confirm_buy'),
+        [openModalWithContent],
+    );
+    const handleSellClick = useCallback(
+        () => openModalWithContent('confirm_sell'),
+        [openModalWithContent],
+    );
 
     return (
         <div className={styles.place_order_buttons}>
             <div className={styles.buttons_wrapper}>
                 <button
-                    style={{ backgroundColor: getBsColor().buy }}
-                    onClick={() => openModalWithContent('confirm_buy')}
+                    style={{ backgroundColor: buyColor }}
+                    onClick={handleBuyClick}
                 >
                     Buy / Long
                 </button>
                 <button
-                    style={{ backgroundColor: getBsColor().sell }}
-                    onClick={() => openModalWithContent('confirm_sell')}
+                    style={{ backgroundColor: sellColor }}
+                    onClick={handleSellClick}
                 >
                     Sell / Short
                 </button>
             </div>
             <div className={styles.input_details}>
-                {dataToUse.map((data: MarketInfoItem) => (
-                    <div>
+                {dataToUse.map((data: MarketInfoItem, idx: number) => (
+                    <div key={data.label + idx}>
                         <div className={styles.detail_label}>
                             <span>{data.label}</span>
                             <Tooltip
-                                content={data?.tooltipLabel}
+                                content={data.tooltipLabel}
                                 position='right'
                             >
                                 <AiOutlineQuestionCircle size={13} />
@@ -132,4 +168,6 @@ export default function PlaceOrderButtons(props: propsIF) {
             </div>
         </div>
     );
-}
+});
+
+export default PlaceOrderButtons;

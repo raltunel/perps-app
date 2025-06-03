@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import styles from './SizeInput.module.css';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
+import styles from './SizeInput.module.css';
 
 interface PropsIF {
     value: string;
@@ -16,7 +16,8 @@ interface PropsIF {
     selectedMode: OrderBookMode;
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
 }
-export default function SizeInput(props: PropsIF) {
+
+const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     const {
         value,
         onChange,
@@ -41,22 +42,41 @@ export default function SizeInput(props: PropsIF) {
     const valueRef = useRef<string>(value);
     valueRef.current = value;
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
-        if (inputRegex.test(newValue) && newValue.length <= 12) {
-            onChange(event);
-            valueNum.current = parseFormattedWithOnlyDecimals(newValue);
-        }
-    };
+    // Memoized input change handler
+    const handleChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement>) => {
+            const newValue = event.target.value;
+            if (inputRegex.test(newValue) && newValue.length <= 12) {
+                onChange(event);
+                valueNum.current = parseFormattedWithOnlyDecimals(newValue);
+            }
+        },
+        [inputRegex, onChange, parseFormattedWithOnlyDecimals],
+    );
+
+    // Memoized ComboBox options
+    const comboBoxOptions = useMemo(
+        () => [symbol.toUpperCase(), 'USD'],
+        [symbol],
+    );
+
+    // Memoized ComboBox onChange handler
+    const handleComboBoxChange = useCallback(
+        (val: string) => {
+            setSelectedMode(val === symbol.toUpperCase() ? 'symbol' : 'usd');
+        },
+        [setSelectedMode, symbol],
+    );
 
     useEffect(() => {
         valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
-    }, [valueRef.current]);
+    }, [parseFormattedWithOnlyDecimals, valueRef.current]);
 
     useEffect(() => {
         const precision = getPrecisionFromNumber(valueNum.current);
         onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
-    }, [formatNumWithOnlyDecimals]);
+        // Only run when formatter functions or onChange change
+    }, [formatNumWithOnlyDecimals, getPrecisionFromNumber, onChange]);
 
     return (
         <div className={styles.sizeInputContainer}>
@@ -74,19 +94,16 @@ export default function SizeInput(props: PropsIF) {
                 placeholder='Enter Size'
             />
             <button className={styles.tokenButton}>
-                {/* {symbol ? symbol : 'ETH'} <FaChevronDown /> */}
                 <ComboBox
                     value={
                         selectedMode === 'symbol' ? symbol.toUpperCase() : 'USD'
                     }
-                    options={[symbol.toUpperCase(), 'USD']}
-                    onChange={(value) =>
-                        setSelectedMode(
-                            value === symbol.toUpperCase() ? 'symbol' : 'usd',
-                        )
-                    }
+                    options={comboBoxOptions}
+                    onChange={handleComboBoxChange}
                 />
             </button>
         </div>
     );
-}
+});
+
+export default SizeInput;
