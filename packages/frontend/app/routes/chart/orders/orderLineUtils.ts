@@ -26,10 +26,10 @@ export function drawLabel(
     { x, y, labelOptions }: DrawSegmentedRectOptions,
 ) {
     const dpr = window.devicePixelRatio || 1;
-    const height = 20 * dpr;
+    const height = 15 * dpr;
 
     ctx.save();
-    ctx.font = `bold ${11 * dpr}px sans-serif`;
+    ctx.font = `bold ${12}px sans-serif`;
     const padding = 4;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
