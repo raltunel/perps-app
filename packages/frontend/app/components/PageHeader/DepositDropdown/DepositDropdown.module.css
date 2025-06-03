@@ -48,6 +48,13 @@
     gap: var(--gap-s);
     grid-row: 1;
 }
+.actionButtons button:hover,
+.dropdownActionButtons button:hover {
+    background: var(--accent1) !important;
+    opacity: 1 !important;
+    transition: all 0.3s ease-in-out;
+    filter: brightness(1) !important;
+}
 
 .connectButton {
     display: flex;

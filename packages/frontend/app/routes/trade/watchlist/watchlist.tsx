@@ -18,15 +18,11 @@ const WatchList: React.FC = () => {
             <TbHeartFilled className={styles.favIcon} size={23} />
             <FiDollarSign
                 onClick={() => setWatchListMode('dollar')}
-                className={`${styles.watchListToolbarIcon} ${
-                    watchListMode === 'dollar' ? styles.active : ''
-                }`}
+                className={`${styles.watchListToolbarIcon} ${watchListMode === 'dollar' ? styles.active : ''}`}
             />
             <FiPercent
                 onClick={() => setWatchListMode('percent')}
-                className={`${styles.watchListToolbarIcon} ${
-                    styles.percentIcon
-                }  ${watchListMode === 'percent' ? styles.active : ''}`}
+                className={`${styles.watchListToolbarIcon} ${styles.percentIcon}  ${watchListMode === 'percent' ? styles.active : ''}`}
             />
 
             <HorizontalScrollable className={styles.watchListLimitor}>
@@ -34,10 +30,13 @@ const WatchList: React.FC = () => {
                     {favCoins &&
                         favCoins.map((e) => (
                             <WatchListNode
-                                key={e.coin + e.dayNtlVlm}
-                                symbol={e}
+                                key={e.coin}
+                                coin={e.coin}
+                                markPx={e.markPx}
+                                prevDayPx={e.prevDayPx}
+                                isActive={e.coin === favCoins[0].coin}
                                 showMode={watchListMode}
-                            ></WatchListNode>
+                            />
                         ))}
                 </div>
             </HorizontalScrollable>

@@ -1,8 +1,8 @@
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import styles from './FundingHistoryTable.module.css';
-import type { UserFundingIF } from '~/utils/UserDataIFs';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import type { UserFundingIF } from '~/utils/UserDataIFs';
+import styles from './FundingHistoryTable.module.css';
 
 interface FundingHistoryTableRowProps {
     fundingHistory: UserFundingIF;
