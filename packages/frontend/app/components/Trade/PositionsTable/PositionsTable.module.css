@@ -60,6 +60,7 @@
     display: inline-block;
     font-size: var(--font-size-s);
     margin-left: var(--gap-xs);
+    cursor: pointer;
 }
 
 .actionButton {

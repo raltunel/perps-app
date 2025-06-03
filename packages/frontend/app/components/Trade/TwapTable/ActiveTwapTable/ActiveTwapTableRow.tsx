@@ -1,12 +1,12 @@
-import type { ActiveTwapIF } from '~/utils/UserDataIFs';
-import styles from './ActiveTwapTable.module.css';
+import { useMemo } from 'react';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import {
     formatDiffAsCountdown,
     formatMinuteValue,
     formatTimestamp,
 } from '~/utils/orderbook/OrderBookUtils';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useMemo } from 'react';
+import type { ActiveTwapIF } from '~/utils/UserDataIFs';
+import styles from './ActiveTwapTable.module.css';
 interface ActiveTwapTableRowProps {
     twap: ActiveTwapIF;
     onTerminate: (coin: string) => void;

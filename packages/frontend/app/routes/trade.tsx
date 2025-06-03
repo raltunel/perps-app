@@ -18,7 +18,6 @@ import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialCo
 import { useTutorial } from '~/hooks/useTutorial';
 
 // Memoize components that don't need frequent re-renders
-const MemoizedOrderInput = memo(OrderInput);
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
@@ -73,11 +72,10 @@ export default function Trade() {
         };
     }, [isMobile]);
 
+    // Memoize switchTab so it's always stable
     const switchTab = useCallback(
         (tab: TabType) => {
             if (activeTab === tab) return;
-
-            // Update visibility refs for lazy loading
             visibilityRefs.current = {
                 order: tab === 'order',
                 chart: tab === 'chart',
@@ -85,7 +83,6 @@ export default function Trade() {
                 recent: tab === 'recent',
                 positions: tab === 'positions',
             };
-
             requestAnimationFrame(() => {
                 setActiveTab(tab);
             });
@@ -113,46 +110,45 @@ export default function Trade() {
     const { showTutorial, handleTutorialComplete, handleTutorialSkip } =
         useTutorial();
 
-    const MobileTabNavigation = useMemo(() => {
-        return (
+    // Tab list and handlers
+    const tabList: { key: TabType; label: string }[] = useMemo(
+        () => [
+            { key: 'order', label: 'Order' },
+            { key: 'chart', label: 'Chart' },
+            { key: 'book', label: 'Book' },
+            { key: 'recent', label: 'Recent' },
+            { key: 'positions', label: 'Positions' },
+        ],
+        [],
+    );
+
+    // Stable tab click handler
+    const handleTabClick = useCallback(
+        (tab: TabType) => () => switchTab(tab),
+        [switchTab],
+    );
+
+    // Memoized tab navigation
+    const MobileTabNavigation = useMemo(
+        () => (
             <div className={styles.mobileTabNav}>
                 <div className={styles.mobileTabBtns}>
-                    <button
-                        className={`${styles.mobileTabBtn} ${activeTab === 'order' ? styles.active : ''}`}
-                        onClick={() => switchTab('order')}
-                    >
-                        Order
-                    </button>
-                    <button
-                        className={`${styles.mobileTabBtn} ${activeTab === 'chart' ? styles.active : ''}`}
-                        onClick={() => switchTab('chart')}
-                    >
-                        Chart
-                    </button>
-                    <button
-                        className={`${styles.mobileTabBtn} ${activeTab === 'book' ? styles.active : ''}`}
-                        onClick={() => switchTab('book')}
-                    >
-                        Book
-                    </button>
-                    <button
-                        className={`${styles.mobileTabBtn} ${activeTab === 'recent' ? styles.active : ''}`}
-                        onClick={() => switchTab('recent')}
-                    >
-                        Recent
-                    </button>
-                    <button
-                        className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''}`}
-                        onClick={() => switchTab('positions')}
-                    >
-                        Positions
-                    </button>
+                    {tabList.map(({ key, label }) => (
+                        <button
+                            key={key}
+                            className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
+                            onClick={handleTabClick(key)}
+                        >
+                            {label}
+                        </button>
+                    ))}
                 </div>
             </div>
-        );
-    }, [activeTab, switchTab]);
+        ),
+        [activeTab, handleTabClick, tabList],
+    );
 
-    // Mobile views with lazy loading
+    // Memoize mobile views with all relevant dependencies
     const mobileOrderBookView = useMemo(
         () => (
             <div className={styles.mobileOnlyOrderBook}>
@@ -193,8 +189,6 @@ export default function Trade() {
                     <MemoizedSymbolInfo />
                 </div>
                 {MobileTabNavigation}
-
-                {/* Order section - only render when active or was active */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileOrder} ${activeTab === 'order' ? styles.active : ''}`}
                     style={{
@@ -202,10 +196,8 @@ export default function Trade() {
                     }}
                 >
                     {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && <MemoizedOrderInput />}
+                        visibilityRefs.current.order) && <OrderInput />}
                 </div>
-
-                {/* Chart section */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
                     style={{
@@ -217,16 +209,12 @@ export default function Trade() {
                         <MemoizedTradingViewWrapper />
                     )}
                 </div>
-
-                {/* Book section - Shows ONLY Order Book */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                     style={{ display: activeTab === 'book' ? 'block' : 'none' }}
                 >
                     {activeTab === 'book' && mobileOrderBookView}
                 </div>
-
-                {/* Recent trades section - Shows ONLY Recent Trades */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileRecent} ${activeTab === 'recent' ? styles.active : ''}`}
                     style={{
@@ -235,8 +223,6 @@ export default function Trade() {
                 >
                     {activeTab === 'recent' && mobileRecentTradesView}
                 </div>
-
-                {/* Positions section */}
                 <div
                     className={`${styles.mobileSection} ${styles.mobilePositions} ${activeTab === 'positions' ? styles.active : ''}`}
                     style={{
@@ -281,7 +267,6 @@ export default function Trade() {
                                 <MemoizedTradingViewWrapper />
                             </div>
                         </div>
-
                         <div id='orderBookSection' className={styles.orderBook}>
                             <MemoizedOrderBookSection symbol={symbol} />
                         </div>
@@ -289,7 +274,7 @@ export default function Trade() {
                             id='tradeModulesSection'
                             className={styles.tradeModules}
                         >
-                            <MemoizedOrderInput />
+                            <OrderInput />
                         </div>
                     </section>
                     <section
@@ -300,12 +285,7 @@ export default function Trade() {
                             <MemoizedTradeTable />
                         </div>
                         <div className={styles.wallet}>
-                            <DepositDropdown
-                                isUserConnected={false}
-                                setIsUserConnected={() =>
-                                    console.log('connected')
-                                }
-                            />
+                            <DepositDropdown />
                         </div>
                     </section>
                 </div>
