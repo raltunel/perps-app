@@ -1,6 +1,6 @@
+import { useEffect, useRef } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './PriceInput.module.css';
-import { useEffect, useRef } from 'react';
 
 interface PropsIF {
     value: string;
