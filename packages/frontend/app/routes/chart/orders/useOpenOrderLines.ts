@@ -2,16 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import type { LineData } from './component/LineComponent';
 import {
     buyColor,
     quantityTextFormatWithComma,
     sellColor,
     type LineLabel,
 } from './customOrderLineUtils';
-import LineComponent from './component/LineComponent';
+import type { LineData } from './component/LineComponent';
 
-const OpenOrderLine = () => {
+export const useOpenOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
     const { userSymbolOrders, positions, symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
@@ -21,20 +20,14 @@ const OpenOrderLine = () => {
     const pnlSzi = useMemo(() => {
         const data = positions
             .filter((i) => i.coin === symbol)
-            .map((i) => {
-                return {
-                    price: i.entryPx,
-                    pnl: i.unrealizedPnl,
-                    szi: i.szi,
-                    liqPrice: i.liquidationPx,
-                };
-            });
+            .map((i) => ({
+                price: i.entryPx,
+                pnl: i.unrealizedPnl,
+                szi: i.szi,
+                liqPrice: i.liquidationPx,
+            }));
 
-        if (data.length > 0) {
-            return data[0].szi;
-        } else {
-            return undefined;
-        }
+        return data.length > 0 ? data[0].szi : undefined;
     }, [JSON.stringify(positions), symbol]);
 
     useEffect(() => {
@@ -42,6 +35,7 @@ const OpenOrderLine = () => {
             setLines([]);
             return;
         }
+
         const newLines: LineData[] = userSymbolOrders
             .sort((a, b) => a.timestamp - b.timestamp)
             .map((order): LineData => {
@@ -99,7 +93,7 @@ const OpenOrderLine = () => {
                     if (triggerPx) {
                         yPrice = triggerPx;
                     }
-                    quantityTextValue = sz ? sz : pnlSzi ? pnlSzi : 0;
+                    quantityTextValue = sz ?? pnlSzi ?? 0;
                 }
 
                 return {
@@ -121,9 +115,5 @@ const OpenOrderLine = () => {
         JSON.stringify(pnlSzi),
     ]);
 
-    if (!chart) return null;
-
-    return <LineComponent key='limit' orderType='openOrder' lines={lines} />;
+    return lines;
 };
-
-export default OpenOrderLine;
