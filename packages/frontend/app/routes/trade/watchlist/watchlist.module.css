@@ -30,7 +30,6 @@
 .watchListToolbarIcon {
     cursor: pointer;
     color: var(--text2);
-    /* padding: .5rem; */
     margin-left: var(--gap-s);
 }
 
@@ -47,7 +46,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    /* gap: var(--gap-m); */
 }
 
 .watchListToolbarIcon,
@@ -57,7 +55,9 @@
     width: var(--svg-width-height);
     height: var(--svg-width-height);
 }
-.watchListToolbarIcon:hover {
+.watchListToolbarIcon:hover,
+.favIcon:hover {
+    cursor: pointer;
     background: var(--bg-dark3);
 }
 .watchListLimitor {

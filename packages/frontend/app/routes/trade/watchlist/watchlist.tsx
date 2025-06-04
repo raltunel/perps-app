@@ -1,21 +1,45 @@
 import { useState } from 'react';
 import { FiDollarSign, FiPercent } from 'react-icons/fi';
-import { TbHeartFilled } from 'react-icons/tb';
+import { TbHeart, TbHeartFilled } from 'react-icons/tb';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './watchlist.module.css';
 import WatchListNode from './watchlistnode/watchlistnode';
 
 const WatchList: React.FC = () => {
-    const { favCoins } = useTradeDataStore();
+    const { favCoins, favKeys, symbol, addToFavKeys, removeFromFavKeys } =
+        useTradeDataStore();
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
         'dollar',
     );
 
+    const handleFavClick = (event: React.MouseEvent<SVGSVGElement>) => {
+        event.stopPropagation();
+
+        if (favKeys.includes(symbol)) {
+            removeFromFavKeys(symbol);
+        } else {
+            addToFavKeys(symbol);
+        }
+    };
+
     return (
         <div className={styles.watchListContainer}>
-            <TbHeartFilled className={styles.favIcon} size={23} />
+            {/* show filled heart when active market is favorited */}
+            {favKeys.includes(symbol) ? (
+                <TbHeartFilled
+                    className={styles.favIcon}
+                    size={23}
+                    onClick={handleFavClick}
+                />
+            ) : (
+                <TbHeart
+                    className={styles.favIcon}
+                    size={23}
+                    onClick={handleFavClick}
+                />
+            )}
             <FiDollarSign
                 onClick={() => setWatchListMode('dollar')}
                 className={`${styles.watchListToolbarIcon} ${watchListMode === 'dollar' ? styles.active : ''}`}
