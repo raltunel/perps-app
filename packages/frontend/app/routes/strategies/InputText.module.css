@@ -48,4 +48,5 @@
     font-size: var(--font-size-s);
     color: var(--text2);
     user-select: none;
+    text-align: justify;
 }

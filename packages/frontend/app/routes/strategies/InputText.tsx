@@ -39,7 +39,12 @@ export default function InputText(props: propsIF) {
             { Array.isArray(data.input) &&
                 <div className={styles.dropdown}>
                     <button onClick={() => setIsOpen(!isOpen)}>
-                        <div>{selection}</div>
+                        <output
+                            id={idForDOM}
+                            onChange={() => console.log('wowee')}
+                        >
+                            {selection}
+                        </output>
                         <LuChevronDown />
                     </button>
                     { isOpen &&
