@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import type { LineData } from './LineComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import {
-    drawLabel,
-    type LabelLocation,
-    type LabelType,
-} from '../orderLineUtils';
 import {
     formatLineLabel,
     getPricetoPixel,
     quantityTextFormatWithComma,
 } from '../customOrderLineUtils';
+import {
+    drawLabel,
+    type LabelLocation,
+    type LabelType,
+} from '../orderLineUtils';
+import type { LineData } from './LineComponent';
 
 interface LabelProps {
     lines: LineData[];
@@ -107,8 +107,8 @@ const LabelComponent = ({
                               {
                                   type: 'Cancel' as LabelType,
                                   text: ' X ',
-                                  backgroundColor: '#000000',
-                                  textColor: '#FFFFFF',
+                                  backgroundColor: '#D1D1D1',
+                                  textColor: '#3C91FF',
                                   borderColor: '#3C91FF',
                               },
                           ]
