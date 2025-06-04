@@ -59,7 +59,6 @@ interface propsIF {
 
 export default function CreateStrategy(props: propsIF) {
     const { page } = props;
-    console.log(page);
     const strategies = useStrategiesStore();
     const navigate = useNavigate();
 
@@ -73,7 +72,8 @@ export default function CreateStrategy(props: propsIF) {
 
     return (
         <div className={styles.create_strategy_page}>
-            <h2>New Strategy</h2>
+            { page === 'new' && <h2>New Strategy</h2> }
+            { page === 'edit' && <h2>Edit Strategy</h2> }
             <section className={styles.create_strategy_inputs}>
                 <InputText
                     data={inputData.name}
