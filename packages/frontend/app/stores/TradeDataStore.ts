@@ -66,13 +66,13 @@ const useTradeDataStore = create<TradeDataStore>()(
                 if (
                     get().favKeys.filter((e: string) => e == coin).length === 0
                 ) {
-                    set({ favKeys: [...get().favKeys, coin] });
+                    set({ favKeys: [coin, ...get().favKeys] });
                     set({
                         favCoins: [
-                            ...get().favCoins,
                             get().coins.find(
                                 (e: SymbolInfoIF) => e.coin == coin,
                             ) as SymbolInfoIF,
+                            ...get().favCoins,
                         ],
                     });
                 }
