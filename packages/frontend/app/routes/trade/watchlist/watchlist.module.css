@@ -24,7 +24,7 @@
 
 .favIcon {
     color: var(--red);
-    margin-right: var(--margin-m);
+    margin-right: var(--margin-s);
 }
 
 .watchListToolbarIcon {
@@ -39,7 +39,7 @@
 }
 
 .percentIcon {
-    margin-right: var(--margin-m);
+    margin-right: var(--margin-s);
 }
 
 .watchListNodesWrapper {
@@ -47,7 +47,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: var(--gap-m);
+    /* gap: var(--gap-m); */
 }
 
 .watchListToolbarIcon,
@@ -57,8 +57,7 @@
     width: var(--svg-width-height);
     height: var(--svg-width-height);
 }
-.watchListToolbarIcon:hover,
-.favIcon:hover {
+.watchListToolbarIcon:hover {
     background: var(--bg-dark3);
 }
 .watchListLimitor {
