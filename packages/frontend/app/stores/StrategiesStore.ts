@@ -103,6 +103,7 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
             name: LS_KEY,
             // format and destination of data
             storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({ data: state.data }),
         },
     ),
 );
