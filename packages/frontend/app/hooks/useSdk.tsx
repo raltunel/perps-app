@@ -1,5 +1,6 @@
 import React, {
     createContext,
+    useCallback,
     useContext,
     useEffect,
     useRef,
@@ -26,19 +27,27 @@ export const SdkProvider: React.FC<{
     const [exchange, setExchange] = useState<Exchange | null>(null);
 
     const { internetConnected } = useTradeDataStore();
+    const internetConnectedRef = useRef(internetConnected);
+
+    const wsCloseListener = useCallback(() => {
+        if (internetConnectedRef.current) {
+            info?.wsManager?.reconnect();
+        }
+    }, []);
 
     // commit to trigger deployment
 
     useEffect(() => {
         if (!isClient) return;
         if (!info) {
-            setInfo(
-                new Info({
-                    environment,
-                    skipWs: false,
-                    // isDebug: true, // TODO: remove in prod
-                }),
-            );
+            const newInfo = new Info({
+                environment,
+                skipWs: false,
+                // isDebug: true, // TODO: remove in prod
+            });
+
+            newInfo.wsManager?.addCloseListener(wsCloseListener);
+            setInfo(newInfo);
         } else {
             info.setEnvironment(environment);
         }

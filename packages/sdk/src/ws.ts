@@ -104,6 +104,7 @@ export class WebsocketManager {
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
+    private closeListeners: (() => void)[] = [];
 
     constructor(
         baseUrl: string,
@@ -301,6 +302,7 @@ export class WebsocketManager {
             this.pingInterval = null;
             this.log('stopped ping due to close');
         }
+        this.closeListeners.forEach((listener) => listener());
     };
 
     public stop() {
@@ -342,9 +344,9 @@ export class WebsocketManager {
         }
     }
 
-    public setBaseUrl(newBaseUrl: string, isReconnect: boolean = false) {
+    public setBaseUrl(newBaseUrl: string) {
         this.log('Setting new base URL:', newBaseUrl);
-        if (this.baseUrl === newBaseUrl && !isReconnect) {
+        if (this.baseUrl === newBaseUrl) {
             this.log(
                 'New base URL is the same as the current one. No action taken.',
             );
@@ -497,5 +499,13 @@ export class WebsocketManager {
         setTimeout(() => {
             this.connect();
         }, 2000);
+    }
+
+    public addCloseListener(listener: () => void) {
+        this.closeListeners.push(listener);
+    }
+
+    public removeCloseListener(listener: () => void) {
+        this.closeListeners = this.closeListeners.filter((l) => l !== listener);
     }
 }
