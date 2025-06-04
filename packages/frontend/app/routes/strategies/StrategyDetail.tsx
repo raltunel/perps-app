@@ -1,10 +1,12 @@
 import Button from '~/components/Button/Button';
 import styles from './strategies.module.css';
 import OrderHistory from '../orderHistory/orderHistory';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 export default function Strategies() {
     const navigate = useNavigate();
+    const { address } = useParams();
+    console.log(address);
 
     return (
         <div className={styles.strategies_page}>
@@ -30,7 +32,7 @@ export default function Strategies() {
                         Remove
                     </Button>
                     <Button
-                        onClick={() => console.log('Editing strategy!')}
+                        onClick={() => navigate(`/strategies/${address}/edit`)}
                         size='medium'
                         selected
                     >
