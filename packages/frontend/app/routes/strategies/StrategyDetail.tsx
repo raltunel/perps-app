@@ -2,11 +2,12 @@ import Button from '~/components/Button/Button';
 import styles from './strategies.module.css';
 import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
+// import { useStrategiesStore, type useStrategiesStoreIF } from '~/stores/StrategiesStore';
 
 export default function Strategies() {
     const navigate = useNavigate();
     const { address } = useParams();
-    console.log(address);
+    // const strategies: useStrategiesStoreIF = useStrategiesStore();
 
     return (
         <div className={styles.strategies_page}>

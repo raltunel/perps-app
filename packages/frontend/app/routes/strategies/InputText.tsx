@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
-import type { textInputIF } from './CreateStrategy';
 import { LuChevronDown } from 'react-icons/lu';
+import type { textInputIF } from './CreateStrategy';
 
 interface propsIF {
     data: textInputIF;
@@ -34,6 +34,7 @@ export default function InputText(props: propsIF) {
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         handleChange(e.currentTarget.value)
                     }
+                    autoComplete='off'
                 />
             }
             { Array.isArray(data.input) &&

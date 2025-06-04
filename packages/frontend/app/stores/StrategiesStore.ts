@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import makeAddress from '~/utils/functions/makeAddress';
 
 interface strategyIF {
     name: string;
@@ -12,6 +13,7 @@ interface strategyIF {
 }
 
 interface strategyDecoratedIF extends strategyIF {
+    address: string;
     pnl: string;
     volume: string;
     maxDrawdown: string;
@@ -24,6 +26,7 @@ const LS_KEY = 'STRATEGIES';
 
 const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     {
+        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
         name: 'My First Strategy',
         market: 'BTC',
         distance: 2,
@@ -49,7 +52,7 @@ const NEW_STRATEGY_DEFAULTS: strategyIF = {
     orderSize: '',
 }
 
-interface useStrategiesStoreIF {
+export interface useStrategiesStoreIF {
     data: strategyDecoratedIF[];
     new: strategyIF;
     update: <K extends keyof strategyIF>(
@@ -83,6 +86,7 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
                         ...get().data,
                         {
                             ...get().new,
+                            address: makeAddress('eth'),
                             pnl: '$0.00',
                             volume: '$0.00',
                             maxDrawdown: '0.00%',
