@@ -47,7 +47,7 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
         const tpSlMap: Map<string, { tp: number; sl: number }> = new Map();
         const coinPriceMap: Map<string, number> = new Map();
         const userBalances: UserBalanceIF[] = [];
-        const activeTwaps: ActiveTwapIF[] = [genRandomActiveTwap()];
+        const activeTwaps: ActiveTwapIF[] = [];
         const accountOverview: AccountOverviewIF = {
             balance: 0,
             unrealizedPnl: 0,
