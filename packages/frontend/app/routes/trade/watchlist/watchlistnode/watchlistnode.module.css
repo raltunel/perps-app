@@ -1,9 +1,10 @@
 .watchListNodeContainer {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     font-size: var(--font-size-s);
+    height: 40px;
 }
 
 .watchListNodeContent {
@@ -14,6 +15,9 @@
     justify-content: center;
     cursor: pointer;
     transition: all var(--ease-in-out-fast);
+    height: 100%;
+    width: 100%;
+    align-self: stretch;
 }
 
 .watchListNodeContent.active {
@@ -26,8 +30,4 @@
 
 .watchListNodeContainer div {
     background-color: transparent !important;
-}
-
-.watchListNodeContainer div {
-    height: auto !important;
 }

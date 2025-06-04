@@ -34,7 +34,7 @@ const WatchList: React.FC = () => {
                                 coin={e.coin}
                                 markPx={e.markPx}
                                 prevDayPx={e.prevDayPx}
-                                isActive={e.coin === favCoins[0].coin}
+                                isActive={false}
                                 showMode={watchListMode}
                             />
                         ))}
