@@ -24,13 +24,12 @@
 
 .favIcon {
     color: var(--red);
-    margin-right: var(--margin-m);
+    margin-right: var(--margin-s);
 }
 
 .watchListToolbarIcon {
     cursor: pointer;
     color: var(--text2);
-    /* padding: .5rem; */
     margin-left: var(--gap-s);
 }
 
@@ -39,7 +38,7 @@
 }
 
 .percentIcon {
-    margin-right: var(--margin-m);
+    margin-right: var(--margin-s);
 }
 
 .watchListNodesWrapper {
@@ -47,7 +46,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: var(--gap-m);
 }
 
 .watchListToolbarIcon,
@@ -59,19 +57,20 @@
 }
 .watchListToolbarIcon:hover,
 .favIcon:hover {
+    cursor: pointer;
     background: var(--bg-dark3);
 }
 .watchListLimitor {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) -
-            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 9.2rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 8rem
     );
 }
 
 .watchListLimitorNarrow {
     max-width: calc(
         100vw - var(--order-book-width-desktop-small) * 3 -
-            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 9.2rem
+            var(--trade-module-width-desktop-small) - var(--gap-s) * 4 - 8rem
     );
 }
 
@@ -80,7 +79,7 @@
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) -
                 var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
-                9.2rem
+                8rem
         );
     }
 
@@ -88,7 +87,7 @@
         max-width: calc(
             100vw - var(--order-book-width-desktop-large) * 3 -
                 var(--trade-module-width-desktop-large) - var(--gap-s) * 4 -
-                9.2rem
+                8rem
         );
     }
 }
@@ -96,6 +95,6 @@
 @media only screen and (max-width: 1080px) {
     .watchListLimitor,
     .watchListLimitorNarrow {
-        max-width: calc(100vw - var(--gap-s) * 4 - 8.2rem);
+        max-width: calc(100vw - var(--gap-s) * 4 - 7.5rem);
     }
 }
