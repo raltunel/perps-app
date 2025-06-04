@@ -1,7 +1,6 @@
 import Button from '~/components/Button/Button';
 import styles from './createStrategy.module.css';
 import InputText from './InputText';
-import { useRef, type MutableRefObject } from 'react';
 import { useStrategiesStore } from '~/stores/StrategiesStore';
 import { useNavigate } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
@@ -55,23 +54,11 @@ const inputData = {
 }
 
 export default function createStrategy() {
-    const makeStrategy = useStrategiesStore().add;
+    const strategies = useStrategiesStore();
     const navigate = useNavigate();
-
-    const nameRef = useRef<string>('');
-    const marketRef = useRef<string>('');
-    const distanceRef = useRef<string>('');
-    const distanceTypeRef = useRef<string>('');
-    const sideRef = useRef<string>('');
-    const totalSizeRef = useRef<string>('');
-    const orderSizeRef = useRef<string>('');
 
     // TODO:    write a function to validate inputs on change and
     // TODO:    ... and enable disable the CTA accordingly
-
-    function handleInput(field: MutableRefObject<string>, val: string): void {
-        field.current = val;
-    }
 
     // logic to dispatch a notification for sub-account creation
     const notifications: NotificationStoreIF = useNotificationStore();
@@ -84,46 +71,48 @@ export default function createStrategy() {
             <section className={styles.create_strategy_inputs}>
                 <InputText
                     data={inputData.name}
-                    handleChange={(text: string) => handleInput(nameRef, text)}
+                    handleChange={(text: string) =>
+                        strategies.update('name', text)
+                    }
                 />
                 <InputText
                     data={inputData.market}
                     handleChange={(text: string) =>
-                        handleInput(marketRef, text)
+                        strategies.update('market', text)
                     }
                 />
                 <InputText
                     data={inputData.distance}
                     handleChange={(text: string) =>
-                        handleInput(distanceRef, text)
+                        strategies.update('distance', text)
                     }
                 />
                 <InputText
                     data={inputData.distanceType}
                     handleChange={(text: string) =>
-                        handleInput(distanceTypeRef, text)
+                        strategies.update('distanceType', text)
                     }
                 />
                 <InputText
                     data={inputData.side}
-                    handleChange={(text: string) => handleInput(sideRef, text)}
+                    handleChange={(text: string) =>
+                        strategies.update('side', text)}
                 />
                 <InputText
                     data={inputData.totalSize}
                     handleChange={(text: string) =>
-                        handleInput(totalSizeRef, text)
+                        strategies.update('totalSize', text)
                     }
                 />
                 <InputText
                     data={inputData.orderSize}
                     handleChange={(text: string) =>
-                        handleInput(orderSizeRef, text)
+                        strategies.update('orderSize', text)
                     }
                 />
             </section>
             <section className={styles.create_strategy_buttons}>
                 <Button
-                    // size='medium'
                     size={100}
                     onClick={() => console.log('RESET FORM')}
                 >
@@ -131,7 +120,6 @@ export default function createStrategy() {
                 </Button>
                 <div className={styles.buttons_right}>
                     <Button
-                        // size='medium'
                         size={100}
                         onClick={() => navigate('/strategies')}
                     >
@@ -139,33 +127,15 @@ export default function createStrategy() {
                     </Button>
                     <Button
                         onClick={() => {
-                            makeStrategy({
-                                name: nameRef.current,
-                                market: marketRef.current,
-                                distance: parseFloat(distanceRef.current),
-                                distanceType: distanceTypeRef.current,
-                                side: sideRef.current,
-                                totalSize: totalSizeRef.current,
-                                orderSize: orderSizeRef.current,
-                            });
-                            console.log({
-                                name: nameRef.current,
-                                market: marketRef.current,
-                                distance: parseFloat(distanceRef.current),
-                                distanceType: distanceTypeRef.current,
-                                side: sideRef.current,
-                                totalSize: totalSizeRef.current,
-                                orderSize: orderSizeRef.current,
-                            });
-                            subAccounts.create(nameRef.current);
+                            strategies.add();
+                            subAccounts.create(strategies.new.name);
                             notifications.add({
                                 title: 'Sub Account Created',
-                                message: `Made new Sub-Account ${nameRef.current}`,
+                                message: `Made new Sub-Account ${strategies.new.name}`,
                                 icon: 'check',
                             });
                             navigate('/strategies');
                         }}
-                        // size='medium'
                         size={100}
                         selected
                     >

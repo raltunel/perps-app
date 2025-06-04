@@ -3,10 +3,10 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface strategyIF {
     name: string;
-    market: string;
-    distance: number;
-    distanceType: string | 'Ticks';
-    side: string | 'Both';
+    market: string | 'BTC' | 'ETH' | 'SOL';
+    distance: number|string;
+    distanceType: string | 'Ticks' | '%';
+    side: string | 'Both' | 'Above' | 'Below';
     totalSize: string;
     orderSize: string;
 }
@@ -39,9 +39,24 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     },
 ];
 
+const NEW_STRATEGY_DEFAULTS: strategyIF = {
+    name: '',
+    market: 'BTC',
+    distance: '',
+    distanceType: 'Ticks',
+    side: 'Both',
+    totalSize: '',
+    orderSize: '',
+}
+
 interface useStrategiesStoreIF {
     data: strategyDecoratedIF[];
-    add: (s: strategyIF) => void;
+    new: strategyIF;
+    update: <K extends keyof strategyIF>(
+        key: K,
+        value: strategyIF[K]
+    ) => void;
+    add: () => void;
     remove: (n: string) => void;
     reset: () => void;
 }
@@ -53,13 +68,21 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
             // consume default data from the `MOCK_STRATEGIES` obj, persisted
             // ... data from local storage will re-hydrate if present
             data: MOCK_STRATEGIES,
-            // add a new sub-account
-            add: (s: strategyIF): void => {
+            new: NEW_STRATEGY_DEFAULTS,
+            update: <K extends keyof strategyIF>(
+                key: K,
+                value: strategyIF[K]
+            ): void => {
+                const current = get().new;
+                current[key] = value;
+                set({ new: current });
+            },
+            add: (): void => {
                 set({
                     data: [
                         ...get().data,
                         {
-                            ...s,
+                            ...get().new,
                             pnl: '$0.00',
                             volume: '$0.00',
                             maxDrawdown: '0.00%',
