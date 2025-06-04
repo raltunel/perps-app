@@ -1,29 +1,24 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { LineData } from './component/LineComponent';
 import { buyColor, sellColor, type LineLabel } from './customOrderLineUtils';
-import LineComponent from './component/LineComponent';
+import type { LineData } from './component/LineComponent';
 
-const PositionOrderLine = () => {
+export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
     const { positions, symbol } = useTradeDataStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
     const filteredPositions = useMemo(() => {
-        const data = positions
+        return positions
             .filter((i) => i.coin === symbol)
-            .map((i) => {
-                return {
-                    price: i.entryPx,
-                    pnl: i.unrealizedPnl,
-                    szi: i.szi,
-                    liqPrice: i.liquidationPx,
-                };
-            });
-
-        return data;
+            .map((i) => ({
+                price: i.entryPx,
+                pnl: i.unrealizedPnl,
+                szi: i.szi,
+                liqPrice: i.liquidationPx,
+            }));
     }, [JSON.stringify(positions), symbol]);
 
     useEffect(() => {
@@ -33,24 +28,22 @@ const PositionOrderLine = () => {
         }
 
         const newLines: LineData[] = filteredPositions.flatMap((order) => {
-            const lines: LineData[] = [];
-
+            const result: LineData[] = [];
             const pnl = Number(order.pnl.toFixed(2));
 
             if (order.price > 0) {
-                const pnlLine: LineData = {
+                result.push({
                     xLoc: 0.1,
                     yPrice: order.price,
                     textValue: { type: 'PNL', pnl } as LineLabel,
                     quantityTextValue: order.szi,
                     color: pnl > 0 ? buyColor : sellColor,
                     type: 'PNL',
-                };
-                lines.push(pnlLine);
+                });
             }
 
             if (order.liqPrice > 0) {
-                const liqLine: LineData = {
+                result.push({
                     xLoc: 0.2,
                     yPrice: order.liqPrice,
                     textValue: {
@@ -60,19 +53,14 @@ const PositionOrderLine = () => {
                     quantityTextValue: undefined,
                     color: sellColor,
                     type: 'LIQ',
-                };
-                lines.push(liqLine);
+                });
             }
 
-            return lines;
+            return result;
         });
 
         setLines(newLines);
     }, [chart, JSON.stringify(filteredPositions), symbol]);
 
-    if (!chart) return null;
-
-    return <LineComponent key='pnl' orderType='position' lines={lines} />;
+    return lines;
 };
-
-export default PositionOrderLine;
