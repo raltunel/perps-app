@@ -53,7 +53,13 @@ const inputData = {
     },
 }
 
-export default function createStrategy() {
+interface propsIF {
+    page: 'new' | 'edit';
+}
+
+export default function CreateStrategy(props: propsIF) {
+    const { page } = props;
+    console.log(page);
     const strategies = useStrategiesStore();
     const navigate = useNavigate();
 
