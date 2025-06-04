@@ -37,6 +37,7 @@
     list-style: none;
     border-radius: var(--radius-s);
     background-color: var(--bg-dark4);
+    z-index: calc(var(--create-strategy-page-z-index) + 1);
 }
 
 .dropdown > ul > li {

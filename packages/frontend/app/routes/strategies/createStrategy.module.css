@@ -3,6 +3,10 @@
     flex-direction: column;
     width: 900px;
     padding: var(--padding-l);
+
+    /* this value is referenced by children to fix z-index issues */
+    --create-strategy-page-z-index: 1;
+    z-index: var(--create-strategy-page-z-index);
 }
 
 .create_strategy_inputs {
