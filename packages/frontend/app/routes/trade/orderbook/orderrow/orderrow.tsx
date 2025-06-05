@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useAppSettings } from '~/stores/AppSettingsStore';
+import { type colorSetIF } from '~/stores/AppSettingsStore';
 import { useTradeModuleStore } from '~/stores/TradeModuleStore';
 import type {
     OrderBookRowIF,
@@ -19,6 +18,14 @@ interface OrderRowProps {
         type: OrderRowClickTypes,
         rowIndex: number,
     ) => void;
+    formatNum: (
+        num: number | string,
+        precision?: number | OrderRowResolutionIF | null,
+        currencyConversion?: boolean,
+        showDollarSign?: boolean,
+        addPlusSignIfPositive?: boolean,
+    ) => string;
+    getBsColor: () => colorSetIF;
 }
 
 export enum OrderRowClickTypes {
@@ -33,11 +40,9 @@ const OrderRow: React.FC<OrderRowProps> = ({
     resolution,
     userSlots,
     clickListener,
+    formatNum,
+    getBsColor,
 }) => {
-    const { formatNum } = useNumFormatter();
-
-    const { getBsColor } = useAppSettings();
-
     const { setTradeSlot } = useTradeModuleStore();
 
     const formattedPrice = useMemo(() => {

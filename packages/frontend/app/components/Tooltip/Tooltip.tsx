@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './Tooltip.module.css';
+import { motion } from 'framer-motion';
 
 const isTouchDevice = () => {
     if (typeof window === 'undefined') return false;
@@ -17,6 +18,7 @@ interface TooltipProps {
     position?: 'top' | 'bottom' | 'left' | 'right';
     className?: string;
     maxWidth?: string;
+    isFixed?: boolean;
 }
 
 const Tooltip = ({
@@ -25,6 +27,7 @@ const Tooltip = ({
     position = 'top',
     className = '',
     maxWidth = '200px',
+    isFixed = false,
 }: TooltipProps) => {
     const [isVisible, setIsVisible] = useState(false);
     const triggerRef = useRef<HTMLDivElement>(null);
@@ -87,6 +90,11 @@ const Tooltip = ({
             top = -tooltipRect.height - 8; // Switch to top if would go off bottom
         }
 
+        if (isFixed) {
+            top = triggerRect.top + top;
+            left = triggerRect.left + left;
+        }
+
         return { top, left };
     };
 
@@ -140,6 +148,37 @@ const Tooltip = ({
         }
     };
 
+    const anim = useMemo(() => {
+        let ret;
+        switch (position) {
+            case 'top':
+                ret = {
+                    initial: { opacity: 0, y: -10 },
+                };
+                break;
+            case 'bottom':
+                ret = {
+                    initial: { opacity: 0, y: 10 },
+                };
+                break;
+            case 'left':
+                ret = {
+                    initial: { opacity: 0, x: 10 },
+                };
+                break;
+            case 'right':
+                ret = {
+                    initial: { opacity: 0, x: -10 },
+                };
+                break;
+        }
+        return {
+            ...ret,
+            transition: { duration: 0.1 },
+            animate: { opacity: 1, y: 0, x: 0 },
+        };
+    }, [position]);
+
     return (
         <div
             className={styles.tooltipWrapper}
@@ -151,9 +190,13 @@ const Tooltip = ({
             {children}
 
             {isVisible && (
-                <div
+                <motion.div
                     ref={tooltipRef}
-                    style={{ maxWidth }}
+                    {...anim}
+                    style={{
+                        maxWidth,
+                        position: isFixed ? 'fixed' : 'absolute',
+                    }}
                     className={`
             ${styles.tooltip}
             ${isTouch ? styles.mobileTooltip : ''}
@@ -161,7 +204,7 @@ const Tooltip = ({
           `}
                 >
                     {content}
-                </div>
+                </motion.div>
             )}
         </div>
     );

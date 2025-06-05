@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
+import { BsStars } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdSearchOff } from 'react-icons/md';
@@ -9,8 +10,6 @@ import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import styles from './symbollist.module.css';
 import SymbolListTableHeader from './SymbolListTableHeader';
 import SymbolListTableRow from './SymbolListTableRow';
-import { section } from 'framer-motion/client';
-import { BsStars } from 'react-icons/bs';
 
 interface SymbolListProps {
     setIsOpen: (isOpen: boolean) => void;
