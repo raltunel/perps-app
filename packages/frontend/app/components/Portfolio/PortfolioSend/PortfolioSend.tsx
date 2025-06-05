@@ -7,6 +7,7 @@ import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface PortfolioSendProps {
     availableAmount: number;
@@ -233,13 +234,14 @@ function PortfolioSend({
                     </div>
                 ))}
             </div>
-            <button
-                className={styles.actionButton}
+
+            <SimpleButton
+                bg='accent1'
                 onClick={handleSend}
                 disabled={isButtonDisabled}
             >
                 {isProcessing ? 'Processing...' : 'Send'}
-            </button>
+            </SimpleButton>
         </div>
     );
 }
