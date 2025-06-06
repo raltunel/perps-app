@@ -167,10 +167,10 @@ export default function CreateStrategy(props: propsT) {
                             } else if (page === 'new') {
                                 (submitFn as (s: strategyIF) => void)(values);
                             }
-                            subAccounts.create(name);
+                            subAccounts.create(name, 'strategy');
                             notifications.add({
                                 title: 'Sub Account Created',
-                                message: `Made new Sub-Account ${name}`,
+                                message: `Made new strategy Sub-Account ${name}`,
                                 icon: 'check',
                             });
                             navigate('/strategies');

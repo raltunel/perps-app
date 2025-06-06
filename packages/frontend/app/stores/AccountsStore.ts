@@ -2,20 +2,25 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { generateSolanaAddress } from '~/utils/functions/makeAddress';
 
+type subaccountGroupT = 'strategy'|'discretionary';
+
 export interface accountIF {
     name: string;
     address: string;
     equity: string;
+    group: subaccountGroupT;
 }
 
 class Account implements accountIF {
     name: string;
     address: string;
     equity: string;
-    constructor(n: string, a: string, e: string) {
+    group: subaccountGroupT;
+    constructor(n: string, a: string, e: string, g: subaccountGroupT) {
         this.name = n;
         this.address = a;
         this.equity = e;
+        this.group = g;
     }
 }
 
@@ -32,18 +37,19 @@ const MOCK_ACCOUNTS: allAccountsIF = {
         'Master Account',
         generateSolanaAddress(),
         ZERO_DOLLARS,
+        'discretionary',
     ),
     sub: [
-        new Account('Sub-Account 1', generateSolanaAddress(), ZERO_DOLLARS),
-        new Account('Sub-Account 2', generateSolanaAddress(), ZERO_DOLLARS),
-        new Account('Sub-Account 5', generateSolanaAddress(), ZERO_DOLLARS),
-        new Account('Sub-Account 3', generateSolanaAddress(), ZERO_DOLLARS),
-        new Account('Sub-Account 4', generateSolanaAddress(), ZERO_DOLLARS),
+        new Account('Sub-Account 1', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
+        new Account('Sub-Account 2', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
+        new Account('Sub-Account 5', generateSolanaAddress(), ZERO_DOLLARS, 'strategy'),
+        new Account('Sub-Account 3', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
+        new Account('Sub-Account 4', generateSolanaAddress(), ZERO_DOLLARS, 'strategy'),
     ],
 };
 
 export interface useAccountsIF extends allAccountsIF {
-    create: (n: string) => void;
+    create: (n: string, g: subaccountGroupT) => void;
     reset: () => void;
 }
 
@@ -62,13 +68,14 @@ export const useAccounts = create<useAccountsIF>()(
             // ... data from local storage will re-hydrate if present
             ...MOCK_ACCOUNTS,
             // add a new sub-account
-            create: (name: string): void =>
+            create: (name: string, g: subaccountGroupT): void =>
                 set({
                     sub: get().sub.concat(
                         new Account(
                             name,
                             generateSolanaAddress(),
                             ZERO_DOLLARS,
+                            g,
                         ),
                     ),
                 }),
