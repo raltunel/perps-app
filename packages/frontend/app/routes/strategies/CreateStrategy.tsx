@@ -1,7 +1,10 @@
 import Button from '~/components/Button/Button';
 import styles from './CreateStrategy.module.css';
 import InputText from './InputText';
-import { NEW_STRATEGY_DEFAULTS, type strategyIF } from '~/stores/StrategiesStore';
+import {
+    NEW_STRATEGY_DEFAULTS,
+    type strategyIF,
+} from '~/stores/StrategiesStore';
 import { useLocation, useNavigate } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
 import {
@@ -12,9 +15,9 @@ import { useState } from 'react';
 
 export interface textInputIF {
     label: string;
-    input: string|string[];
+    input: string | string[];
     blurb: string;
-};
+}
 
 const inputData = {
     name: {
@@ -35,7 +38,7 @@ const inputData = {
     distanceType: {
         label: 'Distance Type',
         input: ['Ticks', '%'],
-        blurb: 'Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.'
+        blurb: 'Choose how the distance is measured. Ticks provide precise control, while percentage offers proportional scaling with price movements.',
     },
     side: {
         label: 'Side',
@@ -52,7 +55,7 @@ const inputData = {
         input: 'Order Size',
         blurb: 'Define the size of individual orders. Smaller orders provide better granularity but may increase transaction costs.',
     },
-}
+};
 
 interface basePropsIF {
     page: 'new' | 'edit';
@@ -83,7 +86,9 @@ export default function CreateStrategy(props: propsT) {
     const subAccounts: useAccountsIF = useAccounts();
 
     const location = useLocation();
-    const strategy: strategyIF = location.state ? location.state.strategy : NEW_STRATEGY_DEFAULTS;
+    const strategy: strategyIF = location.state
+        ? location.state.strategy
+        : NEW_STRATEGY_DEFAULTS;
 
     const [name, setName] = useState(strategy.name);
     const [market, setMarket] = useState(strategy.market);
@@ -95,8 +100,8 @@ export default function CreateStrategy(props: propsT) {
 
     return (
         <div className={styles.create_strategy_page}>
-            { page === 'new' && <h2>New Strategy</h2> }
-            { page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2> }
+            {page === 'new' && <h2>New Strategy</h2>}
+            {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
             <section className={styles.create_strategy_inputs}>
                 <InputText
                     initial={name}
@@ -137,15 +142,21 @@ export default function CreateStrategy(props: propsT) {
             <section className={styles.create_strategy_buttons}>
                 <Button
                     size={100}
-                    onClick={() => console.log('RESET FORM')}
+                    onClick={() => {
+                        console.log(strategy.name);
+                        setName(strategy.name);
+                        setMarket(strategy.market);
+                        setDistance(strategy.distance);
+                        setDistanceType(strategy.distanceType);
+                        setSide(strategy.side);
+                        setTotalSize(strategy.totalSize);
+                        setOrderSize(strategy.orderSize);
+                    }}
                 >
                     Reset
                 </Button>
                 <div className={styles.buttons_right}>
-                    <Button
-                        size={100}
-                        onClick={() => navigate('/strategies')}
-                    >
+                    <Button size={100} onClick={() => navigate('/strategies')}>
                         Cancel
                     </Button>
                     <Button
@@ -157,13 +168,15 @@ export default function CreateStrategy(props: propsT) {
                                 distanceType,
                                 side,
                                 totalSize,
-                                orderSize
+                                orderSize,
                             };
                             if (page === 'edit' && location.state) {
-                                (submitFn as (s: strategyIF, addr: string) => void)(
-                                    values,
-                                    location.state.address
-                                );
+                                (
+                                    submitFn as (
+                                        s: strategyIF,
+                                        addr: string,
+                                    ) => void
+                                )(values, location.state.address);
                             } else if (page === 'new') {
                                 (submitFn as (s: strategyIF) => void)(values);
                             }

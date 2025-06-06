@@ -10,53 +10,47 @@ interface propsIF {
 }
 
 export default function InputText(props: propsIF) {
-    const {
-        initial,
-        data,
-        handleChange,
-    } = props;
+    const { initial, data, handleChange } = props;
     console.log(initial);
 
-    const idForDOM: string = 'CREATE_STRATEGY_'
-        + data.label.toUpperCase().replace(' ', '_');
+    const idForDOM: string =
+        'CREATE_STRATEGY_' + data.label.toUpperCase().replace(' ', '_');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [selection, setSelection] = useState<string>(initial);
 
     return (
         <div className={styles.text_input}>
             <label htmlFor={idForDOM}>{data.label}</label>
-            { typeof data.input === 'string' &&
+            {typeof data.input === 'string' && (
                 <input
                     type='text'
                     id={idForDOM}
-                    defaultValue={selection}
+                    value={initial}
                     placeholder={data.input}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         handleChange(e.currentTarget.value)
                     }
                     autoComplete='off'
                 />
-            }
-            { Array.isArray(data.input) &&
+            )}
+            {Array.isArray(data.input) && (
                 <div className={styles.dropdown}>
                     <button onClick={() => setIsOpen(!isOpen)}>
                         <output
                             id={idForDOM}
                             onChange={() => console.log('wowee')}
                         >
-                            {selection}
+                            {initial}
                         </output>
                         <LuChevronDown />
                     </button>
-                    { isOpen &&
+                    {isOpen && (
                         <ul>
-                            { data.input.map((inp: string) => (
+                            {data.input.map((inp: string) => (
                                 <li
                                     key={inp}
                                     onClick={() => {
                                         handleChange(inp);
-                                        setSelection(inp);
                                         setIsOpen(false);
                                     }}
                                 >
@@ -64,9 +58,9 @@ export default function InputText(props: propsIF) {
                                 </li>
                             ))}
                         </ul>
-                    }
+                    )}
                 </div>
-            }
+            )}
             <p>{data.blurb}</p>
         </div>
     );
