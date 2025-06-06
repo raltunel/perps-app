@@ -127,7 +127,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
-            navigate(`/trade/${position.coin.toLowerCase()}`);
+            navigate(`/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
 
         // Memoize funding values and tooltip
