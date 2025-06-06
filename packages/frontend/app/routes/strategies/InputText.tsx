@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
 import { LuChevronDown } from 'react-icons/lu';
 import type { textInputIF } from './CreateStrategy';
@@ -17,6 +17,21 @@ export default function InputText(props: propsIF) {
         'CREATE_STRATEGY_' + data.label.toUpperCase().replace(' ', '_');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent): void => {
+            if (dropdownRef.current && event.target instanceof Node) {
+                if (!dropdownRef.current.contains(event.target)) {
+                    setIsOpen(false);
+                }
+            }
+        };
+        if (isOpen) {
+            document.addEventListener('click', handleClickOutside);
+        }
+
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, [isOpen]);
 
     return (
         <div className={styles.text_input}>
@@ -34,7 +49,7 @@ export default function InputText(props: propsIF) {
                 />
             )}
             {Array.isArray(data.input) && (
-                <div className={styles.dropdown}>
+                <div className={styles.dropdown} ref={dropdownRef}>
                     <button onClick={() => setIsOpen(!isOpen)}>
                         <output
                             id={idForDOM}
