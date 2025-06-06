@@ -1,5 +1,7 @@
 .container {
     --menu-button-height-width: 25px;
+    --deposit-button-width: 120px;
+    --deposit-button-height: 23px;
 
     width: 100%;
     height: 100%;
@@ -146,6 +148,26 @@
 
 .walletButton:hover {
     background: var(--bg-dark3, #16161c);
+}
+.depositButton {
+    width: var(--deposit-button-width);
+    height: var(--deposit-button-height);
+    transition: all 0.3s ease-in-out;
+    outline: none;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--gap-s);
+    flex-shrink: 0;
+    border-radius: var(--radius-s, 8px);
+    background: var(--accent1,);
+    color: var(--text1);
+    font-size: var(--font-size-m, 18px);
+    padding: 1px var(--padding-s);
+}
+.depositButton:hover {
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
 
 .rpcButton {

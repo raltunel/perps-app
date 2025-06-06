@@ -47,30 +47,6 @@
     left: 0;
     padding: var(--padding-m) 0;
 }
-.confirmButton {
-    width: 100%;
-    outline: none;
-    border: none;
-
-    display: flex;
-    /* css variable wont apply here */
-    height: 47px;
-    padding: var(--button-padding);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    border-radius: var(--radius-s, 8px);
-    background: var(--accent1, #7371fc);
-
-    color: var(--base-text1, #f0f0f8);
-
-    font-size: var(--font-size-m, 18px);
-    transition: all var(--ease-in-out-med);
-}
-.confirmButton:hover {
-    opacity: 0.8;
-}
 
 .green {
     color: var(--green, #26a69a);

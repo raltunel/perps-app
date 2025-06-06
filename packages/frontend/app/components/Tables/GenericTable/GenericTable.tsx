@@ -34,7 +34,7 @@ interface GenericTableProps<T, S> {
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
-    const id = props.storageKey;
+    const id = useId();
     const navigate = useNavigate();
 
     const {
@@ -48,6 +48,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         skeletonColRatios = [2, 1, 1.5, 1.5, 1.5, 1.5, 1, 1, 1],
         slicedLimit = 10,
         viewAllLink,
+        storageKey,
         defaultSortBy,
         defaultSortDirection,
         heightOverride = '100%',
@@ -62,13 +63,14 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         }
     }
 
-    const sortByKey = `GenericTable:${id}:sortBy`;
-    const sortDirKey = `GenericTable:${id}:sortDir`;
+    const sortByKey = `GenericTable:${storageKey}:sortBy`;
+    const sortDirKey = `GenericTable:${storageKey}:sortDir`;
 
     const [sortBy, setSortBy] = useState<S>(() => {
         const stored = localStorage.getItem(sortByKey);
         return safeParse<S>(stored, props.defaultSortBy as S);
     });
+
     const [sortDirection, setSortDirection] = useState<TableSortDirection>(
         () => {
             const stored = localStorage.getItem(sortDirKey);
@@ -80,8 +82,29 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     );
 
     useEffect(() => {
-        localStorage.setItem(sortByKey, JSON.stringify(sortBy));
-        localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
+        const storedSortBy = localStorage.getItem(sortByKey);
+        const storedSortDir = localStorage.getItem(sortDirKey);
+
+        if (storedSortBy) {
+            setSortBy(safeParse<S>(storedSortBy, props.defaultSortBy as S));
+        }
+        if (storedSortDir) {
+            setSortDirection(
+                safeParse<TableSortDirection>(
+                    storedSortDir,
+                    props.defaultSortDirection as TableSortDirection,
+                ),
+            );
+        }
+    }, [sortDirKey, sortByKey]);
+
+    useEffect(() => {
+        if (sortBy !== undefined) {
+            localStorage.setItem(sortByKey, JSON.stringify(sortBy));
+        }
+        if (sortDirection !== undefined) {
+            localStorage.setItem(sortDirKey, JSON.stringify(sortDirection));
+        }
     }, [sortBy, sortDirection, sortByKey, sortDirKey]);
 
     const [tableState, setTableState] = useState<TableState>(

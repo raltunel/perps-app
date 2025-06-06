@@ -48,48 +48,6 @@
     gap: var(--gap-s);
     grid-row: 1;
 }
-.actionButtons button:hover,
-.dropdownActionButtons button:hover {
-    background: var(--accent1) !important;
-    opacity: 1 !important;
-    transition: all 0.3s ease-in-out;
-    filter: brightness(1) !important;
-}
-
-.connectButton {
-    display: flex;
-    padding: var(--button-padding);
-    height: var(--button-height);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-self: stretch;
-
-    outline: none;
-    border: none;
-
-    border-radius: var(--radius-s);
-    background: var(--accent1, #7371fc);
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m);
-}
-.actionButtons button {
-    outline: none;
-    border: none;
-    width: 100%;
-    height: var(--button-height);
-    display: flex;
-    padding: var(--button-padding);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-self: stretch;
-
-    border-radius: var(--radius-s, 8px);
-    background: var(--bg-dark3, #16161c);
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m, 18px);
-}
 
 .notConnectedContainer {
     height: 100%;

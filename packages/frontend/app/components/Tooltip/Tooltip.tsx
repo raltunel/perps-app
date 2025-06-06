@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './Tooltip.module.css';
-import { motion } from 'framer-motion';
 
 const isTouchDevice = () => {
     if (typeof window === 'undefined') return false;
@@ -46,19 +46,19 @@ const Tooltip = ({
         switch (position) {
             case 'top':
                 left = -(tooltipRect.width - triggerRect.width) / 2;
-                top = -tooltipRect.height - 8;
+                top = -tooltipRect?.height - 8;
                 break;
             case 'bottom':
                 left = -(tooltipRect.width - triggerRect.width) / 2;
-                top = triggerRect.height + 8;
+                top = triggerRect?.height + 8;
                 break;
             case 'left':
                 left = -tooltipRect.width - 8;
-                top = -(tooltipRect.height - triggerRect.height) / 2;
+                top = -(tooltipRect?.height - triggerRect?.height) / 2;
                 break;
             case 'right':
                 left = triggerRect.width + 8;
-                top = -(tooltipRect.height - triggerRect.height) / 2;
+                top = -(tooltipRect?.height - triggerRect?.height) / 2;
                 break;
         }
 
@@ -82,12 +82,12 @@ const Tooltip = ({
         }
 
         if (tooltipTop < viewportPadding) {
-            top = triggerRect.height + 8; // Switch to bottom if would go off top
+            top = triggerRect?.height + 8; // Switch to bottom if would go off top
         } else if (
-            tooltipTop + tooltipRect.height >
+            tooltipTop + tooltipRect?.height >
             window.innerHeight - viewportPadding
         ) {
-            top = -tooltipRect.height - 8; // Switch to top if would go off bottom
+            top = -tooltipRect?.height - 8; // Switch to top if would go off bottom
         }
 
         if (isFixed) {

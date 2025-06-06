@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import styles from './LineChart.module.css';
+import React, { useEffect, useRef } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import styles from './LineChart.module.css';
 
 type CurveType = 'step' | 'basic';
 
@@ -80,7 +80,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const canvasHeight = canvas.getBoundingClientRect().height;
+        const canvasHeight = canvas.getBoundingClientRect()?.height;
         const canvasWidth = canvas.getBoundingClientRect().width;
 
         const minDate = d3.min(lineData, (d) => d.time);
@@ -222,7 +222,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             if (!context) return;
 
             const width = canvas.getBoundingClientRect().width;
-            const height = canvas.getBoundingClientRect().height;
+            const height = canvas.getBoundingClientRect()?.height;
 
             context.clearRect(0, 0, width, height);
 

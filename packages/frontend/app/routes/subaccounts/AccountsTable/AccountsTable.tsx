@@ -76,7 +76,7 @@ export default function AccountsTable(props: propsIF) {
         } else if (sortBy.cell === 'accountEquity') {
             output = [...accounts].sort((a: accountIF, b: accountIF) =>
                 a.equity
-                    .toLowerCase()
+                    ?.toLowerCase()
                     .localeCompare(b.equity.toLocaleLowerCase()),
             );
         } else {
