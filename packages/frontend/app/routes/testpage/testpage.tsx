@@ -1,4 +1,4 @@
-import ButtonShowcase from '~/components/Button/ButtonShowcase/ButtonShowcase';
+import ButtonShowcase from '~/routes/showcase/ButtonShowcase/something';
 
 export default function testpage() {
     return <ButtonShowcase />;

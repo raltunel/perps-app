@@ -51,6 +51,12 @@ export default [
         'fundingHistory/:address?',
         'routes/fundingHistory/fundingHistory.tsx',
     ),
+    route('showcase', 'routes/showcase/showcase.tsx'),
+    route(
+        'showcase/buttons',
+        'routes/showcase/buttonShowcase/buttonShowcase.tsx',
+    ),
+    route('showcase/modals', 'routes/showcase/modalshowcase/modalshowcase.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

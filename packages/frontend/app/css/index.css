@@ -76,8 +76,8 @@
     --padding-xl: 64px;
     --padding-xxl: 96px;
     --padding-dropdown: 0px 4px 0px 8px;
-
-    --gap-xs: 4px;
+    --padding-modal: var(--padding-s) var(--padding-m) var(--padding-m)
+        var(--padding-m) --gap-xs: 4px;
     --gap-s: 8px;
     --gap-m: 16px;
     --gap-l: 32px;

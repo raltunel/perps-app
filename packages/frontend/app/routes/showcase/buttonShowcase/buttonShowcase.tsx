@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './ButtonShowcase.module.css';
+import styles from './buttonShowcase.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 // SimpleButton Component (your original component with CSS modules)
