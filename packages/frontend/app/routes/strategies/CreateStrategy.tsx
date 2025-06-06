@@ -191,7 +191,8 @@ export default function CreateStrategy(props: propsT) {
                         size={100}
                         selected
                     >
-                        Create
+                        {page === 'new' && 'Create'}
+                        {page === 'edit' && 'Update'}
                     </Button>
                 </div>
             </section>
