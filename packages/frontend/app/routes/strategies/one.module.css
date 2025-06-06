@@ -1,0 +1,33 @@
+.create_strategy_page {
+    display: flex;
+    flex-direction: column;
+    width: 900px;
+    padding: var(--padding-l);
+
+    /* this value is referenced by children to fix z-index issues */
+    --create-strategy-page-z-index: 1;
+    z-index: var(--create-strategy-page-z-index);
+}
+
+.create_strategy_inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+}
+
+.create_strategy_buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.create_strategy_buttons button {
+    padding: 12px 16px;
+}
+
+.buttons_right {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s);
+}
