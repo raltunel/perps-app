@@ -41,8 +41,14 @@
 }
 
 .dropdown > ul > li {
+    padding: var(--padding-xs);
     cursor: pointer;
+    border-radius: var(--radius-xs);
     color: var(--text2);
+}
+
+.dropdown > ul > li:hover {
+    background-color: var(--bg-dark2);
 }
 
 .text_input > p {

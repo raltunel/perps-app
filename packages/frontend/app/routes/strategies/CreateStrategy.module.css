@@ -1,15 +1,21 @@
 .create_strategy_page {
+    height: 100%;
     display: flex;
-    flex-direction: column;
-    width: 900px;
-    padding: var(--padding-l);
+    align-items: center;
+    justify-content: center;
 
     /* this value is referenced by children to fix z-index issues */
     --create-strategy-page-z-index: 1;
     z-index: var(--create-strategy-page-z-index);
 }
 
-.create_strategy_page > header {
+.create_strategy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-l);
+}
+
+.create_strategy > header {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -17,7 +23,7 @@
     gap: var(--gap-m);
 }
 
-.create_strategy_page > header > div {
+.create_strategy > header > div {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,15 +33,25 @@
     aspect-ratio: 1/1;
 }
 
-.create_strategy_page > header > div:hover {
+.create_strategy > header > div:hover {
     background-color: var(--bg-dark4);
 }
 
-.create_strategy_page > header > h2 {
+.create_strategy > header > h2 {
     font-size: var(--font-size-xl);
     /* font-weight is from Figma not centralized */
     font-weight: 300;
     color: var(--text1);
+}
+
+.create_strategy > div {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-m);
+    width: 900px;
+    gap: var(--gap-m);
+    border-radius: var(--radius-m);
+    background-color: var(--bg-dark2);
 }
 
 .create_strategy_inputs {
@@ -48,6 +64,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    font-size: var(--font-size-m);
     user-select: none;
 }
 

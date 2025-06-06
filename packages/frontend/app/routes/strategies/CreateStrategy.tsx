@@ -101,116 +101,124 @@ export default function CreateStrategy(props: propsT) {
 
     return (
         <div className={styles.create_strategy_page}>
-            <header>
-                <div onClick={() => navigate(-1)}>
-                    <FaChevronLeft />
-                </div>
-                {page === 'new' && <h2>New Strategy</h2>}
-                {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
-            </header>
-            <section className={styles.create_strategy_inputs}>
-                <InputText
-                    initial={name}
-                    data={inputData.name}
-                    handleChange={(text: string) => setName(text)}
-                />
-                <InputText
-                    initial={market}
-                    data={inputData.market}
-                    handleChange={(text: string) => setMarket(text)}
-                />
-                <InputText
-                    initial={distance}
-                    data={inputData.distance}
-                    handleChange={(text: string) => setDistance(text)}
-                />
-                <InputText
-                    initial={distanceType}
-                    data={inputData.distanceType}
-                    handleChange={(text: string) => setDistanceType(text)}
-                />
-                <InputText
-                    initial={side}
-                    data={inputData.side}
-                    handleChange={(text: string) => setSide(text)}
-                />
-                <InputText
-                    initial={totalSize}
-                    data={inputData.totalSize}
-                    handleChange={(text: string) => setTotalSize(text)}
-                />
-                <InputText
-                    initial={orderSize}
-                    data={inputData.orderSize}
-                    handleChange={(text: string) => setOrderSize(text)}
-                />
-            </section>
-            <section className={styles.create_strategy_buttons}>
-                <Button
-                    size={100}
-                    onClick={() => {
-                        console.log(strategy.name);
-                        setName(strategy.name);
-                        setMarket(strategy.market);
-                        setDistance(strategy.distance);
-                        setDistanceType(strategy.distanceType);
-                        setSide(strategy.side);
-                        setTotalSize(strategy.totalSize);
-                        setOrderSize(strategy.orderSize);
-                    }}
-                >
-                    Reset
-                </Button>
-                <div className={styles.buttons_right}>
-                    <Button
-                        size={100}
-                        onClick={() =>
-                            navigate(
-                                location.state
-                                    ? `/strategies/${location.state.address}`
-                                    : '/strategies',
-                            )
-                        }
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            const values = {
-                                name,
-                                market,
-                                distance,
-                                distanceType,
-                                side,
-                                totalSize,
-                                orderSize,
-                            };
-                            if (page === 'edit' && location.state) {
-                                (
-                                    submitFn as (
-                                        s: strategyIF,
-                                        addr: string,
-                                    ) => void
-                                )(values, location.state.address);
-                            } else if (page === 'new') {
-                                (submitFn as (s: strategyIF) => void)(values);
+            <div className={styles.create_strategy}>
+                <header>
+                    <div onClick={() => navigate(-1)}>
+                        <FaChevronLeft />
+                    </div>
+                    {page === 'new' && <h2>New Strategy</h2>}
+                    {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
+                </header>
+                <div>
+                    <section className={styles.create_strategy_inputs}>
+                        <InputText
+                            initial={name}
+                            data={inputData.name}
+                            handleChange={(text: string) => setName(text)}
+                        />
+                        <InputText
+                            initial={market}
+                            data={inputData.market}
+                            handleChange={(text: string) => setMarket(text)}
+                        />
+                        <InputText
+                            initial={distance}
+                            data={inputData.distance}
+                            handleChange={(text: string) => setDistance(text)}
+                        />
+                        <InputText
+                            initial={distanceType}
+                            data={inputData.distanceType}
+                            handleChange={(text: string) =>
+                                setDistanceType(text)
                             }
-                            subAccounts.create(name, 'strategy');
-                            notifications.add({
-                                title: 'Sub Account Created',
-                                message: `Made new strategy Sub-Account ${name}`,
-                                icon: 'check',
-                            });
-                            navigate('/strategies');
-                        }}
-                        size={100}
-                        selected
-                    >
-                        {page === 'new' && 'Create'}
-                        {page === 'edit' && 'Update'}
-                    </Button>
+                        />
+                        <InputText
+                            initial={side}
+                            data={inputData.side}
+                            handleChange={(text: string) => setSide(text)}
+                        />
+                        <InputText
+                            initial={totalSize}
+                            data={inputData.totalSize}
+                            handleChange={(text: string) => setTotalSize(text)}
+                        />
+                        <InputText
+                            initial={orderSize}
+                            data={inputData.orderSize}
+                            handleChange={(text: string) => setOrderSize(text)}
+                        />
+                    </section>
+                    <section className={styles.create_strategy_buttons}>
+                        <Button
+                            size={100}
+                            onClick={() => {
+                                console.log(strategy.name);
+                                setName(strategy.name);
+                                setMarket(strategy.market);
+                                setDistance(strategy.distance);
+                                setDistanceType(strategy.distanceType);
+                                setSide(strategy.side);
+                                setTotalSize(strategy.totalSize);
+                                setOrderSize(strategy.orderSize);
+                            }}
+                        >
+                            Reset
+                        </Button>
+                        <div className={styles.buttons_right}>
+                            <Button
+                                size={100}
+                                onClick={() =>
+                                    navigate(
+                                        location.state
+                                            ? `/strategies/${location.state.address}`
+                                            : '/strategies',
+                                    )
+                                }
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    const values = {
+                                        name,
+                                        market,
+                                        distance,
+                                        distanceType,
+                                        side,
+                                        totalSize,
+                                        orderSize,
+                                    };
+                                    if (page === 'edit' && location.state) {
+                                        (
+                                            submitFn as (
+                                                s: strategyIF,
+                                                addr: string,
+                                            ) => void
+                                        )(values, location.state.address);
+                                    } else if (page === 'new') {
+                                        (submitFn as (s: strategyIF) => void)(
+                                            values,
+                                        );
+                                    }
+                                    subAccounts.create(name, 'strategy');
+                                    notifications.add({
+                                        title: 'Sub Account Created',
+                                        message: `Made new strategy Sub-Account ${name}`,
+                                        icon: 'check',
+                                    });
+                                    navigate('/strategies');
+                                }}
+                                size={100}
+                                selected
+                            >
+                                {page === 'new' && 'Create'}
+                                {page === 'edit' && 'Update'}
+                            </Button>
+                        </div>
+                    </section>
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
