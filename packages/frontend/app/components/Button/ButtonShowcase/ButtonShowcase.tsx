@@ -1,30 +1,11 @@
 import React, { useState } from 'react';
+import styles from './ButtonShowcase.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 // SimpleButton Component (your original component with CSS modules)
-const SimpleButton = ({
-    bg = 'accent1',
-    hoverBg,
-    className = '',
-    ...props
-}) => {
-    const capitalize = (value) =>
-        value.charAt(0).toUpperCase() + value.slice(1);
-
-    // Using CSS modules classes
-    const bgClass = styles[bg];
-    const hoverClass = hoverBg ? styles[`hover${capitalize(hoverBg)}`] : '';
-
-    return (
-        <button
-            className={`${styles.simpleButton} ${bgClass} ${hoverClass} ${className}`}
-            {...props}
-        />
-    );
-};
-
 // Main Showcase Component
 export default function ButtonShowcase() {
-    const [showCode, setShowCode] = useState({});
+    const [showCode, setShowCode] = useState<any>({});
 
     const backgroundColors = [
         'green',
@@ -42,11 +23,11 @@ export default function ButtonShowcase() {
         'dark6',
     ];
 
-    const toggleCode = (section) => {
-        setShowCode((prev) => ({ ...prev, [section]: !prev[section] }));
+    const toggleCode = (section: any) => {
+        setShowCode((prev: any) => ({ ...prev, [section]: !prev[section] }));
     };
 
-    const CodeBlock = ({ children, title }) => (
+    const CodeBlock = ({ children, title }: any) => (
         <div className={styles.codeBlock}>
             <div className={styles.codeHeader}>
                 <span>{title}</span>
@@ -114,6 +95,12 @@ export default function ButtonShowcase() {
                     </button>
                 </div>
 
+                {showCode.backgrounds && (
+                    <CodeBlock title='Background Colors'>
+                        {`// All available background colors
+    ${backgroundColors.map((color) => `<SimpleButton bg="${color}">${color}</SimpleButton>`).join('\n')}`}
+                    </CodeBlock>
+                )}
                 <div className={styles.buttonGrid}>
                     {backgroundColors.map((color) => (
                         <div key={color} className={styles.buttonDemo}>
@@ -124,13 +111,6 @@ export default function ButtonShowcase() {
                         </div>
                     ))}
                 </div>
-
-                {showCode.backgrounds && (
-                    <CodeBlock title='Background Colors'>
-                        {`// All available background colors
-${backgroundColors.map((color) => `<SimpleButton bg="${color}">${color}</SimpleButton>`).join('\n')}`}
-                    </CodeBlock>
-                )}
             </section>
 
             {/* Custom Hover States */}
@@ -330,60 +310,4 @@ ${backgroundColors.map((color) => `<SimpleButton bg="${color}">${color}</SimpleB
             </section>
         </div>
     );
-}
-
-// CSS Modules styles object simulation
-const styles = {
-    // SimpleButton styles (your original styles)
-    simpleButton: 'simple-button',
-    green: 'bg-green',
-    red: 'bg-red',
-    accent1: 'bg-accent1',
-    accent2: 'bg-accent2',
-    accent3: 'bg-accent3',
-    accent4: 'bg-accent4',
-    accent5: 'bg-accent5',
-    dark1: 'bg-dark1',
-    dark2: 'bg-dark2',
-    dark3: 'bg-dark3',
-    dark4: 'bg-dark4',
-    dark5: 'bg-dark5',
-    dark6: 'bg-dark6',
-    hoverGreen: 'hover-green',
-    hoverRed: 'hover-red',
-    hoverAccent1: 'hover-accent1',
-    hoverAccent2: 'hover-accent2',
-    hoverAccent3: 'hover-accent3',
-    hoverAccent4: 'hover-accent4',
-    hoverAccent5: 'hover-accent5',
-    hoverDark1: 'hover-dark1',
-    hoverDark2: 'hover-dark2',
-    hoverDark3: 'hover-dark3',
-    hoverDark4: 'hover-dark4',
-    hoverDark5: 'hover-dark5',
-    hoverDark6: 'hover-dark6',
-
-    // Showcase styles
-    showcase: 'showcase',
-    showcaseHeader: 'showcase-header',
-    showcaseSection: 'showcase-section',
-    sectionHeader: 'section-header',
-    buttonGrid: 'button-grid',
-    buttonDemo: 'button-demo',
-    buttonLabel: 'button-label',
-    toggleCode: 'toggle-code',
-    codeBlock: 'code-block',
-    codeHeader: 'code-header',
-    codeContent: 'code-content',
-    copyBtn: 'copy-btn',
-    propsTable: 'props-table',
-    propsHeader: 'props-header',
-    propsRow: 'props-row',
-};
-
-// Inject styles
-if (typeof document !== 'undefined') {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = cssText;
-    document.head.appendChild(styleElement);
 }
