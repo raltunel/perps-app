@@ -32,7 +32,10 @@ export default function Strategies() {
                         Pause
                     </Button>
                     <Button
-                        onClick={() => console.log('Strategy Removed!')}
+                        onClick={() => {
+                            strategies.remove(strategy.address);
+                            navigate('/strategies');
+                        }}
                         size='medium'
                         selected
                     >

@@ -68,7 +68,7 @@ export interface useStrategiesStoreIF {
     data: strategyDecoratedIF[];
     update: (s: strategyIF, addr: string) => void;
     add: (s: strategyIF) => void;
-    remove: (n: string) => void;
+    remove: (addr: string) => void;
     reset: () => void;
 }
 
@@ -106,10 +106,13 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
                     ],
                 });
             },
-            remove: (n: string): void =>
+            remove: (addr: string): void => {
                 set({
-                    data: get().data.filter((d: strategyIF) => d.name !== n),
-                }),
+                    data: get().data.filter(
+                        (d: strategyDecoratedIF) => d.address !== addr
+                    ),
+                })
+            },
             reset: (): void => set({ data: MOCK_STRATEGIES }),
         }),
         {
