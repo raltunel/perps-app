@@ -89,7 +89,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                 ? 'perp' + selectedPeriod.value
                 : selectedPeriod.value === 'AllTime'
                   ? 'allTime'
-                  : selectedPeriod.value.toLowerCase();
+                  : selectedPeriod.value?.toLowerCase();
 
         if (key !== parsedKey && userProfileLineData) {
             parseUserProfileData(userProfileLineData, key);
