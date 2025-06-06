@@ -1,4 +1,4 @@
-import CreateStrategy from './one';
+import CreateStrategy from './CreateStrategy';
 
 export default function newStrategy() {
     return (

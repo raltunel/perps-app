@@ -1,5 +1,5 @@
 import Button from '~/components/Button/Button';
-import styles from './one.module.css';
+import styles from './CreateStrategy.module.css';
 import InputText from './InputText';
 import { useStrategiesStore } from '~/stores/StrategiesStore';
 import { useNavigate } from 'react-router';

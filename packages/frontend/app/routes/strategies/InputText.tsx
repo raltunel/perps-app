@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from 'react';
 import styles from './InputText.module.css';
 import { LuChevronDown } from 'react-icons/lu';
-import type { textInputIF } from './one';
+import type { textInputIF } from './CreateStrategy';
 
 interface propsIF {
     data: textInputIF;
