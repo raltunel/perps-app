@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { LeaderboardData } from '~/components/Leaderboard/LeaderboardTable/LeaderboardTableRow';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 
@@ -66,7 +66,7 @@ export const useLeaderboard = (initialData: LeaderboardData[]) => {
         if (searchQuery.trim()) {
             const lowercaseQuery = searchQuery.toLowerCase();
             dataToProcess = dataToProcess.filter((item) =>
-                item.trader.toLowerCase().includes(lowercaseQuery),
+                item.trader?.toLowerCase().includes(lowercaseQuery),
             );
         }
 

@@ -57,7 +57,7 @@ export default function WebDataConsumer() {
 
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet.address.toLowerCase();
+    addressRef.current = debugWallet?.address?.toLowerCase();
     const { setSymbolInfo } = useTradeDataStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
@@ -172,7 +172,7 @@ export default function WebDataConsumer() {
         ({ data }: { data: WebData2Output }) => {
             setCoins(data.data.coins);
             setCoinPriceMap(data.data.coinPriceMap);
-            if (data.data.user.toLowerCase() === addressRef.current) {
+            if (data.data.user?.toLowerCase() === addressRef.current) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
@@ -196,7 +196,7 @@ export default function WebDataConsumer() {
             data.orderHistory &&
             data.orderHistory.length > 0 &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const orders: OrderDataIF[] = [];
             data.orderHistory.forEach((order: any) => {
@@ -229,7 +229,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fills = processUserFills(data);
             fills.sort((a, b) => b.time - a.time);
@@ -247,7 +247,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
             if (data.isSnapshot) {
@@ -267,7 +267,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const history = processUserTwapHistory(data);
             if (data.isSnapshot) {
@@ -287,7 +287,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fundings = processUserFundings(data.fundings);
             fundings.sort((a, b) => b.time - a.time);

@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
-import styles from './StrategyTable.module.css';
-import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import Tabs from '~/components/Tabs/Tabs';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { accountIF } from '~/stores/AccountsStore';
+import styles from './StrategyTable.module.css';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -173,12 +173,12 @@ export default function StrategyTable(props: propsIF) {
         // assignment tree for output variable
         if (sortBy.cell === 'name') {
             output = [...accounts].sort((a: accountIF, b: accountIF) =>
-                a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase()),
+                a.name?.toLowerCase().localeCompare(b.name.toLocaleLowerCase()),
             );
         } else if (sortBy.cell === 'accountEquity') {
             output = [...accounts].sort((a: accountIF, b: accountIF) =>
                 a.equity
-                    .toLowerCase()
+                    ?.toLowerCase()
                     .localeCompare(b.equity.toLocaleLowerCase()),
             );
         } else {

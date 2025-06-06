@@ -123,7 +123,7 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
             return sortedSymbols.slice(0, 50);
         }
         return sortedSymbols.filter((c) =>
-            c.coin.toLowerCase().includes(searchQuery.toLowerCase()),
+            c.coin?.toLowerCase().includes(searchQuery?.toLowerCase()),
         );
     }, [searchQuery, sortedSymbols]);
 
