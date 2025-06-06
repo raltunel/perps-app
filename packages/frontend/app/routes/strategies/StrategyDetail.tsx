@@ -2,16 +2,22 @@ import Button from '~/components/Button/Button';
 import styles from './strategies.module.css';
 import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
-// import { useStrategiesStore, type useStrategiesStoreIF } from '~/stores/StrategiesStore';
+import { useStrategiesStore, type strategyDecoratedIF, type useStrategiesStoreIF } from '~/stores/StrategiesStore';
 
 export default function Strategies() {
     const navigate = useNavigate();
     const { address } = useParams();
-    // const strategies: useStrategiesStoreIF = useStrategiesStore();
+    const strategies: useStrategiesStoreIF = useStrategiesStore();
+
+    const strategy: strategyDecoratedIF|undefined = strategies.data.find(
+        (s: strategyDecoratedIF) => s.address === address
+    );
+
+    if (!strategy) return;
 
     return (
         <div className={styles.strategies_page}>
-            <h2>Strategy Name</h2>
+            <h2>{strategy.name}</h2>
             <p className={styles.strategies_blurb}>
                 Run an automated market making strategy
             </p>
@@ -33,7 +39,10 @@ export default function Strategies() {
                         Remove
                     </Button>
                     <Button
-                        onClick={() => navigate(`/strategies/${address}/edit`)}
+                        onClick={() => navigate(
+                            `/strategies/${address}/edit`,
+                            { state: { strategy, address } },
+                        )}
                         size='medium'
                         selected
                     >
@@ -58,27 +67,27 @@ export default function Strategies() {
                     <section>
                         <div>
                             <div>Market</div>
-                            <div>BTC</div>
+                            <div>{strategy.market}</div>
                         </div>
                         <div>
                             <div>Distance</div>
-                            <div>2</div>
+                            <div>{strategy.distance}</div>
                         </div>
                         <div>
                             <div>Distance Type</div>
-                            <div>Ticks</div>
+                            <div>{strategy.distanceType}</div>
                         </div>
                         <div>
                             <div>Side</div>
-                            <div>Both</div>
+                            <div>{strategy.side}</div>
                         </div>
                         <div>
                             <div>Total Size</div>
-                            <div>$100,000</div>
+                            <div>{strategy.totalSize}</div>
                         </div>
                         <div>
                             <div>Order Size</div>
-                            <div>$10,000</div>
+                            <div>{strategy.orderSize}</div>
                         </div>
                     </section>
                 </div>
@@ -89,23 +98,23 @@ export default function Strategies() {
                     <section>
                         <div>
                             <div>PNL</div>
-                            <div>$0.00</div>
+                            <div>{strategy.pnl}</div>
                         </div>
                         <div>
                             <div>Volume</div>
-                            <div>$0.00</div>
+                            <div>{strategy.volume}</div>
                         </div>
                         <div>
                             <div>Max Drawdown</div>
-                            <div>0.00%</div>
+                            <div>{strategy.maxDrawdown}</div>
                         </div>
                         <div>
                             <div>Orders Placed</div>
-                            <div>0</div>
+                            <div>{strategy.ordersPlaced}</div>
                         </div>
                         <div>
                             <div>Runtime</div>
-                            <div>0 hours</div>
+                            <div>{strategy.runtime}</div>
                         </div>
                     </section>
                 </div>

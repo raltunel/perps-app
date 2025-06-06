@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import makeAddress from '~/utils/functions/makeAddress';
+import { generateSolanaAddress } from './AccountsStore';
 
-interface strategyIF {
+export interface strategyIF {
     name: string;
     market: string | 'BTC' | 'ETH' | 'SOL';
     distance: number|string;
@@ -12,13 +12,25 @@ interface strategyIF {
     orderSize: string;
 }
 
-interface strategyDecoratedIF extends strategyIF {
+export interface strategyDecoratedIF extends strategyIF {
     address: string;
     pnl: string;
     volume: string;
     maxDrawdown: string;
     ordersPlaced: number;
     runtime: number;
+}
+
+function decorateStrategy(s: strategyIF): strategyDecoratedIF {
+    return ({
+        ...s,
+        address: generateSolanaAddress(),
+        pnl: '$0.00',
+        volume: '$0.00',
+        maxDrawdown: '0.00%',
+        ordersPlaced: 0,
+        runtime: 0,
+    });
 }
 
 // local storage key to persist data
@@ -42,7 +54,7 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     },
 ];
 
-const NEW_STRATEGY_DEFAULTS: strategyIF = {
+export const NEW_STRATEGY_DEFAULTS: strategyIF = {
     name: '',
     market: 'BTC',
     distance: '',
@@ -54,12 +66,8 @@ const NEW_STRATEGY_DEFAULTS: strategyIF = {
 
 export interface useStrategiesStoreIF {
     data: strategyDecoratedIF[];
-    new: strategyIF;
-    update: <K extends keyof strategyIF>(
-        key: K,
-        value: strategyIF[K]
-    ) => void;
-    add: () => void;
+    update: (s: strategyIF, addr: string) => void;
+    add: (s: strategyIF) => void;
     remove: (n: string) => void;
     reset: () => void;
 }
@@ -71,28 +79,30 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
             // consume default data from the `MOCK_STRATEGIES` obj, persisted
             // ... data from local storage will re-hydrate if present
             data: MOCK_STRATEGIES,
-            new: NEW_STRATEGY_DEFAULTS,
-            update: <K extends keyof strategyIF>(
-                key: K,
-                value: strategyIF[K]
-            ): void => {
-                const current = get().new;
-                current[key] = value;
-                set({ new: current });
+            update: (s: strategyIF, addr: string): void => {
+                set({ data: get().data.map(
+                    (d: strategyDecoratedIF) => {
+                        if (d.address === addr) {
+                            return ({
+                                ...s,
+                                address: d.address,
+                                pnl: d.pnl,
+                                volume: d.volume,
+                                maxDrawdown: d.maxDrawdown,
+                                ordersPlaced: d.ordersPlaced,
+                                runtime: d.runtime,
+                            });
+                        } else {
+                            return d;
+                        }
+                    }
+                )});
             },
-            add: (): void => {
+            add: (s: strategyIF): void => {
                 set({
                     data: [
                         ...get().data,
-                        {
-                            ...get().new,
-                            address: makeAddress('eth'),
-                            pnl: '$0.00',
-                            volume: '$0.00',
-                            maxDrawdown: '0.00%',
-                            ordersPlaced: 0,
-                            runtime: 0,
-                        },
+                        decorateStrategy(s),
                     ],
                 });
             },

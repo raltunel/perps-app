@@ -4,23 +4,24 @@ import { LuChevronDown } from 'react-icons/lu';
 import type { textInputIF } from './CreateStrategy';
 
 interface propsIF {
+    initial: string;
     data: textInputIF;
     handleChange: (text: string) => void;
-    initialVal?: string;
 }
 
 export default function InputText(props: propsIF) {
     const {
+        initial,
         data,
         handleChange,
-        initialVal = '',
     } = props;
+    console.log(initial);
 
     const idForDOM: string = 'CREATE_STRATEGY_'
         + data.label.toUpperCase().replace(' ', '_');
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    const [selection, setSelection] = useState<string>(data.input[0]);
+    const [selection, setSelection] = useState<string>(initial);
 
     return (
         <div className={styles.text_input}>
@@ -29,7 +30,7 @@ export default function InputText(props: propsIF) {
                 <input
                     type='text'
                     id={idForDOM}
-                    defaultValue={initialVal}
+                    defaultValue={selection}
                     placeholder={data.input}
                     onChange={(e: ChangeEvent<HTMLInputElement>) =>
                         handleChange(e.currentTarget.value)
