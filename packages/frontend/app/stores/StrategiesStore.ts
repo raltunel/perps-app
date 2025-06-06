@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { generateSolanaAddress } from './AccountsStore';
+import { generateSolanaAddress } from '~/utils/functions/makeAddress';
 
 export interface strategyIF {
     name: string;
@@ -38,7 +38,7 @@ const LS_KEY = 'STRATEGIES';
 
 const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     {
-        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
+        address: 'Hfdarm6DDC8t141wvqvPVHLE5ZGBfUvB2LjkyZCbwASo',
         name: 'My First Strategy',
         market: 'BTC',
         distance: '2',

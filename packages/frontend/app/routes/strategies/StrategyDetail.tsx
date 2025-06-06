@@ -1,8 +1,10 @@
 import Button from '~/components/Button/Button';
-import styles from './strategies.module.css';
+import styles from './StrategyDetail.module.css';
 import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
 import { useStrategiesStore, type strategyDecoratedIF, type useStrategiesStoreIF } from '~/stores/StrategiesStore';
+import { type useModalIF, useModal } from '~/hooks/useModal';
+import Modal from '~/components/Modal/Modal';
 
 export default function Strategies() {
     const navigate = useNavigate();
@@ -12,6 +14,8 @@ export default function Strategies() {
     const strategy: strategyDecoratedIF|undefined = strategies.data.find(
         (s: strategyDecoratedIF) => s.address === address
     );
+
+    const removeStratModalCtrl: useModalIF = useModal();
 
     if (!strategy) return;
 
@@ -32,10 +36,7 @@ export default function Strategies() {
                         Pause
                     </Button>
                     <Button
-                        onClick={() => {
-                            strategies.remove(strategy.address);
-                            navigate('/strategies');
-                        }}
+                        onClick={() => removeStratModalCtrl.open()}
                         size='medium'
                         selected
                     >
@@ -124,6 +125,37 @@ export default function Strategies() {
                 <div className={styles.strategy_details_graph}></div>
             </div>
             <OrderHistory />
+            { removeStratModalCtrl.isOpen && (
+                <Modal
+                    title='Remove Strategy'
+                    close={removeStratModalCtrl.close}
+                >
+                    <section className={styles.remove_strategy_modal}>
+                        <p className={styles.remove_strat_modal_message}>
+                            Are you sure you want to delete this strategy?
+                        </p>
+                        <div className={styles.remove_strat_modal_buttons}>
+                            <Button
+                                onClick={removeStratModalCtrl.close}
+                                size='large'
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    strategies.remove(strategy.address);
+                                    removeStratModalCtrl.close();
+                                    navigate('/strategies');
+                                }}
+                                size='large'
+                                selected
+                            >
+                                Delete
+                            </Button>
+                        </div>
+                    </section>
+                </Modal>
+            )}
         </div>
     );
 }
