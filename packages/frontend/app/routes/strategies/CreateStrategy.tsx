@@ -156,7 +156,16 @@ export default function CreateStrategy(props: propsT) {
                     Reset
                 </Button>
                 <div className={styles.buttons_right}>
-                    <Button size={100} onClick={() => navigate('/strategies')}>
+                    <Button
+                        size={100}
+                        onClick={() =>
+                            navigate(
+                                location.state
+                                    ? `/strategies/${location.state.address}`
+                                    : '/strategies',
+                            )
+                        }
+                    >
                         Cancel
                     </Button>
                     <Button
