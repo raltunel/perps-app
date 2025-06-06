@@ -57,6 +57,7 @@ export default [
         'routes/showcase/buttonShowcase/buttonShowcase.tsx',
     ),
     route('showcase/modals', 'routes/showcase/modalshowcase/modalshowcase.tsx'),
+    route('showcase/tabs', 'routes/showcase/tabShowcase/tabShowcase.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

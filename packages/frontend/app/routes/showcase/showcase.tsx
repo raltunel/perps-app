@@ -11,35 +11,35 @@ export default function Showcase() {
             path: '/showcase/buttons',
             icon: '🔘',
         },
-        {
-            title: 'Dropdowns',
-            description: 'Dropdown menus and select components',
-            path: '/showcase/dropdowns',
-            icon: '📋',
-        },
-        {
-            title: 'Inputs',
-            description: 'Form inputs and text fields',
-            path: '/showcase/inputs',
-            icon: '📝',
-        },
+        // {
+        //     title: 'Dropdowns',
+        //     description: 'Dropdown menus and select components',
+        //     path: '/showcase/dropdowns',
+        //     icon: '📋',
+        // },
+        // {
+        //     title: 'Inputs',
+        //     description: 'Form inputs and text fields',
+        //     path: '/showcase/inputs',
+        //     icon: '📝',
+        // },
         {
             title: 'Modals',
             description: 'Modal dialogs and overlays',
             path: '/showcase/modals',
             icon: '🪟',
         },
+        // {
+        //     title: 'Cards',
+        //     description: 'Card layouts and containers',
+        //     path: '/showcase/cards',
+        //     icon: '🃏',
+        // },
         {
-            title: 'Cards',
-            description: 'Card layouts and containers',
-            path: '/showcase/cards',
-            icon: '🃏',
-        },
-        {
-            title: 'Tables',
-            description: 'Data tables and grids',
-            path: '/showcase/tables',
-            icon: '📊',
+            title: 'Tabs',
+            description: 'Animated navigation tabs with scrolling',
+            path: '/showcase/tabs',
+            icon: '📑',
         },
     ];
 
@@ -68,12 +68,6 @@ export default function Showcase() {
                     </Link>
                 ))}
             </div>
-
-            <footer className={styles.footer}>
-                <p className={styles.footerText}>
-                    Built with React Router and CSS Modules
-                </p>
-            </footer>
         </div>
     );
 }
