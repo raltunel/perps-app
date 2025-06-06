@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './ModalShowcase.module.css';
+import styles from './modalShowcase.module.css';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useModal } from '~/hooks/useModal';
