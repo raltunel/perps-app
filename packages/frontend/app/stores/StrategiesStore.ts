@@ -5,7 +5,7 @@ import { generateSolanaAddress } from './AccountsStore';
 export interface strategyIF {
     name: string;
     market: string | 'BTC' | 'ETH' | 'SOL';
-    distance: number|string;
+    distance: string;
     distanceType: string | 'Ticks' | '%';
     side: string | 'Both' | 'Above' | 'Below';
     totalSize: string;
@@ -41,7 +41,7 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
         address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
         name: 'My First Strategy',
         market: 'BTC',
-        distance: 2,
+        distance: '2',
         distanceType: 'Ticks',
         side: 'Both',
         totalSize: '$100,000.00',

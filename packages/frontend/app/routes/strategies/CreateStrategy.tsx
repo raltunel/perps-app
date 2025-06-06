@@ -1,7 +1,7 @@
 import Button from '~/components/Button/Button';
 import styles from './CreateStrategy.module.css';
 import InputText from './InputText';
-import type { strategyIF } from '~/stores/StrategiesStore';
+import { NEW_STRATEGY_DEFAULTS, type strategyIF } from '~/stores/StrategiesStore';
 import { useLocation, useNavigate } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
 import {
@@ -82,7 +82,8 @@ export default function CreateStrategy(props: propsT) {
     // state data for subaccounts
     const subAccounts: useAccountsIF = useAccounts();
 
-    const { strategy, address } = useLocation().state;
+    const location = useLocation();
+    const strategy: strategyIF = location.state ? location.state.strategy : NEW_STRATEGY_DEFAULTS;
 
     const [name, setName] = useState(strategy.name);
     const [market, setMarket] = useState(strategy.market);
@@ -158,8 +159,11 @@ export default function CreateStrategy(props: propsT) {
                                 totalSize,
                                 orderSize
                             };
-                            if (page === 'edit' && address) {
-                                (submitFn as (s: strategyIF, addr: string) => void)(values, address);
+                            if (page === 'edit' && location.state) {
+                                (submitFn as (s: strategyIF, addr: string) => void)(
+                                    values,
+                                    location.state.address
+                                );
                             } else if (page === 'new') {
                                 (submitFn as (s: strategyIF) => void)(values);
                             }
