@@ -137,12 +137,14 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
             <div className={styles.buttons_wrapper}>
                 <button
                     style={{ backgroundColor: buyColor }}
+                    className={styles.overlay_button}
                     onClick={handleBuyClick}
                 >
                     Buy / Long
                 </button>
                 <button
                     style={{ backgroundColor: sellColor }}
+                    className={styles.overlay_button}
                     onClick={handleSellClick}
                 >
                     Sell / Short

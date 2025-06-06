@@ -1,6 +1,7 @@
 import React from 'react';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import styles from './VaultCard.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface VaultCardProps {
     name: string;
@@ -78,16 +79,17 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
             </div>
 
             <div className={styles.buttonContainer}>
-                <button className={styles.depositButton} onClick={onDeposit}>
+                <SimpleButton onClick={onDeposit} bg='accent1'>
                     Deposit
-                </button>
+                </SimpleButton>
                 {hasWithdraw && (
-                    <button
-                        className={styles.withdrawButton}
+                    <SimpleButton
+                        bg='dark3'
+                        hoverBg='accent1'
                         onClick={onWithdraw}
                     >
                         Withdraw
-                    </button>
+                    </SimpleButton>
                 )}
             </div>
         </div>

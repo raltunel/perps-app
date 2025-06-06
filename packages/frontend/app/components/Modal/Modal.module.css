@@ -29,7 +29,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
 }
 
 .outside_modal header h3 {
@@ -211,4 +211,12 @@
             height: 48px;
         }
     }
+}
+
+.bottomRightContainer {
+    /* Override the default centering */
+    justify-content: flex-end !important;
+    align-items: flex-end !important;
+    /* Add some padding so modal isn't flush against edges */
+    padding: var(--padding-m) !important;
 }

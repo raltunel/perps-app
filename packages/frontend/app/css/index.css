@@ -17,6 +17,8 @@
     --text3: #88888f;
 
     --accent1: #7371fc;
+    --accent1-dark: #5f5df0;
+
     --accent2: #e480ff;
     --accent3: #5ffff2;
     --accent4: #71b5fc;
@@ -74,7 +76,7 @@
     --padding-xl: 64px;
     --padding-xxl: 96px;
     --padding-dropdown: 0px 4px 0px 8px;
-
+    --padding-modal: var(--padding-s) var(--padding-m) var(--padding-m);
     --gap-xs: 4px;
     --gap-s: 8px;
     --gap-m: 16px;
@@ -235,7 +237,7 @@ button::before {
 }
 
 button:hover::before {
-    filter: brightness(0.8);
+    /* filter: brightness(0.8); */
 }
 
 ul[role='list'],

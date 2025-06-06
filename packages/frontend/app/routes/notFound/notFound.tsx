@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router';
 import styles from './notFound.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 const NotFound: React.FC = () => {
     const navigate = useNavigate();
@@ -14,18 +15,15 @@ const NotFound: React.FC = () => {
                     The page you're looking for doesn't exist or has been moved.
                 </p>
                 <div className={styles.actions}>
-                    <button
+                    <SimpleButton
+                        bg='accent1'
                         onClick={() => navigate('/', { viewTransition: true })}
-                        className={styles.primaryButton}
                     >
                         Back to Home
-                    </button>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className={styles.secondaryButton}
-                    >
+                    </SimpleButton>
+                    <SimpleButton bg='dark4' onClick={() => navigate(-1)}>
                         Go Back
-                    </button>
+                    </SimpleButton>
                 </div>
             </div>
         </div>

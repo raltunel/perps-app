@@ -3,6 +3,7 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 import styles from './PortfolioWithdraw.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface PortfolioWithdrawProps {
     portfolio: {
@@ -203,13 +204,14 @@ function PortfolioWithdraw({
                     </div>
                 ))}
             </div>
-            <button
-                className={styles.actionButton}
+
+            <SimpleButton
+                bg='accent1'
                 onClick={handleWithdraw}
                 disabled={isButtonDisabled}
             >
-                {isProcessing ? 'Processing...' : 'Withdraw'}
-            </button>
+                {isProcessing ? 'Processing...' : 'Withdraw'}{' '}
+            </SimpleButton>
         </div>
     );
 }

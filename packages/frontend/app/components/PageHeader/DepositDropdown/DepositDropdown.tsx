@@ -17,6 +17,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface propsIF {
     isDropdown?: boolean;
@@ -169,20 +170,32 @@ function DepositDropdown(props: propsIF) {
                     <div
                         className={`${styles.actionButtons} ${!isDropdown ? styles.dropdownActionButtons : ''}`}
                     >
-                        <button onClick={handleDeposit}>Deposit</button>
-                        <button onClick={handleWithdraw}>Withdraw</button>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={handleDeposit}
+                            className={styles.depositButton}
+                        >
+                            Deposit
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='dark3'
+                            hoverBg='accent1'
+                            onClick={handleWithdraw}
+                        >
+                            Withdraw
+                        </SimpleButton>
                     </div>
                 ) : (
                     <div className={styles.notConnectedContainer}>
                         <p className={styles.notConnectedText}>
                             Connect your wallet to start trading with zero gas.
                         </p>
-                        <button
-                            className={styles.connectButton}
+                        <SimpleButton
+                            bg='accent1'
                             onClick={handleConnectWallet}
                         >
                             Connect Wallet
-                        </button>
+                        </SimpleButton>
                     </div>
                 )}
                 {isUserConnected && (
