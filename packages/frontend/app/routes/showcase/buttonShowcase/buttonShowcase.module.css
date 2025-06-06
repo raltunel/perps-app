@@ -145,7 +145,6 @@
     overflow-x: auto;
     font-family: 'Monaco', 'Menlo', monospace;
     font-size: var(--font-size-s) + 5px;
-    line-height: 1.5;
     color: var(--text2);
 }
 

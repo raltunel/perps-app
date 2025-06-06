@@ -48,7 +48,6 @@
     color: var(--text2);
     max-width: 600px;
     margin: 0 auto;
-    line-height: 1.6;
 }
 
 .showcaseSection {
@@ -94,7 +93,6 @@
     color: var(--text2);
     margin: 0;
     font-size: var(--paragraph-sm);
-    line-height: 1.5;
 }
 
 .toggleCode {
@@ -190,7 +188,6 @@
     overflow-x: auto;
     font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
     font-size: var(--code-font);
-    line-height: 1.6;
     color: var(--text2);
     background: var(--bg-dark1);
 }
@@ -225,7 +222,6 @@
     padding: var(--padding-m);
     color: var(--text2);
     font-size: var(--code-font);
-    line-height: 1.5;
 }
 
 .propsRow > code {
@@ -280,7 +276,6 @@
     padding: var(--padding-m);
     border-radius: var(--radius-xs);
     border: 1px solid var(--bg-dark4);
-    line-height: 1.6;
     overflow-x: auto;
 }
 
@@ -308,7 +303,6 @@
 .guidelineCard p {
     margin: 0 0 var(--margin-s) 0;
     color: var(--text2);
-    line-height: 1.6;
 }
 
 .guidelineCard p:last-child {
@@ -334,7 +328,6 @@
 .tipCard p {
     margin: 0;
     color: var(--text2);
-    line-height: 1.6;
 }
 
 .inlineCode {
