@@ -1,14 +1,14 @@
 import React, {
-    useEffect,
-    useState,
-    useRef,
     useCallback,
+    useEffect,
     useMemo,
+    useRef,
+    useState,
     type ReactNode,
 } from 'react';
-import styles from './Modal.module.css';
-import { useMobile } from '~/hooks/useMediaQuery';
 import { MdClose } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
+import styles from './Modal.module.css';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 

@@ -38,7 +38,7 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
-            let heightAttr = canvasSize.height;
+            let heightAttr = canvasSize?.height;
             let widthAttr = canvasSize.width;
 
             if (overlayCanvasRef.current) {
@@ -54,9 +54,9 @@ const LabelComponent = ({
                         'canvas[data-name="pane-canvas"]',
                     ) as HTMLCanvasElement;
                     const width = overlayCanvasRef.current.style.width;
-                    const height = overlayCanvasRef.current.style.height;
+                    const height = overlayCanvasRef.current.style?.height;
 
-                    heightAttr = paneCanvas.height;
+                    heightAttr = paneCanvas?.height;
                     widthAttr = paneCanvas.width;
 
                     if (
@@ -70,7 +70,7 @@ const LabelComponent = ({
                     }
                 }
             }
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas?.height);
 
             const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(
@@ -170,7 +170,7 @@ const LabelComponent = ({
                     const startX = loc.x;
                     const endX = loc.x + loc.width;
                     const startY = loc.y;
-                    const endY = loc.y + loc.height;
+                    const endY = loc.y + loc?.height;
 
                     if (x >= startX && x <= endX && y >= startY && y <= endY) {
                         return { label: loc, parentLine: drawnLabels[i] };
@@ -203,7 +203,7 @@ const LabelComponent = ({
                         const cssOffsetX = params.clientX - rect.left;
                         const cssOffsetY = params.clientY - rect.top;
 
-                        const scaleY = paneCanvas.height / rect.height;
+                        const scaleY = paneCanvas?.height / rect?.height;
                         const scaleX = paneCanvas.width / rect.width;
 
                         const offsetX = cssOffsetX * scaleX;

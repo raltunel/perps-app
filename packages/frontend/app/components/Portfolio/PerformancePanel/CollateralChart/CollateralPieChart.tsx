@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import styles from './CollateralPieChart.module.css';
-import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import React, { useEffect } from 'react';
 import Button from '~/components/Button/Button';
+import styles from './CollateralPieChart.module.css';
 
 type PieData = { label: string; value: number };
 
@@ -32,12 +31,12 @@ const CollateralPieChart: React.FC = () => {
         const canvas = document.getElementById(
             'pie-canvas',
         ) as HTMLCanvasElement;
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas?.getContext('2d');
 
         if (!ctx) return;
 
-        const width = canvas.width;
-        const height = canvas.height;
+        const width = canvas?.width;
+        const height = canvas?.height;
         const radius = Math.min(width, height) / 2;
 
         const pie = d3.pie<PieData>().value((d) => d.value);
