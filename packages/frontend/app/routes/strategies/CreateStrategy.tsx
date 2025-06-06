@@ -12,6 +12,7 @@ import {
     useNotificationStore,
 } from '~/stores/NotificationStore';
 import { useState } from 'react';
+import { FaChevronLeft } from 'react-icons/fa';
 
 export interface textInputIF {
     label: string;
@@ -100,8 +101,13 @@ export default function CreateStrategy(props: propsT) {
 
     return (
         <div className={styles.create_strategy_page}>
-            {page === 'new' && <h2>New Strategy</h2>}
-            {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
+            <header>
+                <div onClick={() => navigate(-1)}>
+                    <FaChevronLeft />
+                </div>
+                {page === 'new' && <h2>New Strategy</h2>}
+                {page === 'edit' && <h2>Edit Strategy: {strategy.name}</h2>}
+            </header>
             <section className={styles.create_strategy_inputs}>
                 <InputText
                     initial={name}

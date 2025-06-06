@@ -9,6 +9,35 @@
     z-index: var(--create-strategy-page-z-index);
 }
 
+.create_strategy_page > header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--gap-m);
+}
+
+.create_strategy_page > header > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-s);
+    cursor: pointer;
+    height: 45px;
+    aspect-ratio: 1/1;
+}
+
+.create_strategy_page > header > div:hover {
+    background-color: var(--bg-dark4);
+}
+
+.create_strategy_page > header > h2 {
+    font-size: var(--font-size-xl);
+    /* font-weight is from Figma not centralized */
+    font-weight: 300;
+    color: var(--text1);
+}
+
 .create_strategy_inputs {
     display: flex;
     flex-direction: column;
