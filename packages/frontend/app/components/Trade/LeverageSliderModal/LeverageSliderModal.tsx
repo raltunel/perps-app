@@ -3,6 +3,7 @@ import styles from './LeverageSliderModal.module.css';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { BsQuestionCircle } from 'react-icons/bs';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -262,15 +263,12 @@ export default function LeverageSliderModal({
 
                 {/* Action buttons */}
                 <div className={styles.buttonContainer}>
-                    <button onClick={onClose} className={styles.cancelButton}>
+                    <SimpleButton onClick={onClose} bg='dark4'>
                         Cancel
-                    </button>
-                    <button
-                        onClick={handleConfirm}
-                        className={styles.confirmButton}
-                    >
+                    </SimpleButton>
+                    <SimpleButton onClick={handleConfirm} bg='accent1'>
                         Confirm
-                    </button>
+                    </SimpleButton>
                 </div>
             </div>
         </Modal>

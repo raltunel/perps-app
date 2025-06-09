@@ -7,6 +7,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 // interface for functional component props
 interface propsIF {
@@ -61,8 +62,12 @@ export default function CreateSubaccount(props: propsIF) {
                     />
                 </div>
                 <div className={styles.modal_buttons}>
-                    <button onClick={modalControl.close}>Cancel</button>
-                    <button onClick={createSubaccount}>Confirm</button>
+                    <SimpleButton bg='dark4' onClick={modalControl.close}>
+                        Cancel
+                    </SimpleButton>
+                    <SimpleButton bg='accent1' onClick={createSubaccount}>
+                        Confirm
+                    </SimpleButton>
                 </div>
             </div>
         </Modal>

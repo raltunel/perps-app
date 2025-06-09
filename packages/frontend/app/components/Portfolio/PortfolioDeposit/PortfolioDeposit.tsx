@@ -7,6 +7,7 @@ import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface PortfolioDepositProps {
     portfolio: {
@@ -172,7 +173,11 @@ function PortfolioDeposit({
                     step='any'
                     disabled={isProcessing}
                 />
-                <button onClick={handleMaxClick} disabled={isProcessing}>
+                <button
+                    onClick={handleMaxClick}
+                    disabled={isProcessing}
+                    className={styles.maxButton}
+                >
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
@@ -196,13 +201,14 @@ function PortfolioDeposit({
                     </div>
                 ))}
             </div>
-            <button
-                className={styles.actionButton}
+
+            <SimpleButton
+                bg='accent1'
                 onClick={handleDeposit}
                 disabled={isButtonDisabled}
             >
                 {isProcessing ? 'Processing...' : 'Deposit'}
-            </button>
+            </SimpleButton>
         </div>
     );
 }

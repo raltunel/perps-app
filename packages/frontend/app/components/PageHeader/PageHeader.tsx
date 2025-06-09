@@ -147,13 +147,12 @@ export default function PageHeader() {
             }}
             ref={depositMenuRef}
         >
-            <Button
-                size='medium'
-                selected
+            <button
+                className={styles.depositButton}
                 onClick={() => setIsDepositDropdownOpen(!isDepositDropdownOpen)}
             >
                 Deposit
-            </Button>
+            </button>
 
             {isDepositDropdownOpen && (
                 <DepositDropdown
@@ -251,13 +250,12 @@ export default function PageHeader() {
                     {isUserConnected && networksDisplay}
                     {isUserConnected && rpcDisplay}
                     {!isUserConnected && (
-                        <Button
-                            size='medium'
-                            selected
+                        <button
+                            className={styles.depositButton}
                             onClick={() => setIsUserConnected(true)}
                         >
                             Connect
-                        </Button>
+                        </button>
                     )}
                     {isUserConnected && walletDisplay}
 

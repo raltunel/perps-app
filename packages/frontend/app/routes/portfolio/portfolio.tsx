@@ -8,6 +8,7 @@ import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -77,25 +78,36 @@ function Portfolio() {
                             </h6>
                             <div className={styles.buttonContainer}>
                                 <div className={styles.rowButton}>
-                                    <button onClick={openDepositModal}>
+                                    <SimpleButton
+                                        onClick={openDepositModal}
+                                        bg='accent1'
+                                    >
                                         Deposit
-                                    </button>
-                                    <button onClick={openWithdrawModal}>
+                                    </SimpleButton>
+                                    <SimpleButton
+                                        onClick={openWithdrawModal}
+                                        bg='dark3'
+                                        hoverBg='accent1'
+                                    >
                                         Withdraw
-                                    </button>
-                                    <button
+                                    </SimpleButton>
+                                    <SimpleButton
                                         onClick={openSendModal}
                                         className={styles.sendMobile}
+                                        bg='dark3'
+                                        hoverBg='accent1'
                                     >
                                         Send
-                                    </button>
+                                    </SimpleButton>
                                 </div>
-                                <button
+                                <SimpleButton
                                     onClick={openSendModal}
                                     className={styles.sendDesktop}
+                                    bg='dark3'
+                                    hoverBg='accent1'
                                 >
                                     Send
-                                </button>
+                                </SimpleButton>
                             </div>
                         </div>
                     </div>

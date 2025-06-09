@@ -52,6 +52,10 @@
     cursor: pointer;
     color: var(--accent1);
 }
+.view_detail_clickable:hover {
+    transition: all 0.3s ease-in-out;
+    filter: brightness(0.8);
+}
 
 .totalNetDisplay {
     height: 100%;
@@ -84,30 +88,7 @@
     align-items: center;
     gap: var(--gap-s);
 }
-.totalNetDisplay button {
-    outline: none;
-    border: none;
-    display: flex;
-    padding: var(--button-padding);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--radius-s);
-    background: var(--bg-dark3, #1c1c22);
-    color: var(--text1, #f0f0f8);
 
-    font-size: var(--font-size-m);
-    height: var(--button-height);
-    width: 100%;
-}
-
-.rowButton button:hover,
-.buttonContainer button:hover {
-    background: var(--accent1) !important;
-    opacity: 1 !important;
-    transition: all 0.3s ease-in-out;
-    filter: brightness(1) !important;
-}
 .table {
     height: var(--table-height);
     overflow-y: hidden;

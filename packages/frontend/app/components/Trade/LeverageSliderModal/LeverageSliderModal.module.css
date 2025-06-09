@@ -150,26 +150,3 @@
     grid-template-columns: repeat(2, 1fr);
     gap: var(--gap-s);
 }
-.buttonContainer button {
-    height: var(--button-height);
-    display: flex;
-    padding: var(--padding-button);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: var(--radius-s);
-    color: var(--text1);
-    font-size: var(--font-size-m);
-    cursor: pointer;
-    background-color: transparent;
-    outline: none !important;
-    border: none !important;
-}
-
-.cancelButton {
-    background: var(--bg-dark4) !important;
-}
-
-.confirmButton {
-    background: var(--accent1) !important;
-}
