@@ -81,8 +81,6 @@
     display: flex;
     flex-direction: row;
     gap: var(--gap-m);
-    background-color: var(--bg-dark2);
-    border-radius: 16px;
 }
 
 .strategy_details > div {
@@ -95,6 +93,8 @@
     gap: var(--gap-xs);
     padding: 8px 0;
     font-size: var(--font-size-s);
+    background-color: var(--bg-dark2);
+    border-radius: 16px;
 }
 
 /* these two parts create the grey-purple underline effect */
