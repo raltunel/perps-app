@@ -116,6 +116,10 @@ export default function Strategies() {
                     </header>
                     <section>
                         <div>
+                            <div>Collateral</div>
+                            <div>{strategy?.pnl ?? '-'}</div>
+                        </div>
+                        <div>
                             <div>PNL</div>
                             <div>{strategy?.pnl ?? '-'}</div>
                         </div>
@@ -134,6 +138,16 @@ export default function Strategies() {
                         <div>
                             <div>Runtime</div>
                             <div>{strategy?.runtime ?? '-'}</div>
+                        </div>
+                        <div>
+                            <div>Currently</div>
+                            <div
+                                style={{
+                                    color: `var(--${strategy?.isPaused ? 'red' : 'green'})`,
+                                }}
+                            >
+                                {strategy?.isPaused ? 'Paused' : 'Active'}
+                            </div>
                         </div>
                     </section>
                 </div>

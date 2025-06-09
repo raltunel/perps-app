@@ -15,6 +15,7 @@ export interface strategyIF {
 
 export interface strategyDecoratedIF extends strategyIF {
     address: string;
+    collateral: string;
     pnl: string;
     volume: string;
     maxDrawdown: string;
@@ -26,6 +27,7 @@ function decorateStrategy(s: strategyIF): strategyDecoratedIF {
     return {
         ...s,
         address: generateSolanaAddress(),
+        collateral: '$100,000.00',
         pnl: '$0.00',
         volume: '$0.00',
         maxDrawdown: '0.00%',
@@ -53,6 +55,7 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
         maxDrawdown: '0.00%',
         ordersPlaced: 0,
         runtime: 0,
+        collateral: '$100,000.00',
         isPaused: false,
     },
 ];
@@ -96,6 +99,7 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
                                 maxDrawdown: d.maxDrawdown,
                                 ordersPlaced: d.ordersPlaced,
                                 runtime: d.runtime,
+                                collateral: d.collateral,
                             };
                         } else {
                             return d;
