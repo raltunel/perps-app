@@ -71,6 +71,10 @@
     gap: var(--gap-s);
 }
 
+.header_right > svg {
+    align-self: center;
+}
+
 .header_right > button {
     width: 100px;
     border-radius: var(--radius-m);
