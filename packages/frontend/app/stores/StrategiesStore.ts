@@ -10,6 +10,7 @@ export interface strategyIF {
     side: string | 'Both' | 'Above' | 'Below';
     totalSize: string;
     orderSize: string;
+    isPaused: boolean;
 }
 
 export interface strategyDecoratedIF extends strategyIF {
@@ -22,7 +23,7 @@ export interface strategyDecoratedIF extends strategyIF {
 }
 
 function decorateStrategy(s: strategyIF): strategyDecoratedIF {
-    return ({
+    return {
         ...s,
         address: generateSolanaAddress(),
         pnl: '$0.00',
@@ -30,7 +31,8 @@ function decorateStrategy(s: strategyIF): strategyDecoratedIF {
         maxDrawdown: '0.00%',
         ordersPlaced: 0,
         runtime: 0,
-    });
+        isPaused: false,
+    };
 }
 
 // local storage key to persist data
@@ -51,6 +53,7 @@ const MOCK_STRATEGIES: strategyDecoratedIF[] = [
         maxDrawdown: '0.00%',
         ordersPlaced: 0,
         runtime: 0,
+        isPaused: false,
     },
 ];
 
@@ -62,11 +65,13 @@ export const NEW_STRATEGY_DEFAULTS: strategyIF = {
     side: 'Both',
     totalSize: '',
     orderSize: '',
-}
+    isPaused: false,
+};
 
 export interface useStrategiesStoreIF {
     data: strategyDecoratedIF[];
     update: (s: strategyIF, addr: string) => void;
+    togglePause: (addr: string) => void;
     add: (s: strategyIF) => void;
     remove: (addr: string) => void;
     reset: () => void;
@@ -80,10 +85,10 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
             // ... data from local storage will re-hydrate if present
             data: MOCK_STRATEGIES,
             update: (s: strategyIF, addr: string): void => {
-                set({ data: get().data.map(
-                    (d: strategyDecoratedIF) => {
+                set({
+                    data: get().data.map((d: strategyDecoratedIF) => {
                         if (d.address === addr) {
-                            return ({
+                            return {
                                 ...s,
                                 address: d.address,
                                 pnl: d.pnl,
@@ -91,27 +96,38 @@ export const useStrategiesStore = create<useStrategiesStoreIF>()(
                                 maxDrawdown: d.maxDrawdown,
                                 ordersPlaced: d.ordersPlaced,
                                 runtime: d.runtime,
-                            });
+                            };
                         } else {
                             return d;
                         }
-                    }
-                )});
+                    }),
+                });
+            },
+            // togglePause: (addr: string): void => null,
+            togglePause: (addr: string): void => {
+                set({
+                    data: get().data.map((d: strategyDecoratedIF) => {
+                        if (d.address === addr) {
+                            const toUpdate: strategyDecoratedIF = d;
+                            toUpdate.isPaused = !toUpdate.isPaused;
+                            return toUpdate;
+                        } else {
+                            return d;
+                        }
+                    }),
+                });
             },
             add: (s: strategyIF): void => {
                 set({
-                    data: [
-                        ...get().data,
-                        decorateStrategy(s),
-                    ],
+                    data: [...get().data, decorateStrategy(s)],
                 });
             },
             remove: (addr: string): void => {
                 set({
                     data: get().data.filter(
-                        (d: strategyDecoratedIF) => d.address !== addr
+                        (d: strategyDecoratedIF) => d.address !== addr,
                     ),
-                })
+                });
             },
             reset: (): void => set({ data: MOCK_STRATEGIES }),
         }),

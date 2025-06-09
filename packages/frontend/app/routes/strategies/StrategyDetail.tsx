@@ -43,10 +43,12 @@ export default function Strategies() {
                 </div>
                 <div className={styles.header_right}>
                     <SimpleButton
-                        onClick={() => console.log('Strategy Paused!')}
+                        onClick={() =>
+                            strategy && strategies.togglePause(strategy.address)
+                        }
                         hoverBg='accent1'
                     >
-                        Pause
+                        {strategy?.isPaused ? 'Unpause' : 'Pause'}
                     </SimpleButton>
                     <SimpleButton
                         onClick={() =>

@@ -188,6 +188,7 @@ export default function CreateStrategy(props: propsT) {
                                         side,
                                         totalSize,
                                         orderSize,
+                                        isPaused: false,
                                     };
                                     if (page === 'edit' && location.state) {
                                         (
