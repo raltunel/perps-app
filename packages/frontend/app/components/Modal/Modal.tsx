@@ -1,14 +1,14 @@
 import React, {
-    useEffect,
-    useState,
-    useRef,
     useCallback,
+    useEffect,
     useMemo,
+    useRef,
+    useState,
     type ReactNode,
 } from 'react';
-import styles from './Modal.module.css';
-import { useMobile } from '~/hooks/useMediaQuery';
 import { MdClose } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
+import styles from './Modal.module.css';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 
@@ -420,8 +420,14 @@ function Modal(props: ModalProps) {
                 handleBackdropClick(e);
             }}
             id={OUTSIDE_MODAL_DOM_ID}
-            className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''} ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
-            style={positionStyles[actualPosition]}
+            className={`${styles.outside_modal} ${
+                actualPosition === 'bottomSheet'
+                    ? styles.bottomSheetContainer
+                    : actualPosition === 'bottomRight'
+                      ? styles.bottomRightContainer
+                      : ''
+            } ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
+            // style={positionStyles[actualPosition]}
             role='dialog'
             aria-modal='true'
             aria-labelledby='modal-title'

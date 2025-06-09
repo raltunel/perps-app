@@ -56,44 +56,10 @@
 }
 
 .actions {
-    display: flex;
-    gap: var(--radius-m);
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.primaryButton {
-    padding: var(--font-size-s) var(--font-size-l);
-    background: linear-gradient(90deg, var(--accent1), var(--accent4));
-    color: var(--text1);
-    border: none;
-    border-radius: var(--radius-s);
-    font-size: var(--font-size-m);
-    font-weight: var(--notFound-font-weight-medium);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.primaryButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(115, 113, 252, 0.3);
-}
-
-.secondaryButton {
-    padding: var(--notFound-padding-button);
-    background-color: var(--bg-dark5);
-    color: var(--text1);
-    border: none;
-    border-radius: var(--radius-s);
-    font-size: var(--notFound-font-size-button);
-    font-weight: var(--notFound-font-weight-medium);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.secondaryButton:hover {
-    background-color: var(--bg-dark6);
-    transform: translateY(-2px);
+    padding: var(--padding-m);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-s);
 }
 
 @media (max-width: 768px) {

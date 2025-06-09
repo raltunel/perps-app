@@ -33,7 +33,7 @@ const OverlayCanvas: React.FC = () => {
             newCanvas.style.pointerEvents = 'none';
             newCanvas.style.zIndex = '5';
             newCanvas.width = paneCanvas.width;
-            newCanvas.height = paneCanvas.height;
+            newCanvas.height = paneCanvas?.height;
             paneCanvas.parentNode.appendChild(newCanvas);
             canvasRef.current = newCanvas;
         }
@@ -42,7 +42,7 @@ const OverlayCanvas: React.FC = () => {
 
         const updateCanvasSize = () => {
             const width = paneCanvas.width;
-            const height = paneCanvas.height;
+            const height = paneCanvas?.height;
 
             canvas.width = width;
             canvas.style.width = `${width}px`;
@@ -57,9 +57,9 @@ const OverlayCanvas: React.FC = () => {
             if (result) {
                 setCanvasSize({
                     styleWidth: result[0].contentRect.width,
-                    styleHeight: result[0].contentRect.height,
+                    styleHeight: result[0].contentRect?.height,
                     width: paneCanvas.width,
-                    height: paneCanvas.height,
+                    height: paneCanvas?.height,
                 });
             }
         });

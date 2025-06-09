@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface Props {
     initialTab?: string;
@@ -27,7 +28,7 @@ export default function CodeTabs(props: Props) {
                 />
                 <h6>You will receive a discount on your fees</h6>
             </div>
-            <button>Enter</button>
+            <SimpleButton bg='accent1'>Enter</SimpleButton>
         </section>
     );
 
@@ -44,7 +45,7 @@ export default function CodeTabs(props: Props) {
                     for more.
                 </p>
             </div>
-            <button>Create</button>
+            <SimpleButton bg='accent1'>Enter</SimpleButton>
         </section>
     );
     const claimContent = (
@@ -52,7 +53,7 @@ export default function CodeTabs(props: Props) {
             <div className={styles.claimContent}>
                 <p>Claim $0.00 in rewards</p>
             </div>
-            <button>Claim</button>
+            <SimpleButton bg='accent1'>Enter</SimpleButton>
         </section>
     );
 

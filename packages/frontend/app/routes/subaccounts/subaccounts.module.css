@@ -27,3 +27,9 @@
 .subaccounts_wrapper > header > h2 {
     font-size: var(--font-size-xl);
 }
+
+.button_container {
+    display: grid;
+    grid-template-columns: 130px auto;
+    gap: var(--gap-m);
+}
