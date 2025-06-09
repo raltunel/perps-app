@@ -62,7 +62,7 @@ export default function Strategies() {
                         onClick={() => console.log('Strategy Transfered!')}
                         hoverBg='accent1'
                     >
-                        Pause
+                        Transfer
                     </SimpleButton>
                     <SimpleButton
                         onClick={() => removeStratModalCtrl.open()}
