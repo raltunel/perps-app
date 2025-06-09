@@ -3,6 +3,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import { useState } from 'react';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface PropsIF {
     tx: 'buy' | 'sell';
@@ -84,9 +85,13 @@ export default function ConfirmationModal(props: PropsIF) {
                     // reverse
                 />
             </div>
-            <button className={styles.confirmButton} onClick={onClose}>
+            <SimpleButton
+                bg='accent1'
+                onClick={onClose}
+                style={{ height: '47px' }}
+            >
                 {tx === 'buy' ? 'Buy / Long' : 'Sell / Short'}
-            </button>
+            </SimpleButton>
         </div>
     );
 }

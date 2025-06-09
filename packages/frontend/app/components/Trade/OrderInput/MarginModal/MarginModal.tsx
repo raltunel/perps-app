@@ -1,3 +1,4 @@
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { MarginMode } from '../OrderInput';
 import styles from './MarginModal.module.css';
 
@@ -39,12 +40,13 @@ export default function MarginModal(props: PropsIF) {
                     </p>
                 </button>
             </div>
-            <button
-                className={styles.confirmButton}
+            <SimpleButton
+                bg='accent1'
                 onClick={() => handleMarginModeConfirm()}
+                style={{ height: '47px' }}
             >
                 Confirm
-            </button>
+            </SimpleButton>
         </section>
     );
 }
