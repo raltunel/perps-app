@@ -11,6 +11,7 @@ import { type useModalIF, useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 export default function Strategies() {
     const navigate = useNavigate();
@@ -41,34 +42,34 @@ export default function Strategies() {
                     </div>
                 </div>
                 <div className={styles.header_right}>
-                    <Button
+                    <SimpleButton
                         onClick={() => console.log('Strategy Paused!')}
-                        size='medium'
+                        hoverBg='accent1'
                     >
                         Pause
-                    </Button>
-                    <Button
+                    </SimpleButton>
+                    <SimpleButton
                         onClick={() =>
                             navigate(`/strategies/${address}/edit`, {
                                 state: { strategy, address },
                             })
                         }
-                        size='medium'
+                        hoverBg='accent1'
                     >
                         Edit
-                    </Button>
-                    <Button
+                    </SimpleButton>
+                    <SimpleButton
                         onClick={() => console.log('Strategy Transfered!')}
-                        size='medium'
+                        hoverBg='accent1'
                     >
                         Pause
-                    </Button>
-                    <Button
+                    </SimpleButton>
+                    <SimpleButton
                         onClick={() => removeStratModalCtrl.open()}
-                        size='medium'
+                        hoverBg='accent1'
                     >
                         Remove
-                    </Button>
+                    </SimpleButton>
                 </div>
             </header>
             <div className={styles.strategy_details}>

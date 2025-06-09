@@ -72,8 +72,9 @@
 }
 
 .header_right > button {
-    padding: 12px 16px;
+    width: 100px;
     border-radius: var(--radius-m);
+    background-color: var(--bg-dark3);
 }
 
 .strategy_details {
