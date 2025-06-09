@@ -9,6 +9,8 @@ import {
 } from '~/stores/StrategiesStore';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
+import { FaChevronLeft } from 'react-icons/fa';
+import { FiCopy } from 'react-icons/fi';
 
 export default function Strategies() {
     const navigate = useNavigate();
@@ -23,26 +25,27 @@ export default function Strategies() {
 
     return (
         <div className={styles.strategies_page}>
-            <h2>{strategy?.name ?? 'No Strategy Found'}</h2>
-            <p className={styles.strategies_blurb}>
-                Run an automated market making strategy
-            </p>
-            <div className={styles.strategies_learn_more}>Learn more</div>
-            <div className={styles.strategy_select}>
-                <div className={styles.strategy_select_left}>
+            <header>
+                <div className={styles.header_left}>
+                    <div className={styles.back_and_title}>
+                        <div onClick={() => navigate(-1)}>
+                            <FaChevronLeft />
+                        </div>
+                        <h2>{strategy?.name ?? 'No Strategy Found'}</h2>
+                    </div>
+                    <div className={styles.address_clickable}>
+                        <p>{strategy?.address}</p>
+                        <div className={styles.copy_address}>
+                            <FiCopy size={14} />
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.header_right}>
                     <Button
                         onClick={() => console.log('Strategy Paused!')}
                         size='medium'
-                        selected
                     >
                         Pause
-                    </Button>
-                    <Button
-                        onClick={() => removeStratModalCtrl.open()}
-                        size='medium'
-                        selected
-                    >
-                        Remove
                     </Button>
                     <Button
                         onClick={() =>
@@ -51,21 +54,23 @@ export default function Strategies() {
                             })
                         }
                         size='medium'
-                        selected
                     >
                         Edit
                     </Button>
-                </div>
-                <div className={styles.strategy_select_right}>
                     <Button
-                        onClick={() => navigate('/strategies/new')}
+                        onClick={() => console.log('Strategy Transfered!')}
                         size='medium'
-                        selected
                     >
-                        New Strategy
+                        Pause
+                    </Button>
+                    <Button
+                        onClick={() => removeStratModalCtrl.open()}
+                        size='medium'
+                    >
+                        Remove
                     </Button>
                 </div>
-            </div>
+            </header>
             <div className={styles.strategy_details}>
                 <div className={styles.strategy_details_table}>
                     <header>

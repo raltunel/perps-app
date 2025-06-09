@@ -5,44 +5,81 @@
     width: 1200px;
     font-family: var(--font-family-main);
     outline: 1px solid green;
+    user-select: none;
 }
 
-.strategies_page > h2 {
-    font-size: var(--font-size-xl);
-    font-weight: 300;
-    color: var(--text1);
-}
-
-.strategies_blurb {
-    font-size: var(--font-size-m);
-    color: var(--text-2);
-}
-
-.strategies_learn_more {
-    font-size: var(--font-size-m);
-    color: var(--accent1);
-}
-
-.strategy_select {
+.strategies_page > header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
-.strategy_select > div {
+.header_left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+}
+
+.back_and_title {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
+    --back-and-title-height: 45px;
 }
 
-.strategy_select > label {
-    color: var(--text1);
+.back_and_title > div {
+    height: var(--back-and-title-height);
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-m);
+    cursor: pointer;
+}
+
+.back_and_title > div:hover {
+    background-color: var(--bg-dark4);
+}
+
+.back_and_title > h2 {
+    font-weight: 300;
+    font-size: var(--font-size-xl);
+}
+
+.address_clickable {
+    margin-left: 61px;
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s);
+    color: var(--text2);
+}
+
+.address_clickable > p {
+    font-size: var(--font-size-s);
+    vertical-align: bottom;
+}
+
+.address_clickable > div {
+    cursor: pointer;
+}
+
+.header_right {
+    align-self: start;
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s);
+}
+
+.header_right > button {
+    padding: 12px 16px;
+    border-radius: var(--radius-m);
 }
 
 .strategy_details {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
     background-color: var(--bg-dark2);
     border-radius: 16px;
 }
@@ -54,7 +91,7 @@
 .strategy_details_table {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-xs);
     padding: 8px 0;
     font-size: var(--font-size-s);
 }
@@ -73,7 +110,7 @@
 .strategy_details_table > section {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-xs);
     padding: 0 8px;
 }
 
