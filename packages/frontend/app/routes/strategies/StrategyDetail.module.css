@@ -57,6 +57,8 @@
 
 .address_clickable > p {
     font-size: var(--font-size-s);
+    font-family: var(--font-family-mono);
+    /* letter-spacing: 0.5px; */
     vertical-align: bottom;
 }
 
