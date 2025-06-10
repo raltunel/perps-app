@@ -8,6 +8,7 @@ import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import SortIcon from '~/components/Vault/SortIcon';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -113,14 +114,21 @@ export default function Strategies() {
 
     return (
         <div className={styles.strategies_page}>
-            <h2>Strategies</h2>
-            {/* {
-                data.map((s: strategyDecoratedIF) => (
-                    <button onClick={() => navigate('/strategies/' + s.address)}>
-                        View {s.address}
-                    </button>
-                ))
-            } */}
+            <header>
+                <div className={styles.title_row}>
+                    <h2>Strategies</h2>
+                    <SimpleButton
+                        onClick={() => navigate('/strategies/new')}
+                        hoverBg='accent1'
+                    >
+                        Create Strategy
+                    </SimpleButton>
+                </div>
+                <p className={styles.blurb}>
+                    Run an automated market making strategy on Ambient Perps
+                </p>
+                <p className={styles.learn_more}>Learn more</p>
+            </header>
             <div className={styles.table_wrapper}>
                 <Tabs
                     tabs={['Strategies']}
