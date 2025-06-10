@@ -89,6 +89,13 @@ export default function Strategies() {
                     }
                 },
             );
+        } else if (sortBy.cell === 'collateral') {
+            output = [...data].sort(
+                (a: strategyDecoratedIF, b: strategyDecoratedIF) =>
+                    a.collateral
+                        .toLowerCase()
+                        .localeCompare(b.collateral.toLocaleLowerCase()),
+            );
         } else {
             output = data;
         }
