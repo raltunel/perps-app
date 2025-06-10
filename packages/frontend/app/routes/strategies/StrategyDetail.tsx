@@ -26,7 +26,7 @@ export default function Strategies() {
     const removeStratModalCtrl: useModalIF = useModal();
 
     return (
-        <div className={styles.strategies_page}>
+        <div className={styles.strategy_detail_page}>
             <header>
                 <div className={styles.header_left}>
                     <div className={styles.back_and_title}>
