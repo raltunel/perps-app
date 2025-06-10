@@ -170,7 +170,12 @@ export default function Strategies() {
                     </div>
                     <ol className={styles.table_body}>
                         {sorted.map((strat: strategyDecoratedIF) => (
-                            <li key={JSON.stringify(strat)}>
+                            <li
+                                key={JSON.stringify(strat)}
+                                onClick={() =>
+                                    navigate('/strategies/' + strat.address)
+                                }
+                            >
                                 <div>{strat.name}</div>
                                 <div>
                                     {strat.isPaused ? 'Paused' : 'Running'}

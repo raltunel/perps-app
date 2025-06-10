@@ -88,6 +88,7 @@
     transition: background-color 0.3s ease-out;
     padding: var(--strategies-table-row-padding);
     border-radius: var(--radius-s);
+    cursor: pointer;
 }
 
 .table_body > li:hover {
