@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap');
 :root {
     /* ------------------------------ */
     /* 🎨 Color Palette               */
@@ -45,7 +46,7 @@
     /* ------------------------------ */
     /* 🔤 Typography                  */
     /* ------------------------------ */
-    --font-family-main: 'Lexend Deca';
+    --font-family-main: 'Fira Mono', monospace;
     --font-family-mono: 'Roboto Mono';
     --font-weight: 400;
 
@@ -191,6 +192,20 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-dark1);
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
+    margin: 0;
+    padding: 0;
+    font-weight: normal !important;
 }
 
 img,

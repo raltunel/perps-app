@@ -15,10 +15,12 @@
     font-size: var(--font-size-l);
     user-select: none;
     min-width: var(--search-container-width);
-    height: var(--search-container-height);
+    /* height: var(--search-container-height); */
     cursor: pointer;
-    padding: 0 var(--padding-s);
+    padding: var(--padding-s);
     border-radius: var(--radius-s);
+    height: 35px !important;
+    align-self: center;
 }
 
 .symbolSearchContainer:hover {
