@@ -91,6 +91,8 @@ export default function CreateStrategy(props: propsT) {
         ? location.state.strategy
         : NEW_STRATEGY_DEFAULTS;
 
+    console.log(strategy);
+
     const [name, setName] = useState(strategy.name);
     const [market, setMarket] = useState(strategy.market);
     const [distance, setDistance] = useState(strategy.distance);
@@ -201,13 +203,13 @@ export default function CreateStrategy(props: propsT) {
                                         (submitFn as (s: strategyIF) => void)(
                                             values,
                                         );
+                                        subAccounts.create(name, 'strategy');
+                                        notifications.add({
+                                            title: 'Sub Account Created',
+                                            message: `Made new strategy Sub-Account ${name}`,
+                                            icon: 'check',
+                                        });
                                     }
-                                    subAccounts.create(name, 'strategy');
-                                    notifications.add({
-                                        title: 'Sub Account Created',
-                                        message: `Made new strategy Sub-Account ${name}`,
-                                        icon: 'check',
-                                    });
                                     navigate('/strategies');
                                 }}
                                 size={100}
