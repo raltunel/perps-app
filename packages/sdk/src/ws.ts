@@ -158,6 +158,7 @@ export class WebsocketManager {
     }
 
     private connect = () => {
+        console.log('>>> connect');
         const wsUrl =
             'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
         this.log('Connecting to', wsUrl);
@@ -197,6 +198,7 @@ export class WebsocketManager {
     private onOpen = () => {
         this.log('onOpen');
         console.log('>>> onOpen');
+        console.log('>>> queuedSubscriptions', this.queuedSubscriptions);
         this.wsReady = true;
         // send queued subs
         for (const { subscription, active } of this.queuedSubscriptions) {
