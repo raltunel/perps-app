@@ -15,14 +15,19 @@ import { FaCirclePause } from 'react-icons/fa6';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 export default function Strategies() {
+    // hook to manage navigation actions from this page
     const navigate = useNavigate();
-    const { address } = useParams();
-    const strategies: useStrategiesStoreIF = useStrategiesStore();
 
+    // address of the strategy from URL params
+    const { address } = useParams();
+
+    // strategy data to populate in this page
+    const strategies: useStrategiesStoreIF = useStrategiesStore();
     const strategy: strategyDecoratedIF | undefined = strategies.data.find(
         (s: strategyDecoratedIF) => s.address === address,
     );
 
+    // logic to control the strategy removal modal
     const removeStratModalCtrl: useModalIF = useModal();
 
     return (
