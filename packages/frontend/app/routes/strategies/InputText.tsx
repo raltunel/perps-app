@@ -11,7 +11,6 @@ interface propsIF {
 
 export default function InputText(props: propsIF) {
     const { initial, data, handleChange } = props;
-    console.log(initial);
 
     const idForDOM: string =
         'CREATE_STRATEGY_' + data.label.toUpperCase().replace(' ', '_');
@@ -51,12 +50,7 @@ export default function InputText(props: propsIF) {
             {Array.isArray(data.input) && (
                 <div className={styles.dropdown} ref={dropdownRef}>
                     <button onClick={() => setIsOpen(!isOpen)}>
-                        <output
-                            id={idForDOM}
-                            onChange={() => console.log('wowee')}
-                        >
-                            {initial}
-                        </output>
+                        <output id={idForDOM}>{initial}</output>
                         <LuChevronDown />
                     </button>
                     {isOpen && (

@@ -79,7 +79,6 @@ export default function CreateStrategy(props: propsT) {
     const navigate = useNavigate();
 
     const params = useParams();
-    console.log(params);
 
     // TODO:    write a function to validate inputs on change and
     // TODO:    ... and enable disable the CTA accordingly
@@ -93,8 +92,6 @@ export default function CreateStrategy(props: propsT) {
     const strategy: strategyIF = location.state
         ? location.state.strategy
         : NEW_STRATEGY_DEFAULTS;
-
-    console.log(strategy);
 
     const [name, setName] = useState(strategy.name);
     const [market, setMarket] = useState(strategy.market);
