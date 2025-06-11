@@ -228,7 +228,7 @@ export function useInfoApi() {
         return obj;
     };
 
-    const fetchCandles2 = async (
+    const fetchCandles = async (
         coin: string,
         interval: string,
         from: number,
@@ -265,6 +265,6 @@ export function useInfoApi() {
         fetchFundingHistory,
         fetchOpenOrders,
         fetchUserPortfolio,
-        fetchCandles2,
+        fetchCandles,
     };
 }

@@ -1,5 +1,5 @@
 import { bsColorSets } from '~/stores/AppSettingsStore';
-import { fetchCandles, fetchUserFillsHistory } from './fetchCandleData';
+import { fetchUserFillsHistory } from './fetchCandleData';
 import {
     getChartThemeColors,
     mapResolutionToInterval,
@@ -10,7 +10,7 @@ import { useInfoApi } from '~/hooks/useInfoApi';
 const dataCache = new Map<string, any[]>();
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
-const { fetchCandles2, fetchUserFills } = useInfoApi();
+const { fetchCandles, fetchUserFills } = useInfoApi();
 
 export async function getHistoricalData(
     symbol: string,
@@ -78,7 +78,6 @@ export async function getMarkFillData(coin: string, user?: string) {
 
             if (res) {
                 res.forEach((element: any) => {
-                    console.log('element', element);
                     if (element.coin === coin) {
                         poolFillData.push(element);
                     }

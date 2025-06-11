@@ -95,7 +95,8 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 const floorMode = resolutionToSecondsMiliSeconds(resolution);
 
                 payload.forEach((element: any, index: number) => {
-                    const isBuy = element.side === 'B';
+                    const isBuy =
+                        element.side === 'B' || element.side === 'buy';
 
                     const markerColor = isBuy
                         ? chartTheme.buy
