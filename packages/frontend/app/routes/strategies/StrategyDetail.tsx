@@ -48,9 +48,6 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        {/* {strategy?.isPaused && (
-                            <FaCirclePause color={'var(--red)'} size={28} />
-                        )} */}
                         <p>
                             Status: {strategy?.isPaused ? 'Paused' : 'Running'}
                         </p>
