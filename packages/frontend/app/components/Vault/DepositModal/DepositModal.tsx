@@ -121,7 +121,9 @@ export default function DepositModal({
                     min='0'
                     step='any'
                 />
-                <button onClick={handleMaxClick}>Max</button>
+                <button onClick={handleMaxClick} className={styles.maxButton}>
+                    Max
+                </button>
                 {error && <div className={styles.error}>{error}</div>}
             </div>
 

@@ -1,6 +1,11 @@
 .container {
+    --container-width: 398px;
+    --dropdown-container-height: 32px;
+    --input-container-height: 32px;
+    --max-button-width: 50px;
+
     display: flex;
-    width: 398px;
+    width: var(--container-width);
     flex-direction: column;
     align-items: flex-start;
     gap: var(--gap-s);
@@ -42,7 +47,7 @@
 .dropdownContainer {
     width: 100%;
     display: flex;
-    height: 32px;
+    height: var(--dropdown-container-height);
     padding: 0 var(--padding-s);
     justify-content: space-between;
     align-items: center;
@@ -53,7 +58,7 @@
     gap: var(--gap-s);
 }
 .dropdownContainer span {
-    font-size: 12px;
+    font-size: var(--font-size-s);
 }
 .dropdownContainer svg {
     fill: var(--text2);
@@ -62,7 +67,7 @@
 .inputContainer {
     width: 100%;
     display: flex;
-    height: 32px;
+    height: var(--input-container-height);
     padding: 0 var(--padding-s);
     justify-content: space-between;
     align-items: center;
@@ -92,6 +97,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    width: var(--max-button-width);
 }
 
 .error {
