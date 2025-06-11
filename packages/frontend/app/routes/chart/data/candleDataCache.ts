@@ -5,9 +5,12 @@ import {
     mapResolutionToInterval,
     resolutionToSeconds,
 } from './utils/utils';
+import { useInfoApi } from '~/hooks/useInfoApi';
 
 const dataCache = new Map<string, any[]>();
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
+
+const { fetchCandles2, fetchUserFills } = useInfoApi();
 
 export async function getHistoricalData(
     symbol: string,
@@ -33,6 +36,7 @@ export async function getHistoricalData(
 
     const period = mapResolutionToInterval(resolution);
     return await fetchCandles(symbol, period, from, to).then((res: any) => {
+        // return await fetchCandles2(symbol, period, from, to).then((res: any) => {
         if (res) {
             const formattedData = res.map((item: any) => ({
                 time: item.t,
@@ -74,6 +78,7 @@ export async function getMarkFillData(coin: string, user?: string) {
 
             if (res) {
                 res.forEach((element: any) => {
+                    console.log('element', element);
                     if (element.coin === coin) {
                         poolFillData.push(element);
                     }

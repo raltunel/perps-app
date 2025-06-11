@@ -29,6 +29,7 @@ export enum ApiEndpoints {
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
+    CANDLE_SNAPSHOT = 'candleSnapshot',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -227,6 +228,34 @@ export function useInfoApi() {
         return obj;
     };
 
+    const fetchCandles2 = async (
+        coin: string,
+        interval: string,
+        from: number,
+        to: number,
+    ) => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.CANDLE_SNAPSHOT,
+                req: {
+                    coin,
+                    interval,
+                    startTime: from * 1000,
+                    endTime: to * 1000,
+                },
+            }),
+        });
+        try {
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error(error);
+            return [];
+        }
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -236,5 +265,6 @@ export function useInfoApi() {
         fetchFundingHistory,
         fetchOpenOrders,
         fetchUserPortfolio,
+        fetchCandles2,
     };
 }
