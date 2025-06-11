@@ -11,7 +11,6 @@ import { type useModalIF, useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
-import { FaCirclePause } from 'react-icons/fa6';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 export default function Strategies() {
