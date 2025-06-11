@@ -176,6 +176,9 @@ export class WebsocketManager {
         // make sure workers are ready before connecting
         if (this.workers.length === 0 && this.numWorkers > 0) {
             this.log('Workers not initialized, attempting re-initialization.');
+            console.log(
+                'Workers not initialized, attempting re-initialization.',
+            );
             this.initializeWorkers();
             if (this.workers.length === 0) {
                 this.log(
@@ -193,6 +196,7 @@ export class WebsocketManager {
 
     private onOpen = () => {
         this.log('onOpen');
+        console.log('>>> onOpen');
         this.wsReady = true;
         // send queued subs
         for (const { subscription, active } of this.queuedSubscriptions) {
@@ -296,12 +300,14 @@ export class WebsocketManager {
 
     private onClose = () => {
         this.log('onClose');
+        console.log('>>> onClose');
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
             this.log('stopped ping due to close');
         }
+
         this.closeListeners.forEach((listener) => listener());
     };
 
@@ -362,7 +368,7 @@ export class WebsocketManager {
 
     private stashSubscriptions = () => {
         const oldSubscriptions = { ...this.allSubscriptions };
-
+        console.log('>>> stashSubscriptions');
         this.stop();
 
         this.queuedSubscriptions = [];
@@ -496,7 +502,9 @@ export class WebsocketManager {
 
     public reconnect() {
         this.stashSubscriptions();
+        console.log('>>> reconnect');
         setTimeout(() => {
+            console.log('>>> reconnecting');
             this.connect();
         }, 2000);
     }
