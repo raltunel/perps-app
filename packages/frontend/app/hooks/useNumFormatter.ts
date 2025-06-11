@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
@@ -6,6 +6,8 @@ import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 export function useNumFormatter() {
     const { numFormat } = useAppSettings();
     const { coinPriceMap, selectedCurrency } = useTradeDataStore();
+    const coinPriceMapRef = useRef(coinPriceMap);
+    coinPriceMapRef.current = coinPriceMap;
 
     const parseNum = useCallback((val: string | number) => {
         return Number(val);
@@ -105,7 +107,8 @@ export function useNumFormatter() {
 
             if (currencyConversion && selectedCurrency !== 'USD') {
                 num = parseNum(num);
-                num = num / (coinPriceMap.get(selectedCurrency) || 1);
+                num =
+                    num / (coinPriceMapRef.current.get(selectedCurrency) || 1);
             }
 
             let formattedNum = num.toLocaleString(formatType, {
@@ -137,13 +140,7 @@ export function useNumFormatter() {
 
             return result;
         },
-        [
-            numFormat,
-            parseNum,
-            getDefaultPrecision,
-            coinPriceMap,
-            selectedCurrency,
-        ],
+        [numFormat, parseNum, getDefaultPrecision, selectedCurrency],
     );
 
     const formatNumWithOnlyDecimals = useCallback(
