@@ -49,9 +49,12 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        {strategy?.isPaused && (
+                        {/* {strategy?.isPaused && (
                             <FaCirclePause color={'var(--red)'} size={28} />
-                        )}
+                        )} */}
+                        <p>
+                            Status: {strategy?.isPaused ? 'Paused' : 'Running'}
+                        </p>
                         <SimpleButton
                             onClick={() =>
                                 strategy &&
@@ -147,13 +150,13 @@ export default function Strategies() {
                                 <div>{strategy?.runtime ?? '-'}</div>
                             </div>
                             <div>
-                                <div>Currently</div>
+                                <div>Status</div>
                                 <div
                                     style={{
-                                        color: `var(--${strategy?.isPaused ? 'red' : 'green'})`,
+                                        color: `var(${strategy?.isPaused ? '--red' : '--green'})`,
                                     }}
                                 >
-                                    {strategy?.isPaused ? 'Paused' : 'Active'}
+                                    {strategy?.isPaused ? 'Paused' : 'Running'}
                                 </div>
                             </div>
                         </section>
