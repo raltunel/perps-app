@@ -5,7 +5,7 @@ import {
     NEW_STRATEGY_DEFAULTS,
     type strategyIF,
 } from '~/stores/StrategiesStore';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { type useAccountsIF, useAccounts } from '~/stores/AccountsStore';
 import {
     type NotificationStoreIF,
@@ -78,6 +78,9 @@ export default function CreateStrategy(props: propsT) {
     const { page, submitFn } = props;
     const navigate = useNavigate();
 
+    const params = useParams();
+    console.log(params);
+
     // TODO:    write a function to validate inputs on change and
     // TODO:    ... and enable disable the CTA accordingly
 
@@ -105,7 +108,19 @@ export default function CreateStrategy(props: propsT) {
         <div className={styles.create_strategy_page}>
             <div className={styles.create_strategy}>
                 <header>
-                    <div onClick={() => navigate(-1)}>
+                    <div
+                        onClick={() => {
+                            // base URL destination for backnav
+                            let destination = '/strategies';
+                            // if user is on edit page, add address param to URL
+                            if (params.address) {
+                                destination += `/${params.address}`;
+                            }
+                            // navigate user to the correct destination
+                            // note that this is a forward nav action
+                            navigate(destination);
+                        }}
+                    >
                         <FaChevronLeft />
                     </div>
                     {page === 'new' && <h2>New Strategy</h2>}
