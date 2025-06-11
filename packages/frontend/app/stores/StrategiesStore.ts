@@ -42,6 +42,23 @@ const LS_KEY = 'STRATEGIES';
 
 const MOCK_STRATEGIES: strategyDecoratedIF[] = [
     {
+        address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
+        name: 'Confirm Order Table Working',
+        market: 'BTC',
+        distance: '2',
+        distanceType: 'Ticks',
+        side: 'Both',
+        totalSize: '$100,000.00',
+        orderSize: '$10,000.00',
+        pnl: '$0.00',
+        volume: '$0.00',
+        maxDrawdown: '0.00%',
+        ordersPlaced: 0,
+        runtime: 0,
+        collateral: '$100,000.00',
+        isPaused: false,
+    },
+    {
         address: 'Hfdarm6DDC8t141wvqvPVHLE5ZGBfUvB2LjkyZCbwASo',
         name: 'My First Strategy',
         market: 'BTC',
