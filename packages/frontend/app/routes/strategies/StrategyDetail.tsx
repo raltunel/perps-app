@@ -30,7 +30,7 @@ export default function Strategies() {
             <header>
                 <div className={styles.header_left}>
                     <div className={styles.back_and_title}>
-                        <div onClick={() => navigate(-1)}>
+                        <div onClick={() => navigate('/strategies')}>
                             <FaChevronLeft />
                         </div>
                         <h2>{strategy?.name ?? 'No Strategy Found'}</h2>
