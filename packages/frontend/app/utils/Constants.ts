@@ -1,5 +1,7 @@
 import type { DebugWallet } from '~/stores/DebugStore';
 
+export * from './externalResources';
+
 export enum FormatTypes {
     EN = 'en-US',
     DE = 'de-DE',

@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import SortIcon from '~/components/Vault/SortIcon';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { externalResources } from '~/utils/Constants';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -134,7 +135,14 @@ export default function Strategies() {
                 <p className={styles.blurb}>
                     Run an automated market making strategy on Ambient Perps
                 </p>
-                <p className={styles.learn_more}>Learn more</p>
+                <a
+                    href={externalResources.perpsDocs}
+                    target='_blank'
+                    rel='noopener noreferrer me'
+                    className={styles.learn_more}
+                >
+                    Learn more
+                </a>
             </header>
             <div className={styles.table_wrapper}>
                 <Tabs
