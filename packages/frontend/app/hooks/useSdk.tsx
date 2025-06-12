@@ -30,8 +30,11 @@ export const SdkProvider: React.FC<{
     const internetConnectedRef = useRef(internetConnected);
 
     const wsCloseListener = useCallback(() => {
+        console.log('>>> wsCloseListener');
         if (internetConnectedRef.current) {
             info?.wsManager?.reconnect();
+        } else {
+            console.log('>>> wsCloseListener internet not connected');
         }
     }, []);
 

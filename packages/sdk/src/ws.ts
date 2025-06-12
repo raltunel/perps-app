@@ -303,6 +303,7 @@ export class WebsocketManager {
     private onClose = () => {
         this.log('onClose');
         console.log('>>> onClose');
+        console.log('>>> closeListeners', this.closeListeners);
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {
             clearInterval(this.pingInterval);
