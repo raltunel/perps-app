@@ -30,7 +30,13 @@
 .symbolIcon {
     width: var(--symbol-width-height);
     height: var(--symbol-width-height);
-    border-radius: var(--radius-m);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .symbolName {
