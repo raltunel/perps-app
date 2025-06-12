@@ -105,32 +105,7 @@
     align-items: center;
     gap: var(--gap-s);
 }
-.buttonContainer button {
-    width: 100%;
-    display: flex;
-    height: var(--button-height);
-    padding: var(--button-padding);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 1 0 0;
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m);
-    outline: none;
-    border: none;
-    border-radius: var(--radius-s);
-    transition: all var(--ease-in-out-med);
-}
 
-.buttonContainer button:hover {
-    opacity: 0.8;
-}
-.depositButton {
-    background: var(--accent1);
-}
-.withdrawButton {
-    background: var(--bg-dark3);
-}
 /* Small screens (mobile) */
 @media (max-width: 480px) {
     .vaultCard {

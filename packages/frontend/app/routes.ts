@@ -7,8 +7,9 @@ export default [
     route('trade/:marketId?', 'routes/trade.tsx'),
 
     route('strategies', 'routes/strategies/strategies.tsx'),
-    route('strategies/new', 'routes/strategies/createStrategy.tsx'),
+    route('strategies/new', 'routes/strategies/newStrategy.tsx'),
     route('strategies/:address?', 'routes/strategies/StrategyDetail.tsx'),
+    route('strategies/:address/edit', 'routes/strategies/editStrategy.tsx'),
 
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaultsNew.tsx'),
@@ -53,6 +54,13 @@ export default [
         'fundingHistory/:address?',
         'routes/fundingHistory/fundingHistory.tsx',
     ),
+    route('showcase', 'routes/showcase/showcase.tsx'),
+    route(
+        'showcase/buttons',
+        'routes/showcase/buttonShowcase/buttonShowcase.tsx',
+    ),
+    route('showcase/modals', 'routes/showcase/modalShowcase/modalShowcase.tsx'),
+    route('showcase/tabs', 'routes/showcase/tabShowcase/tabShowcase.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

@@ -1,6 +1,8 @@
 .container {
+    --container-width: 398px;
+    --input-container-width: 70px;
     display: flex;
-    width: 398px;
+    width: var(--container-width);
     padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
@@ -71,6 +73,7 @@
     background: none;
     border: none;
     cursor: pointer;
+    width: var(--input-container-width);
 }
 
 .error {
@@ -117,28 +120,6 @@
     color: var(--text1, #f0f0f8);
 }
 
-.actionButton {
-    display: flex;
-    padding: var(--button-padding);
-    height: var(--button-height);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    border-radius: var(--radius-s);
-    background: var(--accent1, #7371fc);
-    border: none;
-
-    cursor: pointer;
-    font-size: var(--font-size-m, 18px);
-    color: var(--text1, #f0f0f8);
-}
-
-.actionButton:disabled {
-    background: var(--bg-dark4, #27272c);
-    color: var(--text2, #bcbcc4);
-    cursor: not-allowed;
-}
 @media (max-width: 768px) {
     .container {
         width: auto;

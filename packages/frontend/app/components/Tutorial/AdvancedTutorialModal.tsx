@@ -1,5 +1,5 @@
 // AdvancedTutorialModal.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './AdvancedTutorialModal.module.css';
 
 export interface TutorialStep {
@@ -62,7 +62,7 @@ export default function AdvancedTutorialModal(
                 top: rect.top,
                 left: rect.left,
                 width: rect.width,
-                height: rect.height,
+                height: rect?.height,
             });
 
             // Calculate modal position based on step position preference
@@ -87,13 +87,13 @@ export default function AdvancedTutorialModal(
                     break;
                 case 'left':
                     newPosition = {
-                        top: rect.top + rect.height / 2 - modalHeight / 2,
+                        top: rect.top + rect?.height / 2 - modalHeight / 2,
                         left: rect.left - modalWidth - 10,
                     };
                     break;
                 case 'right':
                     newPosition = {
-                        top: rect.top + rect.height / 2 - modalHeight / 2,
+                        top: rect.top + rect?.height / 2 - modalHeight / 2,
                         left: rect.right + 10,
                     };
                     break;
@@ -145,7 +145,7 @@ export default function AdvancedTutorialModal(
                         top: `${spotlightPosition.top}px`,
                         left: `${spotlightPosition.left}px`,
                         width: `${spotlightPosition.width}px`,
-                        height: `${spotlightPosition.height}px`,
+                        height: `${spotlightPosition?.height}px`,
                     }}
                 />
             )}

@@ -55,7 +55,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
-        return dummyOrderRow?.getBoundingClientRect().height || 16;
+        return dummyOrderRow?.getBoundingClientRect()?.height || 16;
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);

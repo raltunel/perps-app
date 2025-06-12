@@ -138,14 +138,13 @@ export default function ShareModal(props: propsIF) {
                         />
                     </div>
                     <div className={styles.button_bank}>
-                        <Button size='medium'>
+                        <button>
                             Save Image <RiArrowDownLine />
-                        </Button>
-                        <Button size='medium'>
+                        </button>
+                        <button>
                             Copy Link <LuCopy />
-                        </Button>
-                        <Button
-                            size='medium'
+                        </button>
+                        <button
                             onClick={() => {
                                 const width = 550;
                                 const height = 420;
@@ -169,7 +168,7 @@ export default function ShareModal(props: propsIF) {
                             }}
                         >
                             Share on 𝕏 <RiTwitterFill />
-                        </Button>
+                        </button>
                     </div>
                 </div>
             </div>

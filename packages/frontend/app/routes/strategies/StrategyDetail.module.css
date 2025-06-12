@@ -1,50 +1,100 @@
-.strategies_page {
+.strategy_detail_page {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-family-main);
+    user-select: none;
+}
+
+.strategy_detail_page > div {
     display: flex;
     flex-direction: column;
     gap: 20px;
     width: 1200px;
-    font-family: var(--font-family-main);
-    outline: 1px solid green;
 }
 
-.strategies_page > h2 {
-    font-size: var(--font-size-xl);
-    font-weight: 300;
-    color: var(--text1);
-}
-
-.strategies_blurb {
-    font-size: var(--font-size-m);
-    color: var(--text-2);
-}
-
-.strategies_learn_more {
-    font-size: var(--font-size-m);
-    color: var(--accent1);
-}
-
-.strategy_select {
+.strategy_detail_page > div > header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
-.strategy_select > div {
+.header_left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+}
+
+.back_and_title {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
+    --back-and-title-height: 45px;
 }
 
-.strategy_select > label {
-    color: var(--text1);
+.back_and_title > div {
+    height: var(--back-and-title-height);
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-m);
+    cursor: pointer;
+}
+
+.back_and_title > div:hover {
+    background-color: var(--bg-dark4);
+}
+
+.back_and_title > h2 {
+    font-weight: 300;
+    font-size: var(--font-size-xl);
+}
+
+.address_clickable {
+    margin-left: 61px;
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s);
+    color: var(--text2);
+}
+
+.address_clickable > p {
+    font-size: var(--font-size-s);
+    font-family: var(--font-family-mono);
+    /* letter-spacing: 0.5px; */
+    vertical-align: bottom;
+}
+
+.address_clickable > div {
+    cursor: pointer;
+}
+
+.header_right {
+    align-self: start;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-s);
+}
+
+.header_right > svg {
+    align-self: center;
+}
+
+.header_right > button {
+    width: 100px;
+    border-radius: var(--radius-m);
+    background-color: var(--bg-dark3);
 }
 
 .strategy_details {
     display: flex;
     flex-direction: row;
-    gap: 16px;
-    background-color: var(--bg-dark2);
-    border-radius: 16px;
+    gap: var(--gap-m);
 }
 
 .strategy_details > div {
@@ -54,9 +104,11 @@
 .strategy_details_table {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-xs);
     padding: 8px 0;
     font-size: var(--font-size-s);
+    background-color: var(--bg-dark2);
+    border-radius: 16px;
 }
 
 /* these two parts create the grey-purple underline effect */
@@ -73,7 +125,7 @@
 .strategy_details_table > section {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--gap-xs);
     padding: 0 8px;
 }
 
@@ -89,4 +141,21 @@
 
 .strategy_details_graph {
     background-color: grey;
+}
+
+.remove_strategy_modal {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-m);
+    gap: var(--gap-l);
+}
+
+.remove_strategy_modal > p {
+    text-align: center;
+}
+
+.remove_strat_modal_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
 }
