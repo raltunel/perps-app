@@ -27,16 +27,6 @@ export const SdkProvider: React.FC<{
     const [exchange, setExchange] = useState<Exchange | null>(null);
 
     const { internetConnected } = useTradeDataStore();
-    const internetConnectedRef = useRef(internetConnected);
-
-    const wsCloseListener = useCallback(() => {
-        console.log('>>> wsCloseListener');
-        if (internetConnectedRef.current) {
-            info?.wsManager?.reconnect();
-        } else {
-            console.log('>>> wsCloseListener internet not connected');
-        }
-    }, []);
 
     // commit to trigger deployment
 
@@ -49,7 +39,6 @@ export const SdkProvider: React.FC<{
                 // isDebug: true, // TODO: remove in prod
             });
 
-            newInfo.wsManager?.addCloseListener(wsCloseListener);
             setInfo(newInfo);
         } else {
             info.setEnvironment(environment);

@@ -1,4 +1,8 @@
-import { DEFAULT_PING_INTERVAL_MS } from './config';
+import {
+    DEFAULT_PING_INTERVAL_MS,
+    PONG_CHECK_TIMEOUT_MS,
+    RECONNECT_TIMEOUT_MS,
+} from './config';
 import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
@@ -104,7 +108,8 @@ export class WebsocketManager {
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
-    private closeListeners: (() => void)[] = [];
+    private pongReceived: boolean = false;
+    private pongTimeout: NodeJS.Timeout | null = null;
 
     constructor(
         baseUrl: string,
@@ -158,7 +163,6 @@ export class WebsocketManager {
     }
 
     private connect = () => {
-        console.log('>>> connect');
         const wsUrl =
             'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
         this.log('Connecting to', wsUrl);
@@ -177,9 +181,6 @@ export class WebsocketManager {
         // make sure workers are ready before connecting
         if (this.workers.length === 0 && this.numWorkers > 0) {
             this.log('Workers not initialized, attempting re-initialization.');
-            console.log(
-                'Workers not initialized, attempting re-initialization.',
-            );
             this.initializeWorkers();
             if (this.workers.length === 0) {
                 this.log(
@@ -195,10 +196,29 @@ export class WebsocketManager {
         }
     };
 
+    private sendPing = () => {
+        if (this.stopped || !this.ws || this.ws.readyState !== WebSocket.OPEN)
+            return;
+        this.log('sending ping');
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+
+        this.ws.send(JSON.stringify({ method: 'ping' }));
+
+        this.pongTimeout = setTimeout(() => {
+            if (!this.pongReceived) {
+                console.log('>>> Pong timeout, reconnecting');
+                this.reconnect();
+            }
+        }, PONG_CHECK_TIMEOUT_MS);
+
+        this.pongReceived = false;
+    };
+
     private onOpen = () => {
         this.log('onOpen');
-        console.log('>>> onOpen');
-        console.log('>>> queuedSubscriptions', this.queuedSubscriptions);
         this.wsReady = true;
         // send queued subs
         for (const { subscription, active } of this.queuedSubscriptions) {
@@ -212,23 +232,19 @@ export class WebsocketManager {
 
         if (!this.stopped && this.pingInterval === null) {
             // @ts-ignore
+
             this.pingInterval = setInterval(() => {
-                if (
-                    this.stopped ||
-                    !this.ws ||
-                    this.ws.readyState !== WebSocket.OPEN
-                )
-                    return;
-                this.log('sending ping');
-                this.ws.send(JSON.stringify({ method: 'ping' }));
+                this.sendPing();
             }, DEFAULT_PING_INTERVAL_MS);
             this.log('started ping');
+            this.sendPing();
         }
     };
 
     private handleParsedMessage = (wsMsg: WsMsg, originalMessage: string) => {
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
+            this.pongReceived = true;
             this.log('Pong response received.');
             return;
         }
@@ -302,16 +318,12 @@ export class WebsocketManager {
 
     private onClose = () => {
         this.log('onClose');
-        console.log('>>> onClose');
-        console.log('>>> closeListeners', this.closeListeners);
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
             this.log('stopped ping due to close');
         }
-
-        this.closeListeners.forEach((listener) => listener());
     };
 
     public stop() {
@@ -371,7 +383,6 @@ export class WebsocketManager {
 
     private stashSubscriptions = () => {
         const oldSubscriptions = { ...this.allSubscriptions };
-        console.log('>>> stashSubscriptions');
         this.stop();
 
         this.queuedSubscriptions = [];
@@ -504,19 +515,10 @@ export class WebsocketManager {
     }
 
     public reconnect() {
+        console.log('>>> reconnecting');
         this.stashSubscriptions();
-        console.log('>>> reconnect');
         setTimeout(() => {
-            console.log('>>> reconnecting');
             this.connect();
-        }, 2000);
-    }
-
-    public addCloseListener(listener: () => void) {
-        this.closeListeners.push(listener);
-    }
-
-    public removeCloseListener(listener: () => void) {
-        this.closeListeners = this.closeListeners.filter((l) => l !== listener);
+        }, RECONNECT_TIMEOUT_MS);
     }
 }
