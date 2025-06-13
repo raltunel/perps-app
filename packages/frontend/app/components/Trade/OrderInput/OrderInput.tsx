@@ -243,7 +243,7 @@ function OrderInput() {
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
-    }, [obChosenAmount, obChosenPrice, handleTypeChange]);
+    }, [obChosenAmount, obChosenPrice]);
 
     const openModalWithContent = (
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',

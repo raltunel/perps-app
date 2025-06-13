@@ -63,8 +63,8 @@
 .tab:hover {
     color: var(--text1);
 }
-
-.activeTab {
+.tab.activeTab,
+.tab.activeTab:hover {
     color: var(--accent1, #7371fc);
 }
 

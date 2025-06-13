@@ -3,6 +3,7 @@ import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 
 interface PropsIF {
     value: string;
@@ -31,29 +32,6 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         setSelectedMode,
     } = props;
 
-    const {
-        inputRegex,
-        parseFormattedWithOnlyDecimals,
-        formatNumWithOnlyDecimals,
-        getPrecisionFromNumber,
-    } = useNumFormatter();
-
-    const valueNum = useRef<number>(0);
-    const valueRef = useRef<string>(value);
-    valueRef.current = value;
-
-    // Memoized input change handler
-    const handleChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            if (inputRegex.test(newValue) && newValue.length <= 12) {
-                onChange(event);
-                valueNum.current = parseFormattedWithOnlyDecimals(newValue);
-            }
-        },
-        [inputRegex, onChange, parseFormattedWithOnlyDecimals],
-    );
-
     // Memoized ComboBox options
     const comboBoxOptions = useMemo(
         () => [symbol.toUpperCase(), 'USD'],
@@ -68,20 +46,19 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         [setSelectedMode, symbol],
     );
 
-    useEffect(() => {
-        valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
-    }, [parseFormattedWithOnlyDecimals, valueRef.current]);
-
-    useEffect(() => {
-        const precision = getPrecisionFromNumber(valueNum.current);
-        onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
-        // Only run when formatter functions or onChange change
-    }, [formatNumWithOnlyDecimals, getPrecisionFromNumber, onChange]);
-
     return (
         <div className={styles.sizeInputContainer}>
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
-            <input
+            <NumFormattedInput
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                onKeyDown={onKeyDown}
+                className={className}
+                aria-label={ariaLabel}
+                placeholder='Enter Size'
+            />
+            {/* <input
                 type='text'
                 value={value}
                 onChange={handleChange}
@@ -92,7 +69,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 inputMode='numeric'
                 pattern='[0-9]*'
                 placeholder='Enter Size'
-            />
+            /> */}
             <button className={styles.tokenButton}>
                 <ComboBox
                     value={
