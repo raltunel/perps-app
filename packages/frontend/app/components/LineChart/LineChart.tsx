@@ -9,10 +9,15 @@ type LineChartProps = {
     lineData: { time: number; value: number }[] | undefined;
     curve: CurveType;
     chartName: string;
+    height?: number;
+    width?: number;
 };
 
 const LineChart: React.FC<LineChartProps> = (props) => {
-    const { lineData, chartName, curve } = props;
+    const { lineData, chartName, curve, height, width } = props;
+
+    const chartWidth = width || 850;
+    const chartHeight = height || 250;
 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -20,7 +25,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const [yScale, setYScale] =
         React.useState<d3.ScaleLinear<number, number>>();
 
-    const [ticks, setTicks] = React.useState<Array<number>>();
+    const [xAxisTicks, setXAxisTicks] = React.useState<Array<number>>();
+    const [yAxisTicks, setYAxisTicks] = React.useState<Array<number>>();
     const [yAxisPadding, setYAxisPadding] = React.useState<number>(50);
 
     const { numFormat } = useAppSettings();
@@ -66,8 +72,6 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 current -= tickDiff;
             }
 
-            console.log(d3.ticks(yScale.domain()[0], yScale.domain()[1], 5));
-
             return ticks;
         }
 
@@ -92,6 +96,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const padding = diff / 40;
 
+            const ticks = d3.ticks(minDate - padding, maxDate + padding, 5);
+
+            setXAxisTicks(() => ticks);
+
             const xScale = d3
                 .scaleTime()
                 .domain([
@@ -113,7 +121,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const ticks = d3.ticks(minPrice - padding, maxPrice + padding, 5);
 
-            setTicks(() => ticks);
+            setYAxisTicks(() => ticks);
 
             const roundedMax = d3.max(
                 d3.ticks(minPrice - padding, maxPrice + padding, 5),
@@ -151,12 +159,61 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const font = 'var(--font-family-main)';
         const fontSize = 'var(--font-size-s)';
 
-        if (xScale) {
+        if (xScale && xAxisTicks) {
             svgXAxis.select('g').remove();
+
+            const formatHour = d3.timeFormat('%H:%M');
+            const formatDay = d3.timeFormat('%d');
+            const formatDayMonth = d3.timeFormat('%d %b');
+            const formatMonth = d3.timeFormat('%b');
+
+            const tickValuesArray: Array<any> = [];
+
+            const timestamps = xAxisTicks.map((d) => new Date(d));
+
+            function getAverageInterval(dates: Date[]) {
+                let total = 0;
+                for (let i = 1; i < dates.length; i++) {
+                    total += dates[i].getTime() - dates[i - 1].getTime();
+                }
+                return total / (dates.length - 1);
+            }
+
+            function dynamicTickFormatter(dates: Date[]) {
+                const avgInterval = getAverageInterval(dates);
+
+                const oneHour = 60 * 60 * 1000;
+                const oneDay = 24 * oneHour;
+                const oneWeek = 7 * oneDay;
+
+                if (avgInterval <= 6 * oneHour) {
+                    return formatHour; // "14:00"
+                } else if (avgInterval <= oneDay) {
+                    return formatDayMonth; // "03 Jun"
+                } else if (avgInterval <= oneWeek) {
+                    return (d: Date) =>
+                        d.getDate() === 1 ? formatMonth(d) : formatDay(d); // "03" or "Jun"
+                } else {
+                    return formatMonth; // "Jun"
+                }
+            }
+
+            const formatter = dynamicTickFormatter(timestamps);
+
+            xAxisTicks.forEach((d, i) => {
+                console.log(new Date(d), formatter(new Date(d)));
+
+                tickValuesArray.push(formatter(new Date(d)));
+            });
 
             svgXAxis
                 .append('g')
-                .call(d3.axisBottom(xScale).ticks(7))
+                .call(
+                    d3
+                        .axisBottom(xScale)
+                        .tickValues(xAxisTicks)
+                        .tickFormat((d, i) => tickValuesArray[i]),
+                )
                 .select('.domain')
                 .remove();
 
@@ -171,12 +228,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-size', fontSize);
         }
 
-        if (yScale && ticks) {
+        if (yScale && yAxisTicks) {
             svgYAxis.select('g').remove();
 
             svgYAxis
                 .append('g')
-                .call(d3.axisRight(yScale).tickValues(ticks))
+                .call(d3.axisRight(yScale).tickValues(yAxisTicks))
                 .select('.domain')
                 .remove();
 
@@ -190,7 +247,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-family', font)
                 .style('font-size', fontSize);
         }
-    }, [yScale, xScale, numFormat, lineData, chartName, ticks]);
+    }, [yScale, xScale, numFormat, lineData, chartName, yAxisTicks]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -199,19 +256,19 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const context = canvas.getContext('2d');
         if (!context) return;
 
-        if (ticks) {
+        if (yAxisTicks) {
             let textMeasure = 30;
 
-            ticks?.forEach((tick) => {
+            yAxisTicks?.forEach((tick) => {
                 textMeasure = Math.max(
                     textMeasure,
                     context.measureText(tick.toString()).width,
                 );
             });
 
-            setYAxisPadding(() => textMeasure + 30);
+            setYAxisPadding(() => textMeasure + 15);
         }
-    }, [ticks, chartName, lineData]);
+    }, [yAxisTicks, xAxisTicks, chartName, lineData]);
 
     useEffect(() => {
         if (yScale && xScale && lineData) {
@@ -239,7 +296,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.strokeStyle = '#7371fc';
             context.stroke();
 
-            ticks?.forEach((tick) => {
+            yAxisTicks?.forEach((tick) => {
                 context.moveTo(xScale(xScale.domain()[0]), yScale(tick));
                 context.lineTo(xScale(xScale.domain()[1]), yScale(tick));
             });
@@ -252,23 +309,30 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         xScale !== undefined,
         lineData,
         chartName,
-        ticks,
+        yAxisTicks,
     ]);
 
     return (
         <div className={styles.chartWrapper}>
             <div
                 className={styles.chartContainer}
-                style={{ gridTemplateColumns: yAxisPadding + 'px 850px' }}
+                style={{
+                    gridTemplateColumns:
+                        yAxisPadding + 'px ' + chartWidth + 'px',
+                }}
             >
-                <svg id='yAxis' height='250' />
-                <canvas ref={canvasRef} width='850' height='250' />
+                <svg id='yAxis' height={chartHeight} />
+                <canvas
+                    ref={canvasRef}
+                    width={chartWidth}
+                    height={chartHeight}
+                />
             </div>
             <div className={styles.xAxisContainer}>
                 <svg
                     id='xAxis'
                     height='50'
-                    width={850 + yAxisPadding}
+                    width={chartWidth + yAxisPadding}
                     style={{ paddingLeft: yAxisPadding }}
                 />
             </div>

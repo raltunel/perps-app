@@ -99,6 +99,7 @@
 
 .strategy_details > div {
     width: 448px;
+    height: 250px;
 }
 
 .strategy_details_table {
@@ -140,7 +141,10 @@
 }
 
 .strategy_details_graph {
-    background-color: grey;
+    background-color: var(--bg-dark2);
+    border-radius: 16px;
+    justify-content: start;
+    align-items: start;
 }
 
 .remove_strategy_modal {
