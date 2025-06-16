@@ -76,7 +76,7 @@
 .header_right {
     align-self: start;
     display: flex;
-    flex-direction: row;
+    flex-direction: row-reverse;
     align-items: center;
     gap: var(--gap-s);
 }
@@ -86,9 +86,14 @@
 }
 
 .header_right > button {
-    width: 100px;
+    /* width not specified in Figma, @miyu requested equal-widths */
+    width: 110px;
     border-radius: var(--radius-m);
     background-color: var(--bg-dark3);
+}
+
+.header_right > button:hover {
+    background-color: var(--accent1);
 }
 
 .strategy_details {

@@ -47,15 +47,14 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        <p>
+                        {/* <p>
                             Status: {strategy?.isPaused ? 'Paused' : 'Running'}
-                        </p>
+                        </p> */}
                         <SimpleButton
                             onClick={() =>
                                 strategy &&
                                 strategies.togglePause(strategy.address)
                             }
-                            hoverBg='accent1'
                         >
                             {strategy?.isPaused ? 'Unpause' : 'Pause'}
                         </SimpleButton>
@@ -65,19 +64,16 @@ export default function Strategies() {
                                     state: { strategy, address },
                                 })
                             }
-                            hoverBg='accent1'
                         >
                             Edit
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => console.log('Strategy Transfered!')}
-                            hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => removeStratModalCtrl.open()}
-                            hoverBg='accent1'
                         >
                             Remove
                         </SimpleButton>
