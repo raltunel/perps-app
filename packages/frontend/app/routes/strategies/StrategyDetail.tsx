@@ -1,4 +1,3 @@
-import Button from '~/components/Button/Button';
 import styles from './StrategyDetail.module.css';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -170,13 +169,14 @@ export default function Strategies() {
                                 Are you sure you want to delete this strategy?
                             </p>
                             <div className={styles.remove_strat_modal_buttons}>
-                                <Button
+                                <SimpleButton
                                     onClick={removeStratModalCtrl.close}
-                                    size='large'
+                                    bg='dark4'
+                                    hoverBg='dark2'
                                 >
                                     Cancel
-                                </Button>
-                                <Button
+                                </SimpleButton>
+                                <SimpleButton
                                     onClick={() => {
                                         if (strategy?.address) {
                                             strategies.remove(strategy.address);
@@ -184,11 +184,10 @@ export default function Strategies() {
                                             navigate('/strategies');
                                         }
                                     }}
-                                    size='large'
-                                    selected
+                                    bg='accent1'
                                 >
                                     Delete
-                                </Button>
+                                </SimpleButton>
                             </div>
                         </section>
                     </Modal>
