@@ -47,9 +47,9 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        {/* <p>
+                        <p>
                             Status: {strategy?.isPaused ? 'Paused' : 'Running'}
-                        </p> */}
+                        </p>
                         <SimpleButton
                             onClick={() =>
                                 strategy &&

@@ -76,7 +76,7 @@
 .header_right {
     align-self: start;
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     align-items: center;
     gap: var(--gap-s);
 }
