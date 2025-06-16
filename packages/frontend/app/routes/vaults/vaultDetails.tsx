@@ -32,7 +32,6 @@ export default function VaultDetails() {
                     vaultAddress,
                 );
                 setVaultDetails(vaultDetails);
-                console.log(vaultDetails);
             }
         };
         fetch();

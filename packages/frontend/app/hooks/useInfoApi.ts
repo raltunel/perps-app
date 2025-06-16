@@ -245,7 +245,6 @@ export function useInfoApi() {
         });
         const data = await response.json();
         const processed = processVaultDetails(data);
-        console.log('processed', processed);
         return processed;
     };
 
