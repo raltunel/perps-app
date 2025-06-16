@@ -56,8 +56,6 @@ export default function TradeTable(props: TradeTableProps) {
     const tabs = useMemo(() => {
         if (!page) return [];
 
-        console.log('page', page);
-
         let availableTabs = [
             'Balances',
             'Positions',
