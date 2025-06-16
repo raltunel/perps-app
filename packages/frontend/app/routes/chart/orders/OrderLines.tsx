@@ -1,27 +1,31 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useOpenOrderLines } from './useOpenOrderLines';
 import { usePositionOrderLines } from './usePositionOrderLines';
-import LineComponent from './component/LineComponent';
+import LineComponent, { type LineData } from './component/LineComponent';
 import LabelComponent from './component/LabelComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import type { IPaneApi } from '~/tv/charting_library';
+import type { LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData: any;
 };
 
 export default function OrderLines({
     overlayCanvasRef,
     canvasSize,
+    scaleData,
 }: OrderLinesProps) {
     const { chart } = useTradingView();
 
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
 
-    const combinedData = [...openLines, ...positionLines];
+    const [lines, setLines] = useState<LineData[]>([]);
 
     const [zoomChanged, setZoomChanged] = useState(false);
     const prevRangeRef = useRef<{ min: number; max: number } | null>(null);
@@ -30,6 +34,19 @@ export default function OrderLines({
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
     const [localChartReady, setLocalChartReady] = useState(true);
+    const [drawnLabels, setDrawnLabels] = useState<LineData[]>([]);
+    const [selectedLine, setSelectedLine] = useState<
+        undefined | LabelLocationData
+    >(undefined);
+
+    useEffect(() => {
+        const updatedLines = openLines.map((line) =>
+            selectedLine && line.oid === selectedLine.parentLine.oid
+                ? selectedLine.parentLine
+                : line,
+        );
+        setLines([...updatedLines, ...positionLines]);
+    }, [openLines, positionLines, selectedLine]);
 
     useEffect(() => {
         if (!chart) return;
@@ -46,6 +63,8 @@ export default function OrderLines({
                     min: priceRange.from,
                     max: priceRange.to,
                 };
+
+                scaleData?.yScale.domain([currentRange.min, currentRange.max]);
 
                 const prevRange = prevRangeRef.current;
                 const hasChanged =
@@ -85,23 +104,28 @@ export default function OrderLines({
                 clearTimeout(debounceTimerRef.current);
             }
         };
-    }, [chart]);
+    }, [chart, scaleData]);
 
     return (
         <>
             <LineComponent
                 key='lines'
-                lines={combinedData}
+                lines={lines}
                 localChartReady={localChartReady}
                 setLocalChartReady={setLocalChartReady}
             />
             {localChartReady && (
                 <LabelComponent
                     key='labels'
-                    lines={combinedData}
+                    lines={lines}
                     overlayCanvasRef={overlayCanvasRef}
                     zoomChanged={zoomChanged}
                     canvasSize={canvasSize}
+                    drawnLabels={drawnLabels}
+                    setDrawnLabels={setDrawnLabels}
+                    scaleData={scaleData}
+                    selectedLine={selectedLine}
+                    setSelectedLine={setSelectedLine}
                 />
             )}
         </>

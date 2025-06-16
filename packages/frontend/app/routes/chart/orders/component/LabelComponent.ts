@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import {
     formatLineLabel,
     getPricetoPixel,
     quantityTextFormatWithComma,
 } from '../customOrderLineUtils';
-import {
-    drawLabel,
-    type LabelLocation,
-    type LabelType,
-} from '../orderLineUtils';
+import { drawLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import {
+    findCancelLabelAtPosition,
+    getXandYLocationForChartDrag,
+    type LabelLocationData,
+} from '../../overlayCanvas/overlayCanvasUtils';
+import * as d3 from 'd3';
 
 interface LabelProps {
     lines: LineData[];
@@ -18,6 +20,14 @@ interface LabelProps {
     zoomChanged: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
+    drawnLabels: LineData[];
+    setDrawnLabels: React.Dispatch<React.SetStateAction<LineData[]>>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData: any;
+    selectedLine: LabelLocationData | undefined;
+    setSelectedLine: React.Dispatch<
+        React.SetStateAction<LabelLocationData | undefined>
+    >;
 }
 
 const LabelComponent = ({
@@ -25,12 +35,15 @@ const LabelComponent = ({
     overlayCanvasRef,
     zoomChanged,
     canvasSize,
+    drawnLabels,
+    setDrawnLabels,
+    scaleData,
+    selectedLine,
+    setSelectedLine,
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
 
     const ctx = overlayCanvasRef.current?.getContext('2d');
-
-    const [drawnLabels, setDrawnLabels] = useState<LineData[]>([]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !ctx) return;
@@ -70,7 +83,13 @@ const LabelComponent = ({
                     }
                 }
             }
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas?.height);
+
+            drawnLabels.map((i) => {
+                const data = i.labelLocations;
+                data?.forEach((item) => {
+                    ctx.clearRect(item.x, item.y, item.width, item.height);
+                });
+            });
 
             const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(
@@ -154,32 +173,8 @@ const LabelComponent = ({
         ctx,
         zoomChanged,
         canvasSize,
+        selectedLine,
     ]);
-
-    function findCancelLabelAtPosition(
-        x: number,
-        y: number,
-        drawnLabels: LineData[],
-    ): { label: LabelLocation; parentLine: (typeof drawnLabels)[0] } | null {
-        for (let i = drawnLabels.length - 1; i >= 0; i--) {
-            const labelLocs = drawnLabels[i].labelLocations;
-            if (!labelLocs) continue;
-
-            for (const loc of labelLocs) {
-                if (loc.type === 'Cancel') {
-                    const startX = loc.x;
-                    const endX = loc.x + loc.width;
-                    const startY = loc.y;
-                    const endY = loc.y + loc?.height;
-
-                    if (x >= startX && x <= endX && y >= startY && y <= endY) {
-                        return { label: loc, parentLine: drawnLabels[i] };
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -213,8 +208,28 @@ const LabelComponent = ({
                             offsetX,
                             offsetY,
                             drawnLabels,
+                            true,
                         );
 
+                        const isLabel = findCancelLabelAtPosition(
+                            offsetX,
+                            offsetY,
+                            drawnLabels,
+                            false,
+                        );
+
+                        if (isLabel) {
+                            if (overlayCanvasRef.current)
+                                overlayCanvasRef.current.style.pointerEvents =
+                                    'auto';
+                            setSelectedLine(isLabel);
+
+                            return;
+                        } else {
+                            if (overlayCanvasRef.current)
+                                overlayCanvasRef.current.style.pointerEvents =
+                                    'none';
+                        }
                         if (found) {
                             console.log(found.parentLine.textValue);
                         }
@@ -237,6 +252,75 @@ const LabelComponent = ({
             }
         };
     }, [chart, JSON.stringify(drawnLabels)]);
+
+    useEffect(() => {
+        if (!overlayCanvasRef.current) return;
+        if (selectedLine) {
+            overlayCanvasRef.current.style.pointerEvents = 'auto';
+        }
+
+        const canvas = overlayCanvasRef.current;
+
+        /*   // eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        const handleDragStart = (/* event: any */) => {
+            // const { x, y } = event;
+            // const target = findCancelLabelAtPosition(x, y, drawnLabels, false);
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleDragging = (event: any) => {
+            const { offsetY: clientY } = getXandYLocationForChartDrag(
+                event,
+                canvas.getBoundingClientRect(),
+            );
+
+            const advancedValue = scaleData?.yScale.invert(clientY);
+
+            setSelectedLine((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          parentLine: {
+                              ...prev.parentLine,
+                              yPrice: advancedValue,
+                          },
+                      }
+                    : undefined,
+            );
+        };
+
+        const handleDragEnd = () => {
+            if (overlayCanvasRef.current) {
+                setSelectedLine(undefined);
+                overlayCanvasRef.current.style.pointerEvents = 'none';
+                // setIsDrag(false);
+            }
+        };
+
+        const dragLines = d3
+            .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
+            .on('start', handleDragStart)
+            .on('drag', handleDragging)
+            .on('end', handleDragEnd)
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .filter((event: any) => {
+                const isLabel = findCancelLabelAtPosition(
+                    event.x,
+                    event.y,
+                    drawnLabels,
+                    false,
+                );
+                return isLabel === null;
+            });
+
+        if (dragLines && canvas) {
+            d3.select<d3.DraggedElementBaseType, unknown>(canvas).call(
+                dragLines,
+            );
+        }
+        return () => {
+            d3.select(canvas).on('.drag', null);
+        };
+    }, [overlayCanvasRef.current, chart, drawnLabels, selectedLine]);
 
     return null;
 };

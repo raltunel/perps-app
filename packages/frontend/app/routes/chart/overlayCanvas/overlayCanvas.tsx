@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import OrderLines from '../orders/OrderLines';
+import * as d3 from 'd3';
 
 const OverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -8,9 +9,17 @@ const OverlayCanvas: React.FC = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [canvasSize, setCanvasSize] = useState<any>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [scaleData, setScaleData] = useState<any>();
+
     useEffect(() => {
         if (!chart) return;
 
+        const yScale = d3.scaleLinear();
+
+        setScaleData(() => {
+            return { yScale: yScale };
+        });
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
         const iframeDoc =
@@ -35,6 +44,7 @@ const OverlayCanvas: React.FC = () => {
             newCanvas.width = paneCanvas.width;
             newCanvas.height = paneCanvas?.height;
             paneCanvas.parentNode.appendChild(newCanvas);
+
             canvasRef.current = newCanvas;
         }
 
@@ -49,6 +59,8 @@ const OverlayCanvas: React.FC = () => {
 
             canvas.height = height;
             canvas.style.height = `${height}px`;
+
+            yScale.range([canvas.height, 0]);
         };
 
         updateCanvasSize();
@@ -61,6 +73,8 @@ const OverlayCanvas: React.FC = () => {
                     width: paneCanvas.width,
                     height: paneCanvas?.height,
                 });
+
+                yScale.range([result[0].contentRect?.height, 0]);
             }
         });
 
@@ -75,7 +89,13 @@ const OverlayCanvas: React.FC = () => {
         };
     }, [chart]);
 
-    return <OrderLines overlayCanvasRef={canvasRef} canvasSize={canvasSize} />;
+    return (
+        <OrderLines
+            overlayCanvasRef={canvasRef}
+            canvasSize={canvasSize}
+            scaleData={scaleData}
+        />
+    );
 };
 
 export default OverlayCanvas;
