@@ -32,6 +32,7 @@ export default function VaultDetails() {
                     vaultAddress,
                 );
                 setVaultDetails(vaultDetails);
+                console.log(vaultDetails);
             }
         };
         fetch();
@@ -54,7 +55,7 @@ export default function VaultDetails() {
                     <div className={styles.vaultCard}>
                         <div className={styles.vaultCardTitle}>TVL</div>
                         <div className={styles.vaultCardContent}>
-                            {formatNum(1280000, 0, true, true)}
+                            {formatNum(vaultDetails?.tvl ?? 0, 0, true, true)}
                         </div>
                     </div>
                     <div className={styles.vaultCard}>

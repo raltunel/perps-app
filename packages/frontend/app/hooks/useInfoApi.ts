@@ -6,6 +6,7 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { processVaultDetails } from '~/processors/processVault';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type {
     TwapHistoryIF,
@@ -243,7 +244,23 @@ export function useInfoApi() {
             }),
         });
         const data = await response.json();
-        return data as VaultDetailsIF;
+        const processed = processVaultDetails(data);
+        console.log('processed', processed);
+        return processed;
+    };
+
+    const fetchVaults = async (): Promise<VaultDetailsIF[]> => {
+        const response = await fetch(
+            'https://stats-data.hyperliquid.xyz/Mainnet/vaults',
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            },
+        );
+
+        const data = await response.json();
+
+        return data;
     };
 
     return {
@@ -256,5 +273,6 @@ export function useInfoApi() {
         fetchOpenOrders,
         fetchUserPortfolio,
         fetchVaultDetails,
+        fetchVaults,
     };
 }
