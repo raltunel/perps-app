@@ -41,6 +41,7 @@ const OverlayCanvas: React.FC = () => {
             newCanvas.style.position = 'absolute';
             newCanvas.style.top = '0';
             newCanvas.style.left = '0';
+            newCanvas.style.cursor = 'pointer';
             newCanvas.style.pointerEvents = 'none';
             newCanvas.style.zIndex = '5';
             newCanvas.width = paneCanvas.width;

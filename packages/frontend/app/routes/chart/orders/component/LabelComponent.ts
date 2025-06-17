@@ -20,8 +20,9 @@ interface LabelProps {
     zoomChanged: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
-    drawnLabels: LineData[];
-    setDrawnLabels: React.Dispatch<React.SetStateAction<LineData[]>>;
+    // drawnLabels: LineData[];
+    // setDrawnLabels: React.Dispatch<React.SetStateAction<LineData[]>>;
+    drawnLabelsRef: React.MutableRefObject<LineData[]>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
     selectedLine: LabelLocationData | undefined;
@@ -39,8 +40,7 @@ const LabelComponent = ({
     overlayCanvasRef,
     zoomChanged,
     canvasSize,
-    drawnLabels,
-    setDrawnLabels,
+    drawnLabelsRef,
     scaleData,
     selectedLine,
     setSelectedLine,
@@ -90,7 +90,7 @@ const LabelComponent = ({
                 }
             }
 
-            drawnLabels.map((i) => {
+            drawnLabelsRef.current.map((i) => {
                 const data = i.labelLocations;
                 data?.forEach((item) => {
                     ctx.clearRect(item.x, item.y, item.width, item.height);
@@ -152,7 +152,7 @@ const LabelComponent = ({
                 };
             });
 
-            setDrawnLabels(linesWithLabels);
+            drawnLabelsRef.current = linesWithLabels;
         };
 
         if (zoomChanged && animationFrameId === null) {
@@ -183,28 +183,31 @@ const LabelComponent = ({
     ]);
 
     useEffect(() => {
-        if (selectedLine) {
-            const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
-            const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
+        const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
+        const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
 
-            console.log({ overlayOffsetX, overlayOffsetY, drawnLabels });
+        const isCancel = findCancelLabelAtPosition(
+            overlayOffsetX,
+            overlayOffsetY,
+            drawnLabelsRef.current,
+            true,
+        );
 
-            const isCancel = findCancelLabelAtPosition(
-                overlayOffsetX,
-                overlayOffsetY,
-                drawnLabels,
-                true,
-            );
+        const isLabel = findCancelLabelAtPosition(
+            overlayOffsetX,
+            overlayOffsetY,
+            drawnLabelsRef.current,
+            false,
+        );
 
-            if (isCancel) {
-                if (overlayCanvasRef.current)
-                    overlayCanvasRef.current.style.pointerEvents = 'none';
-            }
+        if (isCancel || (!isLabel && !isDrag)) {
+            if (overlayCanvasRef.current)
+                overlayCanvasRef.current.style.pointerEvents = 'none';
         }
     }, [
         overlayCanvasMousePositionRef.current,
         selectedLine,
-        drawnLabels,
+        JSON.stringify(drawnLabelsRef.current),
         isDrag,
     ]);
 
@@ -247,7 +250,7 @@ const LabelComponent = ({
                                     const isLabel = findCancelLabelAtPosition(
                                         overlayOffsetX,
                                         overlayOffsetY,
-                                        drawnLabels,
+                                        drawnLabelsRef.current,
                                         false,
                                     );
 
@@ -266,7 +269,7 @@ const LabelComponent = ({
                     });
             });
         }
-    }, [chart, drawnLabels, isDrag]);
+    }, [chart, drawnLabelsRef.current, isDrag]);
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -299,7 +302,7 @@ const LabelComponent = ({
                         const found = findCancelLabelAtPosition(
                             offsetX,
                             offsetY,
-                            drawnLabels,
+                            drawnLabelsRef.current,
                             true,
                         );
 
@@ -324,7 +327,7 @@ const LabelComponent = ({
                 }
             }
         };
-    }, [chart, JSON.stringify(drawnLabels)]);
+    }, [chart, JSON.stringify(drawnLabelsRef.current)]);
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
@@ -380,7 +383,7 @@ const LabelComponent = ({
                 const isLabel = findCancelLabelAtPosition(
                     event.x,
                     event.y,
-                    drawnLabels,
+                    drawnLabelsRef.current,
                     false,
                 );
                 return isLabel === null;

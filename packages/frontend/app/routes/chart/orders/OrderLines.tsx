@@ -39,7 +39,7 @@ export default function OrderLines({
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
     const [localChartReady, setLocalChartReady] = useState(true);
-    const [drawnLabels, setDrawnLabels] = useState<LineData[]>([]);
+    const drawnLabelsRef = useRef<LineData[]>([]);
     const [selectedLine, setSelectedLine] = useState<
         undefined | LabelLocationData
     >(undefined);
@@ -54,7 +54,7 @@ export default function OrderLines({
     }, [openLines, positionLines, selectedLine]);
 
     useEffect(() => {
-        if (!chart) return;
+        if (!chart || !scaleData) return;
 
         const chartRef = chart.activeChart();
         const priceScalePane = chartRef.getPanes()[0] as IPaneApi;
@@ -126,8 +126,7 @@ export default function OrderLines({
                     overlayCanvasRef={overlayCanvasRef}
                     zoomChanged={zoomChanged}
                     canvasSize={canvasSize}
-                    drawnLabels={drawnLabels}
-                    setDrawnLabels={setDrawnLabels}
+                    drawnLabelsRef={drawnLabelsRef}
                     scaleData={scaleData}
                     selectedLine={selectedLine}
                     setSelectedLine={setSelectedLine}
