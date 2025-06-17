@@ -183,38 +183,27 @@ const LabelComponent = ({
     ]);
 
     useEffect(() => {
-        const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
-        const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
+        if (!isDrag) {
+            const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
+            const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
 
-        const isCancel = findCancelLabelAtPosition(
-            overlayOffsetX,
-            overlayOffsetY,
-            drawnLabelsRef.current,
-            true,
-        );
+            const isLabel = findCancelLabelAtPosition(
+                overlayOffsetX,
+                overlayOffsetY,
+                drawnLabelsRef.current,
+                false,
+            );
 
-        const isLabel = findCancelLabelAtPosition(
-            overlayOffsetX,
-            overlayOffsetY,
-            drawnLabelsRef.current,
-            false,
-        );
-
-        if (isCancel || (!isLabel && !isDrag)) {
-            if (overlayCanvasRef.current)
-                overlayCanvasRef.current.style.pointerEvents = 'none';
-        }
-
-        if (
-            isLabel &&
-            isLabel.parentLine.oid !== selectedLine?.parentLine.oid &&
-            !isDrag
-        ) {
-            setSelectedLine(isLabel);
+            if (isLabel) {
+                if (overlayCanvasRef.current)
+                    overlayCanvasRef.current.style.pointerEvents = 'auto';
+            } else {
+                if (overlayCanvasRef.current)
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+            }
         }
     }, [
         overlayCanvasMousePositionRef.current,
-        selectedLine,
         JSON.stringify(drawnLabelsRef.current),
         isDrag,
     ]);
@@ -262,14 +251,15 @@ const LabelComponent = ({
                                         false,
                                     );
 
-                                    if (isLabel) {
-                                        setSelectedLine(isLabel);
+                                    overlayCanvasMousePositionRef.current = {
+                                        x: overlayOffsetX,
+                                        y: overlayOffsetY,
+                                    };
 
+                                    if (isLabel) {
                                         if (overlayCanvasRef.current)
                                             overlayCanvasRef.current.style.pointerEvents =
                                                 'auto';
-                                    } else {
-                                        setSelectedLine(undefined);
                                     }
                                 }
                             }
@@ -339,14 +329,28 @@ const LabelComponent = ({
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
-
+        let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
 
-        /*   // eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        const handleDragStart = (/* event: any */) => {
-            setIsDrag(true);
-            // const { x, y } = event;
-            // const target = findCancelLabelAtPosition(x, y, drawnLabels, false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handleDragStart = (event: any) => {
+            const { offsetX, offsetY } = getXandYLocationForChartDrag(
+                event,
+                canvas.getBoundingClientRect(),
+            );
+            const isLabel = findCancelLabelAtPosition(
+                offsetX,
+                offsetY,
+                drawnLabelsRef.current,
+                false,
+            );
+
+            if (isLabel) {
+                tempSelectedLine = isLabel;
+
+                setSelectedLine(isLabel);
+                setIsDrag(true);
+            }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
@@ -357,24 +361,24 @@ const LabelComponent = ({
 
             const advancedValue = scaleData?.yScale.invert(clientY);
 
-            setSelectedLine((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          parentLine: {
-                              ...prev.parentLine,
-                              yPrice: advancedValue,
-                          },
-                      }
-                    : undefined,
-            );
+            tempSelectedLine = tempSelectedLine
+                ? {
+                      ...tempSelectedLine,
+                      parentLine: {
+                          ...tempSelectedLine.parentLine,
+                          yPrice: advancedValue,
+                      },
+                  }
+                : undefined;
+
+            setSelectedLine(tempSelectedLine);
         };
 
         const handleDragEnd = () => {
+            tempSelectedLine = undefined;
             setSelectedLine(undefined);
-
+            setIsDrag(false);
             setTimeout(() => {
-                setIsDrag(false);
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
@@ -385,10 +389,7 @@ const LabelComponent = ({
             .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
             .on('start', handleDragStart)
             .on('drag', handleDragging)
-            .on('end', handleDragEnd)
-            .filter(() => {
-                return selectedLine !== undefined;
-            });
+            .on('end', handleDragEnd);
 
         if (dragLines && canvas) {
             d3.select<d3.DraggedElementBaseType, unknown>(canvas).call(
