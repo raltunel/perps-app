@@ -204,6 +204,14 @@ const LabelComponent = ({
             if (overlayCanvasRef.current)
                 overlayCanvasRef.current.style.pointerEvents = 'none';
         }
+
+        if (
+            isLabel &&
+            isLabel.parentLine.oid !== selectedLine?.parentLine.oid &&
+            !isDrag
+        ) {
+            setSelectedLine(isLabel);
+        }
     }, [
         overlayCanvasMousePositionRef.current,
         selectedLine,
@@ -378,15 +386,8 @@ const LabelComponent = ({
             .on('start', handleDragStart)
             .on('drag', handleDragging)
             .on('end', handleDragEnd)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .filter((event: any) => {
-                const isLabel = findCancelLabelAtPosition(
-                    event.x,
-                    event.y,
-                    drawnLabelsRef.current,
-                    false,
-                );
-                return isLabel === null;
+            .filter(() => {
+                return selectedLine !== undefined;
             });
 
         if (dragLines && canvas) {
