@@ -33,7 +33,7 @@
     font-size: var(--font-size-l);
 }
 
-.noConnectionIndicatorp {
+.noConnectionIndicator p {
     opacity: 0.5;
     font-size: calc(var(--font-size-m) * 0.8);
 }
