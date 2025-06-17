@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import {
     formatLineLabel,
@@ -28,6 +28,10 @@ interface LabelProps {
     setSelectedLine: React.Dispatch<
         React.SetStateAction<LabelLocationData | undefined>
     >;
+    overlayCanvasMousePositionRef: React.MutableRefObject<{
+        x: number;
+        y: number;
+    }>;
 }
 
 const LabelComponent = ({
@@ -40,11 +44,13 @@ const LabelComponent = ({
     scaleData,
     selectedLine,
     setSelectedLine,
+    overlayCanvasMousePositionRef,
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
 
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
+    const [isDrag, setIsDrag] = useState(false);
     useEffect(() => {
         if (!chart || !isChartReady || !ctx) return;
 
@@ -177,6 +183,92 @@ const LabelComponent = ({
     ]);
 
     useEffect(() => {
+        if (selectedLine) {
+            const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
+            const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
+
+            console.log({ overlayOffsetX, overlayOffsetY, drawnLabels });
+
+            const isCancel = findCancelLabelAtPosition(
+                overlayOffsetX,
+                overlayOffsetY,
+                drawnLabels,
+                true,
+            );
+
+            if (isCancel) {
+                if (overlayCanvasRef.current)
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+            }
+        }
+    }, [
+        overlayCanvasMousePositionRef.current,
+        selectedLine,
+        drawnLabels,
+        isDrag,
+    ]);
+
+    useEffect(() => {
+        if (chart && !isDrag) {
+            chart.onChartReady(() => {
+                chart
+                    .activeChart()
+                    .crossHairMoved()
+                    .subscribe(null, ({ offsetX, offsetY }) => {
+                        if (chart) {
+                            const chartDiv =
+                                document.getElementById('tv_chart');
+                            const iframe = chartDiv?.querySelector(
+                                'iframe',
+                            ) as HTMLIFrameElement;
+
+                            const iframeDoc = iframe.contentDocument;
+
+                            if (iframeDoc) {
+                                const paneCanvas = iframeDoc.querySelector(
+                                    'canvas[data-name="pane-canvas"]',
+                                ) as HTMLCanvasElement;
+
+                                const rect =
+                                    paneCanvas?.getBoundingClientRect();
+
+                                if (rect && paneCanvas && offsetX && offsetY) {
+                                    const cssOffsetX = offsetX - rect.left;
+                                    const cssOffsetY = offsetY - rect.top;
+
+                                    const scaleY =
+                                        paneCanvas?.height / rect?.height;
+                                    const scaleX =
+                                        paneCanvas.width / rect.width;
+
+                                    const overlayOffsetX = cssOffsetX * scaleX;
+                                    const overlayOffsetY = cssOffsetY * scaleY;
+
+                                    const isLabel = findCancelLabelAtPosition(
+                                        overlayOffsetX,
+                                        overlayOffsetY,
+                                        drawnLabels,
+                                        false,
+                                    );
+
+                                    if (isLabel) {
+                                        setSelectedLine(isLabel);
+
+                                        if (overlayCanvasRef.current)
+                                            overlayCanvasRef.current.style.pointerEvents =
+                                                'auto';
+                                    } else {
+                                        setSelectedLine(undefined);
+                                    }
+                                }
+                            }
+                        }
+                    });
+            });
+        }
+    }, [chart, drawnLabels, isDrag]);
+
+    useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleMouseDown = (params: any) => {
             if (chart) {
@@ -211,25 +303,6 @@ const LabelComponent = ({
                             true,
                         );
 
-                        const isLabel = findCancelLabelAtPosition(
-                            offsetX,
-                            offsetY,
-                            drawnLabels,
-                            false,
-                        );
-
-                        if (isLabel) {
-                            if (overlayCanvasRef.current)
-                                overlayCanvasRef.current.style.pointerEvents =
-                                    'auto';
-                            setSelectedLine(isLabel);
-
-                            return;
-                        } else {
-                            if (overlayCanvasRef.current)
-                                overlayCanvasRef.current.style.pointerEvents =
-                                    'none';
-                        }
                         if (found) {
                             console.log(found.parentLine.textValue);
                         }
@@ -255,14 +328,12 @@ const LabelComponent = ({
 
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
-        if (selectedLine) {
-            overlayCanvasRef.current.style.pointerEvents = 'auto';
-        }
 
         const canvas = overlayCanvasRef.current;
 
         /*   // eslint-disable-next-line @typescript-eslint/no-explicit-any */
         const handleDragStart = (/* event: any */) => {
+            setIsDrag(true);
             // const { x, y } = event;
             // const target = findCancelLabelAtPosition(x, y, drawnLabels, false);
         };
@@ -289,11 +360,14 @@ const LabelComponent = ({
         };
 
         const handleDragEnd = () => {
-            if (overlayCanvasRef.current) {
-                setSelectedLine(undefined);
-                overlayCanvasRef.current.style.pointerEvents = 'none';
-                // setIsDrag(false);
-            }
+            setSelectedLine(undefined);
+
+            setTimeout(() => {
+                setIsDrag(false);
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
+            }, 300);
         };
 
         const dragLines = d3
@@ -320,7 +394,7 @@ const LabelComponent = ({
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [overlayCanvasRef.current, chart, drawnLabels, selectedLine]);
+    }, [overlayCanvasRef.current, chart, selectedLine]);
 
     return null;
 };

@@ -13,12 +13,17 @@ export type OrderLinesProps = {
     canvasSize: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
+    overlayCanvasMousePositionRef: React.MutableRefObject<{
+        x: number;
+        y: number;
+    }>;
 };
 
 export default function OrderLines({
     overlayCanvasRef,
     canvasSize,
     scaleData,
+    overlayCanvasMousePositionRef,
 }: OrderLinesProps) {
     const { chart } = useTradingView();
 
@@ -126,6 +131,9 @@ export default function OrderLines({
                     scaleData={scaleData}
                     selectedLine={selectedLine}
                     setSelectedLine={setSelectedLine}
+                    overlayCanvasMousePositionRef={
+                        overlayCanvasMousePositionRef
+                    }
                 />
             )}
         </>

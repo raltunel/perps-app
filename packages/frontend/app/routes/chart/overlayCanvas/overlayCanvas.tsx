@@ -12,6 +12,8 @@ const OverlayCanvas: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [scaleData, setScaleData] = useState<any>();
 
+    const overlayCanvasMousePositionRef = useRef({ x: 0, y: 0 });
+
     useEffect(() => {
         if (!chart) return;
 
@@ -50,6 +52,16 @@ const OverlayCanvas: React.FC = () => {
 
         const canvas = canvasRef.current;
 
+        const handleMouseMove = (e: MouseEvent) => {
+            const rect = canvas.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+
+            overlayCanvasMousePositionRef.current = { x: offsetX, y: offsetY };
+        };
+
+        canvas.addEventListener('mousemove', handleMouseMove);
+
         const updateCanvasSize = () => {
             const width = paneCanvas.width;
             const height = paneCanvas?.height;
@@ -83,6 +95,7 @@ const OverlayCanvas: React.FC = () => {
         return () => {
             observer.disconnect();
             if (canvas && canvas.parentNode) {
+                canvas.removeEventListener('mousemove', handleMouseMove);
                 canvas.parentNode.removeChild(canvas);
             }
             canvasRef.current = null;
@@ -94,6 +107,7 @@ const OverlayCanvas: React.FC = () => {
             overlayCanvasRef={canvasRef}
             canvasSize={canvasSize}
             scaleData={scaleData}
+            overlayCanvasMousePositionRef={overlayCanvasMousePositionRef}
         />
     );
 };
