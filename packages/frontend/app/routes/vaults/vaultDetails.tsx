@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
 import { Link, useNavigate, useParams } from 'react-router';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -12,6 +12,7 @@ import WebDataConsumer from '../trade/webdataconsumer';
 import VaultCharts from './vaultCharts';
 import styles from './vaultDetails.module.css';
 import VaultInfo from './vaultInfo';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -58,6 +59,32 @@ export default function VaultDetails() {
         console.log('deposit');
     };
 
+    const renderContent = useCallback(
+        (content?: string | number, height?: number, width?: number) => {
+            if (content) {
+                return <>{content}</>;
+                return (
+                    <SkeletonNode
+                        nodeStyle={{
+                            height: height ? height + 'px' : '20px',
+                            width: width ? width + 'px' : '400px',
+                        }}
+                    />
+                );
+            } else {
+                return (
+                    <SkeletonNode
+                        nodeStyle={{
+                            height: height ? height + 'px' : '20px',
+                            width: width ? width + 'px' : '400px',
+                        }}
+                    />
+                );
+            }
+        },
+        [],
+    );
+
     return (
         <>
             <div className={styles.container}>
@@ -68,7 +95,9 @@ export default function VaultDetails() {
                     >
                         <FaChevronLeft />
                     </div>
-                    <header>{vaultDetails?.name}</header>
+                    <header>
+                        {renderContent(vaultDetails?.name, 30, 400)}
+                    </header>
                     <div className={styles.headerRightContent}>
                         <SimpleButton
                             onClick={onWithdraw}
@@ -86,7 +115,17 @@ export default function VaultDetails() {
                     <div className={styles.vaultCard}>
                         <div className={styles.vaultCardTitle}>TVL</div>
                         <div className={styles.vaultCardContent}>
-                            {formatNum(vaultDetails?.tvl ?? 0, 0, true, true)}
+                            {renderContent(
+                                formatNum(
+                                    vaultDetails?.tvl ?? 0,
+                                    0,
+                                    true,
+                                    true,
+                                ),
+                                30,
+                                200,
+                            )}
+                            {/* {formatNum(vaultDetails?.tvl ?? 0, 0, true, true)} */}
                         </div>
                     </div>
                     <div className={styles.vaultCard}>
