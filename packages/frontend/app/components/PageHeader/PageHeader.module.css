@@ -322,21 +322,24 @@
 @media (max-width: 1024px) {
     .container nav a,
     .moreButton {
-        font-size: var(--font-size-xs, 12px);
+        font-size: var(--font-size-s);
     }
 
     .ambientmm {
-        font-size: var(--font-size-xs, 12px);
+        font-size: var(--font-size-s);
         padding: 4px 6px;
     }
 
     .depositButton {
         width: 80px;
         height: 20px;
-        font-size: var(--font-size-xs, 12px);
+        font-size: var(--font-size-s);
     }
 
     .networkButton {
+        display: none;
+    }
+    .rpcButton span {
         display: none;
     }
 }

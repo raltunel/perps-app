@@ -21,6 +21,7 @@ import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { useApp } from '~/contexts/AppContext';
 import HelpDropdown from './HelpDropdown/HelpDropdown';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { useTutorial } from '~/hooks/useTutorial';
 
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
@@ -126,6 +127,7 @@ export default function PageHeader() {
                     className={styles.rpcButton}
                     onClick={() => setIsRpcDropdownOpen(!isRpcDropdownOpen)}
                 >
+                    <span>RPC</span>
                     <svg
                         xmlns='http://www.w3.org/2000/svg'
                         width='16'
@@ -254,7 +256,7 @@ export default function PageHeader() {
                     ))}
                     {moreDropdownDisplay}
                     <a href='#' className={styles.ambientmm}>
-                        Ambient MM
+                        Ambient AMM
                     </a>
                 </nav>
                 <div className={styles.rightSide}>
