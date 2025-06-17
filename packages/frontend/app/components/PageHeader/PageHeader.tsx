@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     LuChevronDown,
     LuChevronUp,
@@ -7,6 +8,7 @@ import {
 } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
+import { useApp } from '~/contexts/AppContext';
 import { type useModalIF, useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -14,14 +16,11 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
+import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { useApp } from '~/contexts/AppContext';
-import HelpDropdown from './HelpDropdown/HelpDropdown';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { useTutorial } from '~/hooks/useTutorial';
 
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
@@ -158,13 +157,7 @@ export default function PageHeader() {
                 Deposit
             </button>
 
-            {isDepositDropdownOpen && (
-                <DepositDropdown
-                    isUserConnected={isUserConnected}
-                    setIsUserConnected={setIsUserConnected}
-                    isDropdown
-                />
-            )}
+            {isDepositDropdownOpen && <DepositDropdown isDropdown />}
         </section>
     );
 
@@ -256,7 +249,7 @@ export default function PageHeader() {
                     ))}
                     {moreDropdownDisplay}
                     <a
-                        href='https://ambient-finance.netlify.app/'
+                        href='https://ambient.finance/trade'
                         target='_blank'
                         rel='noopener noreferrer'
                         className={styles.ambientmm}
