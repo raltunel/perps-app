@@ -144,13 +144,16 @@ export function useNumFormatter() {
     );
 
     const formatNumWithOnlyDecimals = useCallback(
-        (num: number | string, precision?: number) => {
-            const formattedNum = formatNum(num, precision);
+        (num: number, precision?: number) => {
             const { group } = getSeparators(numFormat.value);
+
+            precision = getPrecisionFromNumber(num);
+
+            const formattedNum = formatNum(num, precision);
 
             return formattedNum.replace(new RegExp(`\\${group}`, 'g'), '');
         },
-        [formatNum],
+        [formatNum, numFormat],
     );
 
     const parseFormattedWithOnlyDecimals = useCallback(
