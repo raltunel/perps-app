@@ -334,10 +334,11 @@ const LabelComponent = ({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
-            const { offsetX, offsetY } = getXandYLocationForChartDrag(
-                event,
-                canvas.getBoundingClientRect(),
-            );
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
+            const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
+
             const isLabel = findCancelLabelAtPosition(
                 offsetX,
                 offsetY,
@@ -399,7 +400,7 @@ const LabelComponent = ({
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [overlayCanvasRef.current, chart, selectedLine]);
+    }, [overlayCanvasRef.current, chart, selectedLine, drawnLabelsRef.current]);
 
     return null;
 };
