@@ -255,7 +255,12 @@ export default function PageHeader() {
                         </Link>
                     ))}
                     {moreDropdownDisplay}
-                    <a href='#' className={styles.ambientmm}>
+                    <a
+                        href='https://ambient-finance.netlify.app/'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className={styles.ambientmm}
+                    >
                         Ambient AMM
                     </a>
                 </nav>
