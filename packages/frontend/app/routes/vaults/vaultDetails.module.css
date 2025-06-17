@@ -38,15 +38,59 @@
 .vaultCardTitle {
     font-size: var(--font-size-m);
     color: var(--text2);
+    margin-bottom: var(--margin-m);
 }
 
 .vaultCardContent {
-    font-size: var(--font-size-l);
+    font-size: var(--font-size-xl);
     color: var(--text1);
+    display: inline-block;
+}
+
+.vaultCardContentApr {
+    display: inline-block;
+    position: relative;
+}
+
+.vaultCardContentApr::after {
+    content: 'APR';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: calc(100% + var(--gap-s));
+    font-size: var(--font-size-m);
 }
 
 .aprLabel {
     font-size: var(--font-size-m);
     padding: 0 calc(var(--padding-s));
     border-radius: calc(var(--radius-s) / 2);
+}
+
+.headerWrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+}
+
+.backButton {
+    padding: var(--padding-s);
+    cursor: pointer;
+    height: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius-m);
+}
+
+.backButton:hover {
+    background-color: var(--bg-dark4);
+}
+
+.headerRightContent {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-m);
+    margin-left: auto;
 }

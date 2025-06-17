@@ -1,15 +1,17 @@
-import { useParams } from 'react-router';
-import styles from './vaultDetails.module.css';
 import { useEffect, useState } from 'react';
-import { useDebugStore } from '~/stores/DebugStore';
-import WebDataConsumer from '../trade/webdataconsumer';
+import { FaChevronLeft } from 'react-icons/fa';
+import { Link, useNavigate, useParams } from 'react-router';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import type { VaultDetailsIF } from '~/utils/VaultIFs';
-import VaultInfo from './vaultInfo';
-import VaultCharts from './vaultCharts';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useDebugStore } from '~/stores/DebugStore';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
+import WebDataConsumer from '../trade/webdataconsumer';
+import VaultCharts from './vaultCharts';
+import styles from './vaultDetails.module.css';
+import VaultInfo from './vaultInfo';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -21,6 +23,8 @@ export default function VaultDetails() {
     const [vaultDetails, setVaultDetails] = useState<VaultDetailsIF | null>(
         null,
     );
+
+    const navigate = useNavigate();
 
     const { getBsColor } = useAppSettings();
 
@@ -46,10 +50,38 @@ export default function VaultDetails() {
         }
     }, [vaultAddress]);
 
+    const onWithdraw = () => {
+        console.log('withdraw');
+    };
+
+    const onDeposit = () => {
+        console.log('deposit');
+    };
+
     return (
         <>
             <div className={styles.container}>
-                <header>{vaultDetails?.name}</header>
+                <div className={styles.headerWrapper}>
+                    <div
+                        className={styles.backButton}
+                        onClick={() => navigate('/vaults')}
+                    >
+                        <FaChevronLeft />
+                    </div>
+                    <header>{vaultDetails?.name}</header>
+                    <div className={styles.headerRightContent}>
+                        <SimpleButton
+                            onClick={onWithdraw}
+                            bg='dark3'
+                            hoverBg='dark4'
+                        >
+                            Withdraw
+                        </SimpleButton>
+                        <SimpleButton onClick={onDeposit} bg='accent1'>
+                            Deposit
+                        </SimpleButton>
+                    </div>
+                </div>
                 <div className={styles.vaultSection}>
                     <div className={styles.vaultCard}>
                         <div className={styles.vaultCardTitle}>TVL</div>
@@ -64,7 +96,11 @@ export default function VaultDetails() {
                         <div className={styles.vaultCardContent}>
                             {vaultDetails && (
                                 <div
-                                    className={styles.vaultCardContent}
+                                    className={
+                                        styles.vaultCardContent +
+                                        ' ' +
+                                        styles.vaultCardContentApr
+                                    }
                                     style={{
                                         color:
                                             vaultDetails.apr > 0
@@ -74,18 +110,8 @@ export default function VaultDetails() {
                                                   : 'inherit',
                                     }}
                                 >
+                                    {vaultDetails.apr > 0 ? '+' : ''}
                                     {formatNum(vaultDetails.apr * 100, 2)}%{' '}
-                                    <span
-                                        className={styles.aprLabel}
-                                        style={{
-                                            backgroundColor:
-                                                vaultDetails.apr > 0
-                                                    ? `color-mix(in srgb, ${getBsColor().buy} 20%, transparent )`
-                                                    : `color-mix(in srgb, ${getBsColor().sell} 20%, transparent )`,
-                                        }}
-                                    >
-                                        APR
-                                    </span>
                                 </div>
                             )}
                         </div>
