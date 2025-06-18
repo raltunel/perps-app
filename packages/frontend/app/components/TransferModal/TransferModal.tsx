@@ -47,6 +47,14 @@ export default function TransferModal(props: propsIF) {
                     options={['USDe', 'BTC']}
                     handleChange={setAsset}
                 />
+                <div className={styles.asset_qty_input_wrapper}>
+                    <input
+                        id='transfer_asset_qty_input'
+                        type='text'
+                        placeholder='Amount'
+                    />
+                    <div>Max</div>
+                </div>
                 <div className={styles.info}>
                     <div>
                         <p>Available to Deposit</p>

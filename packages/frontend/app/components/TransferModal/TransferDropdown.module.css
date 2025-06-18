@@ -14,8 +14,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    /* magic number for height is specified in Figma */
-    height: 32px;
+    height: var(--transfer-modal-input-height);
     width: 100%;
     padding-left: var(--padding-s);
     padding-right: var(--padding-xs);
