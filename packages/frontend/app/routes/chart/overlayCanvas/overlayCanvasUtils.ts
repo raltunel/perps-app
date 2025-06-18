@@ -4,13 +4,14 @@ import type { LabelLocation } from '../orders/orderLineUtils';
 
 export type LabelLocationData = { label: LabelLocation; parentLine: LineData };
 
-export function findCancelLabelAtPosition(
+export function findLimitLabelAtPosition(
     x: number,
     y: number,
     drawnLabels: LineData[],
     isCancel: boolean,
-): { label: LabelLocation; parentLine: (typeof drawnLabels)[0] } | null {
+): { label: LabelLocation; parentLine: LineData } | null {
     for (let i = drawnLabels.length - 1; i >= 0; i--) {
+        if (drawnLabels[i].type !== 'LIMIT') continue;
         const labelLocs = drawnLabels[i].labelLocations;
         if (!labelLocs) continue;
 

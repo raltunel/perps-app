@@ -8,7 +8,7 @@ import {
 import { drawLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import {
-    findCancelLabelAtPosition,
+    findLimitLabelAtPosition,
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
@@ -187,7 +187,7 @@ const LabelComponent = ({
             const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
             const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
 
-            const isLabel = findCancelLabelAtPosition(
+            const isLabel = findLimitLabelAtPosition(
                 overlayOffsetX,
                 overlayOffsetY,
                 drawnLabelsRef.current,
@@ -244,7 +244,7 @@ const LabelComponent = ({
                                     const overlayOffsetX = cssOffsetX * scaleX;
                                     const overlayOffsetY = cssOffsetY * scaleY;
 
-                                    const isLabel = findCancelLabelAtPosition(
+                                    const isLabel = findLimitLabelAtPosition(
                                         overlayOffsetX,
                                         overlayOffsetY,
                                         drawnLabelsRef.current,
@@ -297,7 +297,7 @@ const LabelComponent = ({
                         const offsetX = cssOffsetX * scaleX;
                         const offsetY = cssOffsetY * scaleY;
 
-                        const found = findCancelLabelAtPosition(
+                        const found = findLimitLabelAtPosition(
                             offsetX,
                             offsetY,
                             drawnLabelsRef.current,
@@ -339,7 +339,7 @@ const LabelComponent = ({
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
-            const isLabel = findCancelLabelAtPosition(
+            const isLabel = findLimitLabelAtPosition(
                 offsetX,
                 offsetY,
                 drawnLabelsRef.current,
