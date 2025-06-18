@@ -15,7 +15,6 @@
     height: var(--transfer-modal-input-height);
     width: 100%;
     padding: var(--padding-s);
-    /* padding-right: var(--padding-xs); */
     background-color: var(--bg-dark4);
     gap: inherit;
     border-radius: var(--radius-s);
