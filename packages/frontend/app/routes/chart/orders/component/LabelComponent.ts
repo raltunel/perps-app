@@ -1,5 +1,11 @@
+import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import {
+    findLimitLabelAtPosition,
+    getXandYLocationForChartDrag,
+    type LabelLocationData,
+} from '../../overlayCanvas/overlayCanvasUtils';
 import {
     formatLineLabel,
     getPricetoPixel,
@@ -7,12 +13,6 @@ import {
 } from '../customOrderLineUtils';
 import { drawLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
-import {
-    findLimitLabelAtPosition,
-    getXandYLocationForChartDrag,
-    type LabelLocationData,
-} from '../../overlayCanvas/overlayCanvasUtils';
-import * as d3 from 'd3';
 
 interface LabelProps {
     lines: LineData[];
@@ -362,12 +362,6 @@ const LabelComponent = ({
 
             const advancedValue = scaleData?.yScale.invert(clientY);
 
-            console.log('dragging', {
-                oid: tempSelectedLine?.parentLine.oid,
-                originalPrice: originalPrice,
-                draggedPrice: advancedValue,
-            });
-
             tempSelectedLine = tempSelectedLine
                 ? {
                       ...tempSelectedLine,
@@ -383,7 +377,7 @@ const LabelComponent = ({
 
         const handleDragEnd = () => {
             console.log('dragend', {
-                oid: tempSelectedLine?.parentLine.oid,
+                orderId: tempSelectedLine?.parentLine.oid,
                 originalPrice: originalPrice,
                 draggedPrice: tempSelectedLine?.parentLine.yPrice,
             });
