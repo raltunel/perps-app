@@ -11,6 +11,8 @@ export default function TransferModal(props: propsIF) {
     const { closeModal } = props;
 
     const [fromAccount, setFromAccount] = useState<string>('Master Account');
+    const [toAccount, setToAccount] = useState<string>('Master Account');
+    const [asset, setAsset] = useState<string>('USDe');
 
     return (
         <Modal title='Transfer' close={closeModal}>
@@ -25,6 +27,24 @@ export default function TransferModal(props: propsIF) {
                         'Sub-Account 2',
                     ]}
                     handleChange={setFromAccount}
+                />
+                <TransferDropdown
+                    idForDOM='transfer_dropdown_field_to'
+                    labelText='To'
+                    initial={toAccount}
+                    options={[
+                        'Master Account',
+                        'Sub-Account 1',
+                        'Sub-Account 2',
+                    ]}
+                    handleChange={setToAccount}
+                />
+                <TransferDropdown
+                    idForDOM='transfer_dropdown_field_asset'
+                    labelText='Asset'
+                    initial={asset}
+                    options={['USDe', 'BTC']}
+                    handleChange={setAsset}
                 />
             </div>
         </Modal>
