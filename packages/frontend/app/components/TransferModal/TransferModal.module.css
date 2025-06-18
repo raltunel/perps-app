@@ -4,3 +4,23 @@
     margin: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
     gap: var(--gap-s);
 }
+
+.info {
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-s);
+    gap: var(--gap-row);
+    border: 1px solid var(--bg-dark4);
+}
+
+.info > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-s);
+}
+
+.info > div > p:first-child {
+    color: var(--text2);
+}

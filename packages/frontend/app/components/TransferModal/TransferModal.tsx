@@ -46,6 +46,16 @@ export default function TransferModal(props: propsIF) {
                     options={['USDe', 'BTC']}
                     handleChange={setAsset}
                 />
+                <div className={styles.info}>
+                    <div>
+                        <p>Available to Deposit</p>
+                        <p>1,000.00</p>
+                    </div>
+                    <div>
+                        <p>Network Fee</p>
+                        <p>$0.001</p>
+                    </div>
+                </div>
             </div>
         </Modal>
     );
