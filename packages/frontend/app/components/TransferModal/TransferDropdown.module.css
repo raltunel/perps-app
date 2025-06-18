@@ -34,10 +34,9 @@
     gap: var(--padding-row);
     padding: var(--padding-s);
     font-size: var(--font-size-s);
-    color: var(--dark2);
     list-style: none;
     border-radius: var(--radius-s);
-    background-color: var(--bg-dark4);
+    background-color: var(--bg-dark5);
     z-index: 2;
 }
 
