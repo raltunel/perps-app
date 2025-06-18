@@ -331,7 +331,7 @@ const LabelComponent = ({
         if (!overlayCanvasRef.current) return;
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
-
+        let originalPrice: number | undefined = undefined;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
             const rect = canvas.getBoundingClientRect();
@@ -348,7 +348,7 @@ const LabelComponent = ({
 
             if (isLabel) {
                 tempSelectedLine = isLabel;
-
+                originalPrice = isLabel.parentLine.yPrice;
                 setSelectedLine(isLabel);
                 setIsDrag(true);
             }
@@ -361,6 +361,12 @@ const LabelComponent = ({
             );
 
             const advancedValue = scaleData?.yScale.invert(clientY);
+
+            console.log('dragging', {
+                oid: tempSelectedLine?.parentLine.oid,
+                originalPrice: originalPrice,
+                draggedPrice: advancedValue,
+            });
 
             tempSelectedLine = tempSelectedLine
                 ? {
@@ -376,6 +382,11 @@ const LabelComponent = ({
         };
 
         const handleDragEnd = () => {
+            console.log('dragend', {
+                oid: tempSelectedLine?.parentLine.oid,
+                originalPrice: originalPrice,
+                draggedPrice: tempSelectedLine?.parentLine.yPrice,
+            });
             tempSelectedLine = undefined;
             setSelectedLine(undefined);
             setIsDrag(false);
