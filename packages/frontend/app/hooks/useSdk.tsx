@@ -26,10 +26,9 @@ export const SdkProvider: React.FC<{
     const [info, setInfo] = useState<Info | null>(null);
     const [exchange, setExchange] = useState<Exchange | null>(null);
 
-    const { internetConnected } = useTradeDataStore();
+    const { internetConnected, setWsReconnecting } = useTradeDataStore();
 
     // commit to trigger deployment
-
     useEffect(() => {
         if (!isClient) return;
         if (!info) {
@@ -63,8 +62,21 @@ export const SdkProvider: React.FC<{
         if (!isClient) return;
         if (internetConnected) {
             info?.wsManager?.reconnect();
+            setWsReconnecting(true);
+            console.log('>>> reconnecting');
         }
-    }, [internetConnected, isClient]);
+
+        const reconnectInterval = setInterval(() => {
+            if (info?.wsManager?.isWsReady()) {
+                setWsReconnecting(false);
+                clearInterval(reconnectInterval);
+            }
+        }, 200);
+
+        return () => {
+            clearInterval(reconnectInterval);
+        };
+    }, [internetConnected, isClient, info]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>
