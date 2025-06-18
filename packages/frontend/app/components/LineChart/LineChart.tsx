@@ -19,6 +19,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const chartWidth = width || 850;
     const chartHeight = height || 250;
 
+    const [canvasInitialWidth] = React.useState<number>(chartWidth);
+    const [canvasInitialHeight] = React.useState<number>(chartHeight);
+
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const [xScale, setXScale] = React.useState<d3.ScaleTime<number, number>>();
@@ -35,7 +38,6 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-        const canvasWidth = canvas.getBoundingClientRect().width;
 
         const minDate = d3.min(lineData, (d) => d.time);
         const maxDate = d3.max(lineData, (d) => d.time);
@@ -49,7 +51,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const xScale = d3
                 .scaleTime()
                 .domain([new Date(minDate), new Date(maxDate + padding)])
-                .range([0, canvasWidth]);
+                .range([0, chartWidth]);
 
             setXScale(() => xScale);
         }
@@ -94,11 +96,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 setYScale(() => yScale);
             }
         }
-    }, [lineData, chartName, chartHeight]);
+    }, [lineData, chartName]);
 
     useEffect(() => {
         yScale && yScale.range([chartHeight, 0]);
-    }, [chartHeight, yScale]);
+        xScale && xScale.range([0, chartWidth]);
+    }, [chartHeight, chartWidth, yScale, xScale]);
 
     useEffect(() => {
         const svgXAxis = d3.select('#xAxis');
@@ -159,7 +162,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-family', font)
                 .style('font-size', fontSize);
         }
-    }, [yScale, xScale, numFormat, lineData, chartName, yAxisTicks]);
+    }, [
+        yScale,
+        xScale,
+        numFormat,
+        lineData,
+        chartName,
+        yAxisTicks,
+        chartHeight,
+        chartWidth,
+    ]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -190,8 +202,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const context = canvas.getContext('2d');
             if (!context) return;
 
-            const width = canvas.getBoundingClientRect().width;
-            const height = canvas.getBoundingClientRect()?.height;
+            const width = chartWidth || canvas.getBoundingClientRect()?.width;
+            const height =
+                chartHeight || canvas.getBoundingClientRect()?.height;
 
             context.clearRect(0, 0, width, height);
 
@@ -234,10 +247,19 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 }}
             >
                 <svg id='yAxis' height={chartHeight} />
+
                 <canvas
                     ref={canvasRef}
-                    width={chartWidth}
-                    height={chartHeight}
+                    style={{
+                        minWidth: '100px',
+                        minHeight: '100px',
+                        height: chartHeight + 'px',
+                        width: chartWidth + 'px',
+                        maxHeight: chartHeight + 'px',
+                        maxWidth: chartWidth + 'px',
+                    }}
+                    width={canvasInitialWidth}
+                    height={canvasInitialHeight}
                 />
             </div>
             <div className={styles.xAxisContainer}>
