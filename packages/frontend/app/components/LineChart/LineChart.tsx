@@ -30,60 +30,11 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
     const { numFormat } = useAppSettings();
 
-    const formatYAxisTicks = () => {
-        if (yScale) {
-            const maxPrice = yScale.domain()[1];
-            const minPrice = yScale.domain()[0];
-
-            const diff = maxPrice - minPrice;
-
-            const padding = diff / 5;
-
-            const factor = Math.pow(10, Math.floor(Math.log10(maxPrice)));
-
-            const topBoundary =
-                Math.ceil((yScale.domain()[1] - padding / 2) / factor) * factor;
-            const bottomBoundary =
-                Math.floor((yScale.domain()[0] + padding / 2) / factor) *
-                factor;
-
-            const isOriginNearTop =
-                Math.abs(topBoundary - padding / 4) < padding / 4 ||
-                Math.abs(topBoundary + padding / 4) < padding / 4;
-            const isOriginNearBottom =
-                Math.abs(bottomBoundary - padding / 4) < padding / 4 ||
-                Math.abs(bottomBoundary + padding / 4) < padding / 4;
-
-            const tickDiff = (topBoundary - bottomBoundary) / 4;
-
-            const ticks: Array<number> = [];
-
-            const topTick = isOriginNearTop ? 0 : topBoundary;
-            const bottomTick = isOriginNearBottom ? 0 : bottomBoundary;
-
-            ticks.push(topTick);
-            ticks.push(bottomTick);
-
-            let current = topTick - tickDiff;
-
-            while (current > bottomTick) {
-                ticks.push(current);
-                current -= tickDiff;
-            }
-
-            return ticks;
-        }
-
-        return [];
-    };
-
     useEffect(() => {
         if (lineData === undefined) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
-
-        const canvasHeight = canvas.getBoundingClientRect()?.height;
         const canvasWidth = canvas.getBoundingClientRect().width;
 
         const minDate = d3.min(lineData, (d) => d.time);
@@ -111,7 +62,13 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const padding = diff / 15;
 
-            const ticks = d3.ticks(minPrice - padding, maxPrice + padding, 5);
+            const tickCount = chartHeight > 150 ? 5 : 2;
+
+            const ticks = d3.ticks(
+                minPrice - padding,
+                maxPrice + padding,
+                tickCount,
+            );
 
             setYAxisTicks(() => ticks);
 
@@ -132,12 +89,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 const yScale = d3
                     .scaleLinear()
                     .domain([bottomBoundaryCanFit, topBoundaryCanFit])
-                    .range([canvasHeight, 0]);
+                    .range([chartHeight, 0]);
 
                 setYScale(() => yScale);
             }
         }
-    }, [lineData, chartName]);
+    }, [lineData, chartName, chartHeight]);
+
+    useEffect(() => {
+        yScale && yScale.range([chartHeight, 0]);
+    }, [chartHeight, yScale]);
 
     useEffect(() => {
         const svgXAxis = d3.select('#xAxis');

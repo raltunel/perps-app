@@ -43,6 +43,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
+    const [chartHeight, setChartHeight] = useState<number>(250);
 
     const parseUserProfileData = (data: any, key: string) => {
         const userPositionData = data.get(key) as UserPositionIF;
@@ -108,6 +109,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                     lineData={pnlHistory}
                     curve={'step'}
                     chartName={selectedVault.value + selectedPeriod.value}
+                    height={chartHeight}
                 />
             )}
 
@@ -116,6 +118,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                     lineData={accountValueHistory}
                     curve={'step'}
                     chartName={selectedVault.value + selectedPeriod.value}
+                    height={chartHeight}
                 />
             )}
 
