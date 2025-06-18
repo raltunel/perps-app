@@ -2,6 +2,7 @@
     --container-width: 303px;
     --container-height: 300px;
     --overview-container-height: 100%;
+    --not-connected-container-height: 180px;
 
     width: auto;
     height: auto;
@@ -18,7 +19,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
-    padding: var(--padding-m);
+    padding: var(--padding-s);
     border-radius: var(--radius-m, 16px);
     box-shadow: var(--dropdown-box-shadow);
     transition:
@@ -29,13 +30,14 @@
     grid-template-rows: auto 1fr;
 }
 .dropdownContainer {
-    background: var(--bg-dark2, #0e0e14);
+    background: var(--bg-dark3, #0e0e14);
     position: absolute;
     top: var(--dropdwon-top);
     right: 0;
     width: var(--container-width);
     height: var(--container-height);
 }
+
 .actionButtons {
     display: flex;
     flex-direction: column;
@@ -50,13 +52,14 @@
 }
 
 .notConnectedContainer {
-    height: 100%;
+    height: var(--not-connected-container-height);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     gap: var(--radius-s);
-    grid-row: 1;
 }
+
 .notConnectedText {
     color: var(--text1, #f0f0f8);
     text-align: center;
@@ -89,6 +92,9 @@
     transition:
         mask 0.2s ease,
         -webkit-mask 0.2s ease;
+}
+.dropdownContainer .overviewContainer {
+    background: var(--bg-dark2) !important;
 }
 
 /* When scrolled to bottom - remove fade */

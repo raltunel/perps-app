@@ -25,12 +25,14 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
         inputRegex,
         parseFormattedWithOnlyDecimals,
         formatNumWithOnlyDecimals,
-        getPrecisionFromNumber,
     } = useNumFormatter();
 
-    const valueNum = useRef<number>(0);
+    const valueNum = useRef<number | null>(null);
 
     useEffect(() => {
+        if (valueNum.current === null) {
+            return;
+        }
         const str = formatNumWithOnlyDecimals(valueNum.current);
         onChange(str);
     }, [inputRegex]);
@@ -48,6 +50,10 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     );
 
     useEffect(() => {
+        if (!value || value.length === 0) {
+            valueNum.current = null;
+            return;
+        }
         valueNum.current = parseFormattedWithOnlyDecimals(value);
     }, [parseFormattedWithOnlyDecimals, value]);
 
@@ -59,7 +65,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 onChange={handleChange}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
-                className={className}
+                className={styles.numFormattedInput + ' ' + className}
                 aria-label={ariaLabel}
                 inputMode='numeric'
                 pattern='[0-9]*'
