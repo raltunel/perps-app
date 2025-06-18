@@ -1,6 +1,4 @@
-import Button from '~/components/Button/Button';
 import styles from './StrategyDetail.module.css';
-import OrderHistory from '../orderHistory/orderHistory';
 import { useNavigate, useParams } from 'react-router';
 import {
     useStrategiesStore,
@@ -12,6 +10,7 @@ import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import OrderHistory from '~/components/OrderHistory/OrderHistory';
 import LineChart from '~/components/LineChart/LineChart';
 
 export default function Strategies() {
@@ -72,15 +71,14 @@ export default function Strategies() {
                         </div>
                     </div>
                     <div className={styles.header_right}>
-                        <p>
+                        <div>
                             Status: {strategy?.isPaused ? 'Paused' : 'Running'}
-                        </p>
+                        </div>
                         <SimpleButton
                             onClick={() =>
                                 strategy &&
                                 strategies.togglePause(strategy.address)
                             }
-                            hoverBg='accent1'
                         >
                             {strategy?.isPaused ? 'Unpause' : 'Pause'}
                         </SimpleButton>
@@ -90,19 +88,16 @@ export default function Strategies() {
                                     state: { strategy, address },
                                 })
                             }
-                            hoverBg='accent1'
                         >
                             Edit
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => console.log('Strategy Transfered!')}
-                            hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
                             onClick={() => removeStratModalCtrl.open()}
-                            hoverBg='accent1'
                         >
                             Remove
                         </SimpleButton>
@@ -191,7 +186,7 @@ export default function Strategies() {
                         />
                     </div>
                 </div>
-                <OrderHistory />
+                <OrderHistory pageMode={false} />
                 {removeStratModalCtrl.isOpen && (
                     <Modal
                         title='Remove Strategy'
@@ -202,13 +197,14 @@ export default function Strategies() {
                                 Are you sure you want to delete this strategy?
                             </p>
                             <div className={styles.remove_strat_modal_buttons}>
-                                <Button
+                                <SimpleButton
                                     onClick={removeStratModalCtrl.close}
-                                    size='large'
+                                    bg='dark4'
+                                    hoverBg='dark2'
                                 >
                                     Cancel
-                                </Button>
-                                <Button
+                                </SimpleButton>
+                                <SimpleButton
                                     onClick={() => {
                                         if (strategy?.address) {
                                             strategies.remove(strategy.address);
@@ -216,11 +212,10 @@ export default function Strategies() {
                                             navigate('/strategies');
                                         }
                                     }}
-                                    size='large'
-                                    selected
+                                    bg='accent1'
                                 >
                                     Delete
-                                </Button>
+                                </SimpleButton>
                             </div>
                         </section>
                     </Modal>

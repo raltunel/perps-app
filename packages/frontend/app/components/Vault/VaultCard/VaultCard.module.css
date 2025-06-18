@@ -49,7 +49,6 @@
     align-items: center;
     flex-shrink: 0;
     border-radius: 50%;
-    background: #000;
 }
 
 .perpsMarkLogo img {
@@ -120,4 +119,12 @@
         flex-basis: calc(50% - 24px);
         min-width: var(--container-min-width);
     }
+}
+
+.moreInfoContainer {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    background: var(--bg-dark3);
+    padding: var(--padding-s);
+    border-radius: var(--radius-s);
 }
