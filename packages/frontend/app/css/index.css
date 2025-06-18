@@ -283,10 +283,6 @@ button::before {
     transition: filter 0.3s ease;
 }
 
-button:hover::before {
-    /* filter: brightness(0.8); */
-}
-
 ul[role='list'],
 ol[role='list'] {
     list-style: none;
