@@ -2,6 +2,7 @@ import styles from './TransferModal.module.css';
 import Modal from '../Modal/Modal';
 import TransferDropdown from './TransferDropdown';
 import { useState } from 'react';
+import SimpleButton from '../SimpleButton/SimpleButton';
 
 interface propsIF {
     closeModal: () => void;
@@ -56,6 +57,14 @@ export default function TransferModal(props: propsIF) {
                         <p>$0.001</p>
                     </div>
                 </div>
+                <SimpleButton
+                    onClick={() => {
+                        console.log('Asset transferred!');
+                        closeModal();
+                    }}
+                >
+                    Confirm
+                </SimpleButton>
             </div>
         </Modal>
     );
