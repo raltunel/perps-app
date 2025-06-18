@@ -14,6 +14,7 @@ export default function TransferModal(props: propsIF) {
     const [fromAccount, setFromAccount] = useState<string>('Master Account');
     const [toAccount, setToAccount] = useState<string>('Master Account');
     const [asset, setAsset] = useState<string>('USDe');
+    const [qty, setQty] = useState<string>('');
 
     return (
         <Modal title='Transfer' close={closeModal}>
@@ -52,8 +53,10 @@ export default function TransferModal(props: propsIF) {
                         id='transfer_asset_qty_input'
                         type='text'
                         placeholder='Amount'
+                        value={qty}
+                        onChange={(e) => setQty(e.currentTarget.value)}
                     />
-                    <div>Max</div>
+                    <div onClick={() => setQty('1000')}>Max</div>
                 </div>
                 <div className={styles.info}>
                     <div>
