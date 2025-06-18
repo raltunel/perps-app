@@ -209,10 +209,10 @@ export class WebsocketManager {
 
         this.pongTimeout = setTimeout(() => {
             if (!this.pongReceived) {
-                if (this.ws.readyState === 1) {
-                    // no need to reconnect if connection state is open
-                    return;
-                }
+                // if (this.ws.readyState === 1) {
+                //     // no need to reconnect if connection state is open
+                //     return;
+                // }
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
