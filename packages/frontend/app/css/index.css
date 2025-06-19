@@ -168,6 +168,7 @@
     /* ------------------------------ */
     --skeleton-height: 20px;
     --skeleton-animation-duration: 1.5s;
+    --skeleton-base-color: #f0f0f0;
     --skeleton-background: linear-gradient(
         90deg,
         #f0f0f005 10%,
