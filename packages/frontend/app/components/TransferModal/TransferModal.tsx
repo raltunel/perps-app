@@ -91,7 +91,10 @@ export default function TransferModal(props: propsIF) {
                     onClick={() => {
                         if (isValid) closeModal();
                     }}
-                    style={{ cursor: isValid ? 'cursor' : 'not-allowed' }}
+                    style={{
+                        cursor: isValid ? 'pointer' : 'not-allowed',
+                    }}
+                    bg={isValid ? 'accent1' : 'dark2'}
                 >
                     {isValid ? 'Confirm' : 'Please enter all fields'}
                 </SimpleButton>
