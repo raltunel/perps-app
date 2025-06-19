@@ -1,7 +1,7 @@
 import styles from './TransferModal.module.css';
 import Modal from '../Modal/Modal';
 import TransferDropdown from './TransferDropdown';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import {
     useAccounts,
@@ -30,6 +30,10 @@ export default function TransferModal(props: propsIF) {
 
     const ACCOUNT_DROPDOWN_INITIAL_TEXT = 'Please select an account';
     const ASSET_DROPDOWN_INITIAL_TEXT = 'Please select an asset';
+
+    const isValid = useMemo<boolean>(() => {
+        return !!(fromAccount && toAccount && asset && qty);
+    }, [fromAccount, toAccount, asset, qty]);
 
     return (
         <Modal title='Transfer' close={closeModal}>
@@ -77,11 +81,11 @@ export default function TransferModal(props: propsIF) {
                 </div>
                 <SimpleButton
                     onClick={() => {
-                        console.log('Asset transferred!');
-                        closeModal();
+                        if (isValid) closeModal();
                     }}
+                    style={{ cursor: isValid ? 'cursor' : 'not-allowed' }}
                 >
-                    Confirm
+                    {isValid ? 'Confirm' : 'Please enter all fields'}
                 </SimpleButton>
             </div>
         </Modal>
