@@ -16,21 +16,26 @@ interface propsIF {
 export default function TransferModal(props: propsIF) {
     const { closeModal } = props;
 
+    // list of active subaccounts data
     const subAccounts: useAccountsIF = useAccounts();
 
+    // array of account name strings
     const accountNames: string[] = [subAccounts.master]
         .concat(subAccounts.sub)
         .map((subaccount: accountIF) => subaccount.name);
     console.log(accountNames);
 
+    // state-handler hooks for current values in modal
     const [fromAccount, setFromAccount] = useState<string | null>(null);
     const [toAccount, setToAccount] = useState<string | null>(null);
     const [asset, setAsset] = useState<string | null>(null);
     const [qty, setQty] = useState<string>('');
 
+    // placeholder text for different input types
     const ACCOUNT_DROPDOWN_INITIAL_TEXT = 'Please select an account';
     const ASSET_DROPDOWN_INITIAL_TEXT = 'Please select an asset';
 
+    // boolean representing whether all fields pass validation
     const isValid = useMemo<boolean>(() => {
         return !!(fromAccount && toAccount && asset && qty);
     }, [fromAccount, toAccount, asset, qty]);
