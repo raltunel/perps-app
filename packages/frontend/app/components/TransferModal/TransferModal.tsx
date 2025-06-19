@@ -23,7 +23,6 @@ export default function TransferModal(props: propsIF) {
     const accountNames: string[] = [subAccounts.master]
         .concat(subAccounts.sub)
         .map((subaccount: accountIF) => subaccount.name);
-    console.log(accountNames);
 
     // state-handler hooks for current values in modal
     const [fromAccount, setFromAccount] = useState<string | null>(null);
