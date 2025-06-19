@@ -9,9 +9,9 @@ import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import { useNumberFormatter } from '~/hooks/useCompactNumberFormat';
 import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -25,7 +25,7 @@ export function meta() {
 function Portfolio() {
     const { portfolio, formatCurrency } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
-    const { currency } = useNumberFormatter();
+    const { currency } = useNumFormatter();
 
     const {
         openDepositModal,
