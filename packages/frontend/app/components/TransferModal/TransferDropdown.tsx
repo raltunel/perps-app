@@ -33,7 +33,7 @@ export default function TransferDropdown(props: propsIF) {
 
     return (
         <div className={styles.transfer_dropdown}>
-            <label htmlFor={idForDOM}>{labelText}</label>
+            <div>{labelText}</div>
             <div className={styles.dropdown} ref={dropdownRef}>
                 <button onClick={() => setIsOpen(!isOpen)}>
                     <output
