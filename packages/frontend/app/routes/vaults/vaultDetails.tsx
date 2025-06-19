@@ -14,6 +14,7 @@ import styles from './vaultDetails.module.css';
 import VaultInfo from './vaultInfo';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import ChartSkeleton from '~/components/Skeletons/ChartSkeleton/ChartSkeleton';
+import { motion } from 'framer-motion';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -65,7 +66,16 @@ export default function VaultDetails() {
     const renderContent = useCallback(
         (content?: string | number, height?: number, width?: number) => {
             if (content) {
-                return <>{content}</>;
+                return (
+                    <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    >
+                        {content}
+                    </motion.div>
+                );
             } else {
                 return (
                     <SkeletonNode
@@ -125,7 +135,14 @@ export default function VaultDetails() {
                         </div>
                         <div className={styles.vaultCardContent}>
                             {vaultDetails ? (
-                                <div
+                                <motion.div
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    transition={{
+                                        duration: 0.2,
+                                        ease: 'easeInOut',
+                                    }}
                                     className={
                                         styles.vaultCardContent +
                                         ' ' +
@@ -142,7 +159,7 @@ export default function VaultDetails() {
                                 >
                                     {vaultDetails.apr > 0 ? '+' : ''}
                                     {formatNum(vaultDetails.apr * 100, 2)}%{' '}
-                                </div>
+                                </motion.div>
                             ) : (
                                 <>
                                     {renderContent(
