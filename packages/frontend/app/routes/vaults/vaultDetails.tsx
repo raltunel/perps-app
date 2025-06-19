@@ -194,7 +194,7 @@ export default function VaultDetails() {
                 </div>
 
                 {vaultAddress && <WebDataConsumer />}
-                <TradeTable />
+                <TradeTable vaultPage={true} />
             </div>
         </>
     );
