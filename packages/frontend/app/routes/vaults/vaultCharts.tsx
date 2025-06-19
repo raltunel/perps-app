@@ -14,29 +14,6 @@ export default function VaultCharts({ info }: VaultChartsProps) {
     const infoTabs = ['Vault Value', 'Vault PnL'];
     const [tab, setTab] = useState(infoTabs[0]);
 
-    const lineData = [
-        { time: 1743446400000, value: 101.2 },
-        { time: 1743532800000, value: 102.5 },
-        { time: 1743619200000, value: 100.8 },
-        { time: 1743705600000, value: 99.4 },
-        { time: 1743792000000, value: 101.9 },
-        { time: 1743878400000, value: 103.3 },
-        { time: 1743964800000, value: 104.0 },
-        { time: 1744051200000, value: 102.1 },
-        { time: 1744137600000, value: 100.7 },
-        { time: 1744224000000, value: 99.5 },
-        { time: 1744310400000, value: 98.9 },
-        { time: 1744396800000, value: 97.6 },
-        { time: 1744483200000, value: 99.2 },
-        { time: 1744569600000, value: 100.3 },
-        { time: 1744656000000, value: 101.0 },
-        { time: 1744742400000, value: 102.6 },
-        { time: 1744828800000, value: 104.3 },
-        { time: 1744915200000, value: 105.1 },
-        { time: 1745001600000, value: 103.7 },
-        { time: 1745088000000, value: 102.4 },
-    ];
-
     const [vaultHistory, setVaultHistory] = useState<
         { time: number; value: number }[] | undefined
     >();
@@ -46,8 +23,12 @@ export default function VaultCharts({ info }: VaultChartsProps) {
     >();
 
     const [parsedKey, setParsedKey] = useState<number>();
-    const [chartWidth, setChartWidth] = useState<number>(500);
-    const [chartHeight, setChartHeight] = useState<number>(250);
+    const [chartWidth] = useState<number>(
+        document.getElementById('chartPlaceholder')?.clientWidth || 560,
+    );
+    const [chartHeight] = useState<number>(
+        document.getElementById('chartPlaceholder')?.clientHeight || 250,
+    );
 
     const parseUserProfileData = (data: any, key: number) => {
         const userPositionData = data[key][1] as UserPositionIF;
@@ -88,14 +69,17 @@ export default function VaultCharts({ info }: VaultChartsProps) {
         switch (tab) {
             case 'Vault Value':
                 return (
-                    <div className={styles.chartPlaceholder}>
+                    <div
+                        id={'chartPlaceholder'}
+                        className={styles.chartPlaceholder}
+                    >
                         {vaultHistory && (
                             <LineChart
                                 lineData={vaultHistory}
                                 curve={'step'}
                                 chartName={'vaultChart'}
                                 height={180}
-                                width={500}
+                                width={chartWidth}
                             />
                         )}
                     </div>
@@ -109,7 +93,7 @@ export default function VaultCharts({ info }: VaultChartsProps) {
                                 curve={'step'}
                                 chartName={'pnlChart'}
                                 height={180}
-                                width={500}
+                                width={chartWidth}
                             />
                         )}
                     </div>
