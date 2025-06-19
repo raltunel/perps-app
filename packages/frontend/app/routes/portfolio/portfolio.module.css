@@ -221,6 +221,16 @@
     pointer-events: auto;
     z-index: var(--z-index-navbar-dropdown);
 }
+
+.mobileTop .detailsContent {
+    justify-content: flex-start;
+}
+.mobileTop .detailsContent h3 {
+    font-size: var(--font-size-m);
+}
+.mobileTop .actionMenuButton {
+    display: flex;
+}
 @media (max-width: 768px) {
     .container {
         overflow-y: auto;

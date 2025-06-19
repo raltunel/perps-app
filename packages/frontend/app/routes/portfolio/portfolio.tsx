@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
@@ -9,6 +9,9 @@ import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useNumberFormatter } from '~/hooks/useCompactNumberFormat';
+import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
+import useOutsideClick from '~/hooks/useOutsideClick';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -22,6 +25,7 @@ export function meta() {
 function Portfolio() {
     const { portfolio, formatCurrency } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
+    const { currency } = useNumberFormatter();
 
     const {
         openDepositModal,
@@ -31,12 +35,25 @@ function Portfolio() {
     } = usePortfolioModals();
 
     const feeScheduleModalCtrl: useModalIF = useModal('closed');
+    const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
+        const target = event.target as HTMLElement;
+
+        if (
+            mobileActionMenuButtonRef.current &&
+            mobileActionMenuButtonRef.current.contains(target)
+        ) {
+            return;
+        }
+
+        setIsMobileActionMenuOpen(false);
+    }, isMobileActionMenuOpen);
+    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
 
     const mobileTop = (
         <section className={styles.mobileTop}>
             <div className={styles.detailsContent}>
-                <h6>14 Day Volume</h6>
-                <h3>{formatCurrency(portfolio.tradingVolume.biWeekly)}</h3>
+                <h6>Vol(14d)</h6>
+                <h3> {currency(portfolio.tradingVolume.biWeekly, true)}</h3>
                 <div
                     className={styles.view_detail_clickable}
                     onClick={() => console.log('viewing volume')}
@@ -60,18 +77,23 @@ function Portfolio() {
             <div
                 className={`${styles.detailsContent} ${styles.netValueMobile}`}
             >
-                <h6>Total Net USD Value</h6>
-                <h3>{formatCurrency(portfolio.totalValueUSD)}</h3>
+                <h6>Total USD Val</h6>
+                <h3>{currency(portfolio.totalValueUSD, true)}</h3>
             </div>
             <button
+                ref={mobileActionMenuButtonRef}
                 onClick={() =>
                     setIsMobileActionMenuOpen(!isMobileActionMenuOpen)
                 }
+                className={styles.actionMenuButton}
             >
-                dropdown
+                <MdOutlineArrowDropDownCircle size={24} />
             </button>
             {isMobileActionMenuOpen && (
-                <div className={styles.mobileActionMenuContainer}>
+                <div
+                    className={styles.mobileActionMenuContainer}
+                    ref={mobileActionMenuRef}
+                >
                     <SimpleButton onClick={openDepositModal} bg='accent1'>
                         Deposit
                     </SimpleButton>
