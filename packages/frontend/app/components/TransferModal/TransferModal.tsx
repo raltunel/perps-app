@@ -25,9 +25,13 @@ export default function TransferModal(props: propsIF) {
         .map((subaccount: accountIF) => subaccount.name);
 
     // state-handler hooks for current values in modal
-    const [fromAccount, setFromAccount] = useState<string | null>(null);
+    // initialize on a string: that option is selected by default
+    // initialize on `null`: dropdown initializes with a placeholder
+    const [fromAccount, setFromAccount] = useState<string | null>(
+        'Master Account',
+    );
     const [toAccount, setToAccount] = useState<string | null>(null);
-    const [asset, setAsset] = useState<string | null>(null);
+    const [asset, setAsset] = useState<string | null>('USDe');
     const [qty, setQty] = useState<string>('');
 
     // placeholder text for different input types
