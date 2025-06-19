@@ -13,6 +13,7 @@ import VaultCharts from './vaultCharts';
 import styles from './vaultDetails.module.css';
 import VaultInfo from './vaultInfo';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
+import ChartSkeleton from '~/components/Skeletons/ChartSkeleton/ChartSkeleton';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -24,6 +25,8 @@ export default function VaultDetails() {
     const [vaultDetails, setVaultDetails] = useState<VaultDetailsIF | null>(
         null,
     );
+
+    const skeletonHeight = 40;
 
     const navigate = useNavigate();
 
@@ -63,14 +66,6 @@ export default function VaultDetails() {
         (content?: string | number, height?: number, width?: number) => {
             if (content) {
                 return <>{content}</>;
-                return (
-                    <SkeletonNode
-                        nodeStyle={{
-                            height: height ? height + 'px' : '20px',
-                            width: width ? width + 'px' : '400px',
-                        }}
-                    />
-                );
             } else {
                 return (
                     <SkeletonNode
@@ -96,7 +91,7 @@ export default function VaultDetails() {
                         <FaChevronLeft />
                     </div>
                     <header>
-                        {renderContent(vaultDetails?.name, 30, 400)}
+                        {renderContent(vaultDetails?.name, skeletonHeight, 400)}
                     </header>
                     <div className={styles.headerRightContent}>
                         <SimpleButton
@@ -116,16 +111,12 @@ export default function VaultDetails() {
                         <div className={styles.vaultCardTitle}>TVL</div>
                         <div className={styles.vaultCardContent}>
                             {renderContent(
-                                formatNum(
-                                    vaultDetails?.tvl ?? 0,
-                                    0,
-                                    true,
-                                    true,
-                                ),
-                                30,
+                                vaultDetails?.tvl
+                                    ? formatNum(vaultDetails.tvl, 0, true, true)
+                                    : undefined,
+                                skeletonHeight,
                                 200,
                             )}
-                            {/* {formatNum(vaultDetails?.tvl ?? 0, 0, true, true)} */}
                         </div>
                     </div>
                     <div className={styles.vaultCard}>
@@ -133,7 +124,7 @@ export default function VaultDetails() {
                             Past Month Return
                         </div>
                         <div className={styles.vaultCardContent}>
-                            {vaultDetails && (
+                            {vaultDetails ? (
                                 <div
                                     className={
                                         styles.vaultCardContent +
@@ -152,6 +143,14 @@ export default function VaultDetails() {
                                     {vaultDetails.apr > 0 ? '+' : ''}
                                     {formatNum(vaultDetails.apr * 100, 2)}%{' '}
                                 </div>
+                            ) : (
+                                <>
+                                    {renderContent(
+                                        undefined,
+                                        skeletonHeight,
+                                        160,
+                                    )}
+                                </>
                             )}
                         </div>
                     </div>
@@ -160,7 +159,13 @@ export default function VaultDetails() {
                             Vault Capacity
                         </div>
                         <div className={styles.vaultCardContent}>
-                            {formatNum(10000000, 0, true, true)}
+                            {renderContent(
+                                vaultDetails
+                                    ? formatNum(10000000, 0, true, true)
+                                    : undefined,
+                                skeletonHeight,
+                                200,
+                            )}
                         </div>
                     </div>
                     <div className={styles.vaultCard}>
@@ -168,7 +173,13 @@ export default function VaultDetails() {
                             Your Deposits
                         </div>
                         <div className={styles.vaultCardContent}>
-                            {formatNum(0, 0, true, true)}
+                            {renderContent(
+                                vaultDetails
+                                    ? formatNum(0, 0, true, true)
+                                    : undefined,
+                                skeletonHeight,
+                                160,
+                            )}
                         </div>
                     </div>
                     <div className={styles.vaultCard}>
@@ -176,7 +187,13 @@ export default function VaultDetails() {
                             All-time Earned
                         </div>
                         <div className={styles.vaultCardContent}>
-                            {formatNum(0, 0, true, true)}
+                            {renderContent(
+                                vaultDetails
+                                    ? formatNum(0, 0, true, true)
+                                    : undefined,
+                                skeletonHeight,
+                                160,
+                            )}
                         </div>
                     </div>
                 </div>
@@ -189,7 +206,13 @@ export default function VaultDetails() {
                     <div
                         className={styles.vaultCard + ' ' + styles.zeroPadding}
                     >
-                        <VaultCharts info={vaultDetails} />
+                        {vaultDetails ? (
+                            <VaultCharts info={vaultDetails} />
+                        ) : (
+                            <div className={styles.chartSkeletonWrapper}>
+                                <ChartSkeleton />
+                            </div>
+                        )}
                     </div>
                 </div>
 
