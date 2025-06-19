@@ -13,7 +13,10 @@ interface propsIF {
 export default function TransferDropdown(props: propsIF) {
     const { idForDOM, labelText, active, options, handleChange } = props;
 
+    // boolean controlling whether the dropdown interface is open
     const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    // logic to close the dropdown on an outside click
     const dropdownRef = useRef<HTMLDivElement>(null);
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent): void => {
@@ -29,6 +32,7 @@ export default function TransferDropdown(props: propsIF) {
         return () => document.removeEventListener('click', handleClickOutside);
     }, [isOpen]);
 
+    // boolean whether the user has modified input from initial placeholder
     const [isInitial, setIsInitial] = useState<boolean>(true);
 
     return (
