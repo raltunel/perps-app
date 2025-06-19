@@ -33,7 +33,9 @@ export default function TransferDropdown(props: propsIF) {
     }, [isOpen]);
 
     // boolean whether the user has modified input from initial placeholder
-    const [isInitial, setIsInitial] = useState<boolean>(true);
+    const [isInitial, setIsInitial] = useState<boolean>(
+        !options.includes(active),
+    );
 
     return (
         <div className={styles.transfer_dropdown}>
