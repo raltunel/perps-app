@@ -5,13 +5,13 @@ import { LuChevronDown } from 'react-icons/lu';
 interface propsIF {
     idForDOM: string;
     labelText: string;
-    initial: string;
+    active: string;
     options: string[];
     handleChange: (option: string) => void;
 }
 
 export default function TransferDropdown(props: propsIF) {
-    const { idForDOM, labelText, initial, options, handleChange } = props;
+    const { idForDOM, labelText, active, options, handleChange } = props;
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,12 +29,21 @@ export default function TransferDropdown(props: propsIF) {
         return () => document.removeEventListener('click', handleClickOutside);
     }, [isOpen]);
 
+    const [isInitial, setIsInitial] = useState<boolean>(true);
+
     return (
         <div className={styles.transfer_dropdown}>
             <label htmlFor={idForDOM}>{labelText}</label>
             <div className={styles.dropdown} ref={dropdownRef}>
                 <button onClick={() => setIsOpen(!isOpen)}>
-                    <output id={idForDOM}>{initial}</output>
+                    <output
+                        id={idForDOM}
+                        style={{
+                            color: isInitial ? 'var(--text3)' : 'inherit',
+                        }}
+                    >
+                        {active}
+                    </output>
                     <LuChevronDown size={16} color={'var(--text2)'} />
                 </button>
                 {isOpen && (
@@ -44,6 +53,7 @@ export default function TransferDropdown(props: propsIF) {
                                 key={option}
                                 onClick={() => {
                                     handleChange(option);
+                                    setIsInitial(false);
                                     setIsOpen(false);
                                 }}
                             >

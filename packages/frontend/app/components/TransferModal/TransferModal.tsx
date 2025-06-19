@@ -23,10 +23,13 @@ export default function TransferModal(props: propsIF) {
         .map((subaccount: accountIF) => subaccount.name);
     console.log(accountNames);
 
-    const [fromAccount, setFromAccount] = useState<string>('Master Account');
-    const [toAccount, setToAccount] = useState<string>('Master Account');
-    const [asset, setAsset] = useState<string>('USDe');
+    const [fromAccount, setFromAccount] = useState<string | null>(null);
+    const [toAccount, setToAccount] = useState<string | null>(null);
+    const [asset, setAsset] = useState<string | null>(null);
     const [qty, setQty] = useState<string>('');
+
+    const ACCOUNT_DROPDOWN_INITIAL_TEXT = 'Please select an account';
+    const ASSET_DROPDOWN_INITIAL_TEXT = 'Please select an asset';
 
     return (
         <Modal title='Transfer' close={closeModal}>
@@ -34,21 +37,21 @@ export default function TransferModal(props: propsIF) {
                 <TransferDropdown
                     idForDOM='transfer_dropdown_field_from'
                     labelText='From'
-                    initial={fromAccount}
+                    active={fromAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
                     options={accountNames}
                     handleChange={setFromAccount}
                 />
                 <TransferDropdown
                     idForDOM='transfer_dropdown_field_to'
                     labelText='To'
-                    initial={toAccount}
+                    active={toAccount ?? ACCOUNT_DROPDOWN_INITIAL_TEXT}
                     options={accountNames}
                     handleChange={setToAccount}
                 />
                 <TransferDropdown
                     idForDOM='transfer_dropdown_field_asset'
                     labelText='Asset'
-                    initial={asset}
+                    active={asset ?? ASSET_DROPDOWN_INITIAL_TEXT}
                     options={['USDe', 'BTC']}
                     handleChange={setAsset}
                 />
