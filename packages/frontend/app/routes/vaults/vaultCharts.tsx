@@ -45,6 +45,7 @@ export default function VaultCharts({ info }: VaultChartsProps) {
 
     const parseUserProfileData = (data: any, key: number) => {
         const userPositionData = data[key][1] as UserPositionIF;
+        console.log(userPositionData, key);
 
         if (userPositionData.accountValueHistory) {
             const accountValueHistory =
@@ -128,7 +129,7 @@ export default function VaultCharts({ info }: VaultChartsProps) {
                             label: value,
                             value:
                                 periodOptions.find((opt) => opt.label === value)
-                                    ?.value || 3,
+                                    ?.value ?? 3,
                         })
                     }
                 />
