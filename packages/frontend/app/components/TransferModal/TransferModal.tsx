@@ -3,6 +3,11 @@ import Modal from '../Modal/Modal';
 import TransferDropdown from './TransferDropdown';
 import { useState } from 'react';
 import SimpleButton from '../SimpleButton/SimpleButton';
+import {
+    useAccounts,
+    type accountIF,
+    type useAccountsIF,
+} from '~/stores/AccountsStore';
 
 interface propsIF {
     closeModal: () => void;
@@ -10,6 +15,13 @@ interface propsIF {
 
 export default function TransferModal(props: propsIF) {
     const { closeModal } = props;
+
+    const subAccounts: useAccountsIF = useAccounts();
+
+    const accountNames: string[] = [subAccounts.master]
+        .concat(subAccounts.sub)
+        .map((subaccount: accountIF) => subaccount.name);
+    console.log(accountNames);
 
     const [fromAccount, setFromAccount] = useState<string>('Master Account');
     const [toAccount, setToAccount] = useState<string>('Master Account');
@@ -23,22 +35,14 @@ export default function TransferModal(props: propsIF) {
                     idForDOM='transfer_dropdown_field_from'
                     labelText='From'
                     initial={fromAccount}
-                    options={[
-                        'Master Account',
-                        'Sub-Account 1',
-                        'Sub-Account 2',
-                    ]}
+                    options={accountNames}
                     handleChange={setFromAccount}
                 />
                 <TransferDropdown
                     idForDOM='transfer_dropdown_field_to'
                     labelText='To'
                     initial={toAccount}
-                    options={[
-                        'Master Account',
-                        'Sub-Account 1',
-                        'Sub-Account 2',
-                    ]}
+                    options={accountNames}
                     handleChange={setToAccount}
                 />
                 <TransferDropdown
