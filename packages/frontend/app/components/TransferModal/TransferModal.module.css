@@ -22,13 +22,17 @@
     color: var(--text1);
 }
 
+/**
+ ** something is causing global styles to hit this elem and
+ ** ... I don't know what, please let me know if anyone
+ ** ... finds a good solution and can remove the overrides
+ */
 .asset_qty_input_wrapper > input {
     flex-grow: 1;
     border: none;
     outline: none;
     padding: 0 !important;
-    height: inherit;
-    font-size: inherit !important;
+    font-size: var(--font-size-s) !important;
     background-color: inherit;
     color: inherit;
 }
