@@ -75,7 +75,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             yAxisTicks?.forEach((tick) => {
                 textMeasure = Math.max(
                     textMeasure,
-                    context.measureText(tick.toString()).width,
+                    context.measureText(d3.format(',')(tick)).width,
                 );
             });
 
