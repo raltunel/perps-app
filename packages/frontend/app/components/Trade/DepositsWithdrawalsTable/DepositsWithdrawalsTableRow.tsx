@@ -59,12 +59,10 @@ export default function DepositsWithdrawalsTableRow(
     const { transaction } = props;
     const d = transaction.delta as any;
 
-    // 1) Status
     const getStatusFromDelta = (type: string): string => {
         return 'Completed';
     };
 
-    // 2) Network
     const TOKEN_TO_NETWORK: Record<string, string> = {
         HYPE: 'Hyperliquid',
         PURR: 'Hyperliquid',
