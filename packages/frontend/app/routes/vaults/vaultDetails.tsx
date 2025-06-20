@@ -133,7 +133,7 @@ export default function VaultDetails() {
                         <SimpleButton
                             onClick={onWithdraw}
                             bg='dark3'
-                            hoverBg='dark4'
+                            hoverBg='accent1'
                         >
                             Withdraw
                         </SimpleButton>
