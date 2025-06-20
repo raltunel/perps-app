@@ -15,6 +15,10 @@ import VaultInfo from './vaultInfo';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import ChartSkeleton from '~/components/Skeletons/ChartSkeleton/ChartSkeleton';
 import { motion } from 'framer-motion';
+import { useVaultManager } from './useVaultManager';
+import Modal from '~/components/Modal/Modal';
+import DepositModal from '~/components/Vault/DepositModal/DepositModal';
+import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -32,6 +36,18 @@ export default function VaultDetails() {
     const navigate = useNavigate();
 
     const { getBsColor } = useAppSettings();
+
+    const {
+        selectedVault,
+        modalOpen,
+        modalContent,
+        depositToVault,
+        withdrawFromVault,
+        processDeposit,
+        processWithdraw,
+        closeModal,
+        assignSelectedVault,
+    } = useVaultManager();
 
     useEffect(() => {
         const fetch = async () => {
@@ -55,12 +71,22 @@ export default function VaultDetails() {
         }
     }, [vaultAddress]);
 
+    useEffect(() => {
+        if (vaultDetails) {
+            assignSelectedVault(vaultDetails);
+        }
+    }, [vaultDetails]);
+
     const onWithdraw = () => {
-        console.log('withdraw');
+        if (vaultDetails?.vaultAddress) {
+            withdrawFromVault(vaultDetails.vaultAddress);
+        }
     };
 
     const onDeposit = () => {
-        console.log('deposit');
+        if (vaultDetails?.vaultAddress) {
+            depositToVault(vaultDetails.vaultAddress);
+        }
     };
 
     const renderContent = useCallback(
@@ -236,6 +262,30 @@ export default function VaultDetails() {
                 {vaultAddress && <WebDataConsumer />}
                 <TradeTable vaultPage={true} />
             </div>
+
+            {modalOpen && selectedVault && (
+                <Modal
+                    close={closeModal}
+                    position='center'
+                    title={modalContent === 'deposit' ? 'Deposit' : 'Withdraw'}
+                >
+                    {modalContent === 'deposit' && (
+                        <DepositModal
+                            vault={selectedVault}
+                            onDeposit={processDeposit}
+                            onClose={closeModal}
+                        />
+                    )}
+
+                    {modalContent === 'withdraw' && (
+                        <WithdrawModal
+                            vault={selectedVault}
+                            onWithdraw={processWithdraw}
+                            onClose={closeModal}
+                        />
+                    )}
+                </Modal>
+            )}
         </>
     );
 }
