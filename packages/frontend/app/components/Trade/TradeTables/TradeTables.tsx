@@ -16,6 +16,8 @@ import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
 import { Pages, usePage } from '~/hooks/usePage';
 import { useDebugStore } from '~/stores/DebugStore';
+import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
+import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 export interface FilterOption {
     id: string;
     label: string;
@@ -36,10 +38,12 @@ const filterOptions: FilterOption[] = [
 interface TradeTableProps {
     portfolioPage?: boolean;
     vaultPage?: boolean;
+    vaultFetched?: boolean;
+    vaultDepositors?: VaultFollowerStateIF[];
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage, vaultPage } = props;
+    const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -69,6 +73,10 @@ export default function TradeTable(props: TradeTableProps) {
             'Order History',
             'Deposits and Withdrawals',
         ];
+
+        if (vaultPage) {
+            availableTabs.push('Depositors');
+        }
 
         if (page === Pages.TRADE) {
             return availableTabs.filter(
@@ -192,6 +200,13 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             case 'Deposits and Withdrawals':
                 return <DepositsWithdrawalsTable />;
+            case 'Depositors':
+                return (
+                    <VaultDepositorsTable
+                        isFetched={vaultFetched ?? false}
+                        data={vaultDepositors ?? []}
+                    />
+                );
             default:
                 return (
                     <div className={styles.emptyState}>
