@@ -38,6 +38,9 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
         configureAmount: false,
         limitPrice: false,
     });
+    const [chaseDistance, setChaseDistance] = useState('');
+    const [chaseMode, setChaseMode] = useState<'usd' | 'symbol'>('usd');
+
     const {
         isReduceOnlyEnabled,
         isTakeProfitEnabled,
@@ -167,10 +170,14 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             </div>
             {isChasingIntervalEnabled && (
                 <ChaseDistance
-                    value=''
-                    onChange={() => {}}
-                    selectedMode='percentage'
-                    setSelectedMode={() => {}}
+                    value={chaseDistance}
+                    onChange={(val) => {
+                        if (typeof val === 'string') setChaseDistance(val);
+                        else if ('target' in val)
+                            setChaseDistance(val.target.value);
+                    }}
+                    selectedMode={chaseMode}
+                    setSelectedMode={setChaseMode}
                     symbol='ETH'
                     ariaLabel='Chase distance input'
                 />
