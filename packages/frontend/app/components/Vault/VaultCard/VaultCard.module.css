@@ -1,4 +1,4 @@
-.container {
+.vault_card {
     --container-min-width: 300px;
     --container-width: 350px;
     --container-height: 290px;
@@ -7,9 +7,8 @@
     --apr-display-width: 50px;
 
     display: flex;
-    padding: var(--padding-m);
     flex-direction: column;
-    align-items: center;
+    padding: var(--padding-m);
     gap: var(--gap-m);
     border-radius: var(--radius-m);
     background: var(--bg-dark2, #111117);
@@ -17,6 +16,7 @@
     height: var(--container-height);
     flex: 1 1 var(--container-width); /* Grow, shrink, and basis */
 }
+
 .headerContainer {
     width: 100%;
     display: flex;

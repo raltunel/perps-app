@@ -35,7 +35,7 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
     const { formatCurrency, formatAPR } = useVaultManager();
 
     return (
-        <div className={styles.container}>
+        <div className={styles.vault_card}>
             <div className={styles.headerContainer}>
                 <div className={styles.perpsMarkLogo}>
                     <img
