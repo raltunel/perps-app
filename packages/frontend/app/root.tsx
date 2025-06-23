@@ -202,7 +202,6 @@ export default function App() {
                                 </ComponentErrorBoundary>
                             </div>
                         </TutorialProvider>
-                        <RuntimeDomManipulation />
                         {showReload && (
                             <div
                                 style={{
@@ -213,7 +212,7 @@ export default function App() {
                                     textAlign: 'center',
                                 }}
                             >
-                                A new version is available.{' '}
+                                A new version is available.
                                 <button
                                     onClick={() => window.location.reload()}
                                 >
@@ -221,6 +220,7 @@ export default function App() {
                                 </button>
                             </div>
                         )}
+                        <RuntimeDomManipulation />
                     </SdkProvider>
                 </AppProvider>
             </Layout>
