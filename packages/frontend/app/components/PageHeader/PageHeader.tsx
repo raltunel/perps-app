@@ -37,7 +37,7 @@ export default function PageHeader() {
     const { symbol } = useTradeDataStore();
 
     const navLinks = [
-        { name: 'Trade3', path: `/trade/${symbol}` },
+        { name: 'Trade4', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
         { name: 'Portfolio', path: '/portfolio' },
         { name: 'Referrals', path: '/referrals' },

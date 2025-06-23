@@ -202,6 +202,7 @@ export default function App() {
                                 </ComponentErrorBoundary>
                             </div>
                         </TutorialProvider>
+                        <RuntimeDomManipulation />
                         {showReload && (
                             <div
                                 style={{
@@ -210,6 +211,7 @@ export default function App() {
                                     width: '100%',
                                     background: 'yellow',
                                     textAlign: 'center',
+                                    color: 'black',
                                 }}
                             >
                                 A new version is available.
@@ -220,7 +222,6 @@ export default function App() {
                                 </button>
                             </div>
                         )}
-                        <RuntimeDomManipulation />
                     </SdkProvider>
                 </AppProvider>
             </Layout>
