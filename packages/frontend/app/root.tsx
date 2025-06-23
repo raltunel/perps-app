@@ -217,6 +217,7 @@ export default function App() {
                                 A new version is available.
                                 <button
                                     onClick={() => window.location.reload()}
+                                    style={{ color: 'green' }}
                                 >
                                     Reload
                                 </button>
