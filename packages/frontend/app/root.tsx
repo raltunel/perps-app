@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -12,17 +12,17 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
+import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import { useTradeDataStore } from './stores/TradeDataStore';
-import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
-import { AppProvider } from './contexts/AppContext';
-import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -108,7 +108,45 @@ export function Layout({ children }: { children: React.ReactNode }) {
     );
 }
 
+function useVersionCheck() {
+    const [showReload, setShowReload] = useState(false);
+    const currentVersion = useRef(null);
+
+    useEffect(() => {
+        // Fetch the version file on load
+        fetch('/version.json', { cache: 'no-store' })
+            .then((res) => res.json())
+            .then((data) => {
+                currentVersion.current = data.version;
+            });
+
+        // Poll for changes every 5 minutes
+        const interval = setInterval(
+            () => {
+                fetch('/version.json', { cache: 'no-store' })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        if (
+                            currentVersion.current &&
+                            data.version !== currentVersion.current
+                        ) {
+                            setShowReload(true);
+                        }
+                    });
+            },
+            30 * 1000, // 30 seconds
+            // 5 * 60 * 1000, // 5 minutes
+        );
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return showReload;
+}
+
 export default function App() {
+    const showReload = useVersionCheck();
+
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
     const { setInternetConnected, internetConnected, wsReconnecting } =
@@ -165,6 +203,24 @@ export default function App() {
                             </div>
                         </TutorialProvider>
                         <RuntimeDomManipulation />
+                        {showReload && (
+                            <div
+                                style={{
+                                    position: 'fixed',
+                                    bottom: 0,
+                                    width: '100%',
+                                    background: 'yellow',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                A new version is available.{' '}
+                                <button
+                                    onClick={() => window.location.reload()}
+                                >
+                                    Reload
+                                </button>
+                            </div>
+                        )}
                     </SdkProvider>
                 </AppProvider>
             </Layout>
