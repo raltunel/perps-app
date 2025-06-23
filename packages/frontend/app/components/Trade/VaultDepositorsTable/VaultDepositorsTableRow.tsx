@@ -1,6 +1,7 @@
 import useNumFormatter from '~/hooks/useNumFormatter';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import styles from './VaultDepositorsTable.module.css';
+import { formatAddress } from '~/utils/Utils';
 
 interface VaultDepositorsTableRowProps {
     depositor: VaultFollowerStateIF;
@@ -15,7 +16,9 @@ export default function VaultDepositorsTableRow(
 
     return (
         <div className={styles.rowContainer}>
-            <div className={`${styles.cell}`}>{depositor.user}</div>
+            <div className={`${styles.cell}`}>
+                {formatAddress(depositor.user)}
+            </div>
             <div className={`${styles.cell}`}>
                 {formatNum(depositor.vaultEquity, 2, true, true)}
             </div>

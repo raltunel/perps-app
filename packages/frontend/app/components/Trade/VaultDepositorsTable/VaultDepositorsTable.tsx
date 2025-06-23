@@ -52,6 +52,8 @@ export default function VaultDepositorsTable(props: VaultDepositorTableProps) {
                 skeletonColRatios={[1, 0.8, 0.8, 0.8, 0.8]}
                 defaultSortBy={'vaultEquity'}
                 defaultSortDirection={'desc'}
+                slicedLimit={100}
+                heightOverride={'30vh'}
             />
         </>
     );

@@ -26,7 +26,10 @@ export interface FilterOption {
 const tradePageBlackListTabs = new Set([
     'Funding History',
     'Deposits and Withdrawals',
+    'Depositors',
 ]);
+
+const portfolioPageBlackListTabs = new Set(['Depositors']);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -82,6 +85,10 @@ export default function TradeTable(props: TradeTableProps) {
             return availableTabs.filter(
                 (tab) => !tradePageBlackListTabs.has(tab),
             );
+        } else if (page === Pages.PORTFOLIO) {
+            return availableTabs.filter(
+                (tab) => !portfolioPageBlackListTabs.has(tab),
+            );
         }
         return availableTabs;
     }, [page]);
@@ -101,6 +108,10 @@ export default function TradeTable(props: TradeTableProps) {
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
+        } else if (page === Pages.PORTFOLIO) {
+            if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
                 handleTabChange('Positions');
             }
         }
