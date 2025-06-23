@@ -134,7 +134,7 @@ function useVersionCheck() {
                         }
                     });
             },
-            30 * 1000, // 30 seconds
+            15 * 1000, // 15 seconds
             // 5 * 60 * 1000, // 5 minutes
         );
 
