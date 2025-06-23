@@ -34,8 +34,6 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
 
     const { formatCurrency, formatAPR } = useVaultManager();
 
-    console.log(apr);
-
     return (
         <div className={styles.vault_card}>
             <div className={styles.headerContainer}>
