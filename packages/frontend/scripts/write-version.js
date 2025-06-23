@@ -13,10 +13,10 @@ const __dirname = path.dirname(__filename);
 
 console.log('Writing version information to version.json...');
 console.log(`Version: ${version.version}`);
-console.log(`Output directory: ${__filename}`);
-console.log(`Output directory: ${__dirname}`);
+console.log(`filename : ${__filename}`);
+console.log(`dirname: ${__dirname}`);
 
-const outDir = path.join(__dirname, '../packages/frontend/build/client');
+const outDir = path.join(__dirname, '../build/client');
 
 console.log(`Output directory: ${outDir}`);
 if (!fs.existsSync(outDir)) {
