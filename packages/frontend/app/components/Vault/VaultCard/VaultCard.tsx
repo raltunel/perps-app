@@ -34,6 +34,8 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
 
     const { formatCurrency, formatAPR } = useVaultManager();
 
+    console.log(apr);
+
     return (
         <div className={styles.vault_card}>
             <div className={styles.headerContainer}>
@@ -49,19 +51,22 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
                     <h3>{name}</h3>
                     <h6>{description}</h6>
                 </div>
-                <div className={styles.moreInfoContainer}>
-                    <Link
-                        to={`/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
-                    >
-                        More Info
-                    </Link>
-                </div>
+                <Link
+                    className={styles.more_info}
+                    to={`/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
+                >
+                    More Info
+                </Link>
             </div>
 
-            <div className={styles.detailsContainer}>
+            <div className={styles.details}>
                 <div className={styles.detailsItem}>
                     <h4>APR</h4>
-                    <h5>{formatAPR(apr)}</h5>
+                    <h5
+                        style={{ color: `var(--${apr > 0 ? 'green' : 'red'})` }}
+                    >
+                        {formatAPR(apr)}
+                    </h5>
                 </div>
 
                 <div className={styles.detailsItem}>
