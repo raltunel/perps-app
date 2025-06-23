@@ -43,8 +43,12 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
-    const [chartWidth, setChartWidth] = useState<number>(900);
-    const [chartHeight, setChartHeight] = useState<number>(300);
+    const [chartWidth, setChartWidth] = useState<number>(
+        Math.max(850 - (1250 - window.innerWidth), 250),
+    );
+    const [chartHeight, setChartHeight] = useState<number>(
+        Math.max(250 - (870 - window.innerHeight), 100),
+    );
 
     const parseUserProfileData = (data: any, key: string) => {
         const userPositionData = data.get(key) as UserPositionIF;

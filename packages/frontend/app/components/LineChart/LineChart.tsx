@@ -32,6 +32,11 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     const [yScale, setYScale] =
         React.useState<d3.ScaleLinear<number, number>>();
 
+    const [svgXScale, setSvgXScale] =
+        React.useState<d3.ScaleTime<number, number>>();
+    const [svgYScale, setSvgYScale] =
+        React.useState<d3.ScaleLinear<number, number>>();
+
     const [yAxisTicks, setYAxisTicks] = React.useState<Array<number>>();
     const [yAxisPadding, setYAxisPadding] = React.useState<number>(50);
 
@@ -44,7 +49,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const maxPrice = d3.max(lineData, (d) => d.value);
 
             if (minPrice !== undefined && maxPrice !== undefined) {
-                const tickCount = chartHeight - 50 > 150 ? 5 : 2;
+                const tickCount = Math.max(chartHeight - 50, 100) > 150 ? 5 : 2;
 
                 const diff = maxPrice - minPrice;
 
@@ -59,7 +64,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 setYAxisTicks(() => ticks);
             }
         }
-    }, [lineData, chartName]);
+    }, [lineData, chartName, chartHeight]);
 
     // Calculate Y axis width based on ticks
     useEffect(() => {
@@ -92,6 +97,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
+        const dpr = window.devicePixelRatio || 1;
+
         const minDate = d3.min(lineData, (d) => d.time);
         const maxDate = d3.max(lineData, (d) => d.time);
 
@@ -103,10 +110,15 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const xScale = d3
                 .scaleTime()
-                .domain([new Date(minDate), new Date(maxDate + padding)])
-                .range([0, chartWidth - yAxisPadding]);
+                .domain([new Date(minDate), new Date(maxDate + padding)]);
+
+            const svgXScale = xScale.copy();
+
+            svgXScale.range([0, chartWidth - yAxisPadding]);
+            xScale.range([0, (chartWidth - yAxisPadding) * dpr]);
 
             setXScale(() => xScale);
+            setSvgXScale(() => svgXScale);
         }
 
         const minPrice = d3.min(lineData, (d) => d.value);
@@ -133,23 +145,36 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
                 const yScale = d3
                     .scaleLinear()
-                    .domain([bottomBoundaryCanFit, topBoundaryCanFit])
-                    .range([chartHeight - 50, 0]);
+                    .domain([bottomBoundaryCanFit, topBoundaryCanFit]);
+
+                const svgYScale = yScale.copy();
+
+                svgYScale.range([0, Math.max(chartHeight - 50, 100)]);
+                yScale.range([(chartHeight - 50) * dpr, 0]);
 
                 setYScale(() => yScale);
+                setSvgYScale(() => svgYScale);
             }
         }
-    }, [yAxisTicks, yAxisPadding, chartName]);
+    }, [yAxisTicks !== undefined, yAxisPadding, chartName]);
 
     useEffect(() => {
         if (yAxisPadding === undefined) return;
-        setCanvasInitialHeight(() => chartHeight - 50);
-        setCanvasInitialWidth(() => chartWidth - yAxisPadding);
+
+        const dpr = window.devicePixelRatio || 1;
+
+        setCanvasInitialHeight(() => Math.max(chartHeight - 50, 100) * dpr);
+        setCanvasInitialWidth(() => (chartWidth - yAxisPadding) * dpr);
     }, [yAxisPadding]);
 
     useEffect(() => {
-        yScale && yScale.range([chartHeight - 50, 0]);
-        xScale && xScale.range([0, chartWidth - yAxisPadding]);
+        const dpr = window.devicePixelRatio || 1;
+
+        yScale && yScale.range([Math.max(chartHeight - 50, 100) * dpr, 0]);
+        xScale && xScale.range([0, (chartWidth - yAxisPadding) * dpr]);
+
+        svgYScale && svgYScale.range([Math.max(chartHeight - 50, 100), 0]);
+        svgXScale && svgXScale.range([0, chartWidth - yAxisPadding]);
     }, [chartHeight, chartWidth, yScale, xScale]);
 
     useEffect(() => {
@@ -160,19 +185,20 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const font = 'var(--font-family-main)';
         const fontSize = 'var(--font-size-s)';
 
-        if (xScale) {
+        if (svgXScale) {
             svgXAxis.select('g').remove();
 
-            const tickScale = xScale.copy();
+            const tickScale = svgXScale.copy();
 
             const diff =
-                xScale.domain()[1].getTime() - xScale.domain()[0].getTime();
+                svgXScale.domain()[1].getTime() -
+                svgXScale.domain()[0].getTime();
 
             const padding = diff / 40;
 
             tickScale.domain([
-                new Date(xScale.domain()[0].getTime() + padding),
-                new Date(xScale.domain()[1].getTime() - padding),
+                new Date(svgXScale.domain()[0].getTime() + padding),
+                new Date(svgXScale.domain()[1].getTime() - padding),
             ]);
 
             svgXAxis
@@ -192,13 +218,13 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('font-size', fontSize);
         }
 
-        if (yScale && yAxisTicks && yAxisPadding) {
+        if (svgYScale && yAxisTicks && yAxisPadding) {
             svgYAxis.select('g').remove();
 
             svgYAxis
                 .append('g')
                 .attr('id', 'yAxisGroup')
-                .call(d3.axisRight(yScale).tickValues(yAxisTicks))
+                .call(d3.axisRight(svgYScale).tickValues(yAxisTicks))
                 .select('.domain')
                 .remove();
 
@@ -214,7 +240,15 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .style('text-anchor', 'end')
                 .style('font-size', fontSize);
         }
-    }, [yScale, xScale, numFormat, yAxisTicks, yAxisPadding]);
+    }, [
+        svgXScale,
+        svgYScale,
+        numFormat,
+        yAxisTicks,
+        yAxisPadding,
+        chartHeight,
+        chartWidth,
+    ]);
 
     useEffect(() => {
         if (
@@ -234,7 +268,9 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const height =
                 chartHeight || canvas.getBoundingClientRect()?.height;
 
-            context.clearRect(0, 0, width, height - 50);
+            const dpr = window.devicePixelRatio || 1;
+
+            context.clearRect(0, 0, width * dpr, (height - 50) * dpr);
 
             const line = d3
                 .line<{ time: number; value: number }>()
@@ -245,7 +281,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             context.beginPath();
             line(lineData);
-            context.lineWidth = 2;
+            context.lineWidth = 2 * dpr;
             context.strokeStyle = '#7371fc';
             context.stroke();
 
@@ -254,7 +290,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 context.lineTo(xScale(xScale.domain()[1]), yScale(tick));
             });
             context.strokeStyle = 'rgba(189,189,189,0.15)';
-            context.lineWidth = 2;
+            context.lineWidth = 2 * dpr;
             context.stroke();
         }
     }, [
@@ -262,7 +298,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         xScale !== undefined,
         lineData,
         chartName,
-        yAxisTicks,
+        // yAxisTicks,
         canvasInitialHeight,
         canvasInitialWidth,
     ]);
@@ -284,7 +320,14 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                         >
                             <svg
                                 id='yAxis'
-                                height={chartHeight - 50}
+                                style={{
+                                    minHeight: '100px',
+                                    minWidth: '100px',
+                                    width: yAxisPadding + 'px',
+                                    height:
+                                        Math.max(chartHeight - 50, 100) + 'px',
+                                }}
+                                height={Math.max(chartHeight - 50, 100)}
                                 width={yAxisPadding}
                             />
 
@@ -293,13 +336,18 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                                 style={{
                                     minWidth: '100px',
                                     minHeight: '100px',
-                                    height: chartHeight - 50 + 'px',
+                                    height:
+                                        Math.max(
+                                            100,
+                                            chartHeight - 50,
+                                        ).toString() + 'px',
                                     width: chartWidth - yAxisPadding + 'px',
-                                    maxHeight: chartHeight - 50 + 'px',
+                                    maxHeight:
+                                        Math.max(chartHeight - 50, 100) + 'px',
                                     maxWidth: chartWidth - yAxisPadding + 'px',
                                 }}
                                 width={canvasInitialWidth}
-                                height={canvasInitialHeight}
+                                height={Math.max(100, canvasInitialHeight)}
                             />
                         </div>
                         <div className={styles.xAxisContainer}>
