@@ -17,6 +17,8 @@ console.log(`Output directory: ${__filename}`);
 console.log(`Output directory: ${__dirname}`);
 
 const outDir = path.join(__dirname, '../packages/frontend/build/client');
+
+console.log(`Output directory: ${outDir}`);
 if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
 }
