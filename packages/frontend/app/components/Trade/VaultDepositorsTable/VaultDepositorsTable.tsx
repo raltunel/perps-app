@@ -22,10 +22,6 @@ export default function VaultDepositorsTable(props: VaultDepositorTableProps) {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const viewAllLink = useMemo(() => {
-        return `/openOrders/${debugWallet.address}`;
-    }, [debugWallet.address]);
-
     return (
         <>
             <GenericTable<VaultFollowerStateIF, VaultDepositorSortBy>
@@ -47,7 +43,7 @@ export default function VaultDepositorsTable(props: VaultDepositorTableProps) {
                 sorterMethod={sortVaultDepositors}
                 pageMode={false}
                 isFetched={isFetched}
-                viewAllLink={viewAllLink}
+                viewAllLink={''}
                 skeletonRows={7}
                 skeletonColRatios={[1, 0.8, 0.8, 0.8, 0.8]}
                 defaultSortBy={'vaultEquity'}
