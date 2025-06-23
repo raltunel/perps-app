@@ -7,16 +7,11 @@ const version = {
     version: new Date().toISOString(),
 };
 
-// Get the directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('Writing version information to version.json...');
-console.log(`Version: ${version.version}`);
-console.log(`filename : ${__filename}`);
-console.log(`dirname: ${__dirname}`);
-
-const outDir = path.join(__dirname, '../build/client');
+// Write to the public directory so it gets copied to the build output
+const outDir = path.join(__dirname, '../public');
 
 console.log(`Output directory: ${outDir}`);
 if (!fs.existsSync(outDir)) {
