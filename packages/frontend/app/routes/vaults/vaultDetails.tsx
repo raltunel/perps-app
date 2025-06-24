@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useInfoApi } from '~/hooks/useInfoApi';
