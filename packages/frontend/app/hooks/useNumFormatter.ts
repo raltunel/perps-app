@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
@@ -6,6 +6,8 @@ import type { OrderRowResolutionIF } from '~/utils/orderbook/OrderBookIFs';
 export function useNumFormatter() {
     const { numFormat } = useAppSettings();
     const { coinPriceMap, selectedCurrency } = useTradeDataStore();
+    const coinPriceMapRef = useRef(coinPriceMap);
+    coinPriceMapRef.current = coinPriceMap;
 
     const parseNum = useCallback((val: string | number) => {
         return Number(val);
@@ -92,6 +94,8 @@ export function useNumFormatter() {
             currencyConversion: boolean = false,
             showDollarSign: boolean = false,
             addPlusSignIfPositive: boolean = false,
+            compact: boolean = false,
+            compactThreshold: number = 10000,
         ) => {
             const formatType = numFormat.value;
 
@@ -105,21 +109,40 @@ export function useNumFormatter() {
 
             if (currencyConversion && selectedCurrency !== 'USD') {
                 num = parseNum(num);
-                num = num / (coinPriceMap.get(selectedCurrency) || 1);
+                num =
+                    num / (coinPriceMapRef.current.get(selectedCurrency) || 1);
             }
 
-            let formattedNum = num.toLocaleString(formatType, {
-                minimumFractionDigits: precisionVal || getDefaultPrecision(num),
-                maximumFractionDigits: precisionVal || getDefaultPrecision(num),
-            });
+            const numValue = parseNum(num);
 
-            // to handle if a static precision has given as parameter but its causing all zeros issue
-            if (isAllZeroFormatted(formattedNum)) {
-                formattedNum = num.toLocaleString(formatType, {
-                    minimumFractionDigits: getDefaultPrecision(num),
-                    maximumFractionDigits: getDefaultPrecision(num),
+            let formattedNum = '';
+
+            // Use compact notation if requested and number exceeds threshold
+            if (compact && Math.abs(numValue) >= compactThreshold) {
+                formattedNum = numValue.toLocaleString(formatType, {
+                    notation: 'compact',
+                    compactDisplay: 'short',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 1,
                 });
+            } else {
+                // Use regular formatting
+                formattedNum = numValue.toLocaleString(formatType, {
+                    minimumFractionDigits:
+                        precisionVal || getDefaultPrecision(num),
+                    maximumFractionDigits:
+                        precisionVal || getDefaultPrecision(num),
+                });
+
+                // to handle if a static precision has given as parameter but its causing all zeros issue
+                if (isAllZeroFormatted(formattedNum)) {
+                    formattedNum = numValue.toLocaleString(formatType, {
+                        minimumFractionDigits: getDefaultPrecision(num),
+                        maximumFractionDigits: getDefaultPrecision(num),
+                    });
+                }
             }
+
             let result = '';
             if (currencyConversion) {
                 result = fillWithCurrencyChar(
@@ -141,19 +164,45 @@ export function useNumFormatter() {
             numFormat,
             parseNum,
             getDefaultPrecision,
-            coinPriceMap,
             selectedCurrency,
+            isAllZeroFormatted,
+            fillWithCurrencyChar,
         ],
     );
 
+    // Add a specific currency formatting function similar to your useNumberFormatter
+    const currency = useCallback(
+        (
+            value: number,
+            compact: boolean = false,
+            currencyCode: string = 'USD',
+            threshold: number = 10000,
+        ): string => {
+            const showDollarSign = currencyCode === 'USD';
+            return formatNum(
+                value,
+                compact && Math.abs(value) >= threshold ? 1 : 2,
+                false,
+                showDollarSign,
+                false,
+                compact,
+                threshold,
+            );
+        },
+        [formatNum],
+    );
+
     const formatNumWithOnlyDecimals = useCallback(
-        (num: number | string, precision?: number) => {
-            const formattedNum = formatNum(num, precision);
+        (num: number, precision?: number) => {
             const { group } = getSeparators(numFormat.value);
+
+            precision = getPrecisionFromNumber(num);
+
+            const formattedNum = formatNum(num, precision);
 
             return formattedNum.replace(new RegExp(`\\${group}`, 'g'), '');
         },
-        [formatNum],
+        [formatNum, numFormat],
     );
 
     const parseFormattedWithOnlyDecimals = useCallback(
@@ -216,6 +265,7 @@ export function useNumFormatter() {
 
     return {
         formatNum,
+        currency, // New currency function with compact support
         formatPriceForChart,
         decimalPrecision,
         getDefaultPrecision,

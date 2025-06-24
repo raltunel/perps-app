@@ -43,6 +43,8 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
+    const [chartWidth, setChartWidth] = useState<number>(900);
+    const [chartHeight, setChartHeight] = useState<number>(300);
 
     const parseUserProfileData = (data: any, key: string) => {
         const userPositionData = data.get(key) as UserPositionIF;
@@ -101,13 +103,31 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
     ]);
 
+    window.addEventListener('resize', () => {
+        const height = window.innerHeight;
+        const width = window.innerWidth;
+        if (height < 870) {
+            setChartHeight(() => Math.max(250 - (870 - height), 100));
+        } else {
+            setChartHeight(() => 250);
+        }
+
+        if (width < 1250) {
+            setChartWidth(() => Math.max(850 - (1250 - width), 250));
+        } else {
+            setChartWidth(() => 900);
+        }
+    });
+
     return (
-        <>
+        <div>
             {activeTab === 'Performance' && pnlHistory && (
                 <LineChart
                     lineData={pnlHistory}
                     curve={'step'}
                     chartName={selectedVault.value + selectedPeriod.value}
+                    height={chartHeight}
+                    width={chartWidth}
                 />
             )}
 
@@ -116,11 +136,13 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                     lineData={accountValueHistory}
                     curve={'step'}
                     chartName={selectedVault.value + selectedPeriod.value}
+                    height={chartHeight}
+                    width={chartWidth}
                 />
             )}
 
             {activeTab === 'Collateral' && <CollateralPieChart />}
-        </>
+        </div>
     );
 };
 

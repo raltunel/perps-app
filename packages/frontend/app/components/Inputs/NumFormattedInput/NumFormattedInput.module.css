@@ -1,0 +1,8 @@
+.numFormattedInput {
+    background-color: transparent;
+    outline: none;
+    border: none;
+    text-align: right;
+    color: var(--text1);
+    cursor: pointer;
+}
