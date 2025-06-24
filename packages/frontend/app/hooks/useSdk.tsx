@@ -1,15 +1,8 @@
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
-import { useIsClient } from './useIsClient';
-import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
+import { DEMO_USER, Exchange, Info, type Environment } from '@perps-app/sdk';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useIsClient } from './useIsClient';
 
 type SdkContextType = {
     info: Info | null;

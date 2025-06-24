@@ -7,8 +7,9 @@ import {
     FaUserSecret,
 } from 'react-icons/fa';
 import { IoIosInformationCircle } from 'react-icons/io';
-import styles from './DropdownMenu.module.css';
 import { useTutorial } from '~/hooks/useTutorial';
+import packageJson from '../../../../package.json';
+import styles from './DropdownMenu.module.css';
 
 const menuItems = [
     { name: 'Docs', icon: <FaFileAlt /> },
@@ -44,7 +45,7 @@ const DropdownMenu = () => {
             >
                 Tutorial <IoIosInformationCircle size={22} />
             </button>
-            <div className={styles.version}>Version: 1.4</div>
+            <div className={styles.version}>Version: {packageJson.version}</div>
             <button className={styles.logoutButton}>Log Out</button>
         </div>
     );
