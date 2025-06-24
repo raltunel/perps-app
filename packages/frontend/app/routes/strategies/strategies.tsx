@@ -1,15 +1,15 @@
+import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import Tabs from '~/components/Tabs/Tabs';
+import SortIcon from '~/components/Vault/SortIcon';
 import {
     useStrategiesStore,
     type strategyDecoratedIF,
 } from '~/stores/StrategiesStore';
-import styles from './strategies.module.css';
-import { useNavigate } from 'react-router';
-import Tabs from '~/components/Tabs/Tabs';
-import { motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
-import SortIcon from '~/components/Vault/SortIcon';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { externalResources } from '~/utils/Constants';
+import styles from './strategies.module.css';
 
 // interface for table column header metadata
 export interface headerItemIF {
@@ -73,7 +73,7 @@ export default function Strategies() {
             output = [...data].sort(
                 (a: strategyDecoratedIF, b: strategyDecoratedIF) =>
                     a.name
-                        .toLowerCase()
+                        ?.toLowerCase()
                         .localeCompare(b.name.toLocaleLowerCase()),
             );
         } else if (sortBy.cell === 'status') {
@@ -94,7 +94,7 @@ export default function Strategies() {
             output = [...data].sort(
                 (a: strategyDecoratedIF, b: strategyDecoratedIF) =>
                     a.collateral
-                        .toLowerCase()
+                        ?.toLowerCase()
                         .localeCompare(b.collateral.toLocaleLowerCase()),
             );
         } else {
