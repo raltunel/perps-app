@@ -4,6 +4,7 @@ import { create } from 'zustand';
 export interface AnnouncementStoreIF {
     wasViewed: string[];
     markViewed: (a: string) => void;
+    checkIfViewed: (a: string) => boolean;
 }
 
 // the actual data store
@@ -12,4 +13,5 @@ export const useAnnouncementStore = create<AnnouncementStoreIF>((set, get) => ({
     wasViewed: [],
     markViewed: (a: string): void =>
         set({ wasViewed: [...get().wasViewed, a] }),
+    checkIfViewed: (a: string): boolean => get().wasViewed.includes(a),
 }));
