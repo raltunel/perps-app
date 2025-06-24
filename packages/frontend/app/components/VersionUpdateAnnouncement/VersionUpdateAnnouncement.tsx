@@ -1,8 +1,8 @@
 import React from 'react';
 
-import styles from './VersionUpdateAnnouncement.module.css';
 import Announcement from '../Announcement/Announcement';
 import SimpleButton from '../SimpleButton/SimpleButton';
+import styles from './VersionUpdateAnnouncement.module.css';
 
 interface VersionUpdateAnnouncementProps {
     onClose?: () => void;
