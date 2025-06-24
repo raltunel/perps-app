@@ -14,6 +14,7 @@
     width: var(--container-width);
     height: var(--container-height);
     flex: 1 1 var(--container-width); /* Grow, shrink, and basis */
+    user-select: none;
 }
 
 .headerContainer {
@@ -81,6 +82,7 @@
 .detail_item > h5 {
     font-size: var(--font-size-m);
     color: var(--text1, #f0f0f8);
+    user-select: text;
 }
 
 .depositContainer {
