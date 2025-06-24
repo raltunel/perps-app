@@ -22,6 +22,7 @@ export function useVersionCheck() {
                             currentVersion.current &&
                             data.version !== currentVersion.current
                         ) {
+                            currentVersion.current = data.version;
                             setShowReload(true);
                         }
                     });
