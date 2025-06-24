@@ -83,12 +83,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         if (!orderBookSection) return;
 
         let availableHeight = orderBookSection.getBoundingClientRect().height;
-        if (
-            window.innerHeight / availableHeight < 1.5 &&
-            window.innerHeight < 1000
-        ) {
-            availableHeight = window.innerHeight / 1.5;
-        }
 
         if (availableHeight <= 0) return;
 
