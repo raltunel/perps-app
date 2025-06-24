@@ -2,8 +2,7 @@
     --container-min-width: 300px;
     --container-width: 350px;
     --container-height: 290px;
-    --logo-width-height: 60px;
-    --logo-padding: 7.5px;
+    --logo-width-height: 45px;
     --apr-display-width: 50px;
 
     display: flex;
@@ -40,20 +39,10 @@
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s);
 }
-.perpsMarkLogo {
-    display: flex;
+
+.market_logo {
     width: var(--logo-width-height);
     height: var(--logo-width-height);
-    padding: var(--logo-padding);
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    border-radius: 50%;
-}
-
-.perpsMarkLogo img {
-    max-width: 100%;
-    max-height: 100%;
 }
 
 .more_info {

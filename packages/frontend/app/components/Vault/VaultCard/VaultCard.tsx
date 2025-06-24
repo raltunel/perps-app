@@ -37,14 +37,13 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
     return (
         <div className={styles.vault_card}>
             <div className={styles.headerContainer}>
-                <div className={styles.perpsMarkLogo}>
-                    <img
-                        src={
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png'
-                        }
-                        alt={`${name} logo`}
-                    />
-                </div>
+                <img
+                    className={styles.market_logo}
+                    src={
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png'
+                    }
+                    alt={`${name} logo`}
+                />
                 <div className={styles.headerTextContainer}>
                     <h3>{name}</h3>
                     <h6>{description}</h6>
