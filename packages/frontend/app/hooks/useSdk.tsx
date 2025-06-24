@@ -9,6 +9,7 @@ import React, {
 import { useIsClient } from './useIsClient';
 import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useDebugStore } from '~/stores/DebugStore';
 
 type SdkContextType = {
     info: Info | null;
@@ -28,6 +29,7 @@ export const SdkProvider: React.FC<{
     const [shouldReconnect, setShouldReconnect] = useState(false);
 
     const { internetConnected, setWsReconnecting } = useTradeDataStore();
+    const { isWsSleepMode, setIsWsSleepMode } = useDebugStore();
 
     // commit to trigger deployment
     useEffect(() => {
@@ -84,6 +86,15 @@ export const SdkProvider: React.FC<{
             clearInterval(reconnectInterval);
         };
     }, [internetConnected, isClient, info, shouldReconnect]);
+
+    useEffect(() => {
+        if (!isClient) return;
+        if (isWsSleepMode) {
+            info?.wsManager?.setSleepMode(true);
+        } else {
+            info?.wsManager?.setSleepMode(false);
+        }
+    }, [isWsSleepMode, info]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>

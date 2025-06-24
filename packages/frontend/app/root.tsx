@@ -110,7 +110,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
-    const { wsEnvironment } = useDebugStore();
+    const { wsEnvironment, setIsWsSleepMode, isWsSleepMode } = useDebugStore();
     const { setInternetConnected, internetConnected, wsReconnecting } =
         useTradeDataStore();
 
@@ -121,13 +121,24 @@ export default function App() {
         const offlineListener = () => {
             setInternetConnected(false);
         };
+        const visibilityListener = () => {
+            if (document.visibilityState === 'hidden') {
+                console.log('>>> pause ws', new Date().toISOString());
+                setIsWsSleepMode(true);
+            } else {
+                console.log('>>> resume ws', new Date().toISOString());
+                setIsWsSleepMode(false);
+            }
+        };
 
         window.addEventListener('online', onlineListener);
         window.addEventListener('offline', offlineListener);
+        window.addEventListener('visibilitychange', visibilityListener);
 
         return () => {
             window.removeEventListener('online', onlineListener);
             window.removeEventListener('offline', offlineListener);
+            window.removeEventListener('visibilitychange', visibilityListener);
         };
     }, []);
 
