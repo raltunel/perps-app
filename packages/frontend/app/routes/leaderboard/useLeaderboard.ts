@@ -64,7 +64,7 @@ export const useLeaderboard = (initialData: LeaderboardData[]) => {
 
         // Apply search filter
         if (searchQuery.trim()) {
-            const lowercaseQuery = searchQuery.toLowerCase();
+            const lowercaseQuery = searchQuery?.toLowerCase();
             dataToProcess = dataToProcess.filter((item) =>
                 item.trader?.toLowerCase().includes(lowercaseQuery),
             );
