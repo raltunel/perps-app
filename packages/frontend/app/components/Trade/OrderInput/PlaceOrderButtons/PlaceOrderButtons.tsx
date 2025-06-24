@@ -1,9 +1,13 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
+import {
+    HiOutlineChevronDoubleDown,
+    HiOutlineChevronDoubleUp,
+} from 'react-icons/hi2';
 
 interface propsIF {
     orderMarketPrice: string;
@@ -25,6 +29,9 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
 
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
+
+    // State for scrolling through items
+    const [currentStartIndex, setCurrentStartIndex] = useState(0);
 
     const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
     const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
@@ -123,14 +130,42 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         [infoDataMap, orderMarketPrice, marketInfoData],
     );
 
+    // Calculate visible items and navigation state
+    const itemsToShow = 2;
+    const hasMoreItems = useMemo(
+        () => dataToUse.length > itemsToShow,
+        [dataToUse, itemsToShow],
+    );
+    const canScrollDown = useMemo(
+        () => currentStartIndex + itemsToShow < dataToUse.length,
+        [currentStartIndex, dataToUse.length, itemsToShow],
+    );
+    const canScrollUp = useMemo(
+        () => currentStartIndex > 0,
+        [currentStartIndex],
+    );
+
     const handleBuyClick = useCallback(
         () => openModalWithContent('confirm_buy'),
         [openModalWithContent],
     );
+
     const handleSellClick = useCallback(
         () => openModalWithContent('confirm_sell'),
         [openModalWithContent],
     );
+
+    const handleScroll = useCallback(() => {
+        if (canScrollDown) {
+            // Scroll down to show next items
+            setCurrentStartIndex((prev) =>
+                Math.min(prev + 1, dataToUse.length - itemsToShow),
+            );
+        } else if (canScrollUp) {
+            // If at bottom, reset to top
+            setCurrentStartIndex(0);
+        }
+    }, [canScrollDown, canScrollUp, dataToUse.length, itemsToShow]);
 
     return (
         <div className={styles.place_order_buttons}>
@@ -151,22 +186,52 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                 </button>
             </div>
             <div className={styles.input_details}>
-                {dataToUse.map((data: MarketInfoItem, idx: number) => (
-                    <div key={data.label + idx}>
-                        <div className={styles.detail_label}>
-                            <span>{data.label}</span>
-                            <Tooltip
-                                content={data.tooltipLabel}
-                                position='right'
+                <div className={styles.details_viewport}>
+                    <div
+                        className={styles.details_container}
+                        style={{
+                            transform: `translateY(-${(currentStartIndex * 100) / itemsToShow}%)`,
+                        }}
+                    >
+                        {dataToUse.map((data: MarketInfoItem, idx: number) => (
+                            <div
+                                key={data.label + idx}
+                                className={styles.detail_item}
                             >
-                                <AiOutlineQuestionCircle size={13} />
-                            </Tooltip>
-                        </div>
-                        <span className={styles.detail_value}>
-                            {data.value}
-                        </span>
+                                <div className={styles.detail_label}>
+                                    <span>{data.label}</span>
+                                    <Tooltip
+                                        content={data.tooltipLabel}
+                                        position='right'
+                                    >
+                                        <AiOutlineQuestionCircle size={13} />
+                                    </Tooltip>
+                                </div>
+                                <span className={styles.detail_value}>
+                                    {data.value}
+                                </span>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
+
+                {hasMoreItems && (
+                    <button
+                        className={styles.scroll_button}
+                        onClick={handleScroll}
+                        aria-label='Scroll through details'
+                    >
+                        {canScrollDown ? (
+                            <HiOutlineChevronDoubleDown
+                                className={styles.scroll_icon}
+                            />
+                        ) : (
+                            <HiOutlineChevronDoubleUp
+                                className={styles.scroll_icon}
+                            />
+                        )}
+                    </button>
+                )}
             </div>
         </div>
     );

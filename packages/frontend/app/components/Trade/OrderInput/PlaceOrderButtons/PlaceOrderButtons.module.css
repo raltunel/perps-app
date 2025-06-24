@@ -50,20 +50,38 @@
 .overlay_button:hover::before {
     background: rgba(0, 0, 0, 0.2);
 }
+
 .input_details {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    /* change from 2px to 4px */
-    gap: var(--gap-xs);
-    padding: var(--padding-s) 0px;
     align-self: stretch;
     border-radius: var(--radius-s);
+    position: relative;
+    overflow: visible;
     border: 1px solid var(--bg-dark4, #27272c);
 }
 
-.input_details > * {
+.details_viewport {
+    width: 100%;
+    height: calc(
+        var(--input-detail-item-height) * 2 + var(--gap-xs) + 14px
+    ); /* Height for exactly 2 items + padding */
+    overflow: hidden;
+    padding: var(--padding-s) 0px 0px 0px;
+    position: relative;
+}
+
+.details_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.detail_item {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -72,6 +90,7 @@
     font-size: var(--font-size-s);
     padding: 0 var(--padding-s);
     height: var(--input-detail-item-height);
+    flex-shrink: 0;
 }
 
 .detail_label {
@@ -84,4 +103,48 @@
 
 .detail_value {
     color: var(--text1);
+}
+
+.scroll_button {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-dark2, #1a1a1f);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text2);
+    transition: color 0.2s ease;
+    z-index: 2;
+}
+
+.scroll_button:hover {
+    color: var(--text1);
+    background: var(--bg-dark2, #0f0f14);
+}
+
+.scroll_button:focus {
+    outline: 2px solid var(--accent-color, #007bff);
+    outline-offset: 2px;
+}
+
+.scroll_button:focus-visible {
+    outline: 2px solid var(--accent-color, #007bff);
+    outline-offset: 2px;
+}
+
+.scroll_icon {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+}
+
+.details_viewport::before,
+.details_viewport::after {
+    display: none;
 }
