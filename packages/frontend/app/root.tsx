@@ -24,6 +24,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import { useDebugStore } from './stores/DebugStore';
 import { useTradeDataStore } from './stores/TradeDataStore';
+import VersionUpdateAnnouncement from './components/VersionUpdateAnnouncement/VersionUpdateAnnouncement';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -168,26 +169,7 @@ export default function App() {
                             </div>
                         </TutorialProvider>
                         <RuntimeDomManipulation />
-                        {showReload && (
-                            <div
-                                style={{
-                                    position: 'fixed',
-                                    bottom: 0,
-                                    width: '100%',
-                                    background: 'yellow',
-                                    textAlign: 'center',
-                                    color: 'black',
-                                }}
-                            >
-                                A new version is available.{' '}
-                                <button
-                                    onClick={() => window.location.reload()}
-                                    style={{ color: 'green' }}
-                                >
-                                    Reload
-                                </button>
-                            </div>
-                        )}
+                        {showReload && <VersionUpdateAnnouncement />}
                     </SdkProvider>
                 </AppProvider>
             </Layout>
