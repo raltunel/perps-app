@@ -31,6 +31,7 @@
     gap: var(--gap-xs);
     flex: 1 0 0;
 }
+
 .headerTextContainer h3 {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-l);
@@ -66,19 +67,22 @@
     gap: auto;
 }
 
-.detailsItem {
+.detail_item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
 }
-.detailsItem h4 {
+
+.detail_item > h4 {
     font-size: var(--font-size-xs);
     color: var(--text2, #bcbcc4);
 }
-.detailsItem h5 {
-    font-size: var(--font-size-s);
+
+.detail_item > h5 {
+    font-size: var(--font-size-m);
     color: var(--text1, #f0f0f8);
 }
+
 .depositContainer {
     width: 100%;
     display: flex;

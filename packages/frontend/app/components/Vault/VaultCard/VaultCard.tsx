@@ -57,7 +57,7 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
             </div>
 
             <div className={styles.details}>
-                <div className={styles.detailsItem}>
+                <div className={styles.detail_item}>
                     <h4>APR</h4>
                     <h5
                         style={{ color: `var(--${apr > 0 ? 'green' : 'red'})` }}
@@ -66,12 +66,12 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
                     </h5>
                 </div>
 
-                <div className={styles.detailsItem}>
+                <div className={styles.detail_item}>
                     <h4>Total Deposited</h4>
                     <h5>{formatCurrency(totalDeposited, unit)}</h5>
                 </div>
 
-                <div className={styles.detailsItem}>
+                <div className={styles.detail_item}>
                     <h4>Total Capacity</h4>
                     <h5>{formatCurrency(totalCapacity, unit)}</h5>
                 </div>
