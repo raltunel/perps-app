@@ -12,33 +12,6 @@ import styles from './Modal.module.css';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 
-interface positionCSS {
-    position?: 'fixed';
-    top?: string;
-    bottom?: string;
-    left?: string;
-    right?: string;
-}
-
-const positionStyles: Record<positions, positionCSS> = {
-    center: {
-        position: 'fixed',
-        top: '0',
-        bottom: '0',
-    },
-    bottomRight: {
-        position: 'fixed',
-        bottom: '0',
-        right: '0',
-    },
-    bottomSheet: {
-        position: 'fixed',
-        bottom: '0',
-        left: '0',
-        right: '0',
-    },
-};
-
 interface ModalProps {
     close?: () => void;
     position?: positions;
