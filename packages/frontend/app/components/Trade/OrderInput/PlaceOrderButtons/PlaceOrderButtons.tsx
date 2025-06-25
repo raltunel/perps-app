@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { motion } from 'framer-motion';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -23,6 +24,7 @@ interface MarketInfoItem {
     value: string;
 }
 
+// In case of any bugs or issues with this component, please reach out to Jr.
 const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     const { orderMarketPrice, openModalWithContent, orderValue, leverage } =
         props;
@@ -30,8 +32,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
 
-    // State for scrolling through items
-    const [currentStartIndex, setCurrentStartIndex] = useState(0);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
     const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
@@ -130,20 +131,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         [infoDataMap, orderMarketPrice, marketInfoData],
     );
 
-    // Calculate visible items and navigation state
-    const itemsToShow = 2;
-    const hasMoreItems = useMemo(
-        () => dataToUse.length > itemsToShow,
-        [dataToUse, itemsToShow],
-    );
-    const canScrollDown = useMemo(
-        () => currentStartIndex + itemsToShow < dataToUse.length,
-        [currentStartIndex, dataToUse.length, itemsToShow],
-    );
-    const canScrollUp = useMemo(
-        () => currentStartIndex > 0,
-        [currentStartIndex],
-    );
+    const hasMoreItems = useMemo(() => dataToUse.length > 2, [dataToUse]);
 
     const handleBuyClick = useCallback(
         () => openModalWithContent('confirm_buy'),
@@ -155,17 +143,9 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         [openModalWithContent],
     );
 
-    const handleScroll = useCallback(() => {
-        if (canScrollDown) {
-            // Scroll down to show next items
-            setCurrentStartIndex((prev) =>
-                Math.min(prev + 1, dataToUse.length - itemsToShow),
-            );
-        } else if (canScrollUp) {
-            // If at bottom, reset to top
-            setCurrentStartIndex(0);
-        }
-    }, [canScrollDown, canScrollUp, dataToUse.length, itemsToShow]);
+    const handleToggleExpand = useCallback(() => {
+        setIsExpanded((prev) => !prev);
+    }, []);
 
     return (
         <div className={styles.place_order_buttons}>
@@ -185,54 +165,88 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                     Sell / Short
                 </button>
             </div>
-            <div className={styles.input_details}>
+            <motion.div
+                className={`${styles.input_details} ${isExpanded ? styles.expanded : ''}`}
+                layout
+                transition={{
+                    duration: 0.3,
+                    ease: [0.4, 0.0, 0.2, 1],
+                }}
+            >
                 <div className={styles.details_viewport}>
-                    <div
-                        className={styles.details_container}
-                        style={{
-                            transform: `translateY(-${(currentStartIndex * 100) / itemsToShow}%)`,
-                        }}
-                    >
-                        {dataToUse.map((data: MarketInfoItem, idx: number) => (
-                            <div
-                                key={data.label + idx}
-                                className={styles.detail_item}
-                            >
-                                <div className={styles.detail_label}>
-                                    <span>{data.label}</span>
-                                    <Tooltip
-                                        content={data.tooltipLabel}
-                                        position='right'
-                                    >
-                                        <AiOutlineQuestionCircle size={13} />
-                                    </Tooltip>
-                                </div>
-                                <span className={styles.detail_value}>
-                                    {data.value}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
+                    <motion.div className={styles.details_container} layout>
+                        {dataToUse.map((data: MarketInfoItem, idx: number) => {
+                            const isVisible = idx < 2 || isExpanded;
+
+                            if (!isVisible) return null;
+
+                            return (
+                                <motion.div
+                                    key={data.label + idx}
+                                    className={styles.detail_item}
+                                    layout
+                                    initial={
+                                        idx >= 2 ? { opacity: 0, y: 10 } : false
+                                    }
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{
+                                        duration: 0.2,
+                                        delay: idx >= 2 ? (idx - 2) * 0.05 : 0,
+                                        ease: [0.4, 0.0, 0.2, 1],
+                                    }}
+                                >
+                                    <div className={styles.detail_label}>
+                                        <span>{data.label}</span>
+                                        <Tooltip
+                                            content={data.tooltipLabel}
+                                            position='right'
+                                        >
+                                            <AiOutlineQuestionCircle
+                                                size={13}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                    <span className={styles.detail_value}>
+                                        {data.value}
+                                    </span>
+                                </motion.div>
+                            );
+                        })}
+                    </motion.div>
                 </div>
 
                 {hasMoreItems && (
-                    <button
+                    <motion.button
                         className={styles.scroll_button}
-                        onClick={handleScroll}
-                        aria-label='Scroll through details'
+                        onClick={handleToggleExpand}
+                        aria-label={
+                            isExpanded ? 'Collapse details' : 'Expand details'
+                        }
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
                     >
-                        {canScrollDown ? (
-                            <HiOutlineChevronDoubleDown
-                                className={styles.scroll_icon}
-                            />
-                        ) : (
-                            <HiOutlineChevronDoubleUp
-                                className={styles.scroll_icon}
-                            />
-                        )}
-                    </button>
+                        <motion.div
+                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                            transition={{
+                                duration: 0.2,
+                                ease: [0.4, 0.0, 0.2, 1],
+                            }}
+                        >
+                            {isExpanded ? (
+                                <HiOutlineChevronDoubleUp
+                                    className={styles.scroll_icon}
+                                />
+                            ) : (
+                                <HiOutlineChevronDoubleDown
+                                    className={styles.scroll_icon}
+                                />
+                            )}
+                        </motion.div>
+                    </motion.button>
                 )}
-            </div>
+            </motion.div>
         </div>
     );
 });
