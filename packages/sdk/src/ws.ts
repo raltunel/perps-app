@@ -164,6 +164,7 @@ export class WebsocketManager {
     }
 
     private connect = () => {
+        console.log('>>> connect', new Date().toISOString());
         const wsUrl =
             'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
         this.log('Connecting to', wsUrl);
@@ -214,6 +215,7 @@ export class WebsocketManager {
                 //     // no need to reconnect if connection state is open
                 //     return;
                 // }
+                console.log('>>> pong problem', new Date().toISOString());
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
@@ -324,6 +326,7 @@ export class WebsocketManager {
     };
 
     private onClose = () => {
+        console.log('>>> onClose', new Date().toISOString());
         this.log('onClose');
         this.wsReady = false;
         if (this.pingInterval !== null && !this.stopped) {
@@ -389,6 +392,7 @@ export class WebsocketManager {
     }
 
     private stashSubscriptions = () => {
+        console.log('>>> stashSubscriptions', new Date().toISOString());
         const oldSubscriptions = { ...this.allSubscriptions };
         this.stop();
 
@@ -530,6 +534,7 @@ export class WebsocketManager {
     }
 
     public reconnect() {
+        console.log('>>> reconnecting', new Date().toISOString());
         this.stashSubscriptions();
         setTimeout(() => {
             this.connect();
@@ -537,6 +542,16 @@ export class WebsocketManager {
     }
 
     public setSleepMode(sleepMode: boolean) {
+        if (this.sleepMode === sleepMode) return;
         this.sleepMode = sleepMode;
+        if (sleepMode) {
+            this.stashSubscriptions();
+            this.ws.close();
+            this.pongReceived = true;
+        } else {
+            setTimeout(() => {
+                this.connect();
+            }, 2000);
+        }
     }
 }
