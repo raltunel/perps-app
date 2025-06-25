@@ -53,10 +53,6 @@ function useOrderSlots(orders: OrderBookRowIF[]) {
 const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const { info } = useSdk();
 
-    useEffect(() => {
-        console.log('>>> orderCount', orderCount);
-    }, [orderCount]);
-
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         return dummyOrderRow?.getBoundingClientRect()?.height || 16;

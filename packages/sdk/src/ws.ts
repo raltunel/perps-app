@@ -414,14 +414,6 @@ export class WebsocketManager {
         callback: Callback,
         subscriptionId?: number,
     ): number {
-        if (subscription.type === 'trades' || subscription.type === 'l2Book') {
-            console.log(
-                '>>> subscribe',
-                subscription,
-                callback,
-                subscriptionId,
-            );
-        }
         if (subscriptionId == null) {
             this.subscriptionIdCounter += 1;
             subscriptionId = this.subscriptionIdCounter;

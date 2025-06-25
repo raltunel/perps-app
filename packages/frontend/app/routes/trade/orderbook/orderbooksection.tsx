@@ -87,9 +87,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         if (availableHeight <= 0) return;
 
         let otherHeightSum = 0;
-        if (orderBookModeRef.current === 'stacked') {
-            availableHeight /= 2;
-        }
 
         ['orderBookTabs', 'orderBookHeader1', 'orderBookHeader2'].forEach(
             (id) => {
@@ -97,12 +94,22 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                 if (el) otherHeightSum += el.getBoundingClientRect().height;
             },
         );
+
+        if (orderBookModeRef.current === 'stacked') {
+            // divide available height by 2 for stacked mode
+            availableHeight /= 2;
+        } else if (orderBookModeRef.current === 'tab') {
+            // subtract 10px for tab mode to make it equal with large mode (border difference between two types)
+            otherHeightSum -= 10;
+        }
         const calculatedOrderCount = Math.floor(
             (availableHeight - otherHeightSum) / (orderRowHeightWithGaps * 2),
         );
         if (orderCount !== calculatedOrderCount)
             setOrderCount(calculatedOrderCount);
-        setTradesCount(Math.floor(availableHeight / orderRowHeightWithGaps));
+        setTradesCount(
+            Math.floor(availableHeight / orderRowHeightWithGaps) - 1,
+        );
     }, [orderCount, orderBookMode]);
 
     // Resize effect
