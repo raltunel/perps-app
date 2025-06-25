@@ -14,9 +14,7 @@ import PageHeader from './components/PageHeader/PageHeader';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
-import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
 import VersionUpdateAnnouncement from './components/VersionUpdateAnnouncement/VersionUpdateAnnouncement';
-import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
@@ -24,7 +22,7 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useVersionCheck } from './hooks/useVersionCheck';
 import { useDebugStore } from './stores/DebugStore';
-import { useTradeDataStore } from './stores/TradeDataStore';
+import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -114,46 +112,15 @@ export default function App() {
     const { showReload, setShowReload } = useVersionCheck();
 
     // Use memoized value to prevent unnecessary re-renders
-    const { wsEnvironment, setIsWsSleepMode, isWsSleepMode } = useDebugStore();
-    const { setInternetConnected, internetConnected, wsReconnecting } =
-        useTradeDataStore();
-
-    useEffect(() => {
-        const onlineListener = () => {
-            setInternetConnected(true);
-        };
-        const offlineListener = () => {
-            setInternetConnected(false);
-        };
-        const visibilityListener = () => {
-            if (document.visibilityState === 'hidden') {
-                console.log('>>> pause ws', new Date().toISOString());
-                setIsWsSleepMode(true);
-            } else {
-                console.log('>>> resume ws', new Date().toISOString());
-                setIsWsSleepMode(false);
-            }
-        };
-
-        window.addEventListener('online', onlineListener);
-        window.addEventListener('offline', offlineListener);
-        window.addEventListener('visibilitychange', visibilityListener);
-
-        return () => {
-            window.removeEventListener('online', onlineListener);
-            window.removeEventListener('offline', offlineListener);
-            window.removeEventListener('visibilitychange', visibilityListener);
-        };
-    }, []);
+    const { wsEnvironment } = useDebugStore();
 
     return (
         <>
             <Layout>
                 <AppProvider>
                     <SdkProvider environment={wsEnvironment}>
-                        {!internetConnected && <NoConnectionIndicator />}
-                        {wsReconnecting && <WsReconnectingIndicator />}
                         <TutorialProvider>
+                            <WsConnectionChecker />
                             <div className='root-container'>
                                 {/* Added error boundary for header */}
                                 <ComponentErrorBoundary>
