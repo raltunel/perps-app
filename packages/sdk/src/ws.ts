@@ -537,6 +537,18 @@ export class WebsocketManager {
     }
 
     public setSleepMode(sleepMode: boolean) {
+        if (this.sleepMode === sleepMode) return;
         this.sleepMode = sleepMode;
+
+        // that block can be used to close the connection instead of ignoring messages.
+        // if (sleepMode) {
+        //     this.stashSubscriptions();
+        //     this.ws.close();
+        //     this.pongReceived = true;
+        // } else {
+        //     setTimeout(() => {
+        //         this.connect();
+        //     }, 2000);
+        // }
     }
 }
