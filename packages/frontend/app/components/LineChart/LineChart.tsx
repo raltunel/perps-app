@@ -84,9 +84,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 );
             });
 
-            const paddingFactor = textMeasure > 40 ? 1.5 : 2;
-
-            setYAxisPadding(() => textMeasure + textMeasure / paddingFactor);
+            setYAxisPadding(() => textMeasure + textMeasure / 1.5);
         }
     }, [yAxisTicks]);
 
@@ -156,7 +154,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 setSvgYScale(() => svgYScale);
             }
         }
-    }, [yAxisTicks !== undefined, yAxisPadding, chartName]);
+    }, [yAxisTicks !== undefined, yAxisPadding, lineData]);
 
     useEffect(() => {
         if (yAxisPadding === undefined) return;
@@ -234,7 +232,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .select('g')
                 .selectAll('text')
                 .attr('fill', fillStyle)
-                .attr('x', yAxisPadding - 5)
+                .attr('x', yAxisPadding - 10)
                 .attr('shape-rendering', 'crispEdges')
                 .style('font-family', font)
                 .style('text-anchor', 'end')
@@ -293,15 +291,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.lineWidth = 2 * dpr;
             context.stroke();
         }
-    }, [
-        yScale !== undefined,
-        xScale !== undefined,
-        lineData,
-        chartName,
-        // yAxisTicks,
-        canvasInitialHeight,
-        canvasInitialWidth,
-    ]);
+    }, [yScale, xScale, canvasInitialHeight, canvasInitialWidth]);
 
     return (
         <>
@@ -322,7 +312,6 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                                 id='yAxis'
                                 style={{
                                     minHeight: '100px',
-                                    minWidth: '100px',
                                     width: yAxisPadding + 'px',
                                     height:
                                         Math.max(chartHeight - 50, 100) + 'px',

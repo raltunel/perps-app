@@ -44,7 +44,9 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
     const [parsedKey, setParsedKey] = useState<string>();
     const [chartWidth, setChartWidth] = useState<number>(
-        Math.max(850 - (1250 - window.innerWidth), 250),
+        window.innerWidth > 768
+            ? Math.min(850, window.innerWidth - 50)
+            : window.innerWidth - 50,
     );
     const [chartHeight, setChartHeight] = useState<number>(
         Math.max(250 - (870 - window.innerHeight), 100),
@@ -110,16 +112,21 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     window.addEventListener('resize', () => {
         const height = window.innerHeight;
         const width = window.innerWidth;
+
+        if (width > 768) {
+            if (width < 1250) {
+                setChartWidth(() => Math.max(850 - (1250 - width), 250));
+            } else {
+                setChartWidth(() => 900);
+            }
+        } else {
+            setChartWidth(() => width - 50);
+        }
+
         if (height < 870) {
             setChartHeight(() => Math.max(250 - (870 - height), 100));
         } else {
             setChartHeight(() => 250);
-        }
-
-        if (width < 1250) {
-            setChartWidth(() => Math.max(850 - (1250 - width), 250));
-        } else {
-            setChartWidth(() => 900);
         }
     });
 
