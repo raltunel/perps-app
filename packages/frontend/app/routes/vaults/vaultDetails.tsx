@@ -73,7 +73,6 @@ export default function VaultDetails() {
 
     useEffect(() => {
         if (vaultDetails) {
-            console.log('assignSelectedVault', vaultDetails);
             assignSelectedVault(vaultDetails);
         }
     }, [vaultDetails]);
