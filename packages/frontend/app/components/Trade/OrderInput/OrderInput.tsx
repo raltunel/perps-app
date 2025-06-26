@@ -739,7 +739,7 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='buy'
                                     isEnabled={
-                                        activeOptions.skipOpenOrderConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
@@ -753,7 +753,7 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='sell'
                                     isEnabled={
-                                        activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipClosePositionConfirm
                                     }
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
