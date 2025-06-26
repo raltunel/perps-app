@@ -9,6 +9,7 @@ import React, {
 import { MdClose } from 'react-icons/md';
 import { useMobile } from '~/hooks/useMediaQuery';
 import styles from './Modal.module.css';
+import { useAnnouncementStore } from '~/stores/AnnouncementStore';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 
@@ -19,6 +20,7 @@ interface ModalProps {
     mobileBreakpoint?: number;
     forceBottomSheet?: boolean;
     title: string;
+    limiter?: string;
 }
 
 function Modal(props: ModalProps) {
@@ -29,7 +31,10 @@ function Modal(props: ModalProps) {
         mobileBreakpoint = 768,
         forceBottomSheet = false,
         title,
+        limiter,
     } = props;
+
+    const announcements = useAnnouncementStore();
 
     const isMobile = useMobile(mobileBreakpoint);
 
@@ -54,6 +59,7 @@ function Modal(props: ModalProps) {
 
     // Memoize the close handler to prevent unnecessary re-renders
     const handleClose = useCallback((): void => {
+        if (limiter) announcements.markViewed(limiter);
         if (actualPosition === 'bottomSheet') {
             setAnimation(styles.slideDown);
             setTimeout(() => {
