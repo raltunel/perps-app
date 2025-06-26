@@ -1,17 +1,31 @@
-import { useEffect, useRef } from 'react';
-import styles from './WsConnectionChecker.module.css';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useEffect, useRef, useState } from 'react';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import NoConnectionIndicator from '../NoConnectionIndicator/NoConnectionIndicator';
 import WsReconnectingIndicator from '../WsReconnectingIndicator/WsReconnectingIndicator';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useInfoApi } from '~/hooks/useInfoApi';
+import { useNumFormatter } from '~/hooks/useNumFormatter';
+
+const PRICE_UPDATE_INTERVAL = 1000 * 60;
+const WS_SLEEP_TIMEOUT = 1000 * 10;
 
 export default function WsConnectionChecker() {
     // Use memoized value to prevent unnecessary re-renders
-    const { setIsWsSleepMode } = useDebugStore();
+    const { setIsWsSleepMode, isWsSleepMode } = useDebugStore();
     const isTabPassive = useRef(false);
     const sleepModeTimeout = useRef<NodeJS.Timeout | null>(null);
     const { setInternetConnected, internetConnected, wsReconnecting } =
-        useTradeDataStore();
+        useAppStateStore();
+
+    const titleSetterIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [tokenId, setTokenId] = useState<string>('');
+
+    const { fetchTokenId, fetchTokenDetails } = useInfoApi();
+
+    const { symbol } = useTradeDataStore();
+    const { setTitleOverride } = useAppStateStore();
+    const { formatNum } = useNumFormatter();
 
     useEffect(() => {
         const onlineListener = () => {
@@ -31,7 +45,7 @@ export default function WsConnectionChecker() {
                         setIsWsSleepMode(true);
                         console.log('>>> pause ws', new Date().toISOString());
                     }
-                }, 10000);
+                }, WS_SLEEP_TIMEOUT);
             } else {
                 isTabPassive.current = false;
                 if (sleepModeTimeout.current) {
@@ -56,6 +70,36 @@ export default function WsConnectionChecker() {
         };
     }, []);
 
+    useEffect(() => {
+        if (symbol && isWsSleepMode) {
+            const fetcher = async () => {
+                const tokenId = await fetchTokenId(symbol);
+                setTokenId(tokenId);
+            };
+            fetcher();
+
+            titleSetterIntervalRef.current = setInterval(async () => {
+                if (tokenId) {
+                    const tokenDetails = await fetchTokenDetails(tokenId);
+                    setTitleOverride(
+                        `.. ${tokenDetails.markPx ? '$' + formatNum(tokenDetails.markPx) + ' | ' : ''} ${symbol?.toUpperCase() ? symbol?.toUpperCase() + ' | ' : ''}Ambient`,
+                    );
+                }
+            }, PRICE_UPDATE_INTERVAL);
+        } else {
+            if (titleSetterIntervalRef.current) {
+                clearInterval(titleSetterIntervalRef.current);
+            }
+            setTitleOverride('');
+        }
+
+        return () => {
+            if (titleSetterIntervalRef.current) {
+                clearInterval(titleSetterIntervalRef.current);
+            }
+        };
+    }, [isWsSleepMode, symbol, tokenId]);
+
     return (
         <>
             {!internetConnected && <NoConnectionIndicator />}
@@ -63,3 +107,4 @@ export default function WsConnectionChecker() {
         </>
     );
 }
+('');
