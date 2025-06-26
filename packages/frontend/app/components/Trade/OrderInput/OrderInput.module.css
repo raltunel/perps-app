@@ -25,7 +25,7 @@
     gap: var(--gap-s);
     overflow-y: scroll;
     /* subtract height of placeorderbuttons.tsx */
-    height: calc(100% - 165px);
+    height: calc(100% - 150px);
 }
 .mainContent::-webkit-scrollbar {
     display: none;
