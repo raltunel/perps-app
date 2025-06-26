@@ -75,16 +75,18 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         if (!context) return;
 
         if (yAxisTicks) {
-            let textMeasure = 30;
+            const textMeasure: Array<number> = [];
 
             yAxisTicks?.forEach((tick) => {
-                textMeasure = Math.max(
-                    textMeasure,
+                textMeasure.push(
                     context.measureText(d3.format(',')(tick)).width,
                 );
             });
 
-            setYAxisPadding(() => textMeasure + textMeasure / 1.5);
+            const maxTextWidth = d3.max(textMeasure);
+
+            maxTextWidth &&
+                setYAxisPadding(() => maxTextWidth + maxTextWidth / 1.5);
         }
     }, [yAxisTicks]);
 
@@ -232,7 +234,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .select('g')
                 .selectAll('text')
                 .attr('fill', fillStyle)
-                .attr('x', yAxisPadding - 10)
+                .attr('x', yAxisPadding - 5)
                 .attr('shape-rendering', 'crispEdges')
                 .style('font-family', font)
                 .style('text-anchor', 'end')
