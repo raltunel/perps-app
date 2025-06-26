@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAnnouncementStore } from '~/stores/AnnouncementStore';
 
 // interface for return value of hook
 export interface useModalIF {
@@ -15,15 +14,8 @@ export interface useModalIF {
 //      number → modal will auto-open after X milliseconds
 type modalDefaultStates = 'open' | 'closed' | number;
 
-interface modalConfigIF {
-    defaultState?: modalDefaultStates;
-    limiterSlug?: string;
-}
-
 // main fn body for hook
-export function useModal(modalConfig?: modalConfigIF): useModalIF {
-    const announcement = useAnnouncementStore();
-
+export function useModal(defaultState?: modalDefaultStates): useModalIF {
     // variable to track if modal is open on initial render
     let shouldOpenAtRender: boolean;
 
@@ -32,7 +24,7 @@ export function useModal(modalConfig?: modalConfigIF): useModalIF {
     const isFirstOpening = useRef<boolean>(true);
 
     // logic tree to determine if modal is open on initial render
-    switch (modalConfig?.defaultState) {
+    switch (defaultState) {
         // open if hook is instantiated that way
         case 'open':
             // check if an auto-open has already occurred
@@ -66,11 +58,11 @@ export function useModal(modalConfig?: modalConfigIF): useModalIF {
     // logic to open the modal after a delay
     useEffect(() => {
         // do not execute unless hook instantiated with a number
-        if (typeof modalConfig?.defaultState !== 'number') return;
+        if (typeof defaultState !== 'number') return;
         // timeout to open modal after time set in parameter
         const openAfterDelay: NodeJS.Timeout = setTimeout(
             () => openModal(),
-            modalConfig.defaultState,
+            defaultState,
         );
         // clear the effect from the DOM when elem dismounts
         return () => clearTimeout(openAfterDelay);
