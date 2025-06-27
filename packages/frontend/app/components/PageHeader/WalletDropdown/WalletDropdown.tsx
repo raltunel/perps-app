@@ -1,6 +1,7 @@
 import React from 'react';
 import { BiLinkExternal } from 'react-icons/bi';
 import { FiCopy } from 'react-icons/fi';
+import { useNavigate } from 'react-router';
 import styles from './WalletDropdown.module.css';
 
 interface PropsIF {
@@ -31,7 +32,9 @@ const TokenDisplay = () => {
 };
 
 export default function WalletDropdown(props: PropsIF) {
-    const { setIsUserConnected, isDropdown } = props;
+    const { setIsUserConnected, isDropdown, setIsWalletMenuOpen } = props;
+
+    const navigate = useNavigate();
 
     return (
         <div
@@ -64,10 +67,21 @@ export default function WalletDropdown(props: PropsIF) {
             </section>
 
             <section className={styles.actionButtons}>
-                <button className={styles.accountButton}>Account</button>
+                <button
+                    className={styles.portfolioButton}
+                    onClick={() => {
+                        navigate('/portfolio', { viewTransition: true });
+                        setIsWalletMenuOpen(false);
+                    }}
+                >
+                    Portfolio
+                </button>
                 <button
                     className={styles.logoutButton}
-                    onClick={() => setIsUserConnected(false)}
+                    onClick={() => {
+                        setIsUserConnected(false);
+                        setIsWalletMenuOpen(false);
+                    }}
                 >
                     Logout
                 </button>
