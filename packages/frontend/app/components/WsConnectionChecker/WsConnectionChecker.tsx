@@ -82,7 +82,7 @@ export default function WsConnectionChecker() {
                 if (tokenId) {
                     const tokenDetails = await fetchTokenDetails(tokenId);
                     setTitleOverride(
-                        `.. ${tokenDetails.markPx ? '$' + formatNum(tokenDetails.markPx) + ' | ' : ''} ${symbol?.toUpperCase() ? symbol?.toUpperCase() + ' | ' : ''}Ambient`,
+                        `${tokenDetails.markPx ? '$' + formatNum(tokenDetails.markPx) + ' | ' : ''} ${symbol?.toUpperCase() ? symbol?.toUpperCase() + ' | ' : ''}Ambient`,
                     );
                 }
             }, PRICE_UPDATE_INTERVAL);

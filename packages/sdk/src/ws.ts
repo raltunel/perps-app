@@ -551,4 +551,9 @@ export class WebsocketManager {
         //     }, 2000);
         // }
     }
+
+    public stashWebsocket() {
+        this.stashSubscriptions();
+        this.ws.close();
+    }
 }
