@@ -1,5 +1,6 @@
 import { IoIosClose } from 'react-icons/io';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useApp } from '~/contexts/AppContext';
 import { useTutorial } from '~/hooks/useTutorial';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import styles from './HelpDropdown.module.css';
@@ -12,6 +13,8 @@ export default function HelpDropdown(props: propsIF) {
     const { setIsHelpDropdownOpen } = props;
 
     const { handleRestartTutorial } = useTutorial();
+
+    const { isUserConnected } = useApp();
 
     const { openWithdrawModal, PortfolioModalsRenderer } = usePortfolioModals();
 
@@ -32,6 +35,7 @@ export default function HelpDropdown(props: propsIF) {
                         onClick={() => {
                             openWithdrawModal();
                         }}
+                        disabled={!isUserConnected}
                     >
                         Withdraw
                     </SimpleButton>
