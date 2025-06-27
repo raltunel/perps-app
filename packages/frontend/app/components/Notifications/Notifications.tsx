@@ -15,6 +15,7 @@ import { useVersionCheck } from '~/hooks/useVersionCheck';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import { MdClose } from 'react-icons/md';
 import { useKeydown } from '~/hooks/useKeydown';
+import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 
 export default function Notifications() {
     const { enableTxNotifications, enableBackgroundFillNotif } =
@@ -42,7 +43,7 @@ export default function Notifications() {
         return unsubscribe;
     }, [debugWallet, info]);
 
-    const postNotification = useCallback((payload) => {
+    const postNotification = useCallback((payload: NotificationMsg) => {
         if (!payload || !payload.data) return;
         const notification = payload.data.notification;
         if (backgroundFillNotifRef.current && notification) {
