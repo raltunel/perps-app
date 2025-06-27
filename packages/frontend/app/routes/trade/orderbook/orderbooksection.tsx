@@ -46,9 +46,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     const orderBookComponent = useMemo(
         () =>
             orderCount > 0 ? (
-                <div className={styles.orderbookInTab}>
-                    <OrderBook symbol={symbol} orderCount={orderCount} />
-                </div>
+                <OrderBook symbol={symbol} orderCount={orderCount} />
             ) : null,
         [orderCount, symbol],
     );
@@ -214,7 +212,11 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                                 Book
                             </div>
                         </div>
-                        <OrderBook symbol={symbol} orderCount={orderCount} />
+                        <OrderBook
+                            symbol={symbol}
+                            heightOverride={`calc(100% - 24px)`}
+                            orderCount={orderCount}
+                        />
                     </div>
                     <div className={styles.childOfLargeContainer}>
                         <div
@@ -238,7 +240,13 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     );
 
     const orderBookTabsComponent = (
-        <div className={styles.orderBookSectionContainer}>
+        <div
+            className={
+                styles.orderBookSectionContainer +
+                ' ' +
+                styles.orderBookTabSectionContainer
+            }
+        >
             <Tabs
                 wrapperId='orderBookTabs'
                 tabs={orderBookTabs}
