@@ -7,6 +7,10 @@
 command = "npm run dev"
 framework = "vite"
 
+[[edge_functions]]
+  path = "/*"
+  function = "country-block"
+
 # Set immutable caching for static files, because they have fingerprinted filenames
 
 [[headers]]
