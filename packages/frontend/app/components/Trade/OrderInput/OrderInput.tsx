@@ -252,11 +252,11 @@ function OrderInput() {
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
         setModalContent(content);
-        if (content === 'confirm_buy' && !activeOptions.skipOpenOrderConfirm) {
+        if (content === 'confirm_buy' && activeOptions.skipOpenOrderConfirm) {
             confirmBuy();
         } else if (
             content === 'confirm_sell' &&
-            !activeOptions.skipClosePositionConfirm
+            activeOptions.skipClosePositionConfirm
         ) {
             confirmSell();
         } else {

@@ -79,7 +79,7 @@ export default function ConfirmationModal(props: PropsIF) {
             </div>
             <div className={styles.toggleContainer}>
                 <ToggleSwitch
-                    isOn={isEnabled}
+                    isOn={!isEnabled}
                     onToggle={toggleEnabled}
                     label={"Don't show this again"}
                     // reverse
