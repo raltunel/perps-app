@@ -95,6 +95,10 @@
     margin-left: auto;
 }
 
+.headerRightContent > button {
+    width: 120px;
+}
+
 .chartSkeletonWrapper {
     width: 100%;
     height: 100%;

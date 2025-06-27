@@ -3,6 +3,7 @@ import styles from './WithdrawModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface WithdrawModalProps {
     vault: {
@@ -77,16 +78,19 @@ export default function WithdrawModal({
 
     return (
         <div className={styles.container}>
-            <div className={styles.textContent}>
+            <div className={styles.text_content}>
+                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
                 <h4>
                     Withdraw {unitValue} from {vault.name}
                 </h4>
-                <p>
-                    {unitValue} will be sent to your address. A{' '}
-                    {unitValue === 'USD' ? '$1' : '0.0001 BTC'} fee will be
-                    deducted from the {unitValue} withdrawn. Withdraws should
-                    arrive within 5 minutes.
-                </p>
+                <div>
+                    <p>{unitValue} will be sent to your address.</p>
+                    <p>
+                        A {unitValue === 'USD' ? '$1' : '0.0001 BTC'} fee will
+                        be deducted from the {unitValue} withdrawn.
+                    </p>
+                    <p>Withdraws should arrive within 5 minutes.</p>
+                </div>
             </div>
 
             <div className={styles.inputContainer}>

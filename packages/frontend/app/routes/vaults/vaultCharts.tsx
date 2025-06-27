@@ -23,9 +23,8 @@ export default function VaultCharts({ info }: VaultChartsProps) {
         { time: number; value: number }[] | undefined
     >();
 
-    const [parsedKey, setParsedKey] = useState<number>();
     const [chartWidth] = useState<number>(
-        document.getElementById('chartPlaceholder')?.clientWidth || 560,
+        document.getElementById('chartPlaceholder')?.clientWidth || 590,
     );
     const [chartHeight] = useState<number>(
         document.getElementById('chartPlaceholder')?.clientHeight || 250,
@@ -45,7 +44,6 @@ export default function VaultCharts({ info }: VaultChartsProps) {
 
     const parseUserProfileData = (data: any, key: number) => {
         const userPositionData = data[key][1] as UserPositionIF;
-        console.log(userPositionData, key);
 
         if (userPositionData.accountValueHistory) {
             const accountValueHistory =
@@ -69,8 +67,6 @@ export default function VaultCharts({ info }: VaultChartsProps) {
 
             setPnlHistory(() => pnlHistory);
         }
-
-        setParsedKey(() => key);
     };
 
     useEffect(() => {
