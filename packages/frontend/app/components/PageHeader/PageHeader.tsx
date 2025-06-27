@@ -21,6 +21,7 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { useKeydown } from '~/hooks/useKeydown';
 
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
@@ -206,6 +207,19 @@ export default function PageHeader() {
     );
 
     const appSettingsModal: useModalIF = useModal('closed');
+
+    useKeydown(
+        'Escape',
+        () => {
+            setIsDepositDropdownOpen(false);
+            setIsRpcDropdownOpen(false);
+            setIsWalletMenuOpen(false);
+            setIsHelpDropdownOpen(false);
+            setIsMoreDropdownOpen(false);
+            setIsDropdownMenuOpen(false);
+        },
+        [],
+    );
 
     return (
         <>
