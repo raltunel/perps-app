@@ -26,6 +26,7 @@ import { useKeydown } from '~/hooks/useKeydown';
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
 
+    // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
     const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
@@ -35,8 +36,10 @@ export default function PageHeader() {
     const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
     const location = useLocation();
 
+    // symbol for active market
     const { symbol } = useTradeDataStore();
 
+    // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
@@ -47,6 +50,7 @@ export default function PageHeader() {
         // { name: 'Strategies', path: '/strategies' },
     ];
 
+    // refs for dropdown menu handline
     const dropdownMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsDropdownMenuOpen(false);
     }, isDropdownMenuOpen);
@@ -71,8 +75,10 @@ export default function PageHeader() {
         setIsHelpDropdownOpen(false);
     }, isHelpDropdownOpen);
 
+    // logic to open and close the app settings modal
     const appSettingsModal: useModalIF = useModal('closed');
 
+    // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
         'Escape',
         () => {
