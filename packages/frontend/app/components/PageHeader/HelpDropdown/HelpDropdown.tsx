@@ -31,7 +31,6 @@ export default function HelpDropdown(props: propsIF) {
                         hoverBg='accent1'
                         onClick={() => {
                             openWithdrawModal();
-                            setIsHelpDropdownOpen(false);
                         }}
                     >
                         Withdraw
