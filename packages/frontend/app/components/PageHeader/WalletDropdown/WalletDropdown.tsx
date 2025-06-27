@@ -32,7 +32,7 @@ const TokenDisplay = () => {
 };
 
 export default function WalletDropdown(props: PropsIF) {
-    const { setIsUserConnected, isDropdown } = props;
+    const { setIsUserConnected, isDropdown, setIsWalletMenuOpen } = props;
 
     const navigate = useNavigate();
 
@@ -69,15 +69,19 @@ export default function WalletDropdown(props: PropsIF) {
             <section className={styles.actionButtons}>
                 <button
                     className={styles.portfolioButton}
-                    onClick={() =>
-                        navigate('/portfolio', { viewTransition: true })
-                    }
+                    onClick={() => {
+                        navigate('/portfolio', { viewTransition: true });
+                        setIsWalletMenuOpen(false);
+                    }}
                 >
                     Portfolio
                 </button>
                 <button
                     className={styles.logoutButton}
-                    onClick={() => setIsUserConnected(false)}
+                    onClick={() => {
+                        setIsUserConnected(false);
+                        setIsWalletMenuOpen(false);
+                    }}
                 >
                     Logout
                 </button>
