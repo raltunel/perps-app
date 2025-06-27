@@ -61,7 +61,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                 maxHeight={maxHeight}
             />
         ),
-        [tradesCount, symbol],
+        [tradesCount, symbol, tradesMaxHeight],
     );
 
     const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
@@ -70,9 +70,15 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
 
     const renderTabContent = useCallback(() => {
-        if (activeTab === 'Trades') return orderBookTradesComponent();
+        if (activeTab === 'Trades')
+            return orderBookTradesComponent(tradesMaxHeight);
         return orderBookComponent;
-    }, [activeTab, orderBookComponent, orderBookTradesComponent]);
+    }, [
+        activeTab,
+        orderBookComponent,
+        orderBookTradesComponent,
+        tradesMaxHeight,
+    ]);
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
@@ -119,9 +125,13 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         if (orderBookModeRef.current === 'stacked') {
             // divide available height by 2 for stacked mode
             availableHeight /= 2;
-
-            setTradesMaxHeight(availableHeight - otherHeightTrades);
         }
+
+        setTradesMaxHeight(
+            availableHeight -
+                otherHeightTrades -
+                (orderBookModeRef.current === 'stacked' ? 15 : 0),
+        );
 
         const calculatedOrderCount = Math.floor(
             (availableHeight - otherHeightOB + ORDER_ROW_GAP * 2) /
@@ -138,7 +148,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         if (tradesCount !== calculatedTradesCount) {
             setTradesCount(calculatedTradesCount - 1);
         }
-    }, [orderCount, tradesCount, orderBookMode]);
+    }, [orderCount, tradesCount, orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
@@ -219,7 +229,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                                 icon={<BsThreeDots />}
                             />
                         </div>
-                        {orderBookTradesComponent()}
+                        {orderBookTradesComponent(tradesMaxHeight)}
                     </div>
                 </div>
             </div>

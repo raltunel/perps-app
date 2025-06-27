@@ -128,11 +128,13 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                             style={{
                                 ...(maxHeight && {
                                     maxHeight: maxHeight + 'px',
+                                    overflowY: 'auto',
                                 }),
                             }}
                         >
                             {trades
-                                .slice(0, tradesCount)
+                                // .slice(0, tradesCount) // NOTE: that slicing has been removed because scrolling has been enabled
+                                .slice(0, TRADES_LIMIT)
                                 .map((trade, index) => (
                                     <OrderTradeRow key={index} trade={trade} />
                                 ))}

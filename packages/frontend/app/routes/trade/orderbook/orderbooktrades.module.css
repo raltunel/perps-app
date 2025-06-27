@@ -23,6 +23,7 @@
     align-items: center;
     width: 100%;
     gap: var(--gap-xs);
+    scrollbar-width: none;
 }
 
 .orderTradesListStacked::-webkit-scrollbar {
