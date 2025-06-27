@@ -11,6 +11,7 @@ import {
 import { WsChannels } from '~/utils/Constants';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
+import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 
 export default function Notifications() {
     const { enableTxNotifications, enableBackgroundFillNotif } =
@@ -34,7 +35,7 @@ export default function Notifications() {
         return unsubscribe;
     }, [debugWallet, info]);
 
-    const postNotification = useCallback((payload) => {
+    const postNotification = useCallback((payload: NotificationMsg) => {
         if (!payload || !payload.data) return;
         const notification = payload.data.notification;
         if (backgroundFillNotifRef.current && notification) {
