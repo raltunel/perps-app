@@ -60,7 +60,7 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
     return 0;
 };
 
-function getDynamicSymlogConstant(
+export function getDynamicSymlogConstant(
     minPrice: number,
     maxPrice: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

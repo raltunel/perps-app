@@ -13,6 +13,7 @@ import {
 } from '../customOrderLineUtils';
 import { drawLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import type { IPaneApi } from '~/tv/charting_library';
 
 interface LabelProps {
     lines: LineData[];
@@ -361,7 +362,21 @@ const LabelComponent = ({
                 canvas.getBoundingClientRect(),
             );
 
-            const advancedValue = scaleData?.yScale.invert(clientY);
+            let advancedValue = scaleData?.yScale.invert(clientY);
+
+            if (chart) {
+                const priceScalePane = chart
+                    .activeChart()
+                    .getPanes()[0] as IPaneApi;
+
+                const priceScale = priceScalePane.getMainSourcePriceScale();
+                if (priceScale) {
+                    const isLogarithmic = priceScale.getMode() === 1;
+                    if (isLogarithmic) {
+                        advancedValue = scaleData.scaleSymlog.invert(clientY);
+                    }
+                }
+            }
 
             tempSelectedLine = tempSelectedLine
                 ? {
