@@ -10,6 +10,7 @@ interface NewsItemIF {
 }
 
 export default function News() {
+    // logic to fetch news data asynchronously
     const [news, setNews] = useState<NewsItemIF[]>([]);
     useEffect(() => {
         fetch('/news.json', { cache: 'no-store' })
@@ -19,28 +20,40 @@ export default function News() {
             });
     }, []);
 
+    // logic to handle modal opening and closing
     const OPEN_MODAL_DELAY_MS = 2000;
     const modalControl = useModal(OPEN_MODAL_DELAY_MS);
 
+    // logic to prevent a user from seeing a news item repeatedly
     const alreadyViewed = useViewed();
 
+    // apply filter to messages received by the app
     const unseen: {
         messages: string[];
         hashes: string[];
     } = useMemo(() => {
+        // output variable for human-readable messages
         const messages: string[] = [];
+        // output variable for message hashes
         const hashes: string[] = [];
+        // iterate over news items, handle ones not previously seen
         news.forEach((n: NewsItemIF) => {
             if (!alreadyViewed.checkIfViewed(n.id)) {
                 messages.push(n.message);
                 hashes.push(n.id);
             }
         });
+        // return output variables
         return {
             messages,
             hashes,
         };
-    }, [news, alreadyViewed]);
+    }, [
+        // recalculate for changes in the base data set
+        news,
+        // recalculate for changes in the list of viewed messages
+        alreadyViewed,
+    ]);
 
     return (
         <>
