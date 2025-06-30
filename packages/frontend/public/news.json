@@ -1,12 +1,20 @@
 {
     "news": [
         {
-            "message": "This is announcement #1",
+            "message": "Bitcoin ipsum dolor sit amet. Inputs block reward full node hyperbitcoinization soft fork key pair Bitcoin Improvement Proposal.",
             "id": "1"
         },
         {
-            "message": "This is announcement #2",
+            "message": "Halvening address, timestamp server outputs full node deflationary monetary policy private key block reward! Full node, difficulty nonce consensus blockchain, deflationary monetary policy decentralized!",
             "id": "2"
+        },
+        {
+            "message": "Inputs blockchain private key satoshis peer-to-peer soft fork wallet full node. Mining, deflationary monetary policy bitcoin proof-of-work miner block height blocksize? ",
+            "id": "7"
+        },
+        {
+            "message": "Blockchain Merkle Tree private key key pair, proof-of-work UTXO Bitcoin Improvement Proposal public key. Cryptocurrency address key pair decentralized full node genesis block difficulty. SHA-256, price action digital signature private key price action Satoshi Nakamoto stacking sats. Hard fork UTXO outputs transaction electronic cash!",
+            "id": "r"
         }
     ]
 }

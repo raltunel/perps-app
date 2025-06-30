@@ -1,13 +1,17 @@
 .news {
     display: flex;
     flex-direction: column;
-    width: 300px;
-    padding: var(--padding-s);
-    gap: var(--gap-s);
-    background-color: green;
+    width: 400px;
+    max-height: 70vh;
+    padding: 0px var(--padding-m) var(--padding-m);
+    gap: var(--gap-m);
     list-style-type: none;
+    overflow-y: auto;
+    scrollbar-gutter: white;
 }
 
 .news > li {
     font-size: var(--font-size-s);
+    color: var(--text2);
+    text-align: center;
 }
