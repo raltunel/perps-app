@@ -13,7 +13,6 @@ import OrderTradeRow from './ordertraderow/ordertraderow';
 
 interface OrderBookTradesProps {
     symbol: string;
-    tradesCount: number;
     maxHeight?: number;
 }
 
@@ -21,7 +20,6 @@ const TRADES_LIMIT = 50;
 
 const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
     symbol,
-    tradesCount,
     maxHeight,
 }) => {
     const { info } = useSdk();
@@ -94,7 +92,7 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
         [trades],
     );
 
-    const loaderLen = 20;
+    const loaderLen = 30;
 
     return (
         <div className={styles.orderTradesContainer}>
@@ -133,7 +131,6 @@ const OrderBookTrades: React.FC<OrderBookTradesProps> = ({
                             }}
                         >
                             {trades
-                                // .slice(0, tradesCount) // NOTE: that slicing has been removed because scrolling has been enabled
                                 .slice(0, TRADES_LIMIT)
                                 .map((trade, index) => (
                                     <OrderTradeRow key={index} trade={trade} />

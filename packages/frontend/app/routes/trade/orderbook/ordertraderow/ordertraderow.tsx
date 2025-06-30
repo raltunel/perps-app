@@ -26,7 +26,7 @@ const OrderTradeRow: React.FC<OrderTradeRowProps> = React.memo(({ trade }) => {
             <div className={styles.orderTradeTime}>
                 <span>{formatDateToTime(new Date(trade.time))}</span>
                 <span>
-                    <LuSquareArrowOutUpRight />
+                    <LuSquareArrowOutUpRight size={13} />
                 </span>
             </div>
         </div>

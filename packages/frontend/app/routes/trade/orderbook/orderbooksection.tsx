@@ -23,7 +23,6 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     mobileContent = 'orderBook',
 }) => {
     const [orderCount, setOrderCount] = useState(9);
-    const [tradesCount, setTradesCount] = useState(25);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
@@ -53,13 +52,9 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
 
     const orderBookTradesComponent = useCallback(
         (maxHeight?: number) => (
-            <OrderBookTrades
-                symbol={symbol}
-                tradesCount={tradesCount}
-                maxHeight={maxHeight}
-            />
+            <OrderBookTrades symbol={symbol} maxHeight={maxHeight} />
         ),
-        [tradesCount, symbol, tradesMaxHeight],
+        [symbol, tradesMaxHeight],
     );
 
     const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
@@ -121,32 +116,36 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         });
 
         if (orderBookModeRef.current === 'stacked') {
-            // divide available height by 2 for stacked mode
-            availableHeight /= 2;
-        }
+            // use remaining height for trades (min 40% of available height)
+            // that calculation adds more space if we can not place two rows for orderbook
+            otherHeightTrades += getElementHeightWithMargins(
+                document.getElementById('orderBookContainer') as HTMLElement,
+            );
+            otherHeightTrades += getElementHeightWithMargins(
+                document.getElementById(
+                    'orderBookHeaderStackedMode',
+                ) as HTMLElement,
+            );
+            setTradesMaxHeight(availableHeight - otherHeightTrades);
 
-        setTradesMaxHeight(
-            availableHeight -
-                otherHeightTrades -
-                (orderBookModeRef.current === 'stacked' ? 15 : 0),
-        );
+            // 60% height for orderbook
+            availableHeight *= 0.6;
+        } else {
+            setTradesMaxHeight(
+                availableHeight -
+                    otherHeightTrades +
+                    (orderBookModeRef.current === 'large' ? 0 : -5),
+            );
+        }
 
         const calculatedOrderCount = Math.floor(
             (availableHeight - otherHeightOB + ORDER_ROW_GAP * 2) /
                 (orderRowHeightWithGaps * 2),
         );
 
-        const calculatedTradesCount = Math.floor(
-            (availableHeight - otherHeightTrades + ORDER_ROW_GAP * 2) /
-                orderRowHeightWithGaps,
-        );
-
         if (orderCount !== calculatedOrderCount)
             setOrderCount(calculatedOrderCount);
-        if (tradesCount !== calculatedTradesCount) {
-            setTradesCount(calculatedTradesCount - 1);
-        }
-    }, [orderCount, tradesCount, orderBookMode, activeTab]);
+    }, [orderCount, orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
@@ -180,7 +179,10 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
         () => (
             <div className={styles.orderBookSection}>
                 <div className={styles.stackedContainer}>
-                    <div className={styles.sectionHeader}>
+                    <div
+                        id='orderBookHeaderStackedMode'
+                        className={styles.sectionHeader}
+                    >
                         <div className={styles.sectionHeaderTitle}>Book</div>
                         <BasicMenu items={menuItems} icon={<BsThreeDots />} />
                     </div>
@@ -196,7 +198,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                 </div>
             </div>
         ),
-        [orderCount, symbol],
+        [orderCount, symbol, tradesMaxHeight],
     );
 
     const largeOrderBook = useMemo(

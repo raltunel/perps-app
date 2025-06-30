@@ -287,6 +287,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     return (
         <div
+            id='orderBookContainer'
             className={styles.orderBookContainer}
             style={{
                 ...(heightOverride && {
