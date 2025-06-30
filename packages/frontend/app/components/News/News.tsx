@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import styles from './News.module.css';
 import { useModal } from '~/hooks/useModal';
 import Modal from '../Modal/Modal';
-import { useKeydown } from '~/hooks/useKeydown';
 import { useViewed } from '~/stores/AlreadySeenStore';
 
 interface NewsItemIF {
@@ -11,23 +10,17 @@ interface NewsItemIF {
 }
 
 export default function News() {
-    console.log('cycling');
-
     const [news, setNews] = useState<NewsItemIF[]>([]);
     useEffect(() => {
         fetch('/news.json', { cache: 'no-store' })
             .then((res) => res.json())
             .then((formatted) => {
-                setTimeout(() => {
-                    setNews(formatted.news);
-                }, 3000);
+                setNews(formatted.news);
             });
     }, []);
 
     const OPEN_MODAL_DELAY_MS = 2000;
     const modalControl = useModal(OPEN_MODAL_DELAY_MS);
-
-    useKeydown('/', modalControl.toggle, [modalControl.isOpen]);
 
     const alreadyViewed = useViewed();
 
