@@ -24,10 +24,6 @@ export const useViewed = create<AlreadySeenStoreIF>()(
                         viewed: [...get().viewed, message],
                     });
                 } else if (Array.isArray(message)) {
-                    // const firstPart: string[] = get().viewed;
-                    // const secondPart: string[] = message;
-                    // const updated = firstPart.concat(secondPart);
-                    // set({ viewed: updated });
                     set({ viewed: get().viewed.concat(message) });
                 }
             },

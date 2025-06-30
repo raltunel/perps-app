@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './News.module.css';
 import { useModal } from '~/hooks/useModal';
 import Modal from '../Modal/Modal';
@@ -10,38 +10,34 @@ interface NewsItemIF {
     id: string;
 }
 
-const mockNews: NewsItemIF[] = [
-    {
-        message: 'First',
-        id: 'aaa',
-    },
-    {
-        message: 'Second',
-        id: 'bbb',
-    },
-    {
-        message: 'Third',
-        id: 'ccc',
-    },
-    {
-        message: 'Fourth',
-        id: 'mmm',
-    },
-];
-
 export default function News() {
     console.log('cycling');
 
-    const modalControl = useModal(2000);
+    const [news, setNews] = useState<NewsItemIF[]>([]);
+    useEffect(() => {
+        fetch('/news.json', { cache: 'no-store' })
+            .then((res) => res.json())
+            .then((formatted) => {
+                setTimeout(() => {
+                    setNews(formatted.news);
+                }, 3000);
+            });
+    }, []);
+
+    const OPEN_MODAL_DELAY_MS = 2000;
+    const modalControl = useModal(OPEN_MODAL_DELAY_MS);
 
     useKeydown('/', modalControl.toggle, [modalControl.isOpen]);
 
     const alreadyViewed = useViewed();
 
-    const unseen = useMemo(() => {
+    const unseen: {
+        messages: string[];
+        hashes: string[];
+    } = useMemo(() => {
         const messages: string[] = [];
         const hashes: string[] = [];
-        mockNews.forEach((n: NewsItemIF) => {
+        news.forEach((n: NewsItemIF) => {
             if (!alreadyViewed.checkIfViewed(n.id)) {
                 messages.push(n.message);
                 hashes.push(n.id);
@@ -51,7 +47,7 @@ export default function News() {
             messages,
             hashes,
         };
-    }, [mockNews, alreadyViewed]);
+    }, [news, alreadyViewed]);
 
     return (
         <>

@@ -1,0 +1,12 @@
+{
+    "news": [
+        {
+            "message": "This is announcement #1",
+            "id": "1"
+        },
+        {
+            "message": "This is announcement #2",
+            "id": "2"
+        }
+    ]
+}
