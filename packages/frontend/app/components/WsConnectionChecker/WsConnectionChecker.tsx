@@ -6,14 +6,11 @@ import WsReconnectingIndicator from '../WsReconnectingIndicator/WsReconnectingIn
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
-
-const PRICE_UPDATE_INTERVAL = 1000 * 60;
-const WS_SLEEP_TIMEOUT = 1000 * 10;
+import { WS_SLEEP_MODE, WS_SLEEP_MODE_PRICE_CHECK } from '~/utils/Constants';
 
 export default function WsConnectionChecker() {
     // Use memoized value to prevent unnecessary re-renders
     const { setIsWsSleepMode, isWsSleepMode } = useDebugStore();
-    const isTabPassive = useRef(false);
     const sleepModeTimeout = useRef<NodeJS.Timeout | null>(null);
     const { setInternetConnected, internetConnected, wsReconnecting } =
         useAppStateStore();
@@ -24,8 +21,9 @@ export default function WsConnectionChecker() {
     const { fetchTokenId, fetchTokenDetails } = useInfoApi();
 
     const { symbol } = useTradeDataStore();
-    const { setTitleOverride } = useAppStateStore();
+    const { setTitleOverride, setIsTabActive } = useAppStateStore();
     const { formatNum } = useNumFormatter();
+    const isTabPassive = useRef(false);
 
     useEffect(() => {
         const onlineListener = () => {
@@ -42,17 +40,19 @@ export default function WsConnectionChecker() {
                 }
                 sleepModeTimeout.current = setTimeout(() => {
                     if (isTabPassive.current) {
+                        console.log('>>> sleep mode', new Date().toISOString());
                         setIsWsSleepMode(true);
-                        console.log('>>> pause ws', new Date().toISOString());
+                        setIsTabActive(false);
                     }
-                }, WS_SLEEP_TIMEOUT);
+                }, WS_SLEEP_MODE);
             } else {
+                console.log('>>> resume mode', new Date().toISOString());
                 isTabPassive.current = false;
                 if (sleepModeTimeout.current) {
                     clearTimeout(sleepModeTimeout.current);
                 }
                 setIsWsSleepMode(false);
-                console.log('>>> resume ws', new Date().toISOString());
+                setIsTabActive(true);
             }
         };
 
@@ -85,7 +85,7 @@ export default function WsConnectionChecker() {
                         `${tokenDetails.markPx ? '$' + formatNum(tokenDetails.markPx) + ' | ' : ''} ${symbol?.toUpperCase() ? symbol?.toUpperCase() + ' | ' : ''}Ambient`,
                     );
                 }
-            }, PRICE_UPDATE_INTERVAL);
+            }, WS_SLEEP_MODE_PRICE_CHECK);
         } else {
             if (titleSetterIntervalRef.current) {
                 clearInterval(titleSetterIntervalRef.current);

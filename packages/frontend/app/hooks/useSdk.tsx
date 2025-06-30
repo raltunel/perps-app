@@ -1,9 +1,16 @@
 import { DEMO_USER, Exchange, Info, type Environment } from '@perps-app/sdk';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useIsClient } from './useIsClient';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
 
 type SdkContextType = {
     info: Info | null;
@@ -21,8 +28,15 @@ export const SdkProvider: React.FC<{
     const [info, setInfo] = useState<Info | null>(null);
     const [exchange, setExchange] = useState<Exchange | null>(null);
     const [shouldReconnect, setShouldReconnect] = useState(false);
+    const stashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const { internetConnected, setWsReconnecting } = useAppStateStore();
+    const {
+        internetConnected,
+        setWsReconnecting,
+        isWsStashed,
+        setIsWsStashed,
+        isTabActive,
+    } = useAppStateStore();
     const { isWsSleepMode, setIsWsSleepMode } = useDebugStore();
 
     // commit to trigger deployment
@@ -63,7 +77,18 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isClient) return;
+        if (!isTabActive) return;
+
+        if (isWsStashed) {
+            info?.wsManager?.connectAfterStash();
+            setIsWsStashed(false);
+            setShouldReconnect(false);
+            console.log('>>> connected after stash', new Date().toISOString());
+            return;
+        }
+
         if (internetConnected && shouldReconnect) {
+            console.log('>>> reconnect alternate', new Date().toISOString());
             info?.wsManager?.reconnect();
             setWsReconnecting(true);
             setShouldReconnect(false);
@@ -79,7 +104,14 @@ export const SdkProvider: React.FC<{
         return () => {
             clearInterval(reconnectInterval);
         };
-    }, [internetConnected, isClient, info, shouldReconnect]);
+    }, [
+        internetConnected,
+        isClient,
+        info,
+        shouldReconnect,
+        isWsStashed,
+        isTabActive,
+    ]);
 
     useEffect(() => {
         if (!isClient) return;
@@ -89,6 +121,30 @@ export const SdkProvider: React.FC<{
             info?.wsManager?.setSleepMode(false);
         }
     }, [isWsSleepMode, info]);
+
+    useEffect(() => {
+        if (!isTabActive) {
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+            stashTimeoutRef.current = setTimeout(() => {
+                console.log('>>> stashing', new Date().toISOString());
+                info?.wsManager?.stashWebsocket();
+                setIsWsStashed(true);
+            }, WS_SLEEP_MODE_STASH_CONNECTION);
+        } else {
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+            setIsWsStashed(false);
+        }
+
+        return () => {
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+        };
+    }, [isTabActive, info]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>
