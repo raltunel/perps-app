@@ -1,7 +1,9 @@
+import { useMemo } from 'react';
 import styles from './News.module.css';
 import { useModal } from '~/hooks/useModal';
 import Modal from '../Modal/Modal';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useViewed } from '~/stores/AlreadySeenStore';
 
 interface NewsItemIF {
     message: string;
@@ -17,10 +19,10 @@ const mockNews: NewsItemIF[] = [
         message: 'Second',
         id: 'bbb',
     },
-    // {
-    //     message: 'Third',
-    //     id: 'ccc'
-    // },
+    {
+        message: 'Third',
+        id: 'ccc',
+    },
     {
         message: 'Fourth',
         id: 'mmm',
@@ -28,22 +30,44 @@ const mockNews: NewsItemIF[] = [
 ];
 
 export default function News() {
+    console.log('cycling');
+
     const modalControl = useModal(2000);
 
     useKeydown('/', modalControl.toggle, [modalControl.isOpen]);
 
+    const alreadyViewed = useViewed();
+
+    const unseen = useMemo(() => {
+        const messages: string[] = [];
+        const hashes: string[] = [];
+        mockNews.forEach((n: NewsItemIF) => {
+            if (!alreadyViewed.checkIfViewed(n.id)) {
+                messages.push(n.message);
+                hashes.push(n.id);
+            }
+        });
+        return {
+            messages,
+            hashes,
+        };
+    }, [mockNews]);
+
     return (
         <>
-            {modalControl.isOpen && (
+            {modalControl.isOpen && unseen.messages.length && (
                 <Modal
                     title='News'
                     close={() => {
                         modalControl.close();
+                        unseen.hashes.forEach((h: string) =>
+                            alreadyViewed.markAsViewed(h),
+                        );
                     }}
                 >
                     <ul className={styles.news}>
-                        {mockNews.map((n: NewsItemIF) => (
-                            <li>{n.message}</li>
+                        {unseen.messages.map((n: string) => (
+                            <li>{n}</li>
                         ))}
                     </ul>
                 </Modal>
