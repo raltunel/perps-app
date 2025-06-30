@@ -7,7 +7,7 @@ const LS_KEY = 'ALREADY_VIEWED';
 export interface AlreadySeenStoreIF {
     viewed: string[];
     checkIfViewed: (message: string) => boolean;
-    markAsViewed: (message: string) => void;
+    markAsViewed: (message: string | string[]) => void;
 }
 
 // the actual data store
@@ -18,10 +18,18 @@ export const useViewed = create<AlreadySeenStoreIF>()(
             viewed: [],
             checkIfViewed: (message: string): boolean =>
                 get().viewed.includes(message),
-            markAsViewed: (message: string): void => {
-                set({
-                    viewed: [...get().viewed, message],
-                });
+            markAsViewed: (message: string | string[]): void => {
+                if (typeof message === 'string') {
+                    set({
+                        viewed: [...get().viewed, message],
+                    });
+                } else if (Array.isArray(message)) {
+                    // const firstPart: string[] = get().viewed;
+                    // const secondPart: string[] = message;
+                    // const updated = firstPart.concat(secondPart);
+                    // set({ viewed: updated });
+                    set({ viewed: get().viewed.concat(message) });
+                }
             },
         }),
         {

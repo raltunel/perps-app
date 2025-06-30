@@ -51,18 +51,16 @@ export default function News() {
             messages,
             hashes,
         };
-    }, [mockNews]);
+    }, [mockNews, alreadyViewed]);
 
     return (
         <>
-            {modalControl.isOpen && unseen.messages.length && (
+            {modalControl.isOpen && unseen.messages.length > 0 && (
                 <Modal
                     title='News'
                     close={() => {
                         modalControl.close();
-                        unseen.hashes.forEach((h: string) =>
-                            alreadyViewed.markAsViewed(h),
-                        );
+                        alreadyViewed.markAsViewed(unseen.hashes);
                     }}
                 >
                     <ul className={styles.news}>
