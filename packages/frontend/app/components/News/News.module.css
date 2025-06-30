@@ -7,7 +7,6 @@
     gap: var(--gap-m);
     list-style-type: none;
     overflow-y: auto;
-    scrollbar-gutter: white;
 }
 
 .news > li {
