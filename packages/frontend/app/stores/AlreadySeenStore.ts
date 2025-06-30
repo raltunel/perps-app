@@ -26,7 +26,7 @@ export const useViewed = create<AlreadySeenStoreIF>()(
             name: LS_KEY,
             // format and destination of data
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({ v: state.viewed }),
+            partialize: (state) => ({ viewed: state.viewed }),
         },
     ),
 );
