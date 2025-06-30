@@ -1,16 +1,14 @@
-import Announcement from '~/components/Announcement/Announcement';
+import styles from './testpage.module.css';
+import { useViewed } from '~/stores/AlreadySeenStore';
 
 export default function testpage() {
+    const alreadyViewed = useViewed();
+
     return (
-        <div>
-            <Announcement
-                type='update'
-                position='bottom-right'
-                // onClose={onClose}
-                // className={className}
-            >
-                <div>this is just testing the Announcement</div>
-            </Announcement>
+        <div className={styles.testpage}>
+            <button onClick={() => alreadyViewed.markAsViewed('aaa')}>
+                Click Me!
+            </button>
         </div>
     );
 }
