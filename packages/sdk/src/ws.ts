@@ -111,6 +111,7 @@ export class WebsocketManager {
     private pongReceived: boolean = false;
     private pongTimeout: NodeJS.Timeout | null = null;
     private sleepMode: boolean = false;
+    private pongCheckLock: boolean = false;
 
     constructor(
         baseUrl: string,
@@ -209,11 +210,12 @@ export class WebsocketManager {
         this.ws.send(JSON.stringify({ method: 'ping' }));
 
         this.pongTimeout = setTimeout(() => {
-            if (!this.pongReceived) {
+            if (!this.pongReceived && !this.pongCheckLock) {
                 // if (this.ws.readyState === 1) {
                 //     // no need to reconnect if connection state is open
                 //     return;
                 // }
+                console.log('>>> pong reconnect', new Date().toISOString());
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
@@ -530,7 +532,9 @@ export class WebsocketManager {
     }
 
     public reconnect() {
+        console.log('>>> WS reconnect', new Date().toISOString());
         this.stashSubscriptions();
+        this.pongCheckDelay();
         setTimeout(() => {
             this.connect();
         }, RECONNECT_TIMEOUT_MS);
@@ -554,6 +558,20 @@ export class WebsocketManager {
 
     public stashWebsocket() {
         this.stashSubscriptions();
-        this.ws.close();
+        this.pongCheckLock = true;
+    }
+
+    private pongCheckDelay() {
+        this.pongCheckLock = true;
+        setTimeout(() => {
+            this.pongCheckLock = false;
+        }, 10000);
+    }
+
+    public connectAfterStash() {
+        console.log('>>> WS connectAfterStash', new Date().toISOString());
+        this.pongCheckLock = false;
+        this.connect();
+        this.pongCheckDelay();
     }
 }
