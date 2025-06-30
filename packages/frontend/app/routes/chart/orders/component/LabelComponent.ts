@@ -102,6 +102,7 @@ const LabelComponent = ({
                     chart,
                     line.yPrice,
                     heightAttr,
+                    scaleData,
                 ).pixel;
 
                 const xPixel = widthAttr * line.xLoc;

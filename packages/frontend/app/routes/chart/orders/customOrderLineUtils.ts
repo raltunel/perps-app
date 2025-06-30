@@ -60,10 +60,25 @@ export const priceToPixel = (chart: IChartingLibraryWidget, price: number) => {
     return 0;
 };
 
+function getDynamicSymlogConstant(
+    minPrice: number,
+    maxPrice: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scale: any,
+): number {
+    if (minPrice < scale.domain()[0] || maxPrice > scale.domain()[1]) {
+        return 1e300;
+    }
+
+    return 0.00001;
+}
+
 export const getPricetoPixel = (
     chart: IChartingLibraryWidget,
     price: number,
     chartHeight?: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData?: any,
 ) => {
     const dpr = window.devicePixelRatio || 1;
     const textHeight = 15 * dpr;
@@ -83,9 +98,15 @@ export const getPricetoPixel = (
         const minPrice = priceRange.from;
         const isLogarithmic = priceScale.getMode() === 1;
         if (isLogarithmic) {
-            const logMinPrice = Math.log(minPrice);
-            const logMaxPrice = Math.log(maxPrice);
-            const logPrice = Math.log(price);
+            const constantMin = getDynamicSymlogConstant(
+                minPrice,
+                maxPrice,
+                scaleData.scaleSymlog,
+            );
+            scaleData.scaleSymlog.constant(constantMin);
+            const logPrice = scaleData.scaleSymlog(price);
+            const logMinPrice = scaleData.scaleSymlog(minPrice);
+            const logMaxPrice = scaleData.scaleSymlog(maxPrice);
 
             const priceDifference = logMaxPrice - logMinPrice;
             const relativePrice = logPrice - logMinPrice;
