@@ -23,6 +23,7 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 import { useTradeDataStore } from './stores/TradeDataStore';
+import News from './components/News/News';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -161,6 +162,7 @@ export default function App() {
                                 {/* Added error boundary for notifications */}
                                 <ComponentErrorBoundary>
                                     <Notifications />
+                                    <News />
                                 </ComponentErrorBoundary>
                             </div>
                         </TutorialProvider>

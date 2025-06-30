@@ -1,0 +1,13 @@
+.news {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    padding: var(--padding-s);
+    gap: var(--gap-s);
+    background-color: green;
+    list-style-type: none;
+}
+
+.news > li {
+    font-size: var(--font-size-s);
+}
