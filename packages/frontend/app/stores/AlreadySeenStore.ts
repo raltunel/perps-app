@@ -6,6 +6,7 @@ const LS_KEY = 'ALREADY_VIEWED';
 // shape of the return obj produced by this store
 export interface AlreadySeenStoreIF {
     viewed: string[];
+    checkIfViewed: (message: string) => boolean;
     markAsViewed: (message: string) => void;
 }
 
@@ -15,6 +16,8 @@ export const useViewed = create<AlreadySeenStoreIF>()(
     persist(
         (set, get) => ({
             viewed: [],
+            checkIfViewed: (message: string): boolean =>
+                get().viewed.includes(message),
             markAsViewed: (message: string): void => {
                 set({
                     viewed: [...get().viewed, message],
