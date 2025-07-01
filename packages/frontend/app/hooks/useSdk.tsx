@@ -106,6 +106,7 @@ export const SdkProvider: React.FC<{
         if (!isTabActive) return;
 
         if (internetConnected && shouldReconnect) {
+            console.log('>>> alternate reconnect');
             info?.wsManager?.reconnect();
             setWsReconnecting(true);
             setShouldReconnect(false);
