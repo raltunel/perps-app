@@ -1,5 +1,5 @@
-import styles from './testpage.module.css';
 import { useViewed } from '~/stores/AlreadySeenStore';
+import styles from './testpage.module.css';
 
 export default function testpage() {
     const alreadyViewed = useViewed();
@@ -7,7 +7,7 @@ export default function testpage() {
     return (
         <div className={styles.testpage}>
             <button onClick={() => alreadyViewed.markAsViewed('aaa')}>
-                Click Me!
+                Click Here!
             </button>
         </div>
     );
