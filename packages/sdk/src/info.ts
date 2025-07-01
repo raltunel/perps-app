@@ -28,7 +28,6 @@ interface InfoOptions {
     meta?: Meta;
     isDebug?: boolean;
     workers?: number;
-    stashedSubs?: Record<string, ActiveSubscription[]>;
 }
 
 export class Info extends API {
@@ -43,19 +42,13 @@ export class Info extends API {
         super(options.environment);
         this.environment = options.environment;
         this.baseUrl = API_URLS[this.environment];
-        const {
-            skipWs = false,
-            isDebug = false,
-            stashedSubs = {},
-            workers = 4,
-        } = options;
+        const { skipWs = false, isDebug = false, workers = 4 } = options;
 
         if (!skipWs) {
             this.wsManager = new WebsocketManager(
                 this.baseUrl,
                 isDebug,
                 workers,
-                stashedSubs,
             );
         }
 

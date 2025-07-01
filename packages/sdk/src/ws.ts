@@ -118,7 +118,6 @@ export class WebsocketManager {
         baseUrl: string,
         isDebug: boolean = false,
         numWorkers: number = 4,
-        stashedSubs: Record<string, ActiveSubscription[]> = {},
     ) {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
@@ -126,21 +125,6 @@ export class WebsocketManager {
 
         this.initializeWorkers();
         this.connect();
-
-        if (stashedSubs) {
-            for (const identifier in stashedSubs) {
-                const subs = stashedSubs[identifier];
-                console.log('>>> sub will be added', subs);
-                this.queuedSubscriptions.push(
-                    ...subs.map((sub) => ({
-                        subscription: sub.subscription,
-                        active: sub,
-                    })),
-                );
-            }
-        }
-
-        console.log('>>> ws constructor', this.queuedSubscriptions);
     }
 
     private initializeWorkers() {
@@ -354,7 +338,6 @@ export class WebsocketManager {
     };
 
     public stop() {
-        console.log('>>> WS stop', new Date().toISOString());
         this.log('stopping');
         this.stopped = true;
         this.pongCheckDelay();
@@ -553,7 +536,6 @@ export class WebsocketManager {
     }
 
     public reconnect() {
-        console.log('>>> WS reconnect', new Date().toISOString());
         this.stashSubscriptions();
         this.pongCheckDelay();
         setTimeout(() => {
@@ -561,20 +543,14 @@ export class WebsocketManager {
         }, RECONNECT_TIMEOUT_MS);
     }
 
+    public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
+        this.processStashedSubs(stashedSubs);
+        this.connect();
+    }
+
     public setSleepMode(sleepMode: boolean) {
         if (this.sleepMode === sleepMode) return;
         this.sleepMode = sleepMode;
-
-        // that block can be used to close the connection instead of ignoring messages.
-        // if (sleepMode) {
-        //     this.stashSubscriptions();
-        //     this.ws.close();
-        //     this.pongReceived = true;
-        // } else {
-        //     setTimeout(() => {
-        //         this.connect();
-        //     }, 2000);
-        // }
     }
 
     public stashWebsocket() {
@@ -593,10 +569,19 @@ export class WebsocketManager {
         }, 10000);
     }
 
-    public connectAfterStash() {
-        console.log('>>> WS connectAfterStash', new Date().toISOString());
-        this.pongCheckLock = false;
-        this.connect();
-        this.pongCheckDelay();
+    public processStashedSubs(
+        stashedSubs: Record<string, ActiveSubscription[]>,
+    ) {
+        if (stashedSubs) {
+            for (const identifier in stashedSubs) {
+                const subs = stashedSubs[identifier];
+                this.queuedSubscriptions.push(
+                    ...subs.map((sub) => ({
+                        subscription: sub.subscription,
+                        active: sub,
+                    })),
+                );
+            }
+        }
     }
 }

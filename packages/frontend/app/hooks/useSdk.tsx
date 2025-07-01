@@ -98,47 +98,14 @@ export const SdkProvider: React.FC<{
     const reInitWs = useCallback(() => {
         if (!isClient) return;
 
-        console.log('>>> re init ws stashed subs', stashedSubs.current);
-
-        const newInfo = new Info({
-            environment,
-            skipWs: false,
-            // isDebug: true, // TODO: remove in prod
-            stashedSubs: stashedSubs.current,
-        });
-
-        setInfo(newInfo);
-
-        const newExchange = new Exchange(
-            {},
-            {
-                environment,
-                accountAddress: DEMO_USER,
-                // isDebug: true, // TODO: remove in prod
-            },
-        );
-
-        setExchange(newExchange);
-    }, [isClient, environment]);
-
-    useEffect(() => {
-        console.log('>>> | INFO |', info);
-    }, [info]);
+        info?.wsManager?.reInit(stashedSubs.current);
+    }, [isClient, info]);
 
     useEffect(() => {
         if (!isClient) return;
         if (!isTabActive) return;
 
-        // if (isWsStashed) {
-        //     info?.wsManager?.connectAfterStash();
-        //     setIsWsStashed(false);
-        //     setShouldReconnect(false);
-        //     console.log('>>> connected after stash', new Date().toISOString());
-        //     return;
-        // }
-
         if (internetConnected && shouldReconnect) {
-            console.log('>>> reconnect alternate', new Date().toISOString());
             info?.wsManager?.reconnect();
             setWsReconnecting(true);
             setShouldReconnect(false);
@@ -167,7 +134,19 @@ export const SdkProvider: React.FC<{
         if (isWsStashed && isTabActive) {
             console.log('>>> will re init ws object');
             reInitWs();
+            setWsReconnecting(true);
         }
+
+        const reconnectInterval = setInterval(() => {
+            if (info?.wsManager?.isWsReady()) {
+                setWsReconnecting(false);
+                clearInterval(reconnectInterval);
+            }
+        }, 200);
+
+        return () => {
+            clearInterval(reconnectInterval);
+        };
     }, [isWsStashed, isTabActive, reInitWs]);
 
     useEffect(() => {
