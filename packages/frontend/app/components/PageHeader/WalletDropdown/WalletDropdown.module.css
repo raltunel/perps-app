@@ -130,7 +130,7 @@
     font-size: var(--font-size-m);
 }
 
-.accountButton {
+.portfolioButton {
     border-radius: var(--radius-s);
     background: var(--bg-dark4, #1e1e24);
 }
