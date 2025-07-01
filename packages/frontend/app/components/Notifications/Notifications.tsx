@@ -158,7 +158,12 @@ export default function Notifications() {
                 <div className={styles.news}>
                     <header>
                         <h4>News</h4>
-                        <MdClose onClick={() => setUserClosedNews(true)} />
+                        <MdClose
+                            onClick={() => {
+                                setUserClosedNews(true);
+                                alreadyViewed.markAsViewed(unseen.hashes);
+                            }}
+                        />
                     </header>
                     <ul>
                         {unseen.messages.map((n: string) => (

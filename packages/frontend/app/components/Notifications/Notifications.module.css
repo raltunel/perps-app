@@ -104,7 +104,7 @@
 .news > ul > li {
     font-size: var(--font-size-s);
     color: var(--text2);
-    text-align: center;
+    text-align: justify;
 }
 
 @media (max-width: 768px) {
