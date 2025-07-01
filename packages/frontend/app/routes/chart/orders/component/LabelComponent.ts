@@ -334,10 +334,11 @@ const LabelComponent = ({
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
         let originalPrice: number | undefined = undefined;
+        const dpr = window.devicePixelRatio || 1;
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
             const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
@@ -373,7 +374,9 @@ const LabelComponent = ({
                 if (priceScale) {
                     const isLogarithmic = priceScale.getMode() === 1;
                     if (isLogarithmic) {
-                        advancedValue = scaleData.scaleSymlog.invert(clientY);
+                        advancedValue = scaleData.scaleSymlog.invert(
+                            clientY * dpr,
+                        );
                     }
                 }
             }
