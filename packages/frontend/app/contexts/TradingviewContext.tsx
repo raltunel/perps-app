@@ -256,6 +256,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         return () => {
+            console.log('>>> info', info);
             if (chart) {
                 drawingEventUnsubscribe(chart);
                 studyEventsUnsubscribe(chart);

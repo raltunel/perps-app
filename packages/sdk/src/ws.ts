@@ -8,9 +8,10 @@ import type { Subscription, WsMsg } from './utils/types';
 
 export type Callback = (msg: WsMsg) => void;
 
-interface ActiveSubscription {
+export interface ActiveSubscription {
     callback: Callback;
     subscriptionId: number;
+    subscription: Subscription;
 }
 
 function subscriptionToIdentifier(subscription: Subscription): string {
@@ -121,6 +122,7 @@ export class WebsocketManager {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
         this.numWorkers = numWorkers;
+
         this.initializeWorkers();
         this.connect();
     }
@@ -338,6 +340,7 @@ export class WebsocketManager {
     public stop() {
         this.log('stopping');
         this.stopped = true;
+        this.pongCheckDelay();
         if (this.pingInterval !== null) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
@@ -407,7 +410,7 @@ export class WebsocketManager {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId: subId },
+                    active: { callback, subscriptionId: subId, subscription },
                 });
             }
         }
@@ -444,7 +447,7 @@ export class WebsocketManager {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId },
+                    active: { callback, subscriptionId, subscription },
                 });
             }
         } else {
@@ -476,6 +479,7 @@ export class WebsocketManager {
                 this.activeSubscriptions[identifier].push({
                     callback,
                     subscriptionId,
+                    subscription,
                 });
                 this.ws.send(
                     JSON.stringify({ method: 'subscribe', subscription }),
@@ -532,7 +536,6 @@ export class WebsocketManager {
     }
 
     public reconnect() {
-        console.log('>>> WS reconnect', new Date().toISOString());
         this.stashSubscriptions();
         this.pongCheckDelay();
         setTimeout(() => {
@@ -540,25 +543,18 @@ export class WebsocketManager {
         }, RECONNECT_TIMEOUT_MS);
     }
 
+    public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
+        this.processStashedSubs(stashedSubs);
+        this.connect();
+    }
+
     public setSleepMode(sleepMode: boolean) {
         if (this.sleepMode === sleepMode) return;
         this.sleepMode = sleepMode;
-
-        // that block can be used to close the connection instead of ignoring messages.
-        // if (sleepMode) {
-        //     this.stashSubscriptions();
-        //     this.ws.close();
-        //     this.pongReceived = true;
-        // } else {
-        //     setTimeout(() => {
-        //         this.connect();
-        //     }, 2000);
-        // }
     }
 
-    public stashWebsocket() {
-        this.stashSubscriptions();
-        this.pongCheckLock = true;
+    public getActiveSubscriptions() {
+        return this.activeSubscriptions;
     }
 
     private pongCheckDelay() {
@@ -568,10 +564,19 @@ export class WebsocketManager {
         }, 10000);
     }
 
-    public connectAfterStash() {
-        console.log('>>> WS connectAfterStash', new Date().toISOString());
-        this.pongCheckLock = false;
-        this.connect();
-        this.pongCheckDelay();
+    public processStashedSubs(
+        stashedSubs: Record<string, ActiveSubscription[]>,
+    ) {
+        if (stashedSubs) {
+            for (const identifier in stashedSubs) {
+                const subs = stashedSubs[identifier];
+                this.queuedSubscriptions.push(
+                    ...subs.map((sub) => ({
+                        subscription: sub.subscription,
+                        active: sub,
+                    })),
+                );
+            }
+        }
     }
 }
