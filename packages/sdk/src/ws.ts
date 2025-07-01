@@ -8,9 +8,10 @@ import type { Subscription, WsMsg } from './utils/types';
 
 export type Callback = (msg: WsMsg) => void;
 
-interface ActiveSubscription {
+export interface ActiveSubscription {
     callback: Callback;
     subscriptionId: number;
+    subscription: Subscription;
 }
 
 function subscriptionToIdentifier(subscription: Subscription): string {
@@ -117,12 +118,29 @@ export class WebsocketManager {
         baseUrl: string,
         isDebug: boolean = false,
         numWorkers: number = 4,
+        stashedSubs: Record<string, ActiveSubscription[]> = {},
     ) {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
         this.numWorkers = numWorkers;
+
         this.initializeWorkers();
         this.connect();
+
+        if (stashedSubs) {
+            for (const identifier in stashedSubs) {
+                const subs = stashedSubs[identifier];
+                console.log('>>> sub will be added', subs);
+                this.queuedSubscriptions.push(
+                    ...subs.map((sub) => ({
+                        subscription: sub.subscription,
+                        active: sub,
+                    })),
+                );
+            }
+        }
+
+        console.log('>>> ws constructor', this.queuedSubscriptions);
     }
 
     private initializeWorkers() {
@@ -336,8 +354,10 @@ export class WebsocketManager {
     };
 
     public stop() {
+        console.log('>>> WS stop', new Date().toISOString());
         this.log('stopping');
         this.stopped = true;
+        this.pongCheckDelay();
         if (this.pingInterval !== null) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
@@ -407,7 +427,7 @@ export class WebsocketManager {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId: subId },
+                    active: { callback, subscriptionId: subId, subscription },
                 });
             }
         }
@@ -444,7 +464,7 @@ export class WebsocketManager {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId },
+                    active: { callback, subscriptionId, subscription },
                 });
             }
         } else {
@@ -476,6 +496,7 @@ export class WebsocketManager {
                 this.activeSubscriptions[identifier].push({
                     callback,
                     subscriptionId,
+                    subscription,
                 });
                 this.ws.send(
                     JSON.stringify({ method: 'subscribe', subscription }),
@@ -559,6 +580,10 @@ export class WebsocketManager {
     public stashWebsocket() {
         this.stashSubscriptions();
         this.pongCheckLock = true;
+    }
+
+    public getActiveSubscriptions() {
+        return this.activeSubscriptions;
     }
 
     private pongCheckDelay() {

@@ -1,5 +1,5 @@
 import { API } from './api';
-import { WebsocketManager } from './ws';
+import { WebsocketManager, type ActiveSubscription } from './ws';
 import type {
     AllMidsData,
     CandleSnapshotData,
@@ -27,6 +27,8 @@ interface InfoOptions {
     skipWs?: boolean;
     meta?: Meta;
     isDebug?: boolean;
+    workers?: number;
+    stashedSubs?: Record<string, ActiveSubscription[]>;
 }
 
 export class Info extends API {
@@ -41,10 +43,20 @@ export class Info extends API {
         super(options.environment);
         this.environment = options.environment;
         this.baseUrl = API_URLS[this.environment];
-        const { skipWs = false, isDebug = false } = options;
+        const {
+            skipWs = false,
+            isDebug = false,
+            stashedSubs = {},
+            workers = 4,
+        } = options;
 
         if (!skipWs) {
-            this.wsManager = new WebsocketManager(this.baseUrl, isDebug);
+            this.wsManager = new WebsocketManager(
+                this.baseUrl,
+                isDebug,
+                workers,
+                stashedSubs,
+            );
         }
 
         // async init
