@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSdk } from '~/hooks/useSdk';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -16,6 +16,12 @@ import SimpleButton from '../SimpleButton/SimpleButton';
 import { MdClose } from 'react-icons/md';
 import { useKeydown } from '~/hooks/useKeydown';
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
+import { useViewed } from '~/stores/AlreadySeenStore';
+
+interface NewsItemIF {
+    message: string;
+    id: string;
+}
 
 export default function Notifications() {
     const { enableTxNotifications, enableBackgroundFillNotif } =
@@ -58,6 +64,49 @@ export default function Notifications() {
     }, []);
 
     const version = null;
+
+    // logic to fetch news data asynchronously
+    const [news, setNews] = useState<NewsItemIF[]>([]);
+    useEffect(() => {
+        fetch('/news.json', { cache: 'no-store' })
+            .then((res) => res.json())
+            .then((formatted) => {
+                setNews(formatted.news);
+            });
+    }, []);
+
+    // logic to prevent a user from seeing a news item repeatedly
+    const alreadyViewed = useViewed();
+
+    // apply filter to messages received by the app
+    const unseen: {
+        messages: string[];
+        hashes: string[];
+    } = useMemo(() => {
+        // output variable for human-readable messages
+        const messages: string[] = [];
+        // output variable for message hashes
+        const hashes: string[] = [];
+        // iterate over news items, handle ones not previously seen
+        news.forEach((n: NewsItemIF) => {
+            if (!alreadyViewed.checkIfViewed(n.id)) {
+                messages.push(n.message);
+                hashes.push(n.id);
+            }
+        });
+        // return output variables
+        return {
+            messages,
+            hashes,
+        };
+    }, [
+        // recalculate for changes in the base data set
+        news,
+        // recalculate for changes in the list of viewed messages
+        alreadyViewed,
+    ]);
+
+    const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
     return (
         <div className={styles.notifications}>
@@ -103,6 +152,19 @@ export default function Notifications() {
                     >
                         Update Now
                     </SimpleButton>
+                </div>
+            )}
+            {unseen.messages.length > 0 && !userClosedNews && (
+                <div className={styles.news}>
+                    <header>
+                        <h4>News</h4>
+                        <MdClose onClick={() => setUserClosedNews(true)} />
+                    </header>
+                    <ul>
+                        {unseen.messages.map((n: string) => (
+                            <li>{n}</li>
+                        ))}
+                    </ul>
                 </div>
             )}
         </div>
