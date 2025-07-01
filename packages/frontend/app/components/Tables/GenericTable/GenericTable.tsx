@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
-import { TableState, type TableSortDirection } from '~/utils/CommonIFs';
+import {
+    TableState,
+    type HeaderCell,
+    type TableSortDirection,
+} from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
 import { useIsClient } from '~/hooks/useIsClient';
 
@@ -31,6 +35,7 @@ interface GenericTableProps<T, S> {
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
     storageKey: string;
+    tableModel?: HeaderCell[];
 }
 
 export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
@@ -52,6 +57,7 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         // defaultSortBy,
         // defaultSortDirection,
         heightOverride = '100%',
+        tableModel,
     } = props;
 
     function safeParse<T>(value: string | null, fallback: T): T {
@@ -258,6 +264,26 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
     };
     const handleExportCsv = (e: React.MouseEvent) => {
         e.preventDefault();
+        if (tableModel) {
+            const headers = tableModel.filter((header) => header.exportable);
+            const csvContent = [
+                headers.join(','),
+                ...data.map((row) =>
+                    headers
+                        .map((header) => row[header.key as keyof T])
+                        .join(','),
+                ),
+            ].join('\n');
+            const blob = new Blob([csvContent], {
+                type: 'text/csv;charset=utf-8;',
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${storageKey}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
         console.log('Exporting CSV');
     };
 

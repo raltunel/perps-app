@@ -5,3 +5,11 @@ export enum TableState {
     EMPTY = 'empty',
     FILLED = 'filled',
 }
+
+export interface HeaderCell {
+    name: string;
+    key: string;
+    sortable?: boolean;
+    className: string;
+    exportable?: boolean;
+}
