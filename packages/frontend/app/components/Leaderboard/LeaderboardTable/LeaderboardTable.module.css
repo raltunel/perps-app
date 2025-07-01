@@ -117,13 +117,13 @@
 .accountValueCell {
 }
 
-.pnlCell {
+/* .pnlCell {
     color: var(--green, #4cd471);
 }
 
 .roiCell {
     color: var(--green, #4cd471);
-}
+} */
 
 .volumeCell {
     display: flex;
