@@ -553,11 +553,6 @@ export class WebsocketManager {
         this.sleepMode = sleepMode;
     }
 
-    public stashWebsocket() {
-        this.stashSubscriptions();
-        this.pongCheckLock = true;
-    }
-
     public getActiveSubscriptions() {
         return this.activeSubscriptions;
     }

@@ -166,7 +166,6 @@ export const SdkProvider: React.FC<{
             stashTimeoutRef.current = setTimeout(() => {
                 console.log('>>> stashing', new Date().toISOString());
                 stashWebsocket();
-                // info?.wsManager?.stashWebsocket();
                 setIsWsStashed(true);
             }, WS_SLEEP_MODE_STASH_CONNECTION);
         } else {
