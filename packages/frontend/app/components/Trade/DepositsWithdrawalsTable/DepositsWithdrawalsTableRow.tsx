@@ -59,7 +59,6 @@ export default function DepositsWithdrawalsTableRow(
     props: DepositsWithdrawalsTableRowProps,
 ) {
     const { transaction } = props;
-    const { fetchExplorerDetails } = useInfoApi();
     const d = transaction.delta as any;
 
     const getStatusFromDelta = (type: string): string => 'Completed';

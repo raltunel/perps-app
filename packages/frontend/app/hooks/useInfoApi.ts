@@ -33,14 +33,11 @@ export enum ApiEndpoints {
     FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
     VAULT_DETAILS = 'vaultDetails',
-    EXPLORER = 'explorer',
-    TX_DETAILS = 'txDetails',
     USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
 const apiUrl = 'https://api.hyperliquid.xyz/info';
-const explorerApiUrl = 'https://rpc.hyperliquid.xyz/explorer';
 
 export function useInfoApi() {
     const fetchData = async (config: ApiCallConfig) => {
@@ -267,25 +264,6 @@ export function useInfoApi() {
         return data;
     };
 
-    const fetchExplorerDetails = async (txHash: string): Promise<any> => {
-        const res = await fetch(explorerApiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                type: ApiEndpoints.TX_DETAILS,
-                hash: txHash,
-            }),
-        });
-
-        if (!res.ok) {
-            throw new Error(
-                `Explorer RPC hata: ${res.status} ${res.statusText}`,
-            );
-        }
-
-        return await res.json();
-    };
-
     const fetchUserNonFundingLedgerUpdates = async (
         address: string,
     ): Promise<TransactionData[]> => {
@@ -316,7 +294,6 @@ export function useInfoApi() {
         fetchUserPortfolio,
         fetchVaultDetails,
         fetchVaults,
-        fetchExplorerDetails,
         fetchUserNonFundingLedgerUpdates,
     };
 }
