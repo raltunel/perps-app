@@ -313,7 +313,6 @@ export default function PageHeader() {
                     close={appSettingsModal.close}
                     position={'center'}
                     title='Options'
-                    limiter={'rr'}
                 >
                     <AppOptions />
                 </Modal>

@@ -17,9 +17,11 @@ import { MdClose } from 'react-icons/md';
 import { useKeydown } from '~/hooks/useKeydown';
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { useViewed } from '~/stores/AlreadySeenStore';
+import { useLocation } from 'react-router';
 
 interface NewsItemIF {
-    message: string;
+    headline: string;
+    body: string;
     id: string;
 }
 
@@ -80,17 +82,26 @@ export default function Notifications() {
 
     // apply filter to messages received by the app
     const unseen: {
-        messages: string[];
+        messages: {
+            headline: string;
+            body: string;
+        }[];
         hashes: string[];
     } = useMemo(() => {
         // output variable for human-readable messages
-        const messages: string[] = [];
+        const messages: {
+            headline: string;
+            body: string;
+        }[] = [];
         // output variable for message hashes
         const hashes: string[] = [];
         // iterate over news items, handle ones not previously seen
         news.forEach((n: NewsItemIF) => {
             if (!alreadyViewed.checkIfViewed(n.id)) {
-                messages.push(n.message);
+                messages.push({
+                    headline: n.headline,
+                    body: n.body,
+                });
                 hashes.push(n.id);
             }
         });
@@ -107,6 +118,12 @@ export default function Notifications() {
     ]);
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
+
+    const { pathname } = useLocation();
+
+    if (pathname === '/') {
+        return <></>;
+    }
 
     return (
         <div className={styles.notifications}>
@@ -159,6 +176,8 @@ export default function Notifications() {
                     <header>
                         <h4>News</h4>
                         <MdClose
+                            color='var(--text2)'
+                            size={16}
                             onClick={() => {
                                 setUserClosedNews(true);
                                 alreadyViewed.markAsViewed(unseen.hashes);
@@ -166,9 +185,14 @@ export default function Notifications() {
                         />
                     </header>
                     <ul>
-                        {unseen.messages.map((n: string) => (
-                            <li>{n}</li>
-                        ))}
+                        {unseen.messages.map(
+                            (n: { headline: string; body: string }) => (
+                                <li>
+                                    <h5>{n.headline}</h5>
+                                    <p>{n.body}</p>
+                                </li>
+                            ),
+                        )}
                     </ul>
                 </div>
             )}
