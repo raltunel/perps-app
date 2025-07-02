@@ -144,10 +144,12 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
 
     const showTakeProfitToggle = ['market', 'limit'].includes(marketOrderType);
     const showReduceToggle = marketOrderType !== 'chase_limit';
+    const showChasingInterval = marketOrderType === 'chase_limit';
+    const showChaseDistance = false;
 
     const showRandomizeToggle = marketOrderType === 'twap';
 
-    const chasingIntervalToggle = marketOrderType === 'chase_limit' && (
+    const chasingIntervalToggle = showChasingInterval && (
         <div className={styles.chasingIntervalContainer}>
             <div className={styles.inputDetailsDataContent}>
                 <div className={styles.inputDetailsLabel}>
@@ -156,19 +158,21 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         <AiOutlineQuestionCircle size={13} />
                     </Tooltip>
                 </div>
-                <span className={styles.inputDetailValue}>Per 1s</span>
+                <span className={styles.inputDetailValue}>Atomic</span>
             </div>
 
-            <div className={styles.reduceToggleContent}>
-                <ToggleSwitch
-                    isOn={isChasingIntervalEnabled}
-                    onToggle={handleToggleIsChasingInterval}
-                    label=''
-                />
+            {showChaseDistance && (
+                <div className={styles.reduceToggleContent}>
+                    <ToggleSwitch
+                        isOn={isChasingIntervalEnabled}
+                        onToggle={handleToggleIsChasingInterval}
+                        label=''
+                    />
 
-                <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
-            </div>
-            {isChasingIntervalEnabled && (
+                    <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
+                </div>
+            )}
+            {showChaseDistance && isChasingIntervalEnabled && (
                 <ChaseDistance
                     value={chaseDistance}
                     onChange={(val) => {
