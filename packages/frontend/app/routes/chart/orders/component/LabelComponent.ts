@@ -374,9 +374,7 @@ const LabelComponent = ({
                 if (priceScale) {
                     const isLogarithmic = priceScale.getMode() === 1;
                     if (isLogarithmic) {
-                        advancedValue = scaleData.scaleSymlog.invert(
-                            clientY * dpr,
-                        );
+                        advancedValue = scaleData.scaleSymlog.invert(clientY);
                     }
                 }
             }

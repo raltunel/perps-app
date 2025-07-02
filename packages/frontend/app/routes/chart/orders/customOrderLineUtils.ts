@@ -88,6 +88,7 @@ export const getPricetoPixel = (
     const priceScale = priceScalePane.getMainSourcePriceScale();
     if (priceScale) {
         const priceRange = priceScale.getVisiblePriceRange();
+
         const chartHeightTemp = chartHeight
             ? chartHeight
             : priceScalePane.getHeight();
@@ -98,22 +99,16 @@ export const getPricetoPixel = (
         const minPrice = priceRange.from;
         const isLogarithmic = priceScale.getMode() === 1;
         if (isLogarithmic) {
-            const constantMin = getDynamicSymlogConstant(
-                minPrice,
-                maxPrice,
-                scaleData.scaleSymlog,
-            );
-            scaleData.scaleSymlog.constant(constantMin);
-            const logPrice = scaleData.scaleSymlog(price);
-            const logMinPrice = scaleData.scaleSymlog(minPrice);
-            const logMaxPrice = scaleData.scaleSymlog(maxPrice);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { coordOffset } = (priceScale as any)._priceScale._logFormula;
+            scaleData.scaleSymlog.constant(coordOffset);
+            const logPrice = scaleData.scaleSymlog(price) * dpr;
 
-            const priceDifference = logMaxPrice - logMinPrice;
-            const relativePrice = logPrice - logMinPrice;
-            const pixelCoordinate =
-                (relativePrice / priceDifference) * chartHeightTemp;
+            pixel = logPrice - textHeight / 2;
 
-            pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
+            console.log('Price: ' + price + ' -> ' + logPrice);
+            console.log('pixel :', pixel);
+            console.log('--------------------------------');
         } else {
             const priceDifference = maxPrice - minPrice;
             const relativePrice = price - minPrice;

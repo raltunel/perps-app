@@ -89,6 +89,7 @@ const OverlayCanvas: React.FC = () => {
                 });
 
                 yScale.range([result[0].contentRect?.height, 0]);
+                scaleSymlog.range([result[0].contentRect?.height, 0]);
             }
         });
 
