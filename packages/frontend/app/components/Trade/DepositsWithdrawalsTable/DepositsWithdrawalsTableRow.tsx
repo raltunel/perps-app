@@ -1,3 +1,5 @@
+import { LuSquareArrowOutUpRight } from 'react-icons/lu';
+import { useInfoApi } from '~/hooks/useInfoApi';
 import styles from './DepositsWithdrawalsTable.module.css';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 
@@ -57,17 +59,15 @@ export default function DepositsWithdrawalsTableRow(
     props: DepositsWithdrawalsTableRowProps,
 ) {
     const { transaction } = props;
+    const { fetchExplorerDetails } = useInfoApi();
     const d = transaction.delta as any;
 
-    const getStatusFromDelta = (type: string): string => {
-        return 'Completed';
-    };
+    const getStatusFromDelta = (type: string): string => 'Completed';
 
     const TOKEN_TO_NETWORK: Record<string, string> = {
         HYPE: 'Hyperliquid',
         PURR: 'Hyperliquid',
         UFART: 'Solana',
-
         FARTCOIN: 'Solana',
         USOL: 'Solana',
         UETH: 'Ethereum',
@@ -92,9 +92,8 @@ export default function DepositsWithdrawalsTableRow(
                 return 'Deposit';
             case 'withdraw':
                 return 'Withdrawal';
-            case 'spotTransfer': {
+            case 'spotTransfer':
                 return 'Spot Transfer';
-            }
             default:
                 return 'Unknown';
         }
@@ -102,7 +101,6 @@ export default function DepositsWithdrawalsTableRow(
 
     function getValueChange(tx: TransactionData): string {
         const d = tx.delta as any;
-
         if (d.type === 'spotTransfer') {
             if (['HYPE', 'USOL'].includes(d.token)) {
                 const amt =
@@ -110,34 +108,30 @@ export default function DepositsWithdrawalsTableRow(
                 return `-${amt.toFixed(7)} ${d.token}`;
             }
             if (d.token === 'UBTC') {
-                const btcPriceUsd = 89_000; // not accurate
+                const btcPriceUsd = 89000;
                 const btc = parseFloat(d.usdcValue) / btcPriceUsd;
                 return `-${btc.toFixed(3)} BTC`;
             }
             if (d.token === 'UETH') {
-                const ethPriceUsd = 1_900;
+                const ethPriceUsd = 1900;
                 const eth = parseFloat(d.usdcValue) / ethPriceUsd;
                 return `-${eth.toFixed(2)} ETH`;
             }
             const usd = parseFloat(d.usdcValue);
             return `-${usd.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDT`;
         }
-
         if (d.type === 'withdraw') {
             const usd = parseFloat(d.usdc);
             return `-${usd.toLocaleString(undefined, { maximumFractionDigits: 7 })} SOL`;
         }
-
         if (d.type === 'deposit') {
             const usd = parseFloat(d.usdc);
             return `+${usd.toFixed(0)} USDT`;
         }
-
         if (d.type === 'accountClassTransfer') {
             const amt = parseFloat(d.usdc) * (d.toPerp ? -1 : 1);
             return `${amt >= 0 ? '+' : ''}${amt.toLocaleString(undefined, { maximumFractionDigits: 2 })} USDT`;
         }
-
         return '';
     }
 
@@ -153,14 +147,15 @@ export default function DepositsWithdrawalsTableRow(
     }
 
     function getToken(network: string): string {
-        switch (d.type) {
+        switch (network) {
             case 'Hyperliquid':
                 return 'HYPE';
             case 'Solana':
                 return 'SOL';
-            case 'Etherium': {
+            case 'Ethereum':
                 return 'ETH';
-            }
+            case 'Bitcoin':
+                return 'BTC';
             default:
                 return 'HYPE';
         }
