@@ -352,15 +352,19 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                                             View All
                                         </a>
                                     )}
-                                {pageMode && (
-                                    <a
-                                        href='#'
-                                        className={styles.exportLink}
-                                        onClick={handleExportCsv}
-                                    >
-                                        Export as CSV
-                                    </a>
-                                )}
+                                {pageMode &&
+                                    tableModel &&
+                                    tableModel.some(
+                                        (header) => header.exportable,
+                                    ) && (
+                                        <a
+                                            href='#'
+                                            className={styles.exportLink}
+                                            onClick={handleExportCsv}
+                                        >
+                                            Export as CSV
+                                        </a>
+                                    )}
                             </div>
                         )}
 
