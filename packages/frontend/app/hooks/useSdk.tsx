@@ -84,15 +84,19 @@ export const SdkProvider: React.FC<{
         }
     }, [internetConnected]);
 
-    const stashWebsocket = useCallback(() => {
+    const stashSubscriptions = useCallback(() => {
         const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
         stashedSubs.current = {};
         Object.keys(activeSubs).forEach((key) => {
             const subs = activeSubs[key];
             stashedSubs.current[key] = subs;
         });
+        console.log('>>> stashed subscriptions', stashedSubs.current);
+    }, [info]);
+
+    const stashWebsocket = useCallback(() => {
         info?.wsManager?.stop();
-        console.log('>>> stashed subs', stashedSubs.current);
+        console.log('>>> stashed websocket');
     }, [info]);
 
     const reInitWs = useCallback(() => {
@@ -106,6 +110,7 @@ export const SdkProvider: React.FC<{
         if (!isTabActive) return;
 
         if (internetConnected && shouldReconnect) {
+            console.log('>>> alternate reconnect', new Date().toISOString());
             info?.wsManager?.reconnect();
             setWsReconnecting(true);
             setShouldReconnect(false);
@@ -126,11 +131,21 @@ export const SdkProvider: React.FC<{
         isClient,
         info,
         shouldReconnect,
+        isTabActive,
         // isWsStashed,
         // isTabActive,
     ]);
 
     useEffect(() => {
+        if (!isClient) return;
+
+        console.log(
+            '>>> useSDK useEffect for reInitWs | isWsStashed',
+            isWsStashed,
+            ' isTabActive',
+            isTabActive,
+        );
+
         if (isWsStashed && isTabActive) {
             console.log('>>> will re init ws object');
             reInitWs();
@@ -147,12 +162,13 @@ export const SdkProvider: React.FC<{
         return () => {
             clearInterval(reconnectInterval);
         };
-    }, [isWsStashed, isTabActive, reInitWs]);
+    }, [isWsStashed, isTabActive, reInitWs, isClient]);
 
     useEffect(() => {
         if (!isClient) return;
         if (isWsSleepMode) {
             info?.wsManager?.setSleepMode(true);
+            stashSubscriptions();
         } else {
             info?.wsManager?.setSleepMode(false);
         }
@@ -160,15 +176,25 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isTabActive) {
+            console.log(
+                '>>> useSDK | tab is inactive',
+                new Date().toISOString(),
+            );
             if (stashTimeoutRef.current) {
                 clearTimeout(stashTimeoutRef.current);
             }
+
+            console.log(
+                '>>> useSDK | start stash timeout',
+                new Date().toISOString(),
+            );
             stashTimeoutRef.current = setTimeout(() => {
-                console.log('>>> stashing', new Date().toISOString());
+                console.log('>>> useSDK | stashing', new Date().toISOString());
                 stashWebsocket();
                 setIsWsStashed(true);
             }, WS_SLEEP_MODE_STASH_CONNECTION);
         } else {
+            console.log('>>> useSDK | tab is active', new Date().toISOString());
             if (stashTimeoutRef.current) {
                 clearTimeout(stashTimeoutRef.current);
             }
