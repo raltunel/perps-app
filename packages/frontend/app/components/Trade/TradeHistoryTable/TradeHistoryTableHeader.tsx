@@ -2,6 +2,7 @@ import type { UserFillSortBy } from '~/utils/UserDataIFs';
 import styles from './TradeHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { HeaderCell, TableSortDirection } from '~/utils/CommonIFs';
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 
 interface TradeHistoryTableHeaderProps {
     sortBy?: UserFillSortBy;
@@ -9,14 +10,19 @@ interface TradeHistoryTableHeaderProps {
     sortClickHandler: (key: UserFillSortBy) => void;
 }
 
-export const TradeHistoryTableModel: HeaderCell[] = [
+export const TradeHistoryTableModel:
+    | HeaderCell<number>[]
+    | HeaderCell<string>[] = [
     {
         name: 'Time',
         key: 'time',
         sortable: true,
         className: 'timeCell',
         exportable: true,
-    },
+        exportAction: (data: number) => {
+            return formatTimestamp(data);
+        },
+    } as HeaderCell<number>,
     {
         name: 'Coin',
         key: 'coin',
@@ -26,7 +32,7 @@ export const TradeHistoryTableModel: HeaderCell[] = [
     },
     {
         name: 'Direction',
-        key: 'side',
+        key: 'dir',
         sortable: true,
         className: 'directionCell',
         exportable: true,

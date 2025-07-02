@@ -267,10 +267,17 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         if (tableModel) {
             const headers = tableModel.filter((header) => header.exportable);
             const csvContent = [
-                headers.join(','),
+                headers.map((header) => header.name).join(','),
                 ...data.map((row) =>
                     headers
-                        .map((header) => row[header.key as keyof T])
+                        .map((header) => {
+                            if (header.exportAction) {
+                                return header.exportAction(
+                                    row[header.key as keyof T],
+                                );
+                            }
+                            return row[header.key as keyof T] as string;
+                        })
                         .join(','),
                 ),
             ].join('\n');

@@ -6,10 +6,11 @@ export enum TableState {
     FILLED = 'filled',
 }
 
-export interface HeaderCell {
+export interface HeaderCell<T> {
     name: string;
     key: string;
     sortable?: boolean;
     className: string;
     exportable?: boolean;
+    exportAction?: (data: T) => string;
 }
