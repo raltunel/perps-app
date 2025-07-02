@@ -1,14 +1,7 @@
-import React, {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
-import { useIsClient } from './useIsClient';
-import { Info, Exchange, type Environment, DEMO_USER } from '@perps-app/sdk';
+import { DEMO_USER, Exchange, Info, type Environment } from '@perps-app/sdk';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useIsClient } from './useIsClient';
 
 type SdkContextType = {
     info: Info | null;
@@ -25,11 +18,11 @@ export const SdkProvider: React.FC<{
 
     const [info, setInfo] = useState<Info | null>(null);
     const [exchange, setExchange] = useState<Exchange | null>(null);
+    const [shouldReconnect, setShouldReconnect] = useState(false);
 
-    const { internetConnected } = useTradeDataStore();
+    const { internetConnected, setWsReconnecting } = useTradeDataStore();
 
     // commit to trigger deployment
-
     useEffect(() => {
         if (!isClient) return;
         if (!info) {
@@ -60,11 +53,30 @@ export const SdkProvider: React.FC<{
     }, [isClient, environment]);
 
     useEffect(() => {
-        if (!isClient) return;
-        if (internetConnected) {
-            info?.wsManager?.reconnect();
+        if (!internetConnected) {
+            setShouldReconnect(true);
         }
-    }, [internetConnected, isClient]);
+    }, [internetConnected]);
+
+    useEffect(() => {
+        if (!isClient) return;
+        if (internetConnected && shouldReconnect) {
+            info?.wsManager?.reconnect();
+            setWsReconnecting(true);
+            setShouldReconnect(false);
+        }
+
+        const reconnectInterval = setInterval(() => {
+            if (info?.wsManager?.isWsReady()) {
+                setWsReconnecting(false);
+                clearInterval(reconnectInterval);
+            }
+        }, 200);
+
+        return () => {
+            clearInterval(reconnectInterval);
+        };
+    }, [internetConnected, isClient, info, shouldReconnect]);
 
     return (
         <SdkContext.Provider value={{ info: info, exchange: exchange }}>

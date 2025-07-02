@@ -10,7 +10,10 @@ import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import TransferModal from '~/components/TransferModal/TransferModal';
 import OrderHistory from '~/components/OrderHistory/OrderHistory';
+import LineChart from '~/components/LineChart/LineChart';
+import StrategyDetailChart from './StrategyDetailChart';
 
 export default function Strategies() {
     // hook to manage navigation actions from this page
@@ -27,6 +30,9 @@ export default function Strategies() {
 
     // logic to control the strategy removal modal
     const removeStratModalCtrl: useModalIF = useModal();
+
+    // logic to control the transfer modal
+    const transferModalCtrl: useModalIF = useModal();
 
     return (
         <div className={styles.strategy_detail_page}>
@@ -68,12 +74,14 @@ export default function Strategies() {
                             Edit
                         </SimpleButton>
                         <SimpleButton
-                            onClick={() => console.log('Strategy Transfered!')}
+                            onClick={transferModalCtrl.open}
+                            hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
-                            onClick={() => removeStratModalCtrl.open()}
+                            onClick={removeStratModalCtrl.open}
+                            hoverBg='accent1'
                         >
                             Remove
                         </SimpleButton>
@@ -152,7 +160,12 @@ export default function Strategies() {
                             </div>
                         </section>
                     </div>
-                    <div className={styles.strategy_details_graph}></div>
+                    <div
+                        id={'strategyDetailsGraph'}
+                        className={styles.strategy_details_graph}
+                    >
+                        <StrategyDetailChart />
+                    </div>
                 </div>
                 <OrderHistory pageMode={false} />
                 {removeStratModalCtrl.isOpen && (
@@ -187,6 +200,9 @@ export default function Strategies() {
                             </div>
                         </section>
                     </Modal>
+                )}
+                {transferModalCtrl.isOpen && (
+                    <TransferModal closeModal={transferModalCtrl.close} />
                 )}
             </div>
         </div>

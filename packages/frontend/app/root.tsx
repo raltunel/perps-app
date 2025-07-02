@@ -12,16 +12,19 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
+import VersionUpdateAnnouncement from './components/VersionUpdateAnnouncement/VersionUpdateAnnouncement';
+import WsReconnectingIndicator from './components/WsReconnectingIndicator/WsReconnectingIndicator';
+import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
+import { useVersionCheck } from './hooks/useVersionCheck';
 import { useDebugStore } from './stores/DebugStore';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import { useTradeDataStore } from './stores/TradeDataStore';
-import NoConnectionIndicator from './components/NoConnectionIndicator/NoConnectionIndicator';
-import { AppProvider } from './contexts/AppContext';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -108,9 +111,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+    const { showReload, setShowReload } = useVersionCheck();
+
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
-    const { setInternetConnected, internetConnected } = useTradeDataStore();
+    const { setInternetConnected, internetConnected, wsReconnecting } =
+        useTradeDataStore();
 
     useEffect(() => {
         const onlineListener = () => {
@@ -134,8 +140,9 @@ export default function App() {
             <Layout>
                 <AppProvider>
                     <SdkProvider environment={wsEnvironment}>
-                      {!internetConnected && <NoConnectionIndicator />}
-                      <TutorialProvider>
+                        {!internetConnected && <NoConnectionIndicator />}
+                        {wsReconnecting && <WsReconnectingIndicator />}
+                        <TutorialProvider>
                             <div className='root-container'>
                                 {/* Added error boundary for header */}
                                 <ComponentErrorBoundary>
@@ -162,6 +169,13 @@ export default function App() {
                             </div>
                         </TutorialProvider>
                         <RuntimeDomManipulation />
+                        {showReload && (
+                            <VersionUpdateAnnouncement
+                                onClose={() => {
+                                    setShowReload(false);
+                                }}
+                            />
+                        )}
                     </SdkProvider>
                 </AppProvider>
             </Layout>

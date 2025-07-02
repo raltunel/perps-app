@@ -11,11 +11,12 @@
 }
 .container header {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--gap-m);
     color: var(--text1, #e1eeee);
     font-size: var(--font-size-xl, 36px);
 }
+
 .container header a {
     color: var(--accent1, #7371fc);
     font-size: var(--font-size-m, 18px);
