@@ -42,7 +42,7 @@ function TradeHistory() {
 
     useEffect(() => {
         if (!isCurrentUser && address) {
-            fetchUserFills(address).then((data) => {
+            fetchUserFills(address, true).then((data) => {
                 setFetchedHistoryData(data);
                 setIsFetched(true);
             });

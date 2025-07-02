@@ -73,7 +73,10 @@ export function useInfoApi() {
         return ret;
     };
 
-    const fetchUserFills = async (address: string): Promise<UserFillIF[]> => {
+    const fetchUserFills = async (
+        address: string,
+        aggregateByTime?: boolean,
+    ): Promise<UserFillIF[]> => {
         const ret: UserFillIF[] = [];
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -81,6 +84,7 @@ export function useInfoApi() {
             body: JSON.stringify({
                 type: ApiEndpoints.USER_FILLS,
                 user: address,
+                aggregateByTime,
             }),
         });
         const data = await response.json();
