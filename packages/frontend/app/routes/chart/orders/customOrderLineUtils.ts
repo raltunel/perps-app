@@ -108,6 +108,8 @@ export const getPricetoPixel = (
 
             console.log('Price: ' + price + ' -> ' + logPrice);
             console.log('pixel :', pixel);
+            console.log('Domain :', minPrice, '-', maxPrice);
+
             console.log('--------------------------------');
         } else {
             const priceDifference = maxPrice - minPrice;
