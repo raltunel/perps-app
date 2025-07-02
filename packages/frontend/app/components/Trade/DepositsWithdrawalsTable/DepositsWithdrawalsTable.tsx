@@ -1,63 +1,107 @@
+import { useMemo, useRef } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
-import DepositsWithdrawalsTableRow from './DepositsWithdrawalsTableRow';
-//import { transactionsData } from './data';
-import styles from './DepositsWithdrawalsTable.module.css';
-import { useEffect, useMemo, useState } from 'react';
+import DepositsWithdrawalsTableRow, {
+    type TransactionData,
+} from './DepositsWithdrawalsTableRow';
+import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
+import type { TableSortDirection } from '~/utils/CommonIFs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-export default function DepositsWithdrawalsTable() {
+import { useDebugStore } from '~/stores/DebugStore';
+
+// 1) Sorter that takes and returns TransactionData[]
+function sortTransactionData(
+    data: TransactionData[],
+    sortBy: DepositAndWithDrawalSortBy,
+    sortDirection: TableSortDirection,
+): TransactionData[] {
+    const copy = [...data];
+    if (!sortBy || !sortDirection) return copy;
+
+    const getKey = (tx: TransactionData): string | number => {
+        const d: any = tx.delta;
+        switch (sortBy) {
+            case 'time':
+                return tx.time;
+            case 'status':
+                return 'Completed';
+            case 'network':
+                return d.token || '';
+            case 'action':
+                return d.type;
+            case 'valueChange':
+                return parseFloat(d.amount || d.usdc || '0');
+            case 'fee':
+                return parseFloat(d.nativeTokenFee || d.fee || '0');
+            default:
+                return '';
+        }
+    };
+
+    copy.sort((a, b) => {
+        const aKey = getKey(a),
+            bKey = getKey(b);
+        if (typeof aKey === 'number' && typeof bKey === 'number') {
+            return sortDirection === 'asc' ? aKey - bKey : bKey - aKey;
+        }
+        return sortDirection === 'asc'
+            ? String(aKey).localeCompare(String(bKey))
+            : String(bKey).localeCompare(String(aKey));
+    });
+
+    return copy;
+}
+
+export default function DepositsWithdrawalsTable({
+    pageMode,
+}: {
+    pageMode?: boolean;
+}) {
+    const isFetchedLocal = true;
+
     const transactions = useTradeDataStore(
-        (state) => state.userNonFundingLedgerUpdates,
+        (s) => s.userNonFundingLedgerUpdates,
     );
-    const handleViewAll = () => {
-        console.log('View all transactions');
-    };
 
-    const handleExportCSV = () => {
-        console.log('Export as CSV');
-    };
-
+    // initial descending sort by time
     const sortedTxs = useMemo(
         () => [...transactions].sort((a, b) => b.time - a.time),
         [transactions],
     );
+    const { debugWallet } = useDebugStore();
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
+
+    const viewAllLink = '/depositsandwithdrawals';
+
+    //   console.log(sortedTxs)
 
     return (
-        <div className={styles.tableWrapper}>
-            <DepositsWithdrawalsTableHeader />
-            <div className={styles.tableBody}>
-                {sortedTxs.map((transaction, index) => (
-                    <DepositsWithdrawalsTableRow
-                        key={`transaction-${index}`}
-                        transaction={transaction}
-                    />
-                ))}
-
-                {sortedTxs.length === 0 && (
-                    <div
-                        className={styles.rowContainer}
-                        style={{ justifyContent: 'center', padding: '2rem 0' }}
-                    >
-                        No transactions to display
-                    </div>
-                )}
-            </div>
-
-            {sortedTxs.length > 0 && (
-                <div className={styles.actionsContainer}>
-                    <button
-                        className={styles.actionLink}
-                        onClick={handleViewAll}
-                    >
-                        View All
-                    </button>
-                    <button
-                        className={styles.actionLink}
-                        onClick={handleExportCSV}
-                    >
-                        Export as CSV
-                    </button>
-                </div>
+        <GenericTable<TransactionData, DepositAndWithDrawalSortBy>
+            storageKey={`DepositsWithdrawalsTable${currentUserRef.current}`}
+            data={sortedTxs}
+            renderHeader={(dir, onSort, by) => (
+                <DepositsWithdrawalsTableHeader
+                    sortBy={by}
+                    sortDirection={dir}
+                    sortClickHandler={onSort}
+                />
             )}
-        </div>
+            renderRow={(tx, idx) => (
+                <DepositsWithdrawalsTableRow
+                    key={`tx-${idx}`}
+                    transaction={tx}
+                />
+            )}
+            sorterMethod={sortTransactionData}
+            isFetched={isFetchedLocal}
+            pageMode={pageMode}
+            viewAllLink={viewAllLink}
+            skeletonRows={7}
+            slicedLimit={0}
+            skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+            defaultSortBy='time'
+            defaultSortDirection='desc'
+        />
     );
 }
