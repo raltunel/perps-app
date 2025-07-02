@@ -140,7 +140,6 @@ function OrderInput() {
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
-        console.log('generating');
         // Generate a random maximum between minimumInputValue and 100
         const newMaximumInputValue =
             Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
@@ -251,11 +250,9 @@ function OrderInput() {
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
-        console.log(`Order type changed to: ${value}`);
     }, []);
     const handleMarginModeChange = useCallback((mode: MarginMode) => {
         setActiveMargin(mode);
-        console.log(`Mode changed to: ${mode}`);
     }, []);
 
     const handleMarginModeConfirm = () => {
@@ -266,7 +263,6 @@ function OrderInput() {
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
-        console.log(`Leverage changed to: ${value}x`);
     };
 
     const handleSizeChange = useCallback(

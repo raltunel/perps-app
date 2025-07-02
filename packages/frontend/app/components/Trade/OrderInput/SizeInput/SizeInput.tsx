@@ -36,7 +36,6 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         () => [symbol.toUpperCase(), 'USD'],
         [symbol],
     );
-    console.log({ useTotalSize });
 
     // Memoized ComboBox onChange handler
     const handleComboBoxChange = useCallback(
