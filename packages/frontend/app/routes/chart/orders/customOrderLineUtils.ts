@@ -105,12 +105,6 @@ export const getPricetoPixel = (
             const logPrice = scaleData.scaleSymlog(price) * dpr;
 
             pixel = logPrice - textHeight / 2;
-
-            console.log('Price: ' + price + ' -> ' + logPrice);
-            console.log('pixel :', pixel);
-            console.log('Domain :', minPrice, '-', maxPrice);
-
-            console.log('--------------------------------');
         } else {
             const priceDifference = maxPrice - minPrice;
             const relativePrice = price - minPrice;
