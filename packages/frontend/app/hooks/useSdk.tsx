@@ -84,15 +84,19 @@ export const SdkProvider: React.FC<{
         }
     }, [internetConnected]);
 
-    const stashWebsocket = useCallback(() => {
+    const stashSubscriptions = useCallback(() => {
         const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
         stashedSubs.current = {};
         Object.keys(activeSubs).forEach((key) => {
             const subs = activeSubs[key];
             stashedSubs.current[key] = subs;
         });
+        console.log('>>> stashed subscriptions', stashedSubs.current);
+    }, [info]);
+
+    const stashWebsocket = useCallback(() => {
         info?.wsManager?.stop();
-        console.log('>>> stashed subs', stashedSubs.current);
+        console.log('>>> stashed websocket');
     }, [info]);
 
     const reInitWs = useCallback(() => {
@@ -154,6 +158,7 @@ export const SdkProvider: React.FC<{
         if (!isClient) return;
         if (isWsSleepMode) {
             info?.wsManager?.setSleepMode(true);
+            stashSubscriptions();
         } else {
             info?.wsManager?.setSleepMode(false);
         }
