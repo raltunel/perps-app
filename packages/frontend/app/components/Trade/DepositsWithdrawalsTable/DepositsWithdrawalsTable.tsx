@@ -9,7 +9,6 @@ import type { TableSortDirection } from '~/utils/CommonIFs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
 
-/** 1) Sorter fonksiyonu */
 function sortTransactionData(
     data: TransactionData[],
     sortBy: DepositAndWithDrawalSortBy,
