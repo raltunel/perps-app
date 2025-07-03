@@ -51,6 +51,10 @@ export default [
     ),
 
     route(
+        'depositsandwithdrawals',
+        'routes/depositsandwithdrawals/depositsandwithdrawals.tsx',
+    ),
+    route(
         'fundingHistory/:address?',
         'routes/fundingHistory/fundingHistory.tsx',
     ),

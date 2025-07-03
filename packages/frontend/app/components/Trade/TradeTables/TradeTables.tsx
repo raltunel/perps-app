@@ -210,7 +210,9 @@ export default function TradeTable(props: TradeTableProps) {
                     />
                 );
             case 'Deposits and Withdrawals':
-                return <DepositsWithdrawalsTable />;
+                return (
+                    <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
+                );
             case 'Depositors':
                 return (
                     <VaultDepositorsTable

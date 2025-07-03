@@ -82,6 +82,7 @@ export default function CodeTabs(props: Props) {
                 onTabChange={handleTabChange}
                 wrapperId='codeTabs'
                 layoutIdPrefix='codeTabIndicator'
+                flex
             />
             <motion.div
                 className={styles.tableContent}
