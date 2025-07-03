@@ -15,6 +15,8 @@ import type {
     UserFundingIF,
     UserFillSortBy,
     UserFundingSortBy,
+    DepositAndWithDrawalIF,
+    DepositAndWithDrawalSortBy,
 } from '~/utils/UserDataIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
@@ -393,6 +395,23 @@ export function processUserFundings(data: UserFunding[]): UserFundingIF[] {
     return ret;
 }
 
+export function processDepositWithdrawal(
+    data: DepositAndWithDrawalIF[],
+): DepositAndWithDrawalIF[] {
+    const ret: DepositAndWithDrawalIF[] = [];
+    data.forEach((f) => {
+        ret.push({
+            time: f.time,
+            status: f.status,
+            network: f.network,
+            action: f.action,
+            valueChange: f.valueChange,
+            fee: f.fee,
+        } as DepositAndWithDrawalIF);
+    });
+    return ret;
+}
+
 export function sortUserFundings(
     fundings: UserFundingIF[],
     sortBy: UserFundingSortBy,
@@ -451,6 +470,74 @@ export function sortUserFundings(
         }
     }
     return fundings;
+}
+
+export function sortDepositWithdrawal(
+    depositAndWithdrawal: DepositAndWithDrawalIF[],
+    sortBy: DepositAndWithDrawalSortBy,
+    sortDirection: TableSortDirection,
+) {
+    if (sortDirection && sortBy) {
+        switch (sortBy) {
+            case 'time':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+            case 'status':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.status.localeCompare(b.status);
+                    } else {
+                        return b.status.localeCompare(a.status);
+                    }
+                });
+            case 'network':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.network.localeCompare(b.network);
+                    } else {
+                        return b.network.localeCompare(a.network);
+                    }
+                });
+            case 'action':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.action.localeCompare(b.action);
+                    } else {
+                        return b.action.localeCompare(a.action);
+                    }
+                });
+            case 'valueChange':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.valueChange.localeCompare(b.valueChange);
+                    } else {
+                        return b.valueChange.localeCompare(a.valueChange);
+                    }
+                });
+            case 'fee':
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.fee.localeCompare(b.fee);
+                    } else {
+                        return b.fee.localeCompare(a.fee);
+                    }
+                });
+            default:
+                return depositAndWithdrawal.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.time - b.time;
+                    } else {
+                        return b.time - a.time;
+                    }
+                });
+        }
+    }
+    return depositAndWithdrawal;
 }
 
 export function processUserActiveTwap(data: UserActiveTwap): ActiveTwapIF {
