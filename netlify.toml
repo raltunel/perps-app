@@ -23,6 +23,7 @@
   from = "/"
   to = "/blocked"
   status = 301
+  force = true
   conditions = {Country = ["RU", "CN", "IR"]}
 
 # Block /index.html explicitly for specified countries
@@ -30,6 +31,7 @@
   from = "/index.html"
   to = "/blocked"
   status = 301
+  force = true
   conditions = {Country = ["RU", "CN", "IR"]}
 
 # Block all other pages for specified countries
@@ -37,6 +39,7 @@
   from = "/*"
   to = "/blocked"
   status = 301
+  force = true
   conditions = {Country = ["RU", "CN", "IR"]}
 
 # Serve the blocked page
