@@ -138,6 +138,7 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isClient) return;
+        if (!info) return;
 
         console.log(
             '>>> useSDK useEffect for reInitWs | isWsStashed',
@@ -152,6 +153,13 @@ export const SdkProvider: React.FC<{
             setWsReconnecting(true);
         }
 
+        if (info) {
+            console.log(
+                '>>> info.wsManager?.isWsReady()',
+                info.wsManager?.isWsReady(),
+            );
+        }
+
         const reconnectInterval = setInterval(() => {
             if (info?.wsManager?.isWsReady()) {
                 setWsReconnecting(false);
@@ -162,7 +170,7 @@ export const SdkProvider: React.FC<{
         return () => {
             clearInterval(reconnectInterval);
         };
-    }, [isWsStashed, isTabActive, reInitWs, isClient]);
+    }, [isWsStashed, isTabActive, reInitWs, isClient, info]);
 
     useEffect(() => {
         if (!isClient) return;
