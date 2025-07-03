@@ -18,6 +18,13 @@
   [headers.values]
     Cache-Control = "no-store"
 
+# Block homepage for specified countries
+[[redirects]]
+  from = "/"
+  to = "/blocked"
+  status = 301
+  conditions = {Country = ["RU", "CN", "IR"]}
+
 # Country-based geofencing: block RU, CN, IR
 [[redirects]]
   from = "/blocked"
