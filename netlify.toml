@@ -25,17 +25,25 @@
   status = 301
   conditions = {Country = ["RU", "CN", "IR"]}
 
-# Country-based geofencing: block RU, CN, IR
+# Block /index.html explicitly for specified countries
 [[redirects]]
-  from = "/blocked"
-  to = "/blocked.html"
-  status = 200
+  from = "/index.html"
+  to = "/blocked"
+  status = 301
+  conditions = {Country = ["RU", "CN", "IR"]}
 
+# Block all other pages for specified countries
 [[redirects]]
   from = "/*"
   to = "/blocked"
   status = 301
   conditions = {Country = ["RU", "CN", "IR"]}
+
+# Serve the blocked page
+[[redirects]]
+  from = "/blocked"
+  to = "/blocked.html"
+  status = 200
 
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
