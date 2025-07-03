@@ -50,9 +50,9 @@
     "ZW"  # Zimbabwe
   ]}
 
-# Redirect all other users away from /blocked.html
+# Redirect all other users away from /blocked and /blocked.html
 [[redirects]]
-  from = "/blocked.html"
+  from = "/blocked*"
   to = "/"
   status = 302
   force = true
