@@ -24,7 +24,32 @@
   to = "/blocked"
   status = 301
   force = true
-  conditions = {Country = ["RU", "CN", "IR"]}
+  conditions = {Country = [
+    "AF", # Afghanistan
+    "RS", # Serbia
+    "MK", # North Macedonia
+    "BY", # Belarus
+    "MM", # Burma
+    "CF", # Central Africa Republic
+    "CU", # Cuba
+    "CD", # Democratic Republic of Congo
+    "ET", # Ethiopia
+    "IR", # Iran
+    "IQ", # Iraq
+    "LB", # Lebanon
+    "LY", # Libya
+    "ML", # Mali
+    "NI", # Nicaragua
+    "KP", # North Korea
+    "RU", # Russia
+    "SO", # Somalia
+    "SS", # South Sudan
+    "SD", # Sudan
+    "SY", # Syria
+    "VE", # Venezuela
+    "YE", # Yemen
+    "ZW"  # Zimbabwe
+  ]}
 
 # Serve the blocked page
 [[redirects]]
