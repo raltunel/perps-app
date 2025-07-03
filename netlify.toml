@@ -18,23 +18,7 @@
   [headers.values]
     Cache-Control = "no-store"
 
-# Block homepage for specified countries
-[[redirects]]
-  from = "/"
-  to = "/blocked"
-  status = 301
-  force = true
-  conditions = {Country = ["RU", "CN", "IR"]}
-
-# Block /index.html explicitly for specified countries
-[[redirects]]
-  from = "/index.html"
-  to = "/blocked"
-  status = 301
-  force = true
-  conditions = {Country = ["RU", "CN", "IR"]}
-
-# Block all other pages for specified countries
+# Block all pages for specified countries
 [[redirects]]
   from = "/*"
   to = "/blocked"
