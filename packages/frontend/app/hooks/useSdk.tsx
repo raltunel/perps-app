@@ -86,6 +86,7 @@ export const SdkProvider: React.FC<{
 
     const stashSubscriptions = useCallback(() => {
         const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
+        console.log('reset subs');
         stashedSubs.current = {};
         Object.keys(activeSubs).forEach((key) => {
             const subs = activeSubs[key];
@@ -175,6 +176,7 @@ export const SdkProvider: React.FC<{
     }, [isWsSleepMode, info]);
 
     useEffect(() => {
+        console.log('>>> isTabActive effect', stashedSubs.current);
         if (!isTabActive) {
             console.log(
                 '>>> useSDK | tab is inactive',
