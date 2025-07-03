@@ -60,7 +60,7 @@
 # Block all pages for specified countries
 [[redirects]]
   from = "/*"
-  to = "/blocked"
+  to = "/blocked.html"
   status = 301
   force = true
   conditions = {Country = [
@@ -89,12 +89,6 @@
     "YE", # Yemen
     "ZW"  # Zimbabwe
   ]}
-
-# Serve the blocked page
-[[redirects]]
-  from = "/blocked"
-  to = "/blocked.html"
-  status = 200
 
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
