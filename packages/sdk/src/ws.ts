@@ -201,7 +201,6 @@ export class WebsocketManager {
     };
 
     private sendPing = () => {
-        console.log('>>> sendPing', new Date().toISOString());
         if (this.stopped || !this.ws || this.ws.readyState !== WebSocket.OPEN)
             return;
         this.log('sending ping');

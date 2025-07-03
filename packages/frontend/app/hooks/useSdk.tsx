@@ -59,6 +59,7 @@ export const SdkProvider: React.FC<{
             });
 
             setInfo(newInfo);
+            stashedSubs.current = {};
         } else {
             info.setEnvironment(environment);
         }
@@ -86,18 +87,26 @@ export const SdkProvider: React.FC<{
 
     const stashSubscriptions = useCallback(() => {
         const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
-        console.log('reset subs');
-        stashedSubs.current = {};
+
+        if (Object.keys(activeSubs).length !== 0) {
+            // reset stashed subs if we can access active subs from ws object
+            stashedSubs.current = {};
+        }
+
         Object.keys(activeSubs).forEach((key) => {
             const subs = activeSubs[key];
             stashedSubs.current[key] = subs;
         });
-        console.log('>>> stashed subscriptions', stashedSubs.current);
+        console.log(
+            '>>> stashed subscriptions',
+            stashedSubs.current,
+            new Date().toISOString(),
+        );
     }, [info]);
 
     const stashWebsocket = useCallback(() => {
         info?.wsManager?.stop();
-        console.log('>>> stashed websocket');
+        console.log('>>> stashed websocket', new Date().toISOString());
     }, [info]);
 
     const reInitWs = useCallback(() => {
@@ -112,7 +121,11 @@ export const SdkProvider: React.FC<{
 
         if (internetConnected && shouldReconnect) {
             console.log('>>> alternate reconnect', new Date().toISOString());
-            console.log('>>> stashed subs', stashedSubs.current);
+            console.log(
+                '>>> stashed subs',
+                stashedSubs.current,
+                new Date().toISOString(),
+            );
             info?.wsManager?.reconnect(stashedSubs.current);
             setWsReconnecting(true);
             setShouldReconnect(false);
@@ -146,10 +159,11 @@ export const SdkProvider: React.FC<{
             isWsStashed,
             ' isTabActive',
             isTabActive,
+            new Date().toISOString(),
         );
 
         if (isWsStashed && isTabActive) {
-            console.log('>>> will re init ws object');
+            console.log('>>> will re init ws object', new Date().toISOString());
             reInitWs();
             setWsReconnecting(true);
         }
@@ -177,7 +191,11 @@ export const SdkProvider: React.FC<{
     }, [isWsSleepMode, info]);
 
     useEffect(() => {
-        console.log('>>> isTabActive effect', stashedSubs.current);
+        console.log(
+            '>>> isTabActive effect',
+            stashedSubs.current,
+            new Date().toISOString(),
+        );
         if (!isTabActive) {
             console.log(
                 '>>> useSDK | tab is inactive',
@@ -203,6 +221,7 @@ export const SdkProvider: React.FC<{
                     console.log(
                         '>>> info.wsManager?.isWsReady()',
                         info.wsManager?.isWsReady(),
+                        new Date().toISOString(),
                     );
                     if (!info.wsManager?.isWsReady()) {
                         setShouldReconnect(true);
