@@ -16,6 +16,7 @@ import type {
     UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
 import type { VaultDetailsIF } from '~/utils/VaultIFs';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 
 export type ApiCallConfig = {
     type: string;
@@ -32,6 +33,7 @@ export enum ApiEndpoints {
     FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
     VAULT_DETAILS = 'vaultDetails',
+    USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -262,6 +264,25 @@ export function useInfoApi() {
         return data;
     };
 
+    const fetchUserNonFundingLedgerUpdates = async (
+        address: string,
+    ): Promise<TransactionData[]> => {
+        const ret: TransactionData[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.USER_NON_FUNDING_LEDGER_UPDATES,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+            ret.push(...(data as TransactionData[]));
+        }
+        return ret;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -273,5 +294,6 @@ export function useInfoApi() {
         fetchUserPortfolio,
         fetchVaultDetails,
         fetchVaults,
+        fetchUserNonFundingLedgerUpdates,
     };
 }

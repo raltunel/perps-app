@@ -21,7 +21,6 @@ import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
-import ChasePrice from './ChasePrice/ChasePrice';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
 import MarginModal from './MarginModal/MarginModal';
@@ -142,7 +141,6 @@ function OrderInput() {
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
-        console.log('generating');
         // Generate a random maximum between minimumInputValue and 100
         const newMaximumInputValue =
             Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
@@ -159,11 +157,9 @@ function OrderInput() {
 
     const confirmationModal: useModalIF = useModal('closed');
 
-    const showPriceInputComponent = [
-        'limit',
-        'stop_limit',
-        'chase_limit',
-    ].includes(marketOrderType);
+    const showPriceInputComponent = ['limit', 'stop_limit'].includes(
+        marketOrderType,
+    );
 
     const showPriceRangeComponent = marketOrderType === 'scale';
 
@@ -266,11 +262,9 @@ function OrderInput() {
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
-        console.log(`Order type changed to: ${value}`);
     }, []);
     const handleMarginModeChange = useCallback((mode: MarginMode) => {
         setActiveMargin(mode);
-        console.log(`Mode changed to: ${mode}`);
     }, []);
 
     const handleMarginModeConfirm = () => {
@@ -281,7 +275,6 @@ function OrderInput() {
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
-        console.log(`Leverage changed to: ${value}x`);
     };
 
     const handleSizeChange = useCallback(
@@ -475,14 +468,14 @@ function OrderInput() {
         [leverage, handleLeverageChange],
     );
 
-    const chasePriceProps = useMemo(
-        () => ({
-            chaseOption,
-            chaseOptionTypes,
-            handleChaseOptionChange,
-        }),
-        [chaseOption, handleChaseOptionChange],
-    );
+    // const chasePriceProps = useMemo(
+    //     () => ({
+    //         chaseOption,
+    //         chaseOptionTypes,
+    //         handleChaseOptionChange,
+    //     }),
+    //     [chaseOption, handleChaseOptionChange],
+    // );
 
     const stopPriceProps = useMemo(
         () => ({
@@ -517,12 +510,12 @@ function OrderInput() {
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
             ariaLabel: 'Size input',
-            useTotalSize,
             symbol,
             selectedMode,
             setSelectedMode,
+            useTotalSize,
         }),
-        [size, handleSizeChange],
+        [size, handleSizeChange, useTotalSize],
     );
 
     const positionSizeProps = useMemo(
@@ -667,9 +660,9 @@ function OrderInput() {
                             ))}
                         </div>
 
-                        {marketOrderType === 'chase_limit' && (
-                            <ChasePrice {...chasePriceProps} />
-                        )}
+                        {/* {marketOrderType === 'chase_limit' && (
+                            <ChasePrice {...chasePriceProps} / predu>
+                        )} */}
 
                         {showStopPriceComponent && (
                             <StopPrice {...stopPriceProps} />

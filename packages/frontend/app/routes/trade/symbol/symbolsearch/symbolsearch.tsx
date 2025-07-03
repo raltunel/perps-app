@@ -37,9 +37,9 @@ const SymbolSearch: React.FunctionComponent = () => {
                 >
                     <div
                         className={styles.symbolIcon}
-                        style={{
-                            background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
-                        }}
+                        // style={{
+                        //     background: `var(--${bgType === 'light' ? 'text1' : 'bg-dark1'})`,
+                        // }}
                     >
                         <img
                             src={`https://app.hyperliquid.xyz/coins/${symbolFileName}.svg`}

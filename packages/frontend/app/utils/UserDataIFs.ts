@@ -47,6 +47,15 @@ export interface UserFillIF {
     closedPnl: number;
 }
 
+export interface DepositAndWithDrawalIF {
+    time: number;
+    status: string;
+    network: string;
+    action: string;
+    valueChange: string;
+    fee: string;
+}
+
 export type UserFillSortBy =
     | 'time'
     | 'coin'
@@ -58,6 +67,15 @@ export type UserFillSortBy =
     | 'closedPnl'
     | 'status'
     | 'tradeValue'
+    | undefined;
+
+export type DepositAndWithDrawalSortBy =
+    | 'time'
+    | 'status'
+    | 'network'
+    | 'action'
+    | 'valueChange'
+    | 'fee'
     | undefined;
 
 export interface TwapStateIF {
