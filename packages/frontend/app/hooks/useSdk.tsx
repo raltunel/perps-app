@@ -138,7 +138,6 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isClient) return;
-        if (!info) return;
 
         console.log(
             '>>> useSDK useEffect for reInitWs | isWsStashed',
@@ -151,13 +150,6 @@ export const SdkProvider: React.FC<{
             console.log('>>> will re init ws object');
             reInitWs();
             setWsReconnecting(true);
-        }
-
-        if (info) {
-            console.log(
-                '>>> info.wsManager?.isWsReady()',
-                info.wsManager?.isWsReady(),
-            );
         }
 
         const reconnectInterval = setInterval(() => {
@@ -203,6 +195,17 @@ export const SdkProvider: React.FC<{
             }, WS_SLEEP_MODE_STASH_CONNECTION);
         } else {
             console.log('>>> useSDK | tab is active', new Date().toISOString());
+            if (info) {
+                setTimeout(() => {
+                    console.log(
+                        '>>> info.wsManager?.isWsReady()',
+                        info.wsManager?.isWsReady(),
+                    );
+                    if (!info.wsManager?.isWsReady()) {
+                        setShouldReconnect(true);
+                    }
+                }, 2000);
+            }
             if (stashTimeoutRef.current) {
                 clearTimeout(stashTimeoutRef.current);
             }
