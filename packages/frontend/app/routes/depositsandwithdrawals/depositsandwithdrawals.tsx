@@ -7,6 +7,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import WebDataConsumer from '../trade/webdataconsumer';
 
 export default function DepositsAndWithdrawals() {
     const { address } = useParams<{ address: string }>();
@@ -47,6 +48,7 @@ export default function DepositsAndWithdrawals() {
 
     return (
         <ExternalPage title='Deposits & Withdrawals'>
+            <WebDataConsumer />
             <DepositsWithdrawalsTable
                 pageMode
                 isFetched={isFetched}
