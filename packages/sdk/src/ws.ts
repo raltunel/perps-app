@@ -536,8 +536,13 @@ export class WebsocketManager {
         return this.wsReady;
     }
 
-    public reconnect() {
+    public reconnect(stashedSubs?: Record<string, ActiveSubscription[]>) {
         this.stashSubscriptions();
+        if (this.queuedSubscriptions.length === 0 && stashedSubs) {
+            console.log('>>> process stashed subs', stashedSubs);
+            this.processStashedSubs(stashedSubs);
+        }
+
         this.pongCheckDelay();
         setTimeout(() => {
             this.connect();
