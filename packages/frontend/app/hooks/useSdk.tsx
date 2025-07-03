@@ -112,6 +112,7 @@ export const SdkProvider: React.FC<{
 
         if (internetConnected && shouldReconnect) {
             console.log('>>> alternate reconnect', new Date().toISOString());
+            console.log('>>> stashed subs', stashedSubs.current);
             info?.wsManager?.reconnect();
             setWsReconnecting(true);
             setShouldReconnect(false);
