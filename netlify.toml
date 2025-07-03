@@ -8,9 +8,6 @@
   command = "npm run dev"
   framework = "vite"
 
-[functions]
-directory = "functions"
-
 # Set immutable caching for static files, because they have fingerprinted filenames
 [[headers]]
   for = "/assets/*"
