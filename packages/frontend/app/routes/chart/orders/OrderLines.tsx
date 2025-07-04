@@ -70,6 +70,10 @@ export default function OrderLines({
                 };
 
                 scaleData?.yScale.domain([currentRange.min, currentRange.max]);
+                scaleData?.scaleSymlog.domain([
+                    currentRange.min,
+                    currentRange.max,
+                ]);
 
                 const prevRange = prevRangeRef.current;
                 const hasChanged =
