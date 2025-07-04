@@ -1,14 +1,8 @@
-import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { HeaderCell, TableSortDirection } from '~/utils/CommonIFs';
 import styles from './OrderHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
-
-export interface HeaderCell {
-    name: string;
-    key: string;
-    sortable: boolean;
-    className: string;
-}
+import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 
 interface OrderHistoryTableHeaderProps {
     sortBy: OrderDataSortBy;
@@ -16,95 +10,112 @@ interface OrderHistoryTableHeaderProps {
     sortClickHandler: (key: OrderDataSortBy) => void;
 }
 
+export const OrderHistoryTableModel:
+    | HeaderCell<number>[]
+    | HeaderCell<string>[] = [
+    {
+        name: 'Time',
+        key: 'timestamp',
+        sortable: true,
+        className: 'timeCell',
+        exportable: true,
+        exportAction: (data: number) => {
+            return formatTimestamp(data);
+        },
+    },
+    {
+        name: 'Type',
+        key: 'orderType',
+        sortable: true,
+        className: 'typeCell',
+        exportable: true,
+    },
+    {
+        name: 'Coin',
+        key: 'coin',
+        sortable: true,
+        className: 'coinCell',
+        exportable: true,
+    },
+    {
+        name: 'Direction',
+        key: 'side',
+        sortable: true,
+        className: 'directionCell',
+        exportable: true,
+    },
+    {
+        name: 'Size',
+        key: 'sz',
+        sortable: true,
+        className: 'sizeCell',
+        exportable: true,
+    },
+    {
+        name: 'Filled Size',
+        key: 'filledSz',
+        sortable: true,
+        className: 'filledSizeCell',
+        exportable: true,
+    },
+    {
+        name: 'Order Value',
+        key: 'orderValue',
+        sortable: true,
+        className: 'orderValueCell',
+        exportable: true,
+    },
+    {
+        name: 'Price',
+        key: 'price',
+        sortable: true,
+        className: 'priceCell',
+        exportable: true,
+    },
+    {
+        name: 'Reduce Only',
+        key: 'reduceOnly',
+        sortable: true,
+        className: 'reduceOnlyCell',
+        exportable: true,
+    },
+    {
+        name: 'Trigger Conditions',
+        key: 'triggerConditions',
+        sortable: true,
+        className: 'triggerConditionsCell',
+        exportable: true,
+    },
+    {
+        name: 'TP/SL',
+        key: 'tpsl',
+        sortable: true,
+        className: 'tpslCell',
+        exportable: true,
+    },
+    {
+        name: 'Status',
+        key: 'status',
+        sortable: true,
+        className: 'statusCell',
+        exportable: true,
+    },
+    {
+        name: 'Order ID',
+        key: 'oid',
+        sortable: true,
+        className: 'orderIdCell',
+    },
+];
+
 export default function OrderHistoryTableHeader(
     props: OrderHistoryTableHeaderProps,
 ) {
     const { sortBy, sortDirection, sortClickHandler } = props;
 
-    const tableHeaders: HeaderCell[] = [
-        {
-            name: 'Time',
-            key: 'timestamp',
-            sortable: true,
-            className: 'timeCell',
-        },
-        {
-            name: 'Type',
-            key: 'orderType',
-            sortable: true,
-            className: 'typeCell',
-        },
-        {
-            name: 'Coin',
-            key: 'coin',
-            sortable: true,
-            className: 'coinCell',
-        },
-        {
-            name: 'Direction',
-            key: 'side',
-            sortable: true,
-            className: 'directionCell',
-        },
-        {
-            name: 'Size',
-            key: 'sz',
-            sortable: true,
-            className: 'sizeCell',
-        },
-        {
-            name: 'Filled Size',
-            key: 'filledSz',
-            sortable: true,
-            className: 'filledSizeCell',
-        },
-        {
-            name: 'Order Value',
-            key: 'orderValue',
-            sortable: true,
-            className: 'orderValueCell',
-        },
-        {
-            name: 'Price',
-            key: 'price',
-            sortable: true,
-            className: 'priceCell',
-        },
-        {
-            name: 'Reduce Only',
-            key: 'reduceOnly',
-            sortable: true,
-            className: 'reduceOnlyCell',
-        },
-        {
-            name: 'Trigger Conditions',
-            key: 'triggerConditions',
-            sortable: true,
-            className: 'triggerConditionsCell',
-        },
-        {
-            name: 'TP/SL',
-            key: 'tpsl',
-            sortable: true,
-            className: 'tpslCell',
-        },
-        {
-            name: 'Status',
-            key: 'status',
-            sortable: true,
-            className: 'statusCell',
-        },
-        {
-            name: 'Order ID',
-            key: 'oid',
-            sortable: true,
-            className: 'orderIdCell',
-        },
-    ];
-
     return (
         <div className={styles.headerContainer}>
-            {tableHeaders.map((header) => (
+            {OrderHistoryTableModel.map((header) => (
                 <div
                     key={header.key}
                     className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
