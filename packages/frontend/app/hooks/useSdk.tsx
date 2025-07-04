@@ -154,14 +154,6 @@ export const SdkProvider: React.FC<{
     useEffect(() => {
         if (!isClient) return;
 
-        console.log(
-            '>>> useSDK useEffect for reInitWs | isWsStashed',
-            isWsStashed,
-            ' isTabActive',
-            isTabActive,
-            new Date().toISOString(),
-        );
-
         if (isWsStashed && isTabActive) {
             console.log('>>> will re init ws object', new Date().toISOString());
             reInitWs();
@@ -191,11 +183,6 @@ export const SdkProvider: React.FC<{
     }, [isWsSleepMode, info]);
 
     useEffect(() => {
-        console.log(
-            '>>> isTabActive effect',
-            stashedSubs.current,
-            new Date().toISOString(),
-        );
         if (!isTabActive) {
             console.log(
                 '>>> useSDK | tab is inactive',
@@ -205,24 +192,14 @@ export const SdkProvider: React.FC<{
                 clearTimeout(stashTimeoutRef.current);
             }
 
-            console.log(
-                '>>> useSDK | start stash timeout',
-                new Date().toISOString(),
-            );
             stashTimeoutRef.current = setTimeout(() => {
                 console.log('>>> useSDK | stashing', new Date().toISOString());
                 stashWebsocket();
                 setIsWsStashed(true);
             }, WS_SLEEP_MODE_STASH_CONNECTION);
         } else {
-            console.log('>>> useSDK | tab is active', new Date().toISOString());
             if (info) {
                 setTimeout(() => {
-                    console.log(
-                        '>>> info.wsManager?.isWsReady()',
-                        info.wsManager?.isWsReady(),
-                        new Date().toISOString(),
-                    );
                     if (!info.wsManager?.isWsReady()) {
                         setShouldReconnect(true);
                     }
