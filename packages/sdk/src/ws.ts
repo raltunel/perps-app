@@ -201,7 +201,12 @@ export class WebsocketManager {
     };
 
     private sendPing = () => {
-        if (this.stopped || !this.ws || this.ws.readyState !== WebSocket.OPEN)
+        if (
+            this.stopped ||
+            !this.ws ||
+            this.ws.readyState !== WebSocket.OPEN ||
+            this.sleepMode
+        )
             return;
         this.log('sending ping');
         if (this.pongTimeout) {
@@ -212,7 +217,7 @@ export class WebsocketManager {
         this.ws.send(JSON.stringify({ method: 'ping' }));
 
         this.pongTimeout = setTimeout(() => {
-            if (!this.pongReceived && !this.pongCheckLock) {
+            if (!this.pongReceived && !this.pongCheckLock && !this.sleepMode) {
                 // if (this.ws.readyState === 1) {
                 //     // no need to reconnect if connection state is open
                 //     return;
@@ -554,6 +559,7 @@ export class WebsocketManager {
     }
 
     public setSleepMode(sleepMode: boolean) {
+        this.pongReceived = true;
         if (this.sleepMode === sleepMode) return;
         this.sleepMode = sleepMode;
     }
