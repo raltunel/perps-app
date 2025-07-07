@@ -16,6 +16,7 @@ export interface useModalIF<T extends string = string> {
 type modalDefaultStates = 'open' | 'closed' | number;
 
 // main fn body for hook
+// type annotation is currently being consumed as a content router
 export function useModal<T extends string = string>(
     dfltState?: modalDefaultStates,
 ): useModalIF<T> {
