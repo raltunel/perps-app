@@ -182,7 +182,7 @@ export default function Notifications() {
             {unseen.messages.length > 0 && !userClosedNews && (
                 <div className={styles.news}>
                     <header>
-                        <h4>News</h4>
+                        <h4>Announcements</h4>
                         <MdClose
                             color='var(--text2)'
                             size={16}
