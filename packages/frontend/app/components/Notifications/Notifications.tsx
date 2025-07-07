@@ -1,6 +1,11 @@
+import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MdClose } from 'react-icons/md';
+import { useLocation } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
+import { useVersionCheck } from '~/hooks/useVersionCheck';
+import { useViewed } from '~/stores/AlreadySeenStore';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import {
@@ -9,14 +14,9 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { WsChannels } from '~/utils/Constants';
+import SimpleButton from '../SimpleButton/SimpleButton';
 import Notification from './Notification';
 import styles from './Notifications.module.css';
-import { useVersionCheck } from '~/hooks/useVersionCheck';
-import SimpleButton from '../SimpleButton/SimpleButton';
-import { MdClose } from 'react-icons/md';
-import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
-import { useViewed } from '~/stores/AlreadySeenStore';
-import { useLocation } from 'react-router';
 
 interface NewsItemIF {
     headline: string;
@@ -67,7 +67,7 @@ export default function Notifications() {
     // logic to fetch news data asynchronously
     const [news, setNews] = useState<NewsItemIF[]>([]);
     useEffect(() => {
-        fetch('/news.json', { cache: 'no-store' })
+        fetch('/announcements.json', { cache: 'no-store' })
             .then((res) => res.json())
             .then((formatted) => {
                 setNews(formatted.news);
