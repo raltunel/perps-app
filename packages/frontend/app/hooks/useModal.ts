@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 // interface for return value of hook
 export interface useModalIF<T extends string = string> {
     isOpen: boolean;
-    open: (c?: T) => void;
+    open: string extends T ? () => void : (c: T) => void;
     close: () => void;
     toggle: () => void;
     content: T;
