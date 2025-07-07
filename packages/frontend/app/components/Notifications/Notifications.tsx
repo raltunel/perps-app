@@ -14,7 +14,6 @@ import styles from './Notifications.module.css';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import { MdClose } from 'react-icons/md';
-import { useKeydown } from '~/hooks/useKeydown';
 import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { useViewed } from '~/stores/AlreadySeenStore';
 import { useLocation } from 'react-router';
@@ -35,8 +34,6 @@ export default function Notifications() {
     const { info } = useSdk();
 
     const { showReload, setShowReload } = useVersionCheck();
-
-    useKeydown('v', () => setShowReload(true));
 
     useEffect(() => {
         if (!info) return;
