@@ -94,10 +94,11 @@ const marketOrderTypes = [
     },
 ];
 
-const chaseOptionTypes = [
-    { value: 'bid1ask1', label: 'Bid1/Ask1' },
-    { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
-];
+// disabled code 07 Jul 25
+// const chaseOptionTypes = [
+//     { value: 'bid1ask1', label: 'Bid1/Ask1' },
+//     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
+// ];
 
 const leverageOptions = [
     { value: 1, label: '1x' },
@@ -334,10 +335,11 @@ function OrderInput() {
         console.log(`PositionSize changed to: ${value}x`);
     };
     // CHASE OPTION---------------------------------------------------
-    const handleChaseOptionChange = (value: string) => {
-        setChaseOption(value);
-        console.log(`Chase Option changed to: ${value}`);
-    };
+    // code disabled 07 Jul 25
+    // const handleChaseOptionChange = (value: string) => {
+    //     setChaseOption(value);
+    //     console.log(`Chase Option changed to: ${value}`);
+    // };
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
