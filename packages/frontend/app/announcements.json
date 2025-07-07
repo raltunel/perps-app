@@ -1,27 +1,23 @@
 {
-    "news": [
+    "announcements": [
         {
             "headline": "Headline 1",
             "body": "Bitcoin ipsum dolor sit amet. Inputs block reward full node hyperbitcoinization soft fork key pair Bitcoin Improvement Proposal.",
-            "id": "1",
             "destination": ""
         },
         {
             "headline": "Headline 2",
             "body": "Halvening address, timestamp server outputs full node deflationary monetary policy private key block reward! Full node, difficulty nonce consensus blockchain, deflationary monetary policy decentralized!",
-            "id": "2",
             "destination": ""
         },
         {
             "headline": "Headline 3",
             "body": "Inputs blockchain private key satoshis peer-to-peer soft fork wallet full node. Mining, deflationary monetary policy bitcoin proof-of-work miner block height blocksize? ",
-            "id": "7",
             "destination": ""
         },
         {
             "headline": "Headline 4",
             "body": "Blockchain Merkle Tree private key key pair, proof-of-work UTXO Bitcoin Improvement Proposal public key. Cryptocurrency address key pair decentralized full node genesis block difficulty.",
-            "id": "r",
             "destination": ""
         }
     ]

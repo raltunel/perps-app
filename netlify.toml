@@ -2,7 +2,7 @@
 [build]
   base = "packages/frontend"
   publish = "build/client"
-  command = "node scripts/write-version.js && pnpm build"
+  command = "node scripts/generate-announcements.js && node scripts/write-version.js && pnpm build"
 
 [dev]
   command = "npm run dev"
