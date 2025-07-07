@@ -5,14 +5,13 @@ import {
     type strategyDecoratedIF,
     type useStrategiesStoreIF,
 } from '~/stores/StrategiesStore';
-import { type useModalIF, useModal } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import Modal from '~/components/Modal/Modal';
 import { FaChevronLeft } from 'react-icons/fa';
 import { FiCopy } from 'react-icons/fi';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TransferModal from '~/components/TransferModal/TransferModal';
 import OrderHistory from '~/components/OrderHistory/OrderHistory';
-import LineChart from '~/components/LineChart/LineChart';
 import StrategyDetailChart from './StrategyDetailChart';
 
 export default function Strategies() {
@@ -29,10 +28,10 @@ export default function Strategies() {
     );
 
     // logic to control the strategy removal modal
-    const removeStratModalCtrl: useModalIF = useModal();
+    const removeStratModalCtrl = useModal();
 
     // logic to control the transfer modal
-    const transferModalCtrl: useModalIF = useModal();
+    const transferModalCtrl = useModal();
 
     return (
         <div className={styles.strategy_detail_page}>
@@ -74,13 +73,13 @@ export default function Strategies() {
                             Edit
                         </SimpleButton>
                         <SimpleButton
-                            onClick={transferModalCtrl.open}
+                            onClick={() => transferModalCtrl.open()}
                             hoverBg='accent1'
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
-                            onClick={removeStratModalCtrl.open}
+                            onClick={() => removeStratModalCtrl.open()}
                             hoverBg='accent1'
                         >
                             Remove

@@ -10,7 +10,7 @@ import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
     useNotificationStore,
@@ -156,7 +156,7 @@ function OrderInput() {
         useTradeDataStore();
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const confirmOrderModal: useModalIF = useModal('closed');
+    const confirmOrderModal = useModal('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
