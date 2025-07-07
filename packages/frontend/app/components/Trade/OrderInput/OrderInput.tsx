@@ -156,7 +156,7 @@ function OrderInput() {
         useTradeDataStore();
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const appSettingsModal: useModalIF = useModal('closed');
+    const confirmOrderModal: useModalIF = useModal('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
@@ -247,7 +247,7 @@ function OrderInput() {
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
         setModalContent(content);
-        appSettingsModal.open();
+        confirmOrderModal.open();
     };
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
@@ -261,7 +261,7 @@ function OrderInput() {
         if (activeMargin) {
             console.log(`Confirmed: ${activeMargin} margin mode`);
         }
-        appSettingsModal.close();
+        confirmOrderModal.close();
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
@@ -663,9 +663,9 @@ function OrderInput() {
                         orderValue={orderValue}
                         leverage={leverage}
                     />
-                    {appSettingsModal.isOpen && (
+                    {confirmOrderModal.isOpen && (
                         <Modal
-                            close={appSettingsModal.close}
+                            close={confirmOrderModal.close}
                             title={
                                 modalContent === 'margin'
                                     ? 'Margin Mode'
@@ -698,7 +698,7 @@ function OrderInput() {
                                     minPrice={parseFloat(priceRangeMin)}
                                     maxPrice={parseFloat(priceRangeMax)}
                                     isModal
-                                    onClose={appSettingsModal.close}
+                                    onClose={confirmOrderModal.close}
                                 />
                             )}
                             {modalContent === 'confirm_buy' && (
@@ -711,7 +711,7 @@ function OrderInput() {
                                                 'Buying 0.0001 ETH at $2,300',
                                             icon: 'spinner',
                                         });
-                                        appSettingsModal.close();
+                                        confirmOrderModal.close();
                                     }}
                                 />
                             )}
@@ -725,7 +725,7 @@ function OrderInput() {
                                                 'Selling 0.0001 ETH at $2,300',
                                             icon: 'spinner',
                                         });
-                                        appSettingsModal.close();
+                                        confirmOrderModal.close();
                                     }}
                                 />
                             )}
