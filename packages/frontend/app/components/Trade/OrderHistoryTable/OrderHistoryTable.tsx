@@ -11,6 +11,7 @@ import OrderHistoryTableHeader, {
     OrderHistoryTableModel,
 } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
+import { useInfoApi } from '~/hooks/useInfoApi';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
@@ -23,6 +24,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     const { selectedFilter, pageMode, data, isFetched } = props;
 
     const { symbol, filterOrderHistory } = useTradeDataStore();
+
+    const { fetchOrderHistory } = useInfoApi();
 
     const { debugWallet } = useDebugStore();
 
@@ -39,7 +42,11 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     return (
         <>
-            <GenericTable<OrderDataIF, OrderDataSortBy>
+            <GenericTable<
+                OrderDataIF,
+                OrderDataSortBy,
+                (address: string) => Promise<OrderDataIF[]>
+            >
                 storageKey={`OrderHistoryTable_${currentUserRef.current}`}
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
@@ -64,6 +71,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
                 tableModel={OrderHistoryTableModel}
+                csvDataFetcher={fetchOrderHistory}
+                csvDataFetcherArgs={[debugWallet.address]}
             />
         </>
     );

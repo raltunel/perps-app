@@ -11,7 +11,7 @@ import {
 import styles from './GenericTable.module.css';
 import { useIsClient } from '~/hooks/useIsClient';
 
-interface GenericTableProps<T, S> {
+interface GenericTableProps<T, S, F extends (...args: Parameters<F>) => any> {
     data: T[];
     renderHeader: (
         sortDirection: TableSortDirection,
@@ -36,9 +36,15 @@ interface GenericTableProps<T, S> {
     heightOverride?: string;
     storageKey: string;
     tableModel?: HeaderCell[];
+    csvDataFetcher?: (...args: Parameters<F>) => Promise<T[]>;
+    csvDataFetcherArgs?: Parameters<F>;
 }
 
-export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
+export default function GenericTable<
+    T,
+    S,
+    F extends (...args: Parameters<F>) => Promise<T[]>,
+>(props: GenericTableProps<T, S, F>) {
     const id = useId();
     const navigate = useNavigate();
 
@@ -58,6 +64,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         // defaultSortDirection,
         heightOverride = '100%',
         tableModel,
+        csvDataFetcher,
+        csvDataFetcherArgs,
     } = props;
 
     function safeParse<T>(value: string | null, fallback: T): T {
@@ -262,18 +270,25 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
         e.preventDefault();
         viewAllLink && navigate(viewAllLink, { viewTransition: true });
     };
-    const handleExportCsv = (e: React.MouseEvent) => {
+    const handleExportCsv = async (e: React.MouseEvent) => {
         e.preventDefault();
         if (tableModel) {
+            let dataToExport = data;
+            if (!pageMode && csvDataFetcher) {
+                dataToExport = await csvDataFetcher(
+                    ...(csvDataFetcherArgs as Parameters<F>),
+                );
+            }
+
             const headers = tableModel.filter((header) => header.exportable);
             const csvContent = [
                 headers.map((header) => header.name).join(','),
-                ...data.map((row) =>
+                ...dataToExport.map((row) =>
                     headers
                         .map((header) => {
                             if (header.exportAction) {
                                 return header.exportAction(
-                                    row[header.key as keyof T],
+                                    row[header.key as keyof T] as T,
                                 );
                             }
                             return row[header.key as keyof T] as string;
@@ -352,8 +367,8 @@ export default function GenericTable<T, S>(props: GenericTableProps<T, S>) {
                                             View All
                                         </a>
                                     )}
-                                {pageMode &&
-                                    tableModel &&
+                                {tableModel &&
+                                    (pageMode || csvDataFetcher) &&
                                     tableModel.some(
                                         (header) => header.exportable,
                                     ) && (
