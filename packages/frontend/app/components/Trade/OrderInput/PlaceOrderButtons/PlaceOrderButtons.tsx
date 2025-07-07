@@ -5,10 +5,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
-import {
-    HiOutlineChevronDoubleDown,
-    HiOutlineChevronDoubleUp,
-} from 'react-icons/hi2';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 
 interface propsIF {
     orderMarketPrice: string;
