@@ -72,6 +72,17 @@ export default function Notifications() {
             .then((formatted) => {
                 setNews(formatted.news);
             });
+        const interval = setInterval(
+            () => {
+                fetch('/announcements.json', { cache: 'no-store' })
+                    .then((res) => res.json())
+                    .then((formatted) => {
+                        setNews(formatted.news);
+                    });
+            },
+            5 * 60 * 1000,
+        );
+        return () => clearInterval(interval);
     }, []);
 
     // logic to prevent a user from seeing a news item repeatedly

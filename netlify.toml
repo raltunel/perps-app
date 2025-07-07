@@ -19,6 +19,11 @@
   [headers.values]
     Cache-Control = "no-store"
 
+[[headers]]
+  for = "/announcements.json"
+  [headers.values]
+    Cache-Control = "no-store"
+
 # Allow blocked countries to access /blocked.html
 [[redirects]]
   from = "/blocked.html"
