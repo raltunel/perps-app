@@ -6,7 +6,7 @@ export interface useModalIF<T extends string = string> {
     open: (c?: T) => void;
     close: () => void;
     toggle: () => void;
-    content: T;
+    content: T | '';
 }
 
 // default states for modal
@@ -47,7 +47,7 @@ export function useModal<T extends string = string>(
     const [isOpen, setIsOpen] = useState<boolean>(shouldOpenAtRender);
 
     // state value to track current content type
-    const [content, setContent] = useState<T>('' as T);
+    const [content, setContent] = useState<T | ''>('');
 
     // modal control functions
     const openModal = (c?: T): void => {
