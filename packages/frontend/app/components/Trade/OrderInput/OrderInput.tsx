@@ -127,7 +127,8 @@ function OrderInput() {
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
     const [positionSize, setPositionSize] = useState(0);
-    const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
+    // disabled 07 Jul 25
+    // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
     const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
     const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
