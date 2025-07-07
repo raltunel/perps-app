@@ -18,9 +18,9 @@ const OverlayCanvas: React.FC = () => {
         if (!chart) return;
 
         const yScale = d3.scaleLinear();
-
+        const scaleSymlog = d3.scaleSymlog();
         setScaleData(() => {
-            return { yScale: yScale };
+            return { yScale: yScale, scaleSymlog: scaleSymlog };
         });
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
@@ -74,6 +74,7 @@ const OverlayCanvas: React.FC = () => {
             canvas.style.height = `${height}px`;
 
             yScale.range([canvas.height, 0]);
+            scaleSymlog.range([canvas.height, 0]);
         };
 
         updateCanvasSize();
@@ -88,6 +89,7 @@ const OverlayCanvas: React.FC = () => {
                 });
 
                 yScale.range([result[0].contentRect?.height, 0]);
+                scaleSymlog.range([result[0].contentRect?.height, 0]);
             }
         });
 

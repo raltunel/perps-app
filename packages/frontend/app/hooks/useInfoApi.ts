@@ -9,6 +9,11 @@ import {
 import { processVaultDetails } from '~/processors/processVault';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type {
+    SpotMetaIF,
+    TokenDetailsIF,
+    TokenDetailsRawIF,
+} from '~/utils/SymbolInfoIFs';
+import type {
     TwapHistoryIF,
     TwapSliceFillIF,
     UserFillIF,
@@ -16,6 +21,7 @@ import type {
     UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
 import type { VaultDetailsIF } from '~/utils/VaultIFs';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 
 export type ApiCallConfig = {
     type: string;
@@ -32,6 +38,9 @@ export enum ApiEndpoints {
     FUNDING_HISTORY = 'userFunding',
     USER_PORTFOLIO = 'portfolio',
     VAULT_DETAILS = 'vaultDetails',
+    USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
+    SPOT_META = 'spotMeta',
+    TOKEN_DETAILS = 'tokenDetails',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -262,6 +271,74 @@ export function useInfoApi() {
         return data;
     };
 
+    const fetchUserNonFundingLedgerUpdates = async (
+        address: string,
+    ): Promise<TransactionData[]> => {
+        const ret: TransactionData[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.USER_NON_FUNDING_LEDGER_UPDATES,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+            ret.push(...(data as TransactionData[]));
+        }
+        return ret;
+    };
+
+    const fetchSpotMeta = async (): Promise<SpotMetaIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.SPOT_META,
+            }),
+        });
+        const data = await response.json();
+        return data as SpotMetaIF;
+    };
+
+    const fetchTokenId = async (tokenName: string): Promise<string> => {
+        const spotMeta = await fetchSpotMeta();
+        if (tokenName === 'BTC') {
+            tokenName = 'UBTC';
+        }
+        const token = spotMeta.tokens.find((t) => t.name === tokenName);
+        return token?.tokenId || '';
+    };
+
+    const fetchTokenDetails = async (
+        tokenId: string,
+    ): Promise<TokenDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.TOKEN_DETAILS,
+                tokenId: tokenId,
+            }),
+        });
+        const data = (await response.json()) as TokenDetailsRawIF;
+
+        const ret = {
+            name: data.name,
+            maxSupply: Number(data.maxSupply),
+            totalSupply: Number(data.totalSupply),
+            circulatingSupply: Number(data.circulatingSupply),
+            szDecimals: data.szDecimals,
+            weiDecimals: data.weiDecimals,
+            midPx: Number(data.midPx),
+            markPx: Number(data.markPx),
+            prevDayPx: Number(data.prevDayPx),
+        };
+
+        return ret;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -273,5 +350,8 @@ export function useInfoApi() {
         fetchUserPortfolio,
         fetchVaultDetails,
         fetchVaults,
+        fetchUserNonFundingLedgerUpdates,
+        fetchTokenId,
+        fetchTokenDetails,
     };
 }
