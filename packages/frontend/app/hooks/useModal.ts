@@ -6,6 +6,7 @@ export interface useModalIF<T extends string = string> {
     open: string extends T ? () => void : (c: T) => void;
     close: () => void;
     toggle: () => void;
+    update: (c: T) => void;
     content: T;
 }
 
@@ -59,6 +60,7 @@ export function useModal<T extends string = string>(
     };
     const closeModal = (): void => setIsOpen(false);
     const toggleModal = (): void => setIsOpen(!isOpen);
+    const update = (c: T): void => setContent(c);
 
     // logic to open the modal after a delay
     useEffect(() => {
@@ -79,6 +81,7 @@ export function useModal<T extends string = string>(
         open: openModal,
         close: closeModal,
         toggle: toggleModal,
+        update,
         content,
     };
 }
