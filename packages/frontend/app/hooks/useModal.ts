@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 // interface for return value of hook
-export interface useModalIF {
+export interface useModalIF<T extends string = string> {
     isOpen: boolean;
-    open: () => void;
+    open: (c?: T) => void;
     close: () => void;
     toggle: () => void;
+    content: T;
 }
 
 // default states for modal
@@ -15,7 +16,9 @@ export interface useModalIF {
 type modalDefaultStates = 'open' | 'closed' | number;
 
 // main fn body for hook
-export function useModal(dfltState?: modalDefaultStates): useModalIF {
+export function useModal<T extends string = string>(
+    dfltState?: modalDefaultStates,
+): useModalIF<T> {
     // variable to track if modal is open on initial render
     let shouldOpenAtRender: boolean;
 
@@ -43,8 +46,16 @@ export function useModal(dfltState?: modalDefaultStates): useModalIF {
     // state value to track if modal is currently open
     const [isOpen, setIsOpen] = useState<boolean>(shouldOpenAtRender);
 
+    // state value to track current content type
+    const [content, setContent] = useState<T>('' as T);
+
     // modal control functions
-    const openModal = (): void => setIsOpen(true);
+    const openModal = (c?: T): void => {
+        if (c) {
+            setContent(c);
+        }
+        setIsOpen(true);
+    };
     const closeModal = (): void => setIsOpen(false);
     const toggleModal = (): void => setIsOpen(!isOpen);
 
@@ -59,7 +70,7 @@ export function useModal(dfltState?: modalDefaultStates): useModalIF {
         );
         // clear the effect from the DOM when elem dismounts
         return () => clearTimeout(openAfterDelay);
-    }, []);
+    }, [dfltState]);
 
     // return obj
     return {
@@ -67,5 +78,6 @@ export function useModal(dfltState?: modalDefaultStates): useModalIF {
         open: openModal,
         close: closeModal,
         toggle: toggleModal,
+        content,
     };
 }
