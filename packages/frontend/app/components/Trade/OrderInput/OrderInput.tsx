@@ -115,12 +115,12 @@ const positionSizeOptions = [
     { value: 100, label: '100%' },
 ];
 
+// keys for content that may be rendered in tx modal
+type modalContentT = 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell';
+
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<
-        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
-    >(null);
 
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
@@ -156,7 +156,7 @@ function OrderInput() {
         useTradeDataStore();
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const confirmOrderModal = useModal('closed');
+    const confirmOrderModal = useModal<modalContentT>('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
@@ -242,13 +242,6 @@ function OrderInput() {
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
-
-    const openModalWithContent = (
-        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
-    ) => {
-        setModalContent(content);
-        confirmOrderModal.open();
-    };
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
@@ -406,11 +399,11 @@ function OrderInput() {
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
-                        <button onClick={() => openModalWithContent('scale')}>
+                        <button onClick={() => confirmOrderModal.open('scale')}>
                             <img src={flatSvg} alt='flat price distribution' />
                             Flat
                         </button>
-                        <button onClick={() => openModalWithContent('scale')}>
+                        <button onClick={() => confirmOrderModal.open('scale')}>
                             <img src={evenSvg} alt='even price distribution' />
                             Evenly Split
                         </button>
@@ -594,7 +587,7 @@ function OrderInput() {
                                 onChange={handleMarketOrderTypeChange}
                             />
                             <button
-                                onClick={() => openModalWithContent('margin')}
+                                onClick={() => confirmOrderModal.open('margin')}
                                 className={styles.isolatedButton}
                             >
                                 Isolated <FiChevronDown size={24} />
@@ -659,7 +652,9 @@ function OrderInput() {
                     </div>
                     <PlaceOrderButtons
                         orderMarketPrice={marketOrderType}
-                        openModalWithContent={openModalWithContent}
+                        openModalWithContent={(
+                            c: 'confirm_buy' | 'confirm_sell',
+                        ) => confirmOrderModal.open(c)}
                         orderValue={orderValue}
                         leverage={leverage}
                     />
@@ -667,18 +662,20 @@ function OrderInput() {
                         <Modal
                             close={confirmOrderModal.close}
                             title={
-                                modalContent === 'margin'
+                                confirmOrderModal.content === 'margin'
                                     ? 'Margin Mode'
-                                    : modalContent === 'scale'
+                                    : confirmOrderModal.content === 'scale'
                                       ? 'Scale Options'
-                                      : modalContent === 'confirm_buy'
+                                      : confirmOrderModal.content ===
+                                          'confirm_buy'
                                         ? 'Confirm Buy Order'
-                                        : modalContent === 'confirm_sell'
+                                        : confirmOrderModal.content ===
+                                            'confirm_sell'
                                           ? 'Confirm Sell Order'
                                           : ''
                             }
                         >
-                            {modalContent === 'margin' && (
+                            {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
                                     handleMarginModeChange={
                                         handleMarginModeChange
@@ -690,7 +687,7 @@ function OrderInput() {
                                 />
                             )}
 
-                            {modalContent === 'scale' && (
+                            {confirmOrderModal.content === 'scale' && (
                                 <ScaleOrders
                                     totalQuantity={parseFloat(
                                         priceRangeTotalOrders,
@@ -701,7 +698,7 @@ function OrderInput() {
                                     onClose={confirmOrderModal.close}
                                 />
                             )}
-                            {modalContent === 'confirm_buy' && (
+                            {confirmOrderModal.content === 'confirm_buy' && (
                                 <ConfirmationModal
                                     tx='buy'
                                     onClose={() => {
@@ -715,7 +712,7 @@ function OrderInput() {
                                     }}
                                 />
                             )}
-                            {modalContent === 'confirm_sell' && (
+                            {confirmOrderModal.content === 'confirm_sell' && (
                                 <ConfirmationModal
                                     tx='sell'
                                     onClose={() => {

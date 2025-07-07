@@ -9,9 +9,7 @@ import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 
 interface propsIF {
     orderMarketPrice: string;
-    openModalWithContent: (
-        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
-    ) => void;
+    openModalWithContent: (content: 'confirm_buy' | 'confirm_sell') => void;
     leverage: number;
     orderValue?: number;
 }
