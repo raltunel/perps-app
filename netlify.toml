@@ -91,15 +91,13 @@
     "ZW"  # Zimbabwe
   ]}
 
-# Redirect US traffic to US domain
+# Redirect US traffic to US domain, preserving the path
 [[redirects]]
   from = "/*"
-  to = "https://deploy-preview-327--ambi-perps-us.netlify.app/"
+  to = "https://deploy-preview-327--ambi-perps-us.netlify.app/:splat"
   status = 302
   force = true
-  conditions = {Country = [
-    "US", # United States
-  ]}
+  conditions = { Country = ["US"], Host = ["ambi-perps.netlify.app", "develop--ambi-perps.netlify.app", "deploy-preview-327--ambi-perps.netlify.app"] }
 
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
