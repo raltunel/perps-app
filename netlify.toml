@@ -97,7 +97,7 @@
   to = "https://deploy-preview-327--ambi-perps-us.netlify.app/:splat"
   status = 302
   force = true
-  conditions = { Country = ["US"], Host = ["ambi-perps.netlify.app", "develop--ambi-perps.netlify.app", "deploy-preview-327--ambi-perps.netlify.app"] }
+  conditions = { Country = ["US"], Host = ["ambi-perps.netlify.app", "develop--ambi-perps.netlify.app", "deploy-preview-327--ambi-perps.netlify.app", "https://deploy-preview-327--ambi-perps.netlify.app/"] }
 
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
