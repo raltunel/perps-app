@@ -293,6 +293,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
 
+        if (!interval) return 1;
+
         if (interval.includes('D')) {
             coef = 24 * 60;
         } else if (interval.includes('W')) {
