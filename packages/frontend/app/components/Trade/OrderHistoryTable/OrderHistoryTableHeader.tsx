@@ -20,7 +20,7 @@ export const OrderHistoryTableModel:
         className: 'timeCell',
         exportable: true,
         exportAction: (data: number) => {
-            return formatTimestamp(data);
+            return formatTimestamp(data).replaceAll(',', ' ');
         },
     },
     {
