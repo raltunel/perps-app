@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 // interface for return value of hook
-export interface useModalIF<T extends string = string> {
+export interface useModalIF<T extends string | number = string> {
     isOpen: boolean;
     open: string extends T ? () => void : (c: T) => void;
     close: () => void;
@@ -18,7 +18,7 @@ type modalDefaultStates = 'open' | 'closed' | number;
 
 // main fn body for hook
 // type annotation is currently being consumed as a content router
-export function useModal<T extends string = string>(
+export function useModal<T extends string | number = string>(
     dfltState?: modalDefaultStates,
 ): useModalIF<T> {
     // variable to track if modal is open on initial render

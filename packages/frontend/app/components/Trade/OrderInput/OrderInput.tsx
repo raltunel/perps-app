@@ -116,7 +116,13 @@ const positionSizeOptions = [
 ];
 
 // keys for content that may be rendered in tx modal
-type modalContentT = 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell';
+export type modalContentT =
+    | 'margin'
+    | 'scale'
+    | 'market_buy'
+    | 'market_sell'
+    | 'limit_buy'
+    | 'limit_sell';
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
@@ -651,10 +657,11 @@ function OrderInput() {
                         />
                     </div>
                     <PlaceOrderButtons
+                        isLimit={marketOrderType === 'limit'}
                         orderMarketPrice={marketOrderType}
-                        openModalWithContent={(
-                            c: 'confirm_buy' | 'confirm_sell',
-                        ) => confirmOrderModal.open(c)}
+                        openModalWithContent={(c: modalContentT) =>
+                            confirmOrderModal.open(c)
+                        }
                         orderValue={orderValue}
                         leverage={leverage}
                     />
@@ -667,12 +674,18 @@ function OrderInput() {
                                     : confirmOrderModal.content === 'scale'
                                       ? 'Scale Options'
                                       : confirmOrderModal.content ===
-                                          'confirm_buy'
+                                          'market_buy'
                                         ? 'Confirm Buy Order'
                                         : confirmOrderModal.content ===
-                                            'confirm_sell'
+                                            'market_sell'
                                           ? 'Confirm Sell Order'
-                                          : ''
+                                          : confirmOrderModal.content ===
+                                              'limit_buy'
+                                            ? 'Confirm Limit Buy'
+                                            : confirmOrderModal.content ===
+                                                'limit_sell'
+                                              ? 'Confirm Limit Sale'
+                                              : ''
                             }
                         >
                             {confirmOrderModal.content === 'margin' && (
@@ -698,12 +711,12 @@ function OrderInput() {
                                     onClose={confirmOrderModal.close}
                                 />
                             )}
-                            {confirmOrderModal.content === 'confirm_buy' && (
+                            {confirmOrderModal.content === 'market_buy' && (
                                 <ConfirmationModal
-                                    tx='buy'
+                                    tx='market_buy'
                                     onClose={() => {
                                         notifications.add({
-                                            title: 'Buy / Long Order Pending',
+                                            title: 'Buy / Long Market Order Pending',
                                             message:
                                                 'Buying 0.0001 ETH at $2,300',
                                             icon: 'spinner',
@@ -712,12 +725,40 @@ function OrderInput() {
                                     }}
                                 />
                             )}
-                            {confirmOrderModal.content === 'confirm_sell' && (
+                            {confirmOrderModal.content === 'market_sell' && (
                                 <ConfirmationModal
-                                    tx='sell'
+                                    tx='market_sell'
                                     onClose={() => {
                                         notifications.add({
-                                            title: 'Sell / Short Order Pending',
+                                            title: 'Sell / Short Market Order Pending',
+                                            message:
+                                                'Selling 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        confirmOrderModal.close();
+                                    }}
+                                />
+                            )}
+                            {confirmOrderModal.content === 'limit_buy' && (
+                                <ConfirmationModal
+                                    tx='limit_buy'
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Buy / Long Limit Order Pending',
+                                            message:
+                                                'Buying 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        confirmOrderModal.close();
+                                    }}
+                                />
+                            )}
+                            {confirmOrderModal.content === 'limit_sell' && (
+                                <ConfirmationModal
+                                    tx='limit_sell'
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Sell / Short Limit Order Pending',
                                             message:
                                                 'Selling 0.0001 ETH at $2,300',
                                             icon: 'spinner',

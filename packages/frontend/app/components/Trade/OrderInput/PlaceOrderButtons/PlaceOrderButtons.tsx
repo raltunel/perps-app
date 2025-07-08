@@ -6,10 +6,12 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
+import type { modalContentT } from '../OrderInput';
 
 interface propsIF {
+    isLimit: boolean;
     orderMarketPrice: string;
-    openModalWithContent: (content: 'confirm_buy' | 'confirm_sell') => void;
+    openModalWithContent: (content: modalContentT) => void;
     leverage: number;
     orderValue?: number;
 }
@@ -21,8 +23,13 @@ interface MarketInfoItem {
 
 // In case of any bugs or issues with this component, please reach out to Jr.
 const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
-    const { orderMarketPrice, openModalWithContent, orderValue, leverage } =
-        props;
+    const {
+        isLimit,
+        orderMarketPrice,
+        openModalWithContent,
+        orderValue,
+        leverage,
+    } = props;
 
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
@@ -129,13 +136,13 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     const hasMoreItems = useMemo(() => dataToUse.length > 2, [dataToUse]);
 
     const handleBuyClick = useCallback(
-        () => openModalWithContent('confirm_buy'),
-        [openModalWithContent],
+        () => openModalWithContent(isLimit ? 'limit_buy' : 'market_buy'),
+        [openModalWithContent, isLimit],
     );
 
     const handleSellClick = useCallback(
-        () => openModalWithContent('confirm_sell'),
-        [openModalWithContent],
+        () => openModalWithContent(isLimit ? 'limit_sell' : 'market_sell'),
+        [openModalWithContent, isLimit],
     );
 
     const handleToggleExpand = useCallback(() => {

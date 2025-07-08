@@ -4,9 +4,10 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import { useState } from 'react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import type { modalContentT } from '../OrderInput';
 
 interface PropsIF {
-    tx: 'buy' | 'sell';
+    tx: modalContentT;
     onClose: () => void;
 }
 type InfoItem = {
@@ -22,13 +23,13 @@ export default function ConfirmationModal(props: PropsIF) {
     const dataInfo: InfoItem[] = [
         {
             label: 'Action',
-            value: tx === 'buy' ? 'Buy' : 'Sell',
-            className: styles[tx === 'buy' ? 'green' : 'red'],
+            value: tx.includes('buy') ? 'Buy' : 'Sell',
+            className: styles[tx.includes('buy') ? 'green' : 'red'],
         },
         {
             label: 'Size',
             value: '0.0001 ETH',
-            className: styles[tx === 'buy' ? 'green' : 'red'],
+            className: styles[tx.includes('buy') ? 'green' : 'red'],
         },
         {
             label: 'Price',
@@ -90,7 +91,7 @@ export default function ConfirmationModal(props: PropsIF) {
                 onClick={onClose}
                 style={{ height: '47px' }}
             >
-                {tx === 'buy' ? 'Buy / Long' : 'Sell / Short'}
+                {tx.includes('buy') ? 'Buy / Long' : 'Sell / Short'}
             </SimpleButton>
         </div>
     );
