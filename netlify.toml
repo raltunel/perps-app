@@ -93,11 +93,11 @@
 
 # Redirect US traffic to US domain, preserving the path on primary domain
 [[redirects]]
-  from = "/*"
+  from = "https://ambi-perps.netlify.app/*"
   to = "https://ambi-perps-us.netlify.app/:splat"
   status = 302
   force = true
-  conditions = { Country = ["US"], Host = ["ambi-perps.netlify.app"] }
+  conditions = { Country = ["US"] }
 
 # Redirect US traffic to US domain, preserving the path on develop branch deploy
 [[redirects]]
@@ -121,7 +121,7 @@
   to = "https://deploy-preview-329--ambi-perps.netlify.app/:splat"
   status = 302
   force = true
-  conditions = { Country = ["!US"] }
+  conditions = { Country = ["PH"] }
 
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
