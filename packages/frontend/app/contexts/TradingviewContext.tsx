@@ -269,7 +269,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 .chart()
                 .onIntervalChanged()
                 .subscribe(null, (interval: ResolutionString) => {
-                    console.log('>>> interval changed', interval);
                     setChartInterval(interval);
                 });
 
@@ -308,7 +307,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     useEffect(() => {
-        console.log('>>> lastSleepMs', lastSleepMs);
         if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
             const intervalMinutes = tvIntervalToMinutes(
                 chartInterval as ResolutionString,
@@ -320,8 +318,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             if (intervalMinutes <= lastSleepDurationInMinutes) {
                 chart?.remove();
                 initChart();
-            } else {
-                console.log('>>> no need to reset');
             }
         }
     }, [lastSleepMs, lastAwakeMs, chartInterval, initChart]);
