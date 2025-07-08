@@ -714,6 +714,10 @@ function OrderInput() {
                             {confirmOrderModal.content === 'market_buy' && (
                                 <ConfirmationModal
                                     tx='market_buy'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
                                     onClose={() => {
                                         notifications.add({
                                             title: 'Buy / Long Market Order Pending',
@@ -728,6 +732,10 @@ function OrderInput() {
                             {confirmOrderModal.content === 'market_sell' && (
                                 <ConfirmationModal
                                     tx='market_sell'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
                                     onClose={() => {
                                         notifications.add({
                                             title: 'Sell / Short Market Order Pending',
@@ -742,6 +750,11 @@ function OrderInput() {
                             {confirmOrderModal.content === 'limit_buy' && (
                                 <ConfirmationModal
                                     tx='limit_buy'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
+                                    limitPrice={price}
                                     onClose={() => {
                                         notifications.add({
                                             title: 'Buy / Long Limit Order Pending',
@@ -756,6 +769,11 @@ function OrderInput() {
                             {confirmOrderModal.content === 'limit_sell' && (
                                 <ConfirmationModal
                                     tx='limit_sell'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
+                                    limitPrice={price}
                                     onClose={() => {
                                         notifications.add({
                                             title: 'Sell / Short Limit Order Pending',

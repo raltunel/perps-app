@@ -6,8 +6,13 @@ import { useState } from 'react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { modalContentT } from '../OrderInput';
 
-interface PropsIF {
+interface propsIF {
     tx: modalContentT;
+    size: {
+        qty: string;
+        denom: string;
+    };
+    limitPrice?: string;
     onClose: () => void;
 }
 type InfoItem = {
@@ -17,8 +22,8 @@ type InfoItem = {
     className?: string;
 };
 
-export default function ConfirmationModal(props: PropsIF) {
-    const { onClose, tx } = props;
+export default function ConfirmationModal(props: propsIF) {
+    const { onClose, size, limitPrice, tx } = props;
 
     const dataInfo: InfoItem[] = [
         {
@@ -28,12 +33,12 @@ export default function ConfirmationModal(props: PropsIF) {
         },
         {
             label: 'Size',
-            value: '0.0001 ETH',
+            value: `${size.qty || '--'} ${size.denom}`,
             className: styles[tx.includes('buy') ? 'green' : 'red'],
         },
         {
             label: 'Price',
-            value: 'Market',
+            value: tx.includes('limit') ? limitPrice || '--' : 'Market',
             className: styles.white,
         },
         {
