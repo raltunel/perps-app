@@ -103,8 +103,9 @@
       "ambi-perps.netlify.app", 
       "develop--ambi-perps.netlify.app", 
       "deploy-preview-327--ambi-perps.netlify.app"
-    ] 
+    ]
   }
+
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
   from = "/*"
