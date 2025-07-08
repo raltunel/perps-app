@@ -115,6 +115,14 @@
   force = true
   conditions = { Country = ["US"] }
 
+# Redirect non-US traffic from US domain to primary domain, preserving the path on deploy preview
+[[redirects]]
+  from = "https://deploy-preview-329--ambi-perps-us.netlify.app/*"
+  to = "https://deploy-preview-329--ambi-perps.netlify.app/:splat"
+  status = 302
+  force = true
+  conditions = { Country = ["!US"] }
+
 # Main SPA redirect (must come after geofencing rules)
 [[redirects]]
   from = "/*"
