@@ -109,8 +109,8 @@
 
 # Redirect US traffic to US domain, preserving the path on deploy preview
 [[redirects]]
-  from = "https://deploy-preview-326--ambi-perps.netlify.app/*"
-  to = "https://deploy-preview-326--ambi-perps-us.netlify.app/:splat"
+  from = "https://deploy-preview-329--ambi-perps.netlify.app/*"
+  to = "https://deploy-preview-329--ambi-perps-us.netlify.app/:splat"
   status = 302
   force = true
   conditions = { Country = ["US"] }
