@@ -67,7 +67,7 @@ export const OrderHistoryTableModel:
     },
     {
         name: 'Price',
-        key: 'price',
+        key: 'limitPx',
         sortable: true,
         className: 'priceCell',
         exportable: true,
@@ -81,17 +81,20 @@ export const OrderHistoryTableModel:
     },
     {
         name: 'Trigger Conditions',
-        key: 'triggerConditions',
+        key: 'triggerCondition',
         sortable: true,
         className: 'triggerConditionsCell',
         exportable: true,
     },
     {
         name: 'TP/SL',
-        key: 'tpsl',
+        key: 'triggerPx',
         sortable: true,
         className: 'tpslCell',
         exportable: true,
+        exportAction: (data: number | null) => {
+            return data && data > 0 ? data.toString() : '';
+        },
     },
     {
         name: 'Status',
