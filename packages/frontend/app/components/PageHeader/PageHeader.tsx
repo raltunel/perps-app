@@ -15,6 +15,7 @@ import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
+import Tooltip from '../Tooltip/Tooltip';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import HelpDropdown from './HelpDropdown/HelpDropdown';
@@ -157,14 +158,16 @@ export default function PageHeader() {
                             />
                         )}
                     </section>
-                    <a
-                        href='/trade'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className={styles.ambientmm}
-                    >
-                        Ambient AMM
-                    </a>
+                    <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
+                        <a
+                            href='/trade'
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className={styles.ambientmm}
+                        >
+                            Ambient AMM
+                        </a>
+                    </Tooltip>
                 </nav>
                 <div className={styles.rightSide}>
                     {isUserConnected && (
