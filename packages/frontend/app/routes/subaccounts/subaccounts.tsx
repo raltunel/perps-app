@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import { useAccounts, type useAccountsIF } from '~/stores/AccountsStore';
 import AccountsTable from './AccountsTable/AccountsTable';
 import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
@@ -16,10 +16,10 @@ export function meta() {
 
 export default function Subaccounts() {
     // logic to open and close subaccount creation modal
-    const createSubaccountModal: useModalIF = useModal('closed');
+    const createSubaccountModal = useModal('closed');
 
     // logic to open and close transfer modal
-    const transferModalCtrl: useModalIF = useModal('closed');
+    const transferModalCtrl = useModal('closed');
 
     // state data for subaccounts
     const data: useAccountsIF = useAccounts();
@@ -58,13 +58,13 @@ export default function Subaccounts() {
                     <div className={styles.button_container}>
                         <SimpleButton
                             bg='dark4'
-                            onClick={transferModalCtrl.open}
+                            onClick={() => transferModalCtrl.open()}
                         >
                             Transfer
                         </SimpleButton>
                         <SimpleButton
                             bg='accent1'
-                            onClick={createSubaccountModal.open}
+                            onClick={() => createSubaccountModal.open()}
                         >
                             Create Sub-Account
                         </SimpleButton>
