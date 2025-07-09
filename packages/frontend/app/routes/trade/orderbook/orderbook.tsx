@@ -1,5 +1,11 @@
 import { motion } from 'framer-motion';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
@@ -23,9 +29,11 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
+    heightOverride?: string;
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -38,15 +46,21 @@ const dummyOrder: OrderBookRowIF = {
     total: 0,
 };
 
-const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
-    // FIXME: data is not rendered on UI
+// Custom hook to memoize slot arrays
+function useOrderSlots(orders: OrderBookRowIF[]) {
+    return useMemo(() => orders.map((order) => order.px), [orders]);
+}
 
+const OrderBook: React.FC<OrderBookProps> = ({
+    symbol,
+    orderCount,
+    heightOverride,
+}) => {
     const { info } = useSdk();
 
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
-
-        return dummyOrderRow?.getBoundingClientRect().height || 16;
+        return dummyOrderRow?.getBoundingClientRect()?.height || 16;
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
@@ -55,26 +69,17 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
-    // added to pass true resolution to orderrow components
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
-
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
-
     const { formatNum } = useNumFormatter();
-
     const lockOrderBook = useRef<boolean>(false);
-
     const { getBsColor } = useAppSettings();
-
     const { buys, sells, setOrderBook } = useOrderBookStore();
+    const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const buyPlaceHolderCount = useMemo(() => {
-        return Math.max(orderCount - buys.length, 0);
-    }, [orderCount, buys]);
-
-    const sellPlaceHolderCount = useMemo(() => {
-        return Math.max(orderCount - sells.length, 0);
-    }, [orderCount, sells]);
+    // No useMemo for simple arithmetic
+    const buyPlaceHolderCount = Math.max(orderCount - buys.length, 0);
+    const sellPlaceHolderCount = Math.max(orderCount - sells.length, 0);
 
     const {
         userOrders,
@@ -85,13 +90,9 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
-    const buySlots = useMemo(() => {
-        return buys.map((order) => order.px);
-    }, [buys]);
-
-    const sellSlots = useMemo(() => {
-        return sells.map((order) => order.px);
-    }, [sells]);
+    // Use custom hook for stable slot arrays
+    const buySlots = useOrderSlots(buys);
+    const sellSlots = useOrderSlots(sells);
 
     const orderCountRef = useRef<number>(0);
     orderCountRef.current = orderCount;
@@ -99,13 +100,12 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     const findClosestSlot = useCallback(
         (orderPriceRounded: number, slots: number[], gapTreshold: number) => {
             let closestSlot = null;
-            slots.map((slot) => {
+            for (const slot of slots) {
                 if (Math.abs(slot - orderPriceRounded) <= gapTreshold) {
                     closestSlot = slot;
-                    return;
+                    break;
                 }
-            });
-
+            }
             return closestSlot;
         },
         [],
@@ -117,92 +117,74 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
         }
     }, [userOrders]);
 
+    // Memoize userBuySlots and userSellSlots with stable dependencies
     const userBuySlots: Set<string> = useMemo(() => {
-        if (!filledResolution.current) {
-            return new Set<string>();
-        }
-
+        if (!filledResolution.current) return new Set<string>();
         const precision = getPrecisionForResolution(filledResolution.current);
         const gapTreshold = filledResolution.current.val / 2;
         const slots = new Set<string>();
-
         userSymbolOrders
             .filter((order) => order.side === 'buy')
-            .map((order) => {
+            .forEach((order) => {
                 const orderPriceRounded = Number(
-                    new Number(order.limitPx).toFixed(precision),
+                    Number(order.limitPx).toFixed(precision),
                 );
-
-                const closestSlot = findClosestSlot(
+                let closestSlot = findClosestSlot(
                     orderPriceRounded,
                     buySlots,
                     gapTreshold,
                 );
-                if (closestSlot) {
-                    slots.add(formatNum(closestSlot, filledResolution.current));
-                } else {
-                    // if not found with gapTreshold, extend treshhold to place order
-                    // mostly to place very top (buy) or bottom (sell) slots in orderbook
-                    const closestSlot = findClosestSlot(
+                if (!closestSlot) {
+                    closestSlot = findClosestSlot(
                         orderPriceRounded,
                         buySlots,
                         gapTreshold * 2,
                     );
-                    if (closestSlot) {
-                        slots.add(
-                            formatNum(closestSlot, filledResolution.current),
-                        );
-                    }
+                }
+                if (closestSlot) {
+                    slots.add(formatNum(closestSlot, filledResolution.current));
                 }
             });
         return slots;
-    }, [userSymbolOrders, filledResolution.current, JSON.stringify(buySlots)]);
+    }, [userSymbolOrders, buySlots, findClosestSlot, formatNum]);
 
     const userSellSlots: Set<string> = useMemo(() => {
-        if (!filledResolution.current) {
-            return new Set<string>();
-        }
-
+        if (!filledResolution.current) return new Set<string>();
         const precision = getPrecisionForResolution(filledResolution.current);
         const gapTreshold = filledResolution.current.val / 2;
         const slots = new Set<string>();
-
         userSymbolOrders
             .filter((order) => order.side === 'sell')
-            .map((order) => {
+            .forEach((order) => {
                 const orderPriceRounded = Number(
-                    new Number(order.limitPx).toFixed(precision),
+                    Number(order.limitPx).toFixed(precision),
                 );
-
-                const closestSlot = findClosestSlot(
+                let closestSlot = findClosestSlot(
                     orderPriceRounded,
                     sellSlots,
                     gapTreshold,
                 );
-                if (closestSlot) {
-                    slots.add(formatNum(closestSlot, filledResolution.current));
-                } else {
-                    const closestSlot = findClosestSlot(
+                if (!closestSlot) {
+                    closestSlot = findClosestSlot(
                         orderPriceRounded,
                         sellSlots,
                         gapTreshold * 2,
                     );
-                    if (closestSlot) {
-                        slots.add(
-                            formatNum(closestSlot, filledResolution.current),
-                        );
-                    }
+                }
+                if (closestSlot) {
+                    slots.add(formatNum(closestSlot, filledResolution.current));
                 }
             });
         return slots;
-    }, [userSymbolOrders, filledResolution.current, JSON.stringify(sellSlots)]);
+    }, [userSymbolOrders, sellSlots, findClosestSlot, formatNum]);
 
     const handleOrderBookWorkerResult = useCallback(
         ({ data }: { data: OrderBookOutput }) => {
             setOrderBook(data.buys, data.sells);
             setOrderBookState(TableState.FILLED);
+            filledResolution.current = selectedResolution;
         },
-        [setOrderBook],
+        [selectedResolution, setOrderBook],
     );
 
     const postOrderBookRaw = useWorker<OrderBookOutput>(
@@ -220,9 +202,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
 
     useEffect(() => {
         if (!info) return;
-
         setOrderBookState(TableState.LOADING);
-
         if (selectedResolution) {
             const subKey = {
                 type: 'l2Book' as const,
@@ -234,40 +214,37 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     ? { mantissa: selectedResolution.mantissa }
                     : {}),
             };
-
             const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
-
-            setTimeout(() => {
-                filledResolution.current = selectedResolution;
-            }, 200);
-
-            return unsubscribe;
+            return () => {
+                unsubscribe();
+            };
         }
-    }, [selectedResolution, info]);
+    }, [selectedResolution, info, symbol, postOrderBookRaw]);
 
     const midHeader = useCallback(
-        (id: string) => {
-            return (
-                <div id={id} className={styles.orderBookBlockMid}>
-                    <div>Spread</div>
-                    <div>{selectedResolution?.val}</div>
-                    <div>
-                        {symbolInfo?.markPx &&
-                            selectedResolution?.val &&
-                            (
-                                (selectedResolution?.val / symbolInfo?.markPx) *
-                                100
-                            ).toFixed(3)}
-                        %
-                    </div>
+        (id: string) => (
+            <div id={id} className={styles.orderBookBlockMid}>
+                <div>Spread</div>
+                <div>{selectedResolution?.val}</div>
+                <div>
+                    {symbolInfo?.markPx &&
+                        selectedResolution?.val &&
+                        (
+                            (selectedResolution?.val / symbolInfo?.markPx) *
+                            100
+                        ).toFixed(3)}
+                    %
                 </div>
-            );
-        },
+            </div>
+        ),
         [selectedResolution, symbolInfo],
     );
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
+            if (rowLockTimeoutRef.current) {
+                clearTimeout(rowLockTimeoutRef.current);
+            }
             lockOrderBook.current = true;
             if (type === OrderRowClickTypes.PRICE) {
                 setObChosenPrice(order.px);
@@ -285,8 +262,7 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                 setObChosenPrice(order.px);
                 setObChosenAmount(amount);
             }
-
-            setTimeout(() => {
+            rowLockTimeoutRef.current = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
         },
@@ -310,42 +286,40 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     );
 
     return (
-        <div className={styles.orderBookContainer}>
+        <div
+            id='orderBookContainer'
+            className={styles.orderBookContainer}
+            style={{
+                ...(heightOverride && {
+                    height: heightOverride,
+                }),
+            }}
+        >
             <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
-                {
-                    <ComboBox
-                        value={selectedResolution?.val}
-                        options={resolutions}
-                        fieldName='val'
-                        onChange={(value) => {
-                            const resolution = resolutions.find(
-                                (resolution) =>
-                                    resolution.val === Number(value),
-                            );
-                            if (resolution) {
-                                setSelectedResolution(resolution);
-                            }
-                        }}
-                    />
-                }
-
-                {
-                    <ComboBox
-                        value={
-                            selectedMode === 'symbol'
-                                ? symbol.toUpperCase()
-                                : 'USD'
+                <ComboBox
+                    value={selectedResolution?.val}
+                    options={resolutions}
+                    fieldName='val'
+                    onChange={(value) => {
+                        const resolution = resolutions.find(
+                            (resolution) => resolution.val === Number(value),
+                        );
+                        if (resolution) {
+                            setSelectedResolution(resolution);
                         }
-                        options={[symbol.toUpperCase(), 'USD']}
-                        onChange={(value) =>
-                            setSelectedMode(
-                                value === symbol.toUpperCase()
-                                    ? 'symbol'
-                                    : 'usd',
-                            )
-                        }
-                    />
-                }
+                    }}
+                />
+                <ComboBox
+                    value={
+                        selectedMode === 'symbol' ? symbol.toUpperCase() : 'USD'
+                    }
+                    options={[symbol.toUpperCase(), 'USD']}
+                    onChange={(value) =>
+                        setSelectedMode(
+                            value === symbol.toUpperCase() ? 'symbol' : 'usd',
+                        )
+                    }
+                />
             </div>
 
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
@@ -374,12 +348,16 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                     resolution={filledResolution.current}
                     userSlots={userBuySlots}
                     clickListener={() => {}}
+                    formatNum={formatNum}
+                    getBsColor={getBsColor}
                 />
             </div>
 
             {orderBookState === TableState.LOADING && (
                 <motion.div
-                    className={styles.skeletonWrapper}
+                    className={
+                        styles.skeletonWrapper + ' ' + styles.orderSlotsWrapper
+                    }
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 10 }}
@@ -426,7 +404,46 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 10 }}
                             transition={{ duration: 0.2 }}
+                            className={styles.orderSlotsWrapper}
                         >
+                            <div
+                                className={styles.obGradientEffect}
+                                style={{
+                                    background: `linear-gradient(to bottom,  ${getBsColor().sell} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.smaller
+                                }
+                                style={{
+                                    background: `linear-gradient(to bottom,  ${getBsColor().sell} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.obGradientEffectBottom
+                                }
+                                style={{
+                                    background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
+                            <div
+                                className={
+                                    styles.obGradientEffect +
+                                    ' ' +
+                                    styles.smaller +
+                                    ' ' +
+                                    styles.obGradientEffectBottom
+                                }
+                                style={{
+                                    background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
+                                }}
+                            ></div>
                             <div className={styles.orderBookBlock}>
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
@@ -495,6 +512,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                                 }
                                                 userSlots={userSellSlots}
                                                 clickListener={rowClickHandler}
+                                                getBsColor={getBsColor}
+                                                formatNum={formatNum}
                                             />
                                             <div
                                                 className={styles.ratioBar}
@@ -535,6 +554,8 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
                                                 }
                                                 userSlots={userBuySlots}
                                                 clickListener={rowClickHandler}
+                                                getBsColor={getBsColor}
+                                                formatNum={formatNum}
                                             />
                                             <div
                                                 className={styles.ratioBar}
@@ -580,4 +601,4 @@ const OrderBook: React.FC<OrderBookProps> = ({ symbol, orderCount }) => {
     );
 };
 
-export default OrderBook;
+export default React.memo(OrderBook);

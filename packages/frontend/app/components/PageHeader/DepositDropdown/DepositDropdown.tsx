@@ -1,166 +1,26 @@
+import { motion } from 'framer-motion';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import { useApp } from '~/contexts/AppContext';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
-import Tooltip from '~/components/Tooltip/Tooltip';
-import { useMemo } from 'react';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { motion } from 'framer-motion';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface propsIF {
-    isUserConnected: boolean;
-    setIsUserConnected: React.Dispatch<React.SetStateAction<boolean>>;
     isDropdown?: boolean;
-}
-export default function DepositDropdown(props: propsIF) {
-    const { isUserConnected, isDropdown } = props;
-
-    const notifications: NotificationStoreIF = useNotificationStore();
-
-    const { accountOverview, selectedCurrency } = useTradeDataStore();
-
-    const { getBsColor } = useAppSettings();
-
-    const { formatNum } = useNumFormatter();
-
-    const overviewData = useMemo(
-        () => [
-            {
-                label: 'Balance',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.balance, 2, true, true),
-                change: accountOverview.balanceChange,
-            },
-            {
-                label: 'Unrealized PNL',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.unrealizedPnl, 2, true, true),
-                color:
-                    accountOverview.unrealizedPnl > 0
-                        ? getBsColor().buy
-                        : accountOverview.unrealizedPnl < 0
-                          ? getBsColor().sell
-                          : 'var(--text-)',
-            },
-            {
-                label: 'Cross Margin Ratio',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.crossMarginRatio, 2) + '%',
-                color:
-                    accountOverview.crossMarginRatio > 0
-                        ? getBsColor().buy
-                        : accountOverview.crossMarginRatio < 0
-                          ? getBsColor().sell
-                          : 'var(--text-)',
-            },
-            {
-                label: 'Maintenance Margin',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(
-                    accountOverview.maintainanceMargin,
-                    2,
-                    true,
-                    true,
-                ),
-                change: accountOverview.maintainanceMarginChange,
-            },
-            {
-                label: 'Cross Account Leverage',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
-            },
-        ],
-        [accountOverview, selectedCurrency],
-    );
-
-    return (
-        <div
-            className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
-        >
-            {isUserConnected ? (
-                <div className={styles.actionButtons}>
-                    <button
-                        onClick={() =>
-                            notifications.add({
-                                title: 'Deposit Pending',
-                                message: 'Deposit 420,000 USDC',
-                                icon: 'spinner',
-                            })
-                        }
-                    >
-                        Deposit
-                    </button>
-                    <button
-                        onClick={() =>
-                            notifications.add({
-                                title: 'Deposit Pending',
-                                message: 'Deposit 420,000 USDC',
-                                icon: 'spinner',
-                            })
-                        }
-                    >
-                        Withdraw
-                    </button>
-                </div>
-            ) : (
-                <div className={styles.notConnectedContainer}>
-                    <p className={styles.notConnectedText}>
-                        Connect your wallet to start trading with zero gas.
-                    </p>
-                    <button className={styles.connectButton}>
-                        Connect Wallet
-                    </button>
-                </div>
-            )}
-            <div className={styles.overviewContainer}>
-                <h3>Account Overview</h3>
-                {overviewData.map((data, idx) => (
-                    <div key={idx} className={styles.overviewItem}>
-                        <div className={styles.tooltipContainer}>
-                            <p className={styles.overviewLabel}>{data.label}</p>
-                            <Tooltip
-                                content={data?.tooltipContent}
-                                position='right'
-                            >
-                                {tooltipSvg}
-                            </Tooltip>
-                        </div>
-                        {data.change ? (
-                            <motion.p
-                                key={data.change}
-                                className={styles.value}
-                                initial={{
-                                    color:
-                                        data.change > 0
-                                            ? getBsColor().buy
-                                            : getBsColor().sell,
-                                }}
-                                animate={{
-                                    color: 'var(--text1)',
-                                }}
-                                transition={{
-                                    duration: 0.3,
-                                    ease: 'easeInOut',
-                                }}
-                            >
-                                {data.value}
-                            </motion.p>
-                        ) : (
-                            <p
-                                className={styles.value}
-                                style={{ color: data.color }}
-                            >
-                                {data.value}
-                            </p>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
 }
 
 const tooltipSvg = (
@@ -186,3 +46,213 @@ const tooltipSvg = (
         </defs>
     </svg>
 );
+
+function DepositDropdown(props: propsIF) {
+    const { isDropdown } = props;
+
+    const { isUserConnected, setIsUserConnected } = useApp();
+    const notifications: NotificationStoreIF = useNotificationStore();
+    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
+        usePortfolioModals();
+    const { accountOverview, selectedCurrency } = useTradeDataStore();
+    const { getBsColor } = useAppSettings();
+    const { formatNum } = useNumFormatter();
+
+    // Scroll fade logic
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [, setIsScrolledToBottom] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollRef.current) {
+                const { scrollTop, scrollHeight, clientHeight } =
+                    scrollRef.current;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 5;
+                setIsScrolledToBottom(isAtBottom);
+            }
+        };
+        const scrollElement = scrollRef.current;
+        if (scrollElement) {
+            scrollElement.addEventListener('scroll', handleScroll);
+            handleScroll();
+        }
+        return () => {
+            if (scrollElement) {
+                scrollElement.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
+
+    // Memoize color values
+    const bsColor = useMemo(() => getBsColor(), [getBsColor]);
+
+    // Memoize overview data
+    const overviewData = useMemo(
+        () => [
+            {
+                label: 'Balance',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.balance, 2, true, true),
+                change: accountOverview.balanceChange,
+            },
+            {
+                label: 'Unrealized PNL',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.unrealizedPnl, 2, true, true),
+                color:
+                    accountOverview.unrealizedPnl > 0
+                        ? bsColor.buy
+                        : accountOverview.unrealizedPnl < 0
+                          ? bsColor.sell
+                          : 'var(--text-)',
+            },
+            {
+                label: 'Cross Margin Ratio',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.crossMarginRatio, 2) + '%',
+                color:
+                    accountOverview.crossMarginRatio > 0
+                        ? bsColor.buy
+                        : accountOverview.crossMarginRatio < 0
+                          ? bsColor.sell
+                          : 'var(--text-)',
+            },
+            {
+                label: 'Maintenance Margin',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(
+                    accountOverview.maintainanceMargin,
+                    2,
+                    true,
+                    true,
+                ),
+                change: accountOverview.maintainanceMarginChange,
+            },
+            {
+                label: 'Cross Account Leverage',
+                tooltipContent: 'this is tooltip data',
+                value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
+            },
+        ],
+        [accountOverview, selectedCurrency, bsColor, formatNum],
+    );
+
+    // Memoize wallet connect handler
+    const handleConnectWallet = useCallback(() => {
+        setIsUserConnected(true);
+    }, [setIsUserConnected]);
+
+    // Memoize deposit/withdraw handlers
+    const handleDeposit = useCallback(() => {
+        notifications.add({
+            title: 'Deposit Pending',
+            message: 'Deposit 420,000 USDC',
+            icon: 'spinner',
+        });
+        openDepositModal();
+    }, [notifications, openDepositModal]);
+
+    const handleWithdraw = useCallback(() => {
+        notifications.add({
+            title: 'Withdraw Pending',
+            message: 'Withdraw 420,000 USDC',
+            icon: 'spinner',
+        });
+        openWithdrawModal();
+    }, [notifications, openWithdrawModal]);
+
+    return (
+        <>
+            <div
+                className={`${styles.container} ${isDropdown ? styles.dropdownContainer : ''}`}
+            >
+                {isUserConnected ? (
+                    <div
+                        className={`${styles.actionButtons} ${!isDropdown ? styles.dropdownActionButtons : ''}`}
+                    >
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={handleDeposit}
+                            className={styles.depositButton}
+                        >
+                            Deposit
+                        </SimpleButton>
+                        <SimpleButton
+                            bg={isDropdown ? 'dark4' : 'dark3'}
+                            hoverBg='accent1'
+                            onClick={handleWithdraw}
+                        >
+                            Withdraw
+                        </SimpleButton>
+                    </div>
+                ) : (
+                    <div className={styles.notConnectedContainer}>
+                        <p className={styles.notConnectedText}>
+                            Connect your wallet to start trading with zero gas.
+                        </p>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={handleConnectWallet}
+                        >
+                            Connect Wallet
+                        </SimpleButton>
+                    </div>
+                )}
+                {isUserConnected && (
+                    <div className={styles.overviewContainer}>
+                        <h3>Account Overview</h3>
+                        {overviewData.map((data) => (
+                            <div
+                                key={data.label}
+                                className={styles.overviewItem}
+                            >
+                                <div className={styles.tooltipContainer}>
+                                    <p className={styles.overviewLabel}>
+                                        {data.label}
+                                    </p>
+                                    <Tooltip
+                                        content={data.tooltipContent}
+                                        position='right'
+                                    >
+                                        {tooltipSvg}
+                                    </Tooltip>
+                                </div>
+                                {data.change !== undefined ? (
+                                    <motion.p
+                                        key={data.change}
+                                        className={styles.value}
+                                        initial={{
+                                            color:
+                                                data.change > 0
+                                                    ? bsColor.buy
+                                                    : bsColor.sell,
+                                        }}
+                                        animate={{
+                                            color: 'var(--text1)',
+                                        }}
+                                        transition={{
+                                            duration: 0.3,
+                                            ease: 'easeInOut',
+                                        }}
+                                    >
+                                        {data.value}
+                                    </motion.p>
+                                ) : (
+                                    <p
+                                        className={styles.value}
+                                        style={{ color: data.color }}
+                                    >
+                                        {data.value}
+                                    </p>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            {PortfolioModalsRenderer}
+        </>
+    );
+}
+
+export default React.memo(DepositDropdown);

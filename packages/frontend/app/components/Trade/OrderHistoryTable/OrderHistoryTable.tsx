@@ -38,6 +38,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     return (
         <>
             <GenericTable<OrderDataIF, OrderDataSortBy>
+                storageKey={`OrderHistoryTable_${currentUserRef.current}`}
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OrderHistoryTableHeader
@@ -58,6 +59,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 viewAllLink={viewAllLink}
                 skeletonRows={7}
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
+                defaultSortBy={'timestamp'}
+                defaultSortDirection={'desc'}
             />
         </>
     );

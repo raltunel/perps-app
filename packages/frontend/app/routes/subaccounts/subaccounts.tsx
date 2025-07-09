@@ -1,10 +1,11 @@
 import { useEffect, useRef } from 'react';
-import Button from '~/components/Button/Button';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import { useAccounts, type useAccountsIF } from '~/stores/AccountsStore';
 import AccountsTable from './AccountsTable/AccountsTable';
 import CreateSubaccount from './CreateSubaccount/CreateSubaccount';
 import styles from './subaccounts.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import TransferModal from '~/components/TransferModal/TransferModal';
 
 export function meta() {
     return [
@@ -15,7 +16,10 @@ export function meta() {
 
 export default function Subaccounts() {
     // logic to open and close subaccount creation modal
-    const createSubaccountModal: useModalIF = useModal('closed');
+    const createSubaccountModal = useModal('closed');
+
+    // logic to open and close transfer modal
+    const transferModalCtrl = useModal('closed');
 
     // state data for subaccounts
     const data: useAccountsIF = useAccounts();
@@ -51,13 +55,20 @@ export default function Subaccounts() {
             <div className={styles.subaccounts_wrapper}>
                 <header>
                     <h2>Sub-Accounts</h2>
-                    <Button
-                        size='medium'
-                        selected={true}
-                        onClick={createSubaccountModal.open}
-                    >
-                        Create Sub-Account
-                    </Button>
+                    <div className={styles.button_container}>
+                        <SimpleButton
+                            bg='dark4'
+                            onClick={() => transferModalCtrl.open()}
+                        >
+                            Transfer
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => createSubaccountModal.open()}
+                        >
+                            Create Sub-Account
+                        </SimpleButton>
+                    </div>
                 </header>
                 <AccountsTable
                     title='Master Account'
@@ -76,6 +87,9 @@ export default function Subaccounts() {
                     modalControl={createSubaccountModal}
                     create={data.create}
                 />
+            )}
+            {transferModalCtrl.isOpen && (
+                <TransferModal closeModal={transferModalCtrl.close} />
             )}
         </div>
     );

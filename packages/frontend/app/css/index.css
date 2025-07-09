@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@100;300;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
 :root {
@@ -17,6 +16,8 @@
     --text3: #88888f;
 
     --accent1: #7371fc;
+    --accent1-dark: #5f5df0;
+
     --accent2: #e480ff;
     --accent3: #5ffff2;
     --accent4: #71b5fc;
@@ -45,6 +46,7 @@
     /* 🔤 Typography                  */
     /* ------------------------------ */
     --font-family-main: 'Lexend Deca';
+    --font-family-mono: 'Roboto Mono';
     --font-weight: 400;
 
     --font-size-xs: 10px;
@@ -66,6 +68,7 @@
     --margin-xl: 64px;
     --margin-xxl: 96px;
 
+    --padding-row: 2px;
     --padding-xs: 4px;
     --padding-s: 8px;
     --padding-m: 16px;
@@ -74,7 +77,9 @@
     --padding-xl: 64px;
     --padding-xxl: 96px;
     --padding-dropdown: 0px 4px 0px 8px;
+    --padding-modal: var(--padding-s) var(--padding-m) var(--padding-m);
 
+    --gap-row: 2px;
     --gap-xs: 4px;
     --gap-s: 8px;
     --gap-m: 16px;
@@ -113,7 +118,13 @@
         var(--order-book-width-desktop-small) * 2
     );
 
-    --trade-tables-height-desktop: 281px;
+    --trade-tables-min-height-desktop: 180px;
+
+    --trade-tables-height-desktop: max(
+        23vh,
+        var(--trade-tables-min-height-desktop)
+    );
+    --trade-tables-tabs-height: 25px;
     --header-height-desktop: 56px;
 
     /* ------------------------------ */
@@ -125,6 +136,7 @@
     --z-index-toast: 200;
     --z-index-tooltip: 300;
     --z-index-navbar-dropdown: 99;
+    --z-index-generic-table-actions: 10;
 
     /* ------------------------------ */
     /* 🌫️ Shadows                    */
@@ -134,6 +146,15 @@
     --shadow-m: 0 4px 6px rgba(0, 0, 0, 0.1);
     --shadow-l: 0 10px 15px rgba(0, 0, 0, 0.15);
     --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.2);
+
+    /* ------------------------------ */
+    /* 👓 Blurs                       */
+    /* ------------------------------ */
+    --blur-xs: 1px;
+    --blur-s: 2px;
+    --blur-m: 4px;
+    --blur-l: 10px;
+    --blur-xl: 20px;
 
     /* ------------------------------ */
     /* 🌫️ Opacity Levels             */
@@ -147,6 +168,7 @@
     /* ------------------------------ */
     --skeleton-height: 20px;
     --skeleton-animation-duration: 1.5s;
+    --skeleton-base-color: #f0f0f0;
     --skeleton-background: linear-gradient(
         90deg,
         #f0f0f005 10%,
@@ -170,6 +192,27 @@
     padding: 0;
 }
 
+/* Hide scrollbar */
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        0deg,
+        var(--accent1) 0%,
+        var(--accent1) 49.48%,
+        var(--accent1) 100%
+    );
+    border-radius: 10px;
+    box-shadow: 0 0 0 100000vh black;
+}
+
 html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
@@ -182,6 +225,20 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background: var(--bg-dark1);
+}
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
+    margin: 0;
+    padding: 0;
+    font-weight: normal !important;
 }
 
 img,
@@ -207,6 +264,24 @@ a {
 
 button {
     cursor: pointer;
+    transition: filter 0.3s ease-in-out;
+}
+button {
+    position: relative;
+    overflow: hidden;
+    color: var(--text1);
+    z-index: 1;
+    background: inherit;
+    border: none;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    z-index: -1;
+    transition: filter 0.3s ease;
 }
 
 ul[role='list'],

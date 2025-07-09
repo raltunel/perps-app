@@ -47,6 +47,15 @@ export interface UserFillIF {
     closedPnl: number;
 }
 
+export interface DepositAndWithDrawalIF {
+    time: number;
+    status: string;
+    network: string;
+    action: string;
+    valueChange: string;
+    fee: string;
+}
+
 export type UserFillSortBy =
     | 'time'
     | 'coin'
@@ -56,6 +65,17 @@ export type UserFillSortBy =
     | 'value'
     | 'fee'
     | 'closedPnl'
+    | 'status'
+    | 'tradeValue'
+    | undefined;
+
+export type DepositAndWithDrawalSortBy =
+    | 'time'
+    | 'status'
+    | 'network'
+    | 'action'
+    | 'valueChange'
+    | 'fee'
     | undefined;
 
 export interface TwapStateIF {
@@ -164,3 +184,42 @@ export interface UserFundingResponseIF {
         nSzi?: boolean;
     };
 }
+
+export interface ActiveTwapIF {
+    coin: string;
+    executedNtl: number;
+    executedSz: number;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: 'buy' | 'sell';
+    sz: number;
+    timestamp: number;
+    user: string;
+}
+
+export type ActiveTwapSortBy =
+    | 'coin'
+    | 'executedNtl'
+    | 'executedSz'
+    | 'minutes'
+    | 'randomize'
+    | 'reduceOnly'
+    | 'side'
+    | 'sz'
+    | 'timestamp'
+    | 'user'
+    | undefined;
+
+interface PositionValueIF {
+    [0]: number;
+    [1]: string;
+}
+
+export interface UserPositionIF {
+    accountValueHistory: PositionValueIF[];
+    pnlHistory: PositionValueIF[];
+    vlm: string;
+}
+
+export type PositionTimeframeKey = 'day' | 'week' | 'month' | 'allTime';

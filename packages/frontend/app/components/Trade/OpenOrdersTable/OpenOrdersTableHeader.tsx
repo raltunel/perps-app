@@ -5,7 +5,7 @@ import type { TableSortDirection } from '~/utils/CommonIFs';
 
 export interface HeaderCell {
     name: string;
-    key: string;
+    key: OrderDataSortBy;
     sortable: boolean;
     className: string;
 }
@@ -13,7 +13,7 @@ export interface HeaderCell {
 interface OpenOrdersTableHeaderProps {
     sortBy: OrderDataSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: OrderDataSortBy) => void;
 }
 
 export default function OpenOrdersTableHeader({
@@ -26,73 +26,73 @@ export default function OpenOrdersTableHeader({
             name: 'Time',
             key: 'timestamp',
             sortable: true,
-            className: 'timeCell',
+            className: styles.timeCell,
         },
         {
             name: 'Type',
             key: 'orderType',
             sortable: true,
-            className: 'typeCell',
+            className: styles.typeCell,
         },
         {
             name: 'Coin',
             key: 'coin',
             sortable: true,
-            className: 'coinCell',
+            className: styles.coinCell,
         },
         {
             name: 'Direction',
             key: 'side',
             sortable: true,
-            className: 'directionCell',
+            className: styles.directionCell,
         },
         {
             name: 'Size',
             key: 'sz',
             sortable: true,
-            className: 'sizeCell',
+            className: styles.sizeCell,
         },
         {
             name: 'Original Size',
             key: 'origSz',
             sortable: true,
-            className: 'originalSizeCell',
+            className: styles.originalSizeCell,
         },
         {
             name: 'Order Value',
             key: 'orderValue',
             sortable: true,
-            className: 'orderValueCell',
+            className: styles.orderValueCell,
         },
         {
             name: 'Price',
             key: 'price',
             sortable: true,
-            className: 'priceCell',
+            className: styles.priceCell,
         },
         {
             name: 'Reduce Only',
             key: 'reduceOnly',
             sortable: false,
-            className: 'reduceOnlyCell',
+            className: styles.reduceOnlyCell,
         },
         {
             name: 'Trigger Conditions',
             key: 'triggerConditions',
             sortable: false,
-            className: 'triggerConditionsCell',
+            className: styles.triggerConditionsCell,
         },
         {
             name: 'TP/SL',
             key: 'tpsl',
             sortable: false,
-            className: 'tpslCell',
+            className: styles.tpslCell,
         },
         {
             name: 'Cancel',
             key: 'cancel',
             sortable: false,
-            className: 'cancelCell',
+            className: styles.cancelCell,
         },
     ];
 
@@ -101,7 +101,7 @@ export default function OpenOrdersTableHeader({
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+                    className={`${styles.cell} ${styles.headerCell} ${header.className} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
                         if (header.sortable) {
                             sortClickHandler(header.key);

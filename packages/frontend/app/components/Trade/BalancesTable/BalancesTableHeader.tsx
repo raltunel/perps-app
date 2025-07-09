@@ -14,7 +14,7 @@ export interface HeaderCell {
 interface BalancesTableHeaderProps {
     sortBy: UserBalanceSortBy;
     sortDirection: TableSortDirection;
-    sortClickHandler: (key: string) => void;
+    sortClickHandler: (key: UserBalanceSortBy) => void;
 }
 
 export default function BalancesTableHeader({
@@ -29,49 +29,49 @@ export default function BalancesTableHeader({
             name: 'Coin',
             key: 'sortName',
             sortable: true,
-            className: 'coinCell',
+            className: styles.coinCell,
         },
         {
             name: 'Total Balance',
             key: 'total',
             sortable: true,
-            className: 'totalBalanceCell',
+            className: styles.totalBalanceCell,
         },
         {
             name: 'Available Balance',
             key: 'available',
             sortable: true,
-            className: 'availableBalanceCell',
+            className: styles.availableBalanceCell,
         },
         {
             name: `${selectedCurrency} Value`,
             key: 'usdcValue',
             sortable: true,
-            className: 'usdcValueCell',
+            className: styles.usdcValueCell,
         },
         {
             name: 'Buying Power',
             key: 'buyingPower',
             sortable: true,
-            className: 'buyingPowerCell',
+            className: styles.buyingPowerCell,
         },
         {
             name: 'PNL (ROGER)',
             key: 'pnlValue',
             sortable: true,
-            className: 'pnlCell',
+            className: styles.pnlCell,
         },
         {
             name: 'Contract',
             key: 'contract',
             sortable: false,
-            className: 'contractCell',
+            className: styles.contractCell,
         },
         {
             name: '',
             key: 'action',
             sortable: false,
-            className: 'actionCell',
+            className: styles.actionCell,
         },
     ];
 
@@ -80,10 +80,10 @@ export default function BalancesTableHeader({
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
+                    className={`${styles.cell} ${styles.headerCell} ${header.className} ${header.sortable ? styles.sortable : ''} ${header.key === sortBy ? styles.active : ''}`}
                     onClick={() => {
                         if (header.sortable) {
-                            sortClickHandler(header.key);
+                            sortClickHandler(header.key as UserBalanceSortBy);
                         }
                     }}
                 >

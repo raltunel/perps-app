@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
+import { BsStars } from 'react-icons/bs';
 import { FiSearch } from 'react-icons/fi';
 import { IoCloseOutline } from 'react-icons/io5';
 import { MdSearchOff } from 'react-icons/md';
@@ -122,9 +123,20 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
             return sortedSymbols.slice(0, 50);
         }
         return sortedSymbols.filter((c) =>
-            c.coin.toLowerCase().includes(searchQuery.toLowerCase()),
+            c.coin?.toLowerCase().includes(searchQuery?.toLowerCase()),
         );
     }, [searchQuery, sortedSymbols]);
+
+    const filterTabs = (
+        <section className={styles.filterTabsContainer}>
+            {/* color to simulate active tab */}
+            <button style={{ color: 'var(--text1)' }}>All Coins</button>
+            <button className={styles.filterNewButton}>
+                New <BsStars color='var(--accent1)' size={14} />
+            </button>
+            <button>Trending</button>
+        </section>
+    );
 
     return (
         <>
@@ -136,7 +148,10 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                 transition={{ duration: 0.2 }}
             >
                 <div className={styles.symbolListSearch}>
-                    <FiSearch className={styles.symbolListSearchIcon} />
+                    <FiSearch
+                        className={styles.symbolListSearchIcon}
+                        size={15}
+                    />
                     <input
                         autoFocus
                         type='text'
@@ -149,9 +164,11 @@ const SymbolList: React.FC<SymbolListProps> = ({ setIsOpen }) => {
                         <IoCloseOutline
                             className={styles.symbolListSearchClose}
                             onClick={() => setSearchQuery('')}
+                            size={18}
                         />
                     )}
                 </div>
+                {filterTabs}
 
                 <SymbolListTableHeader
                     sortClickHandler={sortClickHandler}

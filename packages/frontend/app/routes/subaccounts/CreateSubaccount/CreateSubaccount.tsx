@@ -7,11 +7,12 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 // interface for functional component props
 interface propsIF {
     modalControl: useModalIF;
-    create: (a: string) => void;
+    create: (a: string, g: 'discretionary') => void;
 }
 
 // main react functional component
@@ -32,10 +33,10 @@ export default function CreateSubaccount(props: propsIF) {
         if (inputRef.current) {
             const text: string = inputRef.current.value;
             if (text.length) {
-                create(inputRef.current.value);
+                create(inputRef.current.value, 'discretionary');
                 notifications.add({
                     title: 'Sub Account Created',
-                    message: inputRef.current.value,
+                    message: `Made new discretionary sub-account ${inputRef.current.value}`,
                     icon: 'check',
                 });
             }
@@ -61,8 +62,12 @@ export default function CreateSubaccount(props: propsIF) {
                     />
                 </div>
                 <div className={styles.modal_buttons}>
-                    <button onClick={modalControl.close}>Cancel</button>
-                    <button onClick={createSubaccount}>Confirm</button>
+                    <SimpleButton bg='dark4' onClick={modalControl.close}>
+                        Cancel
+                    </SimpleButton>
+                    <SimpleButton bg='accent1' onClick={createSubaccount}>
+                        Confirm
+                    </SimpleButton>
                 </div>
             </div>
         </Modal>

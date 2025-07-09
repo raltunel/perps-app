@@ -55,6 +55,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 set({ orderBookMode: mode }),
             numFormat: NumFormatTypes[0],
             setNumFormat: (numFormat: NumFormat) => set({ numFormat }),
+            getNumFormat: () => get().numFormat,
             lang: Langs[0],
             setLang: (lang: LangType) => set({ lang }),
             bsColor: 'default',
@@ -64,7 +65,12 @@ export const useAppSettings = create<AppSettingsStore>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({ bsColor: state.bsColor }),
+            partialize: (state) => ({
+                bsColor: state.bsColor,
+                numFormat: state.numFormat,
+                lang: state.lang,
+                // orderBookMode: state.orderBookMode,
+            }),
         },
     ),
 );

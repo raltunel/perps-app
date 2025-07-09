@@ -12,13 +12,13 @@
     align-items: center;
     justify-content: space-between;
     background: var(--bg-dark3, #1c1c22);
-    border-radius: 8px;
+    border-radius: var(--radius-s);
     border: none;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-s, 12px);
     cursor: pointer;
     flex-shrink: 0;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .dropdownToggle.disabled {
@@ -46,16 +46,17 @@
     top: 100%;
     left: 0;
     width: 100%;
-    margin-top: 4px;
+    margin-top: var(--margin-xs);
     padding: 0;
     background: var(--bg-dark3, #1c1c22);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     list-style: none;
     z-index: 10;
     max-height: 200px;
     overflow-y: auto;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     padding-bottom: var(--padding-s);
+    gap: var(--gap-xs);
 }
 
 .dropdownItem {
@@ -70,13 +71,11 @@
 }
 
 .dropdownItem.selected {
-    background-color: rgba(255, 255, 255, 0.05);
     color: var(--text1, #f0f0f8);
 }
 
 .dropdownItem:hover {
     color: var(--text1);
-    background: var(--bg-dark2);
 }
 
 .noOptions {
@@ -97,7 +96,7 @@
 
 .dropdownMenu::-webkit-scrollbar-thumb {
     background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 }
 .orderDropdownWrapper {
     display: flex;

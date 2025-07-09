@@ -1,106 +1,63 @@
-import { useEffect, useMemo, useState } from 'react';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useMemo, useRef } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { TableState } from '~/utils/CommonIFs';
-import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
-import styles from './BalancesTable.module.css';
+import { WsChannels } from '~/utils/Constants';
+import type { UserBalanceIF, UserBalanceSortBy } from '~/utils/UserDataIFs';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import { WsChannels } from '~/utils/Constants';
+import { useDebugStore } from '~/stores/DebugStore';
 
 type BalancesTableProps = {
     hideSmallBalances: boolean;
 };
 
 export default function BalancesTable(props: BalancesTableProps) {
+    const { debugWallet } = useDebugStore();
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
+
     const { hideSmallBalances } = props;
 
     const smallBalanceThreshold = 10;
 
     const { userBalances, fetchedChannels } = useTradeDataStore();
 
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
-
     const webDataFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
     }, [fetchedChannels]);
 
-    const [sortBy, setSortBy] = useState<UserBalanceSortBy>();
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
-
-    const handleSort = (key: string) => {
-        if (sortBy === key) {
-            if (sortDirection === 'desc') {
-                setSortDirection('asc');
-            } else if (sortDirection === 'asc') {
-                setSortDirection(undefined);
-                setSortBy(undefined);
-            } else {
-                setSortDirection('desc');
-            }
-        } else {
-            setSortBy(key as UserBalanceSortBy);
-            setSortDirection('desc');
-        }
-    };
-
-    const sortedBalances = useMemo(() => {
-        return sortUserBalances(userBalances, sortBy, sortDirection);
-    }, [userBalances, sortBy, sortDirection]);
-
     const balancesToShow = useMemo(() => {
         if (hideSmallBalances) {
-            return sortedBalances.filter((balance) => {
+            return userBalances.filter((balance) => {
                 return balance.usdcValue > smallBalanceThreshold;
             });
         }
-        return sortedBalances;
-    }, [sortedBalances, hideSmallBalances]);
-
-    useEffect(() => {
-        if (webDataFetched) {
-            if (balancesToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [balancesToShow, webDataFetched]);
+        return userBalances;
+    }, [userBalances, hideSmallBalances]);
 
     return (
-        <div className={styles.tableWrapper}>
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable rows={7} colRatios={[1, 2, 2, 1, 1, 1, 3]} />
-            ) : (
-                <>
-                    <BalancesTableHeader
-                        sortBy={sortBy}
-                        sortDirection={sortDirection}
-                        sortClickHandler={handleSort}
-                    />
-                    <div className={styles.tableBody}>
-                        {tableState === TableState.FILLED && (
-                            <>
-                                {balancesToShow.map((balance, index) => (
-                                    <BalancesTableRow
-                                        key={`balance-${index}`}
-                                        balance={balance}
-                                    />
-                                ))}
-                            </>
-                        )}
-
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-                    </div>
-                </>
+        <GenericTable<UserBalanceIF, UserBalanceSortBy>
+            storageKey={`BalancesTable_${currentUserRef.current}`}
+            data={balancesToShow}
+            renderHeader={(sortDirection, sortClickHandler, sortBy) => (
+                <BalancesTableHeader
+                    sortBy={sortBy}
+                    sortDirection={sortDirection}
+                    sortClickHandler={sortClickHandler}
+                />
             )}
-        </div>
+            renderRow={(balance, index) => (
+                <BalancesTableRow key={`balance-${index}`} balance={balance} />
+            )}
+            sorterMethod={sortUserBalances}
+            isFetched={webDataFetched}
+            pageMode={false}
+            viewAllLink={''}
+            skeletonRows={7}
+            skeletonColRatios={[1, 2, 2, 1, 1, 1, 3]}
+            defaultSortBy={'usdcValue'}
+            defaultSortDirection={'desc'}
+        />
     );
 }

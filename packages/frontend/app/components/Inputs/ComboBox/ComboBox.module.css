@@ -12,7 +12,7 @@
 .comboBoxValueContainer {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--gap-xs);
     padding: var(--padding-xs);
 
     cursor: pointer;
@@ -39,17 +39,19 @@
 }
 
 .comboBoxOptionsWrapper {
-    background: var(--bg-dark4);
+    background: var(--bg-dark3);
     position: absolute;
     top: 100%;
     left: 0;
-    z-index: 1000;
+    z-index: 999999;
     width: 100%;
     color: var(--text2);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     border-radius: var(--radius-s);
+    /* to add a little space to the right */
+    padding-right: var(--padding-s);
 }
 
 .comboBoxOptionsWrapper > div {
@@ -58,7 +60,7 @@
 }
 
 .comboBoxOptionsWrapper > div:hover {
-    background: var(--bg-dark3);
+    color: var(--text1);
 }
 
 .comboBoxOptionSelected {
@@ -79,7 +81,7 @@
     font-size: var(--font-size-s);
     z-index: 2;
     background-color: var(--bg-dark2);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
 
     border: 1px solid var(--bg-dark3);
 }

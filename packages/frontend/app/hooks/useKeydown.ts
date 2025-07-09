@@ -1,11 +1,15 @@
 import { useEffect } from 'react';
 
+type acceptableDependenciesT = (string | number | symbol | boolean)[];
+
 // hook to create and manage a 'keydown' event in the DOM
 export function useKeydown(
     // keybind for the triggered event
     key: string,
     // fn to execute on keydown
     fn: () => void,
+    // param to accept a dependency array
+    dependencyArray: acceptableDependenciesT = [],
     // param to toggle on debug mode
     debug?: 'debug',
 ): () => void {
@@ -15,7 +19,7 @@ export function useKeydown(
     function listener(trigger: KeyboardEvent): void {
         // console log for debug mode
         if (debug)
-            console.log({
+            console.debug({
                 event: trigger,
                 event_key: trigger.key,
                 bound_key: key,
@@ -33,7 +37,7 @@ export function useKeydown(
         return () => {
             document.removeEventListener(EVENT_TYPE, listener);
         };
-    }, []);
+    }, dependencyArray);
     // return a function to simulate a keydown for testing
     return () => document.dispatchEvent(new KeyboardEvent(EVENT_TYPE, { key }));
 }

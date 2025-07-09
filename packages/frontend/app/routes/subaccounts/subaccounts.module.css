@@ -10,9 +10,6 @@
 .subaccounts_wrapper {
     display: flex;
     flex-direction: column;
-    width: fit-content;
-    align-items: center;
-    justify-content: center;
     gap: 80px;
 }
 
@@ -26,4 +23,10 @@
 
 .subaccounts_wrapper > header > h2 {
     font-size: var(--font-size-xl);
+}
+
+.button_container {
+    display: grid;
+    grid-template-columns: 130px auto;
+    gap: var(--gap-m);
 }

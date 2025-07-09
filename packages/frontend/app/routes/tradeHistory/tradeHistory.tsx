@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
+import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import TradeHistoryTable from '~/components/Trade/TradeHistoryTable/TradeHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { UserFillIF } from '~/utils/UserDataIFs';
-import WebDataConsumer from '../trade/webdataconsumer';
-import styles from './tradeHistory.module.css';
 
 function TradeHistory() {
     const { address } = useParams<{ address: string }>();
@@ -60,26 +59,14 @@ function TradeHistory() {
         }
     }, [isCurrentUser, userFills, fetchedHistoryData]);
 
-    const isFullScreen = true;
-
-    // Memoize the container class name
-    const containerClassName = useMemo(() => {
-        return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
-    }, [isFullScreen]);
-
     return (
-        <div className={containerClassName}>
-            {isCurrentUser && <WebDataConsumer />}
-            <header>Trade History</header>
-
-            <div className={styles.content}>
-                <TradeHistoryTable
-                    data={tableData}
-                    isFetched={isFetched}
-                    pageMode={true}
-                />
-            </div>
-        </div>
+        <ExternalPage title='Trade History'>
+            <TradeHistoryTable
+                data={tableData}
+                isFetched={isFetched}
+                pageMode={true}
+            />
+        </ExternalPage>
     );
 }
 export default TradeHistory;

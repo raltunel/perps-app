@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
 import { createDataFeed } from '~/routes/chart/data/customDataFeed';
@@ -9,6 +17,8 @@ import {
     intervalChangedUnsubscribe,
     studyEvents,
     studyEventsUnsubscribe,
+    visibleRangeChangedSubscribe,
+    visibleRangeChangedUnsubscribe,
 } from '~/routes/chart/data/utils/chartEvents';
 import {
     getChartLayout,
@@ -17,11 +27,13 @@ import {
 import {
     checkDefaultColors,
     customThemes,
+    defaultDrawingToolColors,
     getChartDefaultColors,
     getChartThemeColors,
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
+import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -29,6 +41,8 @@ import {
     widget,
     type IBasicDataFeed,
     type IChartingLibraryWidget,
+    type IDatafeedChartApi,
+    type LibrarySymbolInfo,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -61,7 +75,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-    const { info } = useSdk();
+    const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
     const { symbol } = useTradeDataStore();
 
@@ -69,10 +83,21 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { debugWallet } = useDebugStore();
 
-    const [isChartReady, setIsChartReady] = useState(false);
+    const { showBuysSellsOnChart } = useAppOptions();
 
+    const [chartInterval, setChartInterval] = useState<string | undefined>(
+        chartState?.interval,
+    );
+
+    const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
+
+    const [isChartReady, setIsChartReady] = useState(false);
+    const { marketId } = useParams<{ marketId: string }>();
     useEffect(() => {
         const res = getChartLayout();
+        if (res?.interval) {
+            setChartInterval(res.interval);
+        }
         setChartState(res);
     }, []);
 
@@ -124,9 +149,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (chart) {
-            chart.chart().refreshMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
         }
-    }, [bsColor, chart]);
+    }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (!isChartReady && chart) {
@@ -157,7 +182,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
 
                 saveChartLayout(chart);
-                chart.chart().refreshMarks();
+                showBuysSellsOnChart && chart.chart().refreshMarks();
             });
         }
     }, [chart]);
@@ -170,17 +195,19 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
-    useEffect(() => {
+    const initChart = useCallback(() => {
         if (!info) return;
+
+        dataFeedRef.current = createDataFeed(info);
 
         const tvWidget = new widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
-            symbol: symbol,
+            symbol: marketId,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(info) as IBasicDataFeed,
+            datafeed: dataFeedRef.current as IBasicDataFeed,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -244,18 +271,66 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
             }
 
+            tvWidget.applyOverrides(defaultDrawingToolColors());
+            tvWidget
+                .chart()
+                .onIntervalChanged()
+                .subscribe(null, (interval: ResolutionString) => {
+                    setChartInterval(interval);
+                });
+
             setChart(tvWidget);
         });
+    }, [chartState, info]);
+
+    useEffect(() => {
+        initChart();
 
         return () => {
             if (chart) {
                 drawingEventUnsubscribe(chart);
                 studyEventsUnsubscribe(chart);
                 intervalChangedUnsubscribe(chart);
+                visibleRangeChangedUnsubscribe(chart);
                 chart.remove();
             }
         };
-    }, [chartState, info]);
+    }, [chartState, info, initChart]);
+
+    const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
+        let coef = 1;
+
+        if (!interval) return 1;
+
+        if (interval.includes('D')) {
+            coef = 24 * 60;
+        } else if (interval.includes('W')) {
+            coef = 24 * 60 * 7;
+        } else if (interval.includes('M')) {
+            coef = 60 * 24 * 30;
+        }
+
+        const intervalNum = Number(interval.replace(/[^0-9]/g, ''));
+
+        return intervalNum * coef;
+    }, []);
+
+    useEffect(() => {
+        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
+            const intervalMinutes = tvIntervalToMinutes(
+                chartInterval as ResolutionString,
+            );
+            const lastSleepDurationInMinutes = parseFloat(
+                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
+            );
+
+            if (intervalMinutes <= lastSleepDurationInMinutes) {
+                chart?.resetCache();
+                chart?.chart().resetData();
+                chart?.chart().restoreChart();
+            }
+        }
+    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
 
     useEffect(() => {
         if (chart) {
@@ -275,6 +350,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         drawingEvent(chart);
         studyEvents(chart);
         intervalChangedSubscribe(chart, setIsChartReady);
+        visibleRangeChangedSubscribe(chart);
     }, [chart]);
 
     useEffect(() => {
@@ -282,11 +358,18 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             getMarkFillData(symbol, debugWallet.address).then(() => {
                 if (chart) {
                     chart.chart().clearMarks();
-                    chart.chart().refreshMarks();
+                    showBuysSellsOnChart && chart.chart().refreshMarks();
                 }
             });
         }
     }, [debugWallet, chart, symbol]);
+
+    useEffect(() => {
+        if (chart) {
+            showBuysSellsOnChart || chart.chart().clearMarks();
+            showBuysSellsOnChart && chart.chart().refreshMarks();
+        }
+    }, [showBuysSellsOnChart]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady }}>

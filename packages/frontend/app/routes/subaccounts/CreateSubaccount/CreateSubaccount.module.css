@@ -1,4 +1,6 @@
 .create_sub_account_modal {
+    --container-width: 398px;
+    width: var(--container-width);
     display: flex;
     flex-direction: column;
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
@@ -24,24 +26,5 @@
 .modal_buttons {
     display: flex;
     flex-direction: row;
-    gap: 8px;
-}
-
-.modal_buttons > button {
-    width: 200px;
-    gap: 8px;
-    padding-top: var(--padding-m);
-    padding-bottom: var(--padding-m);
-    border: none;
-    border-radius: var(--radius-s);
-    font-size: var(--font-size-m);
-    color: var(--text1);
-}
-
-.modal_buttons > button:first-child {
-    background-color: var(--bg-dark4);
-}
-
-.modal_buttons > button:last-child {
-    background-color: var(--accent1);
+    gap: var(--gap-s);
 }

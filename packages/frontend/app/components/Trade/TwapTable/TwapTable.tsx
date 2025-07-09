@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './TwapTable.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
@@ -15,20 +15,36 @@ interface Props {
 
 const availableTabs = ['Active', 'History', 'Fill History'];
 export default function TwapTable(props: Props) {
-    const { initialTab = 'Active', selectedFilter } = props;
-    const [activeTab, setActiveTab] = useState(initialTab);
+    const STORAGE_KEY = 'twapTable:selectedTab';
 
-    const { fetchedChannels, twapHistory, twapSliceFills } =
+    const { initialTab = 'Active', selectedFilter } = props;
+    const [activeTab, setActiveTab] = useState<string>(() => {
+        return localStorage.getItem(STORAGE_KEY) || initialTab;
+    });
+
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, activeTab);
+    }, [activeTab]);
+
+    const { fetchedChannels, twapHistory, twapSliceFills, activeTwaps } =
         useTradeDataStore();
 
-    const { twapHistoryFetched, twapSliceFillsFetched } = useMemo(() => {
-        return {
-            twapHistoryFetched: fetchedChannels.has(WsChannels.TWAP_HISTORY),
-            twapSliceFillsFetched: fetchedChannels.has(
-                WsChannels.TWAP_SLICE_FILLS,
-            ),
-        };
-    }, [fetchedChannels]);
+    useEffect(() => {
+        localStorage.setItem(STORAGE_KEY, activeTab);
+    }, [activeTab]);
+
+    const { twapHistoryFetched, twapSliceFillsFetched, webDataFetched } =
+        useMemo(() => {
+            return {
+                twapHistoryFetched: fetchedChannels.has(
+                    WsChannels.TWAP_HISTORY,
+                ),
+                twapSliceFillsFetched: fetchedChannels.has(
+                    WsChannels.TWAP_SLICE_FILLS,
+                ),
+                webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
+            };
+        }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -37,7 +53,13 @@ export default function TwapTable(props: Props) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'Active':
-                return <ActiveTwapTable />;
+                return (
+                    <ActiveTwapTable
+                        data={activeTwaps}
+                        isFetched={webDataFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
 
             case 'History':
                 return (
@@ -63,7 +85,13 @@ export default function TwapTable(props: Props) {
                 );
 
             default:
-                return <ActiveTwapTable />;
+                return (
+                    <ActiveTwapTable
+                        data={activeTwaps}
+                        isFetched={webDataFetched}
+                        selectedFilter={selectedFilter}
+                    />
+                );
         }
     };
 
@@ -73,6 +101,7 @@ export default function TwapTable(props: Props) {
                 tabs={availableTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
+                staticHeight={`var(--trade-tables-tabs-height)`}
             />
             <motion.div
                 className={styles.tableContent}

@@ -1,26 +1,32 @@
 .container {
+    --container-width: 398px;
+    --input-container-height: 32px;
+    --max-button-width: 50px;
+
     display: flex;
-    width: 398px;
-    padding: var(--padding-s) var(--padding-m) 0 var(--padding-m);
+    width: var(--container-width);
+    padding: 0px var(--padding-m) var(--padding-m) var(--padding-m);
     flex-direction: column;
     align-items: flex-start;
     gap: var(--gap-s);
 }
 
-.textContent {
+.text_content {
     width: 100%;
-    align-items: center;
     display: flex;
     flex-direction: column;
-    gap: var(--gap-s);
+    align-items: center;
+    gap: var(--gap-xs);
 }
-.textContent h4 {
-    color: var(--text1, #f0f0f8);
-    text-align: center;
 
+.text_content h4 {
+    text-align: center;
+    color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
 }
-.textContent p {
+
+.text_content > div > p {
+    text-align: center;
     font-size: var(--font-size-s, 12px);
     color: var(--text2);
 }
@@ -28,7 +34,7 @@
 .inputContainer {
     width: 100%;
     display: flex;
-    height: 32px;
+    height: var(--input-container-height);
     padding: 0 var(--padding-s);
     justify-content: space-between;
     align-items: center;
@@ -57,13 +63,14 @@
     background: none;
     border: none;
     cursor: pointer;
+    width: var(--max-button-width);
 }
 
 .error {
     position: absolute;
     bottom: -20px;
     left: 0;
-    color: #ff4d4f;
+    color: var(--red);
     font-size: var(--font-size-xs, 10px);
 }
 .contentContainer {
@@ -89,7 +96,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 4px;
+    gap: var(--gap-xs);
 
     color: var(--text2, #bcbcc4);
     text-align: center;

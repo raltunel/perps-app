@@ -1,43 +1,16 @@
 import React, {
-    useEffect,
-    useState,
-    useRef,
     useCallback,
+    useEffect,
     useMemo,
+    useRef,
+    useState,
     type ReactNode,
 } from 'react';
-import styles from './Modal.module.css';
-import { useMobile } from '~/hooks/useMediaQuery';
 import { MdClose } from 'react-icons/md';
+import { useMobile } from '~/hooks/useMediaQuery';
+import styles from './Modal.module.css';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
-
-interface positionCSS {
-    position?: 'fixed';
-    top?: string;
-    bottom?: string;
-    left?: string;
-    right?: string;
-}
-
-const positionStyles: Record<positions, positionCSS> = {
-    center: {
-        position: 'fixed',
-        top: '0',
-        bottom: '0',
-    },
-    bottomRight: {
-        position: 'fixed',
-        bottom: '0',
-        right: '0',
-    },
-    bottomSheet: {
-        position: 'fixed',
-        bottom: '0',
-        left: '0',
-        right: '0',
-    },
-};
 
 interface ModalProps {
     close?: () => void;
@@ -420,8 +393,13 @@ function Modal(props: ModalProps) {
                 handleBackdropClick(e);
             }}
             id={OUTSIDE_MODAL_DOM_ID}
-            className={`${styles.outside_modal} ${actualPosition === 'bottomSheet' ? styles.bottomSheetContainer : ''} ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
-            style={positionStyles[actualPosition]}
+            className={`${styles.outside_modal} ${
+                actualPosition === 'bottomSheet'
+                    ? styles.bottomSheetContainer
+                    : actualPosition === 'bottomRight'
+                      ? styles.bottomRightContainer
+                      : ''
+            } ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
             role='dialog'
             aria-modal='true'
             aria-labelledby='modal-title'

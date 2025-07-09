@@ -1,4 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
 
 interface VaultData {
     id: string;
@@ -133,16 +134,24 @@ export function useVaultManager() {
         },
         [],
     );
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const closeModal = useCallback(() => {
         setModalOpen(false);
         // Clear content after animation completes
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
             setModalContent(null);
             setSelectedVaultId(null);
         }, 300);
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
     // Vault operations
     const handleDeposit = useCallback((vaultId: string, amount: number) => {
         setVaults((prevVaults) =>
@@ -224,10 +233,28 @@ export function useVaultManager() {
         [vaults],
     );
 
+    const assignSelectedVault = useCallback((vaultDetails: VaultDetailsIF) => {
+        if (!vaults.some((v) => v.id === vaultDetails.vaultAddress)) {
+            const vault = {
+                id: vaultDetails.vaultAddress,
+                name: vaultDetails.name,
+                icon: vaults[0].icon,
+                description: vaultDetails.description,
+                apr: vaultDetails.apr,
+                totalDeposited: vaultDetails.tvl,
+                totalCapacity: vaultDetails.tvl,
+                yourDeposit: 0,
+            } as VaultData;
+            setVaults((prev) => [...prev, vault]);
+        }
+        setSelectedVaultId(vaultDetails.vaultAddress);
+    }, []);
+
     return {
         // Data
         vaults,
         selectedVault,
+        assignSelectedVault,
 
         // Modal state
         modalOpen,

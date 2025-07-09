@@ -53,6 +53,7 @@ body {
     height: 100%;
     border-radius: var(--radius-m);
     overflow-y: hidden;
+    min-height: var(--trade-tables-min-height-desktop);
 }
 
 .wallet {
@@ -63,6 +64,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
+    overflow: hidden;
 }
 
 .containerTopLeft {
@@ -101,6 +103,13 @@ body {
     max-height: calc(
         100vh - var(--trade-tables-height-desktop) -
             var(--header-height-desktop) - var(--gap-s)
+    );
+}
+
+.orderBook {
+    max-height: calc(
+        100vh - var(--trade-tables-height-desktop) -
+            var(--header-height-desktop) - var(--gap-m)
     );
 }
 
@@ -191,7 +200,7 @@ body {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         width: 100%;
-        gap: 8px;
+        gap: var(--gap-s);
     }
 
     .mobileTabBtn {
@@ -204,7 +213,7 @@ body {
         cursor: pointer;
         position: relative;
         transition: color 0.2s ease;
-        border-radius: 8px;
+        border-radius: var(--radius-s);
         color: var(--text2);
         font-size: var(--font-size-s, 12px);
     }

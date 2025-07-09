@@ -1,23 +1,17 @@
-import { lazy, memo, Suspense } from 'react';
+import { memo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
-import type { Route } from '../../+types/root';
+import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
-import WebDataConsumer from '../trade/webdataconsumer';
-
-const PortfolioDeposit = lazy(
-    () => import('~/components/Portfolio/PortfolioDeposit/PortfolioDeposit'),
-);
-const PortfolioWithdraw = lazy(
-    () => import('~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw'),
-);
-const PortfolioSend = lazy(
-    () => import('~/components/Portfolio/PortfolioSend/PortfolioSend'),
-);
+import { usePortfolioModals } from './usePortfolioModals';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
+import useOutsideClick from '~/hooks/useOutsideClick';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -28,26 +22,109 @@ export function meta() {
     ];
 }
 
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
-}
-
 function Portfolio() {
-    const {
-        portfolio,
-        selectedPortfolio,
-        isProcessing,
-        modalState,
-        formatCurrency,
-        openModal,
-        closeModal,
-        processDeposit,
-        processWithdraw,
-        processSend,
-    } = usePortfolioManager();
+    const { portfolio, formatCurrency } = usePortfolioManager();
+    const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
+    const { currency } = useNumFormatter();
 
-    // logic to open and close the fee schedule modal
-    const feeScheduleModalCtrl: useModalIF = useModal('closed');
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        openSendModal,
+        PortfolioModalsRenderer,
+    } = usePortfolioModals();
+
+    const feeScheduleModalCtrl = useModal('closed');
+    const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
+        const target = event.target as HTMLElement;
+
+        if (
+            mobileActionMenuButtonRef.current &&
+            mobileActionMenuButtonRef.current.contains(target)
+        ) {
+            return;
+        }
+
+        setIsMobileActionMenuOpen(false);
+    }, isMobileActionMenuOpen);
+    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
+
+    const mobileTop = (
+        <section className={styles.mobileTop}>
+            <div className={styles.detailsContent}>
+                <h6>Vol(14d)</h6>
+                <h3> {currency(portfolio.tradingVolume.biWeekly, true)}</h3>
+                <div
+                    className={styles.view_detail_clickable}
+                    onClick={() => console.log('viewing volume')}
+                >
+                    View volume
+                </div>
+            </div>
+            <div className={styles.detailsContent}>
+                <h6>Fees (Taker / Maker)</h6>
+                <h3>
+                    {portfolio.fees.taker}% / {portfolio.fees.maker}%
+                </h3>
+                <div
+                    className={styles.view_detail_clickable}
+                    style={{ visibility: 'hidden' }}
+                    onClick={() => feeScheduleModalCtrl.open()}
+                >
+                    View fee schedule
+                </div>
+            </div>
+            <div
+                className={`${styles.detailsContent} ${styles.netValueMobile}`}
+            >
+                <h6>Total USD Val</h6>
+                <h3>{currency(portfolio.totalValueUSD, true)}</h3>
+            </div>
+            <button
+                ref={mobileActionMenuButtonRef}
+                onClick={() =>
+                    setIsMobileActionMenuOpen(!isMobileActionMenuOpen)
+                }
+                className={styles.actionMenuButton}
+            >
+                <MdOutlineArrowDropDownCircle size={24} />
+            </button>
+            {isMobileActionMenuOpen && (
+                <div
+                    className={styles.mobileActionMenuContainer}
+                    ref={mobileActionMenuRef}
+                >
+                    <SimpleButton onClick={openDepositModal} bg='accent1'>
+                        Deposit
+                    </SimpleButton>
+                    <SimpleButton
+                        onClick={openWithdrawModal}
+                        bg='dark3'
+                        hoverBg='accent1'
+                    >
+                        Withdraw
+                    </SimpleButton>
+                    <SimpleButton
+                        onClick={openSendModal}
+                        className={styles.sendMobile}
+                        bg='dark3'
+                        hoverBg='accent1'
+                    >
+                        Send
+                    </SimpleButton>
+
+                    <SimpleButton
+                        onClick={openSendModal}
+                        className={styles.sendDesktop}
+                        bg='dark3'
+                        hoverBg='accent1'
+                    >
+                        Send
+                    </SimpleButton>
+                </div>
+            )}
+        </section>
+    );
 
     return (
         <>
@@ -55,6 +132,7 @@ function Portfolio() {
                 <WebDataConsumer />
                 <header>Portfolio</header>
                 <div className={styles.column}>
+                    {mobileTop}
                     <div className={styles.detailsContainer}>
                         <div className={styles.detailsContent}>
                             <h6>14 Day Volume</h6>
@@ -76,10 +154,10 @@ function Portfolio() {
                                 {portfolio.fees.taker}% / {portfolio.fees.maker}
                                 %
                             </h3>
-                            {/* <Link to='/'>View fee schedule</Link> */}
                             <div
                                 className={styles.view_detail_clickable}
-                                onClick={feeScheduleModalCtrl.open}
+                                style={{ visibility: 'hidden' }}
+                                onClick={() => feeScheduleModalCtrl.open()}
                             >
                                 View fee schedule
                             </div>
@@ -97,29 +175,36 @@ function Portfolio() {
                             </h6>
                             <div className={styles.buttonContainer}>
                                 <div className={styles.rowButton}>
-                                    <button
-                                        onClick={() => openModal('deposit')}
+                                    <SimpleButton
+                                        onClick={openDepositModal}
+                                        bg='accent1'
                                     >
                                         Deposit
-                                    </button>
-                                    <button
-                                        onClick={() => openModal('withdraw')}
+                                    </SimpleButton>
+                                    <SimpleButton
+                                        onClick={openWithdrawModal}
+                                        bg='dark3'
+                                        hoverBg='accent1'
                                     >
                                         Withdraw
-                                    </button>
-                                    <button
-                                        onClick={() => openModal('send')}
+                                    </SimpleButton>
+                                    <SimpleButton
+                                        onClick={openSendModal}
                                         className={styles.sendMobile}
+                                        bg='dark3'
+                                        hoverBg='accent1'
                                     >
                                         Send
-                                    </button>
+                                    </SimpleButton>
                                 </div>
-                                <button
-                                    onClick={() => openModal('send')}
+                                <SimpleButton
+                                    onClick={openSendModal}
                                     className={styles.sendDesktop}
+                                    bg='dark3'
+                                    hoverBg='accent1'
                                 >
                                     Send
-                                </button>
+                                </SimpleButton>
                             </div>
                         </div>
                     </div>
@@ -134,77 +219,8 @@ function Portfolio() {
                 </div>
             </div>
 
-            {modalState.isOpen && selectedPortfolio && (
-                <Modal
-                    close={closeModal}
-                    position='center'
-                    title={
-                        modalState.content === 'deposit'
-                            ? 'Deposit '
-                            : modalState.content === 'withdraw'
-                              ? 'Withdraw '
-                              : modalState.content === 'send'
-                                ? 'Send '
-                                : ''
-                    }
-                >
-                    <Suspense fallback={<div>Loading...</div>}>
-                        {modalState.content === 'deposit' && (
-                            <PortfolioDeposit
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                                onDeposit={processDeposit}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                            />
-                        )}
+            {PortfolioModalsRenderer}
 
-                        {modalState.content === 'withdraw' && (
-                            <PortfolioWithdraw
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                                onWithdraw={processWithdraw}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                            />
-                        )}
-
-                        {modalState.content === 'send' && (
-                            <PortfolioSend
-                                availableAmount={
-                                    selectedPortfolio.availableBalance
-                                }
-                                tokenType={selectedPortfolio.unit}
-                                networkFee={
-                                    selectedPortfolio.unit === 'USD'
-                                        ? '$0.001'
-                                        : '0.0001 BTC'
-                                }
-                                onSend={processSend}
-                                onClose={closeModal}
-                                isProcessing={isProcessing}
-                                portfolio={{
-                                    id: selectedPortfolio.id,
-                                    name: selectedPortfolio.name,
-                                    availableBalance:
-                                        selectedPortfolio.availableBalance,
-                                    unit: selectedPortfolio.unit,
-                                }}
-                            />
-                        )}
-                    </Suspense>
-                </Modal>
-            )}
             {feeScheduleModalCtrl.isOpen && (
                 <Modal
                     close={feeScheduleModalCtrl.close}

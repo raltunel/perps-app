@@ -1,6 +1,5 @@
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
-import type { Route } from '../../+types/root';
 import styles from './referrals.module.css';
 // import styles from './referrals.module.css'
 // export function meta({}: Route.MetaArgs) {
@@ -9,10 +8,6 @@ export function meta() {
         { title: 'Referrals | Ambient' },
         { name: 'description', content: 'Trade Perps with Ambient' },
     ];
-}
-
-export function loader({ context }: Route.LoaderArgs) {
-    return { message: context.VALUE_FROM_NETLIFY };
 }
 
 // export default function Referrals({ loaderData }: Route.ComponentProps) {

@@ -2,7 +2,7 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: var(--gap-l);
 
     width: 100%;
     max-width: 1200px; /* Add a max-width to constrain the content */
@@ -11,11 +11,12 @@
 }
 .container header {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    align-items: baseline;
+    gap: var(--gap-m);
     color: var(--text1, #e1eeee);
     font-size: var(--font-size-xl, 36px);
 }
+
 .container header a {
     color: var(--accent1, #7371fc);
     font-size: var(--font-size-m, 18px);
@@ -25,7 +26,7 @@
 
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: var(--gap-l);
     align-self: stretch;
     flex-wrap: wrap;
 }
@@ -41,7 +42,7 @@
     .content {
         flex-direction: column;
         align-items: center;
-        gap: 16px;
+        gap: var(--gap-m);
         padding: var(--padding-s);
     }
 }

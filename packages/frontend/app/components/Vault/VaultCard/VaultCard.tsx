@@ -1,6 +1,8 @@
 import React from 'react';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import styles from './VaultCard.module.css';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { Link } from 'react-router';
 
 interface VaultCardProps {
     name: string;
@@ -33,34 +35,43 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
     const { formatCurrency, formatAPR } = useVaultManager();
 
     return (
-        <div className={styles.container}>
+        <div className={styles.vault_card}>
             <div className={styles.headerContainer}>
-                <div className={styles.perpsMarkLogo}>
-                    <img
-                        src={
-                            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png'
-                        }
-                        alt={`${name} logo`}
-                    />
-                </div>
+                <img
+                    className={styles.market_logo}
+                    src={
+                        'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/2048px-Bitcoin.svg.png'
+                    }
+                    alt={`${name} logo`}
+                />
                 <div className={styles.headerTextContainer}>
                     <h3>{name}</h3>
                     <h6>{description}</h6>
                 </div>
+                <Link
+                    className={styles.more_info}
+                    to={`/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
+                >
+                    More Info
+                </Link>
             </div>
 
-            <div className={styles.detailsContainer}>
-                <div className={styles.detailsItem}>
+            <div className={styles.details}>
+                <div className={styles.detail_item}>
                     <h4>APR</h4>
-                    <h5>{formatAPR(apr)}</h5>
+                    <h5
+                        style={{ color: `var(--${apr > 0 ? 'green' : 'red'})` }}
+                    >
+                        {formatAPR(apr)}
+                    </h5>
                 </div>
 
-                <div className={styles.detailsItem}>
+                <div className={styles.detail_item}>
                     <h4>Total Deposited</h4>
                     <h5>{formatCurrency(totalDeposited, unit)}</h5>
                 </div>
 
-                <div className={styles.detailsItem}>
+                <div className={styles.detail_item}>
                     <h4>Total Capacity</h4>
                     <h5>{formatCurrency(totalCapacity, unit)}</h5>
                 </div>
@@ -78,16 +89,17 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
             </div>
 
             <div className={styles.buttonContainer}>
-                <button className={styles.depositButton} onClick={onDeposit}>
+                <SimpleButton onClick={onDeposit} bg='accent1'>
                     Deposit
-                </button>
+                </SimpleButton>
                 {hasWithdraw && (
-                    <button
-                        className={styles.withdrawButton}
+                    <SimpleButton
+                        bg='dark3'
+                        hoverBg='accent1'
                         onClick={onWithdraw}
                     >
                         Withdraw
-                    </button>
+                    </SimpleButton>
                 )}
             </div>
         </div>

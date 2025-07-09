@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useInfoApi } from '~/hooks/useInfoApi';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -19,8 +17,9 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 import type {
     AccountOverviewIF,
-    TwapSliceFillIF,
+    ActiveTwapIF,
     TwapHistoryIF,
+    TwapSliceFillIF,
     UserBalanceIF,
     UserFillIF,
     UserFundingIF,
@@ -49,6 +48,8 @@ export default function WebDataConsumer() {
         setTwapHistory,
         setTwapSliceFills,
         setUserFundings,
+        setActiveTwaps,
+        setUserNonFundingLedgerUpdates,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
@@ -57,7 +58,7 @@ export default function WebDataConsumer() {
 
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet.address.toLowerCase();
+    addressRef.current = debugWallet?.address?.toLowerCase();
     const { setSymbolInfo } = useTradeDataStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
@@ -68,6 +69,8 @@ export default function WebDataConsumer() {
     const twapHistoryRef = useRef<TwapHistoryIF[]>([]);
     const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
     const userFundingsRef = useRef<UserFundingIF[]>([]);
+    const activeTwapsRef = useRef<ActiveTwapIF[]>([]);
+    const userNonFundingLedgerUpdatesRef = useRef<any[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
@@ -92,6 +95,9 @@ export default function WebDataConsumer() {
         positionsRef.current = [];
         openOrdersRef.current = [];
         userFundingsRef.current = [];
+        activeTwapsRef.current = [];
+        setUserNonFundingLedgerUpdates([]);
+        userNonFundingLedgerUpdatesRef.current = [];
 
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },
@@ -126,6 +132,15 @@ export default function WebDataConsumer() {
             postUserFundings,
         );
 
+        const { unsubscribe: unsubscribeUserNonFundingLedgerUpdates } =
+            info.subscribe(
+                {
+                    type: WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                    user: debugWallet.address,
+                },
+                postUserNonFundingLedgerUpdates,
+            );
+
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
             setPositions(positionsRef.current);
@@ -135,6 +150,10 @@ export default function WebDataConsumer() {
             setTwapHistory(twapHistoryRef.current);
             setTwapSliceFills(twapSliceFillsRef.current);
             setUserFundings(userFundingsRef.current);
+            setActiveTwaps(activeTwapsRef.current);
+            setUserNonFundingLedgerUpdates(
+                userNonFundingLedgerUpdatesRef.current,
+            );
 
             if (acccountOverviewPrevRef.current && accountOverviewRef.current) {
                 accountOverviewRef.current.balanceChange =
@@ -158,6 +177,7 @@ export default function WebDataConsumer() {
             unsubscribeUserTwapSliceFills();
             unsubscribeUserTwapHistory();
             unsubscribeUserFundings();
+            unsubscribeUserNonFundingLedgerUpdates();
         };
     }, [debugWallet.address, info]);
 
@@ -169,11 +189,12 @@ export default function WebDataConsumer() {
         ({ data }: { data: WebData2Output }) => {
             setCoins(data.data.coins);
             setCoinPriceMap(data.data.coinPriceMap);
-            if (data.data.user.toLowerCase() === addressRef.current) {
+            if (data.data.user?.toLowerCase() === addressRef.current) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
+                activeTwapsRef.current = data.data.activeTwaps;
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
@@ -192,7 +213,7 @@ export default function WebDataConsumer() {
             data.orderHistory &&
             data.orderHistory.length > 0 &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const orders: OrderDataIF[] = [];
             data.orderHistory.forEach((order: any) => {
@@ -225,7 +246,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fills = processUserFills(data);
             fills.sort((a, b) => b.time - a.time);
@@ -243,7 +264,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
             if (data.isSnapshot) {
@@ -263,7 +284,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const history = processUserTwapHistory(data);
             if (data.isSnapshot) {
@@ -283,7 +304,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const fundings = processUserFundings(data.fundings);
             fundings.sort((a, b) => b.time - a.time);
@@ -298,6 +319,32 @@ export default function WebDataConsumer() {
             fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
         }
     }, []);
+
+    const postUserNonFundingLedgerUpdates = useCallback(
+        (payload: any) => {
+            const data = payload.data;
+            if (
+                data &&
+                data.user &&
+                data.user.toLowerCase() === addressRef.current?.toLowerCase()
+            ) {
+                if (data.isSnapshot) {
+                    userNonFundingLedgerUpdatesRef.current =
+                        data.nonFundingLedgerUpdates || [];
+                } else {
+                    userNonFundingLedgerUpdatesRef.current = [
+                        ...(data.nonFundingLedgerUpdates || []),
+                        ...userNonFundingLedgerUpdatesRef.current,
+                    ];
+                }
+                setUserNonFundingLedgerUpdates(
+                    userNonFundingLedgerUpdatesRef.current,
+                );
+                fetchedChannelsRef.current.add('userNonFundingLedgerUpdates');
+            }
+        },
+        [setUserNonFundingLedgerUpdates],
+    );
 
     useEffect(() => {
         if (favKeysRef.current && coins.length > 0) {

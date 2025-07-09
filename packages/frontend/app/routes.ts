@@ -6,8 +6,15 @@ export default [
 
     route('trade/:marketId?', 'routes/trade.tsx'),
 
+    route('strategies', 'routes/strategies/strategies.tsx'),
+    route('strategies/new', 'routes/strategies/newStrategy.tsx'),
+    route('strategies/:address?', 'routes/strategies/StrategyDetail.tsx'),
+    route('strategies/:address/edit', 'routes/strategies/editStrategy.tsx'),
+
     // Renders "routes/vaults/vaults.tsx" at "/vaults"
     route('vaults', 'routes/vaults/vaultsNew.tsx'),
+
+    route('vaults/:vaultAddress', 'routes/vaults/vaultDetails.tsx'),
 
     // Renders "routes/leaderboard/leaderboard.tsx" at "/leaderboard"
     route('leaderboard', 'routes/leaderboard/leaderboard.tsx'),
@@ -36,15 +43,28 @@ export default [
 
     route('twapHistory/:address?', 'routes/twapHistory/twapHistory.tsx'),
 
+    route('openOrders/:address?', 'routes/openOrders/openOrders.tsx'),
+
     route(
         'twapFillHistory/:address?',
         'routes/twapFillHistory/twapFillHistory.tsx',
     ),
 
     route(
+        'depositsandwithdrawals',
+        'routes/depositsandwithdrawals/depositsandwithdrawals.tsx',
+    ),
+    route(
         'fundingHistory/:address?',
         'routes/fundingHistory/fundingHistory.tsx',
     ),
+    route('showcase', 'routes/showcase/showcase.tsx'),
+    route(
+        'showcase/buttons',
+        'routes/showcase/buttonShowcase/buttonShowcase.tsx',
+    ),
+    route('showcase/modals', 'routes/showcase/modalShowcase/modalShowcase.tsx'),
+    route('showcase/tabs', 'routes/showcase/tabShowcase/tabShowcase.tsx'),
 
     route('*', 'routes/notFound/notFound.tsx'),
 ] satisfies RouteConfig;

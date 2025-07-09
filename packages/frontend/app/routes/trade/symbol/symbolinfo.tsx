@@ -1,6 +1,4 @@
-'use client';
-
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -10,15 +8,17 @@ import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
-const SymbolInfo: React.FC = () => {
+const SymbolInfo: React.FC = React.memo(() => {
     const { symbol, symbolInfo } = useTradeDataStore();
-
     const { formatNum, getDefaultPrecision } = useNumFormatter();
-
     const { orderBookMode } = useAppSettings();
+    const { marketId } = useParams<{ marketId: string }>();
+    const { titleOverride } = useAppStateStore();
 
-    const get24hChangeString = () => {
+    // Memoize 24h change string and usdChange
+    const changeData = useMemo(() => {
         if (symbolInfo) {
             const usdChange = symbolInfo.markPx - symbolInfo.prevDayPx;
             const percentChange = (usdChange / symbolInfo.prevDayPx) * 100;
@@ -29,20 +29,20 @@ const SymbolInfo: React.FC = () => {
             };
         }
         return { str: '+0.0/%0.0', usdChange: 0 };
-    };
-
-    const { marketId } = useParams<{ marketId: string }>();
+    }, [symbolInfo, formatNum, getDefaultPrecision]);
 
     const marketIdWithFallback = useMemo(
         () => `${marketId?.toUpperCase() || 'BTC'}`,
         [marketId],
     );
 
-    const title = useMemo(
-        () =>
-            `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`,
-        [symbolInfo?.markPx, marketId?.toUpperCase()],
-    );
+    const title = useMemo(() => {
+        if (titleOverride && titleOverride.length > 0) {
+            return titleOverride;
+        } else {
+            return `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`;
+        }
+    }, [symbolInfo?.markPx, marketId, titleOverride]);
 
     const ogImage = useMemo(
         () =>
@@ -75,29 +75,33 @@ const SymbolInfo: React.FC = () => {
                                 id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Mark'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.markPx)}
                                     lastWsChange={symbolInfo?.lastPriceChange}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Oracle'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.oraclePx)}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='24h Change'
                                     valueClass={'w7'}
-                                    value={get24hChangeString().str}
+                                    value={changeData.str}
                                     type={
-                                        get24hChangeString().usdChange > 0
+                                        changeData.usdChange > 0
                                             ? 'positive'
-                                            : get24hChangeString().usdChange < 0
+                                            : changeData.usdChange < 0
                                               ? 'negative'
                                               : undefined
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='24h Volume'
                                     valueClass={'w7'}
                                     value={
@@ -106,6 +110,7 @@ const SymbolInfo: React.FC = () => {
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Open Interest'
                                     valueClass={'w7'}
                                     value={
@@ -118,6 +123,7 @@ const SymbolInfo: React.FC = () => {
                                     }
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Funding Rate'
                                     valueClass={'w7'}
                                     value={
@@ -128,6 +134,7 @@ const SymbolInfo: React.FC = () => {
                                     type={'positive'}
                                 />
                                 <SymbolInfoField
+                                    tooltipContent='tooltip content'
                                     label='Funding Countdown'
                                     valueClass={'w7'}
                                     value={getTimeUntilNextHour()}
@@ -135,67 +142,45 @@ const SymbolInfo: React.FC = () => {
                             </div>
                         </HorizontalScrollable>
                     ) : (
-                        <>
-                            <HorizontalScrollable
-                                className={
-                                    orderBookMode === 'large'
-                                        ? styles.symbolInfoLimitorNarrow
-                                        : styles.symbolInfoLimitor
-                                }
+                        <HorizontalScrollable
+                            className={
+                                orderBookMode === 'large'
+                                    ? styles.symbolInfoLimitorNarrow
+                                    : styles.symbolInfoLimitor
+                            }
+                        >
+                            <div
+                                className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
                             >
-                                <div
-                                    className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
-                                >
+                                {[
+                                    'Mark',
+                                    'Oracle',
+                                    '24h Change',
+                                    '24h Volume',
+                                    'Open Interest',
+                                    'Funding Rate',
+                                    'Funding Countdown',
+                                ].map((label) => (
                                     <SymbolInfoField
-                                        label='Mark'
-                                        valueClass={'w4'}
+                                        key={label}
+                                        label={label}
+                                        valueClass={
+                                            label === 'Mark' ||
+                                            label === 'Oracle'
+                                                ? 'w4'
+                                                : 'w7'
+                                        }
                                         value={''}
                                         skeleton={true}
                                     />
-                                    <SymbolInfoField
-                                        label='Oracle'
-                                        valueClass={'w4'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                    <SymbolInfoField
-                                        label='24h Change'
-                                        valueClass={'w7'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                    <SymbolInfoField
-                                        label='24h Volume'
-                                        valueClass={'w7'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                    <SymbolInfoField
-                                        label='Open Interest'
-                                        valueClass={'w7'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                    <SymbolInfoField
-                                        label='Funding Rate'
-                                        valueClass={'w7'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                    <SymbolInfoField
-                                        label='Funding Countdown'
-                                        valueClass={'w7'}
-                                        value={''}
-                                        skeleton={true}
-                                    />
-                                </div>
-                            </HorizontalScrollable>
-                        </>
+                                ))}
+                            </div>
+                        </HorizontalScrollable>
                     )}
                 </div>
             </div>
         </>
     );
-};
+});
 
 export default SymbolInfo;

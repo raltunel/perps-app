@@ -1,3 +1,4 @@
+import type { OpenOrderRawData } from '@perps-app/sdk/src/utils/types';
 import { processUserOrder } from '~/processors/processOrderBook';
 import {
     processUserFills,
@@ -5,7 +6,13 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { processVaultDetails } from '~/processors/processVault';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    SpotMetaIF,
+    TokenDetailsIF,
+    TokenDetailsRawIF,
+} from '~/utils/SymbolInfoIFs';
 import type {
     TwapHistoryIF,
     TwapSliceFillIF,
@@ -13,6 +20,8 @@ import type {
     UserFundingIF,
     UserFundingResponseIF,
 } from '~/utils/UserDataIFs';
+import type { VaultDetailsIF } from '~/utils/VaultIFs';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 
 export type ApiCallConfig = {
     type: string;
@@ -27,6 +36,11 @@ export enum ApiEndpoints {
     TWAP_HISTORY = 'twapHistory',
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     FUNDING_HISTORY = 'userFunding',
+    USER_PORTFOLIO = 'portfolio',
+    VAULT_DETAILS = 'vaultDetails',
+    USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
+    SPOT_META = 'spotMeta',
+    TOKEN_DETAILS = 'tokenDetails',
 }
 
 // const apiUrl = 'https://api-ui.hyperliquid.xyz/info';
@@ -177,6 +191,154 @@ export function useInfoApi() {
         return ret;
     };
 
+    const fetchOpenOrders = async (address: string): Promise<OrderDataIF[]> => {
+        const ret: OrderDataIF[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.OPEN_ORDERS,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (data && data.length > 0) {
+            data.forEach((o: OpenOrderRawData) => {
+                const processedOrder = processUserOrder(o, 'open');
+                if (processedOrder) {
+                    ret.push(processedOrder);
+                }
+            });
+        }
+        return ret;
+    };
+
+    const fetchUserPortfolio = async (
+        address: string,
+    ): Promise<Map<string, {}>> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.USER_PORTFOLIO,
+                user: address,
+            }),
+        });
+
+        const obj = new Map<string, {}>();
+
+        const data = await response.json();
+        if (data && data.length > 0) {
+            for (const [timeframe, position] of data) {
+                obj.set(timeframe, {
+                    ...position,
+                });
+            }
+        }
+
+        return obj;
+    };
+
+    const fetchVaultDetails = async (
+        address: string,
+        vaultAddress: string,
+    ): Promise<VaultDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.VAULT_DETAILS,
+                user: address,
+                vaultAddress: vaultAddress,
+            }),
+        });
+        const data = await response.json();
+        const processed = processVaultDetails(data);
+        return processed;
+    };
+
+    const fetchVaults = async (): Promise<VaultDetailsIF[]> => {
+        const response = await fetch(
+            'https://stats-data.hyperliquid.xyz/Mainnet/vaults',
+            {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' },
+            },
+        );
+
+        const data = await response.json();
+
+        return data;
+    };
+
+    const fetchUserNonFundingLedgerUpdates = async (
+        address: string,
+    ): Promise<TransactionData[]> => {
+        const ret: TransactionData[] = [];
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.USER_NON_FUNDING_LEDGER_UPDATES,
+                user: address,
+            }),
+        });
+        const data = await response.json();
+        if (Array.isArray(data) && data.length > 0) {
+            ret.push(...(data as TransactionData[]));
+        }
+        return ret;
+    };
+
+    const fetchSpotMeta = async (): Promise<SpotMetaIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.SPOT_META,
+            }),
+        });
+        const data = await response.json();
+        return data as SpotMetaIF;
+    };
+
+    const fetchTokenId = async (tokenName: string): Promise<string> => {
+        const spotMeta = await fetchSpotMeta();
+        if (tokenName === 'BTC') {
+            tokenName = 'UBTC';
+        }
+        const token = spotMeta.tokens.find((t) => t.name === tokenName);
+        return token?.tokenId || '';
+    };
+
+    const fetchTokenDetails = async (
+        tokenId: string,
+    ): Promise<TokenDetailsIF> => {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                type: ApiEndpoints.TOKEN_DETAILS,
+                tokenId: tokenId,
+            }),
+        });
+        const data = (await response.json()) as TokenDetailsRawIF;
+
+        const ret = {
+            name: data.name,
+            maxSupply: Number(data.maxSupply),
+            totalSupply: Number(data.totalSupply),
+            circulatingSupply: Number(data.circulatingSupply),
+            szDecimals: data.szDecimals,
+            weiDecimals: data.weiDecimals,
+            midPx: Number(data.midPx),
+            markPx: Number(data.markPx),
+            prevDayPx: Number(data.prevDayPx),
+        };
+
+        return ret;
+    };
+
     return {
         fetchData,
         fetchOrderHistory,
@@ -184,5 +346,12 @@ export function useInfoApi() {
         fetchTwapHistory,
         fetchTwapSliceFills,
         fetchFundingHistory,
+        fetchOpenOrders,
+        fetchUserPortfolio,
+        fetchVaultDetails,
+        fetchVaults,
+        fetchUserNonFundingLedgerUpdates,
+        fetchTokenId,
+        fetchTokenDetails,
     };
 }

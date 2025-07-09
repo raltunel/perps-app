@@ -1,31 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useMemo, useRef } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { TableState } from '~/utils/CommonIFs';
-import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderDataIF,
+    OrderDataSortBy,
+} from '~/utils/orderbook/OrderBookIFs';
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
-import styles from './OpenOrdersTable.module.css';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { openOrdersData } from './data';
-import { WsChannels } from '~/utils/Constants';
 interface OpenOrdersTableProps {
+    data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
     onViewAll?: () => void;
-    selectedFilter: string;
+    selectedFilter?: string;
+    isFetched: boolean;
+    pageMode?: boolean;
 }
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
-    const { onCancel, onViewAll, selectedFilter } = props;
-
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
-
-    const [sortDirection, setSortDirection] = useState<TableSortDirection>();
-    const [sortBy, setSortBy] = useState<OrderDataSortBy>();
+    const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
 
     const handleCancel = (time: number, coin: string) => {
         if (onCancel) {
@@ -33,116 +27,64 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     };
 
-    const handleViewAll = () => {
-        if (onViewAll) {
-            onViewAll();
-        }
-    };
+    const { debugWallet } = useDebugStore();
 
-    const { userSymbolOrders, userOrders, fetchedChannels } =
-        useTradeDataStore();
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
 
-    const webDataFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.WEB_DATA2);
-    }, [fetchedChannels]);
-
-    const openOrdersLimit = 10;
+    const { symbol } = useTradeDataStore();
 
     const filteredOrders = useMemo(() => {
+        if (!selectedFilter) {
+            return data;
+        }
+
         switch (selectedFilter) {
             case 'all':
-                return userOrders;
+                return data;
             case 'active':
-                return userSymbolOrders;
+                return data.filter((order) => order.coin === symbol);
             case 'long':
-                return userOrders.filter((order) => order.side === 'buy');
+                return data.filter((order) => order.side === 'buy');
             case 'short':
-                return userOrders.filter((order) => order.side === 'sell');
+                return data.filter((order) => order.side === 'sell');
         }
 
-        return userOrders;
-    }, [userOrders, selectedFilter]);
+        return data;
+    }, [data, selectedFilter, symbol]);
 
-    const sortedOrders = useMemo(() => {
-        return sortOrderData(filteredOrders, sortBy, sortDirection);
-    }, [filteredOrders, sortBy, sortDirection]);
-
-    const ordersToShow = useMemo(() => {
-        return sortedOrders.slice(0, openOrdersLimit);
-    }, [sortedOrders]);
-
-    const handleSort = (key: string) => {
-        if (sortBy === key) {
-            if (sortDirection === 'desc') {
-                setSortDirection('asc');
-            } else if (sortDirection === 'asc') {
-                setSortDirection(undefined);
-                setSortBy(undefined);
-            } else {
-                setSortDirection('desc');
-            }
-        } else {
-            setSortBy(key as OrderDataSortBy);
-            setSortDirection('desc');
-        }
-    };
-
-    useEffect(() => {
-        if (webDataFetched) {
-            if (ordersToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [ordersToShow, webDataFetched]);
+    const viewAllLink = useMemo(() => {
+        return `/openOrders/${debugWallet.address}`;
+    }, [debugWallet.address]);
 
     return (
-        <div className={styles.tableWrapper}>
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={7}
-                    colRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
-                />
-            ) : (
-                <>
+        <>
+            <GenericTable
+                storageKey={`OpenOrdersTable_${currentUserRef.current}`}
+                data={filteredOrders}
+                renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OpenOrdersTableHeader
-                        sortBy={sortBy}
+                        sortBy={sortBy as OrderDataSortBy}
                         sortDirection={sortDirection}
-                        sortClickHandler={handleSort}
+                        sortClickHandler={sortClickHandler}
                     />
-                    <div className={styles.tableBody}>
-                        {tableState === TableState.FILLED && (
-                            <>
-                                {ordersToShow.map((order) => (
-                                    <OpenOrdersTableRow
-                                        key={`order-${order.oid}`}
-                                        order={order}
-                                        onCancel={handleCancel}
-                                    />
-                                ))}
-
-                                {openOrdersData.length > 0 && (
-                                    <a
-                                        href='#'
-                                        className={styles.viewAllLink}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleViewAll();
-                                        }}
-                                    >
-                                        View All
-                                    </a>
-                                )}
-                            </>
-                        )}
-
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-                    </div>
-                </>
-            )}
-        </div>
+                )}
+                renderRow={(order, index) => (
+                    <OpenOrdersTableRow
+                        key={`order-${index}`}
+                        order={order}
+                        onCancel={handleCancel}
+                    />
+                )}
+                sorterMethod={sortOrderData}
+                pageMode={pageMode}
+                isFetched={isFetched}
+                viewAllLink={viewAllLink}
+                skeletonRows={7}
+                skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
+                defaultSortBy={'timestamp'}
+                defaultSortDirection={'desc'}
+            />
+        </>
     );
 }

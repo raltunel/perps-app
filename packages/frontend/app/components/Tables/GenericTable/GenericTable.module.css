@@ -9,17 +9,14 @@
 }
 
 .headerContainer {
-    background: var(--bg-dark2);
-    width: 100%;
-    height: var(--table-header-height);
-    padding-left: var(--padding-s);
-    gap: var(--gap-s);
-    display: grid;
-    grid-template-columns: 1fr 0.7fr 1fr 1fr 1fr 1fr 0.7fr 1fr;
-    align-items: center;
     position: sticky;
     top: 0;
     z-index: 10;
+    box-shadow: 0px 0px 0px 0px var(--bg-dark2);
+}
+
+.headerContainer.shadowed {
+    /* box-shadow: 0px -10px 80px 20px var(--bg-dark2); */
 }
 
 .tableWrapper {
@@ -33,11 +30,18 @@
 }
 
 .tableBody {
-    height: 82%;
-    overflow-y: scroll;
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none !important;
     padding-bottom: var(--padding-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
 }
 
+.tableBody::-webkit-scrollbar {
+    display: none !important;
+}
 .pageMode.tableBody {
     position: relative;
 }
@@ -112,6 +116,12 @@
     background-color: var(--bg-dark2);
     width: 100%;
     padding-left: var(--padding-l);
+    box-shadow: 0px 0px 20px 20px var(--bg-dark2);
+    z-index: var(--z-index-generic-table-actions);
+}
+
+.actionsContainer.notShadowed {
+    box-shadow: 0px 0px 0px 0px var(--bg-dark2);
 }
 
 .pageMode .actionsContainer {

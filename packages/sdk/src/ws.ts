@@ -1,12 +1,17 @@
-import { DEFAULT_PING_INTERVAL_MS } from './config';
+import {
+    DEFAULT_PING_INTERVAL_MS,
+    PONG_CHECK_TIMEOUT_MS,
+    RECONNECT_TIMEOUT_MS,
+} from './config';
 import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
 export type Callback = (msg: WsMsg) => void;
 
-interface ActiveSubscription {
+export interface ActiveSubscription {
     callback: Callback;
     subscriptionId: number;
+    subscription: Subscription;
 }
 
 function subscriptionToIdentifier(subscription: Subscription): string {
@@ -104,6 +109,10 @@ export class WebsocketManager {
     private nextWorkerIndex: number = 0;
     private numWorkers: number;
     private jsonParserWorkerBlobUrl: string | null = null;
+    private pongReceived: boolean = false;
+    private pongTimeout: NodeJS.Timeout | null = null;
+    private sleepMode: boolean = false;
+    private pongCheckLock: boolean = false;
 
     constructor(
         baseUrl: string,
@@ -113,6 +122,7 @@ export class WebsocketManager {
         this.isDebug = isDebug;
         this.baseUrl = baseUrl;
         this.numWorkers = numWorkers;
+
         this.initializeWorkers();
         this.connect();
     }
@@ -190,6 +200,36 @@ export class WebsocketManager {
         }
     };
 
+    private sendPing = () => {
+        if (
+            this.stopped ||
+            !this.ws ||
+            this.ws.readyState !== WebSocket.OPEN ||
+            this.sleepMode
+        )
+            return;
+        this.log('sending ping');
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+
+        this.ws.send(JSON.stringify({ method: 'ping' }));
+
+        this.pongTimeout = setTimeout(() => {
+            if (!this.pongReceived && !this.pongCheckLock && !this.sleepMode) {
+                // if (this.ws.readyState === 1) {
+                //     // no need to reconnect if connection state is open
+                //     return;
+                // }
+                console.log('>>> pong reconnect', new Date().toISOString());
+                this.reconnect();
+            }
+        }, PONG_CHECK_TIMEOUT_MS);
+
+        this.pongReceived = false;
+    };
+
     private onOpen = () => {
         this.log('onOpen');
         this.wsReady = true;
@@ -205,23 +245,19 @@ export class WebsocketManager {
 
         if (!this.stopped && this.pingInterval === null) {
             // @ts-ignore
+
             this.pingInterval = setInterval(() => {
-                if (
-                    this.stopped ||
-                    !this.ws ||
-                    this.ws.readyState !== WebSocket.OPEN
-                )
-                    return;
-                this.log('sending ping');
-                this.ws.send(JSON.stringify({ method: 'ping' }));
+                this.sendPing();
             }, DEFAULT_PING_INTERVAL_MS);
             this.log('started ping');
+            this.sendPing();
         }
     };
 
     private handleParsedMessage = (wsMsg: WsMsg, originalMessage: string) => {
         const identifier = wsMsgToIdentifier(wsMsg);
         if (identifier === 'pong') {
+            this.pongReceived = true;
             this.log('Pong response received.');
             return;
         }
@@ -251,6 +287,9 @@ export class WebsocketManager {
     };
 
     private onMessage = (event: MessageEvent) => {
+        if (this.sleepMode) {
+            return;
+        }
         const message = event.data;
         this.log('onMessage Raw:', message);
         if (message === 'Websocket connection established.') {
@@ -306,6 +345,7 @@ export class WebsocketManager {
     public stop() {
         this.log('stopping');
         this.stopped = true;
+        this.pongCheckDelay();
         if (this.pingInterval !== null) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
@@ -351,26 +391,37 @@ export class WebsocketManager {
             return;
         }
 
-        const oldSubscriptions = { ...this.allSubscriptions };
-
-        this.stop();
-
-        this.queuedSubscriptions = [];
-        for (const _subId in oldSubscriptions) {
-            const subId = Number(_subId);
-            const { subscription, callback } = oldSubscriptions[subId];
-            this.queuedSubscriptions.push({
-                subscription,
-                active: { callback, subscriptionId: subId },
-            });
-        }
-        this.allSubscriptions = {};
-        this.activeSubscriptions = {};
+        this.stashSubscriptions();
 
         this.baseUrl = newBaseUrl;
 
         this.connect();
     }
+
+    private stashSubscriptions = () => {
+        const oldSubscriptions = { ...this.allSubscriptions };
+        this.stop();
+
+        // this.queuedSubscriptions = [];
+        for (const _subId in oldSubscriptions) {
+            const subId = Number(_subId);
+            const { subscription, callback } = oldSubscriptions[subId];
+            if (
+                !this.queuedSubscriptions.some(
+                    (q) =>
+                        JSON.stringify(q.subscription) ===
+                        JSON.stringify(subscription),
+                )
+            ) {
+                this.queuedSubscriptions.push({
+                    subscription,
+                    active: { callback, subscriptionId: subId, subscription },
+                });
+            }
+        }
+        this.allSubscriptions = {};
+        this.activeSubscriptions = {};
+    };
 
     public subscribe(
         subscription: Subscription,
@@ -401,7 +452,7 @@ export class WebsocketManager {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId },
+                    active: { callback, subscriptionId, subscription },
                 });
             }
         } else {
@@ -433,6 +484,7 @@ export class WebsocketManager {
                 this.activeSubscriptions[identifier].push({
                     callback,
                     subscriptionId,
+                    subscription,
                 });
                 this.ws.send(
                     JSON.stringify({ method: 'subscribe', subscription }),
@@ -486,5 +538,56 @@ export class WebsocketManager {
 
     public isWsReady() {
         return this.wsReady;
+    }
+
+    public reconnect(stashedSubs?: Record<string, ActiveSubscription[]>) {
+        this.stashSubscriptions();
+        if (this.queuedSubscriptions.length === 0 && stashedSubs) {
+            console.log('>>> process stashed subs', stashedSubs);
+            this.processStashedSubs(stashedSubs);
+        }
+
+        this.pongCheckDelay();
+        setTimeout(() => {
+            this.connect();
+        }, RECONNECT_TIMEOUT_MS);
+    }
+
+    public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
+        this.processStashedSubs(stashedSubs);
+        this.connect();
+    }
+
+    public setSleepMode(sleepMode: boolean) {
+        this.pongReceived = true;
+        if (this.sleepMode === sleepMode) return;
+        this.sleepMode = sleepMode;
+    }
+
+    public getActiveSubscriptions() {
+        return this.activeSubscriptions;
+    }
+
+    private pongCheckDelay() {
+        this.pongCheckLock = true;
+        setTimeout(() => {
+            this.pongCheckLock = false;
+        }, 10000);
+    }
+
+    public processStashedSubs(
+        stashedSubs: Record<string, ActiveSubscription[]>,
+    ) {
+        if (stashedSubs) {
+            for (const identifier in stashedSubs) {
+                const subs = stashedSubs[identifier];
+                this.queuedSubscriptions.push(
+                    ...subs.map((sub) => ({
+                        subscription: sub.subscription,
+                        active: sub,
+                    })),
+                );
+            }
+        }
     }
 }

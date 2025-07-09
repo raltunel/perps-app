@@ -610,3 +610,39 @@ export interface UserFundingsData {
     isSnapshot?: boolean;
     fundings: UserFunding[];
 }
+
+export interface UserActiveTwap {
+    coin: string;
+    executedNtl: string;
+    executedSz: string;
+    minutes: number;
+    randomize: boolean;
+    reduceOnly: boolean;
+    side: string;
+    sz: string;
+    timestamp: number;
+    user: string;
+}
+
+export interface UserActiveTwapData {
+    0: number;
+    1: UserActiveTwap;
+}
+export interface OpenOrderRawData {
+    coin: string;
+    side: string;
+    limitPx: string;
+    sz: string;
+    oid: number;
+    timestamp: number;
+    triggerCondition: string;
+    isTrigger: boolean;
+    triggerPx: string;
+    children: any[];
+    isPositionTpsl: boolean;
+    reduceOnly: boolean;
+    orderType: string;
+    origSz: string;
+    tif: string;
+    cloid: string;
+}

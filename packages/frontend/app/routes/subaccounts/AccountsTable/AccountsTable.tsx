@@ -71,12 +71,12 @@ export default function AccountsTable(props: propsIF) {
         // assignment tree for output variable
         if (sortBy.cell === 'name') {
             output = [...accounts].sort((a: accountIF, b: accountIF) =>
-                a.name.toLowerCase().localeCompare(b.name.toLocaleLowerCase()),
+                a.name?.toLowerCase().localeCompare(b.name.toLocaleLowerCase()),
             );
         } else if (sortBy.cell === 'accountEquity') {
             output = [...accounts].sort((a: accountIF, b: accountIF) =>
                 a.equity
-                    .toLowerCase()
+                    ?.toLowerCase()
                     .localeCompare(b.equity.toLocaleLowerCase()),
             );
         } else {

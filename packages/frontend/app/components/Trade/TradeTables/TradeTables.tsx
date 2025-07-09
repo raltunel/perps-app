@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
+import { debugWallets, WsChannels } from '~/utils/Constants';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -15,6 +15,9 @@ import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import styles from './TradeTable.module.css';
 import { Pages, usePage } from '~/hooks/usePage';
+import { useDebugStore } from '~/stores/DebugStore';
+import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
+import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 export interface FilterOption {
     id: string;
     label: string;
@@ -23,7 +26,10 @@ export interface FilterOption {
 const tradePageBlackListTabs = new Set([
     'Funding History',
     'Deposits and Withdrawals',
+    'Depositors',
 ]);
+
+const portfolioPageBlackListTabs = new Set(['Depositors']);
 
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
@@ -34,10 +40,13 @@ const filterOptions: FilterOption[] = [
 
 interface TradeTableProps {
     portfolioPage?: boolean;
+    vaultPage?: boolean;
+    vaultFetched?: boolean;
+    vaultDepositors?: VaultFollowerStateIF[];
 }
 
 export default function TradeTable(props: TradeTableProps) {
-    const { portfolioPage } = props;
+    const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -45,11 +54,14 @@ export default function TradeTable(props: TradeTableProps) {
         fetchedChannels,
         userFills,
         userFundings,
+        userOrders,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const { page } = usePage();
+
+    const { debugWallet, setDebugWallet } = useDebugStore();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -65,34 +77,63 @@ export default function TradeTable(props: TradeTableProps) {
             'Deposits and Withdrawals',
         ];
 
+        if (vaultPage) {
+            availableTabs.push('Depositors');
+        }
+
         if (page === Pages.TRADE) {
             return availableTabs.filter(
                 (tab) => !tradePageBlackListTabs.has(tab),
             );
+        } else if (page === Pages.PORTFOLIO) {
+            return availableTabs.filter(
+                (tab) => !portfolioPageBlackListTabs.has(tab),
+            );
         }
         return availableTabs;
     }, [page]);
+
+    // reset wallet on trade tables after switch back from vaults
+    useEffect(() => {
+        if (
+            !vaultPage &&
+            !debugWallets.reduce((acc, wallet) => {
+                return acc || wallet.address === debugWallet.address;
+            }, false)
+        ) {
+            setDebugWallet(debugWallets[0]);
+        }
+    }, [vaultPage]);
 
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
                 handleTabChange('Positions');
             }
+        } else if (page === Pages.PORTFOLIO) {
+            if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('Positions');
+            }
         }
     }, [page]);
 
-    const { orderHistoryFetched, tradeHistoryFetched, fundingHistoryFetched } =
-        useMemo(() => {
-            return {
-                orderHistoryFetched: fetchedChannels.has(
-                    WsChannels.USER_HISTORICAL_ORDERS,
-                ),
-                tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
-                fundingHistoryFetched: fetchedChannels.has(
-                    WsChannels.USER_FUNDINGS,
-                ),
-            };
-        }, [fetchedChannels]);
+    const {
+        orderHistoryFetched,
+        tradeHistoryFetched,
+        fundingHistoryFetched,
+        webDataFetched,
+    } = useMemo(() => {
+        return {
+            orderHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_HISTORICAL_ORDERS,
+            ),
+            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
+            fundingHistoryFetched: fetchedChannels.has(
+                WsChannels.USER_FUNDINGS,
+            ),
+            webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
+        };
+    }, [fetchedChannels]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -136,7 +177,13 @@ export default function TradeTable(props: TradeTableProps) {
                     />
                 );
             case 'Open Orders':
-                return <OpenOrdersTable selectedFilter={selectedFilter} />;
+                return (
+                    <OpenOrdersTable
+                        selectedFilter={selectedFilter}
+                        isFetched={webDataFetched}
+                        data={userOrders}
+                    />
+                );
             case 'TWAP':
                 return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
@@ -163,7 +210,16 @@ export default function TradeTable(props: TradeTableProps) {
                     />
                 );
             case 'Deposits and Withdrawals':
-                return <DepositsWithdrawalsTable />;
+                return (
+                    <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
+                );
+            case 'Depositors':
+                return (
+                    <VaultDepositorsTable
+                        isFetched={vaultFetched ?? false}
+                        data={vaultDepositors ?? []}
+                    />
+                );
             default:
                 return (
                     <div className={styles.emptyState}>
@@ -182,6 +238,7 @@ export default function TradeTable(props: TradeTableProps) {
                 rightContent={rightAlignedContent}
                 wrapperId='tradeTableTabs'
                 layoutIdPrefix='tradeTableTabsIndicator'
+                staticHeight={`var(--trade-tables-tabs-height)`}
             />
             <motion.div
                 className={`${styles.tableContent} ${

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     LuChevronDown,
     LuChevronUp,
@@ -7,32 +8,38 @@ import {
 } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
-import { type useModalIF, useModal } from '~/hooks/useModal';
+import { useApp } from '~/contexts/AppContext';
+import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
-import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
+import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
-import NetworkDropdown from './NetworkDropdown/NetworkDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { useKeydown } from '~/hooks/useKeydown';
+
 export default function PageHeader() {
+    const { isUserConnected, setIsUserConnected } = useApp();
+
+    // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
     const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
-    const [isUserConnected, setIsUserConnected] = useState(false);
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
-    const [isNetworkDropdownOpen, setIsNetworkDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
+    const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
     const location = useLocation();
 
+    // symbol for active market
     const { symbol } = useTradeDataStore();
 
+    // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/trade/${symbol}` },
         { name: 'Vaults', path: '/vaults' },
@@ -40,8 +47,10 @@ export default function PageHeader() {
         { name: 'Referrals', path: '/referrals' },
         // { name: 'Points', path: '/points' },
         { name: 'Leaderboard', path: '/leaderboard' },
+        // { name: 'Strategies', path: '/strategies' },
     ];
 
+    // refs for dropdown menu handline
     const dropdownMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsDropdownMenuOpen(false);
     }, isDropdownMenuOpen);
@@ -57,149 +66,31 @@ export default function PageHeader() {
     const depositMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsDepositDropdownOpen(false);
     }, isDepositDropdownOpen);
-    const networkMenuRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsNetworkDropdownOpen(false);
-    }, isNetworkDropdownOpen);
+
     const moreDropdownRef = useOutsideClick<HTMLDivElement>(() => {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
 
-    const walletDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={walletMenuRef}
-        >
-            {isUserConnected && (
-                <button
-                    className={styles.walletButton}
-                    onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)}
-                >
-                    <LuWallet size={18} /> Miyuki.eth
-                </button>
-            )}
+    const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
+        setIsHelpDropdownOpen(false);
+    }, isHelpDropdownOpen);
 
-            {isWalletMenuOpen && isUserConnected && (
-                <WalletDropdown
-                    isWalletMenuOpen={isWalletMenuOpen}
-                    setIsWalletMenuOpen={setIsWalletMenuOpen}
-                    setIsUserConnected={setIsUserConnected}
-                    isDropdown
-                />
-            )}
-        </section>
+    // logic to open and close the app settings modal
+    const appSettingsModal = useModal('closed');
+
+    // event handler to close dropdown menus on `Escape` keydown
+    useKeydown(
+        'Escape',
+        () => {
+            setIsDepositDropdownOpen(false);
+            setIsRpcDropdownOpen(false);
+            setIsWalletMenuOpen(false);
+            setIsHelpDropdownOpen(false);
+            setIsMoreDropdownOpen(false);
+            setIsDropdownMenuOpen(false);
+        },
+        [],
     );
-
-    const dropdownMenuDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={dropdownMenuRef}
-        >
-            <button
-                className={styles.menuButton}
-                onClick={() => setIsDropdownMenuOpen(!isDropdownMenuOpen)}
-            >
-                <MdOutlineMoreHoriz size={20} />
-            </button>
-            {isDropdownMenuOpen && <DropdownMenu />}
-        </section>
-    );
-
-    const rpcDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={rpcMenuRef}
-        >
-            {isUserConnected && (
-                <button
-                    className={styles.rpcButton}
-                    onClick={() => setIsRpcDropdownOpen(!isRpcDropdownOpen)}
-                >
-                    RPC
-                    <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        width='16'
-                        height='16'
-                        viewBox='0 0 16 16'
-                        fill='none'
-                    >
-                        <circle cx='8' cy='8' r='8' fill='#26A69A' />
-                    </svg>
-                </button>
-            )}
-
-            {isRpcDropdownOpen && isUserConnected && <RpcDropdown />}
-        </section>
-    );
-
-    const depositDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={depositMenuRef}
-        >
-            <Button
-                size='medium'
-                selected
-                onClick={() => setIsDepositDropdownOpen(!isDepositDropdownOpen)}
-            >
-                Deposit
-            </Button>
-
-            {isDepositDropdownOpen && (
-                <DepositDropdown
-                    isUserConnected={isUserConnected}
-                    setIsUserConnected={setIsUserConnected}
-                    isDropdown
-                />
-            )}
-        </section>
-    );
-    const networksDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={networkMenuRef}
-        >
-            <button
-                className={styles.networkButton}
-                onClick={() => setIsNetworkDropdownOpen(!isNetworkDropdownOpen)}
-            >
-                Ethereum
-            </button>
-
-            {isNetworkDropdownOpen && <NetworkDropdown />}
-        </section>
-    );
-
-    const moreDropdownDisplay = (
-        <section
-            style={{
-                position: 'relative',
-            }}
-            ref={moreDropdownRef}
-        >
-            <button
-                className={styles.moreButton}
-                onClick={() => setIsMoreDropdownOpen(!isMoreDropdownOpen)}
-            >
-                more
-                {isMoreDropdownOpen ? <LuChevronUp /> : <LuChevronDown />}
-            </button>
-            {isMoreDropdownOpen && (
-                <MoreDropdown setIsMoreDropdownOpen={setIsMoreDropdownOpen} />
-            )}
-        </section>
-    );
-
-    const appSettingsModal: useModalIF = useModal('closed');
 
     return (
         <>
@@ -208,8 +99,8 @@ export default function PageHeader() {
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
-                        width='90px'
-                        height='90px'
+                        width='70px'
+                        height='70px'
                     />
                 </Link>
                 <nav
@@ -241,37 +132,185 @@ export default function PageHeader() {
                             {link.name}
                         </Link>
                     ))}
-                    {moreDropdownDisplay}
+                    <section
+                        style={{
+                            position: 'relative',
+                        }}
+                        ref={moreDropdownRef}
+                    >
+                        <button
+                            className={styles.moreButton}
+                            onClick={() =>
+                                setIsMoreDropdownOpen(!isMoreDropdownOpen)
+                            }
+                        >
+                            more
+                            {isMoreDropdownOpen ? (
+                                <LuChevronUp size={15} />
+                            ) : (
+                                <LuChevronDown size={15} />
+                            )}
+                        </button>
+                        {isMoreDropdownOpen && (
+                            <MoreDropdown
+                                setIsMoreDropdownOpen={setIsMoreDropdownOpen}
+                            />
+                        )}
+                    </section>
+                    <a
+                        href='https://ambient.finance/trade'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className={styles.ambientmm}
+                    >
+                        Ambient AMM
+                    </a>
                 </nav>
                 <div className={styles.rightSide}>
-                    {isUserConnected && depositDisplay}
-                    {isUserConnected && networksDisplay}
-                    {isUserConnected && rpcDisplay}
+                    {isUserConnected && (
+                        <section
+                            style={{
+                                position: 'relative',
+                            }}
+                            ref={depositMenuRef}
+                        >
+                            <button
+                                className={styles.depositButton}
+                                onClick={() =>
+                                    setIsDepositDropdownOpen(
+                                        !isDepositDropdownOpen,
+                                    )
+                                }
+                            >
+                                Deposit
+                            </button>
+
+                            {isDepositDropdownOpen && (
+                                <DepositDropdown isDropdown />
+                            )}
+                        </section>
+                    )}
+
+                    {isUserConnected && (
+                        <section
+                            style={{ position: 'relative' }}
+                            ref={rpcMenuRef}
+                        >
+                            {isUserConnected && (
+                                <button
+                                    className={styles.rpcButton}
+                                    onClick={() =>
+                                        setIsRpcDropdownOpen(!isRpcDropdownOpen)
+                                    }
+                                >
+                                    <span>RPC</span>
+                                    <svg
+                                        xmlns='http://www.w3.org/2000/svg'
+                                        width='16'
+                                        height='16'
+                                        viewBox='0 0 16 16'
+                                        fill='none'
+                                    >
+                                        <circle
+                                            cx='8'
+                                            cy='8'
+                                            r='8'
+                                            fill='#26A69A'
+                                        />
+                                    </svg>
+                                </button>
+                            )}
+
+                            {isRpcDropdownOpen && isUserConnected && (
+                                <RpcDropdown />
+                            )}
+                        </section>
+                    )}
                     {!isUserConnected && (
-                        <Button
-                            size='medium'
-                            selected
+                        <button
+                            className={styles.depositButton}
                             onClick={() => setIsUserConnected(true)}
                         >
                             Connect
-                        </Button>
+                        </button>
                     )}
-                    {isUserConnected && walletDisplay}
+                    {isUserConnected && (
+                        <section
+                            style={{ position: 'relative' }}
+                            ref={walletMenuRef}
+                        >
+                            {isUserConnected && (
+                                <button
+                                    className={styles.walletButton}
+                                    onClick={() =>
+                                        setIsWalletMenuOpen(!isWalletMenuOpen)
+                                    }
+                                >
+                                    <LuWallet size={18} /> Miyuki.eth
+                                </button>
+                            )}
+
+                            {isWalletMenuOpen && isUserConnected && (
+                                <WalletDropdown
+                                    isWalletMenuOpen={isWalletMenuOpen}
+                                    setIsWalletMenuOpen={setIsWalletMenuOpen}
+                                    setIsUserConnected={setIsUserConnected}
+                                    isDropdown
+                                />
+                            )}
+                        </section>
+                    )}
+                    <section
+                        style={{
+                            position: 'relative',
+                        }}
+                        ref={helpDropdownRef}
+                    >
+                        <button
+                            className={styles.helpButton}
+                            onClick={() =>
+                                setIsHelpDropdownOpen(!isHelpDropdownOpen)
+                            }
+                        >
+                            <AiOutlineQuestionCircle
+                                size={18}
+                                color='var(--text2)'
+                            />
+                        </button>
+
+                        {isHelpDropdownOpen && (
+                            <HelpDropdown
+                                setIsHelpDropdownOpen={setIsHelpDropdownOpen}
+                            />
+                        )}
+                    </section>
 
                     <button
                         className={styles.internationalButton}
-                        onClick={appSettingsModal.open}
+                        onClick={() => appSettingsModal.open()}
                     >
                         <LuSettings size={20} />
                     </button>
-
-                    {dropdownMenuDisplay}
+                    <section
+                        style={{ position: 'relative' }}
+                        ref={dropdownMenuRef}
+                    >
+                        <button
+                            className={styles.menuButton}
+                            onClick={() =>
+                                setIsDropdownMenuOpen(!isDropdownMenuOpen)
+                            }
+                        >
+                            <MdOutlineMoreHoriz size={20} />
+                        </button>
+                        {isDropdownMenuOpen && <DropdownMenu />}
+                    </section>
                 </div>
             </header>
 
             {appSettingsModal.isOpen && (
                 <Modal
-                    close={appSettingsModal.close}
+                    close={() => appSettingsModal.close()}
                     position={'center'}
                     title='Options'
                 >

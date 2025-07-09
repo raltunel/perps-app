@@ -1,6 +1,7 @@
+import { useEffect, useRef } from 'react';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './PriceInput.module.css';
-import { useEffect, useRef } from 'react';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 
 interface PropsIF {
     value: string;
@@ -22,40 +23,21 @@ export default function PriceInput(props: PropsIF) {
         showMidButton,
     } = props;
 
-    const {
-        inputRegex,
-        parseFormattedWithOnlyDecimals,
-        formatNumWithOnlyDecimals,
-        getPrecisionFromNumber,
-    } = useNumFormatter();
-
-    const valueNum = useRef<number>(0);
-    const valueRef = useRef<string>(value);
-    valueRef.current = value;
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = event.target.value;
-        if (inputRegex.test(newValue) && newValue.length <= 12) {
-            onChange(event);
-            valueNum.current = parseFormattedWithOnlyDecimals(newValue);
-        }
-    };
-
-    useEffect(() => {
-        valueNum.current = parseFormattedWithOnlyDecimals(valueRef.current);
-    }, [valueRef.current]);
-
-    useEffect(() => {
-        const precision = getPrecisionFromNumber(valueNum.current);
-        onChange(formatNumWithOnlyDecimals(valueNum.current, precision));
-    }, [formatNumWithOnlyDecimals]);
-
     return (
         <div
             className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}
         >
             <span>Price</span>
-            <input
+            <NumFormattedInput
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                onKeyDown={onKeyDown}
+                className={className}
+                aria-label={ariaLabel}
+                placeholder='Enter Price'
+            />
+            {/* <input
                 type='text'
                 value={value}
                 onChange={handleChange}
@@ -66,7 +48,7 @@ export default function PriceInput(props: PropsIF) {
                 inputMode='numeric'
                 pattern='[0-9]*'
                 placeholder='Enter Price'
-            />
+            /> */}
             {showMidButton && (
                 <button className={styles.midButton}>Mid </button>
             )}

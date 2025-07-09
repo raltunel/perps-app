@@ -3,13 +3,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-    gap: 4px;
+    gap: var(--gap-xs);
+    gap: var(--gap-xs);
 }
 
 .orderBookContainer {
     width: 100%;
     font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
 }
 
 .orderBookBlockMid {
@@ -20,7 +24,7 @@
     gap: var(--gap-xs);
     background-color: var(--bg-dark4);
     margin: var(--margin-xs) 0;
-    padding: 0 1rem;
+    padding: 0 var(--padding-m);
 }
 
 .orderBookHeader {
@@ -30,7 +34,7 @@
     width: 100%;
     gap: var(--gap-xs);
     margin: var(--margin-xs) 0;
-    padding: 0 var(--padding-s);
+    padding: 0 var(--padding-xs);
     color: var(--text3);
 }
 
@@ -65,4 +69,30 @@
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+.orderSlotsWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.obGradientEffect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20%;
+    opacity: 0.03;
+}
+.obGradientEffect.smaller {
+    opacity: 0.05;
+    height: 5%;
+}
+
+.obGradientEffectBottom {
+    top: auto;
+    bottom: 0;
 }

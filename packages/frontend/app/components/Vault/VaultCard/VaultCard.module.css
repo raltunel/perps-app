@@ -1,22 +1,22 @@
-.container {
+.vault_card {
     --container-min-width: 300px;
     --container-width: 350px;
     --container-height: 290px;
-    --logo-width-height: 60px;
-    --logo-padding: 7.5px;
+    --logo-width-height: 45px;
     --apr-display-width: 50px;
 
     display: flex;
-    padding: var(--padding-m);
     flex-direction: column;
-    align-items: center;
+    padding: var(--padding-m);
     gap: var(--gap-m);
     border-radius: var(--radius-m);
     background: var(--bg-dark2, #111117);
     width: var(--container-width);
     height: var(--container-height);
     flex: 1 1 var(--container-width); /* Grow, shrink, and basis */
+    user-select: none;
 }
+
 .headerContainer {
     width: 100%;
     display: flex;
@@ -32,6 +32,7 @@
     gap: var(--gap-xs);
     flex: 1 0 0;
 }
+
 .headerTextContainer h3 {
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-l);
@@ -40,42 +41,50 @@
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s);
 }
-.perpsMarkLogo {
-    display: flex;
+
+.market_logo {
     width: var(--logo-width-height);
     height: var(--logo-width-height);
-    padding: var(--logo-padding);
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: #000;
 }
 
-.perpsMarkLogo img {
-    max-width: 100%;
-    max-height: 100%;
+.more_info {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    background: var(--bg-dark3);
+    padding: var(--padding-s);
+    border-radius: var(--radius-s);
+    transition: var(--ease-in-out-fast);
 }
 
-.detailsContainer {
+.more_info:hover {
+    background-color: var(--bg-dark4);
+}
+
+.details {
     width: 100%;
-    display: grid;
-    grid-template-columns: var(--apr-display-width) 1fr 1fr;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
     gap: auto;
 }
-.detailsItem {
+
+.detail_item {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
 }
-.detailsItem h4 {
+
+.detail_item > h4 {
     font-size: var(--font-size-xs);
     color: var(--text2, #bcbcc4);
 }
-.detailsItem h5 {
-    font-size: var(--font-size-s);
+
+.detail_item > h5 {
+    font-size: var(--font-size-m);
     color: var(--text1, #f0f0f8);
+    user-select: text;
 }
+
 .depositContainer {
     width: 100%;
     display: flex;
@@ -105,32 +114,7 @@
     align-items: center;
     gap: var(--gap-s);
 }
-.buttonContainer button {
-    width: 100%;
-    display: flex;
-    height: var(--button-height);
-    padding: var(--button-padding);
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    flex: 1 0 0;
-    color: var(--text1, #f0f0f8);
-    font-size: var(--font-size-m);
-    outline: none;
-    border: none;
-    border-radius: 8px;
-    transition: all var(--ease-in-out-med);
-}
 
-.buttonContainer button:hover {
-    opacity: 0.8;
-}
-.depositButton {
-    background: var(--accent1);
-}
-.withdrawButton {
-    background: var(--bg-dark3);
-}
 /* Small screens (mobile) */
 @media (max-width: 480px) {
     .vaultCard {

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
+import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import FillTwapTable from '~/components/Trade/TwapTable/FillTwapTable/FillTwapTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
-import styles from './twapFillHistory.module.css';
 
 function TwapFillHistory() {
     const { address } = useParams<{ address: string }>();
@@ -25,25 +25,14 @@ function TwapFillHistory() {
         }
     }, [address]);
 
-    const isFullScreen = true;
-
-    // Memoize the container class name
-    const containerClassName = useMemo(() => {
-        return `${styles.container} ${isFullScreen ? styles.fullScreen : ''}`;
-    }, [isFullScreen]);
-
     return (
-        <div className={containerClassName}>
-            <header>TWAP Fill History</header>
-
-            <div className={styles.content}>
-                <FillTwapTable
-                    data={fetchedHistoryData}
-                    isFetched={isFetched}
-                    pageMode={true}
-                />
-            </div>
-        </div>
+        <ExternalPage title='TWAP Fill History'>
+            <FillTwapTable
+                data={fetchedHistoryData}
+                isFetched={isFetched}
+                pageMode={true}
+            />
+        </ExternalPage>
     );
 }
 export default TwapFillHistory;

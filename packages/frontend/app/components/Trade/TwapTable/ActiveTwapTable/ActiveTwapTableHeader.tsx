@@ -20,56 +20,56 @@ export default function ActiveTwapTableHeader() {
             key: 'coin',
             sortable: true,
             onClick: () => handleSort('coin'),
-            className: 'coinCell',
+            className: styles.coinCell,
         },
         {
             name: 'Size',
             key: 'size',
             sortable: true,
             onClick: () => handleSort('size'),
-            className: 'sizeCell',
+            className: styles.sizeCell,
         },
         {
             name: 'Executed Size',
             key: 'executedSize',
             sortable: true,
             onClick: () => handleSort('executedSize'),
-            className: 'executedSizeCell',
+            className: styles.executedSizeCell,
         },
         {
             name: 'Average Price',
             key: 'averagePrice',
             sortable: true,
             onClick: () => handleSort('averagePrice'),
-            className: 'averagePriceCell',
+            className: styles.averagePriceCell,
         },
         {
             name: 'Running Time / Total',
             key: 'runningTime',
             sortable: true,
             onClick: () => handleSort('runningTime'),
-            className: 'runningTimeCell',
+            className: styles.runningTimeCell,
         },
         {
             name: 'Reduce Only',
             key: 'reduceOnly',
             sortable: true,
             onClick: () => handleSort('reduceOnly'),
-            className: 'reduceOnlyCell',
+            className: styles.reduceOnlyCell,
         },
         {
             name: 'Creation Time',
             key: 'creationTime',
             sortable: true,
             onClick: () => handleSort('creationTime'),
-            className: 'creationTimeCell',
+            className: styles.creationTimeCell,
         },
         {
             name: 'Terminate',
             key: 'terminate',
             sortable: false,
             onClick: undefined,
-            className: 'terminateCell',
+            className: styles.terminateCell,
         },
     ];
 
@@ -78,7 +78,7 @@ export default function ActiveTwapTableHeader() {
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
-                    className={`${styles.cell} ${styles.headerCell} ${styles[header.className]} ${header.sortable ? styles.sortable : ''}`}
+                    className={`${styles.cell} ${styles.headerCell} ${header.className} ${header.sortable ? styles.sortable : ''}`}
                     onClick={header.onClick}
                 >
                     {header.name}

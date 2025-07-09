@@ -12,7 +12,10 @@ import type { Route } from './+types/root';
 import PageHeader from './components/PageHeader/PageHeader';
 
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
+import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
@@ -50,11 +53,6 @@ class ComponentErrorBoundary extends React.Component<
         }
         return this.props.children;
     }
-}
-
-// Added loading component for async operations
-function LoadingIndicator() {
-    return <div className='loading-indicator'>Loading...</div>;
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
@@ -115,36 +113,38 @@ export default function App() {
     return (
         <>
             <Layout>
-                <SdkProvider environment={wsEnvironment}>
-                    <TutorialProvider>
-                        <div className='root-container'>
-                            {/* Added error boundary for header */}
-                            <ComponentErrorBoundary>
-                                <PageHeader />
-                            </ComponentErrorBoundary>
+                <AppProvider>
+                    <SdkProvider environment={wsEnvironment}>
+                        <TutorialProvider>
+                            <WsConnectionChecker />
+                            <div className='root-container'>
+                                {/* Added error boundary for header */}
+                                <ComponentErrorBoundary>
+                                    <PageHeader />
+                                </ComponentErrorBoundary>
+                                <main className='content'>
+                                    {/*  Added Suspense for async content loading */}
+                                    <Suspense fallback={<LoadingIndicator />}>
+                                        <ComponentErrorBoundary>
+                                            <Outlet />
+                                        </ComponentErrorBoundary>
+                                    </Suspense>
+                                </main>
+                                <ComponentErrorBoundary>
+                                    <footer className='mobile-footer'>
+                                        <MobileFooter />
+                                    </footer>
+                                </ComponentErrorBoundary>
 
-                            <main className='content'>
-                                {/*  Added Suspense for async content loading */}
-                                <Suspense fallback={<LoadingIndicator />}>
-                                    <ComponentErrorBoundary>
-                                        <Outlet />
-                                    </ComponentErrorBoundary>
-                                </Suspense>
-                            </main>
-                            <ComponentErrorBoundary>
-                                <footer className='mobile-footer'>
-                                    <MobileFooter />
-                                </footer>
-                            </ComponentErrorBoundary>
-
-                            {/* Added error boundary for notifications */}
-                            <ComponentErrorBoundary>
-                                <Notifications />
-                            </ComponentErrorBoundary>
-                        </div>
-                    </TutorialProvider>
-                    <RuntimeDomManipulation />
-                </SdkProvider>
+                                {/* Added error boundary for notifications */}
+                                <ComponentErrorBoundary>
+                                    <Notifications />
+                                </ComponentErrorBoundary>
+                            </div>
+                        </TutorialProvider>
+                        <RuntimeDomManipulation />
+                    </SdkProvider>
+                </AppProvider>
             </Layout>
         </>
     );

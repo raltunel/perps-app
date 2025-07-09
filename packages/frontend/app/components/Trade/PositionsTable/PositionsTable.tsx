@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
-import styles from './PositionsTable.module.css';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import { useModal } from '~/hooks/useModal';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -21,8 +20,12 @@ export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
     const { coinPriceMap } = useTradeDataStore();
     const { positions, fetchedChannels } = useTradeDataStore();
+    const appSettingsModal = useModal('closed');
 
     const { debugWallet } = useDebugStore();
+
+    const currentUserRef = useRef<string>('');
+    currentUserRef.current = debugWallet.address;
 
     const webDataFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
@@ -49,6 +52,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     return (
         <>
             <GenericTable
+                storageKey={`PositionsTable_${currentUserRef.current}`}
                 data={filteredData as any}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>
@@ -63,6 +67,8 @@ export default function PositionsTable(props: PositionsTableProps) {
                     <PositionsTableRow
                         key={`position-${index}`}
                         position={position as unknown as PositionIF}
+                        openTPModal={() => appSettingsModal.open()}
+                        closeTPModal={appSettingsModal.close}
                     />
                 )}
                 sorterMethod={(

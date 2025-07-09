@@ -1,9 +1,12 @@
 .share_modal {
+    --button-height: 23px;
     display: flex;
     flex-direction: row;
     max-width: 1200px;
-    padding: 0 24px;
+    /* padding: 0 192px; */
     gap: 24px;
+    padding: 0 50px 50px 50px;
+
     background-color: var(--bg-dark3);
 }
 
@@ -24,13 +27,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .symbol_icon {
     width: 30px;
     height: 30px;
-    border-radius: 16px;
+    border-radius: var(--radius-m);
 }
 
 .symbol {
@@ -53,7 +56,7 @@
 .prices {
     display: flex;
     flex-direction: row;
-    gap: 16px;
+    gap: var(--gap-m);
 }
 
 .price {
@@ -116,15 +119,26 @@
 .button_bank {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-s);
 }
 
 .button_bank > button {
+    width: 100%;
+    height: var(--button-height);
+    transition: all 0.3s ease-in-out;
+    outline: none;
+    border: none;
     display: flex;
-    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    gap: 12px;
-    font-size: var(--font-size-m);
+    gap: var(--gap-s);
+    flex-shrink: 0;
+    border-radius: var(--radius-s, 8px);
+    background: var(--accent1,);
     color: var(--text1);
-    background-color: var(--accent1);
+    font-size: var(--font-size-m, 18px);
+    padding: 1px var(--padding-s);
+}
+.button_bank > button:hover {
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }

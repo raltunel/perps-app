@@ -1,0 +1,332 @@
+.loadingContainer {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-dark1);
+    z-index: var(--z-index-modal);
+    padding: var(--padding-m);
+}
+
+.loaderContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chartContainer {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 180px;
+    margin-bottom: 40px;
+    border-radius: var(--radius-s);
+    background-color: var(--bg-dark2);
+    overflow: hidden;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .chartContainer {
+        max-width: 320px;
+        height: 140px;
+        margin-bottom: 32px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .chartContainer {
+        max-width: 280px;
+        height: 100px;
+        margin-bottom: 24px;
+    }
+}
+
+.chartLine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        var(--accent1) 20%,
+        var(--accent3) 40%,
+        var(--accent4) 60%,
+        var(--accent5) 80%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 180'%3E%3Cpath d='M0,120 C30,105 60,135 90,90 C120,45 150,75 180,90 C210,105 240,75 270,60 C300,45 330,67 360,90 C390,112 420,90 420,120 L420,180 L0,180 Z' fill='%23000'/%3E%3C/svg%3E");
+    mask-size: 100% 100%;
+    animation: moveChart 3s infinite linear;
+}
+
+@keyframes moveChart {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+
+.candlesContainer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+    align-items: flex-end;
+}
+
+.candle {
+    width: 8px;
+    height: 36px;
+    border-radius: 1px;
+    animation: pulseOpacity 2s infinite;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .candlesContainer {
+        padding: 0 25px;
+    }
+
+    .candle {
+        width: 6px;
+        height: 28px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .candlesContainer {
+        padding: 0 20px;
+    }
+
+    .candle {
+        width: 4px;
+        height: 20px;
+    }
+}
+
+.green {
+    background-color: var(--green);
+}
+
+.red {
+    background-color: var(--red);
+}
+
+@keyframes pulseOpacity {
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.marketIndicators {
+    display: flex;
+    gap: 48px;
+    margin-bottom: 32px;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .marketIndicators {
+        gap: 36px;
+        margin-bottom: 28px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .marketIndicators {
+        gap: 24px;
+        margin-bottom: 16px;
+    }
+}
+
+.indicatorGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.indicatorLabel {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 6px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+    }
+}
+
+.upIcon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2326a69a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 6 13.5 15.5 8.5 10.5 1 18'%3E%3C/polyline%3E%3Cpolyline points='17 6 23 6 23 12'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.downIcon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ef5350' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 18 13.5 8.5 8.5 13.5 1 6'%3E%3C/polyline%3E%3Cpolyline points='17 18 23 18 23 12'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.greenText {
+    color: var(--green);
+    font-weight: 500;
+    font-size: var(--font-size-m);
+}
+
+.redText {
+    color: var(--red);
+    font-weight: 500;
+    font-size: var(--font-size-m);
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .greenText,
+    .redText {
+        font-size: var(--font-size-s);
+    }
+}
+
+.volumeBars {
+    display: flex;
+    align-items: flex-end;
+    height: 56px;
+    gap: 5px;
+    margin-bottom: 32px;
+    width: 100%;
+    max-width: 400px;
+    justify-content: center;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .volumeBars {
+        height: 48px;
+        gap: 4px;
+        margin-bottom: 28px;
+        max-width: 320px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .volumeBars {
+        height: 32px;
+        margin-bottom: 20px;
+        gap: 2px;
+        max-width: 280px;
+    }
+}
+
+.volumeBar {
+    width: 6px;
+    min-height: 4px;
+    border-radius: 1px 1px 0 0;
+    animation: barPulse 1.5s infinite alternate;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .volumeBar {
+        width: 5px;
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .volumeBar {
+        width: 3px;
+    }
+}
+
+@keyframes barPulse {
+    0% {
+        transform: scaleY(0.8);
+    }
+    100% {
+        transform: scaleY(1.2);
+    }
+}
+
+.loadingText {
+    color: var(--text1);
+    font-size: var(--font-size-l); /* Increased from font-size-m */
+    font-family: var(--font-family-main);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+/* For medium sized screens */
+@media (max-width: 768px) {
+    .loadingText {
+        font-size: var(--font-size-m);
+    }
+}
+
+/* For mobile screens */
+@media (max-width: 480px) {
+    .loadingText {
+        font-size: var(--font-size-s);
+    }
+}
+
+/* Handle landscape mobile orientation */
+@media (max-height: 480px) and (orientation: landscape) {
+    .chartContainer {
+        height: 90px;
+        margin-bottom: 16px;
+    }
+
+    .marketIndicators {
+        margin-bottom: 12px;
+    }
+
+    .volumeBars {
+        height: 24px;
+        margin-bottom: 12px;
+    }
+
+    .loadingText {
+        font-size: var(--font-size-s);
+    }
+}

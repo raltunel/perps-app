@@ -1,9 +1,11 @@
 .container {
+    --menu-item-height: 23px;
+
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     position: absolute;
-    gap: 4px;
+    gap: var(--gap-xs);
     top: 30px;
     right: 0;
     width: 210px;
@@ -21,6 +23,7 @@
 }
 
 .menuItem {
+    height: var(--menu-item-height);
     display: flex;
     padding: 2px var(--padding-xs);
     justify-content: space-between;
@@ -40,7 +43,7 @@
 .version {
     color: var(--text2, #6a6a6d);
     font-size: var(--font-size-s, 12px);
-    margin-top: 8px;
+    margin-top: var(--margin-s);
     height: 19px;
 }
 
@@ -58,16 +61,11 @@
     background: var(--accent1, #7371fc);
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-m, 18px);
+    transition: all 0.3s ease-in-out;
 }
 
 .logoutButton:hover {
-    background:
-        linear-gradient(
-            0deg,
-            var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 0%,
-            var(--misc-button-hover, rgba(6, 6, 12, 0.3)) 100%
-        ),
-        var(--accent1, #7371fc);
+    background-color: color-mix(in srgb, var(--accent1) 90%, black);
 }
 
 .toggleButton {
