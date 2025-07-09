@@ -124,5 +124,5 @@
 
 [[redirects]]
   from = "/*"
-  to = "https://ambient.finance/:splat"
+  to = "https://deploy-preview-12--ambi-perps.netlify.app/:splat"
   status = 301
