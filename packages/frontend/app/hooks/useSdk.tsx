@@ -22,6 +22,8 @@ import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
 type SdkContextType = {
     info: Info | null;
     exchange: Exchange | null;
+    lastSleepMs: number;
+    lastAwakeMs: number;
 };
 
 const SdkContext = createContext<SdkContextType | undefined>(undefined);
@@ -36,6 +38,8 @@ export const SdkProvider: React.FC<{
     const [exchange, setExchange] = useState<Exchange | null>(null);
     const [shouldReconnect, setShouldReconnect] = useState(false);
     const stashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [lastSleepMs, setLastSleepMs] = useState<number>(0);
+    const [lastAwakeMs, setLastAwakeMs] = useState<number>(0);
 
     const stashedSubs = useRef<Record<string, ActiveSubscription[]>>({});
 
@@ -176,9 +180,11 @@ export const SdkProvider: React.FC<{
         if (!isClient) return;
         if (isWsSleepMode) {
             info?.wsManager?.setSleepMode(true);
+            setLastSleepMs(Date.now());
             stashSubscriptions();
         } else {
             info?.wsManager?.setSleepMode(false);
+            setLastAwakeMs(Date.now());
         }
     }, [isWsSleepMode, info]);
 
@@ -219,7 +225,9 @@ export const SdkProvider: React.FC<{
     }, [isTabActive, info]);
 
     return (
-        <SdkContext.Provider value={{ info: info, exchange: exchange }}>
+        <SdkContext.Provider
+            value={{ info: info, exchange: exchange, lastSleepMs, lastAwakeMs }}
+        >
             {children}
         </SdkContext.Provider>
     );
