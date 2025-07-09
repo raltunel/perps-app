@@ -3,10 +3,10 @@ import { BsThreeDots } from 'react-icons/bs';
 import BasicMenu from '~/components/BasicMenu/BasicMenu';
 import Tabs from '~/components/Tabs/Tabs';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { getElementHeightWithMargins } from '~/utils/Utils';
 import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
-import { getElementHeightWithMargins } from '~/utils/Utils';
 
 interface propsIF {
     symbol: string;

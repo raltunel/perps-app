@@ -27,7 +27,7 @@ const WatchListNode: React.FC<WatchListNodeProps> = memo(
             () => () => {
                 if (coin === storeSymbol) return;
                 setStoreSymbol(coin);
-                navigate(`/trade/${coin}`, { viewTransition: true });
+                navigate(`/v2/trade/${coin}`, { viewTransition: true });
             },
             [coin, storeSymbol, setStoreSymbol, navigate],
         );
