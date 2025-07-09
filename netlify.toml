@@ -127,7 +127,11 @@
   to = "https://ambient-finance.netlify.app/:splat"
   status = 301
 
-# Main SPA redirect (must come after geofencing rules)
+[[redirects]]
+  from = "/v2/*"
+  to = "/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
