@@ -2,10 +2,15 @@
     width: 100%;
     height: 100%;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
-.testpage > button {
-    border: 1px solid var(--bg-dark5);
+.modal_inside {
+    width: 600px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    background-color: green;
 }
