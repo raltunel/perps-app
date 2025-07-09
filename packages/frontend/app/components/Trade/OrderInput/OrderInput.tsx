@@ -35,6 +35,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -248,6 +249,8 @@ function OrderInput() {
             handleTypeChange();
         }
     }, [obChosenAmount, obChosenPrice]);
+
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
@@ -718,6 +721,14 @@ function OrderInput() {
                                         qty: size,
                                         denom: 'BTC',
                                     }}
+                                    isEnabled={
+                                        !activeOptions.skipOpenOrderConfirm
+                                    }
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipOpenOrderConfirm',
+                                        )
+                                    }
                                     onClose={() => {
                                         notifications.add({
                                             title: 'Buy / Long Market Order Pending',
@@ -745,6 +756,14 @@ function OrderInput() {
                                         });
                                         confirmOrderModal.close();
                                     }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipClosePositionConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
                                 />
                             )}
                             {confirmOrderModal.content === 'limit_buy' && (
@@ -764,6 +783,14 @@ function OrderInput() {
                                         });
                                         confirmOrderModal.close();
                                     }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipOpenOrderConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
                                 />
                             )}
                             {confirmOrderModal.content === 'limit_sell' && (
@@ -783,6 +810,14 @@ function OrderInput() {
                                         });
                                         confirmOrderModal.close();
                                     }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipClosePositionConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
                                 />
                             )}
                         </Modal>

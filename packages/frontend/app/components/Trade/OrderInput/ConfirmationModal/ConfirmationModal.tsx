@@ -2,7 +2,6 @@ import styles from './ConfirmationModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
-import { useState } from 'react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { modalContentT } from '../OrderInput';
 
@@ -14,6 +13,8 @@ interface propsIF {
     };
     limitPrice?: string;
     onClose: () => void;
+    isEnabled: boolean;
+    toggleEnabled: () => void;
 }
 type InfoItem = {
     label: string;
@@ -23,7 +24,7 @@ type InfoItem = {
 };
 
 export default function ConfirmationModal(props: propsIF) {
-    const { onClose, size, limitPrice, tx } = props;
+    const { onClose, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
 
     const dataInfo: InfoItem[] = [
         {
@@ -56,7 +57,6 @@ export default function ConfirmationModal(props: propsIF) {
         },
     ];
 
-    const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
             <div className={styles.contentContainer}>
@@ -85,8 +85,8 @@ export default function ConfirmationModal(props: propsIF) {
             </div>
             <div className={styles.toggleContainer}>
                 <ToggleSwitch
-                    isOn={isDontShowEnabled}
-                    onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
+                    isOn={!isEnabled}
+                    onToggle={toggleEnabled}
                     label={"Don't show this again"}
                     // reverse
                 />

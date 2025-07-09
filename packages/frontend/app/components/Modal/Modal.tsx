@@ -400,7 +400,6 @@ function Modal(props: ModalProps) {
                       ? styles.bottomRightContainer
                       : ''
             } ${isKeyboardVisible ? styles.keyboardVisible : ''}`}
-            // style={positionStyles[actualPosition]}
             role='dialog'
             aria-modal='true'
             aria-labelledby='modal-title'
