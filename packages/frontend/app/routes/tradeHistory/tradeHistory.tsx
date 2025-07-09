@@ -21,20 +21,20 @@ export default function TradeHistory() {
 
     useEffect(() => {
         if (!targetAddress) return;
-        setIsFetched(true);
         fetchUserFills(targetAddress)
             .then((fills: UserFillIF[]) => {
                 setUserFills(fills);
+                setIsFetched(true);
             })
             .catch(console.error)
-            .finally(() => setIsFetched(false));
+            .finally(() => setIsFetched(true));
     }, [targetAddress]);
 
     return (
         <ExternalPage title='Trade History'>
             <TradeHistoryTable
                 data={userFills}
-                isFetched={!isFetched}
+                isFetched={isFetched}
                 pageMode
             />
         </ExternalPage>
