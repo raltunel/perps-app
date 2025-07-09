@@ -1,72 +1,38 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import TradeHistoryTable from '~/components/Trade/TradeHistoryTable/TradeHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
 import type { UserFillIF } from '~/utils/UserDataIFs';
 
-function TradeHistory() {
-    const { address } = useParams<{ address: string }>();
+export default function TradeHistory() {
+    const { address } = useParams<{ address?: string }>();
+    const walletAddress = useDebugStore((s) => s.debugWallet.address);
+    const targetAddress = address ?? walletAddress;
 
-    const [isFetched, setIsFetched] = useState(false);
-
-    const { debugWallet } = useDebugStore();
-
-    const { userFills, fetchedChannels } = useTradeDataStore();
-
-    const tradeHistoryFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.USER_FILLS);
-    }, [fetchedChannels]);
-
-    const [fetchedHistoryData, setFetchedHistoryData] = useState<UserFillIF[]>(
-        [],
-    );
+    const userFills = useTradeDataStore((s) => s.userFills);
+    const setUserFills = useTradeDataStore((s) => s.setUserFills);
 
     const { fetchUserFills } = useInfoApi();
 
-    // TODO: live update is disabled for now, because websocket snapshots were sending limited data
-    const isCurrentUser = useMemo(() => {
-        return false;
-        // if (address) {
-        //     return (
-        //         address.toLocaleLowerCase() ===
-        //         debugWallet.address.toLocaleLowerCase()
-        //     );
-        // } else {
-        //     return true;
-        // }
-    }, [address, debugWallet.address]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!isCurrentUser && address) {
-            fetchUserFills(address).then((data) => {
-                setFetchedHistoryData(data);
-                setIsFetched(true);
-            });
-        } else if (tradeHistoryFetched) {
-            setIsFetched(true);
-        }
-    }, [isCurrentUser, address, tradeHistoryFetched]);
-
-    const tableData = useMemo(() => {
-        if (isCurrentUser) {
-            return userFills;
-        } else {
-            return fetchedHistoryData;
-        }
-    }, [isCurrentUser, userFills, fetchedHistoryData]);
+        if (!targetAddress) return;
+        setLoading(true);
+        fetchUserFills(targetAddress)
+            .then((fills: UserFillIF[]) => {
+                setUserFills(fills);
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [targetAddress]);
 
     return (
         <ExternalPage title='Trade History'>
-            <TradeHistoryTable
-                data={tableData}
-                isFetched={isFetched}
-                pageMode={true}
-            />
+            <TradeHistoryTable data={userFills} isFetched={!loading} pageMode />
         </ExternalPage>
     );
 }
-export default TradeHistory;

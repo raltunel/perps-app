@@ -74,7 +74,11 @@ export default function DepositsWithdrawalsTable(
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const viewAllLink = '/depositsandwithdrawals';
+    const viewAllLink = debugWallet.address
+        ? `/depositsandwithdrawals/${debugWallet.address}`
+        : '/depositsandwithdrawals';
+
+    console.log('buradaki data: ', props.data);
 
     return (
         <GenericTable<TransactionData, DepositAndWithDrawalSortBy>

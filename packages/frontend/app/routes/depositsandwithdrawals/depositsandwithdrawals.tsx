@@ -1,58 +1,43 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import DepositsWithdrawalsTable from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
-import WebDataConsumer from '../trade/webdataconsumer';
 
 export default function DepositsAndWithdrawals() {
-    const { address } = useParams<{ address: string }>();
-    const [httpFetched, setHttpFetched] = useState(false);
+    const { address } = useParams<{ address?: string }>();
+    const walletAddress = useDebugStore((s) => s.debugWallet.address);
+    const targetAddress = address ?? walletAddress;
 
-    const debugWallet = useDebugStore((s) => s.debugWallet);
-    const userNonFundingLedgerUpdates = useTradeDataStore(
+    const { fetchUserNonFundingLedgerUpdates } = useInfoApi();
+    const transactions = useTradeDataStore(
         (s) => s.userNonFundingLedgerUpdates,
     );
-    const fetchedChannels = useTradeDataStore((s) => s.fetchedChannels);
-    const setTxs = useTradeDataStore((s) => s.setUserNonFundingLedgerUpdates);
-    const { fetchUserNonFundingLedgerUpdates } = useInfoApi();
+    const setTransactions = useTradeDataStore(
+        (s) => s.setUserNonFundingLedgerUpdates,
+    );
 
-    const isCurrentUser = useMemo(
-        () =>
-            !!debugWallet?.address &&
-            (!address ||
-                address.toLowerCase() === debugWallet.address.toLowerCase()),
-        [address, debugWallet],
-    );
-    const wsFetched = fetchedChannels.has(
-        WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
-    );
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!isCurrentUser && address) {
-            setHttpFetched(false);
-            fetchUserNonFundingLedgerUpdates(address)
-                .then((txs) => setTxs(txs))
-                .catch(console.error)
-                .finally(() => setHttpFetched(true));
-        }
-    }, [isCurrentUser, address, fetchUserNonFundingLedgerUpdates, setTxs]);
+        if (!targetAddress) return;
+        setLoading(true);
 
-    const isFetched = isCurrentUser ? wsFetched : httpFetched;
-
-    const tableData = userNonFundingLedgerUpdates;
+        fetchUserNonFundingLedgerUpdates(targetAddress)
+            .then((txs: TransactionData[]) => setTransactions(txs))
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, [targetAddress]);
 
     return (
         <ExternalPage title='Deposits & Withdrawals'>
-            <WebDataConsumer />
             <DepositsWithdrawalsTable
+                data={transactions}
+                isFetched={!loading}
                 pageMode
-                isFetched={isFetched}
-                data={tableData}
             />
         </ExternalPage>
     );
