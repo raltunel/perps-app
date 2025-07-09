@@ -1,24 +1,24 @@
-import { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';
 import { FaChevronLeft } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router';
+import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import ChartSkeleton from '~/components/Skeletons/ChartSkeleton/ChartSkeleton';
+import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import DepositModal from '~/components/Vault/DepositModal/DepositModal';
+import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import type { VaultDetailsIF } from '~/utils/VaultIFs';
 import WebDataConsumer from '../trade/webdataconsumer';
+import { useVaultManager } from './useVaultManager';
 import VaultCharts from './vaultCharts';
 import styles from './vaultDetails.module.css';
 import VaultInfo from './vaultInfo';
-import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
-import ChartSkeleton from '~/components/Skeletons/ChartSkeleton/ChartSkeleton';
-import { motion } from 'framer-motion';
-import { useVaultManager } from './useVaultManager';
-import Modal from '~/components/Modal/Modal';
-import DepositModal from '~/components/Vault/DepositModal/DepositModal';
-import WithdrawModal from '~/components/Vault/WithdrawModal/WithdrawModal';
 
 export default function VaultDetails() {
     const { vaultAddress } = useParams<{ vaultAddress: string }>();
@@ -122,7 +122,7 @@ export default function VaultDetails() {
                 <div className={styles.headerWrapper}>
                     <div
                         className={styles.backButton}
-                        onClick={() => navigate('/vaults')}
+                        onClick={() => navigate('/v2/vaults')}
                     >
                         <FaChevronLeft />
                     </div>
