@@ -8,7 +8,7 @@ import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
 import { getElementHeightWithMargins } from '~/utils/Utils';
 
-interface OrderBookSectionProps {
+interface propsIF {
     symbol: string;
     mobileView?: boolean;
     mobileContent?: 'orderBook' | 'recentTrades';
@@ -17,11 +17,8 @@ interface OrderBookSectionProps {
 const ORDER_ROW_HEIGHT_FALLBACK = 16;
 const ORDER_ROW_GAP = 4;
 
-const OrderBookSection: React.FC<OrderBookSectionProps> = ({
-    symbol,
-    mobileView = false,
-    mobileContent = 'orderBook',
-}) => {
+export default function OrderBookSection(props: propsIF) {
+    const { symbol, mobileView, mobileContent } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
@@ -282,6 +279,4 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
             {orderBookMode === 'large' && largeOrderBook}
         </>
     );
-};
-
-export default OrderBookSection;
+}
