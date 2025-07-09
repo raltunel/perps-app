@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
@@ -785,11 +785,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
+                                            'skipOpenLimitConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenLimitConfirm
                                     }
                                 />
                             )}
@@ -812,11 +812,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipCloseLimitConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipCloseLimitConfirm
                                     }
                                 />
                             )}
@@ -828,4 +828,4 @@ function OrderInput() {
     );
 }
 
-export default React.memo(OrderInput);
+export default memo(OrderInput);
