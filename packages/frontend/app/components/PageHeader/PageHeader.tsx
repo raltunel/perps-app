@@ -158,7 +158,7 @@ export default function PageHeader() {
                         )}
                     </section>
                     <a
-                        href='https://ambient.finance/trade'
+                        href='/trade'
                         target='_blank'
                         rel='noopener noreferrer'
                         className={styles.ambientmm}
