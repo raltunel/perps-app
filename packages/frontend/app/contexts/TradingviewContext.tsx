@@ -3,6 +3,7 @@ import React, {
     useCallback,
     useContext,
     useEffect,
+    useRef,
     useState,
 } from 'react';
 import { useParams } from 'react-router';
@@ -40,6 +41,8 @@ import {
     widget,
     type IBasicDataFeed,
     type IChartingLibraryWidget,
+    type IDatafeedChartApi,
+    type LibrarySymbolInfo,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -85,6 +88,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
     );
+
+    const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
 
     const [isChartReady, setIsChartReady] = useState(false);
     const { marketId } = useParams<{ marketId: string }>();
@@ -193,6 +198,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const initChart = useCallback(() => {
         if (!info) return;
 
+        dataFeedRef.current = createDataFeed(info);
+
         const tvWidget = new widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
@@ -200,7 +207,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: marketId,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(info) as IBasicDataFeed,
+            datafeed: dataFeedRef.current as IBasicDataFeed,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -318,11 +325,12 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             );
 
             if (intervalMinutes <= lastSleepDurationInMinutes) {
-                chart?.remove();
-                initChart();
+                chart?.resetCache();
+                chart?.chart().resetData();
+                chart?.chart().restoreChart();
             }
         }
-    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart]);
+    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
 
     useEffect(() => {
         if (chart) {
