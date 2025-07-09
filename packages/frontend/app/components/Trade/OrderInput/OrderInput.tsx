@@ -35,6 +35,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -154,7 +155,7 @@ function OrderInput() {
         useTradeDataStore();
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const appSettingsModal: useModalIF = useModal('closed');
+    const confirmationModal: useModalIF = useModal('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
@@ -241,11 +242,22 @@ function OrderInput() {
         }
     }, [obChosenAmount, obChosenPrice]);
 
+    const activeOptions: useAppOptionsIF = useAppOptions();
+
     const openModalWithContent = (
         content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
     ) => {
         setModalContent(content);
-        appSettingsModal.open();
+        if (content === 'confirm_buy' && activeOptions.skipOpenOrderConfirm) {
+            confirmBuy();
+        } else if (
+            content === 'confirm_sell' &&
+            activeOptions.skipClosePositionConfirm
+        ) {
+            confirmSell();
+        } else {
+            confirmationModal.open();
+        }
     };
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
@@ -259,7 +271,7 @@ function OrderInput() {
         if (activeMargin) {
             console.log(`Confirmed: ${activeMargin} margin mode`);
         }
-        appSettingsModal.close();
+        confirmationModal.close();
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
@@ -543,6 +555,24 @@ function OrderInput() {
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
+    function confirmBuy(): void {
+        notifications.add({
+            title: 'Buy / Long Order Pending',
+            message: 'Buying 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmationModal.close();
+    }
+
+    function confirmSell(): void {
+        notifications.add({
+            title: 'Sell / Short Order Pending',
+            message: 'Selling 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmationModal.close();
+    }
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
@@ -660,9 +690,9 @@ function OrderInput() {
                         orderValue={orderValue}
                         leverage={leverage}
                     />
-                    {appSettingsModal.isOpen && (
+                    {confirmationModal.isOpen && (
                         <Modal
-                            close={appSettingsModal.close}
+                            close={confirmationModal.close}
                             title={
                                 modalContent === 'margin'
                                     ? 'Margin Mode'
@@ -695,35 +725,35 @@ function OrderInput() {
                                     minPrice={parseFloat(priceRangeMin)}
                                     maxPrice={parseFloat(priceRangeMax)}
                                     isModal
-                                    onClose={appSettingsModal.close}
+                                    onClose={confirmationModal.close}
                                 />
                             )}
                             {modalContent === 'confirm_buy' && (
                                 <ConfirmationModal
                                     tx='buy'
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Buy / Long Order Pending',
-                                            message:
-                                                'Buying 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        appSettingsModal.close();
-                                    }}
+                                    isEnabled={
+                                        !activeOptions.skipOpenOrderConfirm
+                                    }
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipOpenOrderConfirm',
+                                        )
+                                    }
+                                    onClose={confirmBuy}
                                 />
                             )}
                             {modalContent === 'confirm_sell' && (
                                 <ConfirmationModal
                                     tx='sell'
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Sell / Short Order Pending',
-                                            message:
-                                                'Selling 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        appSettingsModal.close();
-                                    }}
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipClosePositionConfirm',
+                                        )
+                                    }
+                                    onClose={confirmSell}
                                 />
                             )}
                         </Modal>
