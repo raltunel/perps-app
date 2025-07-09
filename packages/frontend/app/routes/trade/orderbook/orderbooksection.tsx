@@ -169,7 +169,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
     const menuContent = useMemo(
         () => (
             <div className={styles.menuContent}>
-                <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+                <BasicMenu items={menuItems} icon={<BsThreeDots size={14} />} />
             </div>
         ),
         [menuItems],
@@ -184,7 +184,10 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                         className={styles.sectionHeader}
                     >
                         <div className={styles.sectionHeaderTitle}>Book</div>
-                        <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+                        <BasicMenu
+                            items={menuItems}
+                            icon={<BsThreeDots size={14} />}
+                        />
                     </div>
                     <OrderBook symbol={symbol} orderCount={orderCount} />
                     <div
@@ -192,7 +195,10 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                         className={styles.sectionHeader}
                     >
                         <div className={styles.sectionHeaderTitle}>Trades</div>
-                        <BasicMenu items={menuItems} icon={<BsThreeDots />} />
+                        <BasicMenu
+                            items={menuItems}
+                            icon={<BsThreeDots size={14} />}
+                        />
                     </div>
                     {orderBookTradesComponent(tradesMaxHeight)}
                 </div>
@@ -230,7 +236,7 @@ const OrderBookSection: React.FC<OrderBookSectionProps> = ({
                             </div>
                             <BasicMenu
                                 items={menuItems}
-                                icon={<BsThreeDots />}
+                                icon={<BsThreeDots size={14} />}
                             />
                         </div>
                         {orderBookTradesComponent(tradesMaxHeight)}
