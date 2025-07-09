@@ -20,23 +20,23 @@ export default function DepositsAndWithdrawals() {
         (s) => s.setUserNonFundingLedgerUpdates,
     );
 
-    const [loading, setLoading] = useState(false);
+    const [isFetched, setIsFetched] = useState(false);
 
     useEffect(() => {
         if (!targetAddress) return;
-        setLoading(true);
+        setIsFetched(true);
 
         fetchUserNonFundingLedgerUpdates(targetAddress)
             .then((txs: TransactionData[]) => setTransactions(txs))
             .catch(console.error)
-            .finally(() => setLoading(false));
+            .finally(() => setIsFetched(false));
     }, [targetAddress]);
 
     return (
         <ExternalPage title='Deposits & Withdrawals'>
             <DepositsWithdrawalsTable
                 data={transactions}
-                isFetched={!loading}
+                isFetched={!isFetched}
                 pageMode
             />
         </ExternalPage>

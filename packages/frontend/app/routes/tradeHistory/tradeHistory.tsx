@@ -17,22 +17,26 @@ export default function TradeHistory() {
 
     const { fetchUserFills } = useInfoApi();
 
-    const [loading, setLoading] = useState(false);
+    const [isFetched, setIsFetched] = useState(false);
 
     useEffect(() => {
         if (!targetAddress) return;
-        setLoading(true);
+        setIsFetched(true);
         fetchUserFills(targetAddress)
             .then((fills: UserFillIF[]) => {
                 setUserFills(fills);
             })
             .catch(console.error)
-            .finally(() => setLoading(false));
+            .finally(() => setIsFetched(false));
     }, [targetAddress]);
 
     return (
         <ExternalPage title='Trade History'>
-            <TradeHistoryTable data={userFills} isFetched={!loading} pageMode />
+            <TradeHistoryTable
+                data={userFills}
+                isFetched={!isFetched}
+                pageMode
+            />
         </ExternalPage>
     );
 }
