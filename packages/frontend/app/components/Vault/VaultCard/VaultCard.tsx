@@ -1,8 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import styles from './VaultCard.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import { Link } from 'react-router';
 
 interface VaultCardProps {
     name: string;
@@ -50,7 +50,7 @@ const VaultCard = React.memo(function VaultCard(props: VaultCardProps) {
                 </div>
                 <Link
                     className={styles.more_info}
-                    to={`/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
+                    to={`/v2/vaults/0xdfc24b077bc1425ad1dea75bcb6f8158e10df303`}
                 >
                     More Info
                 </Link>

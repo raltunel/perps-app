@@ -101,7 +101,7 @@ export default function Trade() {
 
     useEffect(() => {
         if (!marketId)
-            navigate(`/trade/${symbol}`, {
+            navigate(`/v2/trade/${symbol}`, {
                 replace: true,
                 viewTransition: true,
             });

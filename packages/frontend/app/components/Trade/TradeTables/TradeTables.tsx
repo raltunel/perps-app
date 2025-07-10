@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
+import { Pages, usePage } from '~/hooks/usePage';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, WsChannels } from '~/utils/Constants';
+import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
 import FilterDropdown from '../FilterDropdown/FilterDropdown';
@@ -13,11 +16,8 @@ import PositionsTable from '../PositionsTable/PositionsTable';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
-import styles from './TradeTable.module.css';
-import { Pages, usePage } from '~/hooks/usePage';
-import { useDebugStore } from '~/stores/DebugStore';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
-import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
+import styles from './TradeTable.module.css';
 export interface FilterOption {
     id: string;
     label: string;
@@ -66,7 +66,7 @@ export default function TradeTable(props: TradeTableProps) {
     const tabs = useMemo(() => {
         if (!page) return [];
 
-        let availableTabs = [
+        const availableTabs = [
             'Balances',
             'Positions',
             'Open Orders',

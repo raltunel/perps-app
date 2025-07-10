@@ -145,7 +145,7 @@ export default function Home(): JSX.Element {
 
         return (
             <Link
-                to={`/trade/${symbol}`}
+                to={`/v2/trade/${symbol}`}
                 className={styles.primary}
                 viewTransition
             >
@@ -194,7 +194,7 @@ export default function Home(): JSX.Element {
             >
                 <div className={styles.mockupGlow} />
                 <div className={styles.mockupContainer}>
-                    <Link to={`/trade/${symbol}`} viewTransition>
+                    <Link to={`/v2/trade/${symbol}`} viewTransition>
                         <img
                             src='/images/mockup.png'
                             alt='Perps App'

@@ -171,7 +171,9 @@ export default function AccountsTable(props: propsIF) {
                                     cursor: 'pointer',
                                 }}
                                 onClick={() =>
-                                    navigate('/trade', { viewTransition: true })
+                                    navigate('/v2/trade', {
+                                        viewTransition: true,
+                                    })
                                 }
                             >
                                 Trade
