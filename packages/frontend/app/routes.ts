@@ -51,9 +51,10 @@ export default [
     ),
 
     route(
-        'v2/depositsandwithdrawals',
+        'v2/depositsandwithdrawals/:address?',
         'routes/depositsandwithdrawals/depositsandwithdrawals.tsx',
     ),
+
     route(
         'v2/fundingHistory/:address?',
         'routes/fundingHistory/fundingHistory.tsx',
