@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
@@ -34,6 +41,8 @@ import {
     widget,
     type IBasicDataFeed,
     type IChartingLibraryWidget,
+    type IDatafeedChartApi,
+    type LibrarySymbolInfo,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -66,7 +75,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
-    const { info } = useSdk();
+    const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
     const { symbol } = useTradeDataStore();
 
@@ -76,10 +85,19 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { showBuysSellsOnChart } = useAppOptions();
 
+    const [chartInterval, setChartInterval] = useState<string | undefined>(
+        chartState?.interval,
+    );
+
+    const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
+
     const [isChartReady, setIsChartReady] = useState(false);
     const { marketId } = useParams<{ marketId: string }>();
     useEffect(() => {
         const res = getChartLayout();
+        if (res?.interval) {
+            setChartInterval(res.interval);
+        }
         setChartState(res);
     }, []);
 
@@ -177,8 +195,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
-    useEffect(() => {
+    const initChart = useCallback(() => {
         if (!info) return;
+
+        dataFeedRef.current = createDataFeed(info);
 
         const tvWidget = new widget({
             container: 'tv_chart',
@@ -187,7 +207,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             symbol: marketId,
             fullscreen: false,
             autosize: true,
-            datafeed: createDataFeed(info) as IBasicDataFeed,
+            datafeed: dataFeedRef.current as IBasicDataFeed,
             interval: (chartState?.interval || '1D') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
@@ -252,9 +272,19 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             }
 
             tvWidget.applyOverrides(defaultDrawingToolColors());
+            tvWidget
+                .chart()
+                .onIntervalChanged()
+                .subscribe(null, (interval: ResolutionString) => {
+                    setChartInterval(interval);
+                });
 
             setChart(tvWidget);
         });
+    }, [chartState, info]);
+
+    useEffect(() => {
+        initChart();
 
         return () => {
             if (chart) {
@@ -265,7 +295,42 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 chart.remove();
             }
         };
-    }, [chartState, info]);
+    }, [chartState, info, initChart]);
+
+    const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
+        let coef = 1;
+
+        if (!interval) return 1;
+
+        if (interval.includes('D')) {
+            coef = 24 * 60;
+        } else if (interval.includes('W')) {
+            coef = 24 * 60 * 7;
+        } else if (interval.includes('M')) {
+            coef = 60 * 24 * 30;
+        }
+
+        const intervalNum = Number(interval.replace(/[^0-9]/g, ''));
+
+        return intervalNum * coef;
+    }, []);
+
+    useEffect(() => {
+        if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
+            const intervalMinutes = tvIntervalToMinutes(
+                chartInterval as ResolutionString,
+            );
+            const lastSleepDurationInMinutes = parseFloat(
+                ((lastAwakeMs - lastSleepMs) / 60000).toFixed(2),
+            );
+
+            if (intervalMinutes <= lastSleepDurationInMinutes) {
+                chart?.resetCache();
+                chart?.chart().resetData();
+                chart?.chart().restoreChart();
+            }
+        }
+    }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
 
     useEffect(() => {
         if (chart) {

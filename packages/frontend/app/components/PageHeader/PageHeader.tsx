@@ -9,7 +9,7 @@ import {
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { useApp } from '~/contexts/AppContext';
-import { type useModalIF, useModal } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
@@ -76,7 +76,7 @@ export default function PageHeader() {
     }, isHelpDropdownOpen);
 
     // logic to open and close the app settings modal
-    const appSettingsModal: useModalIF = useModal('closed');
+    const appSettingsModal = useModal('closed');
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -287,7 +287,7 @@ export default function PageHeader() {
 
                     <button
                         className={styles.internationalButton}
-                        onClick={appSettingsModal.open}
+                        onClick={() => appSettingsModal.open()}
                     >
                         <LuSettings size={20} />
                     </button>
@@ -310,7 +310,7 @@ export default function PageHeader() {
 
             {appSettingsModal.isOpen && (
                 <Modal
-                    close={appSettingsModal.close}
+                    close={() => appSettingsModal.close()}
                     position={'center'}
                     title='Options'
                 >
