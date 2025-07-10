@@ -17,7 +17,7 @@ export default function PositionSize({
     onChange,
     className = '',
 }: PositionSizeProps) {
-    //  Visual markers and clickable positions
+    // Visual markers and clickable positions
     const VISUAL_MARKERS: SizeOption[] = [
         { value: 0, label: '0%' },
         { value: 25, label: '25%' },
@@ -26,7 +26,7 @@ export default function PositionSize({
         { value: 100, label: '100%' },
     ];
 
-    //  Drag increment step
+    // Drag increment step
     const DRAG_STEP = 5;
 
     const [inputValue, setInputValue] = useState<string>(value.toString());
@@ -128,7 +128,7 @@ export default function PositionSize({
         const offsetX = e.clientX - rect.left;
         const percentage = (offsetX / rect.width) * 100;
 
-        // Find the closest visual marker for track clicks
+        // For track clicks, only snap to visual markers if we're close to them (within 5%)
         const closestMarker = VISUAL_MARKERS.reduce((prev, curr) =>
             Math.abs(curr.value - percentage) <
             Math.abs(prev.value - percentage)
@@ -136,7 +136,16 @@ export default function PositionSize({
                 : prev,
         );
 
-        onChange(closestMarker.value);
+        // Only snap to marker if we're within 5% of it, otherwise use 5% increment
+        const distanceToMarker = Math.abs(closestMarker.value - percentage);
+        if (distanceToMarker <= 5) {
+            onChange(closestMarker.value);
+        } else {
+            // Round to nearest 5% increment
+            const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
+            const clampedValue = Math.max(0, Math.min(100, newValue));
+            onChange(clampedValue);
+        }
     };
 
     // Get position for the knob as percentage
