@@ -133,7 +133,7 @@ export default function TradeTable(props: TradeTableProps) {
             ),
             webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
         };
-    }, [fetchedChannels]);
+    }, [Array.from(fetchedChannels).join(',')]);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
