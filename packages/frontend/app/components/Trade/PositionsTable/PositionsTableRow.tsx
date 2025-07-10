@@ -127,7 +127,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
-            navigate(`/trade/${position.coin?.toLowerCase()}`);
+            navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
 
         // Memoize funding values and tooltip
@@ -227,11 +227,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                   : 'var(--text2)',
                     }}
                 >
-                    <Tooltip
-                        content={fundingTooltipMsg}
-                        isFixed
-                        maxWidth='400px'
-                    >
+                    <Tooltip content={fundingTooltipMsg}>
                         {formatNum(fundingToShow, 2, true, true, true)}
                     </Tooltip>
                 </div>

@@ -110,7 +110,7 @@ export const useTutorial = (): TutorialContextType => {
 
         if (!isOnTradePage) {
             // Navigate to the trade page before showing tutorial
-            navigate('/trade', { viewTransition: true });
+            navigate('/v2/trade', { viewTransition: true });
 
             // Give a small delay to ensure navigation completes before showing tutorial
             setTimeout(() => {
