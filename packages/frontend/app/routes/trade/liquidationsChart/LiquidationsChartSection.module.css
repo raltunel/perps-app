@@ -1,0 +1,11 @@
+.liqChartTabContainer {
+    width: 100%;
+    height: 100%;
+}
+
+.liqChartSectionContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+}

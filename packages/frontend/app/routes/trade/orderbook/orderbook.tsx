@@ -81,11 +81,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const buyPlaceHolderCount = Math.max(orderCount - buys.length, 0);
     const sellPlaceHolderCount = Math.max(orderCount - sells.length, 0);
 
-    useEffect(() => {
-        console.log('buys', buys);
-        console.log('sells', sells);
-        console.log('orderBook');
-    }, [buys, sells]);
+    // useEffect(() => {
+    //     console.log('buys', buys);
+    //     console.log('sells', sells);
+    //     console.log('orderBook');
+    // }, [buys, sells]);
 
     const {
         userOrders,

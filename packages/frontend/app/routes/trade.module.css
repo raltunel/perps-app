@@ -87,6 +87,7 @@ body {
 .chart,
 .symbolInfo,
 .orderBook,
+.liquidationsChart,
 .tradeModules {
     background: var(--bg-dark2);
     height: 100%;
@@ -98,6 +99,7 @@ body {
 
 .orderBook,
 .tradeModules,
+.liquidationsChart,
 .symbolSectionWrapper {
     overflow: hidden;
     max-height: calc(
@@ -114,6 +116,21 @@ body {
 }
 
 .orderBook {
+    position: relative;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.chartLayout {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+
+    gap: var(--gap-s);
+}
+
+.liquidationsChart {
     position: relative;
     align-items: flex-start;
     overflow: hidden;

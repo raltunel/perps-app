@@ -16,6 +16,7 @@ import WebDataConsumer from './trade/webdataconsumer';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
+import LiquidationsChartSection from './trade/liquidationsChart/LiquidationsChartSection';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -247,24 +248,32 @@ export default function Trade() {
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
-                        <div
-                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
-                        >
-                            <ComboBoxContainer />
+                        <div className={styles.chartLayout}>
                             <div
-                                id='watchlistSection'
-                                className={styles.watchlist}
+                                className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
                             >
-                                <WatchList />
+                                <ComboBoxContainer />
+                                <div
+                                    id='watchlistSection'
+                                    className={styles.watchlist}
+                                >
+                                    <WatchList />
+                                </div>
+                                <div
+                                    id='symbolInfoSection'
+                                    className={styles.symbolInfo}
+                                >
+                                    <MemoizedSymbolInfo />
+                                </div>
+                                <div id='chartSection' className={styles.chart}>
+                                    <MemoizedTradingViewWrapper />
+                                </div>
                             </div>
                             <div
-                                id='symbolInfoSection'
-                                className={styles.symbolInfo}
+                                id='liquidationsChart'
+                                className={styles.liquidationsChart}
                             >
-                                <MemoizedSymbolInfo />
-                            </div>
-                            <div id='chartSection' className={styles.chart}>
-                                <MemoizedTradingViewWrapper />
+                                <LiquidationsChartSection symbol={symbol} />
                             </div>
                         </div>
                         <div id='orderBookSection' className={styles.orderBook}>
