@@ -1,13 +1,13 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
 import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
 import DepositsWithdrawalsTableRow, {
     type TransactionData,
 } from './DepositsWithdrawalsTableRow';
-import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
 
 function sortTransactionData(
     data: TransactionData[],
@@ -77,8 +77,6 @@ export default function DepositsWithdrawalsTable(
     const viewAllLink = debugWallet.address
         ? `/depositsandwithdrawals/${debugWallet.address}`
         : '/depositsandwithdrawals';
-
-    console.log('buradaki data: ', props.data);
 
     return (
         <GenericTable<TransactionData, DepositAndWithDrawalSortBy>
