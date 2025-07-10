@@ -21,7 +21,7 @@ export default function TradeHistory() {
 
     useEffect(() => {
         if (!targetAddress) return;
-        fetchUserFills(targetAddress)
+        fetchUserFills(targetAddress, true)
             .then((fills: UserFillIF[]) => {
                 setUserFills(fills);
                 setIsFetched(true);
