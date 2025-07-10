@@ -230,13 +230,14 @@ export class Info extends API {
         const subId = this.wsManager.subscribe(subscription, callback);
         return {
             subId,
-            unsubscribe: () => this.unsubscribe(subscription, subId),
+            unsubscribe: () => this.unsubscribe(subscription, subId, callback),
         };
     }
 
     public unsubscribe(
         subscription: Subscription,
         subscriptionId: number,
+        callback?: Callback,
     ): boolean {
         if (
             subscription.type === 'l2Book' ||
@@ -248,7 +249,11 @@ export class Info extends API {
         if (!this.wsManager) {
             throw new Error('Cannot call unsubscribe since skipWs was used');
         }
-        return this.wsManager.unsubscribe(subscription, subscriptionId);
+        return this.wsManager.unsubscribe(
+            subscription,
+            subscriptionId,
+            callback,
+        );
     }
 
     public nameToAsset(name: string): number {

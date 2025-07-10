@@ -39,7 +39,7 @@ export default function TradeRouteHandler() {
                 setSymbol(urlSymbol);
             } else {
                 setSymbol('BTC');
-                navigate('/trade/BTC', { viewTransition: true });
+                navigate('/v2/trade/BTC', { viewTransition: true });
             }
         }
     };
