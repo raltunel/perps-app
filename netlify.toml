@@ -124,5 +124,5 @@
 
 [[redirects]]
   from = "/*"
-  to = "http://ambient-finance.netlify.app/:splat"
+  to = "http://ambient-finance-testnet.netlify.app/:splat" # TODO: update to http://ambient-finance.netlify.app/:splat
   status = 200
