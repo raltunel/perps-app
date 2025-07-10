@@ -2,12 +2,19 @@ import styles from './ConfirmationModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
-import { useState } from 'react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import type { modalContentT } from '../OrderInput';
 
-interface PropsIF {
-    tx: 'buy' | 'sell';
+interface propsIF {
+    tx: modalContentT;
+    size: {
+        qty: string;
+        denom: string;
+    };
+    limitPrice?: string;
     onClose: () => void;
+    isEnabled: boolean;
+    toggleEnabled: () => void;
 }
 type InfoItem = {
     label: string;
@@ -16,23 +23,23 @@ type InfoItem = {
     className?: string;
 };
 
-export default function ConfirmationModal(props: PropsIF) {
-    const { onClose, tx } = props;
+export default function ConfirmationModal(props: propsIF) {
+    const { onClose, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
 
     const dataInfo: InfoItem[] = [
         {
             label: 'Action',
-            value: tx === 'buy' ? 'Buy' : 'Sell',
-            className: styles[tx === 'buy' ? 'green' : 'red'],
+            value: tx.includes('buy') ? 'Buy' : 'Sell',
+            className: styles[tx.includes('buy') ? 'green' : 'red'],
         },
         {
             label: 'Size',
-            value: '0.0001 ETH',
-            className: styles[tx === 'buy' ? 'green' : 'red'],
+            value: `${size.qty || '--'} ${size.denom}`,
+            className: styles[tx.includes('buy') ? 'green' : 'red'],
         },
         {
             label: 'Price',
-            value: 'Market',
+            value: tx.includes('limit') ? limitPrice || '--' : 'Market',
             className: styles.white,
         },
         {
@@ -50,7 +57,6 @@ export default function ConfirmationModal(props: PropsIF) {
         },
     ];
 
-    const [isDontShowEnabled, setIsDontShowEnabled] = useState(false);
     return (
         <div className={styles.container}>
             <div className={styles.contentContainer}>
@@ -79,8 +85,8 @@ export default function ConfirmationModal(props: PropsIF) {
             </div>
             <div className={styles.toggleContainer}>
                 <ToggleSwitch
-                    isOn={isDontShowEnabled}
-                    onToggle={() => setIsDontShowEnabled(!isDontShowEnabled)}
+                    isOn={!isEnabled}
+                    onToggle={toggleEnabled}
                     label={"Don't show this again"}
                     // reverse
                 />
@@ -90,7 +96,7 @@ export default function ConfirmationModal(props: PropsIF) {
                 onClick={onClose}
                 style={{ height: '47px' }}
             >
-                {tx === 'buy' ? 'Buy / Long' : 'Sell / Short'}
+                {tx.includes('buy') ? 'Buy / Long' : 'Sell / Short'}
             </SimpleButton>
         </div>
     );
