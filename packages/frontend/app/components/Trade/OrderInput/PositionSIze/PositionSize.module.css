@@ -30,7 +30,15 @@
     height: 2px;
     cursor: pointer;
 }
-
+.sliderTrack::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
 .sliderBackground {
     position: absolute;
     top: 0;
