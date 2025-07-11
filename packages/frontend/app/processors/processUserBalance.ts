@@ -1,4 +1,8 @@
-import type { UserBalanceIF, UserBalanceSortBy } from '~/utils/UserDataIFs';
+import type {
+    UserBalanceIF,
+    UserBalanceRawIF,
+    UserBalanceSortBy,
+} from '~/utils/UserDataIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 
@@ -17,7 +21,7 @@ const coinSortName = (coin: string) => {
 };
 
 export function processUserBalance(
-    data: any,
+    data: UserBalanceRawIF,
     type: 'spot' | 'margin',
     coinPriceMap: Map<string, number>,
 ): UserBalanceIF {
