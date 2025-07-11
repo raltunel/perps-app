@@ -37,7 +37,7 @@ export default function BalancesTable(props: BalancesTableProps) {
     }, [userBalances, hideSmallBalances]);
 
     return (
-        <GenericTable<UserBalanceIF, UserBalanceSortBy>
+        <GenericTable
             storageKey={`BalancesTable_${currentUserRef.current}`}
             data={balancesToShow}
             renderHeader={(sortDirection, sortClickHandler, sortBy) => (

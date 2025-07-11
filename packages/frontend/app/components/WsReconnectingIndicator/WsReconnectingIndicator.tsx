@@ -1,9 +1,6 @@
-import { useNavigate } from 'react-router';
-import styles from './WsReconnectingIndicator.module.css';
-import { ImConnection } from 'react-icons/im';
 import { motion } from 'framer-motion';
-import LoadingIndicator from '../LoadingIndicator/LoadingIndicator';
 import WsLogo from './WsLogo/WsLogo';
+import styles from './WsReconnectingIndicator.module.css';
 
 export default function WsReconnectingIndicator() {
     return (

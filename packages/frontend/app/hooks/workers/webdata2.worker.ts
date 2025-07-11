@@ -19,6 +19,7 @@ import type {
     AccountOverviewIF,
     ActiveTwapIF,
     UserBalanceIF,
+    UserBalanceRawIF,
 } from '../../utils/UserDataIFs';
 import { processUserBalance } from '../../processors/processUserBalance';
 import { processUserActiveTwap } from '../../processors/processUserFills';
@@ -179,11 +180,17 @@ self.onmessage = function (event: MessageEvent<OtherWsMsg>) {
                 }
 
                 if (data.spotState && data.spotState.balances) {
-                    data.spotState.balances.forEach((balance: any) => {
-                        userBalances.push(
-                            processUserBalance(balance, 'spot', coinPriceMap),
-                        );
-                    });
+                    data.spotState.balances.forEach(
+                        (balance: UserBalanceRawIF) => {
+                            userBalances.push(
+                                processUserBalance(
+                                    balance,
+                                    'spot',
+                                    coinPriceMap,
+                                ),
+                            );
+                        },
+                    );
                 }
             }
         }
