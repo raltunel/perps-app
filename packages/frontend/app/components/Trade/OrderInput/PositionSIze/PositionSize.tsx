@@ -17,7 +17,7 @@ export default function PositionSize({
     onChange,
     className = '',
 }: PositionSizeProps) {
-    // Configuration: Visual markers and clickable positions
+    // Visual markers and clickable positions
     const VISUAL_MARKERS: SizeOption[] = [
         { value: 0, label: '0%' },
         { value: 25, label: '25%' },
@@ -26,7 +26,7 @@ export default function PositionSize({
         { value: 100, label: '100%' },
     ];
 
-    // Configuration: Drag increment step
+    //  Drag increment step
     const DRAG_STEP = 5;
 
     const [inputValue, setInputValue] = useState<string>(value.toString());
