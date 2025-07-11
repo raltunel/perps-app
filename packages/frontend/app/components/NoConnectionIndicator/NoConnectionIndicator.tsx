@@ -1,7 +1,6 @@
-import { useNavigate } from 'react-router';
-import styles from './NoConnectionIndicator.module.css';
-import { MdSignalWifiConnectedNoInternet0 } from 'react-icons/md';
 import { motion } from 'framer-motion';
+import { MdSignalWifiConnectedNoInternet0 } from 'react-icons/md';
+import styles from './NoConnectionIndicator.module.css';
 
 export default function NoConnectionIndicator() {
     return (

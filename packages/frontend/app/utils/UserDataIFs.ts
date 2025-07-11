@@ -1,3 +1,11 @@
+export interface UserBalanceRawIF {
+    coin: string;
+    entryNtl: string;
+    hold: string;
+    token: number;
+    total: string;
+}
+
 export interface UserBalanceIF {
     coin: string;
     type: 'spot' | 'margin';

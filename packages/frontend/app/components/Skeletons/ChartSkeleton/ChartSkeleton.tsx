@@ -1,8 +1,6 @@
 import styles from './ChartSkeleton.module.css';
 
-interface ChartSkeletonProps {}
-
-const ChartSkeleton: React.FC<ChartSkeletonProps> = ({}) => {
+const ChartSkeleton: React.FC = () => {
     return (
         <>
             <div className={styles.loadingWrapper}>
