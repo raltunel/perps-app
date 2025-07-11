@@ -12,6 +12,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
@@ -35,7 +36,6 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -717,13 +717,13 @@ function OrderInput() {
                         }}
                         sellFn={() => {
                             if (marketOrderType === 'market') {
-                                if (activeOptions.skipClosePositionConfirm) {
+                                if (activeOptions.skipOpenOrderConfirm) {
                                     submitMarketSell();
                                 } else {
                                     confirmOrderModal.open('market_sell');
                                 }
                             } else if (marketOrderType === 'limit') {
-                                if (activeOptions.skipCloseLimitConfirm) {
+                                if (activeOptions.skipOpenLimitConfirm) {
                                     submitLimitSell();
                                 } else {
                                     confirmOrderModal.open('limit_sell');
