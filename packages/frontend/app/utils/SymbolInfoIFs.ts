@@ -1,3 +1,29 @@
+export interface AssetCtxRawIF {
+    dayBaseVlm: string;
+    dayNtlVlm: string;
+    funding: string;
+    impactPxs: string[];
+    markPx: string;
+    midPx: string;
+    openInterest: string;
+    oraclePx: string;
+    premium: string;
+    prevDayPx: string;
+}
+
+export interface MetaRawIF {
+    marginTableId: number;
+    maxLeverage: number;
+    name: string;
+    szDecimals: number;
+}
+
+export interface SymbolInfoRawIF {
+    coin: string;
+    szDecimals: number;
+    maxLeverage: number;
+    ctx: AssetCtxRawIF;
+}
 export interface SymbolInfoIF {
     coin: string;
     dayBaseVlm: number;
