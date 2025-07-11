@@ -57,6 +57,9 @@ export default function PositionSize({
             const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
             const clampedValue = Math.max(0, Math.min(100, newValue));
 
+            // Update hover value during dragging for immediate visual feedback
+            setHoverValue(clampedValue);
+
             if (clampedValue !== value) {
                 onChange(clampedValue);
             }
@@ -77,6 +80,9 @@ export default function PositionSize({
             const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
             const clampedValue = Math.max(0, Math.min(100, newValue));
 
+            // Update hover value during dragging for immediate visual feedback
+            setHoverValue(clampedValue);
+
             if (clampedValue !== value) {
                 onChange(clampedValue);
             }
@@ -87,10 +93,12 @@ export default function PositionSize({
 
         const handleMouseUp = () => {
             setIsDragging(false);
+            setHoverValue(null); // Clear hover value when dragging ends
         };
 
         const handleTouchEnd = () => {
             setIsDragging(false);
+            setHoverValue(null); // Clear hover value when dragging ends
         };
 
         if (isDragging) {
