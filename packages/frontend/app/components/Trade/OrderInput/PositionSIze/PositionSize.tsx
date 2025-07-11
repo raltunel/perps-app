@@ -17,7 +17,7 @@ export default function PositionSize({
     onChange,
     className = '',
 }: PositionSizeProps) {
-    // Visual markers and clickable positions
+    // Configuration: Visual markers and clickable positions
     const VISUAL_MARKERS: SizeOption[] = [
         { value: 0, label: '0%' },
         { value: 25, label: '25%' },
@@ -26,7 +26,7 @@ export default function PositionSize({
         { value: 100, label: '100%' },
     ];
 
-    // Drag increment step
+    // Configuration: Drag increment step
     const DRAG_STEP = 5;
 
     const [inputValue, setInputValue] = useState<string>(value.toString());
@@ -41,17 +41,21 @@ export default function PositionSize({
         setInputValue(value.toString());
     }, [value]);
 
+    // Helper function to get percentage from mouse position
+    const getPercentageFromPosition = (clientX: number) => {
+        if (!sliderRef.current) return 0;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        return (offsetX / rect.width) * 100;
+    };
+
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!isDragging || !sliderRef.current) return;
 
-            const rect = sliderRef.current.getBoundingClientRect();
-            const offsetX = Math.max(
-                0,
-                Math.min(e.clientX - rect.left, rect.width),
-            );
-            const percentage = (offsetX / rect.width) * 100;
+            const percentage = getPercentageFromPosition(e.clientX);
 
             // Round to nearest DRAG_STEP increment
             const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
@@ -68,13 +72,7 @@ export default function PositionSize({
         const handleTouchMove = (e: TouchEvent) => {
             if (!isDragging || !sliderRef.current || !e.touches[0]) return;
 
-            const rect = sliderRef.current.getBoundingClientRect();
-            const touch = e.touches[0];
-            const offsetX = Math.max(
-                0,
-                Math.min(touch.clientX - rect.left, rect.width),
-            );
-            const percentage = (offsetX / rect.width) * 100;
+            const percentage = getPercentageFromPosition(e.touches[0].clientX);
 
             // Round to nearest DRAG_STEP increment
             const newValue = Math.round(percentage / DRAG_STEP) * DRAG_STEP;
@@ -133,9 +131,7 @@ export default function PositionSize({
     const handleTrackMouseMove = (e: React.MouseEvent) => {
         if (!sliderRef.current || isDragging) return;
 
-        const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percentage = (offsetX / rect.width) * 100;
+        const percentage = getPercentageFromPosition(e.clientX);
 
         // Round to nearest 5% increment for display
         const roundedPercentage =
@@ -152,11 +148,9 @@ export default function PositionSize({
     const handleTrackClick = (e: React.MouseEvent) => {
         if (!sliderRef.current) return;
 
-        const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percentage = (offsetX / rect.width) * 100;
+        const percentage = getPercentageFromPosition(e.clientX);
 
-        // For track clicks, only snap to visual markers if we're close to them (within 5%)
+        // For track clicks, snap to visual markers if we're close to them (within 7.5%)
         const closestMarker = VISUAL_MARKERS.reduce((prev, curr) =>
             Math.abs(curr.value - percentage) <
             Math.abs(prev.value - percentage)
@@ -164,9 +158,9 @@ export default function PositionSize({
                 : prev,
         );
 
-        // Only snap to marker if we're within 5% of it, otherwise use 5% increment
+        // Increase snap tolerance to 7.5% to make it easier to hit markers
         const distanceToMarker = Math.abs(closestMarker.value - percentage);
-        if (distanceToMarker <= 5) {
+        if (distanceToMarker <= 7.5) {
             onChange(closestMarker.value);
         } else {
             // Round to nearest 5% increment
@@ -310,10 +304,7 @@ export default function PositionSize({
                     <span
                         className={styles.valueSuffix}
                         style={{
-                            color:
-                                hoverValue !== null
-                                    ? 'var(--accent1)'
-                                    : 'var(--text1)',
+                            color: 'var(--text1)',
                         }}
                     >
                         %
