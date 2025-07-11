@@ -80,7 +80,7 @@ export default function PageHeader() {
     const appSettingsModal = useModal('closed');
 
     // logic to open and close the wallet modal
-    const walletModal = useModal<1 | 2 | 3>('closed');
+    const walletModal = useModal<0 | 1 | 2 | 3>('closed');
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -96,15 +96,13 @@ export default function PageHeader() {
         [],
     );
 
+    // boolean to inform user of view only mode in wallet connection modal
     const VIEW_ONLY =
         (import.meta.env.VITE_VIEW_ONLY !== undefined
             ? import.meta.env.VITE_VIEW_ONLY.toLowerCase() === 'true'
             : false) ||
         window.location.hostname.startsWith('us.') ||
         window.location.hostname.split('.')[0].endsWith('-us');
-
-    // logic to open and close the geofencing modal
-    const geofenceModal = useModal(VIEW_ONLY ? 2000 : 'closed');
 
     return (
         <>
@@ -245,7 +243,7 @@ export default function PageHeader() {
                     {!isUserConnected && (
                         <button
                             className={styles.depositButton}
-                            onClick={() => walletModal.open(1)}
+                            onClick={() => walletModal.open(VIEW_ONLY ? 0 : 1)}
                         >
                             Connect
                         </button>
@@ -342,6 +340,11 @@ export default function PageHeader() {
                     title='Connect Wallet'
                 >
                     <section className={styles.connect_wallet_modal}>
+                        {walletModal.content === 0 && (
+                            <section>
+                                Ambi perps is not supported for your country.
+                            </section>
+                        )}
                         {walletModal.content === 1 && (
                             <button onClick={() => walletModal.update(2)}>
                                 Connect a Wallet!
@@ -358,18 +361,6 @@ export default function PageHeader() {
                         {walletModal.content === 3 && (
                             <div>You're connected! 🎉</div>
                         )}
-                    </section>
-                </Modal>
-            )}
-            {geofenceModal.isOpen && (
-                <Modal
-                    title='Country of Origin'
-                    close={() => {
-                        geofenceModal.close();
-                    }}
-                >
-                    <section>
-                        Ambi perps is not supported for your country.
                     </section>
                 </Modal>
             )}
