@@ -32,6 +32,7 @@ export default function PositionSize({
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(false);
+    const [hoverValue, setHoverValue] = useState<number | null>(null);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -121,6 +122,25 @@ export default function PositionSize({
         setIsDragging(true);
     };
 
+    const handleTrackMouseMove = (e: React.MouseEvent) => {
+        if (!sliderRef.current || isDragging) return;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const percentage = (offsetX / rect.width) * 100;
+
+        // Round to nearest 5% increment for display
+        const roundedPercentage =
+            Math.round(percentage / DRAG_STEP) * DRAG_STEP;
+        const clampedPercentage = Math.max(0, Math.min(100, roundedPercentage));
+
+        setHoverValue(clampedPercentage);
+    };
+
+    const handleTrackMouseLeave = () => {
+        setHoverValue(null);
+    };
+
     const handleTrackClick = (e: React.MouseEvent) => {
         if (!sliderRef.current) return;
 
@@ -187,6 +207,8 @@ export default function PositionSize({
                         ref={sliderRef}
                         className={styles.sliderTrack}
                         onClick={handleTrackClick}
+                        onMouseMove={handleTrackMouseMove}
+                        onMouseLeave={handleTrackMouseLeave}
                     >
                         {/* Gray background track */}
                         <div className={styles.sliderBackground}></div>
@@ -216,7 +238,7 @@ export default function PositionSize({
                                     borderColor:
                                         marker.value <= value
                                             ? 'transparent'
-                                            : 'var(--bg-dark3)',
+                                            : 'var(--accent1)',
                                 }}
                             ></div>
                         ))}
@@ -224,7 +246,7 @@ export default function PositionSize({
                         {/* Draggable knob */}
                         <div
                             ref={knobRef}
-                            className={`${styles.sliderKnob} ${value === 0 ? styles.sliderKnobTransparent : ''}`}
+                            className={styles.sliderKnob}
                             style={{
                                 left: `${getKnobPosition()}%`,
                                 // borderColor: getKnobColor(),
@@ -260,14 +282,34 @@ export default function PositionSize({
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
-                        value={inputValue}
+                        value={
+                            hoverValue !== null
+                                ? hoverValue.toString()
+                                : inputValue
+                        }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
                         aria-label='Leverage value'
+                        style={{
+                            color:
+                                hoverValue !== null
+                                    ? 'var(--accent1)'
+                                    : 'var(--text1)',
+                        }}
                     />
-                    <span className={styles.valueSuffix}>%</span>
+                    <span
+                        className={styles.valueSuffix}
+                        style={{
+                            color:
+                                hoverValue !== null
+                                    ? 'var(--accent1)'
+                                    : 'var(--text1)',
+                        }}
+                    >
+                        %
+                    </span>
                 </div>
             </div>
         </div>
