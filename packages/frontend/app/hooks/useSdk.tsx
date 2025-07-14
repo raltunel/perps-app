@@ -13,11 +13,10 @@ import React, {
     useRef,
     useState,
 } from 'react';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
-import { useIsClient } from './useIsClient';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
+import { useIsClient } from './useIsClient';
 
 type SdkContextType = {
     info: Info | null;
@@ -50,7 +49,7 @@ export const SdkProvider: React.FC<{
         setIsWsStashed,
         isTabActive,
     } = useAppStateStore();
-    const { isWsSleepMode, setIsWsSleepMode } = useDebugStore();
+    const { isWsSleepMode } = useDebugStore();
 
     // commit to trigger deployment
     useEffect(() => {
