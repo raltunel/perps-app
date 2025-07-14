@@ -6,10 +6,12 @@ import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
     sellData: OrderBookRowIF[];
+    width?: number;
+    height?: number;
 }
 
 const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
-    const { sellData, buyData } = props;
+    const { sellData, buyData, width = 300, height = 400 } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
 
@@ -32,8 +34,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [buyLineSeries, setBuyLineSeries] = React.useState<any>();
 
-    const chartHeight = 600;
-    const chartWidth = 200;
+    const chartHeight = height;
+    const chartWidth = width;
 
     useEffect(() => {
         if (buyData === undefined || sellData === undefined) return;
@@ -63,7 +65,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         setBuyYScale(() => buyYScale);
         setSellYScale(() => sellYScale);
-    }, [JSON.stringify(buyData), JSON.stringify(sellData)]);
+    }, [JSON.stringify(buyData), JSON.stringify(sellData), width, height]);
 
     useEffect(() => {
         if (sellYScale && buyYScale && xScale && sellData && buyData) {
@@ -147,7 +149,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             setSellAreaSeries(() => sellArea);
             setBuyAreaSeries(() => buyArea);
         }
-    }, [buyYScale, sellYScale, xScale]);
+    }, [buyYScale, sellYScale, xScale, width, height]);
 
     useEffect(() => {
         if (sellData.length === 0 || buyData.length === 0) return;
