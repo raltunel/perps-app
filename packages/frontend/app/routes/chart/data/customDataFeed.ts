@@ -9,6 +9,7 @@ import {
     getHistoricalData,
     getMarkColorData,
     getMarkFillData,
+    updateCandleCache,
 } from './candleDataCache';
 import { processWSCandleMessage } from './processChartData';
 import {
@@ -196,8 +197,14 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                     interval: mapResolutionToInterval(resolution),
                 },
                 (payload: any) => {
-                    if (payload.data.s === symbolInfo.ticker) {
-                        onTick(processWSCandleMessage(payload.data));
+                    if (
+                        symbolInfo.ticker &&
+                        payload.data.s === symbolInfo.ticker
+                    ) {
+                        const tick = processWSCandleMessage(payload.data);
+                        onTick(tick);
+
+                        updateCandleCache(symbolInfo.ticker, resolution, tick);
                     }
                 },
             );
