@@ -7,6 +7,7 @@ import {
     createUserTradesSlice,
     type UserTradeDataStore,
 } from './UserTradeDataStore';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 
 type TradeDataStore = UserTradeDataStore & {
     symbol: string;
@@ -33,8 +34,8 @@ type TradeDataStore = UserTradeDataStore & {
     setSelectedTradeTab: (tab: string) => void;
     fetchedChannels: Set<string>;
     setFetchedChannels: (channels: Set<string>) => void;
-    userNonFundingLedgerUpdates: any[];
-    setUserNonFundingLedgerUpdates: (updates: any[]) => void;
+    userNonFundingLedgerUpdates: TransactionData[];
+    setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(

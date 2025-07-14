@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef } from 'react';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
@@ -203,6 +204,7 @@ export default function WebDataConsumer() {
         handleWebData2WorkerResult,
     );
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postUserHistoricalOrders = useCallback((payload: any) => {
         const data = payload.data;
         if (
@@ -213,6 +215,7 @@ export default function WebDataConsumer() {
             data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
         ) {
             const orders: OrderDataIF[] = [];
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data.orderHistory.forEach((order: any) => {
                 const processedOrder = processUserOrder(
                     order.order,
@@ -256,6 +259,7 @@ export default function WebDataConsumer() {
         }
     }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postUserTwapSliceFills = useCallback((payload: any) => {
         const data = payload.data;
         if (
@@ -276,6 +280,7 @@ export default function WebDataConsumer() {
         }
     }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postUserTwapHistory = useCallback((payload: any) => {
         const data = payload.data;
         if (
@@ -296,6 +301,7 @@ export default function WebDataConsumer() {
         }
     }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postUserFundings = useCallback((payload: any) => {
         const data = payload.data;
         if (
@@ -317,6 +323,7 @@ export default function WebDataConsumer() {
         }
     }, []);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const postUserNonFundingLedgerUpdates = useCallback(
         (payload: any) => {
             const data = payload.data;
