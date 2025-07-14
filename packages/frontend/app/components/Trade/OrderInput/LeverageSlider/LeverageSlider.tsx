@@ -133,6 +133,7 @@ export default function LeverageSlider({
         return Math.exp(valueLog);
     };
 
+    // Get position for the knob as percentage, adjusted to keep knob fully visible
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
         if (isNaN(value)) {
@@ -217,7 +218,17 @@ export default function LeverageSlider({
             0,
             Math.min(e.clientX - rect.left, rect.width),
         );
-        const percentage = (offsetX / rect.width) * 100;
+
+        // Account for knob margins when calculating percentage
+        const knobRadius = 7;
+        const knobOffset = (knobRadius / rect.width) * 100;
+        const adjustedOffsetX = Math.max(
+            knobRadius,
+            Math.min(offsetX, rect.width - knobRadius),
+        );
+        const percentage =
+            ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
+            100;
 
         // Convert percentage to value (logarithmic)
         const newValue = percentageToValue(percentage);
@@ -250,7 +261,16 @@ export default function LeverageSlider({
             0,
             Math.min(e.clientX - rect.left, rect.width),
         );
-        const percentage = (offsetX / rect.width) * 100;
+
+        // Account for knob margins when calculating percentage
+        const knobRadius = 7;
+        const adjustedOffsetX = Math.max(
+            knobRadius,
+            Math.min(offsetX, rect.width - knobRadius),
+        );
+        const percentage =
+            ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
+            100;
 
         // Convert percentage to value (logarithmic)
         const newValue = percentageToValue(percentage);
@@ -277,7 +297,17 @@ export default function LeverageSlider({
                 0,
                 Math.min(e.clientX - rect.left, rect.width),
             );
-            const percentage = (offsetX / rect.width) * 100;
+
+            // Account for knob margins when calculating percentage
+            const knobRadius = 7;
+            const adjustedOffsetX = Math.max(
+                knobRadius,
+                Math.min(offsetX, rect.width - knobRadius),
+            );
+            const percentage =
+                ((adjustedOffsetX - knobRadius) /
+                    (rect.width - 2 * knobRadius)) *
+                100;
 
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
@@ -303,7 +333,17 @@ export default function LeverageSlider({
                 0,
                 Math.min(touch.clientX - rect.left, rect.width),
             );
-            const percentage = (offsetX / rect.width) * 100;
+
+            // Account for knob margins when calculating percentage
+            const knobRadius = 7;
+            const adjustedOffsetX = Math.max(
+                knobRadius,
+                Math.min(offsetX, rect.width - knobRadius),
+            );
+            const percentage =
+                ((adjustedOffsetX - knobRadius) /
+                    (rect.width - 2 * knobRadius)) *
+                100;
 
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
@@ -399,7 +439,9 @@ export default function LeverageSlider({
     };
 
     return (
-        <div className={`${styles.leverageSliderContainer} ${className}`}>
+        <div
+            className={`${styles.leverageSliderContainer} ${className} ${value !== minimumInputValue ? styles.sliderContainerNotAtFirst : ''}`}
+        >
             <h3 className={styles.containerTitle}>Leverage</h3>
 
             <div className={styles.sliderWithValue}>
@@ -516,8 +558,8 @@ export default function LeverageSlider({
                             color:
                                 isDragging ||
                                 (isHovering && hoverValue !== null)
-                                    ? 'var(--accent1)'
-                                    : 'var(--text1)',
+                                    ? '#888'
+                                    : 'inherit',
                         }}
                     />
                     <span className={styles.valueSuffix}>x</span>

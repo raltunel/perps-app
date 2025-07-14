@@ -202,7 +202,7 @@ export default function PositionSize({
     };
 
     return (
-        <div className={`${styles.positionSliderContainer} ${className}`}>
+        <div className={`${styles.positionSliderContainer} ${className} `}>
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
