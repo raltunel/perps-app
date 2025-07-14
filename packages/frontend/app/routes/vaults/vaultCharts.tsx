@@ -1,4 +1,8 @@
-import type { VaultDetailsIF } from '~/utils/VaultIFs';
+import type {
+    VaultDetailsIF,
+    VaultPortfolioHistoryIF,
+    VaultPortfolioIF,
+} from '~/utils/VaultIFs';
 import styles from './vaultCharts.module.css';
 import { useEffect, useState } from 'react';
 import { useCallback } from 'react';
@@ -26,9 +30,10 @@ export default function VaultCharts({ info }: VaultChartsProps) {
     const [chartWidth] = useState<number>(
         document.getElementById('chartPlaceholder')?.clientWidth || 590,
     );
-    const [chartHeight] = useState<number>(
-        document.getElementById('chartPlaceholder')?.clientHeight || 250,
-    );
+
+    // const [chartHeight] = useState<number>(
+    //     document.getElementById('chartPlaceholder')?.clientHeight || 250,
+    // );
 
     const periodOptions = [
         { label: '24H', value: 0 },
@@ -42,8 +47,8 @@ export default function VaultCharts({ info }: VaultChartsProps) {
         value: number;
     }>({ label: 'All-time', value: 3 });
 
-    const parseUserProfileData = (data: any, key: number) => {
-        const userPositionData = data[key][1] as UserPositionIF;
+    const parseUserProfileData = (data: VaultPortfolioIF, key: number) => {
+        const userPositionData = data[key][1] as VaultPortfolioHistoryIF;
 
         if (userPositionData.accountValueHistory) {
             const accountValueHistory =
