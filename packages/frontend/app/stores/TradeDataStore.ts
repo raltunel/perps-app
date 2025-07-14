@@ -113,7 +113,7 @@ const useTradeDataStore = create<TradeDataStore>()(
             setFetchedChannels: (channels: Set<string>) =>
                 set({ fetchedChannels: channels }),
             userNonFundingLedgerUpdates: [],
-            setUserNonFundingLedgerUpdates: (updates: any[]) =>
+            setUserNonFundingLedgerUpdates: (updates: TransactionData[]) =>
                 set({ userNonFundingLedgerUpdates: updates }),
         }),
         {
