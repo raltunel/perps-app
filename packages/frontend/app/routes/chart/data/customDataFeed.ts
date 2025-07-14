@@ -17,6 +17,12 @@ import {
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+
+const subscriptions = new Map<
+    string,
+    { subId: number; unsubscribe: () => void }
+>();
+
 export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
     ({
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
@@ -188,9 +194,9 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
             );
         },
 
-        subscribeBars: (symbolInfo, resolution, onTick) => {
+        subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
             if (!info) return console.log('SDK is not ready');
-            info.subscribe(
+            const unsubscribe = info.subscribe(
                 {
                     type: WsChannels.CANDLE,
                     coin: symbolInfo.ticker || '',
@@ -207,12 +213,30 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                         updateCandleCache(symbolInfo.ticker, resolution, tick);
                     }
                 },
-            );
+            ) as { subId: number; unsubscribe: () => void };
+            subscriptions.set(listenerGuid, unsubscribe);
+
             // subscribeOnStream(symbolInfo, resolution, onTick);
         },
 
         unsubscribeBars: (listenerGuid) => {
-            clearInterval((window as any)[listenerGuid]);
-            delete (window as any)[listenerGuid];
+            const subscription = subscriptions.get(listenerGuid);
+
+            if (subscription) {
+                try {
+                    subscription.unsubscribe();
+                } catch (error) {
+                    console.warn(
+                        `Failed to unsubscribe for listenerGuid ${listenerGuid}:`,
+                        error,
+                    );
+                }
+
+                subscriptions.delete(listenerGuid); // Temizle
+            } else {
+                console.warn(
+                    `No active subscription found for listenerGuid: ${listenerGuid}`,
+                );
+            }
         },
     }) as IDatafeedChartApi;
