@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
+import { EXTERNAL_PAGE_URL_PREFIX, WsChannels } from '~/utils/Constants';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -31,7 +31,7 @@ export default function PositionsTable(props: PositionsTableProps) {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
     }, [fetchedChannels]);
 
-    const viewAllLink = '/positions';
+    const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
     const { symbol } = useTradeDataStore();
 
