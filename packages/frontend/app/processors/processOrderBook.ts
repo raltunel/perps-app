@@ -1,4 +1,4 @@
-import type { L2BookData } from '@perps-app/sdk/src/utils/types';
+import type { L2BookData, OrderData } from '@perps-app/sdk/src/utils/types';
 import type {
     OrderBookRowIF,
     OrderBookTradeIF,
@@ -58,7 +58,7 @@ export function processTrades(data: any): OrderBookTradeIF[] {
     return data.map((e: any) => {
         return {
             coin: e.coin,
-            side: e.side === 'A' ? 'sell' : 'buy',
+            side: e.side === 'A' ? 'sell' : e.side === 'B' ? 'buy' : e.side,
             px: parseNum(e.px),
             sz: parseNum(e.sz),
             hash: e.hash,
@@ -70,7 +70,7 @@ export function processTrades(data: any): OrderBookTradeIF[] {
 }
 
 export function processUserOrder(
-    data: any,
+    data: OrderData,
     status: string,
 ): OrderDataIF | null {
     if (data) {
@@ -79,7 +79,12 @@ export function processUserOrder(
             cloid: data.cloid,
             oid: parseNum(data.oid),
             // side: e.side,
-            side: data.side === 'A' ? 'sell' : 'buy',
+            side:
+                data.side === 'A'
+                    ? 'sell'
+                    : data.side === 'B'
+                      ? 'buy'
+                      : data.side,
             sz: parseNum(data.sz),
             tif: data.tif,
             timestamp: data.timestamp,
@@ -89,7 +94,7 @@ export function processUserOrder(
             reduceOnly: data.reduceOnly,
             isPositionTpsl: data.isPositionTpsl,
             isTrigger: data.isTrigger,
-            triggerPx: parseNum(data.triggerPx),
+            triggerPx: data.triggerPx ? parseNum(data.triggerPx) : undefined,
             triggerCondition: data.triggerCondition,
             orderType: data.orderType || '',
             orderValue: parseNum(data.sz * data.limitPx),

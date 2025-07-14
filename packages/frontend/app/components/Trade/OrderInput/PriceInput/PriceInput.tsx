@@ -1,7 +1,5 @@
-import { useEffect, useRef } from 'react';
-import useNumFormatter from '~/hooks/useNumFormatter';
-import styles from './PriceInput.module.css';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import styles from './PriceInput.module.css';
 
 interface PropsIF {
     value: string;
@@ -37,18 +35,6 @@ export default function PriceInput(props: PropsIF) {
                 aria-label={ariaLabel}
                 placeholder='Enter Price'
             />
-            {/* <input
-                type='text'
-                value={value}
-                onChange={handleChange}
-                onBlur={onBlur}
-                onKeyDown={onKeyDown}
-                className={className}
-                aria-label={ariaLabel}
-                inputMode='numeric'
-                pattern='[0-9]*'
-                placeholder='Enter Price'
-            /> */}
             {showMidButton && (
                 <button className={styles.midButton}>Mid </button>
             )}

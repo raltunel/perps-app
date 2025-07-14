@@ -6,6 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { TwapSliceFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import FillTwapTableHeader from './FillTwapTableHeader';
 import FillTwapTableRow from './FillTwapTableRow';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 interface FillTwapTableProps {
     data: TwapSliceFillIF[];
@@ -25,7 +26,7 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     currentUserRef.current = debugWallet.address;
 
     const viewAllLink = useMemo(() => {
-        return `/twapFillHistory/${currentUserRef.current}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/twapFillHistory/${currentUserRef.current}`;
     }, [debugWallet.address]);
 
     const filteredData = useMemo(() => {

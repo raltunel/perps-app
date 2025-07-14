@@ -9,6 +9,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -54,7 +55,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `/openOrders/${debugWallet.address}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${debugWallet.address}`;
     }, [debugWallet.address]);
 
     return (
