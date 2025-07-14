@@ -1,3 +1,4 @@
+import type { T } from 'node_modules/framer-motion/dist/types.d-CtuPurYT';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TableSortDirection } from '~/utils/CommonIFs';
@@ -16,7 +17,7 @@ interface TableSortStore<S> {
     ) => void;
 }
 
-export const useTableSortStore = create<TableSortStore<any>>()(
+export const useTableSortStore = create<TableSortStore<T>>()(
     persist(
         (set) => ({
             entries: {},
