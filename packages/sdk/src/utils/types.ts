@@ -262,7 +262,7 @@ export interface OrderData {
     orderType: string;
     origSz: number;
     reduceOnly?: boolean;
-    side: 'buy' | 'sell';
+    side: 'buy' | 'sell' | 'A' | 'B';
     sz: number;
     tif?: string;
     timestamp: number;

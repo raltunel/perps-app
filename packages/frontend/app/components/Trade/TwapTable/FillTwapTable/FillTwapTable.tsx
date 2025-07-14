@@ -1,22 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
-import Pagination from '~/components/Pagination/Pagination';
-import NoDataRow from '~/components/Skeletons/NoDataRow';
-import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useMemo, useRef } from 'react';
+import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { sortTwapFillHistory } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { TableState } from '~/utils/CommonIFs';
-import type { TwapSliceFillIF } from '~/utils/UserDataIFs';
-import styles from './FillTwapTable.module.css';
+import type { TwapSliceFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import FillTwapTableHeader from './FillTwapTableHeader';
 import FillTwapTableRow from './FillTwapTableRow';
-import type { TwapHistoryIF, UserFillSortBy } from '~/utils/UserDataIFs';
-import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import {
-    sortTwapFillHistory,
-    sortTwapHistory,
-} from '~/processors/processUserFills';
-import { sortPositionData } from '~/utils/position/PositionUtils';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 interface FillTwapTableProps {
     data: TwapSliceFillIF[];
@@ -28,8 +18,6 @@ interface FillTwapTableProps {
 export default function FillTwapTable(props: FillTwapTableProps) {
     const { data, isFetched, selectedFilter, pageMode } = props;
 
-    const navigate = useNavigate();
-
     const { symbol } = useTradeDataStore();
 
     const { debugWallet } = useDebugStore();
@@ -37,23 +25,9 @@ export default function FillTwapTable(props: FillTwapTableProps) {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const tableModeLimit = 10;
-
-    const [tableState, setTableState] = useState<TableState>(
-        TableState.LOADING,
-    );
-
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(20);
-
     const viewAllLink = useMemo(() => {
-        return `/twapFillHistory/${currentUserRef.current}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/twapFillHistory/${currentUserRef.current}`;
     }, [debugWallet.address]);
-
-    const handleExportCsv = (e: React.MouseEvent) => {
-        e.preventDefault();
-        console.log('export csv');
-    };
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
@@ -68,32 +42,6 @@ export default function FillTwapTable(props: FillTwapTableProps) {
         }
         return data;
     }, [data, selectedFilter, symbol]);
-
-    const sortedData = useMemo(() => {
-        return filteredData;
-    }, [filteredData]);
-
-    const dataToShow = useMemo(() => {
-        if (pageMode) {
-            return sortedData.slice(
-                page * rowsPerPage,
-                (page + 1) * rowsPerPage,
-            );
-        }
-        return sortedData.slice(0, tableModeLimit);
-    }, [sortedData, pageMode, page, rowsPerPage]);
-
-    useEffect(() => {
-        if (isFetched) {
-            if (dataToShow.length === 0) {
-                setTableState(TableState.EMPTY);
-            } else {
-                setTableState(TableState.FILLED);
-            }
-        } else {
-            setTableState(TableState.LOADING);
-        }
-    }, [isFetched, dataToShow]);
 
     return (
         <>
