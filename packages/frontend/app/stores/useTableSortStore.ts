@@ -1,4 +1,4 @@
-import type { T } from 'node_modules/framer-motion/dist/types.d-CtuPurYT';
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { TableSortDirection } from '~/utils/CommonIFs';
@@ -17,7 +17,7 @@ interface TableSortStore<S> {
     ) => void;
 }
 
-export const useTableSortStore = create<TableSortStore<T>>()(
+export const useTableSortStore = create<TableSortStore<any>>()(
     persist(
         (set) => ({
             entries: {},
