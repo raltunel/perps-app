@@ -1,4 +1,7 @@
-import type { OpenOrderRawData } from '@perps-app/sdk/src/utils/types';
+import type {
+    OpenOrderRawData,
+    OrderHistory,
+} from '@perps-app/sdk/src/utils/types';
 import { processUserOrder } from '~/processors/processOrderBook';
 import {
     processUserFills,
@@ -74,7 +77,7 @@ export function useInfoApi() {
         });
         const data = await response.json();
         if (data && data.length > 0) {
-            data.map((o: any) => {
+            data.map((o: OrderHistory) => {
                 const processedOrder = processUserOrder(o.order, o.status);
                 if (processedOrder) {
                     ret.push(processedOrder);
@@ -221,7 +224,7 @@ export function useInfoApi() {
 
     const fetchUserPortfolio = async (
         address: string,
-    ): Promise<Map<string, {}>> => {
+    ): Promise<Map<string, object>> => {
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -231,7 +234,7 @@ export function useInfoApi() {
             }),
         });
 
-        const obj = new Map<string, {}>();
+        const obj = new Map<string, object>();
 
         const data = await response.json();
         if (data && data.length > 0) {

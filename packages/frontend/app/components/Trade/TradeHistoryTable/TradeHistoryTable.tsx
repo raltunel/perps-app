@@ -9,6 +9,7 @@ import TradeHistoryTableHeader, {
 } from './TradeHistoryTableHeader';
 import TradeHistoryTableRow from './TradeHistoryTableRow';
 import { useInfoApi } from '~/hooks/useInfoApi';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 interface TradeHistoryTableProps {
     data: UserFillIF[];
     isFetched: boolean;
@@ -53,7 +54,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
     }, [data, selectedFilter]);
 
     const viewAllLink = useMemo(() => {
-        return `/v2/tradeHistory/${debugWallet.address}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/tradeHistory/${debugWallet.address}`;
     }, [debugWallet.address]);
 
     return (

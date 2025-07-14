@@ -6,6 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { UserFundingIF, UserFundingSortBy } from '~/utils/UserDataIFs';
 import FundingHistoryTableHeader from './FundingHistoryTableHeader';
 import FundingHistoryTableRow from './FundingHistoryTableRow';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 interface FundingHistoryTableProps {
     userFundings: UserFundingIF[];
@@ -42,12 +43,12 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
     }, [userFundings, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `/fundingHistory/${debugWallet.address}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/fundingHistory/${debugWallet.address}`;
     }, [debugWallet.address]);
 
     return (
         <>
-            <GenericTable<UserFundingIF, UserFundingSortBy>
+            <GenericTable
                 storageKey={`FundingHistoryTable_${currentUserRef.current}`}
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

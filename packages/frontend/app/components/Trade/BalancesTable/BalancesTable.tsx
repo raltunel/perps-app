@@ -1,12 +1,11 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
-import type { UserBalanceIF, UserBalanceSortBy } from '~/utils/UserDataIFs';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
-import { useDebugStore } from '~/stores/DebugStore';
 
 type BalancesTableProps = {
     hideSmallBalances: boolean;

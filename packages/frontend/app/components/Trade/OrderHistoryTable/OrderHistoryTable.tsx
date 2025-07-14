@@ -12,6 +12,7 @@ import OrderHistoryTableHeader, {
 } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
 import { useInfoApi } from '~/hooks/useInfoApi';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
@@ -37,7 +38,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `/orderHistory/${debugWallet.address}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/orderHistory/${debugWallet.address}`;
     }, [debugWallet.address]);
 
     return (

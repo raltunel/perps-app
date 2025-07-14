@@ -1,18 +1,16 @@
 /// <reference lib="webworker" />
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { SymbolInfoIF } from '../../utils/SymbolInfoIFs';
 import { processSymbolInfo } from '../../processors/processSymbolInfo';
 import type { OrderDataIF } from '../../utils/orderbook/OrderBookIFs';
 import { processUserOrder } from '../../processors/processOrderBook';
 import { processPosition } from '../../processors/processPosition';
 import type { PositionIF } from '../../utils/position/PositionIFs';
-import {
-    parseNum,
-    genRandomActiveTwap,
-} from '../../utils/orderbook/OrderBookUtils';
+import { parseNum } from '../../utils/orderbook/OrderBookUtils';
 import type {
     OtherWsMsg,
-    UserActiveTwap,
     UserActiveTwapData,
 } from '@perps-app/sdk/src/utils/types';
 import type {
