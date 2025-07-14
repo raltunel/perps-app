@@ -1,7 +1,5 @@
-import { LuSquareArrowOutUpRight } from 'react-icons/lu';
-import { useInfoApi } from '~/hooks/useInfoApi';
-import styles from './DepositsWithdrawalsTable.module.css';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import styles from './DepositsWithdrawalsTable.module.css';
 
 export interface TransactionData {
     time: number;
@@ -59,7 +57,6 @@ export default function DepositsWithdrawalsTableRow(
     props: DepositsWithdrawalsTableRowProps,
 ) {
     const { transaction } = props;
-    const d = transaction.delta as any;
 
     const getStatusFromDelta = (type: string): string => 'Completed';
 
@@ -75,7 +72,12 @@ export default function DepositsWithdrawalsTableRow(
     };
 
     function getNetwork(tx: TransactionData): string {
-        const d = tx.delta as any;
+        const d = tx.delta as
+            | DepositDelta
+            | AccountClassTransferDelta
+            | VaultDepositDelta
+            | SpotTransferDelta
+            | WithdrawDelta;
         if (d.type === 'spotTransfer') {
             return TOKEN_TO_NETWORK[d.token] || 'Unknown';
         }
@@ -83,7 +85,12 @@ export default function DepositsWithdrawalsTableRow(
     }
 
     function getAction(tx: TransactionData): string {
-        const d = tx.delta as any;
+        const d = tx.delta as
+            | DepositDelta
+            | AccountClassTransferDelta
+            | VaultDepositDelta
+            | SpotTransferDelta
+            | WithdrawDelta;
         switch (d.type) {
             case 'deposit':
             case 'accountClassTransfer':
@@ -99,7 +106,12 @@ export default function DepositsWithdrawalsTableRow(
     }
 
     function getValueChange(tx: TransactionData): string {
-        const d = tx.delta as any;
+        const d = tx.delta as
+            | DepositDelta
+            | AccountClassTransferDelta
+            | VaultDepositDelta
+            | SpotTransferDelta
+            | WithdrawDelta;
         if (d.type === 'spotTransfer') {
             if (['HYPE', 'USOL'].includes(d.token)) {
                 const amt =
@@ -135,7 +147,7 @@ export default function DepositsWithdrawalsTableRow(
     }
 
     function getFee(tx: TransactionData): string {
-        const d = tx.delta as any;
+        const d = tx.delta as SpotTransferDelta;
         if (d.nativeTokenFee && +d.nativeTokenFee > 0) {
             return `${parseFloat(d.nativeTokenFee).toFixed(7)} ${getToken(getNetwork(tx))}`;
         }
