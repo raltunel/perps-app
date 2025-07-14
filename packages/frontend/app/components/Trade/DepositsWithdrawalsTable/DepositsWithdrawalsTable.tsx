@@ -8,6 +8,7 @@ import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
 import DepositsWithdrawalsTableRow, {
     type TransactionData,
 } from './DepositsWithdrawalsTableRow';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 function sortTransactionData(
     data: TransactionData[],
@@ -75,11 +76,11 @@ export default function DepositsWithdrawalsTable(
     currentUserRef.current = debugWallet.address;
 
     const viewAllLink = debugWallet.address
-        ? `/depositsandwithdrawals/${debugWallet.address}`
-        : '/depositsandwithdrawals';
+        ? `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals/${debugWallet.address}`
+        : `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals`;
 
     return (
-        <GenericTable<TransactionData, DepositAndWithDrawalSortBy>
+        <GenericTable
             storageKey={`DepositsWithdrawalsTable_${currentUserRef.current}`}
             data={sortedTxs}
             renderHeader={(dir, onSort, by) => (
