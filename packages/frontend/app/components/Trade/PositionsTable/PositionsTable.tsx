@@ -18,8 +18,7 @@ interface PositionsTableProps {
 
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
-    const { coinPriceMap } = useTradeDataStore();
-    const { positions } = useTradeDataStore();
+    const { coinPriceMap, positions, symbol } = useTradeDataStore();
     const appSettingsModal = useModal('closed');
 
     const { debugWallet } = useDebugStore();
@@ -27,13 +26,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const webDataFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.WEB_DATA2);
-    }, [fetchedChannels]);
-
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
-
-    const { symbol } = useTradeDataStore();
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
