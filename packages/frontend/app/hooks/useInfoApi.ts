@@ -25,7 +25,9 @@ import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTabl
 
 export type ApiCallConfig = {
     type: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handler: (data: any, payload: any) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload?: any;
 };
 

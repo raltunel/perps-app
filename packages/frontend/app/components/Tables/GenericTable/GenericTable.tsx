@@ -11,7 +11,11 @@ import {
 import styles from './GenericTable.module.css';
 import { useIsClient } from '~/hooks/useIsClient';
 
-interface GenericTableProps<T, S, F extends (...args: Parameters<F>) => any> {
+interface GenericTableProps<
+    T,
+    S,
+    F extends (...args: Parameters<F>) => Promise<T[]>,
+> {
     data: T[];
     renderHeader: (
         sortDirection: TableSortDirection,
@@ -181,7 +185,7 @@ export default function GenericTable<
         ) as HTMLElement;
 
         if (tableBody) {
-            scrollEvent = tableBody.addEventListener('scroll', (e: Event) => {
+            scrollEvent = tableBody.addEventListener('scroll', () => {
                 checkShadow();
             });
         }
@@ -268,7 +272,9 @@ export default function GenericTable<
 
     const handleViewAll = (e: React.MouseEvent) => {
         e.preventDefault();
-        viewAllLink && navigate(viewAllLink, { viewTransition: true });
+        if (viewAllLink) {
+            navigate(viewAllLink, { viewTransition: true });
+        }
     };
     const handleExportCsv = async (e: React.MouseEvent) => {
         e.preventDefault();
