@@ -1,14 +1,14 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useModal } from '~/hooks/useModal';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
+import { sortPositionData } from '~/utils/position/PositionUtils';
 import { EXTERNAL_PAGE_URL_PREFIX, WsChannels } from '~/utils/Constants';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import { useDebugStore } from '~/stores/DebugStore';
-import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
-import { sortPositionData } from '~/utils/position/PositionUtils';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { useModal } from '~/hooks/useModal';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -18,8 +18,7 @@ interface PositionsTableProps {
 
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
-    const { coinPriceMap } = useTradeDataStore();
-    const { positions, fetchedChannels } = useTradeDataStore();
+    const { coinPriceMap, positions, symbol } = useTradeDataStore();
     const appSettingsModal = useModal('closed');
 
     const { debugWallet } = useDebugStore();
@@ -27,13 +26,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const webDataFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.WEB_DATA2);
-    }, [fetchedChannels]);
-
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
-
-    const { symbol } = useTradeDataStore();
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
@@ -53,13 +46,13 @@ export default function PositionsTable(props: PositionsTableProps) {
         <>
             <GenericTable
                 storageKey={`PositionsTable_${currentUserRef.current}`}
-                data={filteredData as any}
+                data={filteredData as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>
                         <PositionsTableHeader
                             sortBy={sortBy as PositionDataSortBy}
                             sortDirection={sortDirection}
-                            sortClickHandler={sortClickHandler as any}
+                            sortClickHandler={sortClickHandler}
                         />
                     </>
                 )}
@@ -75,7 +68,7 @@ export default function PositionsTable(props: PositionsTableProps) {
                     positions: PositionIF[],
                     sortBy: PositionDataSortBy,
                     sortDirection: TableSortDirection,
-                    _ignoredMap?: Record<string, number>,
+                    // _ignoredMap?: Record<string, number>, // TODO: commented out for lint
                 ) =>
                     sortPositionData(
                         positions,
