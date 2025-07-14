@@ -6,6 +6,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
+import { EXTERNAL_PAGE_URL_PREFIX, WsChannels } from '~/utils/Constants';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 
@@ -26,7 +27,11 @@ export default function PositionsTable(props: PositionsTableProps) {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const viewAllLink = '/positions';
+    const webDataFetched = useMemo(() => {
+        return fetchedChannels.has(WsChannels.WEB_DATA2);
+    }, [fetchedChannels]);
+
+    const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
     const { symbol } = useTradeDataStore();
 
