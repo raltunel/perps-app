@@ -10,6 +10,8 @@ import { TableState } from '~/utils/CommonIFs';
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
+    highResBuys: OrderBookRowIF[];
+    highResSells: OrderBookRowIF[];
     selectedResolution: OrderRowResolutionIF | null;
     selectedMode: OrderBookMode;
     orderBookState: TableState;
@@ -21,15 +23,54 @@ interface OrderBookStore {
     setTrades: (trades: OrderBookTradeIF[]) => void;
 }
 
-export const useOrderBookStore = create<OrderBookStore>((set) => ({
+const interpolateOrderBookData = (
+    orders: OrderBookRowIF[],
+    subRanges: number = 3,
+): OrderBookRowIF[] => {
+    if (orders.length === 0) return [];
+
+    const highResOrders: OrderBookRowIF[] = [orders[0]];
+
+    for (let i = 1; i < orders.length; i++) {
+        const pxDiff = orders[i].px - orders[i - 1].px;
+        let ratioDiff = 0;
+        if (orders[i].ratio && orders[i - 1].ratio) {
+            const r2 = orders[i].ratio;
+            const r1 = orders[i - 1].ratio;
+            ratioDiff = (r2 || 0) - (r1 || 0);
+        }
+
+        for (let j = 0; j < subRanges; j++) {
+            const midPx = orders[i - 1].px + (pxDiff * (j + 1)) / subRanges;
+            const midSz = orders[i].sz / subRanges;
+            const midRatio = (ratioDiff * j) / subRanges;
+            const newOrder = {
+                ...orders[i],
+                px: midPx,
+                sz: midSz,
+                ratio: (orders[i].ratio || 0) + midRatio,
+            };
+            highResOrders.push(newOrder);
+        }
+    }
+
+    return highResOrders;
+};
+
+export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
     buys: [],
     sells: [],
+    highResBuys: [],
+    highResSells: [],
     selectedResolution: null,
     selectedMode: 'symbol',
     orderBookState: TableState.LOADING,
     trades: [],
-    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) =>
-        set({ buys, sells }),
+    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => {
+        const highResBuys = interpolateOrderBookData(buys);
+        const highResSells = interpolateOrderBookData(sells);
+        set({ buys, sells, highResBuys, highResSells });
+    },
     setSelectedResolution: (selectedResolution: OrderRowResolutionIF | null) =>
         set({ selectedResolution }),
     setSelectedMode: (selectedMode: OrderBookMode) => set({ selectedMode }),

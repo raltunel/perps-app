@@ -26,6 +26,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const {
         buys,
         sells,
+        highResBuys,
+        highResSells,
         selectedResolution,
         selectedMode,
         orderBookState,
@@ -33,6 +35,9 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         setSelectedMode,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
+
+    console.log('highResBuys', highResBuys);
+    console.log('highResSells', highResSells);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const tabContentRef = useRef<HTMLDivElement>(null);
@@ -68,9 +73,9 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     }, []);
 
     const orderCount = useMemo(() => {
-        if (!buys.length) return 30;
-        return buys.length;
-    }, [buys]);
+        if (!highResBuys.length) return 30;
+        return highResBuys.length;
+    }, [highResBuys]);
 
     const getRandWidth = useCallback(
         (index: number, inverse: boolean = false) => {
@@ -125,8 +130,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
             if (
                 orderBookState === TableState.FILLED &&
-                buys.length > 0 &&
-                sells.length > 0
+                highResBuys.length > 0 &&
+                highResSells.length > 0
             ) {
                 return (
                     <motion.div
@@ -137,8 +142,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         style={{ width: '100%', height: '100%' }}
                     >
                         <LiquidationsChart
-                            buyData={buys}
-                            sellData={sells}
+                            buyData={highResBuys}
+                            sellData={highResSells}
                             width={dimensions.width}
                             height={dimensions.height}
                         />
@@ -147,7 +152,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             }
         }
         return <div>Feed</div>;
-    }, [activeTab, buys, sells, dimensions, orderBookState]);
+    }, [activeTab, highResBuys, highResSells, dimensions, orderBookState]);
 
     const liqChartTabsComponent = (
         <div className={styles.liqChartTabContainer}>
