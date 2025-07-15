@@ -295,10 +295,7 @@ export default function PositionSize({
                         className={styles.valueInput}
                         aria-label='Leverage value'
                         style={{
-                            color:
-                                hoverValue !== null
-                                    ? 'var(--accent1)'
-                                    : 'var(--text1)',
+                            color: 'var(--text1)',
                         }}
                     />
                     <span

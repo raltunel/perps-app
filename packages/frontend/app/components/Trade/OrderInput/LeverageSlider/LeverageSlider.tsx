@@ -224,7 +224,7 @@ export default function LeverageSlider({
 
         // Account for knob margins when calculating percentage
         const knobRadius = 7;
-        // const knobOffset = (knobRadius / rect.width) * 100;
+        const knobOffset = (knobRadius / rect.width) * 100;
         const adjustedOffsetX = Math.max(
             knobRadius,
             Math.min(offsetX, rect.width - knobRadius),
@@ -579,9 +579,7 @@ export default function LeverageSlider({
                                 ? value.toString()
                                 : isHovering && hoverValue !== null
                                   ? hoverValue.toString()
-                                  : isNaN(parseFloat(inputValue))
-                                    ? '0'
-                                    : inputValue
+                                  : inputValue
                         }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
@@ -595,7 +593,7 @@ export default function LeverageSlider({
                                   ? getColorAtPosition(
                                         valueToPercentage(hoverValue),
                                     )
-                                  : getKnobColor(),
+                                  : 'inherit',
                         }}
                     />
                     <span className={styles.valueSuffix}>x</span>
