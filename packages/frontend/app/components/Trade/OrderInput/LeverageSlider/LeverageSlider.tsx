@@ -22,6 +22,9 @@ export default function LeverageSlider({
     const [tickMarks, setTickMarks] = useState<number[]>([]);
     const [hoverValue, setHoverValue] = useState<number | null>(null);
     const [isHovering, setIsHovering] = useState<boolean>(false);
+    const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
+        null,
+    );
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -221,7 +224,7 @@ export default function LeverageSlider({
 
         // Account for knob margins when calculating percentage
         const knobRadius = 7;
-        const knobOffset = (knobRadius / rect.width) * 100;
+        // const knobOffset = (knobRadius / rect.width) * 100;
         const adjustedOffsetX = Math.max(
             knobRadius,
             Math.min(offsetX, rect.width - knobRadius),
@@ -427,6 +430,20 @@ export default function LeverageSlider({
         }
     };
 
+    // Handle tick mark/label hover
+    const handleTickHover = (tickIndex: number) => {
+        setHoveredTickIndex(tickIndex);
+        const tickValue = tickMarks[tickIndex];
+        setHoverValue(tickValue);
+        setIsHovering(true);
+    };
+
+    const handleTickLeave = () => {
+        setHoveredTickIndex(null);
+        setHoverValue(null);
+        setIsHovering(false);
+    };
+
     // Creates gradient string for the active part of the slider
     const createGradientString = (): string => {
         // fixed color positions
@@ -472,6 +489,8 @@ export default function LeverageSlider({
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
                             const isCurrent = Math.abs(tickValue - value) < 0.1;
+                            const isHovered = hoveredTickIndex === index;
+                            const tickColor = getColorAtPosition(position);
 
                             return (
                                 <div
@@ -482,20 +501,24 @@ export default function LeverageSlider({
                                         isCurrent
                                             ? styles.sliderMarkerCurrent
                                             : ''
+                                    } ${
+                                        isHovered
+                                            ? styles.sliderMarkerHovered
+                                            : ''
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        backgroundColor: isActive
-                                            ? getColorAtPosition(
-                                                  (index /
-                                                      (tickMarks.length - 1)) *
-                                                      100,
-                                              )
-                                            : 'transparent',
-                                        borderColor: isActive
-                                            ? 'transparent'
-                                            : 'rgba(255, 255, 255, 0.3)',
+                                        backgroundColor:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : 'transparent',
+                                        borderColor:
+                                            isActive || isHovered
+                                                ? 'transparent'
+                                                : 'rgba(255, 255, 255, 0.3)',
                                     }}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
                                 ></div>
                             );
                         })}
@@ -518,16 +541,27 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
+                            const isHovered = hoveredTickIndex === index;
+                            const tickColor = getColorAtPosition(position);
 
                             return (
                                 <div
                                     key={index}
-                                    className={styles.valueLabel}
+                                    className={`${styles.valueLabel} ${
+                                        isHovered
+                                            ? styles.valueLabelHovered
+                                            : ''
+                                    }`}
                                     style={{
                                         left: `${position}%`,
-                                        color: isActive ? '#FFFFFF' : '#808080',
+                                        color:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : '#808080',
                                     }}
                                     onClick={() => onChange(tickValue)}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
                                 >
                                     {tickValue}x
                                 </div>
@@ -555,11 +589,13 @@ export default function LeverageSlider({
                         className={styles.valueInput}
                         aria-label='Leverage value'
                         style={{
-                            color:
-                                isDragging ||
-                                (isHovering && hoverValue !== null)
-                                    ? '#888'
-                                    : 'inherit',
+                            color: isDragging
+                                ? getKnobColor()
+                                : isHovering && hoverValue !== null
+                                  ? getColorAtPosition(
+                                        valueToPercentage(hoverValue),
+                                    )
+                                  : getKnobColor(),
                         }}
                     />
                     <span className={styles.valueSuffix}>x</span>
