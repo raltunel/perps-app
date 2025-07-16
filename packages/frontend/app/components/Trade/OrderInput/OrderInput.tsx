@@ -122,7 +122,7 @@ function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
-    const [leverage, setLeverage] = useState(100);
+    const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');

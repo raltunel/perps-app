@@ -21,7 +21,7 @@ const LEVERAGE_CONFIG = {
     DECIMAL_INCREMENT: 0.1,
 
     // Default fallback max leverage when symbolInfo is not available
-    DEFAULT_MAX_LEVERAGE: 100,
+    DEFAULT_MAX_LEVERAGE: 1,
 
     // Number of tick marks to show on slider
     TICK_COUNT_HIGH_LEVERAGE: 7,
@@ -58,12 +58,16 @@ const UI_CONFIG = {
 } as const;
 
 export default function LeverageSlider({
-    value = 1,
+    value,
     onChange,
     className = '',
     minimumInputValue = 1,
 }: LeverageSliderProps) {
-    const [inputValue, setInputValue] = useState<string>(value.toString());
+    // Always default to 1x leverage if no value provided
+    const currentValue = value ?? 1;
+    const [inputValue, setInputValue] = useState<string>(
+        currentValue.toString(),
+    );
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [tickMarks, setTickMarks] = useState<number[]>([]);
     const [hoverValue, setHoverValue] = useState<number | null>(null);
@@ -104,8 +108,19 @@ export default function LeverageSlider({
 
     // Update input value when prop value changes
     useEffect(() => {
-        setInputValue(formatValue(value));
-    }, [value, maximumInputValue]);
+        setInputValue(formatValue(currentValue));
+    }, [currentValue, maximumInputValue]);
+
+    // Initialize input value on first render and notify parent if no value was provided
+    useEffect(() => {
+        if (inputValue === '') {
+            setInputValue(formatValue(currentValue));
+            // If no value was provided, set it to 1x
+            if (value === undefined || value === null) {
+                onChange(1);
+            }
+        }
+    }, [maximumInputValue]);
 
     // Generate logarithmically distributed tick marks
     useEffect(() => {
@@ -252,10 +267,10 @@ export default function LeverageSlider({
 
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
-        if (isNaN(value)) {
+        if (isNaN(currentValue)) {
             return 0;
         }
-        return valueToPercentage(value);
+        return valueToPercentage(currentValue);
     };
 
     // Get color based on position
@@ -514,7 +529,7 @@ export default function LeverageSlider({
             );
             onChange(boundedValue);
         } else {
-            setInputValue(formatValue(value));
+            setInputValue(formatValue(currentValue));
         }
     };
 
@@ -551,7 +566,7 @@ export default function LeverageSlider({
 
     return (
         <div
-            className={`${styles.leverageSliderContainer} ${className} ${value !== minimumInputValue ? styles.sliderContainerNotAtFirst : ''}`}
+            className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
         >
             <h3 className={styles.containerTitle}>Leverage</h3>
 
@@ -581,7 +596,7 @@ export default function LeverageSlider({
                         {/* Slider markers */}
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
-                            const isActive = tickValue <= value;
+                            const isActive = tickValue <= currentValue;
                             const isCurrent =
                                 Math.abs(tickValue - value) <
                                 SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
@@ -678,10 +693,8 @@ export default function LeverageSlider({
                         type='text'
                         value={
                             isDragging
-                                ? formatValue(value)
-                                : isHovering && hoverValue !== null
-                                  ? formatValue(hoverValue)
-                                  : formatValue(parseFloat(inputValue))
+                                ? formatValue(currentValue)
+                                : inputValue || formatValue(1)
                         }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
@@ -689,13 +702,7 @@ export default function LeverageSlider({
                         className={styles.valueInput}
                         aria-label='Leverage value'
                         style={{
-                            color: isDragging
-                                ? getKnobColor()
-                                : isHovering && hoverValue !== null
-                                  ? getColorAtPosition(
-                                        valueToPercentage(hoverValue),
-                                    )
-                                  : 'inherit',
+                            color: isDragging ? getKnobColor() : 'inherit',
                         }}
                     />
                     <span className={styles.valueSuffix}>x</span>
