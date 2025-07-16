@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
@@ -39,18 +39,31 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const currentFrame = useRef(0);
 
+    const animFrameRef = useRef<number | null>(null);
+    const animDuration = 50;
+
+    const isAnimating = useRef(false);
+
+    const [currentBuyData, setCurrentBuyData] =
+        useState<OrderBookRowIF[]>(buyData);
+    const [currentSellData, setCurrentSellData] =
+        useState<OrderBookRowIF[]>(sellData);
+
     useEffect(() => {
-        if (buyData === undefined || sellData === undefined) return;
-        if (buyData.length === 0 || sellData.length === 0) return;
+        if (currentBuyData === undefined || currentSellData === undefined)
+            return;
+        if (currentBuyData.length === 0 || currentSellData.length === 0) return;
 
         // Scale with RATIO
         const xScale = d3.scaleLinear().domain([0, 1]).range([chartWidth, 0]);
 
-        const topBoundaryBuy = Math.max(...buyData.map((d) => d.px));
-        const bottomBoundaryBuy = Math.min(...buyData.map((d) => d.px));
+        const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
+        const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
 
-        const topBoundarySell = Math.max(...sellData.map((d) => d.px));
-        const bottomBoundarySell = Math.min(...sellData.map((d) => d.px));
+        const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
+        const bottomBoundarySell = Math.min(
+            ...currentSellData.map((d) => d.px),
+        );
 
         // Scale with PX
         const buyYScale = d3
@@ -67,17 +80,92 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         setBuyYScale(() => buyYScale);
         setSellYScale(() => sellYScale);
-    }, [JSON.stringify(buyData), JSON.stringify(sellData), width, height]);
+    }, [
+        JSON.stringify(currentBuyData),
+        JSON.stringify(currentSellData),
+        width,
+        height,
+    ]);
 
-    // const animate = useCallback(() => {
+    const interPolateData = useCallback(
+        (
+            fromData: OrderBookRowIF[],
+            toData: OrderBookRowIF[],
+            progress: number,
+        ) => {
+            if (progress < 0) return fromData;
+            if (progress > 1) return toData;
 
-    //     if (sellYScale && buyYScale && xScale && sellData && buyData) {
-    //         const canvas = d3
-    //             .select(d3CanvasLiq.current)
-    //             .select('canvas')
-    //             .node() as HTMLCanvasElement;
-    //     }
-    // }, [sellYScale, buyYScale, xScale, sellData, buyData]);
+            const interpolatedData: OrderBookRowIF[] = [];
+
+            for (let i = 0; i < fromData.length; i++) {
+                const fromRow = fromData[i];
+                const toRow = toData[i];
+
+                const interpolatedRow = {
+                    ...fromRow,
+                    ratio:
+                        (fromRow.ratio || 0) +
+                        ((toRow.ratio || 0) - (fromRow.ratio || 0)) * progress,
+                    px:
+                        (fromRow.px || 0) +
+                        ((toRow.px || 0) - (fromRow.px || 0)) * progress,
+                    sz:
+                        (fromRow.sz || 0) +
+                        ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                };
+
+                interpolatedData.push(interpolatedRow);
+            }
+
+            return interpolatedData;
+        },
+        [],
+    );
+
+    const animateChart = useCallback(
+        (newBuyData: OrderBookRowIF[], newSellData: OrderBookRowIF[]) => {
+            if (isAnimating.current && animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+                isAnimating.current = false;
+            }
+
+            isAnimating.current = true;
+
+            const startTs = performance.now();
+
+            const anim = (time: number) => {
+                const elapsed = time - startTs;
+                const progress = Math.min(elapsed / animDuration, 1);
+
+                const interpolatedBuys = interPolateData(
+                    currentBuyData,
+                    newBuyData,
+                    progress,
+                );
+                const interpolatedSells = interPolateData(
+                    currentSellData,
+                    newSellData,
+                    progress,
+                );
+
+                setCurrentBuyData(interpolatedBuys);
+                setCurrentSellData(interpolatedSells);
+
+                animFrameRef.current = requestAnimationFrame(anim);
+
+                if (progress < 1) {
+                    requestAnimationFrame(anim);
+                } else {
+                    isAnimating.current = false;
+                    animFrameRef.current = null;
+                }
+            };
+
+            animFrameRef.current = requestAnimationFrame(anim);
+        },
+        [currentBuyData, currentSellData, animDuration, interPolateData],
+    );
 
     useEffect(() => {
         if (sellYScale && buyYScale && xScale && sellData && buyData) {
@@ -181,10 +269,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             d3.select(d3CanvasLiq.current)
                 .on('draw', () => {
-                    sellAreaSeries(sellData);
-                    buyAreaSeries(buyData);
-                    sellLineSeries(sellData);
-                    buyLineSeries(buyData);
+                    sellAreaSeries(currentSellData);
+                    buyAreaSeries(currentBuyData);
+                    sellLineSeries(currentSellData);
+                    buyLineSeries(currentBuyData);
                 })
                 .on('measure', (event: CustomEvent) => {
                     sellAreaSeries?.context(context);
@@ -198,9 +286,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyAreaSeries,
         sellLineSeries,
         buyLineSeries,
-        JSON.stringify(buyData),
-        JSON.stringify(sellData),
+        JSON.stringify(currentBuyData),
+        JSON.stringify(currentSellData),
     ]);
+
+    useEffect(() => {
+        if (buyData.length === 0 || sellData.length === 0) return;
+        animateChart(buyData, sellData);
+    }, [JSON.stringify(buyData), JSON.stringify(sellData), animateChart]);
 
     return (
         <>
