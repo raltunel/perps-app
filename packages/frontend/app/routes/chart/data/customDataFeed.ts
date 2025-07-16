@@ -232,7 +232,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                     );
                 }
 
-                subscriptions.delete(listenerGuid); // Temizle
+                subscriptions.delete(listenerGuid);
             } else {
                 console.warn(
                     `No active subscription found for listenerGuid: ${listenerGuid}`,
