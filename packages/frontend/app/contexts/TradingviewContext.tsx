@@ -30,6 +30,7 @@ import {
     defaultDrawingToolColors,
     getChartDefaultColors,
     getChartThemeColors,
+    getLiquidationsSvgIcon,
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
@@ -42,7 +43,6 @@ import {
     type IBasicDataFeed,
     type IChartingLibraryWidget,
     type IDatafeedChartApi,
-    type LibrarySymbolInfo,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -247,6 +247,68 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             custom_formatters: {
                 priceFormatterFactory: priceFormatterFactory,
             },
+        });
+
+        tvWidget.headerReady().then(() => {
+            const liquidationsButton = tvWidget.createButton();
+
+            let isToggled = false;
+
+            const updateButtonStyle = () => {
+                const svg = getLiquidationsSvgIcon(
+                    isToggled ? '#7371fc' : '#cbcaca',
+                );
+                liquidationsButton.style.color = isToggled
+                    ? '#7371fc'
+                    : '#cbcaca';
+
+                liquidationsButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 3px;">
+                      ${svg}
+                     <span> Liquidations
+                     </span>`;
+            };
+
+            updateButtonStyle();
+
+            liquidationsButton.style.borderRadius = '4px';
+
+            liquidationsButton.style.cursor = 'pointer';
+
+            const onClick = () => {
+                isToggled = !isToggled;
+                updateButtonStyle();
+
+                if (isToggled) {
+                    console.log('Open');
+                } else {
+                    console.log('Close');
+                }
+            };
+            const onMouseEnter = () => {
+                liquidationsButton.style.backgroundColor = '#313030';
+            };
+            const onMouseLeave = () => {
+                liquidationsButton.style.backgroundColor = 'transparent';
+            };
+
+            liquidationsButton.addEventListener('click', onClick);
+            liquidationsButton.addEventListener('mouseenter', onMouseEnter);
+            liquidationsButton.addEventListener('mouseleave', onMouseLeave);
+
+            return () => {
+                console.log('removee');
+
+                liquidationsButton.removeEventListener('click', onClick);
+                liquidationsButton.removeEventListener(
+                    'mouseenter',
+                    onMouseEnter,
+                );
+                liquidationsButton.removeEventListener(
+                    'mouseleave',
+                    onMouseLeave,
+                );
+            };
         });
 
         tvWidget.onChartReady(() => {
