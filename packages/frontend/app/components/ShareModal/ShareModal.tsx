@@ -6,7 +6,6 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
 import type { PositionIF } from '~/utils/position/PositionIFs';
-import Button from '../Button/Button';
 import Modal from '../Modal/Modal';
 import perpsLogo from './perpsLogo.png';
 import shareCardBackground from './shareCardBackground.png';

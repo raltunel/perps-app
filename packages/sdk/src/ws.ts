@@ -10,6 +10,7 @@ export type Callback = (msg: WsMsg) => void;
 
 export interface ActiveSubscription {
     callback: Callback;
+    multiCallbacks?: Callback[];
     subscriptionId: number;
     subscription: Subscription;
 }
@@ -282,7 +283,11 @@ export class WebsocketManager {
             return;
         }
         for (const active of activeSubs) {
-            active.callback(wsMsg);
+            if (active.multiCallbacks && active.multiCallbacks.length > 0) {
+                active.multiCallbacks.forEach((c) => c(wsMsg));
+            } else {
+                active.callback(wsMsg);
+            }
         }
     };
 
@@ -428,6 +433,36 @@ export class WebsocketManager {
         callback: Callback,
         subscriptionId?: number,
     ): number {
+        const identifier = subscriptionToIdentifier(subscription);
+
+        const existingSubs = this.activeSubscriptions[identifier] || [];
+        if (existingSubs.length > 0) {
+            const sub = existingSubs[0];
+            // if that subscription is not a multi callback subscription, check if the callback is the same
+            if (!sub.multiCallbacks || sub.multiCallbacks.length === 0) {
+                // return sub id if callback is the same
+                if (sub.callback.toString() === callback.toString()) {
+                    return sub.subscriptionId;
+                } else {
+                    // if the callback is different, add it to the multi callbacks
+                    sub.multiCallbacks = [sub.callback, callback];
+                    return sub.subscriptionId;
+                }
+            } else {
+                let found = false;
+                sub.multiCallbacks.map((c: Callback) => {
+                    if (JSON.stringify(c) === JSON.stringify(callback)) {
+                        found = true;
+                        return;
+                    }
+                });
+                if (!found) {
+                    sub.multiCallbacks.push(callback);
+                }
+                return sub.subscriptionId;
+            }
+        }
+
         if (subscriptionId == null) {
             this.subscriptionIdCounter += 1;
             subscriptionId = this.subscriptionIdCounter;
@@ -497,8 +532,37 @@ export class WebsocketManager {
     public unsubscribe(
         subscription: Subscription,
         subscriptionId: number,
+        callback?: Callback,
     ): boolean {
         this.log('unsubscribing', subscription, subscriptionId);
+
+        const identifier = subscriptionToIdentifier(subscription);
+        const activeSubs = this.activeSubscriptions[identifier] || [];
+
+        // TO-DO without triggerin unsubscribe to keep the subscription alive
+        // may effect ended subscriptions corrupting the related listeners
+        // once user turn back the related subscription, the ws manager will be corrupted
+        // need to find a way to keep the subscription alive without triggering unsubscribe
+
+        // if (activeSubs.length === 0) {
+        //     return false;
+        // } else {
+        //     const sub = activeSubs.find(
+        //         (s) => s.subscriptionId === subscriptionId,
+        //     );
+        //     if (sub) {
+        //         if (sub.multiCallbacks && sub.multiCallbacks.length > 0) {
+        //             sub.multiCallbacks = sub.multiCallbacks.filter(
+        //                 (c) => c.toString() !== callback?.toString(),
+        //             );
+        //             console.log(
+        //                 '??? remove one of callbacks ',
+        //                 sub.multiCallbacks,
+        //             );
+        //             return true;
+        //         }
+        //     }
+        // }
 
         const wasTracked = this.allSubscriptions[subscriptionId] !== undefined;
         delete this.allSubscriptions[subscriptionId];
@@ -514,8 +578,6 @@ export class WebsocketManager {
             );
         }
 
-        const identifier = subscriptionToIdentifier(subscription);
-        const activeSubs = this.activeSubscriptions[identifier] || [];
         const initialActiveLength = activeSubs.length;
         const newActiveSubs = activeSubs.filter(
             (x) => x.subscriptionId !== subscriptionId,
@@ -543,7 +605,6 @@ export class WebsocketManager {
     public reconnect(stashedSubs?: Record<string, ActiveSubscription[]>) {
         this.stashSubscriptions();
         if (this.queuedSubscriptions.length === 0 && stashedSubs) {
-            console.log('>>> process stashed subs', stashedSubs);
             this.processStashedSubs(stashedSubs);
         }
 

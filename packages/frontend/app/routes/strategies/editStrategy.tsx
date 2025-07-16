@@ -1,4 +1,8 @@
-import { useStrategiesStore, type strategyIF, type useStrategiesStoreIF } from '~/stores/StrategiesStore';
+import {
+    useStrategiesStore,
+    type strategyIF,
+    type useStrategiesStoreIF,
+} from '~/stores/StrategiesStore';
 import CreateStrategy from './CreateStrategy';
 
 export default function editStrategy() {
@@ -8,10 +12,5 @@ export default function editStrategy() {
         strategies.update(s, addr);
     }
 
-    return (
-        <CreateStrategy
-            page='edit'
-            submitFn={editStrategy}
-        />
-    );
+    return <CreateStrategy page='edit' submitFn={editStrategy} />;
 }

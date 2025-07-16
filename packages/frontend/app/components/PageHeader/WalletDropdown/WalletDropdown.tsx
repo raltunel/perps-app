@@ -70,7 +70,7 @@ export default function WalletDropdown(props: PropsIF) {
                 <button
                     className={styles.portfolioButton}
                     onClick={() => {
-                        navigate('/portfolio', { viewTransition: true });
+                        navigate('/v2/portfolio', { viewTransition: true });
                         setIsWalletMenuOpen(false);
                     }}
                 >

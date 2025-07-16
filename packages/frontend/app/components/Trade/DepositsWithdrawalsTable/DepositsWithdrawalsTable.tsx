@@ -1,13 +1,14 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useDebugStore } from '~/stores/DebugStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
 import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
 import DepositsWithdrawalsTableRow, {
     type TransactionData,
 } from './DepositsWithdrawalsTableRow';
-import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
-import type { TableSortDirection } from '~/utils/CommonIFs';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useDebugStore } from '~/stores/DebugStore';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 function sortTransactionData(
     data: TransactionData[],
@@ -74,10 +75,12 @@ export default function DepositsWithdrawalsTable(
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const viewAllLink = '/depositsandwithdrawals';
+    const viewAllLink = debugWallet.address
+        ? `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals/${debugWallet.address}`
+        : `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals`;
 
     return (
-        <GenericTable<TransactionData, DepositAndWithDrawalSortBy>
+        <GenericTable
             storageKey={`DepositsWithdrawalsTable_${currentUserRef.current}`}
             data={sortedTxs}
             renderHeader={(dir, onSort, by) => (

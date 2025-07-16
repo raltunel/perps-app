@@ -7,8 +7,12 @@ import type {
     OrderDataSortBy,
 } from '~/utils/orderbook/OrderBookIFs';
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
-import OrderHistoryTableHeader from './OrderHistoryTableHeader';
+import OrderHistoryTableHeader, {
+    OrderHistoryTableModel,
+} from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
+import { useInfoApi } from '~/hooks/useInfoApi';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
@@ -22,6 +26,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const { symbol, filterOrderHistory } = useTradeDataStore();
 
+    const { fetchOrderHistory } = useInfoApi();
+
     const { debugWallet } = useDebugStore();
 
     const currentUserRef = useRef<string>('');
@@ -32,12 +38,16 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `/orderHistory/${debugWallet.address}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/orderHistory/${debugWallet.address}`;
     }, [debugWallet.address]);
 
     return (
         <>
-            <GenericTable<OrderDataIF, OrderDataSortBy>
+            <GenericTable<
+                OrderDataIF,
+                OrderDataSortBy,
+                (address: string) => Promise<OrderDataIF[]>
+            >
                 storageKey={`OrderHistoryTable_${currentUserRef.current}`}
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
@@ -61,6 +71,9 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
+                tableModel={OrderHistoryTableModel}
+                csvDataFetcher={fetchOrderHistory}
+                csvDataFetcherArgs={[debugWallet.address]}
             />
         </>
     );

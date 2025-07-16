@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useDebugStore } from '~/stores/DebugStore';
 import {
@@ -24,7 +24,7 @@ export default function VaultDepositorsTable(props: VaultDepositorTableProps) {
 
     return (
         <>
-            <GenericTable<VaultFollowerStateIF, VaultDepositorSortBy>
+            <GenericTable
                 storageKey={`VaultDepositorsTable_${currentUserRef.current}`}
                 data={data}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

@@ -23,6 +23,7 @@ const SymbolSearch: React.FunctionComponent = () => {
         return match ? match[1] : symbol;
     }, [symbol]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const bgType = tokenBackgroundMap[symbolFileName.toUpperCase()] || 'light';
 
     return (

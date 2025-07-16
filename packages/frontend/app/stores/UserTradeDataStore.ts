@@ -42,6 +42,7 @@ export interface UserTradeDataStore {
     setActiveTwaps: (activeTwaps: ActiveTwapIF[]) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createUserTradesSlice = (set: any, get: any) => ({
     userOrders: [],
     userSymbolOrders: [],

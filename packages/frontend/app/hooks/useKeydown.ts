@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-type acceptableDependenciesT = (string | number | symbol)[];
+type acceptableDependenciesT = (string | number | symbol | boolean)[];
 
 // hook to create and manage a 'keydown' event in the DOM
 export function useKeydown(
@@ -9,7 +9,7 @@ export function useKeydown(
     // fn to execute on keydown
     fn: () => void,
     // param to accept a dependency array
-    dependencyArray: acceptableDependenciesT[] = [],
+    dependencyArray: acceptableDependenciesT = [],
     // param to toggle on debug mode
     debug?: 'debug',
 ): () => void {
