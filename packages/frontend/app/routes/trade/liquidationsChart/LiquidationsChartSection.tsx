@@ -36,9 +36,6 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
 
-    console.log('highResBuys', highResBuys);
-    console.log('highResSells', highResSells);
-
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
     const tabContentRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

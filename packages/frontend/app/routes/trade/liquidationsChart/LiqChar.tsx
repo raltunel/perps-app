@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
 import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
@@ -37,6 +37,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const chartHeight = height;
     const chartWidth = width;
 
+    const currentFrame = useRef(0);
+
     useEffect(() => {
         if (buyData === undefined || sellData === undefined) return;
         if (buyData.length === 0 || sellData.length === 0) return;
@@ -66,6 +68,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         setBuyYScale(() => buyYScale);
         setSellYScale(() => sellYScale);
     }, [JSON.stringify(buyData), JSON.stringify(sellData), width, height]);
+
+    // const animate = useCallback(() => {
+
+    //     if (sellYScale && buyYScale && xScale && sellData && buyData) {
+    //         const canvas = d3
+    //             .select(d3CanvasLiq.current)
+    //             .select('canvas')
+    //             .node() as HTMLCanvasElement;
+    //     }
+    // }, [sellYScale, buyYScale, xScale, sellData, buyData]);
 
     useEffect(() => {
         if (sellYScale && buyYScale && xScale && sellData && buyData) {
@@ -154,6 +166,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     useEffect(() => {
         if (sellData.length === 0 || buyData.length === 0) return;
         if (sellAreaSeries && buyAreaSeries) {
+            currentFrame.current = performance.now();
+
             const canvas = d3
                 .select(d3CanvasLiq.current)
                 .select('canvas')

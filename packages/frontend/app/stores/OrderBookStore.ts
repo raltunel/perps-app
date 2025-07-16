@@ -40,10 +40,24 @@ const interpolateOrderBookData = (
             ratioDiff = (r2 || 0) - (r1 || 0);
         }
 
+        let usedSz = 0;
+
         for (let j = 0; j < subRanges; j++) {
-            const midPx = orders[i - 1].px + (pxDiff * (j + 1)) / subRanges;
-            const midSz = orders[i].sz / subRanges;
-            const midRatio = (ratioDiff * j) / subRanges;
+            let midSz = 0;
+            if (j === subRanges - 1) {
+                midSz = orders[i].sz - usedSz;
+            } else {
+                midSz = ((orders[i].sz - usedSz) * Math.random()) / 2;
+                usedSz += midSz;
+            }
+            const midPx = orders[i - 1].px + (pxDiff / subRanges) * (j + 1);
+
+            let midRatio = (ratioDiff * midSz) / orders[i].sz;
+
+            if (midRatio < 0) {
+                console.log('>>> negative ratio');
+            }
+
             const newOrder = {
                 ...orders[i],
                 px: midPx,
