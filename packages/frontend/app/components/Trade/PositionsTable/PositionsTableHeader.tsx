@@ -1,7 +1,7 @@
 import SortIcon from '~/components/Vault/SortIcon';
-import styles from './PositionsTable.module.css';
-import type { PositionIF, PositionDataSortBy } from '~/utils/UserDataIFs';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import type { PositionDataSortBy } from '~/utils/UserDataIFs';
+import styles from './PositionsTable.module.css';
 
 export interface HeaderCell {
     name: string;

@@ -1,7 +1,7 @@
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
-import type { SymbolInfoIF } from '../utils/SymbolInfoIFs';
+import type { SymbolInfoIF, SymbolInfoRawIF } from '../utils/SymbolInfoIFs';
 
-export const processSymbolInfo = (payload: any): SymbolInfoIF => {
+export const processSymbolInfo = (payload: SymbolInfoRawIF): SymbolInfoIF => {
     try {
         return {
             coin: payload.coin,
@@ -19,15 +19,17 @@ export const processSymbolInfo = (payload: any): SymbolInfoIF => {
             prevDayPx: parseNum(payload.ctx.prevDayPx),
             lastPriceChange: 0,
             last24hPriceChange: parseNum(
-                payload.ctx.markPx - payload.ctx.prevDayPx,
+                parseNum(payload.ctx.markPx) - parseNum(payload.ctx.prevDayPx),
             ),
             last24hPriceChangePercent: parseNum(
-                ((payload.ctx.markPx - payload.ctx.prevDayPx) /
-                    payload.ctx.prevDayPx) *
+                ((parseNum(payload.ctx.markPx) -
+                    parseNum(payload.ctx.prevDayPx)) /
+                    parseNum(payload.ctx.prevDayPx)) *
                     100,
             ),
             openInterestDollarized: parseNum(
-                payload.ctx.openInterest * payload.ctx.oraclePx,
+                parseNum(payload.ctx.openInterest) *
+                    parseNum(payload.ctx.oraclePx),
             ),
             szDecimals: payload.szDecimals,
             maxLeverage: payload.maxLeverage,
