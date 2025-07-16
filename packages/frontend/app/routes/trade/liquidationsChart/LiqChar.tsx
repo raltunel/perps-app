@@ -152,10 +152,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 setCurrentBuyData(interpolatedBuys);
                 setCurrentSellData(interpolatedSells);
 
-                animFrameRef.current = requestAnimationFrame(anim);
-
                 if (progress < 1) {
-                    requestAnimationFrame(anim);
+                    animFrameRef.current = requestAnimationFrame(anim);
                 } else {
                     isAnimating.current = false;
                     animFrameRef.current = null;
@@ -292,6 +290,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     useEffect(() => {
         if (buyData.length === 0 || sellData.length === 0) return;
+
         animateChart(buyData, sellData);
     }, [JSON.stringify(buyData), JSON.stringify(sellData), animateChart]);
 
