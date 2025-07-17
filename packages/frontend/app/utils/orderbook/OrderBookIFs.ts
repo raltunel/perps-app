@@ -76,4 +76,6 @@ export type OrderDataSortBy =
     | 'triggerConditions'
     | 'tpsl'
     | 'cancel'
+    | 'limitPx'
+    | 'triggerPx'
     | undefined;

@@ -214,6 +214,7 @@ export const sortOrderData = (
                         : (b.orderValue ?? 0) - (a.orderValue ?? 0),
                 );
             case 'price':
+            case 'limitPx':
                 return [...orderData].sort((a, b) =>
                     sortDirection === 'asc'
                         ? (a.limitPx ?? 0) - (b.limitPx ?? 0)
@@ -238,6 +239,12 @@ export const sortOrderData = (
             case 'oid':
                 return [...orderData].sort((a, b) =>
                     sortDirection === 'asc' ? a.oid - b.oid : b.oid - a.oid,
+                );
+            case 'triggerPx':
+                return [...orderData].sort((a, b) =>
+                    sortDirection === 'asc'
+                        ? (a.triggerPx ?? 0) - (b.triggerPx ?? 0)
+                        : (b.triggerPx ?? 0) - (a.triggerPx ?? 0),
                 );
             default:
                 return orderData;
