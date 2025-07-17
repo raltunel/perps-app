@@ -263,15 +263,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                     : '#cbcaca';
 
                 liquidationsButton.innerHTML = `
-                    <span style="display: flex; align-items: center; gap: 3px;">
+                    <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
                       ${svg}
-                     <span> Liquidations
+                     <span style="padding-left:3px"> Liquidations
                      </span>`;
             };
 
             updateButtonStyle();
-
-            liquidationsButton.style.borderRadius = '4px';
 
             const onClick = () => {
                 isToggled = !isToggled;
@@ -284,10 +282,18 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 }
             };
             const onMouseEnter = () => {
-                liquidationsButton.style.backgroundColor = '#313030';
+                const wrapper = liquidationsButton.querySelector(
+                    '.liquidations-wrapper',
+                ) as HTMLDivElement;
+                if (wrapper) {
+                    wrapper.style.backgroundColor = '#313030';
+                }
             };
             const onMouseLeave = () => {
-                liquidationsButton.style.backgroundColor = 'transparent';
+                const wrapper = liquidationsButton.querySelector(
+                    '.liquidations-wrapper',
+                ) as HTMLDivElement;
+                if (wrapper) wrapper.style.backgroundColor = 'transparent';
             };
 
             liquidationsButton.addEventListener('click', onClick);
@@ -295,8 +301,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             liquidationsButton.addEventListener('mouseleave', onMouseLeave);
 
             return () => {
-                console.log('removee');
-
                 liquidationsButton.removeEventListener('click', onClick);
                 liquidationsButton.removeEventListener(
                     'mouseenter',
