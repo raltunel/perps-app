@@ -501,7 +501,7 @@ function OrderInput() {
             setSelectedMode,
             useTotalSize,
         }),
-        [size, handleSizeChange, useTotalSize, selectedMode],
+        [size, handleSizeChange, useTotalSize, selectedMode, symbol],
     );
 
     const positionSizeProps = useMemo(
