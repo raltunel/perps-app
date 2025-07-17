@@ -273,8 +273,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             liquidationsButton.style.borderRadius = '4px';
 
-            liquidationsButton.style.cursor = 'pointer';
-
             const onClick = () => {
                 isToggled = !isToggled;
                 updateButtonStyle();
