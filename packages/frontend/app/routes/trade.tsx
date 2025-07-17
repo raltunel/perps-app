@@ -98,7 +98,7 @@ export default function Trade() {
 
     useEffect(() => {
         const keydownHandler = (e: KeyboardEvent) => {
-            if (e.key.toLowerCase() === 'd' && e.altKey) {
+            if (e.code === 'KeyD' && e.altKey) {
                 e.preventDefault();
                 setDebugToolbarOpen(!debugToolbarOpenRef.current);
             }
