@@ -91,15 +91,15 @@
     height: var(--padding-xs);
     border-radius: 100%;
     background-color: var(--neon-yellow);
-    opacity: 0.4;
+    opacity: 1;
 }
 
-.userOrder .orderRowPrice,
+/* .userOrder .orderRowPrice,
 .userOrder .orderRowSize,
 .userOrder .orderRowTotal {
     color: var(--neon-yellow) !important;
-}
+} */
 
-.userOrder {
+/* .userOrder {
     background-color: color-mix(in srgb, var(--neon-yellow) 13%, transparent);
-}
+} */
