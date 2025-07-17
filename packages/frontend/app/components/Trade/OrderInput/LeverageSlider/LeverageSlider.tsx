@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './LeverageSlider.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 
 interface LeverageSliderProps {
     value: number;
@@ -63,6 +64,20 @@ export default function LeverageSlider({
     className = '',
     minimumInputValue = 1,
 }: LeverageSliderProps) {
+    const { symbolInfo } = useTradeDataStore();
+    const {
+        preferredLeverage,
+        currentLeverage,
+        currentMarket,
+        setPreferredLeverage,
+        validateAndApplyLeverageForMarket,
+    } = useLeverageStore();
+
+    // Use maxLeverage from symbolInfo, fallback to default if not available
+    const maximumInputValue =
+        symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+    const currentSymbol = symbolInfo?.symbol;
+
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
     const [inputValue, setInputValue] = useState<string>(
@@ -75,35 +90,84 @@ export default function LeverageSlider({
     const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
         null,
     );
-
-    const { symbolInfo } = useTradeDataStore();
-
-    // Use maxLeverage from symbolInfo, fallback to default if not available
-    const maximumInputValue =
-        symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+    const [hasInitializedLeverage, setHasInitializedLeverage] =
+        useState<boolean>(false);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
 
-    // Helper function to format values based on max leverage
+    // Market change detection and leverage validation
+    useEffect(() => {
+        if (!currentSymbol || !symbolInfo?.maxLeverage) return;
+
+        // Check if market has changed or if this is the first initialization
+        const isMarketChange = currentMarket !== currentSymbol;
+        const isFirstLoad = !hasInitializedLeverage;
+
+        if (isMarketChange || isFirstLoad) {
+            // Validate and apply leverage for this market
+            const validatedLeverage = validateAndApplyLeverageForMarket(
+                currentSymbol,
+                symbolInfo.maxLeverage,
+                minimumInputValue,
+            );
+
+            // Apply the validated leverage
+            onChange(validatedLeverage);
+            setHasInitializedLeverage(true);
+
+            console.log(
+                `Market: ${currentSymbol}, Preferred: ${preferredLeverage}x, Applied: ${validatedLeverage}x, Max: ${symbolInfo.maxLeverage}x`,
+            );
+        }
+    }, [
+        currentSymbol,
+        symbolInfo?.maxLeverage,
+        currentMarket,
+        preferredLeverage,
+        minimumInputValue,
+        onChange,
+        validateAndApplyLeverageForMarket,
+        hasInitializedLeverage,
+    ]);
+
+    // Handle leverage changes from parent component
+    const handleLeverageChange = (newLeverage: number) => {
+        // Update the preferred leverage in store (this represents user's comfort level)
+        setPreferredLeverage(newLeverage);
+
+        // Also call the parent onChange
+        onChange(newLeverage);
+    };
+
+    // Helper function to format values for input display (shows decimals below 3)
     const formatValue = (val: number): string => {
-        if (maximumInputValue <= LEVERAGE_CONFIG.MAX_LEVERAGE_FOR_DECIMALS) {
+        if (val < 3) {
             return val.toFixed(LEVERAGE_CONFIG.DECIMAL_PLACES_FOR_LOW_LEVERAGE);
         } else {
             return Math.round(val).toString();
         }
     };
 
-    // Helper function to round values based on max leverage
+    // Helper function to format values for labels (always whole numbers)
+    const formatLabelValue = (val: number): string => {
+        return Math.round(val).toString();
+    };
+
+    // Updated rounding logic based on your requirements
     const roundValue = (val: number): number => {
-        if (maximumInputValue <= LEVERAGE_CONFIG.MAX_LEVERAGE_FOR_DECIMALS) {
-            return (
-                Math.round(val / LEVERAGE_CONFIG.DECIMAL_INCREMENT) *
-                LEVERAGE_CONFIG.DECIMAL_INCREMENT
-            );
+        if (val < 3) {
+            // Below 3: round DOWN to nearest tenth (0.1)
+            return Math.floor(val * 10) / 10;
         } else {
-            return Math.round(val); // Round to whole numbers
+            // 3 or above: round DOWN to nearest whole number
+            return Math.floor(val);
         }
+    };
+
+    // New function for smooth slider movement (no rounding during drag)
+    const constrainValue = (val: number): number => {
+        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
 
     // Update input value when prop value changes
@@ -117,7 +181,7 @@ export default function LeverageSlider({
             setInputValue(formatValue(currentValue));
             // If no value was provided, set it to 1x
             if (value === undefined || value === null) {
-                onChange(1);
+                handleLeverageChange(1);
             }
         }
     }, [maximumInputValue]);
@@ -236,7 +300,7 @@ export default function LeverageSlider({
         }
     };
 
-    // Convert percentage position to value
+    // Convert percentage position to value (no rounding for smooth movement)
     const percentageToValue = (percentage: number): number => {
         if (minimumInputValue <= 0 || maximumInputValue <= minimumInputValue)
             return minimumInputValue;
@@ -250,7 +314,7 @@ export default function LeverageSlider({
                 minimumInputValue +
                 (boundedPercentage / 100) *
                     (maximumInputValue - minimumInputValue);
-            return roundValue(value);
+            return value; // No rounding for smooth movement
         }
 
         // For higher leverage, use logarithmic scale
@@ -262,7 +326,7 @@ export default function LeverageSlider({
         const maxLog = Math.log(maximumInputValue);
         const valueLog = minLog + (boundedPercentage / 100) * (maxLog - minLog);
 
-        return roundValue(Math.exp(valueLog));
+        return Math.exp(valueLog); // No rounding for smooth movement
     };
 
     // Get position for the knob as percentage
@@ -354,14 +418,11 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value with appropriate rounding
+        // Convert percentage to value (no rounding for smooth preview)
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = Math.max(
-            minimumInputValue,
-            Math.min(maximumInputValue, newValue),
-        );
+        const boundedValue = constrainValue(newValue);
 
         setHoverValue(boundedValue);
         setIsHovering(true);
@@ -396,16 +457,13 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value with appropriate rounding
+        // Convert percentage to value (no rounding for smooth movement)
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = Math.max(
-            minimumInputValue,
-            Math.min(maximumInputValue, newValue),
-        );
+        const boundedValue = constrainValue(newValue);
 
-        onChange(boundedValue);
+        handleLeverageChange(boundedValue);
     };
 
     // Handle dragging functionality
@@ -430,16 +488,13 @@ export default function LeverageSlider({
                     (rect.width - 2 * knobRadius)) *
                 100;
 
-            // Convert percentage to value with appropriate rounding
+            // Convert percentage to value (no rounding for smooth movement)
             const newValue = percentageToValue(percentage);
 
             // Ensure value is within min/max bounds
-            const boundedValue = Math.max(
-                minimumInputValue,
-                Math.min(maximumInputValue, newValue),
-            );
+            const boundedValue = constrainValue(newValue);
 
-            onChange(boundedValue);
+            handleLeverageChange(boundedValue);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
@@ -463,16 +518,13 @@ export default function LeverageSlider({
                     (rect.width - 2 * knobRadius)) *
                 100;
 
-            // Convert percentage to value with appropriate rounding
+            // Convert percentage to value (no rounding for smooth movement)
             const newValue = percentageToValue(percentage);
 
             // Ensure value is within min/max bounds
-            const boundedValue = Math.max(
-                minimumInputValue,
-                Math.min(maximumInputValue, newValue),
-            );
+            const boundedValue = constrainValue(newValue);
 
-            onChange(boundedValue);
+            handleLeverageChange(boundedValue);
 
             // Prevent scrolling while dragging
             e.preventDefault();
@@ -507,7 +559,7 @@ export default function LeverageSlider({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, minimumInputValue, maximumInputValue, onChange]);
+    }, [isDragging, minimumInputValue, maximumInputValue]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -523,12 +575,11 @@ export default function LeverageSlider({
         const newValue = parseFloat(inputValue);
         if (!isNaN(newValue)) {
             // Ensure value is within min/max bounds and properly rounded
-            const boundedValue = Math.max(
-                minimumInputValue,
-                Math.min(maximumInputValue, roundValue(newValue)),
-            );
-            onChange(boundedValue);
+            const boundedValue = constrainValue(newValue);
+            const roundedValue = roundValue(boundedValue);
+            handleLeverageChange(roundedValue);
         } else {
+            // If input is invalid, revert to current value
             setInputValue(formatValue(currentValue));
         }
     };
@@ -676,11 +727,13 @@ export default function LeverageSlider({
                                                 ? tickColor
                                                 : UI_CONFIG.INACTIVE_LABEL_COLOR,
                                     }}
-                                    onClick={() => onChange(tickValue)}
+                                    onClick={() =>
+                                        handleLeverageChange(tickValue)
+                                    }
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
                                 >
-                                    {formatValue(tickValue)}x
+                                    {formatLabelValue(tickValue)}x
                                 </div>
                             );
                         })}
@@ -692,9 +745,7 @@ export default function LeverageSlider({
                     <input
                         type='text'
                         value={
-                            isDragging
-                                ? formatValue(currentValue)
-                                : inputValue || formatValue(1)
+                            isDragging ? formatValue(currentValue) : inputValue
                         }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
@@ -704,6 +755,7 @@ export default function LeverageSlider({
                         style={{
                             color: isDragging ? getKnobColor() : 'inherit',
                         }}
+                        placeholder=''
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>
