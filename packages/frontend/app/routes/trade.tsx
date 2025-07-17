@@ -16,6 +16,8 @@ import WebDataConsumer from './trade/webdataconsumer';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
+import { useAppStateStore } from '~/stores/AppStateStore';
+import { motion } from 'framer-motion';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -34,6 +36,10 @@ export default function Trade() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
+
+    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const debugToolbarOpenRef = useRef(debugToolbarOpen);
+    debugToolbarOpenRef.current = debugToolbarOpen;
 
     const visibilityRefs = useRef<{
         order: boolean;
@@ -89,6 +95,21 @@ export default function Trade() {
         },
         [activeTab],
     );
+
+    useEffect(() => {
+        const keydownHandler = (e: KeyboardEvent) => {
+            if (e.code === 'KeyD' && e.altKey) {
+                e.preventDefault();
+                setDebugToolbarOpen(!debugToolbarOpenRef.current);
+            }
+        };
+
+        window.addEventListener('keydown', keydownHandler);
+
+        return () => {
+            window.removeEventListener('keydown', keydownHandler);
+        };
+    }, []);
 
     useEffect(() => {
         document.body.style.overscrollBehaviorX = 'none';
@@ -248,9 +269,19 @@ export default function Trade() {
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
                         <div
-                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper}`}
+                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
                         >
-                            <ComboBoxContainer />
+                            {debugToolbarOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                                >
+                                    <ComboBoxContainer />
+                                </motion.div>
+                            )}
                             <div
                                 id='watchlistSection'
                                 className={styles.watchlist}
