@@ -5,6 +5,8 @@ export const leverageIntervalsMap = new Map([
     [20, [1, 3, 5, 10, 15, 20]],
     [25, [1, 3, 5, 10, 15, 20, 25]],
     [40, [1, 3, 5, 10, 20, 30, 40]],
+    [50, [1, 5, 10, 20, 30, 40, 50]],
+    [100, [1, 5, 10, 30, 50, 70, 100]],
 ]);
 
 export const getLeverageIntervals = (maxLeverage: number): number[] => {
