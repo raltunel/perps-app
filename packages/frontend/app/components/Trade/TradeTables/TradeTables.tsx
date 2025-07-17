@@ -13,7 +13,6 @@ import FundingHistoryTable from '../FundingHistoryTable/FundingHistoryTable';
 import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
 import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
-import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 import TwapTable from '../TwapTable/TwapTable';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
@@ -57,7 +56,7 @@ export default function TradeTable(props: TradeTableProps) {
         userOrders,
     } = useTradeDataStore();
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
-    const [hideSmallBalances, setHideSmallBalances] = useState(false);
+    // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const { page } = usePage();
 
@@ -143,32 +142,20 @@ export default function TradeTable(props: TradeTableProps) {
         setSelectedFilter(selectedId);
     };
 
-    const handleToggleSmallBalances = (newState?: boolean) => {
-        const newValue = newState !== undefined ? newState : !hideSmallBalances;
-        setHideSmallBalances(newValue);
-    };
-
     const rightAlignedContent = (
         <div className={styles.tableControls}>
-            {' '}
             <FilterDropdown
                 options={filterOptions}
                 selectedOption={selectedFilter}
                 onChange={handleFilterChange}
             />
-            {selectedTradeTab === 'Balances' && (
-                <ToggleSwitch
-                    isOn={hideSmallBalances}
-                    onToggle={handleToggleSmallBalances}
-                />
-            )}
         </div>
     );
 
     const renderTabContent = () => {
         switch (selectedTradeTab) {
             case 'Balances':
-                return <BalancesTable hideSmallBalances={hideSmallBalances} />;
+                return <BalancesTable />;
             case 'Positions':
                 return (
                     <PositionsTable
