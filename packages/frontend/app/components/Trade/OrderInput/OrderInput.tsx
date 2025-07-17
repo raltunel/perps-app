@@ -150,7 +150,7 @@ function OrderInput() {
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
 
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
@@ -501,7 +501,7 @@ function OrderInput() {
             setSelectedMode,
             useTotalSize,
         }),
-        [size, handleSizeChange, useTotalSize],
+        [size, handleSizeChange, useTotalSize, selectedMode],
     );
 
     const positionSizeProps = useMemo(
