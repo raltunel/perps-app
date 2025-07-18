@@ -1,3 +1,4 @@
+import { SessionButton } from '@fogo/sessions-sdk-react';
 import { useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
@@ -229,14 +230,7 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    {!isUserConnected && (
-                        <button
-                            className={styles.depositButton}
-                            onClick={() => setIsUserConnected(true)}
-                        >
-                            Connect
-                        </button>
-                    )}
+                    {!isUserConnected && <SessionButton />}
                     {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
