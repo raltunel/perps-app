@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { type useModalIF, useModal } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -29,7 +29,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
 
-        const modalCtrl: useModalIF = useModal('closed');
+        const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
 
         // Memoize TP/SL string
@@ -127,7 +127,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         // Memoize navigation handler
         const handleCoinClick = useCallback(() => {
-            navigate(`/trade/${position.coin?.toLowerCase()}`);
+            navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
 
         // Memoize funding values and tooltip
@@ -227,11 +227,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                   : 'var(--text2)',
                     }}
                 >
-                    <Tooltip
-                        content={fundingTooltipMsg}
-                        isFixed
-                        maxWidth='400px'
-                    >
+                    <Tooltip content={fundingTooltipMsg}>
                         {formatNum(fundingToShow, 2, true, true, true)}
                     </Tooltip>
                 </div>

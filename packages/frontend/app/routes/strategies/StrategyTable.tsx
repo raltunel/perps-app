@@ -271,7 +271,7 @@ export default function StrategyTable(props: propsIF) {
                                     color: 'var(--accent1)',
                                     cursor: 'pointer',
                                 }}
-                                onClick={() => navigate('/trade')}
+                                onClick={() => navigate('/v2/trade')}
                             >
                                 Trade
                             </div>

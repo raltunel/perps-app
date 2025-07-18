@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { setLS } from '~/utils/AppUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
@@ -33,8 +34,8 @@ type TradeDataStore = UserTradeDataStore & {
     setSelectedTradeTab: (tab: string) => void;
     fetchedChannels: Set<string>;
     setFetchedChannels: (channels: Set<string>) => void;
-    userNonFundingLedgerUpdates: any[];
-    setUserNonFundingLedgerUpdates: (updates: any[]) => void;
+    userNonFundingLedgerUpdates: TransactionData[];
+    setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -62,7 +63,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
+            favKeys: ['BTC'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (
@@ -112,7 +113,7 @@ const useTradeDataStore = create<TradeDataStore>()(
             setFetchedChannels: (channels: Set<string>) =>
                 set({ fetchedChannels: channels }),
             userNonFundingLedgerUpdates: [],
-            setUserNonFundingLedgerUpdates: (updates: any[]) =>
+            setUserNonFundingLedgerUpdates: (updates: TransactionData[]) =>
                 set({ userNonFundingLedgerUpdates: updates }),
         }),
         {

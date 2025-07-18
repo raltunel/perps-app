@@ -2,7 +2,7 @@ import { memo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 import WebDataConsumer from '../trade/webdataconsumer';
 import styles from './portfolio.module.css';
@@ -34,7 +34,7 @@ function Portfolio() {
         PortfolioModalsRenderer,
     } = usePortfolioModals();
 
-    const feeScheduleModalCtrl: useModalIF = useModal('closed');
+    const feeScheduleModalCtrl = useModal('closed');
     const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
         const target = event.target as HTMLElement;
 
@@ -69,7 +69,7 @@ function Portfolio() {
                 <div
                     className={styles.view_detail_clickable}
                     style={{ visibility: 'hidden' }}
-                    onClick={feeScheduleModalCtrl.open}
+                    onClick={() => feeScheduleModalCtrl.open()}
                 >
                     View fee schedule
                 </div>
@@ -157,7 +157,7 @@ function Portfolio() {
                             <div
                                 className={styles.view_detail_clickable}
                                 style={{ visibility: 'hidden' }}
-                                onClick={feeScheduleModalCtrl.open}
+                                onClick={() => feeScheduleModalCtrl.open()}
                             >
                                 View fee schedule
                             </div>

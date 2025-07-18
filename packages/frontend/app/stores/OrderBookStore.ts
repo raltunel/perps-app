@@ -4,6 +4,7 @@ import type {
     OrderBookRowIF,
     OrderBookMode,
     OrderRowResolutionIF,
+    OrderBookLiqIF,
 } from '~/utils/orderbook/OrderBookIFs';
 import { TableState } from '~/utils/CommonIFs';
 
@@ -12,6 +13,8 @@ interface OrderBookStore {
     sells: OrderBookRowIF[];
     highResBuys: OrderBookRowIF[];
     highResSells: OrderBookRowIF[];
+    liqBuys: OrderBookLiqIF[];
+    liqSells: OrderBookLiqIF[];
     selectedResolution: OrderRowResolutionIF | null;
     selectedMode: OrderBookMode;
     orderBookState: TableState;
@@ -71,6 +74,53 @@ const interpolateOrderBookData = (
     return highResOrders;
 };
 
+const createRandomOrderBookLiq = (
+    buys: OrderBookRowIF[],
+    sells: OrderBookRowIF[],
+): { liqBuys: OrderBookLiqIF[]; liqSells: OrderBookLiqIF[] } => {
+    const liqBuys: OrderBookLiqIF[] = [];
+    const liqSells: OrderBookLiqIF[] = [];
+
+    buys.forEach((buy) => {
+        liqBuys.push({
+            sz: buy.sz * Math.random() * 0.5,
+            type: 'buy',
+            px: buy.px,
+        });
+    });
+
+    sells.forEach((sell) => {
+        liqSells.push({
+            sz: sell.sz * Math.random() * 0.5,
+            type: 'sell',
+            px: sell.px,
+        });
+    });
+
+    let maxSz = 0;
+
+    liqBuys.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqSells.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqBuys.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+    liqSells.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+
+    return { liqBuys, liqSells };
+};
+
 export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
     buys: [],
     sells: [],
@@ -83,11 +133,16 @@ export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
     setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => {
         const highResBuys = interpolateOrderBookData(buys);
         const highResSells = interpolateOrderBookData(sells);
-        set({ buys, sells, highResBuys, highResSells });
+        const { liqBuys, liqSells } = createRandomOrderBookLiq(buys, sells);
+        set({ buys, sells, highResBuys, highResSells, liqBuys, liqSells });
     },
     setSelectedResolution: (selectedResolution: OrderRowResolutionIF | null) =>
         set({ selectedResolution }),
     setSelectedMode: (selectedMode: OrderBookMode) => set({ selectedMode }),
     setOrderBookState: (orderBookState: TableState) => set({ orderBookState }),
     setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
+    liqBuys: [],
+    liqSells: [],
+    setLiqBuys: (liqBuys: OrderBookLiqIF[]) => set({ liqBuys }),
+    setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
 }));

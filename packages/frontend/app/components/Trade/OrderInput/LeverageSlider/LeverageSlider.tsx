@@ -20,6 +20,11 @@ export default function LeverageSlider({
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [tickMarks, setTickMarks] = useState<number[]>([]);
+    const [hoverValue, setHoverValue] = useState<number | null>(null);
+    const [isHovering, setIsHovering] = useState<boolean>(false);
+    const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
+        null,
+    );
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -131,6 +136,7 @@ export default function LeverageSlider({
         return Math.exp(valueLog);
     };
 
+    // Get position for the knob as percentage, adjusted to keep knob fully visible
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
         if (isNaN(value)) {
@@ -206,6 +212,49 @@ export default function LeverageSlider({
         return getColorAtPosition(getKnobPosition());
     };
 
+    // Handle mouse move over track for hover preview
+    const handleTrackMouseMove = (e: React.MouseEvent) => {
+        if (!sliderRef.current || isDragging) return;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = Math.max(
+            0,
+            Math.min(e.clientX - rect.left, rect.width),
+        );
+
+        // Account for knob margins when calculating percentage
+        const knobRadius = 7;
+        const knobOffset = (knobRadius / rect.width) * 100;
+        const adjustedOffsetX = Math.max(
+            knobRadius,
+            Math.min(offsetX, rect.width - knobRadius),
+        );
+        const percentage =
+            ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
+            100;
+
+        // Convert percentage to value (logarithmic)
+        const newValue = percentageToValue(percentage);
+
+        // Round to whole number
+        const roundedValue = Math.round(newValue);
+
+        // Ensure value is within min/max bounds
+        const boundedValue = Math.max(
+            minimumInputValue,
+            Math.min(maximumInputValue, roundedValue),
+        );
+
+        setHoverValue(boundedValue);
+        setIsHovering(true);
+    };
+
+    // Handle mouse leave from track
+    const handleTrackMouseLeave = () => {
+        setIsHovering(false);
+        setHoverValue(null);
+    };
+
     // Handle track click to set value
     const handleTrackClick = (e: React.MouseEvent) => {
         if (!sliderRef.current) return;
@@ -215,7 +264,16 @@ export default function LeverageSlider({
             0,
             Math.min(e.clientX - rect.left, rect.width),
         );
-        const percentage = (offsetX / rect.width) * 100;
+
+        // Account for knob margins when calculating percentage
+        const knobRadius = 7;
+        const adjustedOffsetX = Math.max(
+            knobRadius,
+            Math.min(offsetX, rect.width - knobRadius),
+        );
+        const percentage =
+            ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
+            100;
 
         // Convert percentage to value (logarithmic)
         const newValue = percentageToValue(percentage);
@@ -242,7 +300,17 @@ export default function LeverageSlider({
                 0,
                 Math.min(e.clientX - rect.left, rect.width),
             );
-            const percentage = (offsetX / rect.width) * 100;
+
+            // Account for knob margins when calculating percentage
+            const knobRadius = 7;
+            const adjustedOffsetX = Math.max(
+                knobRadius,
+                Math.min(offsetX, rect.width - knobRadius),
+            );
+            const percentage =
+                ((adjustedOffsetX - knobRadius) /
+                    (rect.width - 2 * knobRadius)) *
+                100;
 
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
@@ -268,7 +336,17 @@ export default function LeverageSlider({
                 0,
                 Math.min(touch.clientX - rect.left, rect.width),
             );
-            const percentage = (offsetX / rect.width) * 100;
+
+            // Account for knob margins when calculating percentage
+            const knobRadius = 7;
+            const adjustedOffsetX = Math.max(
+                knobRadius,
+                Math.min(offsetX, rect.width - knobRadius),
+            );
+            const percentage =
+                ((adjustedOffsetX - knobRadius) /
+                    (rect.width - 2 * knobRadius)) *
+                100;
 
             // Convert percentage to value (logarithmic)
             const newValue = percentageToValue(percentage);
@@ -352,6 +430,20 @@ export default function LeverageSlider({
         }
     };
 
+    // Handle tick mark/label hover
+    const handleTickHover = (tickIndex: number) => {
+        setHoveredTickIndex(tickIndex);
+        const tickValue = tickMarks[tickIndex];
+        setHoverValue(tickValue);
+        setIsHovering(true);
+    };
+
+    const handleTickLeave = () => {
+        setHoveredTickIndex(null);
+        setHoverValue(null);
+        setIsHovering(false);
+    };
+
     // Creates gradient string for the active part of the slider
     const createGradientString = (): string => {
         // fixed color positions
@@ -364,7 +456,9 @@ export default function LeverageSlider({
     };
 
     return (
-        <div className={`${styles.leverageSliderContainer} ${className}`}>
+        <div
+            className={`${styles.leverageSliderContainer} ${className} ${value !== minimumInputValue ? styles.sliderContainerNotAtFirst : ''}`}
+        >
             <h3 className={styles.containerTitle}>Leverage</h3>
 
             <div className={styles.sliderWithValue}>
@@ -373,6 +467,8 @@ export default function LeverageSlider({
                         ref={sliderRef}
                         className={styles.sliderTrack}
                         onClick={handleTrackClick}
+                        onMouseMove={handleTrackMouseMove}
+                        onMouseLeave={handleTrackMouseLeave}
                     >
                         {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
@@ -393,6 +489,8 @@ export default function LeverageSlider({
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
                             const isCurrent = Math.abs(tickValue - value) < 0.1;
+                            const isHovered = hoveredTickIndex === index;
+                            const tickColor = getColorAtPosition(position);
 
                             return (
                                 <div
@@ -403,20 +501,24 @@ export default function LeverageSlider({
                                         isCurrent
                                             ? styles.sliderMarkerCurrent
                                             : ''
+                                    } ${
+                                        isHovered
+                                            ? styles.sliderMarkerHovered
+                                            : ''
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        backgroundColor: isActive
-                                            ? getColorAtPosition(
-                                                  (index /
-                                                      (tickMarks.length - 1)) *
-                                                      100,
-                                              )
-                                            : 'transparent',
-                                        borderColor: isActive
-                                            ? 'transparent'
-                                            : 'rgba(255, 255, 255, 0.3)',
+                                        backgroundColor:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : 'transparent',
+                                        borderColor:
+                                            isActive || isHovered
+                                                ? 'transparent'
+                                                : 'rgba(255, 255, 255, 0.3)',
                                     }}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
                                 ></div>
                             );
                         })}
@@ -439,16 +541,27 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
+                            const isHovered = hoveredTickIndex === index;
+                            const tickColor = getColorAtPosition(position);
 
                             return (
                                 <div
                                     key={index}
-                                    className={styles.valueLabel}
+                                    className={`${styles.valueLabel} ${
+                                        isHovered
+                                            ? styles.valueLabelHovered
+                                            : ''
+                                    }`}
                                     style={{
                                         left: `${position}%`,
-                                        color: isActive ? '#FFFFFF' : '#808080',
+                                        color:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : '#808080',
                                     }}
                                     onClick={() => onChange(tickValue)}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
                                 >
                                     {tickValue}x
                                 </div>
@@ -461,12 +574,27 @@ export default function LeverageSlider({
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
-                        value={isNaN(parseFloat(inputValue)) ? '0' : inputValue}
+                        value={
+                            isDragging
+                                ? value.toString()
+                                : isHovering && hoverValue !== null
+                                  ? hoverValue.toString()
+                                  : inputValue
+                        }
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
                         aria-label='Leverage value'
+                        style={{
+                            color: isDragging
+                                ? getKnobColor()
+                                : isHovering && hoverValue !== null
+                                  ? getColorAtPosition(
+                                        valueToPercentage(hoverValue),
+                                    )
+                                  : 'inherit',
+                        }}
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>

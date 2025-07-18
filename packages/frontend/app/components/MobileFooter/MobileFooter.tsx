@@ -1,6 +1,6 @@
+import { motion } from 'framer-motion';
 import React from 'react';
 import { Link } from 'react-router';
-import { motion } from 'framer-motion';
 import styles from './MobileFooter.module.css';
 
 // Define the navigation item type
@@ -14,22 +14,22 @@ const MobileFooter: React.FC = () => {
     const navItems: NavItem[] = [
         {
             name: 'Trade',
-            path: '/trade',
+            path: '/v2/trade',
             icon: tradeSvg,
         },
         {
             name: 'Explore',
-            path: '/leaderboards',
+            path: '/v2/leaderboards',
             icon: exploreSvg,
         },
         {
             name: 'Account',
-            path: '/portfolio',
+            path: '/v2/portfolio',
             icon: accountSvg,
         },
         {
             name: 'Chat',
-            path: '/chat',
+            path: '/v2/chat',
             icon: chatSvg,
         },
     ];

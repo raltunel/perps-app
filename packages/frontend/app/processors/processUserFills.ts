@@ -2,21 +2,20 @@ import type {
     UserActiveTwap,
     UserFillsData,
     UserFunding,
-    UserFundingsData,
     UserTwapHistoryData,
     UserTwapSliceFillsData,
 } from '@perps-app/sdk/src/utils/types';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type {
-    TwapHistoryIF,
-    TwapSliceFillIF,
     ActiveTwapIF,
-    UserFillIF,
-    UserFundingIF,
-    UserFillSortBy,
-    UserFundingSortBy,
     DepositAndWithDrawalIF,
     DepositAndWithDrawalSortBy,
+    TwapHistoryIF,
+    TwapSliceFillIF,
+    UserFillIF,
+    UserFillSortBy,
+    UserFundingIF,
+    UserFundingSortBy,
 } from '~/utils/UserDataIFs';
 import { parseNum } from '../utils/orderbook/OrderBookUtils';
 
