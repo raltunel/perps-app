@@ -21,7 +21,12 @@ export default defineConfig({
         },
     },
     plugins: [
-        nodePolyfills(), // this is necessary to avoid "process is not defined issue",
+        nodePolyfills({
+            include: ['buffer'],
+            globals: {
+                Buffer: true,
+            },
+        }),
         tsconfigPaths() as PluginOption,
         reactRouter(),
         VitePWA({
