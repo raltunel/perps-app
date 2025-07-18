@@ -237,26 +237,28 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    <button
-                        onClick={() => {
-                            (async () => {
-                                if (isEstablished(sessionState)) {
-                                    console.log('established');
-                                    const ix = instructions.pingIx(42n, {
-                                        actor: sessionState.sessionPublicKey,
-                                    });
-                                    console.log({ ix, sessionState });
-                                    const result =
-                                        await sessionState.sendTransaction([
-                                            ix,
-                                        ]);
-                                    console.log({ result });
-                                }
-                            })();
-                        }}
-                    >
-                        Send ping
-                    </button>
+                    {isEstablished(sessionState) && (
+                        <button
+                            onClick={() => {
+                                (async () => {
+                                    if (isEstablished(sessionState)) {
+                                        console.log('established');
+                                        const ix = instructions.pingIx(42n, {
+                                            actor: sessionState.sessionPublicKey,
+                                        });
+                                        console.log({ ix, sessionState });
+                                        const result =
+                                            await sessionState.sendTransaction([
+                                                ix,
+                                            ]);
+                                        console.log({ result });
+                                    }
+                                })();
+                            }}
+                        >
+                            Send ping
+                        </button>
+                    )}
                     {!isUserConnected && <SessionButton />}
                     {isUserConnected && (
                         <section
