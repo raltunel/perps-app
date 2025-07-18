@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface LeverageState {
-    // User's preferred leverage level
+    // User's preferred leverage level (their comfort level)
     preferredLeverage: number;
 
     // Current applied leverage (may be different from preferred if market limits are lower)
@@ -14,14 +14,14 @@ interface LeverageState {
 
 interface LeverageStore extends LeverageState {
     /**
-     * this setss preferred leverage and applies it as current leverage
-     * Currently calling this when user manually changes leverage
+     * Sets the user's preferred leverage and applies it as current leverage
+     * This is called when user manually changes leverage
      */
     setPreferredLeverage: (leverage: number) => void;
 
     /**
      * Validates and applies leverage for a new market
-     * Returns the leverage that should be applied (thsi may be different from preferred)
+     * Returns the leverage that should be applied
      */
     validateAndApplyLeverageForMarket: (
         marketSymbol: string,
@@ -30,13 +30,13 @@ interface LeverageStore extends LeverageState {
     ) => number;
 
     /**
-     * for now, this just returns the appropriate leverage for a market without changing state
-     * but we can also use it for calculations, etc...
+     * Gets the appropriate leverage for a market without changing state
+     * Useful in the future if we want to calculate leverage on the fly
      */
     getLeverageForMarket: (maxLeverage: number, minLeverage?: number) => number;
 
     /**
-     * Reset leverage to default
+     * Reset leverage to default (not used right now)
      */
     resetLeverage: () => void;
 }

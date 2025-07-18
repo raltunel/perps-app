@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './LeverageSlider.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
+import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
 
 interface LeverageSliderProps {
     value: number;
@@ -96,6 +97,46 @@ export default function LeverageSlider({
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
 
+    // Helper function to get the actual rounded value (what user sees)
+    const getRoundedDisplayValue = (val: number): number => {
+        if (val < 3) {
+            // Round DOWN to nearest tenth
+            return Math.floor(val * 10) / 10;
+        } else {
+            // Round DOWN to nearest whole number
+            return Math.floor(val);
+        }
+    };
+
+    // Helper function to format values for input display (shows decimals below 3)
+    const formatValue = (val: number): string => {
+        if (val < 3) {
+            // Round DOWN to nearest tenth, then format
+            const roundedVal = Math.floor(val * 10) / 10;
+            return roundedVal.toFixed(
+                LEVERAGE_CONFIG.DECIMAL_PLACES_FOR_LOW_LEVERAGE,
+            );
+        } else {
+            // Round DOWN to nearest whole number
+            return Math.floor(val).toString();
+        }
+    };
+
+    // Helper function to format values for labels (always whole numbers)
+    const formatLabelValue = (val: number): string => {
+        return Math.floor(val).toString();
+    };
+
+    // Updated rounding logic - rounds DOWN consistently
+    const roundValue = (val: number): number => {
+        return getRoundedDisplayValue(val);
+    };
+
+    // New function for smooth slider movement (no rounding during drag)
+    const constrainValue = (val: number): number => {
+        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+    };
+
     // Market change detection and leverage validation
     useEffect(() => {
         if (!currentSymbol || !symbolInfo?.maxLeverage) return;
@@ -112,12 +153,13 @@ export default function LeverageSlider({
                 minimumInputValue,
             );
 
-            // Apply the validated leverage
-            onChange(validatedLeverage);
+            // Round the validated leverage to display value before applying
+            const displayValue = getRoundedDisplayValue(validatedLeverage);
+            onChange(displayValue);
             setHasInitializedLeverage(true);
 
             console.log(
-                `Market: ${currentSymbol}, Preferred: ${preferredLeverage}x, Applied: ${validatedLeverage}x, Max: ${symbolInfo.maxLeverage}x`,
+                `Market: ${currentSymbol}, Preferred: ${preferredLeverage}x, Applied: ${displayValue}x, Max: ${symbolInfo.maxLeverage}x`,
             );
         }
     }, [
@@ -133,41 +175,21 @@ export default function LeverageSlider({
 
     // Handle leverage changes from parent component
     const handleLeverageChange = (newLeverage: number) => {
-        // Update the preferred leverage in store (this represents user's comfort level)
-        setPreferredLeverage(newLeverage);
+        // Get the rounded value that will be displayed to the user
+        const displayValue = getRoundedDisplayValue(newLeverage);
 
-        // Also call the parent onChange
+        // Update the preferred leverage in store with the DISPLAY VALUE
+        // This ensures localStorage saves exactly what the user sees
+        setPreferredLeverage(displayValue);
+
+        // Also call the parent onChange with the display value
+        onChange(displayValue);
+    };
+
+    // Handle smooth leverage changes during dragging (no rounding)
+    const handleSmoothLeverageChange = (newLeverage: number) => {
+        // During dragging, don't round - just update parent with smooth value
         onChange(newLeverage);
-    };
-
-    // Helper function to format values for input display (shows decimals below 3)
-    const formatValue = (val: number): string => {
-        if (val < 3) {
-            return val.toFixed(LEVERAGE_CONFIG.DECIMAL_PLACES_FOR_LOW_LEVERAGE);
-        } else {
-            return Math.round(val).toString();
-        }
-    };
-
-    // Helper function to format values for labels (always whole numbers)
-    const formatLabelValue = (val: number): string => {
-        return Math.round(val).toString();
-    };
-
-    // Updated rounding logic based on your requirements
-    const roundValue = (val: number): number => {
-        if (val < 3) {
-            // Below 3: round DOWN to nearest tenth (0.1)
-            return Math.floor(val * 10) / 10;
-        } else {
-            // 3 or above: round DOWN to nearest whole number
-            return Math.floor(val);
-        }
-    };
-
-    // New function for smooth slider movement (no rounding during drag)
-    const constrainValue = (val: number): number => {
-        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
 
     // Update input value when prop value changes
@@ -186,76 +208,13 @@ export default function LeverageSlider({
         }
     }, [maximumInputValue]);
 
-    // Generate logarithmically distributed tick marks
+    // Generate tick marks using centralized logic
     useEffect(() => {
-        // Check for valid inputs
-        if (
-            !isNaN(minimumInputValue) &&
-            !isNaN(maximumInputValue) &&
-            minimumInputValue > 0 &&
-            maximumInputValue > minimumInputValue
-        ) {
-            const generateLogarithmicTicks = (
-                min: number,
-                max: number,
-                count: number,
-            ): number[] => {
-                // For low leverage (≤ threshold), use linear distribution with decimal increments
-                if (max <= LEVERAGE_CONFIG.MAX_LEVERAGE_FOR_DECIMALS) {
-                    const ticks = [];
-                    const step = (max - min) / (count - 1);
-                    for (let i = 0; i < count; i++) {
-                        const value = min + step * i;
-                        ticks.push(
-                            Math.round(
-                                value / LEVERAGE_CONFIG.DECIMAL_INCREMENT,
-                            ) * LEVERAGE_CONFIG.DECIMAL_INCREMENT,
-                        );
-                    }
-                    return ticks;
-                }
-
-                // For higher leverage, use logarithmic distribution with whole numbers
-                const safeMin = Math.max(UI_CONFIG.MIN_SAFE_LOG_VALUE, min);
-                const minLog = Math.log(safeMin);
-                const maxLog = Math.log(max);
-                const ticks = [];
-
-                // Always include min and max
-                ticks.push(Math.round(min));
-
-                // Generate intermediate ticks (logarithmically distributed)
-                if (count > 2) {
-                    const step = (maxLog - minLog) / (count - 1);
-                    for (let i = 1; i < count - 1; i++) {
-                        const logValue = minLog + step * i;
-                        const value = Math.round(Math.exp(logValue));
-                        if (value > ticks[ticks.length - 1] && value < max) {
-                            ticks.push(value);
-                        }
-                    }
-                }
-
-                // Make sure max is included
-                if (ticks[ticks.length - 1] !== Math.round(max)) {
-                    ticks.push(Math.round(max));
-                }
-
-                return ticks;
-            };
-
-            // Generate 5-7 ticks depending on the range
-            const tickCount =
-                maximumInputValue > LEVERAGE_CONFIG.TICK_COUNT_THRESHOLD
-                    ? LEVERAGE_CONFIG.TICK_COUNT_HIGH_LEVERAGE
-                    : LEVERAGE_CONFIG.TICK_COUNT_LOW_LEVERAGE;
-            const ticks = generateLogarithmicTicks(
-                minimumInputValue,
-                maximumInputValue,
-                tickCount,
-            );
-            setTickMarks(ticks);
-        }
+        const ticks = getLeverageIntervals(
+            maximumInputValue,
+            minimumInputValue,
+        );
+        setTickMarks(ticks);
     }, [minimumInputValue, maximumInputValue]);
 
     // Convert value to percentage position on slider
@@ -463,6 +422,7 @@ export default function LeverageSlider({
         // Ensure value is within min/max bounds
         const boundedValue = constrainValue(newValue);
 
+        // Use the rounded display value for clicks
         handleLeverageChange(boundedValue);
     };
 
@@ -494,7 +454,8 @@ export default function LeverageSlider({
             // Ensure value is within min/max bounds
             const boundedValue = constrainValue(newValue);
 
-            handleLeverageChange(boundedValue);
+            // Use smooth dragging (no rounding during drag)
+            handleSmoothLeverageChange(boundedValue);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
@@ -524,17 +485,30 @@ export default function LeverageSlider({
             // Ensure value is within min/max bounds
             const boundedValue = constrainValue(newValue);
 
-            handleLeverageChange(boundedValue);
+            // Use smooth dragging (no rounding during drag)
+            handleSmoothLeverageChange(boundedValue);
 
             // Prevent scrolling while dragging
             e.preventDefault();
         };
 
         const handleMouseUp = () => {
+            if (isDragging) {
+                // Apply rounding when dragging ends
+                const roundedValue = getRoundedDisplayValue(currentValue);
+                setPreferredLeverage(roundedValue);
+                onChange(roundedValue);
+            }
             setIsDragging(false);
         };
 
         const handleTouchEnd = () => {
+            if (isDragging) {
+                // Apply rounding when dragging ends
+                const roundedValue = getRoundedDisplayValue(currentValue);
+                setPreferredLeverage(roundedValue);
+                onChange(roundedValue);
+            }
             setIsDragging(false);
         };
 
@@ -559,7 +533,7 @@ export default function LeverageSlider({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, minimumInputValue, maximumInputValue]);
+    }, [isDragging, minimumInputValue, maximumInputValue, currentValue]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -576,8 +550,9 @@ export default function LeverageSlider({
         if (!isNaN(newValue)) {
             // Ensure value is within min/max bounds and properly rounded
             const boundedValue = constrainValue(newValue);
-            const roundedValue = roundValue(boundedValue);
-            handleLeverageChange(roundedValue);
+            // Use the rounded display value
+            const displayValue = getRoundedDisplayValue(boundedValue);
+            handleLeverageChange(displayValue);
         } else {
             // If input is invalid, revert to current value
             setInputValue(formatValue(currentValue));
