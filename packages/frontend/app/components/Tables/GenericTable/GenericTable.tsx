@@ -145,7 +145,6 @@ export default function GenericTable<
             return;
         }
 
-        // 2px offset has been added to handle edge scrolling cases
         const bottomNotShadowed =
             tableBody.scrollTop + tableBody.clientHeight + 2 >=
             tableBody.scrollHeight;
@@ -286,7 +285,6 @@ export default function GenericTable<
             return val.toFixed(2);
         }
 
-        // 3) Strings → trim first
         if (typeof val === 'string') {
             const trimmed = val.trim();
 
