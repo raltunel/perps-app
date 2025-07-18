@@ -57,8 +57,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const chartHeight = height;
     const chartWidth = width;
 
-    const currentFrame = useRef(0);
-
     const animFrameRef = useRef<number | null>(null);
     const animDuration = 50;
 
@@ -68,6 +66,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         useState<OrderBookRowIF[]>(buyData);
     const [currentSellData, setCurrentSellData] =
         useState<OrderBookRowIF[]>(sellData);
+
+    const [currentLiqBuys, setCurrentLiqBuys] =
+        useState<OrderBookLiqIF[]>(liqBuys);
+    const [currentLiqSells, setCurrentLiqSells] =
+        useState<OrderBookLiqIF[]>(liqSells);
 
     useEffect(() => {
         if (currentBuyData === undefined || currentSellData === undefined)
@@ -143,8 +146,49 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [],
     );
 
+    const interPolateLiqData = useCallback(
+        (
+            fromData: OrderBookLiqIF[],
+            toData: OrderBookLiqIF[],
+            progress: number,
+        ) => {
+            if (progress < 0) return fromData;
+            if (progress > 1) return toData;
+
+            const interpolatedData: OrderBookLiqIF[] = [];
+
+            for (let i = 0; i < fromData.length; i++) {
+                const fromRow = fromData[i];
+                const toRow = toData[i];
+
+                const interpolatedRow = {
+                    ...fromRow,
+                    ratio:
+                        (fromRow.ratio || 0) +
+                        ((toRow.ratio || 0) - (fromRow.ratio || 0)) * progress,
+                    px:
+                        (fromRow.px || 0) +
+                        ((toRow.px || 0) - (fromRow.px || 0)) * progress,
+                    sz:
+                        (fromRow.sz || 0) +
+                        ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                };
+
+                interpolatedData.push(interpolatedRow);
+            }
+
+            return interpolatedData;
+        },
+        [],
+    );
+
     const animateChart = useCallback(
-        (newBuyData: OrderBookRowIF[], newSellData: OrderBookRowIF[]) => {
+        (
+            newBuyData: OrderBookRowIF[],
+            newSellData: OrderBookRowIF[],
+            newLiqBuys: OrderBookLiqIF[],
+            newLiqSells: OrderBookLiqIF[],
+        ) => {
             if (isAnimating.current && animFrameRef.current) {
                 cancelAnimationFrame(animFrameRef.current);
                 isAnimating.current = false;
@@ -168,9 +212,21 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     newSellData,
                     progress,
                 );
+                const interpolatedLiqBuys = interPolateLiqData(
+                    currentLiqBuys,
+                    newLiqBuys,
+                    progress,
+                );
+                const interpolatedLiqSells = interPolateLiqData(
+                    currentLiqSells,
+                    newLiqSells,
+                    progress,
+                );
 
                 setCurrentBuyData(interpolatedBuys);
                 setCurrentSellData(interpolatedSells);
+                setCurrentLiqBuys(interpolatedLiqBuys);
+                setCurrentLiqSells(interpolatedLiqSells);
 
                 if (progress < 1) {
                     animFrameRef.current = requestAnimationFrame(anim);
@@ -182,7 +238,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             animFrameRef.current = requestAnimationFrame(anim);
         },
-        [currentBuyData, currentSellData, animDuration, interPolateData],
+        [
+            currentBuyData,
+            currentSellData,
+            currentLiqBuys,
+            currentLiqSells,
+            animDuration,
+            interPolateData,
+            interPolateLiqData,
+        ],
     );
 
     useEffect(() => {
@@ -271,7 +335,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.lineWidth = 2;
 
                     // Draw discrete horizontal lines for buy liquidations
-                    liqBuys.forEach((liq) => {
+                    currentLiqBuys.forEach((liq) => {
                         const yPos = buyYScale(liq.px);
                         const xStart = xScale(liq.ratio || 0); // Start position based on ratio
                         const xEnd = chartWidth; // End at right edge
@@ -298,7 +362,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.lineWidth = 2;
 
                     // Draw discrete horizontal lines for sell liquidations
-                    liqSells.forEach((liq) => {
+                    currentLiqSells.forEach((liq) => {
                         const yPos = sellYScale(liq.px);
                         const xStart = xScale(liq.ratio || 0); // Start position based on ratio
                         const xEnd = chartWidth; // End at right edge
@@ -330,16 +394,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         width,
         height,
         getBsColor,
-        liqBuys,
-        liqSells,
+        currentLiqBuys,
+        currentLiqSells,
         chartWidth,
     ]);
 
     useEffect(() => {
         if (sellData.length === 0 || buyData.length === 0) return;
         if (sellAreaSeries && buyAreaSeries) {
-            currentFrame.current = performance.now();
-
             const canvas = d3
                 .select(d3CanvasLiq.current)
                 .select('canvas')
@@ -358,12 +420,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     sellLineSeries(currentSellData);
                     buyLineSeries(currentBuyData);
 
-                    // Only call liquidation series if we have data
-                    if (liqBuys.length > 0 && buyLiqSeries) {
-                        buyLiqSeries([{}]); // Pass dummy data since we draw manually
+                    if (currentLiqBuys.length > 0 && buyLiqSeries) {
+                        buyLiqSeries([{}]);
                     }
-                    if (liqSells.length > 0 && sellLiqSeries) {
-                        sellLiqSeries([{}]); // Pass dummy data since we draw manually
+                    if (currentLiqSells.length > 0 && sellLiqSeries) {
+                        sellLiqSeries([{}]);
                     }
                 })
                 .on('measure', (event: CustomEvent) => {
@@ -382,8 +443,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyLineSeries,
         buyLiqSeries,
         sellLiqSeries,
-        liqBuys,
-        liqSells,
+        JSON.stringify(currentLiqBuys),
+        JSON.stringify(currentLiqSells),
         JSON.stringify(currentBuyData),
         JSON.stringify(currentSellData),
     ]);
@@ -391,8 +452,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     useEffect(() => {
         if (buyData.length === 0 || sellData.length === 0) return;
 
-        animateChart(buyData, sellData);
-    }, [JSON.stringify(buyData), JSON.stringify(sellData), animateChart]);
+        animateChart(buyData, sellData, liqBuys, liqSells);
+    }, [
+        JSON.stringify(buyData),
+        JSON.stringify(sellData),
+        animateChart,
+        JSON.stringify(liqBuys),
+        JSON.stringify(liqSells),
+    ]);
 
     return (
         <>
