@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { setLS } from '~/utils/AppUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
@@ -7,7 +8,6 @@ import {
     createUserTradesSlice,
     type UserTradeDataStore,
 } from './UserTradeDataStore';
-import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 
 type TradeDataStore = UserTradeDataStore & {
     symbol: string;
@@ -63,7 +63,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
+            favKeys: ['BTC'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (

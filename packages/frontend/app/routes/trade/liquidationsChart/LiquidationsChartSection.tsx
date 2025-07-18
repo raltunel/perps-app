@@ -33,6 +33,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         orderBookState,
         setSelectedResolution,
         setSelectedMode,
+        liqBuys,
+        liqSells,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
 
@@ -141,6 +143,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         <LiquidationsChart
                             buyData={highResBuys}
                             sellData={highResSells}
+                            liqBuys={liqBuys}
+                            liqSells={liqSells}
                             width={dimensions.width}
                             height={dimensions.height}
                         />

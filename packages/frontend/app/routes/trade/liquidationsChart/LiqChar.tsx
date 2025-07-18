@@ -1,17 +1,30 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
-import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderBookLiqIF,
+    OrderBookRowIF,
+} from '~/utils/orderbook/OrderBookIFs';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
     sellData: OrderBookRowIF[];
+    liqBuys: OrderBookLiqIF[];
+    liqSells: OrderBookLiqIF[];
     width?: number;
     height?: number;
 }
 
 const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
-    const { sellData, buyData, width = 300, height = 400 } = props;
+    const {
+        sellData,
+        buyData,
+        liqBuys,
+        liqSells,
+        width = 300,
+        height = 400,
+    } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
 
@@ -33,6 +46,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const [sellLineSeries, setSellLineSeries] = React.useState<any>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [buyLineSeries, setBuyLineSeries] = React.useState<any>();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [buyLiqSeries, setBuyLiqSeries] = React.useState<any>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [sellLiqSeries, setSellLiqSeries] = React.useState<any>();
+
+    const { getBsColor } = useAppSettings();
 
     const chartHeight = height;
     const chartWidth = width;
@@ -179,8 +199,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const style = getComputedStyle(context.canvas);
 
-            const buyRgbaColor = style.getPropertyValue('--green');
-            const sellRgbaColor = style.getPropertyValue('--red');
+            // liq chart coloring should be inverted
+            const buyRgbaColor = getBsColor().sell;
+            const sellRgbaColor = getBsColor().buy;
 
             const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
             const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
@@ -225,6 +246,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 .xScale(xScale)
                 .yScale(sellYScale)
                 .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
                     context.strokeStyle = sellRgbaColor;
                     context.lineWidth = 1.5;
                 });
@@ -241,13 +263,77 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.strokeStyle = buyRgbaColor;
                     context.lineWidth = 1.5;
                 });
+            const buyLiqLines = d3fc
+                .seriesCanvasLine()
+                .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
+                    context.strokeStyle = getBsColor().sell;
+                    context.lineWidth = 2;
+
+                    // Draw discrete horizontal lines for buy liquidations
+                    liqBuys.forEach((liq) => {
+                        const yPos = buyYScale(liq.px);
+                        const xStart = xScale(liq.ratio || 0); // Start position based on ratio
+                        const xEnd = chartWidth; // End at right edge
+
+                        context.beginPath();
+                        context.moveTo(xStart, yPos);
+                        context.lineTo(xEnd, yPos);
+                        context.stroke();
+                    });
+
+                    context.restore();
+                })
+                .mainValue(() => 0) // Dummy values
+                .crossValue(() => 0)
+                .xScale(xScale)
+                .yScale(buyYScale);
+
+            // Fixed Sell Liquidation Lines - start from right, length based on ratio
+            const sellLiqLines = d3fc
+                .seriesCanvasLine()
+                .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
+                    context.strokeStyle = getBsColor().buy;
+                    context.lineWidth = 2;
+
+                    // Draw discrete horizontal lines for sell liquidations
+                    liqSells.forEach((liq) => {
+                        const yPos = sellYScale(liq.px);
+                        const xStart = xScale(liq.ratio || 0); // Start position based on ratio
+                        const xEnd = chartWidth; // End at right edge
+
+                        context.beginPath();
+                        context.moveTo(xStart, yPos);
+                        context.lineTo(xEnd, yPos);
+                        context.stroke();
+                    });
+
+                    context.restore();
+                })
+                .mainValue(() => 0) // Dummy values
+                .crossValue(() => 0)
+                .xScale(xScale)
+                .yScale(sellYScale);
 
             setSellLineSeries(() => sellLine);
             setBuyLineSeries(() => buyLine);
             setSellAreaSeries(() => sellArea);
             setBuyAreaSeries(() => buyArea);
+            setBuyLiqSeries(() => buyLiqLines);
+            setSellLiqSeries(() => sellLiqLines);
         }
-    }, [buyYScale, sellYScale, xScale, width, height]);
+    }, [
+        buyYScale,
+        sellYScale,
+        xScale,
+        width,
+        height,
+        getBsColor,
+        liqBuys,
+        liqSells,
+        chartWidth,
+    ]);
 
     useEffect(() => {
         if (sellData.length === 0 || buyData.length === 0) return;
@@ -271,12 +357,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     buyAreaSeries(currentBuyData);
                     sellLineSeries(currentSellData);
                     buyLineSeries(currentBuyData);
+
+                    // Only call liquidation series if we have data
+                    if (liqBuys.length > 0 && buyLiqSeries) {
+                        buyLiqSeries([{}]); // Pass dummy data since we draw manually
+                    }
+                    if (liqSells.length > 0 && sellLiqSeries) {
+                        sellLiqSeries([{}]); // Pass dummy data since we draw manually
+                    }
                 })
                 .on('measure', (event: CustomEvent) => {
                     sellAreaSeries?.context(context);
                     sellLineSeries?.context(context);
                     buyAreaSeries?.context(context);
                     buyLineSeries?.context(context);
+                    buyLiqSeries?.context(context);
+                    sellLiqSeries?.context(context);
                 });
         }
     }, [
@@ -284,6 +380,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyAreaSeries,
         sellLineSeries,
         buyLineSeries,
+        buyLiqSeries,
+        sellLiqSeries,
+        liqBuys,
+        liqSells,
         JSON.stringify(currentBuyData),
         JSON.stringify(currentSellData),
     ]);

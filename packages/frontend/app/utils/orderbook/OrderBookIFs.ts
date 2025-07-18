@@ -33,7 +33,7 @@ export interface OrderBookTradeIF {
 
 export interface OrderRowResolutionIF {
     val: number;
-    nsigfigs: number;
+    nsigfigs?: number | null;
     mantissa?: number | null;
 }
 
@@ -58,6 +58,13 @@ export interface OrderDataIF {
     orderValue?: number;
 }
 
+export interface OrderBookLiqIF {
+    sz: number;
+    type: 'buy' | 'sell';
+    px: number;
+    ratio?: number;
+}
+
 export type OrderBookMode = 'symbol' | 'usd';
 
 export type OrderDataSortBy =
@@ -76,4 +83,6 @@ export type OrderDataSortBy =
     | 'triggerConditions'
     | 'tpsl'
     | 'cancel'
+    | 'limitPx'
+    | 'triggerPx'
     | undefined;
