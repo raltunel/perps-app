@@ -35,7 +35,7 @@ export const createResolutionObjectForVal = (
     mantissa?: number,
 ) => {
     return {
-        nsigfigs: nsigfigs,
+        nsigfigs: nsigfigs < 0 ? null : nsigfigs,
         val: mantissa
             ? parseFloat(Number(val * mantissa).toFixed(15))
             : Number(val),
@@ -56,22 +56,6 @@ export const parseNum = (val: string | number) => {
 
 export const formatDateToTime = (date: Date) => {
     return date.toLocaleTimeString('en-GB', { hour12: false });
-};
-
-export const getResolutionListForPrice = (
-    price: number | string,
-): OrderRowResolutionIF[] => {
-    const ret: OrderRowResolutionIF[] = [];
-
-    const priceNum = Number(price);
-    ret.push(createResolutionObject(priceNum, 5));
-    ret.push(createResolutionObject(priceNum, 5, 2));
-    ret.push(createResolutionObject(priceNum, 5, 5));
-    ret.push(createResolutionObject(priceNum, 4));
-    ret.push(createResolutionObject(priceNum, 3));
-    ret.push(createResolutionObject(priceNum, 2));
-
-    return ret;
 };
 
 export const getTimeUntilNextHour = () => {
@@ -147,6 +131,21 @@ export const getResolutionListForSymbol = (
     const pricePow = get10PowForPrice(price);
 
     if (pricePow > -3) {
+        if (pricePow - 4 > 0) {
+            let temp = pricePow;
+            while (temp - 4 > 0) {
+                if (temp - 5 <= 0) {
+                    ret.push(
+                        createResolutionObjectForVal(
+                            Math.pow(10, temp - 5),
+                            -1,
+                        ),
+                    );
+                }
+                temp -= 1;
+            }
+        }
+
         ret.push(createResolutionObjectForVal(Math.pow(10, pricePow - 4), 5));
         ret.push(
             createResolutionObjectForVal(Math.pow(10, pricePow - 4), 5, 2),
