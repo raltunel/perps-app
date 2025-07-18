@@ -18,6 +18,7 @@
         "generate-pwa-assets": "pwa-assets-generator"
     },
     "dependencies": {
+        "@crocswap-libs/ambient-ember": "^0.0.3",
         "@fogo/sessions-idls": "^0.0.2",
         "@fogo/sessions-sdk": "^0.0.5",
         "@fogo/sessions-sdk-react": "^0.0.5",

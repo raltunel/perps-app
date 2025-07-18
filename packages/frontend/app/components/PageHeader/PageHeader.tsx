@@ -1,4 +1,9 @@
-import { SessionButton } from '@fogo/sessions-sdk-react';
+import { instructions } from '@crocswap-libs/ambient-ember';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
@@ -27,6 +32,8 @@ import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
+
+    const sessionState = useSession();
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -230,6 +237,26 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
+                    <button
+                        onClick={() => {
+                            (async () => {
+                                if (isEstablished(sessionState)) {
+                                    console.log('established');
+                                    const ix = instructions.pingIx(42n, {
+                                        actor: sessionState.sessionPublicKey,
+                                    });
+                                    console.log({ ix, sessionState });
+                                    const result =
+                                        await sessionState.sendTransaction([
+                                            ix,
+                                        ]);
+                                    console.log({ result });
+                                }
+                            })();
+                        }}
+                    >
+                        Send ping
+                    </button>
                     {!isUserConnected && <SessionButton />}
                     {isUserConnected && (
                         <section
