@@ -1,8 +1,8 @@
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './BalancesTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import type { UserBalanceSortBy } from '~/utils/UserDataIFs';
+import styles from './BalancesTable.module.css';
 
 export interface HeaderCell {
     name: string;
@@ -56,7 +56,7 @@ export default function BalancesTableHeader({
             className: styles.buyingPowerCell,
         },
         {
-            name: 'PNL (ROGER)',
+            name: 'PNL (ROE%)',
             key: 'pnlValue',
             sortable: true,
             className: styles.pnlCell,
