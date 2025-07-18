@@ -1,15 +1,30 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import * as d3fc from 'd3fc';
-import type { OrderBookRowIF } from '~/utils/orderbook/OrderBookIFs';
+import type {
+    OrderBookLiqIF,
+    OrderBookRowIF,
+} from '~/utils/orderbook/OrderBookIFs';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
     sellData: OrderBookRowIF[];
+    liqBuys: OrderBookLiqIF[];
+    liqSells: OrderBookLiqIF[];
+    width?: number;
+    height?: number;
 }
 
 const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
-    const { sellData, buyData } = props;
+    const {
+        sellData,
+        buyData,
+        liqBuys,
+        liqSells,
+        width = 300,
+        height = 400,
+    } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
 
@@ -32,21 +47,43 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [buyLineSeries, setBuyLineSeries] = React.useState<any>();
 
-    const chartHeight = 600;
-    const chartWidth = 200;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [buyLiqSeries, setBuyLiqSeries] = React.useState<any>();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [sellLiqSeries, setSellLiqSeries] = React.useState<any>();
+
+    const { getBsColor } = useAppSettings();
+
+    const chartHeight = height;
+    const chartWidth = width;
+
+    const currentFrame = useRef(0);
+
+    const animFrameRef = useRef<number | null>(null);
+    const animDuration = 50;
+
+    const isAnimating = useRef(false);
+
+    const [currentBuyData, setCurrentBuyData] =
+        useState<OrderBookRowIF[]>(buyData);
+    const [currentSellData, setCurrentSellData] =
+        useState<OrderBookRowIF[]>(sellData);
 
     useEffect(() => {
-        if (buyData === undefined || sellData === undefined) return;
-        if (buyData.length === 0 || sellData.length === 0) return;
+        if (currentBuyData === undefined || currentSellData === undefined)
+            return;
+        if (currentBuyData.length === 0 || currentSellData.length === 0) return;
 
         // Scale with RATIO
         const xScale = d3.scaleLinear().domain([0, 1]).range([chartWidth, 0]);
 
-        const topBoundaryBuy = Math.max(...buyData.map((d) => d.px));
-        const bottomBoundaryBuy = Math.min(...buyData.map((d) => d.px));
+        const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
+        const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
 
-        const topBoundarySell = Math.max(...sellData.map((d) => d.px));
-        const bottomBoundarySell = Math.min(...sellData.map((d) => d.px));
+        const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
+        const bottomBoundarySell = Math.min(
+            ...currentSellData.map((d) => d.px),
+        );
 
         // Scale with PX
         const buyYScale = d3
@@ -63,7 +100,90 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         setBuyYScale(() => buyYScale);
         setSellYScale(() => sellYScale);
-    }, [JSON.stringify(buyData), JSON.stringify(sellData)]);
+    }, [
+        JSON.stringify(currentBuyData),
+        JSON.stringify(currentSellData),
+        width,
+        height,
+    ]);
+
+    const interPolateData = useCallback(
+        (
+            fromData: OrderBookRowIF[],
+            toData: OrderBookRowIF[],
+            progress: number,
+        ) => {
+            if (progress < 0) return fromData;
+            if (progress > 1) return toData;
+
+            const interpolatedData: OrderBookRowIF[] = [];
+
+            for (let i = 0; i < fromData.length; i++) {
+                const fromRow = fromData[i];
+                const toRow = toData[i];
+
+                const interpolatedRow = {
+                    ...fromRow,
+                    ratio:
+                        (fromRow.ratio || 0) +
+                        ((toRow.ratio || 0) - (fromRow.ratio || 0)) * progress,
+                    px:
+                        (fromRow.px || 0) +
+                        ((toRow.px || 0) - (fromRow.px || 0)) * progress,
+                    sz:
+                        (fromRow.sz || 0) +
+                        ((toRow.sz || 0) - (fromRow.sz || 0)) * progress,
+                };
+
+                interpolatedData.push(interpolatedRow);
+            }
+
+            return interpolatedData;
+        },
+        [],
+    );
+
+    const animateChart = useCallback(
+        (newBuyData: OrderBookRowIF[], newSellData: OrderBookRowIF[]) => {
+            if (isAnimating.current && animFrameRef.current) {
+                cancelAnimationFrame(animFrameRef.current);
+                isAnimating.current = false;
+            }
+
+            isAnimating.current = true;
+
+            const startTs = performance.now();
+
+            const anim = (time: number) => {
+                const elapsed = time - startTs;
+                const progress = Math.min(elapsed / animDuration, 1);
+
+                const interpolatedBuys = interPolateData(
+                    currentBuyData,
+                    newBuyData,
+                    progress,
+                );
+                const interpolatedSells = interPolateData(
+                    currentSellData,
+                    newSellData,
+                    progress,
+                );
+
+                setCurrentBuyData(interpolatedBuys);
+                setCurrentSellData(interpolatedSells);
+
+                if (progress < 1) {
+                    animFrameRef.current = requestAnimationFrame(anim);
+                } else {
+                    isAnimating.current = false;
+                    animFrameRef.current = null;
+                }
+            };
+
+            animFrameRef.current = requestAnimationFrame(anim);
+        },
+        [currentBuyData, currentSellData, animDuration, interPolateData],
+    );
 
     useEffect(() => {
         if (sellYScale && buyYScale && xScale && sellData && buyData) {
@@ -79,8 +199,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const style = getComputedStyle(context.canvas);
 
-            const buyRgbaColor = style.getPropertyValue('--green');
-            const sellRgbaColor = style.getPropertyValue('--red');
+            // liq chart coloring should be inverted
+            const buyRgbaColor = getBsColor().sell;
+            const sellRgbaColor = getBsColor().buy;
 
             const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
             const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
@@ -125,6 +246,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 .xScale(xScale)
                 .yScale(sellYScale)
                 .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
                     context.strokeStyle = sellRgbaColor;
                     context.lineWidth = 1.5;
                 });
@@ -141,17 +263,83 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     context.strokeStyle = buyRgbaColor;
                     context.lineWidth = 1.5;
                 });
+            const buyLiqLines = d3fc
+                .seriesCanvasLine()
+                .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
+                    context.strokeStyle = getBsColor().sell;
+                    context.lineWidth = 2;
+
+                    // Draw discrete horizontal lines for buy liquidations
+                    liqBuys.forEach((liq) => {
+                        const yPos = buyYScale(liq.px);
+                        const xStart = xScale(liq.ratio || 0); // Start position based on ratio
+                        const xEnd = chartWidth; // End at right edge
+
+                        context.beginPath();
+                        context.moveTo(xStart, yPos);
+                        context.lineTo(xEnd, yPos);
+                        context.stroke();
+                    });
+
+                    context.restore();
+                })
+                .mainValue(() => 0) // Dummy values
+                .crossValue(() => 0)
+                .xScale(xScale)
+                .yScale(buyYScale);
+
+            // Fixed Sell Liquidation Lines - start from right, length based on ratio
+            const sellLiqLines = d3fc
+                .seriesCanvasLine()
+                .decorate((context: CanvasRenderingContext2D) => {
+                    context.save();
+                    context.strokeStyle = getBsColor().buy;
+                    context.lineWidth = 2;
+
+                    // Draw discrete horizontal lines for sell liquidations
+                    liqSells.forEach((liq) => {
+                        const yPos = sellYScale(liq.px);
+                        const xStart = xScale(liq.ratio || 0); // Start position based on ratio
+                        const xEnd = chartWidth; // End at right edge
+
+                        context.beginPath();
+                        context.moveTo(xStart, yPos);
+                        context.lineTo(xEnd, yPos);
+                        context.stroke();
+                    });
+
+                    context.restore();
+                })
+                .mainValue(() => 0) // Dummy values
+                .crossValue(() => 0)
+                .xScale(xScale)
+                .yScale(sellYScale);
 
             setSellLineSeries(() => sellLine);
             setBuyLineSeries(() => buyLine);
             setSellAreaSeries(() => sellArea);
             setBuyAreaSeries(() => buyArea);
+            setBuyLiqSeries(() => buyLiqLines);
+            setSellLiqSeries(() => sellLiqLines);
         }
-    }, [buyYScale, sellYScale, xScale]);
+    }, [
+        buyYScale,
+        sellYScale,
+        xScale,
+        width,
+        height,
+        getBsColor,
+        liqBuys,
+        liqSells,
+        chartWidth,
+    ]);
 
     useEffect(() => {
         if (sellData.length === 0 || buyData.length === 0) return;
         if (sellAreaSeries && buyAreaSeries) {
+            currentFrame.current = performance.now();
+
             const canvas = d3
                 .select(d3CanvasLiq.current)
                 .select('canvas')
@@ -165,16 +353,26 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             d3.select(d3CanvasLiq.current)
                 .on('draw', () => {
-                    sellAreaSeries(sellData);
-                    buyAreaSeries(buyData);
-                    sellLineSeries(sellData);
-                    buyLineSeries(buyData);
+                    sellAreaSeries(currentSellData);
+                    buyAreaSeries(currentBuyData);
+                    sellLineSeries(currentSellData);
+                    buyLineSeries(currentBuyData);
+
+                    // Only call liquidation series if we have data
+                    if (liqBuys.length > 0 && buyLiqSeries) {
+                        buyLiqSeries([{}]); // Pass dummy data since we draw manually
+                    }
+                    if (liqSells.length > 0 && sellLiqSeries) {
+                        sellLiqSeries([{}]); // Pass dummy data since we draw manually
+                    }
                 })
                 .on('measure', (event: CustomEvent) => {
                     sellAreaSeries?.context(context);
                     sellLineSeries?.context(context);
                     buyAreaSeries?.context(context);
                     buyLineSeries?.context(context);
+                    buyLiqSeries?.context(context);
+                    sellLiqSeries?.context(context);
                 });
         }
     }, [
@@ -182,9 +380,19 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyAreaSeries,
         sellLineSeries,
         buyLineSeries,
-        JSON.stringify(buyData),
-        JSON.stringify(sellData),
+        buyLiqSeries,
+        sellLiqSeries,
+        liqBuys,
+        liqSells,
+        JSON.stringify(currentBuyData),
+        JSON.stringify(currentSellData),
     ]);
+
+    useEffect(() => {
+        if (buyData.length === 0 || sellData.length === 0) return;
+
+        animateChart(buyData, sellData);
+    }, [JSON.stringify(buyData), JSON.stringify(sellData), animateChart]);
 
     return (
         <>

@@ -8,6 +8,7 @@ import { TableState } from '~/utils/CommonIFs';
 import type { TwapHistoryIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import HistoryTwapTableHeader from './HistoryTwapTableHeader';
 import HistoryTwapTableRow from './HistoryTwapTableRow';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 interface HistoryTwapTableProps {
     data: TwapHistoryIF[];
     isFetched: boolean;
@@ -26,7 +27,7 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
     currentUserRef.current = debugWallet.address;
 
     const viewAllLink = useMemo(() => {
-        return `/twapHistory/${currentUserRef.current}`;
+        return `${EXTERNAL_PAGE_URL_PREFIX}/twapHistory/${currentUserRef.current}`;
     }, [debugWallet.address]);
 
     const filteredData = useMemo(() => {

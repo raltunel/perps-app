@@ -10,7 +10,7 @@ import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
-import { useModal, type useModalIF } from '~/hooks/useModal';
+import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import {
     useNotificationStore,
@@ -35,6 +35,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -94,10 +95,11 @@ const marketOrderTypes = [
     },
 ];
 
-const chaseOptionTypes = [
-    { value: 'bid1ask1', label: 'Bid1/Ask1' },
-    { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
-];
+// disabled code 07 Jul 25
+// const chaseOptionTypes = [
+//     { value: 'bid1ask1', label: 'Bid1/Ask1' },
+//     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
+// ];
 
 const leverageOptions = [
     { value: 1, label: '1x' },
@@ -106,27 +108,27 @@ const leverageOptions = [
     { value: 50, label: '50x' },
     { value: 100, label: '100x' },
 ];
-const positionSizeOptions = [
-    { value: 0, label: '0%' },
-    { value: 25, label: '5%' },
-    { value: 50, label: '10%' },
-    { value: 75, label: '50%' },
-    { value: 100, label: '100%' },
-];
+
+// keys for content that may be rendered in tx modal
+export type modalContentT =
+    | 'margin'
+    | 'scale'
+    | 'market_buy'
+    | 'market_sell'
+    | 'limit_buy'
+    | 'limit_sell';
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
-    const [modalContent, setModalContent] = useState<
-        'margin' | 'scale' | 'confirm_buy' | 'confirm_sell' | null
-    >(null);
 
     const [leverage, setLeverage] = useState(100);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
     const [positionSize, setPositionSize] = useState(0);
-    const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
+    // disabled 07 Jul 25
+    // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
     const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
     const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
@@ -148,13 +150,13 @@ function OrderInput() {
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
 
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
     const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
         useTradeDataStore();
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const appSettingsModal: useModalIF = useModal('closed');
+    const confirmOrderModal = useModal<modalContentT>('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
@@ -241,12 +243,7 @@ function OrderInput() {
         }
     }, [obChosenAmount, obChosenPrice]);
 
-    const openModalWithContent = (
-        content: 'margin' | 'scale' | 'confirm_buy' | 'confirm_sell',
-    ) => {
-        setModalContent(content);
-        appSettingsModal.open();
-    };
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
@@ -259,7 +256,7 @@ function OrderInput() {
         if (activeMargin) {
             console.log(`Confirmed: ${activeMargin} margin mode`);
         }
-        appSettingsModal.close();
+        confirmOrderModal.close();
     };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
@@ -334,10 +331,11 @@ function OrderInput() {
         console.log(`PositionSize changed to: ${value}x`);
     };
     // CHASE OPTION---------------------------------------------------
-    const handleChaseOptionChange = (value: string) => {
-        setChaseOption(value);
-        console.log(`Chase Option changed to: ${value}`);
-    };
+    // code disabled 07 Jul 25
+    // const handleChaseOptionChange = (value: string) => {
+    //     setChaseOption(value);
+    //     console.log(`Chase Option changed to: ${value}`);
+    // };
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
@@ -403,11 +401,11 @@ function OrderInput() {
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
-                        <button onClick={() => openModalWithContent('scale')}>
+                        <button onClick={() => confirmOrderModal.open('scale')}>
                             <img src={flatSvg} alt='flat price distribution' />
                             Flat
                         </button>
-                        <button onClick={() => openModalWithContent('scale')}>
+                        <button onClick={() => confirmOrderModal.open('scale')}>
                             <img src={evenSvg} alt='even price distribution' />
                             Evenly Split
                         </button>
@@ -503,12 +501,12 @@ function OrderInput() {
             setSelectedMode,
             useTotalSize,
         }),
-        [size, handleSizeChange, useTotalSize],
+        [size, handleSizeChange, useTotalSize, selectedMode, symbol],
     );
 
     const positionSizeProps = useMemo(
         () => ({
-            options: positionSizeOptions,
+            step: 5,
             value: positionSize,
             onChange: handlePositionSizeChange,
         }),
@@ -591,7 +589,7 @@ function OrderInput() {
                                 onChange={handleMarketOrderTypeChange}
                             />
                             <button
-                                onClick={() => openModalWithContent('margin')}
+                                onClick={() => confirmOrderModal.open('margin')}
                                 className={styles.isolatedButton}
                             >
                                 Isolated <FiChevronDown size={24} />
@@ -655,27 +653,38 @@ function OrderInput() {
                         />
                     </div>
                     <PlaceOrderButtons
+                        isLimit={marketOrderType === 'limit'}
                         orderMarketPrice={marketOrderType}
-                        openModalWithContent={openModalWithContent}
+                        openModalWithContent={(c: modalContentT) =>
+                            confirmOrderModal.open(c)
+                        }
                         orderValue={orderValue}
                         leverage={leverage}
                     />
-                    {appSettingsModal.isOpen && (
+                    {confirmOrderModal.isOpen && (
                         <Modal
-                            close={appSettingsModal.close}
+                            close={confirmOrderModal.close}
                             title={
-                                modalContent === 'margin'
+                                confirmOrderModal.content === 'margin'
                                     ? 'Margin Mode'
-                                    : modalContent === 'scale'
+                                    : confirmOrderModal.content === 'scale'
                                       ? 'Scale Options'
-                                      : modalContent === 'confirm_buy'
+                                      : confirmOrderModal.content ===
+                                          'market_buy'
                                         ? 'Confirm Buy Order'
-                                        : modalContent === 'confirm_sell'
+                                        : confirmOrderModal.content ===
+                                            'market_sell'
                                           ? 'Confirm Sell Order'
-                                          : ''
+                                          : confirmOrderModal.content ===
+                                              'limit_buy'
+                                            ? 'Confirm Limit Buy'
+                                            : confirmOrderModal.content ===
+                                                'limit_sell'
+                                              ? 'Confirm Limit Sale'
+                                              : ''
                             }
                         >
-                            {modalContent === 'margin' && (
+                            {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
                                     handleMarginModeChange={
                                         handleMarginModeChange
@@ -687,7 +696,7 @@ function OrderInput() {
                                 />
                             )}
 
-                            {modalContent === 'scale' && (
+                            {confirmOrderModal.content === 'scale' && (
                                 <ScaleOrders
                                     totalQuantity={parseFloat(
                                         priceRangeTotalOrders,
@@ -695,35 +704,113 @@ function OrderInput() {
                                     minPrice={parseFloat(priceRangeMin)}
                                     maxPrice={parseFloat(priceRangeMax)}
                                     isModal
-                                    onClose={appSettingsModal.close}
+                                    onClose={confirmOrderModal.close}
                                 />
                             )}
-                            {modalContent === 'confirm_buy' && (
+                            {confirmOrderModal.content === 'market_buy' && (
                                 <ConfirmationModal
-                                    tx='buy'
+                                    tx='market_buy'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
+                                    isEnabled={
+                                        !activeOptions.skipOpenOrderConfirm
+                                    }
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipOpenOrderConfirm',
+                                        )
+                                    }
                                     onClose={() => {
                                         notifications.add({
-                                            title: 'Buy / Long Order Pending',
+                                            title: 'Buy / Long Market Order Pending',
                                             message:
                                                 'Buying 0.0001 ETH at $2,300',
                                             icon: 'spinner',
                                         });
-                                        appSettingsModal.close();
+                                        confirmOrderModal.close();
                                     }}
                                 />
                             )}
-                            {modalContent === 'confirm_sell' && (
+                            {confirmOrderModal.content === 'market_sell' && (
                                 <ConfirmationModal
-                                    tx='sell'
+                                    tx='market_sell'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
                                     onClose={() => {
                                         notifications.add({
-                                            title: 'Sell / Short Order Pending',
+                                            title: 'Sell / Short Market Order Pending',
                                             message:
                                                 'Selling 0.0001 ETH at $2,300',
                                             icon: 'spinner',
                                         });
-                                        appSettingsModal.close();
+                                        confirmOrderModal.close();
                                     }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipClosePositionConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
+                                />
+                            )}
+                            {confirmOrderModal.content === 'limit_buy' && (
+                                <ConfirmationModal
+                                    tx='limit_buy'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
+                                    limitPrice={price}
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Buy / Long Limit Order Pending',
+                                            message:
+                                                'Buying 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        confirmOrderModal.close();
+                                    }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipOpenOrderConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
+                                />
+                            )}
+                            {confirmOrderModal.content === 'limit_sell' && (
+                                <ConfirmationModal
+                                    tx='limit_sell'
+                                    size={{
+                                        qty: size,
+                                        denom: 'BTC',
+                                    }}
+                                    limitPrice={price}
+                                    onClose={() => {
+                                        notifications.add({
+                                            title: 'Sell / Short Limit Order Pending',
+                                            message:
+                                                'Selling 0.0001 ETH at $2,300',
+                                            icon: 'spinner',
+                                        });
+                                        confirmOrderModal.close();
+                                    }}
+                                    toggleEnabled={() =>
+                                        activeOptions.toggle(
+                                            'skipClosePositionConfirm',
+                                        )
+                                    }
+                                    isEnabled={
+                                        !activeOptions.skipClosePositionConfirm
+                                    }
                                 />
                             )}
                         </Modal>

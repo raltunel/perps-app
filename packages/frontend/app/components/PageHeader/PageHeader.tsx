@@ -9,11 +9,13 @@ import {
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
 import { useApp } from '~/contexts/AppContext';
-import { type useModalIF, useModal } from '~/hooks/useModal';
+import { useKeydown } from '~/hooks/useKeydown';
+import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
+import Tooltip from '../Tooltip/Tooltip';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import HelpDropdown from './HelpDropdown/HelpDropdown';
@@ -21,7 +23,6 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { useKeydown } from '~/hooks/useKeydown';
 
 export default function PageHeader() {
     const { isUserConnected, setIsUserConnected } = useApp();
@@ -41,12 +42,12 @@ export default function PageHeader() {
 
     // data to generate nav links in page header
     const navLinks = [
-        { name: 'Trade', path: `/trade/${symbol}` },
-        { name: 'Vaults', path: '/vaults' },
-        { name: 'Portfolio', path: '/portfolio' },
-        { name: 'Referrals', path: '/referrals' },
+        { name: 'Trade', path: `/v2/trade/${symbol}` },
+        { name: 'Vaults', path: '/v2/vaults' },
+        { name: 'Portfolio', path: '/v2/portfolio' },
+        { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
-        { name: 'Leaderboard', path: '/leaderboard' },
+        { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
     ];
 
@@ -76,7 +77,7 @@ export default function PageHeader() {
     }, isHelpDropdownOpen);
 
     // logic to open and close the app settings modal
-    const appSettingsModal: useModalIF = useModal('closed');
+    const appSettingsModal = useModal('closed');
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -157,14 +158,16 @@ export default function PageHeader() {
                             />
                         )}
                     </section>
-                    <a
-                        href='https://ambient.finance/trade'
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className={styles.ambientmm}
-                    >
-                        Ambient AMM
-                    </a>
+                    <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
+                        <a
+                            href='/trade'
+                            // target='_blank'
+                            // rel='noopener noreferrer'
+                            className={styles.ambientmm}
+                        >
+                            Ambient AMM
+                        </a>
+                    </Tooltip>
                 </nav>
                 <div className={styles.rightSide}>
                     {isUserConnected && (
@@ -287,7 +290,7 @@ export default function PageHeader() {
 
                     <button
                         className={styles.internationalButton}
-                        onClick={appSettingsModal.open}
+                        onClick={() => appSettingsModal.open()}
                     >
                         <LuSettings size={20} />
                     </button>
@@ -310,7 +313,7 @@ export default function PageHeader() {
 
             {appSettingsModal.isOpen && (
                 <Modal
-                    close={appSettingsModal.close}
+                    close={() => appSettingsModal.close()}
                     position={'center'}
                     title='Options'
                 >

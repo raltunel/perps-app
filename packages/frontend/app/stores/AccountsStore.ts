@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { generateSolanaAddress } from '~/utils/functions/makeAddress';
 
-type subaccountGroupT = 'strategy'|'discretionary';
+type subaccountGroupT = 'strategy' | 'discretionary';
 
 export interface accountIF {
     name: string;
@@ -24,7 +24,6 @@ class Account implements accountIF {
     }
 }
 
-
 export interface allAccountsIF {
     master: accountIF;
     sub: accountIF[];
@@ -40,11 +39,36 @@ const MOCK_ACCOUNTS: allAccountsIF = {
         'discretionary',
     ),
     sub: [
-        new Account('Sub-Account 1', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
-        new Account('Sub-Account 2', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
-        new Account('Sub-Account 5', generateSolanaAddress(), ZERO_DOLLARS, 'strategy'),
-        new Account('Sub-Account 3', generateSolanaAddress(), ZERO_DOLLARS, 'discretionary'),
-        new Account('Sub-Account 4', generateSolanaAddress(), ZERO_DOLLARS, 'strategy'),
+        new Account(
+            'Sub-Account 1',
+            generateSolanaAddress(),
+            ZERO_DOLLARS,
+            'discretionary',
+        ),
+        new Account(
+            'Sub-Account 2',
+            generateSolanaAddress(),
+            ZERO_DOLLARS,
+            'discretionary',
+        ),
+        new Account(
+            'Sub-Account 5',
+            generateSolanaAddress(),
+            ZERO_DOLLARS,
+            'strategy',
+        ),
+        new Account(
+            'Sub-Account 3',
+            generateSolanaAddress(),
+            ZERO_DOLLARS,
+            'discretionary',
+        ),
+        new Account(
+            'Sub-Account 4',
+            generateSolanaAddress(),
+            ZERO_DOLLARS,
+            'strategy',
+        ),
     ],
 };
 

@@ -1,4 +1,8 @@
-import { type useStrategiesStoreIF, useStrategiesStore, type strategyIF } from '~/stores/StrategiesStore';
+import {
+    type useStrategiesStoreIF,
+    useStrategiesStore,
+    type strategyIF,
+} from '~/stores/StrategiesStore';
 import CreateStrategy from './CreateStrategy';
 
 export default function newStrategy() {

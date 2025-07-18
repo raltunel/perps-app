@@ -70,10 +70,19 @@ body {
 .containerTopLeft {
     height: 100%;
     display: grid;
-    grid-template-rows: 30px 40px 40px 1fr;
-    width: 100%;
+    grid-template-rows: 40px 40px 1fr;
+    min-width: 0;
+    /* width: 100%; */
 
     gap: var(--gap-s);
+}
+
+.containerTopLeft > * {
+    min-width: 0;
+}
+
+.containerTopLeft.debugToolbarOpen {
+    grid-template-rows: 30px 40px 40px 1fr;
 }
 
 .watchlist,
@@ -122,12 +131,14 @@ body {
 }
 
 .chartLayout {
-    width: 100%;
-    height: 100%;
+    transition: all 0.2s ease-in-out;
     display: grid;
-    grid-template-columns: 5fr 1fr;
-
     gap: var(--gap-s);
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.chartLayout.liqActive {
+    grid-template-columns: minmax(0, 1fr) var(--order-book-width-desktop-small);
 }
 
 .liquidationsChart {
@@ -147,6 +158,10 @@ body {
         grid-template-columns: 1fr var(--order-book-width-desktop-large) var(
                 --trade-module-width-desktop-large
             );
+    }
+
+    .chartLayout.liqActive {
+        grid-template-columns: 1fr var(--order-book-width-desktop-large);
     }
 
     .containerTop.orderBookLarge {
@@ -329,4 +344,8 @@ body {
     .containerBottom {
         display: none;
     }
+}
+
+.debugToolbar {
+    transition: all 0.2s ease-in-out;
 }

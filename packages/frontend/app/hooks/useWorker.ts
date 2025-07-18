@@ -14,7 +14,7 @@ export const useWorker = <T>(
     workerKey: WorkerKey,
     onMessage: (event: MessageEvent<T>) => void,
     onError?: (event: ErrorEvent) => void,
-): ((message: any) => void) => {
+): ((message: T) => void) => {
     const workerRef = useRef<Worker | null>(null);
     const onMessageRef = useRef(onMessage);
     const onErrorRef = useRef(onError);

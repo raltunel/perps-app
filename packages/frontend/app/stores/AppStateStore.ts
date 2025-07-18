@@ -11,6 +11,10 @@ type AppStateStore = {
     setIsWsStashed: (isWsStashed: boolean) => void;
     isTabActive: boolean;
     setIsTabActive: (isTabActive: boolean) => void;
+    debugToolbarOpen: boolean;
+    setDebugToolbarOpen: (debugToolbarOpen: boolean) => void;
+    liquidationsActive: boolean;
+    setLiquidationsActive: (liquidationsActive: boolean) => void;
 };
 
 export const useAppStateStore = create<AppStateStore>((set) => ({
@@ -25,4 +29,10 @@ export const useAppStateStore = create<AppStateStore>((set) => ({
     setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
     isTabActive: true,
     setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
+    debugToolbarOpen: false,
+    setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
+        set({ debugToolbarOpen }),
+    liquidationsActive: true,
+    setLiquidationsActive: (liquidationsActive: boolean) =>
+        set({ liquidationsActive }),
 }));
