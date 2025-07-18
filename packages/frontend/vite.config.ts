@@ -1,5 +1,6 @@
 import { reactRouter } from '@react-router/dev/vite';
 import { defineConfig, type PluginOption } from 'vite';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -20,6 +21,7 @@ export default defineConfig({
         },
     },
     plugins: [
+        nodePolyfills(), // this is necessary to avoid "process is not defined issue",
         tsconfigPaths() as PluginOption,
         reactRouter(),
         VitePWA({

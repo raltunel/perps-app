@@ -9,17 +9,17 @@ import {
 } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
-import PageHeader from './components/PageHeader/PageHeader';
-
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import PageHeader from './components/PageHeader/PageHeader';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
+import './polyfills';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
