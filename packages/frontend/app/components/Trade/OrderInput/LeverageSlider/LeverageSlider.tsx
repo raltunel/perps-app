@@ -67,11 +67,11 @@ export default function LeverageSlider({
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
-        preferredLeverage,
         currentLeverage,
         currentMarket,
         setPreferredLeverage,
         validateAndApplyLeverageForMarket,
+        getPreferredLeverage,
     } = useLeverageStore();
 
     // Use maxLeverage from symbolInfo, fallback to default if not available
@@ -158,6 +158,8 @@ export default function LeverageSlider({
             onChange(displayValue);
             setHasInitializedLeverage(true);
 
+            // Get the preferred leverage for logging
+            const preferredLeverage = getPreferredLeverage();
             console.log(
                 `Market: ${currentSymbol}, Preferred: ${preferredLeverage}x, Applied: ${displayValue}x, Max: ${symbolInfo.maxLeverage}x`,
             );
@@ -166,10 +168,10 @@ export default function LeverageSlider({
         currentSymbol,
         symbolInfo?.maxLeverage,
         currentMarket,
-        preferredLeverage,
         minimumInputValue,
         onChange,
         validateAndApplyLeverageForMarket,
+        getPreferredLeverage,
         hasInitializedLeverage,
     ]);
 
@@ -179,7 +181,7 @@ export default function LeverageSlider({
         const displayValue = getRoundedDisplayValue(newLeverage);
 
         // Update the preferred leverage in store with the DISPLAY VALUE
-        // This ensures localStorage saves exactly what the user sees
+        // This will now save to localStorage per market
         setPreferredLeverage(displayValue);
 
         // Also call the parent onChange with the display value
@@ -589,6 +591,17 @@ export default function LeverageSlider({
             #EE9A4F 75%, 
             #EF5350 100%)`;
     };
+
+    // Helper function to check if current leverage matches preference
+    const isCurrentLeveragePreferred = () => {
+        const preferredLeverage = getPreferredLeverage();
+        return Math.abs(currentValue - preferredLeverage) < 0.01; // Small tolerance for floating point comparison
+    };
+
+    // Optional: Get leverage status for styling
+    const leverageStatus = isCurrentLeveragePreferred()
+        ? 'preferred'
+        : 'adjusted';
 
     return (
         <div
