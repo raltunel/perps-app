@@ -11,6 +11,14 @@ export default defineConfig({
         ssr: false, // Explicitly disable SSR
         outDir: 'build/client',
     },
+    ssr: {
+        noExternal: ['@fogo/sessions-sdk-react'],
+    },
+    resolve: {
+        alias: {
+            'node-fetch': 'isomorphic-fetch',
+        },
+    },
     plugins: [
         tsconfigPaths() as PluginOption,
         reactRouter(),
