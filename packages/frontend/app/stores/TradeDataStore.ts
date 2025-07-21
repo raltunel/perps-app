@@ -9,7 +9,7 @@ import {
     type UserTradeDataStore,
 } from './UserTradeDataStore';
 
-export type marginModesT = 'cross' | 'isolate';
+export type marginModesT = 'cross' | 'isolated';
 
 type TradeDataStore = UserTradeDataStore & {
     marginMode: marginModesT;
