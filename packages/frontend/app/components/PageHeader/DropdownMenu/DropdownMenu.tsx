@@ -1,10 +1,10 @@
 import {
     FaDiscord,
-    FaFileAlt,
-    FaMediumM,
-    FaQuestionCircle,
+    // FaFileAlt,
+    // FaMediumM,
+    // FaQuestionCircle,
     FaTwitter,
-    FaUserSecret,
+    // FaUserSecret,
 } from 'react-icons/fa';
 import { IoIosInformationCircle } from 'react-icons/io';
 import { useTutorial } from '~/hooks/useTutorial';
@@ -12,13 +12,13 @@ import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 
 const menuItems = [
-    { name: 'Docs', icon: <FaFileAlt /> },
+    // { name: 'Docs', icon: <FaFileAlt /> },
     { name: 'Twitter', icon: <FaTwitter /> },
     { name: 'Discord', icon: <FaDiscord /> },
-    { name: 'Medium', icon: <FaMediumM /> },
-    { name: 'Privacy', icon: <FaUserSecret /> },
-    { name: 'Terms of Service', icon: <FaFileAlt /> },
-    { name: 'FAQ', icon: <FaQuestionCircle /> },
+    // { name: 'Medium', icon: <FaMediumM /> },
+    // { name: 'Privacy', icon: <FaUserSecret /> },
+    // { name: 'Terms of Service', icon: <FaFileAlt /> },
+    // { name: 'FAQ', icon: <FaQuestionCircle /> },
 ];
 
 const DropdownMenu = () => {

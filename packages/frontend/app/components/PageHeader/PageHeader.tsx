@@ -35,6 +35,7 @@ export default function PageHeader() {
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
+    const showRPCButton = false;
     const location = useLocation();
 
     // symbol for active market
@@ -195,7 +196,7 @@ export default function PageHeader() {
                         </section>
                     )}
 
-                    {isUserConnected && (
+                    {isUserConnected && showRPCButton && (
                         <section
                             style={{ position: 'relative' }}
                             ref={rpcMenuRef}
