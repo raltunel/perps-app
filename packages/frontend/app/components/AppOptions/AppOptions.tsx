@@ -44,21 +44,22 @@ export default function AppOptions() {
                     text='Skip Close Position Confirmations'
                     isChecked={activeOptions['skipClosePositionConfirm']}
                     toggle={() =>
-                        activeOptions.toggle('skipClosePositionConfirm')
+                        // activeOptions.toggle('skipClosePositionConfirm')
+                        activeOptions.enable('skipClosePositionConfirm')
                     }
                 />
-                <OptionLine
+                {/* <OptionLine
                     text='Opt Out of Spot Dusting'
                     isChecked={activeOptions['optOutSpotDusting']}
                     toggle={() => activeOptions.toggle('optOutSpotDusting')}
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Persist Trading Connection'
                     isChecked={activeOptions['persistTradingConnection']}
                     toggle={() =>
                         activeOptions.toggle('persistTradingConnection')
                     }
-                />
+                /> */}
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>

@@ -1,6 +1,12 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    memo,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+    type JSX,
+} from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
@@ -15,7 +21,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -29,11 +35,12 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -111,7 +118,6 @@ export type modalContentT =
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
     const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
@@ -120,11 +126,11 @@ function OrderInput() {
     const [positionSize, setPositionSize] = useState(0);
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
-    const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
-    const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
-    const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
-    const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
-        useState(false);
+    // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
+    // const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
+    // const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
+    // const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
+    //     useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
@@ -144,8 +150,15 @@ function OrderInput() {
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
-        useTradeDataStore();
+    const {
+        obChosenPrice,
+        obChosenAmount,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+    } = useTradeDataStore();
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -271,16 +284,7 @@ function OrderInput() {
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
     }, []);
-    const handleMarginModeChange = useCallback((mode: MarginMode) => {
-        setActiveMargin(mode);
-    }, []);
 
-    const handleMarginModeConfirm = () => {
-        if (activeMargin) {
-            console.log(`Confirmed: ${activeMargin} margin mode`);
-        }
-        confirmOrderModal.close();
-    };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
     };
@@ -362,26 +366,26 @@ function OrderInput() {
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
-    const handleToggleReduceOnly = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isReduceOnlyEnabled;
-        setIsReduceOnlyEnabled(newValue);
-    };
-    const handleToggleProfitOnly = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isTakeProfitEnabled;
-        setIsTakeProfitEnabled(newValue);
-    };
-    const handleToggleRandomize = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isRandomizeEnabled;
-        setIsRandomizeEnabled(newValue);
-    };
-    const handleToggleChasingInterval = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isChasingIntervalEnabled;
-        setIsChasingIntervalEnabled(newValue);
-    };
+    // const handleToggleReduceOnly = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isReduceOnlyEnabled;
+    //     setIsReduceOnlyEnabled(newValue);
+    // };
+    // const handleToggleProfitOnly = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isTakeProfitEnabled;
+    //     setIsTakeProfitEnabled(newValue);
+    // };
+    // const handleToggleRandomize = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isRandomizeEnabled;
+    //     setIsRandomizeEnabled(newValue);
+    // };
+    // const handleToggleChasingInterval = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isChasingIntervalEnabled;
+    //     setIsChasingIntervalEnabled(newValue);
+    // };
 
     // PRICE RANGE AND TOTAL ORDERS -----------------------------------------
     const handleMinPriceRange = (
@@ -440,30 +444,30 @@ function OrderInput() {
     );
 
     // -----------------------------PROPS----------------------------------------
-    const reduceAndProfitToggleProps = useMemo(
-        () => ({
-            isReduceOnlyEnabled,
-            isTakeProfitEnabled,
-            handleToggleProfitOnly,
-            handleToggleReduceOnly,
-            marketOrderType,
-            isRandomizeEnabled,
-            handleToggleRandomize,
-            isChasingIntervalEnabled,
-            handleToggleIsChasingInterval: handleToggleChasingInterval,
-        }),
-        [
-            isReduceOnlyEnabled,
-            isTakeProfitEnabled,
-            handleToggleProfitOnly,
-            handleToggleReduceOnly,
-            marketOrderType,
-            isRandomizeEnabled,
-            handleToggleRandomize,
-            isChasingIntervalEnabled,
-            handleToggleChasingInterval,
-        ],
-    );
+    // const reduceAndProfitToggleProps = useMemo(
+    //     () => ({
+    //         isReduceOnlyEnabled,
+    //         isTakeProfitEnabled,
+    //         handleToggleProfitOnly,
+    //         handleToggleReduceOnly,
+    //         marketOrderType,
+    //         isRandomizeEnabled,
+    //         handleToggleRandomize,
+    //         isChasingIntervalEnabled,
+    //         handleToggleIsChasingInterval: handleToggleChasingInterval,
+    //     }),
+    //     [
+    //         isReduceOnlyEnabled,
+    //         isTakeProfitEnabled,
+    //         handleToggleProfitOnly,
+    //         handleToggleReduceOnly,
+    //         marketOrderType,
+    //         isRandomizeEnabled,
+    //         handleToggleRandomize,
+    //         isChasingIntervalEnabled,
+    //         handleToggleChasingInterval,
+    //     ],
+    // );
 
     const leverageSliderProps = useMemo(
         () => ({
@@ -504,7 +508,7 @@ function OrderInput() {
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit'].includes(marketOrderType),
         }),
         [price, handlePriceChange],
     );
@@ -552,6 +556,46 @@ function OrderInput() {
             priceRangeTotalOrders,
         ],
     );
+
+    // fn to submit a 'Buy' market order
+    function submitMarketBuy(): void {
+        notifications.add({
+            title: 'Buy / Long Market Order Pending',
+            message: 'Buying 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Sell' market order
+    function submitMarketSell(): void {
+        notifications.add({
+            title: 'Sell / Short Market Order Pending',
+            message: 'Selling 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Buy' limit order
+    function submitLimitBuy(): void {
+        notifications.add({
+            title: 'Buy / Long Limit Order Pending',
+            message: 'Buying 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
+
+    // fn to submit a 'Sell' limit order
+    function submitLimitSell(): void {
+        notifications.add({
+            title: 'Sell / Short Limit Order Pending',
+            message: 'Selling 0.0001 ETH at $2,300',
+            icon: 'spinner',
+        });
+        confirmOrderModal.close();
+    }
 
     // logic to dispatch a notification on demand
     const notifications: NotificationStoreIF = useNotificationStore();
@@ -609,12 +653,14 @@ function OrderInput() {
                                 value={marketOrderType}
                                 onChange={handleMarketOrderTypeChange}
                             />
-                            <button
+                            <SimpleButton
+                                className={styles.margin_type_btn}
                                 onClick={() => confirmOrderModal.open('margin')}
-                                className={styles.isolatedButton}
+                                bg='dark3'
+                                hoverBg='accent1'
                             >
-                                Isolated <FiChevronDown size={24} />
-                            </button>
+                                {marginMode}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 onClick={() => setShowLaunchpad(true)}
@@ -669,16 +715,42 @@ function OrderInput() {
                             priceDistributionButtons}
                         {marketOrderType === 'twap' && <RunningTime />}
 
-                        <ReduceAndProfitToggle
+                        {/* <ReduceAndProfitToggle
                             {...reduceAndProfitToggleProps}
-                        />
+                        /> */}
                     </div>
                     <PlaceOrderButtons
-                        isLimit={marketOrderType === 'limit'}
+                        buyFn={() => {
+                            if (marketOrderType === 'market') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitMarketBuy();
+                                } else {
+                                    confirmOrderModal.open('market_buy');
+                                }
+                            } else if (marketOrderType === 'limit') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitLimitBuy();
+                                } else {
+                                    confirmOrderModal.open('limit_buy');
+                                }
+                            }
+                        }}
+                        sellFn={() => {
+                            if (marketOrderType === 'market') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitMarketSell();
+                                } else {
+                                    confirmOrderModal.open('market_sell');
+                                }
+                            } else if (marketOrderType === 'limit') {
+                                if (activeOptions.skipOpenOrderConfirm) {
+                                    submitLimitSell();
+                                } else {
+                                    confirmOrderModal.open('limit_sell');
+                                }
+                            }
+                        }}
                         orderMarketPrice={marketOrderType}
-                        openModalWithContent={(c: modalContentT) =>
-                            confirmOrderModal.open(c)
-                        }
                         orderValue={orderValue}
                         leverage={leverage}
                     />
@@ -707,13 +779,11 @@ function OrderInput() {
                         >
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
-                                    handleMarginModeChange={
-                                        handleMarginModeChange
-                                    }
-                                    handleMarginModeConfirm={
-                                        handleMarginModeConfirm
-                                    }
-                                    activeMargin={activeMargin}
+                                    initial={marginMode}
+                                    handleConfirm={(m: marginModesT): void => {
+                                        setMarginMode(m);
+                                        confirmOrderModal.close();
+                                    }}
                                 />
                             )}
 
@@ -743,15 +813,7 @@ function OrderInput() {
                                             'skipOpenOrderConfirm',
                                         )
                                     }
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Buy / Long Market Order Pending',
-                                            message:
-                                                'Buying 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitMarketBuy}
                                 />
                             )}
                             {confirmOrderModal.content === 'market_sell' && (
@@ -761,15 +823,7 @@ function OrderInput() {
                                         qty: size,
                                         denom: 'BTC',
                                     }}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Sell / Short Market Order Pending',
-                                            message:
-                                                'Selling 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitMarketSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
                                             'skipOpenOrderConfirm',
@@ -788,15 +842,7 @@ function OrderInput() {
                                         denom: 'BTC',
                                     }}
                                     limitPrice={price}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Buy / Long Limit Order Pending',
-                                            message:
-                                                'Buying 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitLimitBuy}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
                                             'skipOpenOrderConfirm',
@@ -815,15 +861,7 @@ function OrderInput() {
                                         denom: 'BTC',
                                     }}
                                     limitPrice={price}
-                                    onClose={() => {
-                                        notifications.add({
-                                            title: 'Sell / Short Limit Order Pending',
-                                            message:
-                                                'Selling 0.0001 ETH at $2,300',
-                                            icon: 'spinner',
-                                        });
-                                        confirmOrderModal.close();
-                                    }}
+                                    submitFn={submitLimitSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
                                             'skipOpenOrderConfirm',
@@ -842,4 +880,4 @@ function OrderInput() {
     );
 }
 
-export default React.memo(OrderInput);
+export default memo(OrderInput);
