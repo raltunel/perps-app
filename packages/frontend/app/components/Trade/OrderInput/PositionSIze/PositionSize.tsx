@@ -18,7 +18,7 @@ const POSITION_SIZE_CONFIG = {
     MAX_VALUE: 100,
 
     // Snap tolerance for clicking near markers (percentage)
-    MARKER_SNAP_TOLERANCE: 2.5,
+    MARKER_SNAP_TOLERANCE: 0.5,
 
     // Visual markers for the slider
     VISUAL_MARKERS: [
@@ -48,7 +48,7 @@ export default function PositionSize({
 }: PositionSizeProps) {
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(POSITION_SIZE_UI_CONFIG.DEFAULT_SHOW_LABELS);
-    const [currentValue, setCurrentValue] = useState<number>(value);
+    const [currentValue, setCurrentValue] = useState<number>(Math.floor(value));
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -56,7 +56,7 @@ export default function PositionSize({
     // Update internal value when prop changes (but not during drag)
     useEffect(() => {
         if (!isDragging) {
-            setCurrentValue(value);
+            setCurrentValue(Math.floor(value));
         }
     }, [value, isDragging]);
 
@@ -66,7 +66,10 @@ export default function PositionSize({
 
         const rect = sliderRef.current.getBoundingClientRect();
         const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
-        return (offsetX / rect.width) * 100;
+        const percentage = (offsetX / rect.width) * 100;
+
+        // Always round down to nearest integer
+        return Math.floor(percentage);
     };
 
     // Handle dragging functionality
@@ -76,7 +79,7 @@ export default function PositionSize({
 
             const percentage = getPercentageFromPosition(e.clientX);
 
-            // Clamp to min/max - NO ROUNDING AT ALL
+            // Clamp to min/max
             const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
@@ -84,6 +87,7 @@ export default function PositionSize({
 
             // Update internal value immediately for smooth visual feedback
             setCurrentValue(clampedValue);
+            onChange(clampedValue);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
@@ -91,30 +95,24 @@ export default function PositionSize({
 
             const percentage = getPercentageFromPosition(e.touches[0].clientX);
 
-            // Clamp to min/max - NO ROUNDING AT ALL
+            // Clamp to min/max
             const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
 
-            // Update internal value immediately for smooth visual feedback
             setCurrentValue(clampedValue);
+            onChange(clampedValue);
 
             // Prevent scrolling while dragging
             e.preventDefault();
         };
 
         const handleMouseUp = () => {
-            const snappedValue = Math.floor(currentValue / 5) * 5;
-            setCurrentValue(snappedValue);
-            onChange(snappedValue);
             setIsDragging(false);
         };
 
         const handleTouchEnd = () => {
-            const snappedValue = Math.floor(currentValue / 5) * 5;
-            setCurrentValue(snappedValue);
-            onChange(snappedValue);
             setIsDragging(false);
         };
 
@@ -139,7 +137,7 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, currentValue, onChange]);
+    }, [isDragging, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -168,7 +166,7 @@ export default function PositionSize({
             setCurrentValue(newValue);
             onChange(newValue);
         } else {
-            // For clicks not near markers, use the exact percentage
+            // For clicks not near markers, use the rounded down percentage
             const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
@@ -180,19 +178,22 @@ export default function PositionSize({
 
     // Handle input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = parseFloat(e.target.value);
+        const inputValue = e.target.value;
+        const newValue = parseInt(inputValue);
+
         if (!isNaN(newValue)) {
             const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, newValue),
             );
             setCurrentValue(clampedValue);
+            onChange(clampedValue);
         }
     };
 
     // Handle input blur (when user finishes typing)
     const handleInputBlur = () => {
-        onChange(currentValue);
+        // Value is already updated in onChange, I am only leaving this here for calculations we will be doing later
     };
 
     // Handle Enter key in input
@@ -200,11 +201,6 @@ export default function PositionSize({
         if (e.key === 'Enter') {
             e.currentTarget.blur();
         }
-    };
-
-    // Format the display value to show last reached 5% increment
-    const formatDisplayValue = (val: number) => {
-        return Math.floor(val / 5) * 5;
     };
 
     return (
@@ -293,7 +289,9 @@ export default function PositionSize({
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
-                        value={formatDisplayValue(currentValue).toString()}
+                        inputMode='numeric'
+                        pattern='[0-9]*'
+                        value={currentValue}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
