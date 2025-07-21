@@ -5,10 +5,12 @@ interface HorizontalScrollableProps {
     children: React.ReactNode;
     className?: string;
     maxWidth?: string;
+    wrapperId?: string;
+    excludeIds?: string[];
 }
 
 export function HorizontalScrollable(props: HorizontalScrollableProps) {
-    const { children, className, maxWidth } = props;
+    const { children, className, maxWidth, wrapperId, excludeIds } = props;
 
     const contentRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -18,6 +20,15 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
 
     const scrollLeftBtnRef = useRef<HTMLButtonElement>(null);
     const scrollRightBtnRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (wrapperId) {
+            const wrapper = document.getElementById(wrapperId);
+            if (wrapper) {
+                wrapper.style.maxWidth = maxWidth || '';
+            }
+        }
+    }, []);
 
     const checkScroll = () => {
         if (wrapperRef.current) {
@@ -115,40 +126,22 @@ export function HorizontalScrollable(props: HorizontalScrollableProps) {
 
     return (
         <>
-            {maxWidth ? (
-                <div style={{ position: 'relative' }}>
-                    <div
-                        ref={wrapperRef}
-                        className={`${styles.horizontalScrollable} ${className}`}
-                        style={{ maxWidth }}
-                    >
-                        {scrollLeftBtn}
-                        {scrollRightBtn}
-                        <div
-                            className={styles.horizontalScrollableContent}
-                            ref={contentRef}
-                        >
-                            {children}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div style={{ position: 'relative' }}>
-                    <div
-                        ref={wrapperRef}
-                        className={`${styles.horizontalScrollable} ${className}`}
-                    >
-                        <div
-                            className={styles.horizontalScrollableContent}
-                            ref={contentRef}
-                        >
-                            {children}
-                        </div>
-                    </div>
+            <div style={{ position: 'relative' }}>
+                <div
+                    ref={wrapperRef}
+                    className={`${styles.horizontalScrollable} ${className}`}
+                    style={{ ...(maxWidth && { maxWidth }) }}
+                >
                     {scrollLeftBtn}
                     {scrollRightBtn}
+                    <div
+                        className={styles.horizontalScrollableContent}
+                        ref={contentRef}
+                    >
+                        {children}
+                    </div>
                 </div>
-            )}
+            </div>
         </>
     );
 }
