@@ -4,10 +4,9 @@ import {
     // FaMediumM,
     // FaQuestionCircle,
     FaTwitter,
-    // FaUserSecret,
 } from 'react-icons/fa';
-import { IoIosInformationCircle } from 'react-icons/io';
-import { useTutorial } from '~/hooks/useTutorial';
+// import { IoIosInformationCircle } from 'react-icons/io';
+// import { useTutorial } from '~/hooks/useTutorial';
 import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 
@@ -22,14 +21,14 @@ const menuItems = [
 ];
 
 const DropdownMenu = () => {
-    const { handleRestartTutorial } = useTutorial();
+    // const { handleRestartTutorial } = useTutorial();
 
-    const handleTutorialClick = () => {
-        console.log(
-            'Tutorial button clicked in DropdownMenu, restarting tutorial...',
-        );
-        handleRestartTutorial();
-    };
+    // const handleTutorialClick = () => {
+    //     console.log(
+    //         'Tutorial button clicked in DropdownMenu, restarting tutorial...',
+    //     );
+    //     handleRestartTutorial();
+    // };
 
     return (
         <div className={styles.container}>
@@ -39,12 +38,12 @@ const DropdownMenu = () => {
                     <span>{item.icon}</span>
                 </div>
             ))}
-            <button
+            {/* <button
                 className={styles.tutorialButton}
                 onClick={handleTutorialClick}
             >
                 Tutorial <IoIosInformationCircle size={22} />
-            </button>
+            </button> */}
             <div className={styles.version}>Version: {packageJson.version}</div>
             <button className={styles.logoutButton}>Log Out</button>
         </div>
