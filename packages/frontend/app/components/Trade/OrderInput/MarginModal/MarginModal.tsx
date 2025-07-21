@@ -12,11 +12,9 @@ interface PropsIF {
 }
 export default function MarginModal(props: PropsIF) {
     const { active, handleMarginModeConfirm } = props;
-    console.log(active);
 
     // hook to track the current selection before updating settings
     const [selected, setSelected] = useState<marginModesT>(active);
-    console.log(selected === 'cross');
 
     return (
         <section className={styles.margin_modal_content}>
