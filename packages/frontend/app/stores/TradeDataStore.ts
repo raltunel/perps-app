@@ -9,7 +9,11 @@ import {
     type UserTradeDataStore,
 } from './UserTradeDataStore';
 
+export type marginModesT = 'cross' | 'isolate';
+
 type TradeDataStore = UserTradeDataStore & {
+    marginMode: marginModesT;
+    setMarginMode: (m: marginModesT) => void;
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
@@ -42,6 +46,8 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
+            marginMode: 'cross',
+            setMarginMode: (m: marginModesT) => set({ marginMode: m }),
             symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
@@ -119,6 +125,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         {
             name: 'TRADE_DATA',
             partialize: (state) => ({
+                marginMode: state.marginMode,
                 favKeys: state.favKeys,
                 symbol: state.symbol,
                 selectedTradeTab:
