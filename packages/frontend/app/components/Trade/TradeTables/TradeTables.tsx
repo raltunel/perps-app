@@ -14,7 +14,7 @@ import OpenOrdersTable from '../OpenOrdersTable/OpenOrdersTable';
 import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
-import TwapTable from '../TwapTable/TwapTable';
+// import TwapTable from '../TwapTable/TwapTable';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 export interface FilterOption {
@@ -28,8 +28,11 @@ const tradePageBlackListTabs = new Set([
     'Depositors',
 ]);
 
-const portfolioPageBlackListTabs = new Set(['Depositors']);
-
+const portfolioPageBlackListTabs = new Set([
+    'Depositors',
+    'Funding History',
+    'Deposits and Withdrawals',
+]);
 const filterOptions: FilterOption[] = [
     { id: 'all', label: 'All' },
     { id: 'active', label: 'Active' },
@@ -69,7 +72,7 @@ export default function TradeTable(props: TradeTableProps) {
             'Balances',
             'Positions',
             'Open Orders',
-            'TWAP',
+            // 'TWAP',
             'Trade History',
             'Funding History',
             'Order History',
@@ -171,8 +174,8 @@ export default function TradeTable(props: TradeTableProps) {
                         data={userOrders}
                     />
                 );
-            case 'TWAP':
-                return <TwapTable selectedFilter={selectedFilter} />;
+            // case 'TWAP':
+            //     return <TwapTable selectedFilter={selectedFilter} />;
             case 'Trade History':
                 return (
                     <TradeHistoryTable
