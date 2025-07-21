@@ -2,10 +2,9 @@
 // import { FlexContainer } from '../../../styled/Common';
 // import TopPools from '../TopPools/TopPools';
 // import AnimatedGradientPaths from './AnimatedGradientPaths';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import styles from './Hero.module.css';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { Link, useNavigation } from 'react-router';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import styles from './Hero.module.css';
 // import TradeNowButton from './TradeNowButton/TradeNowButton';
 export default function Hero() {
     // const { totalTvlString, totalVolumeString, totalFeesString } =
@@ -38,7 +37,7 @@ export default function Hero() {
             </div>
 
             <p>
-                Ambient is an entirely new kind of decentralized exchange
+                Ambient is an entirely new kind of decentralized perp DEX
                 combining unique DeFi native products with a user experience
                 rivaling CEXes
             </p>
