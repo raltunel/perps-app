@@ -1,3 +1,4 @@
+import { SessionButton } from '@fogo/sessions-sdk-react';
 import { useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
@@ -81,9 +82,6 @@ export default function PageHeader() {
     // logic to open and close the app settings modal
     const appSettingsModal = useModal('closed');
 
-    // logic to open and close the wallet modal
-    const geofenceModal = useModal('closed');
-
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
         'Escape',
@@ -97,14 +95,6 @@ export default function PageHeader() {
         },
         [],
     );
-
-    // boolean to inform user of geofenced mode in wallet connection modal
-    const VIEW_ONLY =
-        (import.meta.env.VITE_VIEW_ONLY !== undefined
-            ? import.meta.env.VITE_VIEW_ONLY.toLowerCase() === 'true'
-            : false) ||
-        window.location.hostname.startsWith('us.') ||
-        window.location.hostname.split('.')[0].endsWith('-us');
 
     return (
         <>
@@ -242,20 +232,7 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    {!isUserConnected && (
-                        <button
-                            className={styles.depositButton}
-                            onClick={() => {
-                                if (VIEW_ONLY) {
-                                    geofenceModal.open();
-                                } else {
-                                    setIsUserConnected(true);
-                                }
-                            }}
-                        >
-                            Connect
-                        </button>
-                    )}
+                    {!isUserConnected && <SessionButton />}
                     {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
@@ -325,7 +302,11 @@ export default function PageHeader() {
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
-                        {isDropdownMenuOpen && <DropdownMenu />}
+                        {isDropdownMenuOpen && (
+                            <DropdownMenu
+                                setIsDropdownMenuOpen={setIsDropdownMenuOpen}
+                            />
+                        )}
                     </section>
                 </div>
             </header>
@@ -337,13 +318,6 @@ export default function PageHeader() {
                     title='Options'
                 >
                     <AppOptions />
-                </Modal>
-            )}
-            {geofenceModal.isOpen && (
-                <Modal close={geofenceModal.close} title='Not Available'>
-                    <section className={styles.geofence_modal}>
-                        Ambi perps is not supported for your country.
-                    </section>
                 </Modal>
             )}
         </>

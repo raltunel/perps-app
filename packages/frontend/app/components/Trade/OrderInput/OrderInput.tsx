@@ -1,4 +1,11 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+    memo,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+    type JSX,
+} from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
