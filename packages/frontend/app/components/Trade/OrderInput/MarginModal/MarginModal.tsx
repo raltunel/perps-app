@@ -1,20 +1,17 @@
 import { useState } from 'react';
 import styles from './MarginModal.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import type { MarginMode } from '../OrderInput';
 import { type marginModesT } from '~/stores/TradeDataStore';
 
 interface PropsIF {
-    active: marginModesT;
-    handleMarginModeChange: (mode: MarginMode) => void;
-    handleMarginModeConfirm: (m: marginModesT) => void;
-    activeMargin: MarginMode;
+    initial: marginModesT;
+    handleConfirm: (m: marginModesT) => void;
 }
 export default function MarginModal(props: PropsIF) {
-    const { active, handleMarginModeConfirm } = props;
+    const { initial, handleConfirm } = props;
 
     // hook to track the current selection before updating settings
-    const [selected, setSelected] = useState<marginModesT>(active);
+    const [selected, setSelected] = useState<marginModesT>(initial);
 
     return (
         <section className={styles.margin_modal_content}>
@@ -49,7 +46,7 @@ export default function MarginModal(props: PropsIF) {
             </div>
             <SimpleButton
                 bg='accent1'
-                onClick={() => handleMarginModeConfirm(selected)}
+                onClick={() => handleConfirm(selected)}
                 style={{ height: '47px' }}
             >
                 Confirm

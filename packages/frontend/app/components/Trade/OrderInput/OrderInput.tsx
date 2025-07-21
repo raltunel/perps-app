@@ -111,7 +111,6 @@ export type modalContentT =
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
     const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
@@ -278,14 +277,6 @@ function OrderInput() {
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
     }, []);
-    const handleMarginModeChange = useCallback((mode: MarginMode) => {
-        setActiveMargin(mode);
-    }, []);
-
-    const handleMarginModeConfirm = (mode: marginModesT): void => {
-        setMarginMode(mode);
-        confirmOrderModal.close();
-    };
 
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
@@ -715,14 +706,11 @@ function OrderInput() {
                         >
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
-                                    active={marginMode}
-                                    handleMarginModeChange={
-                                        handleMarginModeChange
-                                    }
-                                    handleMarginModeConfirm={
-                                        handleMarginModeConfirm
-                                    }
-                                    activeMargin={activeMargin}
+                                    initial={marginMode}
+                                    handleConfirm={(m: marginModesT): void => {
+                                        setMarginMode(m);
+                                        confirmOrderModal.close();
+                                    }}
                                 />
                             )}
 
