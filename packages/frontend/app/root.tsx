@@ -133,7 +133,6 @@ export default function App() {
                     }}
                     enableUnlimited={true}
                 >
-                    <hr />
                     <AppProvider>
                         <SdkProvider environment={wsEnvironment}>
                             <TutorialProvider>
