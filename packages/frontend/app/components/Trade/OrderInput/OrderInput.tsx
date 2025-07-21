@@ -64,36 +64,37 @@ const marketOrderTypes = [
         blurb: 'Buy/Sell at a specific price or better',
         icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'stop_market',
-        label: 'Stop Market',
-        blurb: 'Triggers a market order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'stop_limit',
-        label: 'Stop Limit',
-        blurb: 'Triggers a limit order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'twap',
-        label: 'TWAP',
-        blurb: 'Distributes trades across a specified time period',
-        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'scale',
-        label: 'Scale',
-        blurb: 'Multiple orders at incrementing prices',
-        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'chase_limit',
-        label: 'Chase Limit',
-        blurb: 'Adjusts limit price to follow the market',
-        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-    },
+    // disabled code 21 Jul 25
+    // {
+    //     value: 'stop_market',
+    //     label: 'Stop Market',
+    //     blurb: 'Triggers a market order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'stop_limit',
+    //     label: 'Stop Limit',
+    //     blurb: 'Triggers a limit order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'twap',
+    //     label: 'TWAP',
+    //     blurb: 'Distributes trades across a specified time period',
+    //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'scale',
+    //     label: 'Scale',
+    //     blurb: 'Multiple orders at incrementing prices',
+    //     icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'chase_limit',
+    //     label: 'Chase Limit',
+    //     blurb: 'Adjusts limit price to follow the market',
+    //     icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+    // },
 ];
 
 // disabled code 07 Jul 25
