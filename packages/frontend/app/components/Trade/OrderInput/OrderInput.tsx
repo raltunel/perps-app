@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
@@ -9,11 +8,13 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -27,13 +28,12 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
-import { useLeverageStore } from '~/stores/LeverageStore';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -111,7 +111,6 @@ export type modalContentT =
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
     const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
@@ -144,8 +143,15 @@ function OrderInput() {
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
-        useTradeDataStore();
+    const {
+        obChosenPrice,
+        obChosenAmount,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+    } = useTradeDataStore();
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -271,16 +277,7 @@ function OrderInput() {
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
     }, []);
-    const handleMarginModeChange = useCallback((mode: MarginMode) => {
-        setActiveMargin(mode);
-    }, []);
 
-    const handleMarginModeConfirm = () => {
-        if (activeMargin) {
-            console.log(`Confirmed: ${activeMargin} margin mode`);
-        }
-        confirmOrderModal.close();
-    };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
     };
@@ -504,7 +501,7 @@ function OrderInput() {
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit'].includes(marketOrderType),
         }),
         [price, handlePriceChange],
     );
@@ -609,12 +606,14 @@ function OrderInput() {
                                 value={marketOrderType}
                                 onChange={handleMarketOrderTypeChange}
                             />
-                            <button
+                            <SimpleButton
+                                className={styles.margin_type_btn}
                                 onClick={() => confirmOrderModal.open('margin')}
-                                className={styles.isolatedButton}
+                                bg='dark3'
+                                hoverBg='accent1'
                             >
-                                Isolated <FiChevronDown size={24} />
-                            </button>
+                                {marginMode}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 onClick={() => setShowLaunchpad(true)}
@@ -669,9 +668,9 @@ function OrderInput() {
                             priceDistributionButtons}
                         {marketOrderType === 'twap' && <RunningTime />}
 
-                        <ReduceAndProfitToggle
+                        {/* <ReduceAndProfitToggle
                             {...reduceAndProfitToggleProps}
-                        />
+                        /> */}
                     </div>
                     <PlaceOrderButtons
                         isLimit={marketOrderType === 'limit'}
@@ -707,13 +706,11 @@ function OrderInput() {
                         >
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
-                                    handleMarginModeChange={
-                                        handleMarginModeChange
-                                    }
-                                    handleMarginModeConfirm={
-                                        handleMarginModeConfirm
-                                    }
-                                    activeMargin={activeMargin}
+                                    initial={marginMode}
+                                    handleConfirm={(m: marginModesT): void => {
+                                        setMarginMode(m);
+                                        confirmOrderModal.close();
+                                    }}
                                 />
                             )}
 
@@ -772,11 +769,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -803,7 +800,7 @@ function OrderInput() {
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -826,11 +823,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
