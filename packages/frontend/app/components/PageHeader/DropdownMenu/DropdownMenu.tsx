@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa';
 // import { IoIosInformationCircle } from 'react-icons/io';
 // import { useTutorial } from '~/hooks/useTutorial';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import packageJson from '../../../../package.json';
 import styles from './DropdownMenu.module.css';
 
@@ -20,7 +21,12 @@ const menuItems = [
     // { name: 'FAQ', icon: <FaQuestionCircle /> },
 ];
 
-const DropdownMenu = () => {
+interface DropdownMenuProps {
+    setIsDropdownMenuOpen: (open: boolean) => void;
+}
+
+const DropdownMenu = ({ setIsDropdownMenuOpen }: DropdownMenuProps) => {
+    const sessionState = useSession();
     // const { handleRestartTutorial } = useTutorial();
 
     // const handleTutorialClick = () => {
@@ -45,7 +51,17 @@ const DropdownMenu = () => {
                 Tutorial <IoIosInformationCircle size={22} />
             </button> */}
             <div className={styles.version}>Version: {packageJson.version}</div>
-            <button className={styles.logoutButton}>Log Out</button>
+            {isEstablished(sessionState) && (
+                <button
+                    className={styles.logoutButton}
+                    onClick={() => {
+                        sessionState.endSession();
+                        setIsDropdownMenuOpen(false);
+                    }}
+                >
+                    Log Out
+                </button>
+            )}
         </div>
     );
 };
