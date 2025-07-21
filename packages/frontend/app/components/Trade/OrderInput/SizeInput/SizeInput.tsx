@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
@@ -33,7 +33,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
 
     // Memoized ComboBox options
     const comboBoxOptions = useMemo(
-        () => [symbol.toUpperCase(), 'USD'],
+        () => ['USD', symbol.toUpperCase()],
         [symbol],
     );
 
@@ -57,25 +57,15 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 aria-label={ariaLabel}
                 placeholder='Enter Size'
             />
-            {/* <input
-                type='text'
-                value={value}
-                onChange={handleChange}
-                onBlur={onBlur}
-                onKeyDown={onKeyDown}
-                className={className}
-                aria-label={ariaLabel}
-                inputMode='numeric'
-                pattern='[0-9]*'
-                placeholder='Enter Size'
-            /> */}
             <button className={styles.tokenButton}>
                 <ComboBox
+                    key={selectedMode}
                     value={
-                        selectedMode === 'symbol' ? symbol.toUpperCase() : 'USD'
+                        selectedMode === 'usd' ? 'USD' : symbol.toUpperCase()
                     }
                     options={comboBoxOptions}
                     onChange={handleComboBoxChange}
+                    cssPositioning='fixed'
                 />
             </button>
         </div>

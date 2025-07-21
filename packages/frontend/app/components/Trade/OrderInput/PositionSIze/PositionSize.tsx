@@ -7,105 +7,102 @@ interface SizeOption {
 }
 
 interface PositionSizeProps {
-    options: SizeOption[];
     value: number;
     onChange: (value: number) => void;
     className?: string;
 }
 
-export default function PositionSize({
-    options = [
+const POSITION_SIZE_CONFIG = {
+    // Minimum and maximum values
+    MIN_VALUE: 0,
+    MAX_VALUE: 100,
+
+    // Snap tolerance for clicking near markers (percentage)
+    MARKER_SNAP_TOLERANCE: 0.5,
+
+    // Visual markers for the slider
+    VISUAL_MARKERS: [
         { value: 0, label: '0%' },
-        { value: 25, label: '5%' },
-        { value: 50, label: '10%' },
-        { value: 75, label: '50%' },
+        { value: 25, label: '25%' },
+        { value: 50, label: '50%' },
+        { value: 75, label: '75%' },
         { value: 100, label: '100%' },
     ],
+} as const;
+
+const POSITION_SIZE_UI_CONFIG = {
+    // Color values
+    ACTIVE_LABEL_COLOR: '#FFFFFF',
+    INACTIVE_LABEL_COLOR: '#808080',
+    TEXT_COLOR: 'var(--text1)',
+    ACCENT_COLOR: 'var(--accent1)',
+
+    // Default show labels state
+    DEFAULT_SHOW_LABELS: false,
+} as const;
+
+export default function PositionSize({
     value = 0,
     onChange,
     className = '',
 }: PositionSizeProps) {
-    const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
-    const [showLabels] = useState(false);
+    const [showLabels] = useState(POSITION_SIZE_UI_CONFIG.DEFAULT_SHOW_LABELS);
+    const [currentValue, setCurrentValue] = useState<number>(Math.floor(value));
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
 
+    // Update internal value when prop changes (but not during drag)
     useEffect(() => {
-        setInputValue(value.toString());
-    }, [value]);
+        if (!isDragging) {
+            setCurrentValue(Math.floor(value));
+        }
+    }, [value, isDragging]);
 
-    // Find the selected option index
-    const selectedIndex = options.findIndex((option) => option.value === value);
+    // Get percentage from mouse position
+    const getPercentageFromPosition = (clientX: number) => {
+        if (!sliderRef.current) return 0;
+
+        const rect = sliderRef.current.getBoundingClientRect();
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+        const percentage = (offsetX / rect.width) * 100;
+
+        // Always round down to nearest integer
+        return Math.floor(percentage);
+    };
 
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!isDragging || !sliderRef.current) return;
 
-            const rect = sliderRef.current.getBoundingClientRect();
-            const offsetX = Math.max(
-                0,
-                Math.min(e.clientX - rect.left, rect.width),
+            const percentage = getPercentageFromPosition(e.clientX);
+
+            // Clamp to min/max
+            const clampedValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
-            const percentage = offsetX / rect.width;
 
-            // Find the closest option based on drag position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
-
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
-            }
+            // Update internal value immediately for smooth visual feedback
+            setCurrentValue(clampedValue);
+            onChange(clampedValue);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
             if (!isDragging || !sliderRef.current || !e.touches[0]) return;
 
-            const rect = sliderRef.current.getBoundingClientRect();
-            const touch = e.touches[0];
-            const offsetX = Math.max(
-                0,
-                Math.min(touch.clientX - rect.left, rect.width),
+            const percentage = getPercentageFromPosition(e.touches[0].clientX);
+
+            // Clamp to min/max
+            const clampedValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
-            const percentage = offsetX / rect.width;
 
-            // Find the closest option based on touch position
-            const position = percentage * (options.length - 1);
-            const lowerIndex = Math.floor(position);
-            const upperIndex = Math.ceil(position);
-
-            // Determine which one is closer
-            let newIndex;
-            if (upperIndex >= options.length) {
-                newIndex = options.length - 1;
-            } else if (lowerIndex < 0) {
-                newIndex = 0;
-            } else {
-                const lowerDiff = Math.abs(position - lowerIndex);
-                const upperDiff = Math.abs(upperIndex - position);
-                newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
-            }
-
-            const newValue = options[newIndex].value;
-            if (newValue !== value) {
-                onChange(newValue);
-            }
+            setCurrentValue(clampedValue);
+            onChange(clampedValue);
 
             // Prevent scrolling while dragging
             e.preventDefault();
@@ -140,7 +137,7 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, options, value, onChange]);
+    }, [isDragging, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
@@ -151,60 +148,52 @@ export default function PositionSize({
     const handleTrackClick = (e: React.MouseEvent) => {
         if (!sliderRef.current) return;
 
-        const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percentage = offsetX / rect.width;
+        const percentage = getPercentageFromPosition(e.clientX);
 
-        // Find the closest option based on click position
-        const position = percentage * (options.length - 1);
-        const lowerIndex = Math.floor(position);
-        const upperIndex = Math.ceil(position);
+        // For track clicks, snap to visual markers if we're close to them
+        const closestMarker = POSITION_SIZE_CONFIG.VISUAL_MARKERS.reduce(
+            (prev, curr) =>
+                Math.abs(curr.value - percentage) <
+                Math.abs(prev.value - percentage)
+                    ? curr
+                    : prev,
+        );
 
-        // Determine which one is closer
-        let newIndex;
-        if (upperIndex >= options.length) {
-            newIndex = options.length - 1;
-        } else if (lowerIndex < 0) {
-            newIndex = 0;
+        // Check if we're within snap tolerance to make it easier to hit markers
+        const distanceToMarker = Math.abs(closestMarker.value - percentage);
+        if (distanceToMarker <= POSITION_SIZE_CONFIG.MARKER_SNAP_TOLERANCE) {
+            const newValue = closestMarker.value;
+            setCurrentValue(newValue);
+            onChange(newValue);
         } else {
-            const lowerDiff = Math.abs(position - lowerIndex);
-            const upperDiff = Math.abs(upperIndex - position);
-            newIndex = lowerDiff <= upperDiff ? lowerIndex : upperIndex;
+            // For clicks not near markers, use the rounded down percentage
+            const clampedValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
+            );
+            setCurrentValue(clampedValue);
+            onChange(clampedValue);
         }
-
-        onChange(options[newIndex].value);
     };
-
-    // Get position for the knob as percentage
-    const getKnobPosition = () => {
-        return selectedIndex === -1
-            ? 0
-            : (selectedIndex / (options.length - 1)) * 100;
-    };
-
-    // Get color for the knob based on value
 
     // Handle input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
+        const inputValue = e.target.value;
+        const newValue = parseInt(inputValue);
+
+        if (!isNaN(newValue)) {
+            const clampedValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, newValue),
+            );
+            setCurrentValue(clampedValue);
+            onChange(clampedValue);
+        }
     };
 
     // Handle input blur (when user finishes typing)
     const handleInputBlur = () => {
-        const newValue = parseInt(inputValue, 10);
-        if (!isNaN(newValue)) {
-            // Find the closest valid option
-            const closestOption = options.reduce((prev, curr) =>
-                Math.abs(curr.value - newValue) <
-                Math.abs(prev.value - newValue)
-                    ? curr
-                    : prev,
-            );
-            onChange(closestOption.value);
-        } else {
-            // Reset to current value if invalid
-            setInputValue(value.toString());
-        }
+        // Value is already updated in onChange, I am only leaving this here for calculations we will be doing later
     };
 
     // Handle Enter key in input
@@ -215,7 +204,7 @@ export default function PositionSize({
     };
 
     return (
-        <div className={`${styles.positionSliderContainer} ${className}`}>
+        <div className={`${styles.positionSliderContainer} ${className} `}>
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -230,44 +219,39 @@ export default function PositionSize({
                         <div
                             className={styles.sliderActive}
                             style={{
-                                width: `${getKnobPosition()}%`,
-                                // background: `linear-gradient(to right, ${colors['1']}, ${colors['5']}, ${colors['10']}, ${colors['50']}, ${colors['100']})`
+                                width: `${currentValue}%`,
+                                transition: isDragging ? 'none' : undefined,
                             }}
                         ></div>
 
                         {/* Slider markers */}
-                        {options.map((option, index) => (
-                            <div
-                                key={option.value}
-                                className={`${styles.sliderMarker} ${
-                                    index <= selectedIndex ? styles.active : ''
-                                } ${
-                                    index === selectedIndex
-                                        ? styles.sliderMarkerCurrent
-                                        : ''
-                                }`}
-                                style={{
-                                    left: `${
-                                        (index / (options.length - 1)) * 100
-                                    }%`,
-                                    //   backgroundColor: index <= selectedIndex ?
-                                    //     colors[option.value.toString()] || '#FFFFFF' :
-                                    //     'transparent',
-                                    borderColor:
-                                        index <= selectedIndex
-                                            ? 'transparent'
-                                            : 'var(--bg-dark3)',
-                                }}
-                            ></div>
-                        ))}
+                        {POSITION_SIZE_CONFIG.VISUAL_MARKERS.map(
+                            (marker: SizeOption) => (
+                                <div
+                                    key={marker.value}
+                                    className={`${styles.sliderMarker} ${
+                                        marker.value <= currentValue
+                                            ? styles.active
+                                            : ''
+                                    }`}
+                                    style={{
+                                        left: `${marker.value}%`,
+                                        borderColor:
+                                            marker.value <= currentValue
+                                                ? 'transparent'
+                                                : POSITION_SIZE_UI_CONFIG.ACCENT_COLOR,
+                                    }}
+                                ></div>
+                            ),
+                        )}
 
                         {/* Draggable knob */}
                         <div
                             ref={knobRef}
-                            className={`${styles.sliderKnob} ${selectedIndex === 0 ? styles.sliderKnobTransparent : ''}`}
+                            className={styles.sliderKnob}
                             style={{
-                                left: `${getKnobPosition()}%`,
-                                // borderColor: getKnobColor(),
+                                left: `${currentValue}%`,
+                                transition: isDragging ? 'none' : undefined,
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
@@ -276,40 +260,55 @@ export default function PositionSize({
 
                     {showLabels && (
                         <div className={styles.labelContainer}>
-                            {options.map((option, index) => (
-                                <div
-                                    key={option.value}
-                                    className={styles.valueLabel}
-                                    style={{
-                                        left: `${
-                                            (index / (options.length - 1)) * 100
-                                        }%`,
-                                        color:
-                                            index <= selectedIndex
-                                                ? '#FFFFFF'
-                                                : '#808080',
-                                    }}
-                                    onClick={() => onChange(option.value)}
-                                >
-                                    {option.label}
-                                </div>
-                            ))}
+                            {POSITION_SIZE_CONFIG.VISUAL_MARKERS.map(
+                                (marker: SizeOption) => (
+                                    <div
+                                        key={marker.value}
+                                        className={styles.valueLabel}
+                                        style={{
+                                            left: `${marker.value}%`,
+                                            color:
+                                                marker.value <= currentValue
+                                                    ? POSITION_SIZE_UI_CONFIG.ACTIVE_LABEL_COLOR
+                                                    : POSITION_SIZE_UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                        }}
+                                        onClick={() => {
+                                            setCurrentValue(marker.value);
+                                            onChange(marker.value);
+                                        }}
+                                    >
+                                        {marker.label}
+                                    </div>
+                                ),
+                            )}
                         </div>
                     )}
                 </div>
 
-                {/* Current value display with input */}
+                {/* Current value display with input  */}
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
-                        value={inputValue}
+                        inputMode='numeric'
+                        pattern='[0-9]*'
+                        value={currentValue}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}
                         className={styles.valueInput}
-                        aria-label='Leverage value'
+                        aria-label='Position size value'
+                        style={{
+                            color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
+                        }}
                     />
-                    <span className={styles.valueSuffix}>%</span>
+                    <span
+                        className={styles.valueSuffix}
+                        style={{
+                            color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
+                        }}
+                    >
+                        %
+                    </span>
                 </div>
             </div>
         </div>

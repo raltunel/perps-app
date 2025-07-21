@@ -1,25 +1,16 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { WsChannels } from '~/utils/Constants';
-import type { UserBalanceIF, UserBalanceSortBy } from '~/utils/UserDataIFs';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
-import { useDebugStore } from '~/stores/DebugStore';
 
-type BalancesTableProps = {
-    hideSmallBalances: boolean;
-};
-
-export default function BalancesTable(props: BalancesTableProps) {
+export default function BalancesTable() {
     const { debugWallet } = useDebugStore();
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
-
-    const { hideSmallBalances } = props;
-
-    const smallBalanceThreshold = 10;
 
     const { userBalances, fetchedChannels } = useTradeDataStore();
 
@@ -27,19 +18,10 @@ export default function BalancesTable(props: BalancesTableProps) {
         return fetchedChannels.has(WsChannels.WEB_DATA2);
     }, [fetchedChannels]);
 
-    const balancesToShow = useMemo(() => {
-        if (hideSmallBalances) {
-            return userBalances.filter((balance) => {
-                return balance.usdcValue > smallBalanceThreshold;
-            });
-        }
-        return userBalances;
-    }, [userBalances, hideSmallBalances]);
-
     return (
-        <GenericTable<UserBalanceIF, UserBalanceSortBy>
+        <GenericTable
             storageKey={`BalancesTable_${currentUserRef.current}`}
-            data={balancesToShow}
+            data={userBalances}
             renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                 <BalancesTableHeader
                     sortBy={sortBy}

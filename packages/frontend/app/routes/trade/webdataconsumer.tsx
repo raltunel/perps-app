@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useRef } from 'react';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -34,14 +36,11 @@ export default function WebDataConsumer() {
         setCoins,
         coins,
         setPositions,
-        positions,
         setUserBalances,
-        userBalances,
         setCoinPriceMap,
         setAccountOverview,
         accountOverview,
         setOrderHistory,
-        fetchedChannels,
         setFetchedChannels,
         setUserSymbolOrders,
         setUserFills,
@@ -70,7 +69,7 @@ export default function WebDataConsumer() {
     const twapSliceFillsRef = useRef<TwapSliceFillIF[]>([]);
     const userFundingsRef = useRef<UserFundingIF[]>([]);
     const activeTwapsRef = useRef<ActiveTwapIF[]>([]);
-    const userNonFundingLedgerUpdatesRef = useRef<any[]>([]);
+    const userNonFundingLedgerUpdatesRef = useRef<TransactionData[]>([]);
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
