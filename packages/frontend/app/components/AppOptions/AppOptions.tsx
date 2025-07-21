@@ -42,10 +42,7 @@ export default function AppOptions() {
                 />
                 <OptionLine
                     text='Skip Close Position Confirmations'
-                    isChecked={
-                        // activeOptions['skipClosePositionConfirm']
-                        true
-                    }
+                    isChecked={activeOptions['skipClosePositionConfirm']}
                     toggle={() =>
                         // activeOptions.toggle('skipClosePositionConfirm')
                         activeOptions.enable('skipClosePositionConfirm')
