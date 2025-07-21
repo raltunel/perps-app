@@ -8,6 +8,8 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
@@ -31,8 +33,6 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
-import { useLeverageStore } from '~/stores/LeverageStore';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
@@ -769,11 +769,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -800,7 +800,7 @@ function OrderInput() {
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -823,11 +823,11 @@ function OrderInput() {
                                     }}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
