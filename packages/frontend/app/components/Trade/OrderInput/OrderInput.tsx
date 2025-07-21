@@ -2,11 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
-import { LuOctagonX } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
@@ -36,6 +33,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -63,36 +61,37 @@ const marketOrderTypes = [
         blurb: 'Buy/Sell at a specific price or better',
         icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'stop_market',
-        label: 'Stop Market',
-        blurb: 'Triggers a market order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'stop_limit',
-        label: 'Stop Limit',
-        blurb: 'Triggers a limit order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'twap',
-        label: 'TWAP',
-        blurb: 'Distributes trades across a specified time period',
-        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'scale',
-        label: 'Scale',
-        blurb: 'Multiple orders at incrementing prices',
-        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'chase_limit',
-        label: 'Chase Limit',
-        blurb: 'Adjusts limit price to follow the market',
-        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-    },
+    // disabled code 21 Jul 25
+    // {
+    //     value: 'stop_market',
+    //     label: 'Stop Market',
+    //     blurb: 'Triggers a market order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'stop_limit',
+    //     label: 'Stop Limit',
+    //     blurb: 'Triggers a limit order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'twap',
+    //     label: 'TWAP',
+    //     blurb: 'Distributes trades across a specified time period',
+    //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'scale',
+    //     label: 'Scale',
+    //     blurb: 'Multiple orders at incrementing prices',
+    //     icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'chase_limit',
+    //     label: 'Chase Limit',
+    //     blurb: 'Adjusts limit price to follow the market',
+    //     icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+    // },
 ];
 
 // disabled code 07 Jul 25
@@ -100,14 +99,6 @@ const marketOrderTypes = [
 //     { value: 'bid1ask1', label: 'Bid1/Ask1' },
 //     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 // ];
-
-const leverageOptions = [
-    { value: 1, label: '1x' },
-    { value: 5, label: '5x' },
-    { value: 10, label: '10x' },
-    { value: 50, label: '50x' },
-    { value: 100, label: '100x' },
-];
 
 // keys for content that may be rendered in tx modal
 export type modalContentT =
@@ -122,7 +113,7 @@ function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
-    const [leverage, setLeverage] = useState(100);
+    const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
@@ -139,6 +130,7 @@ function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 1;
+    // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
@@ -169,6 +161,8 @@ function OrderInput() {
     );
 
     const useTotalSize = ['twap', 'chase_limit'].includes(marketOrderType);
+
+    const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
     const inputDetailsData = useMemo(
         () => [
@@ -211,7 +205,36 @@ function OrderInput() {
     useEffect(() => {
         setSize('');
         setPrice('');
-    }, [symbol]);
+
+        // Apply leverage validation when symbol changes
+        // BUT only if we have the correct symbolInfo for the current symbol
+        if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol === symbol
+        ) {
+            const validatedLeverage = validateAndApplyLeverageForMarket(
+                symbol,
+                symbolInfo.maxLeverage,
+                minimumInputValue,
+            );
+            setLeverage(validatedLeverage);
+        } else if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol &&
+            symbolInfo.symbol !== symbol
+        ) {
+            console.log(
+                `OrderInput: Symbol mismatch - waiting for correct symbolInfo. Current: ${symbol}, symbolInfo: ${symbolInfo?.symbol}`,
+            );
+        }
+    }, [
+        symbol,
+        symbolInfo?.maxLeverage,
+        symbolInfo?.symbol,
+        validateAndApplyLeverageForMarket,
+    ]);
 
     const handleTypeChange = () => {
         switch (marketOrderType) {
@@ -444,11 +467,9 @@ function OrderInput() {
 
     const leverageSliderProps = useMemo(
         () => ({
-            options: leverageOptions,
             value: leverage,
             onChange: handleLeverageChange,
             minimumInputValue: minimumInputValue,
-            maximumInputValue: tempMaximumLeverageInput,
             generateRandomMaximumInput: generateRandomMaximumInput,
         }),
         [leverage, handleLeverageChange],
