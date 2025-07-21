@@ -61,7 +61,7 @@ export const SdkProvider: React.FC<{
             const newInfo = new Info({
                 environment,
                 skipWs: false,
-                useMultiSocket: false, // Disable multi-socket for now - server may not support concurrent connections
+                useMultiSocket: true, // Re-enable multi-socket mode
                 wsEndpoints:
                     marketEndpoint || userEndpoint
                         ? {
@@ -74,6 +74,14 @@ export const SdkProvider: React.FC<{
 
             setInfo(newInfo);
             stashedSubs.current = {};
+
+            // Debug: Log WebSocket connections to console
+            if (typeof window !== 'undefined') {
+                (window as any).__perps_websockets__ = newInfo;
+                console.log(
+                    'WebSocket connections initialized. Type __perps_websockets__.multiSocketInfo.getPool().getConnectionStatus() in console to check status',
+                );
+            }
         } else {
             info.setEnvironment(environment);
         }
@@ -149,18 +157,35 @@ export const SdkProvider: React.FC<{
         if (!isTabActive) return;
 
         if (internetConnected && shouldReconnect) {
-            console.log('>>> alternate reconnect', new Date().toISOString());
-            console.log(
-                '>>> stashed subs',
-                stashedSubs.current,
-                new Date().toISOString(),
-            );
+            // Check if already connected before reconnecting
+            let needsReconnect = true;
             if (info?.multiSocketInfo) {
-                info.multiSocketInfo.reconnect();
-            } else {
-                info?.wsManager?.reconnect(stashedSubs.current);
+                const pool = info.multiSocketInfo.getPool();
+                const status = pool.getConnectionStatus();
+                needsReconnect = !Object.values(status).some(
+                    (connected) => connected,
+                );
+            } else if (info?.wsManager) {
+                needsReconnect = !info.wsManager.isWsReady();
             }
-            setWsReconnecting(true);
+
+            if (needsReconnect) {
+                console.log(
+                    '>>> alternate reconnect',
+                    new Date().toISOString(),
+                );
+                console.log(
+                    '>>> stashed subs',
+                    stashedSubs.current,
+                    new Date().toISOString(),
+                );
+                if (info?.multiSocketInfo) {
+                    info.multiSocketInfo.reconnect();
+                } else {
+                    info?.wsManager?.reconnect(stashedSubs.current);
+                }
+                setWsReconnecting(true);
+            }
             setShouldReconnect(false);
         }
 

@@ -126,6 +126,8 @@ export class WebSocketInstance {
     private pongCheckLock: boolean = false;
     private pingIntervalMs: number;
     private firstMessageLogged: boolean = false;
+    private isConnecting: boolean = false;
+    private reconnectTimeout: NodeJS.Timeout | null = null;
 
     // New properties for multi-socket support
     private readonly socketType: SocketType;
@@ -140,14 +142,19 @@ export class WebSocketInstance {
         this.socketName = config.socketName ?? config.socketType;
         this.pingIntervalMs = config.pingInterval ?? DEFAULT_PING_INTERVAL_MS;
 
+        // Bind methods to ensure proper context
+        this.onOpen = this.onOpen.bind(this);
+        this.onMessage = this.onMessage.bind(this);
+        this.onClose = this.onClose.bind(this);
+        this.onError = this.onError.bind(this);
+
         console.log(
             `[${this.socketName}] WebSocketInstance created with baseUrl:`,
             this.baseUrl,
         );
 
         this.initializeWorkers();
-        // Delay initial connection to avoid race conditions
-        setTimeout(() => this.connect(), this.socketName === 'user' ? 500 : 0);
+        this.connect();
     }
 
     private initializeWorkers() {
@@ -164,6 +171,7 @@ export class WebSocketInstance {
         if (this.jsonParserWorkerBlobUrl) {
             URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
         }
+        // Create a unique worker blob URL for each instance
         this.jsonParserWorkerBlobUrl = createJsonParserWorker();
 
         this.log(`Initializing ${this.numWorkers} JSON parsing worker(s)`);
@@ -190,24 +198,46 @@ export class WebSocketInstance {
     }
 
     private connect = () => {
+        // Prevent duplicate connection attempts
+        if (this.isConnecting) {
+            console.log(
+                `[${this.socketName}] Already connecting, skipping duplicate attempt`,
+            );
+            return;
+        }
+
+        // Check if already connected
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            console.log(
+                `[${this.socketName}] Already connected, skipping connection attempt`,
+            );
+            return;
+        }
+
+        this.isConnecting = true;
+
         const wsUrl =
             'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
         console.log(`[${this.socketName}] Connecting to`, wsUrl);
 
-        // Create WebSocket with subprotocol to differentiate connections
-        this.ws = new WebSocket(wsUrl);
-        this.wsReady = false;
-        this.stopped = false;
+        // Create WebSocket
+        try {
+            this.ws = new WebSocket(wsUrl);
+            this.wsReady = false;
+            this.stopped = false;
 
-        this.ws.removeEventListener('open', this.onOpen);
-        this.ws.removeEventListener('message', this.onMessage);
-        this.ws.removeEventListener('close', this.onClose);
-        this.ws.removeEventListener('error', this.onError);
-
-        this.ws.addEventListener('open', this.onOpen);
-        this.ws.addEventListener('message', this.onMessage);
-        this.ws.addEventListener('close', this.onClose);
-        this.ws.addEventListener('error', this.onError);
+            this.ws.addEventListener('open', this.onOpen);
+            this.ws.addEventListener('message', this.onMessage);
+            this.ws.addEventListener('close', this.onClose);
+            this.ws.addEventListener('error', this.onError);
+        } catch (error) {
+            console.error(
+                `[${this.socketName}] Failed to create WebSocket:`,
+                error,
+            );
+            this.isConnecting = false;
+            throw error;
+        }
 
         // make sure workers are ready before connecting
         if (this.workers.length === 0 && this.numWorkers > 0) {
@@ -259,6 +289,8 @@ export class WebSocketInstance {
     private onOpen = () => {
         console.log(`[${this.socketName}] onOpen`);
         this.wsReady = true;
+        this.isConnecting = false;
+        this.firstMessageLogged = false;
         this.onConnectionChange?.(true);
 
         // send queued subs
@@ -331,20 +363,28 @@ export class WebSocketInstance {
             `[${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
         );
         this.wsReady = false;
+        this.isConnecting = false;
         this.onConnectionChange?.(false);
 
         if (this.pingInterval !== null) {
             clearInterval(this.pingInterval);
             this.pingInterval = null;
         }
+
+        // Clear any existing reconnect timeout
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
+
         if (!this.stopped) {
             console.log(
                 `>>> [${this.socketName}] close reconnect`,
                 new Date().toISOString(),
             );
-            setTimeout(() => {
+            this.reconnectTimeout = setTimeout(() => {
                 if (!this.stopped) {
-                    this.reconnect();
+                    this.connect(); // Call connect directly instead of reconnect
                 }
             }, RECONNECT_TIMEOUT_MS);
         }
@@ -565,8 +605,25 @@ export class WebSocketInstance {
 
     public reconnect = () => {
         this.log('reconnect');
-        this.ws.close();
-        this.connect();
+
+        // Clear any pending reconnect timeout
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
+        }
+
+        // Close existing connection if any
+        if (
+            this.ws &&
+            (this.ws.readyState === WebSocket.OPEN ||
+                this.ws.readyState === WebSocket.CONNECTING)
+        ) {
+            this.ws.close();
+            // The onClose handler will trigger the reconnection
+        } else {
+            // No active connection, connect directly
+            this.connect();
+        }
     };
 
     public stop = () => {
@@ -581,6 +638,10 @@ export class WebSocketInstance {
         if (this.pongTimeout) {
             clearTimeout(this.pongTimeout);
             this.pongTimeout = null;
+        }
+        if (this.reconnectTimeout) {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = null;
         }
         this.workers.forEach((worker) => worker.terminate());
         this.workers = [];

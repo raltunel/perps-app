@@ -15,6 +15,7 @@ import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
+import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
 import './css/index.css';
@@ -114,9 +115,14 @@ export default function App() {
         <>
             <Layout>
                 <AppProvider>
-                    <SdkProvider environment={wsEnvironment}>
+                    <SdkProvider
+                        environment={wsEnvironment}
+                        marketEndpoint={import.meta.env.VITE_MARKET_WS_ENDPOINT}
+                        userEndpoint={import.meta.env.VITE_USER_WS_ENDPOINT}
+                    >
                         <TutorialProvider>
                             <WsConnectionChecker />
+                            <WebSocketDebug />
                             <div className='root-container'>
                                 {/* Added error boundary for header */}
                                 <ComponentErrorBoundary>
