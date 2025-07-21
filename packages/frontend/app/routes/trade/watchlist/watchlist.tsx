@@ -55,7 +55,6 @@ const WatchList: React.FC = () => {
             </div>
 
             <HorizontalScrollable
-                className={styles.watchListLimitor}
                 excludes={['watchlist-static-area']}
                 wrapperId='trade-page-left-section'
                 offset={20}
