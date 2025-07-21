@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+// import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     LuChevronDown,
     LuChevronUp,
@@ -35,6 +35,7 @@ export default function PageHeader() {
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
+    const showRPCButton = false;
     const location = useLocation();
 
     // symbol for active market
@@ -49,7 +50,7 @@ export default function PageHeader() {
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
-        { name: 'Docs', path: '/404' },
+        // { name: 'Docs', path: '/docs' },
     ];
 
     // refs for dropdown menu handline
@@ -195,7 +196,7 @@ export default function PageHeader() {
                         </section>
                     )}
 
-                    {isUserConnected && (
+                    {isUserConnected && showRPCButton && (
                         <section
                             style={{ position: 'relative' }}
                             ref={rpcMenuRef}
@@ -270,7 +271,7 @@ export default function PageHeader() {
                         }}
                         ref={helpDropdownRef}
                     >
-                        <button
+                        {/* <button
                             className={styles.helpButton}
                             onClick={() =>
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
@@ -280,7 +281,7 @@ export default function PageHeader() {
                                 size={18}
                                 color='var(--text2)'
                             />
-                        </button>
+                        </button> */}
 
                         {isHelpDropdownOpen && (
                             <HelpDropdown

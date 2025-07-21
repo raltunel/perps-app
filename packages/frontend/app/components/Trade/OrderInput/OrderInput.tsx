@@ -28,7 +28,7 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -501,7 +501,7 @@ function OrderInput() {
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit'].includes(marketOrderType),
         }),
         [price, handlePriceChange],
     );
@@ -668,9 +668,9 @@ function OrderInput() {
                             priceDistributionButtons}
                         {marketOrderType === 'twap' && <RunningTime />}
 
-                        <ReduceAndProfitToggle
+                        {/* <ReduceAndProfitToggle
                             {...reduceAndProfitToggleProps}
-                        />
+                        /> */}
                     </div>
                     <PlaceOrderButtons
                         isLimit={marketOrderType === 'limit'}
