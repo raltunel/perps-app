@@ -126,6 +126,7 @@ export default function App() {
                     defaultRequestedLimits={{
                         [NATIVE_MINT.toBase58()]: 1_500_000_000n,
                     }}
+                    enableUnlimited={true}
                 >
                     <hr />
                     <AppProvider>
