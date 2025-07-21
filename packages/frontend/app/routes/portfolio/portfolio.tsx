@@ -79,7 +79,12 @@ function Portfolio() {
                 className={`${styles.detailsContent} ${styles.netValueMobile}`}
             >
                 <h6>Total USD Val</h6>
-                <h3>{currency(portfolio.totalValueUSD, true)}</h3>
+                <h3>
+                    {currency(
+                        portfolio.balances.contract + portfolio.balances.wallet,
+                        true,
+                    )}
+                </h3>
             </div>
             <button
                 ref={mobileActionMenuButtonRef}
@@ -167,12 +172,20 @@ function Portfolio() {
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
                             <h6>Total Net USD Value</h6>
-                            <h3>{formatCurrency(portfolio.totalValueUSD)}</h3>
+                            <h3>
+                                {formatCurrency(
+                                    portfolio.balances.contract +
+                                        portfolio.balances.wallet,
+                                )}
+                            </h3>
                         </div>
                         <div className={styles.totalNetDisplay}>
                             <h6>
                                 <span>Total Net USD Value:</span>{' '}
-                                {formatCurrency(portfolio.totalValueUSD)}
+                                {formatCurrency(
+                                    portfolio.balances.contract +
+                                        portfolio.balances.wallet,
+                                )}
                             </h6>
                             <div className={styles.buttonContainer}>
                                 <div className={styles.rowButton}>

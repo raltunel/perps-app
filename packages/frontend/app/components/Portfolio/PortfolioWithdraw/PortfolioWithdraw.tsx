@@ -6,7 +6,7 @@ import styles from './PortfolioWithdraw.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
-interface PortfolioWithdrawProps {
+interface propsIF {
     portfolio: {
         id: string;
         name: string;
@@ -22,11 +22,11 @@ function PortfolioWithdraw({
     portfolio,
     onWithdraw,
     isProcessing = false,
-}: PortfolioWithdrawProps) {
+}: propsIF) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
 
-    const unitValue = portfolio.unit || 'USD';
+    const unitValue = portfolio.unit || 'fUSD';
 
     // const isValidNumberInput = useCallback(() => {
     //     return true
@@ -143,6 +143,11 @@ function PortfolioWithdraw({
         [portfolio.availableBalance, unitValue, formatCurrency],
     );
 
+    console.log(
+        'for withdraw: ' +
+            formatCurrency(portfolio.availableBalance, unitValue),
+    );
+
     // Memoize button disabled state calculation
     const isButtonDisabled = useMemo(
         () =>
@@ -157,7 +162,8 @@ function PortfolioWithdraw({
         <div className={styles.container}>
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
-                <h4>Withdraw {unitValue} to Fogo</h4>
+                {/* <h4>Withdraw {unitValue} to Fogo</h4> */}
+                <h4>Withdraw fUSD to Fogo</h4>
                 <div>
                     <p>fUSD will be sent to your address.</p>
                     <p>

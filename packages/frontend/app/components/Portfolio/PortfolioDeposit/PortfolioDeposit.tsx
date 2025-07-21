@@ -10,7 +10,7 @@ import TokenDropdown, {
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
-interface PortfolioDepositProps {
+interface propsIF {
     portfolio: {
         id: string;
         name: string;
@@ -22,12 +22,9 @@ interface PortfolioDepositProps {
     isProcessing?: boolean;
 }
 
-function PortfolioDeposit({
-    portfolio,
-    onDeposit,
+function PortfolioDeposit(props: propsIF) {
+    const { portfolio, onDeposit, isProcessing = false } = props;
 
-    isProcessing = false,
-}: PortfolioDepositProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken, setSelectedToken] = useState<Token>(
@@ -129,6 +126,11 @@ function PortfolioDeposit({
             },
         ],
         [availableBalance, selectedToken.symbol, formatCurrency],
+    );
+
+    console.log(
+        'for deposit: ' +
+            formatCurrency(availableBalance, selectedToken.symbol),
     );
 
     const isButtonDisabled = useMemo(

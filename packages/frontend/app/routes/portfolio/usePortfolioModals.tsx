@@ -123,8 +123,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                         portfolio={{
                             id: selectedPortfolio.id,
                             name: selectedPortfolio.name,
-                            availableBalance:
-                                selectedPortfolio.availableBalance,
+                            availableBalance: selectedPortfolio.balances.wallet,
                             unit: selectedPortfolio.unit,
                         }}
                         onDeposit={processDeposit}
@@ -139,7 +138,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                             id: selectedPortfolio.id,
                             name: selectedPortfolio.name,
                             availableBalance:
-                                selectedPortfolio.availableBalance,
+                                selectedPortfolio.balances.contract,
                             unit: selectedPortfolio.unit,
                         }}
                         onWithdraw={processWithdraw}
@@ -150,7 +149,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
 
                 {activePortfolioModalType === 'send' && (
                     <PortfolioSend
-                        availableAmount={selectedPortfolio.availableBalance}
+                        availableAmount={selectedPortfolio.balances.contract}
                         tokenType={selectedPortfolio.unit}
                         networkFee={
                             selectedPortfolio.unit === 'USD'
@@ -164,7 +163,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                             id: selectedPortfolio.id,
                             name: selectedPortfolio.name,
                             availableBalance:
-                                selectedPortfolio.availableBalance,
+                                selectedPortfolio.balances.contract,
                             unit: selectedPortfolio.unit,
                         }}
                     />

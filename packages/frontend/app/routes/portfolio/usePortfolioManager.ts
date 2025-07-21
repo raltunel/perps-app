@@ -1,10 +1,14 @@
 import { useCallback, useMemo, useReducer, useState } from 'react';
 
-export interface PortfolioData {
+interface PortfolioDataIF {
     id: string;
     name: string;
-    totalValueUSD: number;
-    availableBalance: number;
+    // totalValueUSD: number;
+    // availableBalance: number;
+    balances: {
+        contract: number;
+        wallet: number;
+    };
     unit: string;
     tradingVolume: {
         daily: number;
@@ -18,12 +22,19 @@ export interface PortfolioData {
     };
 }
 
+const WALLET_BALANCE = 483167;
+const CONTRACT_BALANCE = 1987654.32;
+
 // Mock data
-export const portfolioData: PortfolioData = {
+export const portfolioData: PortfolioDataIF = {
     id: 'main-portfolio',
     name: 'Main Portfolio',
-    totalValueUSD: 1987654.32,
-    availableBalance: 1987654.32,
+    // totalValueUSD: 1987654.32,
+    // availableBalance: 1987654.32,
+    balances: {
+        contract: CONTRACT_BALANCE,
+        wallet: WALLET_BALANCE,
+    },
     unit: 'USD',
     tradingVolume: {
         daily: 215678.9,
@@ -37,20 +48,40 @@ export const portfolioData: PortfolioData = {
     },
 };
 
-function portfolioReducer(state: PortfolioData, action: any): PortfolioData {
+function portfolioReducer(
+    state: PortfolioDataIF,
+    action: any,
+): PortfolioDataIF {
     switch (action.type) {
         case 'DEPOSIT':
             return {
                 ...state,
-                availableBalance: state.availableBalance + action.amount,
-                totalValueUSD: state.totalValueUSD + action.amount,
+                // availableBalance: state.availableBalance + action.amount,
+                // totalValueUSD: state.totalValueUSD + action.amount,
+                balances: {
+                    contract: state.balances.contract + action.amount,
+                    wallet: state.balances.wallet - action.amount,
+                },
             };
         case 'WITHDRAW':
+            return {
+                ...state,
+                // availableBalance: state.availableBalance - action.amount,
+                // totalValueUSD: state.totalValueUSD - action.amount,
+                balances: {
+                    contract: state.balances.contract - action.amount,
+                    wallet: state.balances.wallet + action.amount,
+                },
+            };
         case 'SEND':
             return {
                 ...state,
-                availableBalance: state.availableBalance - action.amount,
-                totalValueUSD: state.totalValueUSD - action.amount,
+                // availableBalance: state.availableBalance - action.amount,
+                // totalValueUSD: state.totalValueUSD - action.amount,
+                balances: {
+                    contract: state.balances.contract - action.amount,
+                    wallet: state.balances.wallet,
+                },
             };
         default:
             return state;
@@ -119,7 +150,7 @@ export function usePortfolioManager() {
 
     const processWithdraw = useCallback(
         (amount: number) => {
-            if (amount > portfolio.availableBalance) {
+            if (amount > portfolio.balances.contract) {
                 setStatus({ isLoading: false, error: 'Insufficient funds' });
                 return;
             }
@@ -144,12 +175,12 @@ export function usePortfolioManager() {
                 }
             }, 2000);
         },
-        [portfolio.availableBalance],
+        [portfolio.balances.contract],
     );
 
     const processSend = useCallback(
         (address: string, amount: number) => {
-            if (!address || amount > portfolio.availableBalance) {
+            if (!address || amount > portfolio.balances.contract) {
                 setStatus({
                     isLoading: false,
                     error: !address ? 'Invalid address' : 'Insufficient funds',
@@ -177,7 +208,7 @@ export function usePortfolioManager() {
                 }
             }, 2000);
         },
-        [portfolio.availableBalance],
+        [portfolio.balances.contract],
     );
 
     return {
