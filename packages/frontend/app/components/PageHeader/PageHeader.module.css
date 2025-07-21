@@ -256,6 +256,18 @@
     color: var(--text1, #f0f0f8);
 }
 
+.geofence_modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 300px;
+    height: auto;
+    margin: var(--margin-m);
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    text-align: center;
+}
+
 @keyframes bounce {
     0% {
         transform: translateY(0);
@@ -272,13 +284,6 @@
     100% {
         transform: translateY(0);
     }
-}
-
-.connect_wallet_modal {
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    height: 400px;
 }
 
 /* Desktop to Laptop Responsive Styles */

@@ -80,7 +80,7 @@ export default function PageHeader() {
     const appSettingsModal = useModal('closed');
 
     // logic to open and close the wallet modal
-    const walletModal = useModal<0 | 1 | 2 | 3>('closed');
+    const geofenceModal = useModal('closed');
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -96,7 +96,7 @@ export default function PageHeader() {
         [],
     );
 
-    // boolean to inform user of view only mode in wallet connection modal
+    // boolean to inform user of geofenced mode in wallet connection modal
     const VIEW_ONLY =
         (import.meta.env.VITE_VIEW_ONLY !== undefined
             ? import.meta.env.VITE_VIEW_ONLY.toLowerCase() === 'true'
@@ -243,7 +243,13 @@ export default function PageHeader() {
                     {!isUserConnected && (
                         <button
                             className={styles.depositButton}
-                            onClick={() => walletModal.open(VIEW_ONLY ? 0 : 1)}
+                            onClick={() => {
+                                if (VIEW_ONLY) {
+                                    geofenceModal.open();
+                                } else {
+                                    setIsUserConnected(true);
+                                }
+                            }}
                         >
                             Connect
                         </button>
@@ -331,36 +337,10 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {walletModal.isOpen && (
-                <Modal
-                    close={() => {
-                        walletModal.close();
-                        setIsUserConnected(true);
-                    }}
-                    title='Connect Wallet'
-                >
-                    <section className={styles.connect_wallet_modal}>
-                        {walletModal.content === 0 && (
-                            <section>
-                                Ambi perps is not supported for your country.
-                            </section>
-                        )}
-                        {walletModal.content === 1 && (
-                            <button onClick={() => walletModal.update(2)}>
-                                Connect a Wallet!
-                            </button>
-                        )}
-                        {walletModal.content === 2 && (
-                            <>
-                                <p>Connecting...</p>
-                                <button onClick={() => walletModal.update(3)}>
-                                    Click to finish connecting
-                                </button>
-                            </>
-                        )}
-                        {walletModal.content === 3 && (
-                            <div>You're connected! 🎉</div>
-                        )}
+            {geofenceModal.isOpen && (
+                <Modal close={geofenceModal.close} title='Not Available'>
+                    <section className={styles.geofence_modal}>
+                        Ambi perps is not supported for your country.
                     </section>
                 </Modal>
             )}
