@@ -64,11 +64,8 @@ const SymbolInfo: React.FC = React.memo(() => {
                 <div>
                     {symbolInfo && symbolInfo.coin === symbol ? (
                         <HorizontalScrollable
-                            className={
-                                orderBookMode === 'large'
-                                    ? styles.symbolInfoLimitorNarrow
-                                    : styles.symbolInfoLimitor
-                            }
+                            excludes={['tutorial-pool-explorer']}
+                            wrapperId='trade-page-left-section'
                         >
                             <div
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}
