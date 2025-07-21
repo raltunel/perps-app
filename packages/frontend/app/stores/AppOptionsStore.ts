@@ -5,8 +5,6 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 const DEFAULTS = {
     skipOpenOrderConfirm: false,
     skipClosePositionConfirm: false,
-    skipOpenLimitConfirm: false,
-    skipCloseLimitConfirm: false,
     optOutSpotDusting: false,
     persistTradingConnection: false,
     displayVerboseErrors: false,

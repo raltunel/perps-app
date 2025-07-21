@@ -721,7 +721,7 @@ function OrderInput() {
                                     confirmOrderModal.open('market_buy');
                                 }
                             } else if (marketOrderType === 'limit') {
-                                if (activeOptions.skipOpenLimitConfirm) {
+                                if (activeOptions.skipOpenOrderConfirm) {
                                     submitLimitBuy();
                                 } else {
                                     confirmOrderModal.open('limit_buy');
@@ -736,7 +736,7 @@ function OrderInput() {
                                     confirmOrderModal.open('market_sell');
                                 }
                             } else if (marketOrderType === 'limit') {
-                                if (activeOptions.skipOpenLimitConfirm) {
+                                if (activeOptions.skipOpenOrderConfirm) {
                                     submitLimitSell();
                                 } else {
                                     confirmOrderModal.open('limit_sell');
@@ -838,7 +838,7 @@ function OrderInput() {
                                     submitFn={submitLimitBuy}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipOpenLimitConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
