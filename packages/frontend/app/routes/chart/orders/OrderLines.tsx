@@ -142,10 +142,10 @@ export default function OrderLines({
                 Math.min(labelMaxPixel, height) - Math.max(yPricePixel, 0) >=
                 visibleBuffer;
 
+            const max = Math.max(minY, maxY);
+            const min = Math.min(minY, maxY);
             return (
-                (line.yPrice >= minY &&
-                    line.yPrice <= maxY &&
-                    isVisibleEnough) ||
+                (line.yPrice >= min && line.yPrice <= max && isVisibleEnough) ||
                 (selectedLine && line.oid === selectedLine?.parentLine.oid)
             );
         });
