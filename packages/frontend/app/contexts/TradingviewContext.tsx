@@ -42,7 +42,6 @@ import {
     type IBasicDataFeed,
     type IChartingLibraryWidget,
     type IDatafeedChartApi,
-    type LibrarySymbolInfo,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -248,6 +247,70 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 priceFormatterFactory: priceFormatterFactory,
             },
         });
+
+        // tvWidget.headerReady().then(() => {
+        //     const liquidationsButton = tvWidget.createButton();
+
+        //     let isToggled = false;
+
+        //     const updateButtonStyle = () => {
+        //         const svg = getLiquidationsSvgIcon(
+        //             isToggled ? '#7371fc' : '#cbcaca',
+        //         );
+        //         liquidationsButton.style.color = isToggled
+        //             ? '#7371fc'
+        //             : '#cbcaca';
+
+        //         liquidationsButton.innerHTML = `
+        //             <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
+        //               ${svg}
+        //              <span style="padding-left:3px"> Liquidations
+        //              </span>`;
+        //     };
+
+        //     updateButtonStyle();
+
+        //     const onClick = () => {
+        //         isToggled = !isToggled;
+        //         updateButtonStyle();
+
+        //         if (isToggled) {
+        //             console.log('Open');
+        //         } else {
+        //             console.log('Close');
+        //         }
+        //     };
+        //     const onMouseEnter = () => {
+        //         const wrapper = liquidationsButton.querySelector(
+        //             '.liquidations-wrapper',
+        //         ) as HTMLDivElement;
+        //         if (wrapper) {
+        //             wrapper.style.backgroundColor = '#313030';
+        //         }
+        //     };
+        //     const onMouseLeave = () => {
+        //         const wrapper = liquidationsButton.querySelector(
+        //             '.liquidations-wrapper',
+        //         ) as HTMLDivElement;
+        //         if (wrapper) wrapper.style.backgroundColor = 'transparent';
+        //     };
+
+        //     liquidationsButton.addEventListener('click', onClick);
+        //     liquidationsButton.addEventListener('mouseenter', onMouseEnter);
+        //     liquidationsButton.addEventListener('mouseleave', onMouseLeave);
+
+        //     return () => {
+        //         liquidationsButton.removeEventListener('click', onClick);
+        //         liquidationsButton.removeEventListener(
+        //             'mouseenter',
+        //             onMouseEnter,
+        //         );
+        //         liquidationsButton.removeEventListener(
+        //             'mouseleave',
+        //             onMouseLeave,
+        //         );
+        //     };
+        // });
 
         tvWidget.onChartReady(() => {
             /**

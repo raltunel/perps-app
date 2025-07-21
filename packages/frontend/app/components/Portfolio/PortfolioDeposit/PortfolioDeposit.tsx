@@ -8,8 +8,9 @@ import TokenDropdown, {
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
-interface PortfolioDepositProps {
+interface propsIF {
     portfolio: {
         id: string;
         name: string;
@@ -21,12 +22,9 @@ interface PortfolioDepositProps {
     isProcessing?: boolean;
 }
 
-function PortfolioDeposit({
-    portfolio,
-    onDeposit,
+function PortfolioDeposit(props: propsIF) {
+    const { portfolio, onDeposit, isProcessing = false } = props;
 
-    isProcessing = false,
-}: PortfolioDepositProps) {
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken, setSelectedToken] = useState<Token>(
@@ -130,6 +128,11 @@ function PortfolioDeposit({
         [availableBalance, selectedToken.symbol, formatCurrency],
     );
 
+    console.log(
+        'for deposit: ' +
+            formatCurrency(availableBalance, selectedToken.symbol),
+    );
+
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
@@ -142,14 +145,8 @@ function PortfolioDeposit({
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
-                <h4>
-                    Deposit {selectedToken.symbol} to {portfolio.name}
-                </h4>
-                <p>
-                    Deposit {selectedToken.symbol} to your {portfolio.name}{' '}
-                    portfolio. Funds will be immediately available for
-                    allocation.
-                </p>
+                <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
+                <h4>Deposit {selectedToken.symbol} from Fogo</h4>
             </div>
 
             <TokenDropdown

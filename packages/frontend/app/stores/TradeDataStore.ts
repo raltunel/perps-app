@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { setLS } from '~/utils/AppUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
@@ -7,9 +8,12 @@ import {
     createUserTradesSlice,
     type UserTradeDataStore,
 } from './UserTradeDataStore';
-import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+
+export type marginModesT = 'cross' | 'isolated';
 
 type TradeDataStore = UserTradeDataStore & {
+    marginMode: marginModesT;
+    setMarginMode: (m: marginModesT) => void;
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
@@ -42,6 +46,8 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
+            marginMode: 'cross',
+            setMarginMode: (m: marginModesT) => set({ marginMode: m }),
             symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
@@ -63,7 +69,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC', 'ETH', 'SOL', 'XRP', 'DOGE', 'LINK'],
+            favKeys: ['BTC'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (
@@ -119,6 +125,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         {
             name: 'TRADE_DATA',
             partialize: (state) => ({
+                marginMode: state.marginMode,
                 favKeys: state.favKeys,
                 symbol: state.symbol,
                 selectedTradeTab:

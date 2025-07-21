@@ -1,23 +1,20 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
-import { LuOctagonX } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -31,11 +28,12 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -63,36 +61,37 @@ const marketOrderTypes = [
         blurb: 'Buy/Sell at a specific price or better',
         icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'stop_market',
-        label: 'Stop Market',
-        blurb: 'Triggers a market order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'stop_limit',
-        label: 'Stop Limit',
-        blurb: 'Triggers a limit order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'twap',
-        label: 'TWAP',
-        blurb: 'Distributes trades across a specified time period',
-        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'scale',
-        label: 'Scale',
-        blurb: 'Multiple orders at incrementing prices',
-        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'chase_limit',
-        label: 'Chase Limit',
-        blurb: 'Adjusts limit price to follow the market',
-        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-    },
+    // disabled code 21 Jul 25
+    // {
+    //     value: 'stop_market',
+    //     label: 'Stop Market',
+    //     blurb: 'Triggers a market order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'stop_limit',
+    //     label: 'Stop Limit',
+    //     blurb: 'Triggers a limit order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'twap',
+    //     label: 'TWAP',
+    //     blurb: 'Distributes trades across a specified time period',
+    //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'scale',
+    //     label: 'Scale',
+    //     blurb: 'Multiple orders at incrementing prices',
+    //     icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'chase_limit',
+    //     label: 'Chase Limit',
+    //     blurb: 'Adjusts limit price to follow the market',
+    //     icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+    // },
 ];
 
 // disabled code 07 Jul 25
@@ -100,14 +99,6 @@ const marketOrderTypes = [
 //     { value: 'bid1ask1', label: 'Bid1/Ask1' },
 //     { value: 'distancebidask1', label: 'Distance from Bid1/Ask1' },
 // ];
-
-const leverageOptions = [
-    { value: 1, label: '1x' },
-    { value: 5, label: '5x' },
-    { value: 10, label: '10x' },
-    { value: 50, label: '50x' },
-    { value: 100, label: '100x' },
-];
 
 // keys for content that may be rendered in tx modal
 export type modalContentT =
@@ -120,25 +111,25 @@ export type modalContentT =
 
 function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [activeMargin, setActiveMargin] = useState<MarginMode>('isolated');
 
-    const [leverage, setLeverage] = useState(100);
+    const [leverage, setLeverage] = useState(1);
     const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
     const [positionSize, setPositionSize] = useState(0);
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
-    const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
-    const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
-    const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
-    const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
-        useState(false);
+    // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
+    // const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
+    // const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
+    // const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
+    //     useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 1;
+    // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
@@ -150,10 +141,17 @@ function OrderInput() {
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
 
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
-        useTradeDataStore();
+    const {
+        obChosenPrice,
+        obChosenAmount,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+    } = useTradeDataStore();
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -169,6 +167,8 @@ function OrderInput() {
     );
 
     const useTotalSize = ['twap', 'chase_limit'].includes(marketOrderType);
+
+    const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
     const inputDetailsData = useMemo(
         () => [
@@ -211,7 +211,36 @@ function OrderInput() {
     useEffect(() => {
         setSize('');
         setPrice('');
-    }, [symbol]);
+
+        // Apply leverage validation when symbol changes
+        // BUT only if we have the correct symbolInfo for the current symbol
+        if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol === symbol
+        ) {
+            const validatedLeverage = validateAndApplyLeverageForMarket(
+                symbol,
+                symbolInfo.maxLeverage,
+                minimumInputValue,
+            );
+            setLeverage(validatedLeverage);
+        } else if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol &&
+            symbolInfo.symbol !== symbol
+        ) {
+            console.log(
+                `OrderInput: Symbol mismatch - waiting for correct symbolInfo. Current: ${symbol}, symbolInfo: ${symbolInfo?.symbol}`,
+            );
+        }
+    }, [
+        symbol,
+        symbolInfo?.maxLeverage,
+        symbolInfo?.symbol,
+        validateAndApplyLeverageForMarket,
+    ]);
 
     const handleTypeChange = () => {
         switch (marketOrderType) {
@@ -248,16 +277,7 @@ function OrderInput() {
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
     }, []);
-    const handleMarginModeChange = useCallback((mode: MarginMode) => {
-        setActiveMargin(mode);
-    }, []);
 
-    const handleMarginModeConfirm = () => {
-        if (activeMargin) {
-            console.log(`Confirmed: ${activeMargin} margin mode`);
-        }
-        confirmOrderModal.close();
-    };
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
     };
@@ -339,26 +359,26 @@ function OrderInput() {
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
-    const handleToggleReduceOnly = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isReduceOnlyEnabled;
-        setIsReduceOnlyEnabled(newValue);
-    };
-    const handleToggleProfitOnly = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isTakeProfitEnabled;
-        setIsTakeProfitEnabled(newValue);
-    };
-    const handleToggleRandomize = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isRandomizeEnabled;
-        setIsRandomizeEnabled(newValue);
-    };
-    const handleToggleChasingInterval = (newState?: boolean) => {
-        const newValue =
-            newState !== undefined ? newState : !isChasingIntervalEnabled;
-        setIsChasingIntervalEnabled(newValue);
-    };
+    // const handleToggleReduceOnly = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isReduceOnlyEnabled;
+    //     setIsReduceOnlyEnabled(newValue);
+    // };
+    // const handleToggleProfitOnly = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isTakeProfitEnabled;
+    //     setIsTakeProfitEnabled(newValue);
+    // };
+    // const handleToggleRandomize = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isRandomizeEnabled;
+    //     setIsRandomizeEnabled(newValue);
+    // };
+    // const handleToggleChasingInterval = (newState?: boolean) => {
+    //     const newValue =
+    //         newState !== undefined ? newState : !isChasingIntervalEnabled;
+    //     setIsChasingIntervalEnabled(newValue);
+    // };
 
     // PRICE RANGE AND TOTAL ORDERS -----------------------------------------
     const handleMinPriceRange = (
@@ -417,38 +437,36 @@ function OrderInput() {
     );
 
     // -----------------------------PROPS----------------------------------------
-    const reduceAndProfitToggleProps = useMemo(
-        () => ({
-            isReduceOnlyEnabled,
-            isTakeProfitEnabled,
-            handleToggleProfitOnly,
-            handleToggleReduceOnly,
-            marketOrderType,
-            isRandomizeEnabled,
-            handleToggleRandomize,
-            isChasingIntervalEnabled,
-            handleToggleIsChasingInterval: handleToggleChasingInterval,
-        }),
-        [
-            isReduceOnlyEnabled,
-            isTakeProfitEnabled,
-            handleToggleProfitOnly,
-            handleToggleReduceOnly,
-            marketOrderType,
-            isRandomizeEnabled,
-            handleToggleRandomize,
-            isChasingIntervalEnabled,
-            handleToggleChasingInterval,
-        ],
-    );
+    // const reduceAndProfitToggleProps = useMemo(
+    //     () => ({
+    //         isReduceOnlyEnabled,
+    //         isTakeProfitEnabled,
+    //         handleToggleProfitOnly,
+    //         handleToggleReduceOnly,
+    //         marketOrderType,
+    //         isRandomizeEnabled,
+    //         handleToggleRandomize,
+    //         isChasingIntervalEnabled,
+    //         handleToggleIsChasingInterval: handleToggleChasingInterval,
+    //     }),
+    //     [
+    //         isReduceOnlyEnabled,
+    //         isTakeProfitEnabled,
+    //         handleToggleProfitOnly,
+    //         handleToggleReduceOnly,
+    //         marketOrderType,
+    //         isRandomizeEnabled,
+    //         handleToggleRandomize,
+    //         isChasingIntervalEnabled,
+    //         handleToggleChasingInterval,
+    //     ],
+    // );
 
     const leverageSliderProps = useMemo(
         () => ({
-            options: leverageOptions,
             value: leverage,
             onChange: handleLeverageChange,
             minimumInputValue: minimumInputValue,
-            maximumInputValue: tempMaximumLeverageInput,
             generateRandomMaximumInput: generateRandomMaximumInput,
         }),
         [leverage, handleLeverageChange],
@@ -483,7 +501,7 @@ function OrderInput() {
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit'].includes(marketOrderType),
         }),
         [price, handlePriceChange],
     );
@@ -501,7 +519,7 @@ function OrderInput() {
             setSelectedMode,
             useTotalSize,
         }),
-        [size, handleSizeChange, useTotalSize],
+        [size, handleSizeChange, useTotalSize, selectedMode, symbol],
     );
 
     const positionSizeProps = useMemo(
@@ -628,12 +646,14 @@ function OrderInput() {
                                 value={marketOrderType}
                                 onChange={handleMarketOrderTypeChange}
                             />
-                            <button
+                            <SimpleButton
+                                className={styles.margin_type_btn}
                                 onClick={() => confirmOrderModal.open('margin')}
-                                className={styles.isolatedButton}
+                                bg='dark3'
+                                hoverBg='accent1'
                             >
-                                Isolated <FiChevronDown size={24} />
-                            </button>
+                                {marginMode}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 onClick={() => setShowLaunchpad(true)}
@@ -688,9 +708,9 @@ function OrderInput() {
                             priceDistributionButtons}
                         {marketOrderType === 'twap' && <RunningTime />}
 
-                        <ReduceAndProfitToggle
+                        {/* <ReduceAndProfitToggle
                             {...reduceAndProfitToggleProps}
-                        />
+                        /> */}
                     </div>
                     <PlaceOrderButtons
                         buyFn={() => {
@@ -752,13 +772,11 @@ function OrderInput() {
                         >
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
-                                    handleMarginModeChange={
-                                        handleMarginModeChange
-                                    }
-                                    handleMarginModeConfirm={
-                                        handleMarginModeConfirm
-                                    }
-                                    activeMargin={activeMargin}
+                                    initial={marginMode}
+                                    handleConfirm={(m: marginModesT): void => {
+                                        setMarginMode(m);
+                                        confirmOrderModal.close();
+                                    }}
                                 />
                             )}
 
@@ -801,11 +819,11 @@ function OrderInput() {
                                     submitFn={submitMarketSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipClosePositionConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipClosePositionConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -824,7 +842,7 @@ function OrderInput() {
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipOpenLimitConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
@@ -839,11 +857,11 @@ function OrderInput() {
                                     submitFn={submitLimitSell}
                                     toggleEnabled={() =>
                                         activeOptions.toggle(
-                                            'skipCloseLimitConfirm',
+                                            'skipOpenOrderConfirm',
                                         )
                                     }
                                     isEnabled={
-                                        !activeOptions.skipCloseLimitConfirm
+                                        !activeOptions.skipOpenOrderConfirm
                                     }
                                 />
                             )}
