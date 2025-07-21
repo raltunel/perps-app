@@ -69,6 +69,8 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     ? styles.symbolInfoLimitorNarrow
                                     : styles.symbolInfoLimitor
                             }
+                            excludes={['tutorial-pool-explorer']}
+                            wrapperId='trade-page-left-section'
                         >
                             <div
                                 className={`${styles.symbolInfoFieldsWrapper} ${orderBookMode === 'large' ? styles.symbolInfoFieldsWrapperNarrow : ''}`}

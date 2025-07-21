@@ -22,6 +22,14 @@
     padding-left: var(--font-size-s);
 }
 
+.watchlistStaticArea {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--margin-s);
+}
+
 .favIcon {
     color: var(--red);
     margin-right: var(--margin-s);

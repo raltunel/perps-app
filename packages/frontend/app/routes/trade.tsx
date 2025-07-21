@@ -269,6 +269,7 @@ export default function Trade() {
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
                         <div
+                            id='trade-page-left-section'
                             className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
                         >
                             {debugToolbarOpen && (
