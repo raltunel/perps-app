@@ -21,6 +21,8 @@ export default function OpenOrdersTableHeader({
     sortDirection,
     sortClickHandler,
 }: OpenOrdersTableHeaderProps) {
+    const showTpSl = false;
+
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Time',
@@ -82,12 +84,16 @@ export default function OpenOrdersTableHeader({
             sortable: false,
             className: styles.triggerConditionsCell,
         },
-        {
-            name: 'TP/SL',
-            key: 'tpsl',
-            sortable: false,
-            className: styles.tpslCell,
-        },
+        ...(showTpSl
+            ? [
+                  {
+                      name: 'TP/SL',
+                      key: 'tpsl' as OrderDataSortBy,
+                      sortable: false,
+                      className: styles.tpslCell,
+                  },
+              ]
+            : []),
         {
             name: 'Cancel',
             key: 'cancel',
@@ -97,7 +103,9 @@ export default function OpenOrdersTableHeader({
     ];
 
     return (
-        <div className={styles.headerContainer}>
+        <div
+            className={`${styles.headerContainer} ${!showTpSl ? styles.noTpSl : ''}`}
+        >
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}

@@ -1,3 +1,8 @@
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
 import React, {
     useCallback,
@@ -6,8 +11,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { useApp } from '~/contexts/AppContext';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -17,7 +22,6 @@ import {
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface propsIF {
     isDropdown?: boolean;
@@ -50,7 +54,9 @@ const tooltipSvg = (
 function DepositDropdown(props: propsIF) {
     const { isDropdown } = props;
 
-    const { isUserConnected, setIsUserConnected } = useApp();
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
+
     const notifications: NotificationStoreIF = useNotificationStore();
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
@@ -138,9 +144,9 @@ function DepositDropdown(props: propsIF) {
     );
 
     // Memoize wallet connect handler
-    const handleConnectWallet = useCallback(() => {
-        setIsUserConnected(true);
-    }, [setIsUserConnected]);
+    // const handleConnectWallet = useCallback(() => {
+    //     console.log('connect wallet');
+    // }, []);
 
     // Memoize deposit/withdraw handlers
     const handleDeposit = useCallback(() => {
@@ -190,12 +196,7 @@ function DepositDropdown(props: propsIF) {
                         <p className={styles.notConnectedText}>
                             Connect your wallet to start trading with zero gas.
                         </p>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={handleConnectWallet}
-                        >
-                            Connect Wallet
-                        </SimpleButton>
+                        <SessionButton />
                     </div>
                 )}
                 {isUserConnected && (

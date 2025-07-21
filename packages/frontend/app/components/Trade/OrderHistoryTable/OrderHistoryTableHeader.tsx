@@ -10,6 +10,8 @@ interface OrderHistoryTableHeaderProps {
     sortClickHandler: (key: OrderDataSortBy) => void;
 }
 
+const showTpSl = false;
+
 export const OrderHistoryTableModel:
     | HeaderCell<number>[]
     | HeaderCell<string>[] = [
@@ -102,17 +104,21 @@ export const OrderHistoryTableModel:
         className: 'triggerConditionsCell',
         exportable: true,
     },
-    {
-        name: 'TP/SL',
-        key: 'triggerPx',
-        sortable: true,
-        className: 'tpslCell',
-        exportable: true,
-        exportAction: (data: number | null) => {
-            console.log(data);
-            return data && data > 0 ? data.toString() : '--';
-        },
-    },
+    ...(showTpSl
+        ? [
+              {
+                  name: 'TP/SL',
+                  key: 'triggerPx',
+                  sortable: true,
+                  className: 'tpslCell',
+                  exportable: true,
+                  exportAction: (data: number | null) => {
+                      console.log(data);
+                      return data && data > 0 ? data.toString() : '--';
+                  },
+              },
+          ]
+        : []),
     {
         name: 'Status',
         key: 'status',
@@ -136,7 +142,9 @@ export default function OrderHistoryTableHeader(
     const { sortBy, sortDirection, sortClickHandler } = props;
 
     return (
-        <div className={styles.headerContainer}>
+        <div
+            className={`${styles.headerContainer} ${!showTpSl ? styles.noTpSl : ''}`}
+        >
             {OrderHistoryTableModel.map((header) => (
                 <div
                     key={header.key}

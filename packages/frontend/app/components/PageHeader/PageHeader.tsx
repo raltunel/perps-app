@@ -1,14 +1,13 @@
-import { useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
-    LuChevronDown,
-    LuChevronUp,
-    LuSettings,
-    LuWallet,
-} from 'react-icons/lu';
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
+import { useState } from 'react';
+// import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
-import { useApp } from '~/contexts/AppContext';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
@@ -22,10 +21,12 @@ import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-import WalletDropdown from './WalletDropdown/WalletDropdown';
+// import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
-    const { isUserConnected, setIsUserConnected } = useApp();
+    const sessionState = useSession();
+
+    const isUserConnected = isEstablished(sessionState);
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function PageHeader() {
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
     const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
+    const showRPCButton = false;
     const location = useLocation();
 
     // symbol for active market
@@ -44,12 +46,12 @@ export default function PageHeader() {
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
-        { name: 'Portfolio', path: '/v2/portfolio' },
+        // { name: 'Portfolio', path: '/v2/portfolio' },
         // { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
-        { name: 'Docs', path: '/404' },
+        // { name: 'Docs', path: '/docs' },
     ];
 
     // refs for dropdown menu handline
@@ -195,7 +197,7 @@ export default function PageHeader() {
                         </section>
                     )}
 
-                    {isUserConnected && (
+                    {isUserConnected && showRPCButton && (
                         <section
                             style={{ position: 'relative' }}
                             ref={rpcMenuRef}
@@ -230,20 +232,13 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    {!isUserConnected && (
-                        <button
-                            className={styles.depositButton}
-                            onClick={() => setIsUserConnected(true)}
-                        >
-                            Connect
-                        </button>
-                    )}
+                    <SessionButton />
                     {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
                             ref={walletMenuRef}
                         >
-                            {isUserConnected && (
+                            {/* {isUserConnected && (
                                 <button
                                     className={styles.walletButton}
                                     onClick={() =>
@@ -252,16 +247,16 @@ export default function PageHeader() {
                                 >
                                     <LuWallet size={18} /> Miyuki.eth
                                 </button>
-                            )}
+                            )} */}
 
-                            {isWalletMenuOpen && isUserConnected && (
+                            {/* {isWalletMenuOpen && isUserConnected && (
                                 <WalletDropdown
                                     isWalletMenuOpen={isWalletMenuOpen}
                                     setIsWalletMenuOpen={setIsWalletMenuOpen}
                                     setIsUserConnected={setIsUserConnected}
                                     isDropdown
                                 />
-                            )}
+                            )} */}
                         </section>
                     )}
                     <section
@@ -270,7 +265,7 @@ export default function PageHeader() {
                         }}
                         ref={helpDropdownRef}
                     >
-                        <button
+                        {/* <button
                             className={styles.helpButton}
                             onClick={() =>
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
@@ -280,7 +275,7 @@ export default function PageHeader() {
                                 size={18}
                                 color='var(--text2)'
                             />
-                        </button>
+                        </button> */}
 
                         {isHelpDropdownOpen && (
                             <HelpDropdown
@@ -307,7 +302,11 @@ export default function PageHeader() {
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
-                        {isDropdownMenuOpen && <DropdownMenu />}
+                        {isDropdownMenuOpen && (
+                            <DropdownMenu
+                                setIsDropdownMenuOpen={setIsDropdownMenuOpen}
+                            />
+                        )}
                     </section>
                 </div>
             </header>

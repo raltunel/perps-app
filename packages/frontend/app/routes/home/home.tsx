@@ -9,6 +9,7 @@ import btcImage from '../../assets/tokens/btc.svg';
 import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
+import Hero from '~/components/Home/Hero/Hero';
 
 interface FloatingTokenProps {
     src: string;
@@ -153,6 +154,9 @@ export default function Home(): JSX.Element {
             </Link>
         );
     }
+    const yes = true;
+
+    if (yes) return <Hero />;
 
     return (
         <section className={styles.hero}>

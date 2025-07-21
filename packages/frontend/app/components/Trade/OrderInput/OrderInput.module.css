@@ -74,28 +74,13 @@
     color: var(--text1);
 }
 
-.isolatedButton {
+.margin_type_btn {
     display: flex;
     height: 100%;
-    padding: 0px var(--padding-xs) 0px var(--padding-s);
     align-items: center;
-    justify-content: space-between;
-    background: var(--bg-dark3, #1c1c22);
-    border-radius: var(--radius-s);
-    border: none;
-    color: var(--text1, #f0f0f8);
+    justify-content: center;
     font-size: var(--font-size-s);
-    cursor: pointer;
-    flex-shrink: 0;
-    gap: var(--gap-s);
-}
-
-.isolatedButton svg {
-    color: var(--text2);
-}
-
-.isolatedButton:hover svg {
-    color: var(--text1);
+    text-transform: capitalize;
 }
 
 .trade_type_toggle {

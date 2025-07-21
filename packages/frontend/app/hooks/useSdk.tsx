@@ -1,10 +1,10 @@
 import {
+    API_URLS,
     DEMO_USER,
     Exchange,
     Info,
     type ActiveSubscription,
     type Environment,
-    API_URLS,
 } from '@perps-app/sdk';
 import React, {
     createContext,
@@ -54,7 +54,6 @@ export const SdkProvider: React.FC<{
     } = useAppStateStore();
     const { isWsSleepMode } = useDebugStore();
 
-    // commit to trigger deployment
     useEffect(() => {
         if (!isClient) return;
         if (!info) {
