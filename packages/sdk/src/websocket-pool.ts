@@ -55,7 +55,9 @@ export class WebSocketPool {
     }
 
     private initializeSockets() {
-        // Initialize market socket if endpoint provided
+        const socketsToCreate: Array<[string, WebSocketInstanceConfig]> = [];
+
+        // Prepare market socket config if endpoint provided
         if (this.config.endpoints.market) {
             const marketConfig: WebSocketInstanceConfig = {
                 baseUrl: this.config.endpoints.market,
@@ -64,11 +66,12 @@ export class WebSocketPool {
                 isDebug: this.config.isDebug,
                 numWorkers: this.config.numWorkers,
                 pingInterval: this.config.pingInterval,
+                autoConnect: false, // Don't connect immediately
             };
-            this.sockets.set('market', new WebSocketInstance(marketConfig));
+            socketsToCreate.push(['market', marketConfig]);
         }
 
-        // Initialize user socket if endpoint provided
+        // Prepare user socket config if endpoint provided
         if (this.config.endpoints.user) {
             const userConfig: WebSocketInstanceConfig = {
                 baseUrl: this.config.endpoints.user,
@@ -77,11 +80,12 @@ export class WebSocketPool {
                 isDebug: this.config.isDebug,
                 numWorkers: this.config.numWorkers,
                 pingInterval: this.config.pingInterval,
+                autoConnect: false, // Don't connect immediately
             };
-            this.sockets.set('user', new WebSocketInstance(userConfig));
+            socketsToCreate.push(['user', userConfig]);
         }
 
-        // Initialize any custom sockets
+        // Prepare any custom sockets
         Object.entries(this.config.endpoints).forEach(([name, endpoint]) => {
             if (name !== 'market' && name !== 'user' && endpoint) {
                 const customConfig: WebSocketInstanceConfig = {
@@ -91,9 +95,21 @@ export class WebSocketPool {
                     isDebug: this.config.isDebug,
                     numWorkers: this.config.numWorkers,
                     pingInterval: this.config.pingInterval,
+                    autoConnect: false, // Don't connect immediately
                 };
-                this.sockets.set(name, new WebSocketInstance(customConfig));
+                socketsToCreate.push([name, customConfig]);
             }
+        });
+
+        // Create all socket instances first
+        socketsToCreate.forEach(([name, config]) => {
+            this.sockets.set(name, new WebSocketInstance(config));
+        });
+
+        // Connect all sockets in parallel
+        console.log('Connecting all WebSocket instances in parallel...');
+        this.sockets.forEach((socket) => {
+            socket.connect();
         });
     }
 

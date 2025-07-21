@@ -23,6 +23,7 @@ export interface WebSocketInstanceConfig {
     isDebug?: boolean;
     numWorkers?: number;
     pingInterval?: number;
+    autoConnect?: boolean; // defaults to true
 }
 
 function subscriptionToIdentifier(subscription: Subscription): string {
@@ -154,7 +155,11 @@ export class WebSocketInstance {
         );
 
         this.initializeWorkers();
-        this.connect();
+
+        // Auto-connect unless explicitly disabled
+        if (config.autoConnect !== false) {
+            this.connect();
+        }
     }
 
     private initializeWorkers() {
@@ -197,7 +202,7 @@ export class WebSocketInstance {
         this.nextWorkerIndex = 0;
     }
 
-    private connect = () => {
+    public connect = () => {
         // Prevent duplicate connection attempts
         if (this.isConnecting) {
             console.log(
@@ -532,13 +537,26 @@ export class WebSocketInstance {
                 active: activeSubscription,
             });
         } else {
-            console.log(`[${this.socketName}] subscribing`, subscription);
-            this.ws.send(
-                JSON.stringify({
-                    method: 'subscribe',
-                    subscription,
-                }),
+            // Check if we already sent this exact subscription
+            const isDuplicate = existingActiveSubscriptions.some(
+                (sub) =>
+                    JSON.stringify(sub.subscription) ===
+                    JSON.stringify(subscription),
             );
+
+            if (!isDuplicate || existingActiveSubscriptions.length === 1) {
+                console.log(`[${this.socketName}] subscribing`, subscription);
+                this.ws.send(
+                    JSON.stringify({
+                        method: 'subscribe',
+                        subscription,
+                    }),
+                );
+            } else {
+                this.log(
+                    `Already subscribed to ${identifier}, skipping duplicate subscription`,
+                );
+            }
         }
 
         const unsubscribe = () => {
