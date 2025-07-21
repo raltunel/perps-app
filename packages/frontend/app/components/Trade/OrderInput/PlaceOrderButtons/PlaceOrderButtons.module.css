@@ -39,6 +39,13 @@
     border: none;
     height: 47px !important;
 }
+.buttons_wrapper > button:disabled {
+    background-color: var(--bg-dark3) !important;
+    color: var(--text3) !important;
+
+    cursor: not-allowed;
+    pointer-events: none;
+}
 
 .overlay_button {
     position: relative;
