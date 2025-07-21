@@ -118,7 +118,7 @@ export default function OrderLines({
     }, [chart, scaleData]);
 
     useEffect(() => {
-        if (!scaleData || !lines.length || !chart) return;
+        if (!scaleData || !lines.length || !chart || !canvasSize) return;
 
         const [minY, maxY] = scaleData.yScale.domain();
 
@@ -151,7 +151,12 @@ export default function OrderLines({
         });
 
         setVisibleLines(filtered);
-    }, [lines, selectedLine, JSON.stringify(scaleData?.yScale.domain())]);
+    }, [
+        lines,
+        canvasSize,
+        selectedLine,
+        JSON.stringify(scaleData?.yScale.domain()),
+    ]);
 
     return (
         <>
