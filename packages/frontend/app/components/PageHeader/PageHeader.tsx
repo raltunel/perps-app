@@ -50,7 +50,7 @@ export default function PageHeader() {
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
         // { name: 'Strategies', path: '/strategies' },
-        { name: 'Docs', path: '/404' },
+        // { name: 'Docs', path: '/docs' },
     ];
 
     // refs for dropdown menu handline
