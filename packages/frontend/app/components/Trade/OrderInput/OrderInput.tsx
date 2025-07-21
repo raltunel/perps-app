@@ -2,11 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
-import { LuOctagonX } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
@@ -133,6 +130,7 @@ function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 1;
+    // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
