@@ -10,7 +10,7 @@ import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useMultiSocket, useMarketSocket } from '~/hooks/useMultiSocket';
+import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -61,11 +61,8 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
     orderCount,
     heightOverride,
 }) => {
-    // Use the market socket directly for order book data
-    const marketSocket = useMarketSocket();
-
-    // Alternative: use the multiSocketInfo for backward-compatible API
-    // const { multiSocketInfo } = useMultiSocket();
+    // Use the SDK's info object which now has multi-socket enabled
+    const { info } = useSdk();
 
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
@@ -200,9 +197,9 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
         }
     }, [symbol, symbolInfo?.coin]);
 
-    // MAIN CHANGE: Use marketSocket directly for l2Book subscription
+    // Use info object which now routes l2Book to market socket automatically
     useEffect(() => {
-        if (!marketSocket) return;
+        if (!info) return;
 
         setOrderBookState(TableState.LOADING);
         if (selectedResolution) {
@@ -217,8 +214,8 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
                     : {}),
             };
 
-            // Subscribe directly to the market socket
-            const { unsubscribe } = marketSocket.subscribe(
+            // Subscribe using info - will automatically route to market socket
+            const { unsubscribe } = info.subscribe(
                 subscription,
                 postOrderBookRaw,
             );
@@ -227,7 +224,7 @@ const OrderBookMultiSocket: React.FC<OrderBookProps> = ({
                 unsubscribe();
             };
         }
-    }, [selectedResolution, marketSocket, symbol, postOrderBookRaw]);
+    }, [selectedResolution, info, symbol, postOrderBookRaw]);
 
     const midHeader = useCallback(
         (id: string) => (

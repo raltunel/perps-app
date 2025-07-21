@@ -1,10 +1,14 @@
 import {
     WebSocketInstance,
     WebSocketInstanceConfig,
-    SocketType,
-    Callback,
+    type SocketType,
+    type Callback,
 } from './websocket-instance';
 import type { Subscription } from './utils/types';
+
+// Re-export types
+export type { SocketType, Callback } from './websocket-instance';
+export { WebSocketInstance } from './websocket-instance';
 
 export interface WebSocketEndpoints {
     market?: string;

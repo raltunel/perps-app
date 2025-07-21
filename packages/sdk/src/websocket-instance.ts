@@ -102,7 +102,7 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
 export class WebSocketInstance {
     private ws!: WebSocket;
     private wsReady: boolean = false;
-    private subscriptionIdCounter: number = 0;
+    private subscriptionIdCounter: number = Math.floor(Math.random() * 10000);
     private queuedSubscriptions: Array<{
         subscription: Subscription;
         active: ActiveSubscription;
@@ -125,6 +125,7 @@ export class WebSocketInstance {
     private sleepMode: boolean = false;
     private pongCheckLock: boolean = false;
     private pingIntervalMs: number;
+    private firstMessageLogged: boolean = false;
 
     // New properties for multi-socket support
     private readonly socketType: SocketType;
@@ -139,8 +140,14 @@ export class WebSocketInstance {
         this.socketName = config.socketName ?? config.socketType;
         this.pingIntervalMs = config.pingInterval ?? DEFAULT_PING_INTERVAL_MS;
 
+        console.log(
+            `[${this.socketName}] WebSocketInstance created with baseUrl:`,
+            this.baseUrl,
+        );
+
         this.initializeWorkers();
-        this.connect();
+        // Delay initial connection to avoid race conditions
+        setTimeout(() => this.connect(), this.socketName === 'user' ? 500 : 0);
     }
 
     private initializeWorkers() {
@@ -185,7 +192,9 @@ export class WebSocketInstance {
     private connect = () => {
         const wsUrl =
             'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
-        this.log(`[${this.socketName}] Connecting to`, wsUrl);
+        console.log(`[${this.socketName}] Connecting to`, wsUrl);
+
+        // Create WebSocket with subprotocol to differentiate connections
         this.ws = new WebSocket(wsUrl);
         this.wsReady = false;
         this.stopped = false;
@@ -193,10 +202,12 @@ export class WebSocketInstance {
         this.ws.removeEventListener('open', this.onOpen);
         this.ws.removeEventListener('message', this.onMessage);
         this.ws.removeEventListener('close', this.onClose);
+        this.ws.removeEventListener('error', this.onError);
 
         this.ws.addEventListener('open', this.onOpen);
         this.ws.addEventListener('message', this.onMessage);
         this.ws.addEventListener('close', this.onClose);
+        this.ws.addEventListener('error', this.onError);
 
         // make sure workers are ready before connecting
         if (this.workers.length === 0 && this.numWorkers > 0) {
@@ -246,7 +257,7 @@ export class WebSocketInstance {
     };
 
     private onOpen = () => {
-        this.log('onOpen');
+        console.log(`[${this.socketName}] onOpen`);
         this.wsReady = true;
         this.onConnectionChange?.(true);
 
@@ -272,15 +283,42 @@ export class WebSocketInstance {
         if (this.sleepMode) {
             return;
         }
+        const message = event.data;
+
+        // Log first message to debug connection issues
+        if (!this.firstMessageLogged) {
+            this.firstMessageLogged = true;
+            console.log(
+                `[${this.socketName}] First message received:`,
+                message.substring ? message.substring(0, 200) : message,
+            );
+        }
+
+        // Skip connection established message
+        if (message === 'Websocket connection established.') {
+            console.log(
+                `[${this.socketName}] Websocket connection established.`,
+            );
+            return;
+        }
+
+        // Check for error messages
+        if (message.includes && message.includes('error')) {
+            console.error(
+                `[${this.socketName}] Possible error message:`,
+                message,
+            );
+        }
+
         if (this.numWorkers > 0 && this.workers.length > 0) {
             const worker = this.workers[this.nextWorkerIndex];
-            worker.postMessage(event.data);
+            worker.postMessage(message);
             this.nextWorkerIndex =
                 (this.nextWorkerIndex + 1) % this.workers.length;
         } else {
             // Parse on main thread
             try {
-                const parsed = JSON.parse(event.data);
+                const parsed = JSON.parse(message);
                 this.handleParsedMessage(parsed);
             } catch (error) {
                 this.log('Failed to parse message on main thread:', error);
@@ -288,8 +326,10 @@ export class WebSocketInstance {
         }
     };
 
-    private onClose = () => {
-        this.log('onClose');
+    private onClose = (event: CloseEvent) => {
+        console.log(
+            `[${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
+        );
         this.wsReady = false;
         this.onConnectionChange?.(false);
 
@@ -310,24 +350,55 @@ export class WebSocketInstance {
         }
     };
 
+    private onError = (event: Event) => {
+        const wsEvent = event as ErrorEvent;
+        console.error(`[${this.socketName}] WebSocket error:`, {
+            message: wsEvent.message,
+            filename: wsEvent.filename,
+            lineno: wsEvent.lineno,
+            colno: wsEvent.colno,
+            error: wsEvent.error,
+            readyState: this.ws?.readyState,
+            url: this.ws?.url,
+        });
+    };
+
     private handleWorkerMessage = (
         event: MessageEvent,
         workerIndex: number,
     ) => {
-        if (event.data.error) {
-            this.log(`Worker ${workerIndex} parse error:`, event.data.error);
+        const { success, data, error, originalMessage } = event.data;
+        if (success && data) {
+            this.handleParsedMessage(data as WsMsg);
+        } else if (error) {
+            this.log(
+                `Worker ${workerIndex} parse error:`,
+                error,
+                'Original:',
+                originalMessage?.substring(0, 100),
+            );
         } else {
-            this.handleParsedMessage(event.data.parsed);
+            this.log(`Worker ${workerIndex} returned invalid response`);
         }
     };
 
     private handleParsedMessage = (msg: WsMsg) => {
+        if (!msg) {
+            this.log('Received undefined message');
+            return;
+        }
         if (msg.channel === 'subscriptionResponse') {
             const subId = msg.data.id;
             const sub = this.allSubscriptions[subId];
             const success = msg.data.success;
             if (sub && !success) {
-                this.log('subscription failed', sub.subscription);
+                console.error(
+                    `[${this.socketName}] subscription failed`,
+                    sub.subscription,
+                    msg.data,
+                );
+            } else if (sub && success) {
+                this.log(`subscription successful for id ${subId}`);
             }
             return;
         }
@@ -421,11 +492,11 @@ export class WebSocketInstance {
                 active: activeSubscription,
             });
         } else {
-            this.log('subscribing', subscription);
+            console.log(`[${this.socketName}] subscribing`, subscription);
             this.ws.send(
                 JSON.stringify({
                     method: 'subscribe',
-                    subscription: { ...subscription, id: subscriptionId },
+                    subscription,
                 }),
             );
         }
@@ -467,10 +538,7 @@ export class WebSocketInstance {
                         this.ws.send(
                             JSON.stringify({
                                 method: 'unsubscribe',
-                                subscription: {
-                                    ...subscription,
-                                    id: subscriptionId,
-                                },
+                                subscription,
                             }),
                         );
                     }

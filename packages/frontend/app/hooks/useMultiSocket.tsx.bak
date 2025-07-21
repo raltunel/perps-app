@@ -1,9 +1,11 @@
-import { DEMO_USER, Exchange, type Environment } from '@perps-app/sdk';
-import {
+import { 
+    DEMO_USER, 
+    Exchange, 
+    type Environment,
     MultiSocketInfo,
     WebSocketPool,
     WebSocketInstance,
-} from '@perps-app/sdk/src/websocket-pool';
+} from '@perps-app/sdk';
 import React, {
     createContext,
     useCallback,

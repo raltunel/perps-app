@@ -4,6 +4,7 @@ import {
     Info,
     type ActiveSubscription,
     type Environment,
+    API_URLS,
 } from '@perps-app/sdk';
 import React, {
     createContext,
@@ -30,7 +31,9 @@ const SdkContext = createContext<SdkContextType | undefined>(undefined);
 export const SdkProvider: React.FC<{
     environment: Environment;
     children: React.ReactNode;
-}> = ({ environment, children }) => {
+    marketEndpoint?: string;
+    userEndpoint?: string;
+}> = ({ environment, children, marketEndpoint, userEndpoint }) => {
     const isClient = useIsClient();
 
     const [info, setInfo] = useState<Info | null>(null);
@@ -58,6 +61,14 @@ export const SdkProvider: React.FC<{
             const newInfo = new Info({
                 environment,
                 skipWs: false,
+                useMultiSocket: false, // Disable multi-socket for now - server may not support concurrent connections
+                wsEndpoints:
+                    marketEndpoint || userEndpoint
+                        ? {
+                              market: marketEndpoint || API_URLS[environment],
+                              user: userEndpoint || API_URLS[environment],
+                          }
+                        : undefined,
                 // isDebug: true, // TODO: remove in prod
             });
 
@@ -80,7 +91,7 @@ export const SdkProvider: React.FC<{
         } else {
             exchange.setEnvironment(environment);
         }
-    }, [isClient, environment]);
+    }, [isClient, environment, marketEndpoint, userEndpoint]);
 
     useEffect(() => {
         if (!internetConnected) {
@@ -89,17 +100,23 @@ export const SdkProvider: React.FC<{
     }, [internetConnected]);
 
     const stashSubscriptions = useCallback(() => {
-        const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
-
-        if (Object.keys(activeSubs).length !== 0) {
-            // reset stashed subs if we can access active subs from ws object
+        if (info?.multiSocketInfo) {
+            // For multi-socket mode, we don't need to stash subscriptions
+            // as they're managed internally by each socket
             stashedSubs.current = {};
-        }
+        } else {
+            const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
 
-        Object.keys(activeSubs).forEach((key) => {
-            const subs = activeSubs[key];
-            stashedSubs.current[key] = subs;
-        });
+            if (Object.keys(activeSubs).length !== 0) {
+                // reset stashed subs if we can access active subs from ws object
+                stashedSubs.current = {};
+            }
+
+            Object.keys(activeSubs).forEach((key) => {
+                const subs = activeSubs[key];
+                stashedSubs.current[key] = subs;
+            });
+        }
         console.log(
             '>>> stashed subscriptions',
             stashedSubs.current,
@@ -108,14 +125,23 @@ export const SdkProvider: React.FC<{
     }, [info]);
 
     const stashWebsocket = useCallback(() => {
-        info?.wsManager?.stop();
+        if (info?.multiSocketInfo) {
+            info.multiSocketInfo.stop();
+        } else {
+            info?.wsManager?.stop();
+        }
         console.log('>>> stashed websocket', new Date().toISOString());
     }, [info]);
 
     const reInitWs = useCallback(() => {
         if (!isClient) return;
 
-        info?.wsManager?.reInit(stashedSubs.current);
+        if (info?.multiSocketInfo) {
+            // For multi-socket, just reconnect
+            info.multiSocketInfo.reconnect();
+        } else {
+            info?.wsManager?.reInit(stashedSubs.current);
+        }
     }, [isClient, info]);
 
     useEffect(() => {
@@ -129,13 +155,33 @@ export const SdkProvider: React.FC<{
                 stashedSubs.current,
                 new Date().toISOString(),
             );
-            info?.wsManager?.reconnect(stashedSubs.current);
+            if (info?.multiSocketInfo) {
+                info.multiSocketInfo.reconnect();
+            } else {
+                info?.wsManager?.reconnect(stashedSubs.current);
+            }
             setWsReconnecting(true);
             setShouldReconnect(false);
         }
 
         const reconnectInterval = setInterval(() => {
-            if (info?.wsManager?.isWsReady()) {
+            // Check connection status based on mode
+            let isReady = false;
+            if (info) {
+                if (info.multiSocketInfo) {
+                    // Multi-socket mode - check if any socket is connected
+                    const pool = info.multiSocketInfo.getPool();
+                    const status = pool.getConnectionStatus();
+                    isReady = Object.values(status).some(
+                        (connected) => connected,
+                    );
+                } else if (info.wsManager) {
+                    // Single socket mode
+                    isReady = info.wsManager.isWsReady();
+                }
+            }
+
+            if (isReady) {
                 setWsReconnecting(false);
                 clearInterval(reconnectInterval);
             }
@@ -164,7 +210,23 @@ export const SdkProvider: React.FC<{
         }
 
         const reconnectInterval = setInterval(() => {
-            if (info?.wsManager?.isWsReady()) {
+            // Check connection status based on mode
+            let isReady = false;
+            if (info) {
+                if (info.multiSocketInfo) {
+                    // Multi-socket mode - check if any socket is connected
+                    const pool = info.multiSocketInfo.getPool();
+                    const status = pool.getConnectionStatus();
+                    isReady = Object.values(status).some(
+                        (connected) => connected,
+                    );
+                } else if (info.wsManager) {
+                    // Single socket mode
+                    isReady = info.wsManager.isWsReady();
+                }
+            }
+
+            if (isReady) {
                 setWsReconnecting(false);
                 clearInterval(reconnectInterval);
             }
@@ -178,11 +240,19 @@ export const SdkProvider: React.FC<{
     useEffect(() => {
         if (!isClient) return;
         if (isWsSleepMode) {
-            info?.wsManager?.setSleepMode(true);
+            if (info?.multiSocketInfo) {
+                info.multiSocketInfo.enableSleepMode();
+            } else {
+                info?.wsManager?.setSleepMode(true);
+            }
             setLastSleepMs(Date.now());
             stashSubscriptions();
         } else {
-            info?.wsManager?.setSleepMode(false);
+            if (info?.multiSocketInfo) {
+                info.multiSocketInfo.disableSleepMode();
+            } else {
+                info?.wsManager?.setSleepMode(false);
+            }
             setLastAwakeMs(Date.now());
         }
     }, [isWsSleepMode, info]);
