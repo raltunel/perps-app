@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+// import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     LuChevronDown,
     LuChevronUp,
@@ -271,7 +271,7 @@ export default function PageHeader() {
                         }}
                         ref={helpDropdownRef}
                     >
-                        <button
+                        {/* <button
                             className={styles.helpButton}
                             onClick={() =>
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
@@ -281,7 +281,7 @@ export default function PageHeader() {
                                 size={18}
                                 color='var(--text2)'
                             />
-                        </button>
+                        </button> */}
 
                         {isHelpDropdownOpen && (
                             <HelpDropdown
