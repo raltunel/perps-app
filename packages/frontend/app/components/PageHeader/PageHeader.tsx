@@ -1,15 +1,13 @@
-import { SessionButton } from '@fogo/sessions-sdk-react';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import {
-    LuChevronDown,
-    LuChevronUp,
-    LuSettings,
-    LuWallet,
-} from 'react-icons/lu';
+import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
-import { useApp } from '~/contexts/AppContext';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
@@ -23,10 +21,12 @@ import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-import WalletDropdown from './WalletDropdown/WalletDropdown';
+// import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
-    const { isUserConnected, setIsUserConnected } = useApp();
+    const sessionState = useSession();
+
+    const isUserConnected = isEstablished(sessionState);
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,7 +46,7 @@ export default function PageHeader() {
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
-        { name: 'Portfolio', path: '/v2/portfolio' },
+        // { name: 'Portfolio', path: '/v2/portfolio' },
         // { name: 'Referrals', path: '/v2/referrals' },
         // { name: 'Points', path: '/points' },
         // { name: 'Leaderboard', path: '/v2/leaderboard' },
@@ -232,13 +232,13 @@ export default function PageHeader() {
                             )}
                         </section>
                     )}
-                    {!isUserConnected && <SessionButton />}
+                    <SessionButton />
                     {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
                             ref={walletMenuRef}
                         >
-                            {isUserConnected && (
+                            {/* {isUserConnected && (
                                 <button
                                     className={styles.walletButton}
                                     onClick={() =>
@@ -247,16 +247,16 @@ export default function PageHeader() {
                                 >
                                     <LuWallet size={18} /> Miyuki.eth
                                 </button>
-                            )}
+                            )} */}
 
-                            {isWalletMenuOpen && isUserConnected && (
+                            {/* {isWalletMenuOpen && isUserConnected && (
                                 <WalletDropdown
                                     isWalletMenuOpen={isWalletMenuOpen}
                                     setIsWalletMenuOpen={setIsWalletMenuOpen}
                                     setIsUserConnected={setIsUserConnected}
                                     isDropdown
                                 />
-                            )}
+                            )} */}
                         </section>
                     )}
                     <section
