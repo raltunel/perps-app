@@ -13,7 +13,7 @@ interface PositionSizeProps {
 }
 
 const POSITION_SIZE_CONFIG = {
-    // Step increment for final values and rounding
+    // Step increment for final rounding only
     DRAG_STEP: 5,
 
     // Minimum and maximum values
@@ -52,7 +52,8 @@ export default function PositionSize({
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(POSITION_SIZE_UI_CONFIG.DEFAULT_SHOW_LABELS);
-    const [dragPosition, setDragPosition] = useState<number | null>(null); // Smooth drag position
+    const [hoverValue, setHoverValue] = useState<number | null>(null);
+    const [dragValue, setDragValue] = useState<number | null>(null);
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -61,7 +62,7 @@ export default function PositionSize({
         setInputValue(value.toString());
     }, [value]);
 
-    // Get percentage from mouse position
+    //  get percentage from mouse position
     const getPercentageFromPosition = (clientX: number) => {
         if (!sliderRef.current) return 0;
 
@@ -76,69 +77,73 @@ export default function PositionSize({
             if (!isDragging || !sliderRef.current) return;
 
             const percentage = getPercentageFromPosition(e.clientX);
-            const clampedPercentage = Math.max(
+
+            // Clamp to min/max without rounding during drag
+            const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
 
-            // Update smooth drag position for immediate visual feedback
-            setDragPosition(clampedPercentage);
+            // Store the precise drag value for smooth visual feedback
+            setDragValue(clampedValue);
+            setHoverValue(clampedValue);
+
+            // Only round when we actually commit the change
+            const roundedValue =
+                Math.round(clampedValue / POSITION_SIZE_CONFIG.DRAG_STEP) *
+                POSITION_SIZE_CONFIG.DRAG_STEP;
+            const finalValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, roundedValue),
+            );
+
+            if (finalValue !== value) {
+                onChange(finalValue);
+            }
         };
 
         const handleTouchMove = (e: TouchEvent) => {
             if (!isDragging || !sliderRef.current || !e.touches[0]) return;
 
             const percentage = getPercentageFromPosition(e.touches[0].clientX);
-            const clampedPercentage = Math.max(
+
+            // Clamp to min/max without rounding during drag
+            const clampedValue = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
 
-            // Update smooth drag position for immediate visual feedback
-            setDragPosition(clampedPercentage);
+            // Store the precise drag value for smooth visual feedback
+            setDragValue(clampedValue);
+            setHoverValue(clampedValue);
+
+            // Only round when we actually commit the change
+            const roundedValue =
+                Math.round(clampedValue / POSITION_SIZE_CONFIG.DRAG_STEP) *
+                POSITION_SIZE_CONFIG.DRAG_STEP;
+            const finalValue = Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, roundedValue),
+            );
+
+            if (finalValue !== value) {
+                onChange(finalValue);
+            }
 
             // Prevent scrolling while dragging
             e.preventDefault();
         };
 
         const handleMouseUp = () => {
-            if (dragPosition !== null) {
-                // Round to nearest DRAG_STEP increment when releasing
-                const snappedValue =
-                    Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
-                    POSITION_SIZE_CONFIG.DRAG_STEP;
-                const clampedValue = Math.max(
-                    POSITION_SIZE_CONFIG.MIN_VALUE,
-                    Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
-                );
-
-                if (clampedValue !== value) {
-                    onChange(clampedValue);
-                }
-            }
-
             setIsDragging(false);
-            setDragPosition(null); // Clear drag position when dragging ends
+            setHoverValue(null);
+            setDragValue(null);
         };
 
         const handleTouchEnd = () => {
-            if (dragPosition !== null) {
-                // Round to nearest DRAG_STEP increment when releasing
-                const snappedValue =
-                    Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
-                    POSITION_SIZE_CONFIG.DRAG_STEP;
-                const clampedValue = Math.max(
-                    POSITION_SIZE_CONFIG.MIN_VALUE,
-                    Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
-                );
-
-                if (clampedValue !== value) {
-                    onChange(clampedValue);
-                }
-            }
-
             setIsDragging(false);
-            setDragPosition(null); // Clear drag position when dragging ends
+            setHoverValue(null);
+            setDragValue(null);
         };
 
         if (isDragging) {
@@ -162,24 +167,30 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, dragPosition, value, onChange]);
+    }, [isDragging, value, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
-        // Initialize drag position with current value
-        setDragPosition(value);
     };
 
     const handleTrackMouseMove = (e: React.MouseEvent) => {
         if (!sliderRef.current || isDragging) return;
 
-        // For hover effects, still show rounded values
+        const percentage = getPercentageFromPosition(e.clientX);
+
+        // For hover, show smooth values without rounding
+        const clampedPercentage = Math.max(
+            POSITION_SIZE_CONFIG.MIN_VALUE,
+            Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
+        );
+
+        setHoverValue(clampedPercentage);
     };
 
     const handleTrackMouseLeave = () => {
-        // Clear hover effects if any
+        setHoverValue(null);
     };
 
     const handleTrackClick = (e: React.MouseEvent) => {
@@ -215,21 +226,18 @@ export default function PositionSize({
 
     // Get position for the knob as percentage
     const getKnobPosition = () => {
-        // Use smooth drag position during dragging, otherwise use the actual value
-        return isDragging && dragPosition !== null ? dragPosition : value;
+        // Use dragValue for smooth visual feedback during dragging
+        if (isDragging && dragValue !== null) {
+            return dragValue;
+        }
+        return value; // Direct percentage positioning
     };
 
-    // Get the display value - show smooth position during drag, snapped value otherwise
-    const getDisplayValue = () => {
-        if (isDragging && dragPosition !== null) {
-            // During dragging, show the value that it will snap to
-            const snappedValue =
-                Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
-                POSITION_SIZE_CONFIG.DRAG_STEP;
-            return Math.max(
-                POSITION_SIZE_CONFIG.MIN_VALUE,
-                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
-            );
+    // Get width for the active track
+    const getActiveTrackWidth = () => {
+        // Use dragValue for smooth visual feedback during dragging
+        if (isDragging && dragValue !== null) {
+            return dragValue;
         }
         return value;
     };
@@ -279,11 +287,11 @@ export default function PositionSize({
                         {/* Gray background track */}
                         <div className={styles.sliderBackground}></div>
 
-                        {/* Colored active track - uses smooth position during drag */}
+                        {/* Colored active track */}
                         <div
                             className={styles.sliderActive}
                             style={{
-                                width: `${getKnobPosition()}%`,
+                                width: `${getActiveTrackWidth()}%`,
                                 // background: `linear-gradient(to right, ${colors['1']}, ${colors['5']}, ${colors['10']}, ${colors['50']}, ${colors['100']})`
                             }}
                         ></div>
@@ -294,7 +302,10 @@ export default function PositionSize({
                                 <div
                                     key={marker.value}
                                     className={`${styles.sliderMarker} ${
-                                        marker.value <= getKnobPosition()
+                                        marker.value <=
+                                        (isDragging && dragValue !== null
+                                            ? dragValue
+                                            : value)
                                             ? styles.active
                                             : ''
                                     } ${
@@ -305,7 +316,10 @@ export default function PositionSize({
                                     style={{
                                         left: `${marker.value}%`,
                                         borderColor:
-                                            marker.value <= getKnobPosition()
+                                            marker.value <=
+                                            (isDragging && dragValue !== null
+                                                ? dragValue
+                                                : value)
                                                 ? 'transparent'
                                                 : POSITION_SIZE_UI_CONFIG.ACCENT_COLOR,
                                     }}
@@ -337,7 +351,10 @@ export default function PositionSize({
                                             left: `${marker.value}%`,
                                             color:
                                                 marker.value <=
-                                                getKnobPosition()
+                                                (isDragging &&
+                                                dragValue !== null
+                                                    ? dragValue
+                                                    : value)
                                                     ? POSITION_SIZE_UI_CONFIG.ACTIVE_LABEL_COLOR
                                                     : POSITION_SIZE_UI_CONFIG.INACTIVE_LABEL_COLOR,
                                         }}
@@ -351,13 +368,18 @@ export default function PositionSize({
                     )}
                 </div>
 
-                {/* Current value display with input - shows the snapped value during drag */}
+                {/* Current value display with input  */}
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
                         value={
-                            isDragging
-                                ? getDisplayValue().toString()
+                            isDragging && hoverValue !== null
+                                ? (
+                                      Math.round(
+                                          hoverValue /
+                                              POSITION_SIZE_CONFIG.DRAG_STEP,
+                                      ) * POSITION_SIZE_CONFIG.DRAG_STEP
+                                  ).toString()
                                 : inputValue
                         }
                         onChange={handleInputChange}

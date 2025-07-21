@@ -98,11 +98,11 @@ export default function LeverageSlider({
     // Helper function to get the actual rounded value (what user sees)
     const getRoundedDisplayValue = (val: number): number => {
         if (val < 3) {
-            // Round to nearest tenth
-            return Math.round(val * 10) / 10;
+            // Round DOWN to nearest tenth
+            return Math.floor(val * 10) / 10;
         } else {
-            // Round to nearest whole number
-            return Math.round(val);
+            // Round DOWN to nearest whole number
+            return Math.floor(val);
         }
     };
 
@@ -120,28 +120,23 @@ export default function LeverageSlider({
         }
     };
 
-    // Helper function to format values for labels (always whole numbers)
+    // format values for labels
     const formatLabelValue = (val: number): string => {
         return Math.floor(val).toString();
     };
 
-    // New function for smooth slider movement (no rounding during drag)
     const constrainValue = (val: number): number => {
         return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
 
-    // Handle leverage changes from parent component
     const handleLeverageChange = (newLeverage: number) => {
-        // Get the rounded value that will be displayed to the user
-        const displayValue = getRoundedDisplayValue(newLeverage);
+        // Update the preferred leverage in store with the exact value (no rounding)
+        setPreferredLeverage(newLeverage);
 
-        // Update the preferred leverage in store with the DISPLAY VALUE
-        // This will now save to localStorage per market
-        setPreferredLeverage(displayValue);
-
-        // Also call the parent onChange with the display value
-        onChange(displayValue);
+        // Also call the parent onChange with the exact value
+        onChange(newLeverage);
     };
+
     const handleMarketChange = useCallback(() => {
         const effectiveSymbol = symbolInfo?.symbol || symbolInfo?.coin;
         const currentMaxLeverage = symbolInfo?.maxLeverage;
@@ -166,9 +161,8 @@ export default function LeverageSlider({
                 minimumInputValue,
             );
 
-            // Round the validated leverage to display value before applying
-            const displayValue = getRoundedDisplayValue(validatedLeverage);
-            onChange(displayValue);
+            // Use the exact validated leverage
+            onChange(validatedLeverage);
             setHasInitializedLeverage(true);
         } else {
             // Even if no market change, ensure we have the right leverage for the current maxLeverage
@@ -188,8 +182,8 @@ export default function LeverageSlider({
                     minimumInputValue,
                 );
 
-                const displayValue = getRoundedDisplayValue(validatedLeverage);
-                onChange(displayValue);
+                // Use the exact validated leverage (no rounding)
+                onChange(validatedLeverage);
             }
         }
     }, [
@@ -305,7 +299,7 @@ export default function LeverageSlider({
         const maxLog = Math.log(maximumInputValue);
         const valueLog = minLog + (boundedPercentage / 100) * (maxLog - minLog);
 
-        return Math.exp(valueLog); // No rounding for smooth movement
+        return Math.exp(valueLog);
     };
 
     // Get position for the knob as percentage
@@ -442,7 +436,7 @@ export default function LeverageSlider({
         // Ensure value is within min/max bounds
         const boundedValue = constrainValue(newValue);
 
-        // Use the rounded display value for clicks
+        // Use the exact value for clicks (no rounding)
         handleLeverageChange(boundedValue);
     };
 
@@ -514,20 +508,16 @@ export default function LeverageSlider({
 
         const handleMouseUp = () => {
             if (isDragging) {
-                // Apply rounding when dragging ends
-                const roundedValue = getRoundedDisplayValue(currentValue);
-                setPreferredLeverage(roundedValue);
-                onChange(roundedValue);
+                // Keep the exact value when dragging ends (no rounding/snapping)
+                setPreferredLeverage(currentValue);
             }
             setIsDragging(false);
         };
 
         const handleTouchEnd = () => {
             if (isDragging) {
-                // Apply rounding when dragging ends
-                const roundedValue = getRoundedDisplayValue(currentValue);
-                setPreferredLeverage(roundedValue);
-                onChange(roundedValue);
+                // Keep the exact value when dragging ends (no rounding/snapping)
+                setPreferredLeverage(currentValue);
             }
             setIsDragging(false);
         };
@@ -568,11 +558,10 @@ export default function LeverageSlider({
     const handleInputBlur = () => {
         const newValue = parseFloat(inputValue);
         if (!isNaN(newValue)) {
-            // Ensure value is within min/max bounds and properly rounded
+            // Ensure value is within min/max bounds but don't round
             const boundedValue = constrainValue(newValue);
-            // Use the rounded display value
-            const displayValue = getRoundedDisplayValue(boundedValue);
-            handleLeverageChange(displayValue);
+            // Use the exact bounded value (no rounding)
+            handleLeverageChange(boundedValue);
         } else {
             // If input is invalid, revert to current value
             setInputValue(formatValue(currentValue));

@@ -126,3 +126,5 @@ export const hasPredefinedIntervals = (maxLeverage: number): boolean => {
 export const getSupportedMaxLeverageValues = (): number[] => {
     return Array.from(leverageIntervalsMap.keys()).sort((a, b) => a - b);
 };
+
+// Had a weird bug with the leverage switching between markets - it was keeping the old market's leverage instead of setting the right default for the new one. Turns out we had two components fighting each other when switching markets. The OrderInput component was calling the leverage store before the new market data finished loading, so it was passing stale maxLeverage values (like ETH getting LTC's 10x instead of its proper 25x). Fixed it by adding a simple check in OrderInput to make sure the symbol data actually matches before setting leverage, plus added some validation in the store to catch obviously wrong values. Pretty straightforward fix once I tracked down where the race condition was happening.
