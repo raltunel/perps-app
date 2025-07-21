@@ -23,6 +23,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { MARKET_WS_ENDPOINT, USER_WS_ENDPOINT } from './utils/Constants';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -138,10 +139,8 @@ export default function App() {
                     <AppProvider>
                         <SdkProvider
                             environment={wsEnvironment}
-                            marketEndpoint={
-                                import.meta.env.VITE_MARKET_WS_ENDPOINT
-                            }
-                            userEndpoint={import.meta.env.VITE_USER_WS_ENDPOINT}
+                            marketEndpoint={MARKET_WS_ENDPOINT}
+                            userEndpoint={USER_WS_ENDPOINT}
                         >
                             <TutorialProvider>
                                 <WsConnectionChecker />
