@@ -1,0 +1,557 @@
+import {
+    DEFAULT_PING_INTERVAL_MS,
+    PONG_CHECK_TIMEOUT_MS,
+    RECONNECT_TIMEOUT_MS,
+} from './config';
+import { createJsonParserWorker } from './utils/workers';
+import type { Subscription, WsMsg } from './utils/types';
+
+export type Callback = (msg: WsMsg) => void;
+export type SocketType = 'market' | 'user' | 'custom';
+
+export interface ActiveSubscription {
+    callback: Callback;
+    multiCallbacks?: Callback[];
+    subscriptionId: number;
+    subscription: Subscription;
+}
+
+export interface WebSocketInstanceConfig {
+    baseUrl: string;
+    socketType: SocketType;
+    socketName?: string;
+    isDebug?: boolean;
+    numWorkers?: number;
+    pingInterval?: number;
+}
+
+function subscriptionToIdentifier(subscription: Subscription): string {
+    switch (subscription.type) {
+        case 'allMids':
+            return 'allMids';
+        case 'l2Book':
+            return `l2Book:${subscription.coin.toLowerCase()}`;
+        case 'trades':
+            return `trades:${subscription.coin.toLowerCase()}`;
+        case 'userEvents':
+            return 'userEvents';
+        case 'userFills':
+            return `userFills:${subscription.user.toLowerCase()}`;
+        case 'candle':
+            return `candle:${subscription.coin.toLowerCase()},${subscription.interval}`;
+        case 'orderUpdates':
+            return 'orderUpdates';
+        case 'userFundings':
+            return `userFundings:${subscription.user.toLowerCase()}`;
+        case 'userNonFundingLedgerUpdates':
+            return `userNonFundingLedgerUpdates:${subscription.user.toLowerCase()}`;
+        case 'webData2':
+            return `webData2:${subscription.user.toLowerCase()}`;
+        case 'notification':
+            return `notification`;
+        case 'userHistoricalOrders':
+            return `userHistoricalOrders:${subscription.user.toLowerCase()}`;
+        case 'userTwapSliceFills':
+            return `userTwapSliceFills:${subscription.user.toLowerCase()}`;
+        case 'userTwapHistory':
+            return `userTwapHistory:${subscription.user.toLowerCase()}`;
+        default:
+            throw new Error('Unknown subscription type');
+    }
+}
+
+function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
+    switch (wsMsg.channel) {
+        case 'pong':
+            return 'pong';
+        case 'allMids':
+            return 'allMids';
+        case 'l2Book':
+            return `l2Book:${wsMsg.data.coin.toLowerCase()}`;
+        case 'trades':
+            const trades = wsMsg.data;
+            if (!Array.isArray(trades) || trades.length === 0) return undefined;
+            return `trades:${trades[0].coin.toLowerCase()}`;
+        case 'user':
+            return 'userEvents';
+        case 'userFills':
+            return `userFills:${wsMsg.data.user.toLowerCase()}`;
+        case 'candle':
+            return `candle:${wsMsg.data.s?.toLowerCase?.() ?? wsMsg.data.coin?.toLowerCase?.()},${wsMsg.data.i ?? wsMsg.data.interval}`;
+        case 'orderUpdates':
+            return 'orderUpdates';
+        case 'userFundings':
+            return `userFundings:${wsMsg.data.user.toLowerCase()}`;
+        case 'userNonFundingLedgerUpdates':
+            return `userNonFundingLedgerUpdates:${wsMsg.data.user.toLowerCase()}`;
+        case 'webData2':
+            return `webData2:${wsMsg.data.user.toLowerCase()}`;
+        case 'notification':
+            return 'notification';
+        case 'userHistoricalOrders':
+            return `userHistoricalOrders:${wsMsg.data.user.toLowerCase()}`;
+        case 'userTwapSliceFills':
+            return `userTwapSliceFills:${wsMsg.data.user.toLowerCase()}`;
+        case 'userTwapHistory':
+            return `userTwapHistory:${wsMsg.data.user.toLowerCase()}`;
+        default:
+            return undefined;
+    }
+}
+
+export class WebSocketInstance {
+    private ws!: WebSocket;
+    private wsReady: boolean = false;
+    private subscriptionIdCounter: number = 0;
+    private queuedSubscriptions: Array<{
+        subscription: Subscription;
+        active: ActiveSubscription;
+    }> = [];
+    private activeSubscriptions: Record<string, ActiveSubscription[]> = {};
+    private allSubscriptions: Record<
+        number,
+        { subscription: Subscription; callback: Callback }
+    > = {};
+    private pingInterval: number | null = null;
+    private stopped: boolean = false;
+    private isDebug: boolean;
+    private baseUrl: string;
+    private workers: Worker[] = [];
+    private nextWorkerIndex: number = 0;
+    private numWorkers: number;
+    private jsonParserWorkerBlobUrl: string | null = null;
+    private pongReceived: boolean = false;
+    private pongTimeout: NodeJS.Timeout | null = null;
+    private sleepMode: boolean = false;
+    private pongCheckLock: boolean = false;
+    private pingIntervalMs: number;
+
+    // New properties for multi-socket support
+    private readonly socketType: SocketType;
+    private readonly socketName: string;
+    private onConnectionChange?: (connected: boolean) => void;
+
+    constructor(config: WebSocketInstanceConfig) {
+        this.isDebug = config.isDebug ?? false;
+        this.baseUrl = config.baseUrl;
+        this.numWorkers = config.numWorkers ?? 4;
+        this.socketType = config.socketType;
+        this.socketName = config.socketName ?? config.socketType;
+        this.pingIntervalMs = config.pingInterval ?? DEFAULT_PING_INTERVAL_MS;
+
+        this.initializeWorkers();
+        this.connect();
+    }
+
+    private initializeWorkers() {
+        if (this.numWorkers === 0) {
+            this.log(
+                'No workers requested, skipping initialization. JSON parsing will occur on the main thread.',
+            );
+            return;
+        }
+
+        this.workers.forEach((worker) => worker.terminate());
+        this.workers = [];
+
+        if (this.jsonParserWorkerBlobUrl) {
+            URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
+        }
+        this.jsonParserWorkerBlobUrl = createJsonParserWorker();
+
+        this.log(`Initializing ${this.numWorkers} JSON parsing worker(s)`);
+        for (let i = 0; i < this.numWorkers; i++) {
+            try {
+                const worker = new Worker(this.jsonParserWorkerBlobUrl);
+                worker.onmessage = (event: MessageEvent) =>
+                    this.handleWorkerMessage(event, i);
+                worker.onerror = (event) => {
+                    this.log(`Worker ${i} error: ${event.message}`, event);
+                };
+                this.workers.push(worker);
+            } catch (error) {
+                this.log(`Failed to create worker ${i}:`, error);
+            }
+        }
+        if (this.workers.length < this.numWorkers) {
+            this.log(
+                `Could only initialize ${this.workers.length} workers instead of the requested ${this.numWorkers}.`,
+            );
+            this.numWorkers = this.workers.length;
+        }
+        this.nextWorkerIndex = 0;
+    }
+
+    private connect = () => {
+        const wsUrl =
+            'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
+        this.log(`[${this.socketName}] Connecting to`, wsUrl);
+        this.ws = new WebSocket(wsUrl);
+        this.wsReady = false;
+        this.stopped = false;
+
+        this.ws.removeEventListener('open', this.onOpen);
+        this.ws.removeEventListener('message', this.onMessage);
+        this.ws.removeEventListener('close', this.onClose);
+
+        this.ws.addEventListener('open', this.onOpen);
+        this.ws.addEventListener('message', this.onMessage);
+        this.ws.addEventListener('close', this.onClose);
+
+        // make sure workers are ready before connecting
+        if (this.workers.length === 0 && this.numWorkers > 0) {
+            this.log('Workers not initialized, attempting re-initialization.');
+            this.initializeWorkers();
+            if (this.workers.length === 0) {
+                this.log(
+                    'Worker re-initialization failed. Proceeding without workers.',
+                );
+            }
+        }
+    };
+
+    private log = (...args: any[]) => {
+        if (this.isDebug) {
+            console.log(`[WebSocket:${this.socketName}]`, ...args);
+        }
+    };
+
+    private sendPing = () => {
+        if (
+            this.stopped ||
+            !this.ws ||
+            this.ws.readyState !== WebSocket.OPEN ||
+            this.sleepMode
+        )
+            return;
+        this.log('sending ping');
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+
+        this.ws.send(JSON.stringify({ method: 'ping' }));
+
+        this.pongTimeout = setTimeout(() => {
+            if (!this.pongReceived && !this.pongCheckLock && !this.sleepMode) {
+                console.log(
+                    `>>> [${this.socketName}] pong reconnect`,
+                    new Date().toISOString(),
+                );
+                this.reconnect();
+            }
+        }, PONG_CHECK_TIMEOUT_MS);
+
+        this.pongReceived = false;
+    };
+
+    private onOpen = () => {
+        this.log('onOpen');
+        this.wsReady = true;
+        this.onConnectionChange?.(true);
+
+        // send queued subs
+        for (const { subscription, active } of this.queuedSubscriptions) {
+            this.subscribe(
+                subscription,
+                active.callback,
+                active.subscriptionId,
+            );
+        }
+        this.queuedSubscriptions = [];
+
+        if (!this.stopped && this.pingInterval === null) {
+            // @ts-ignore
+            this.pingInterval = setInterval(this.sendPing, this.pingIntervalMs);
+            // send initial ping
+            this.sendPing();
+        }
+    };
+
+    private onMessage = (event: MessageEvent) => {
+        if (this.sleepMode) {
+            return;
+        }
+        if (this.numWorkers > 0 && this.workers.length > 0) {
+            const worker = this.workers[this.nextWorkerIndex];
+            worker.postMessage(event.data);
+            this.nextWorkerIndex =
+                (this.nextWorkerIndex + 1) % this.workers.length;
+        } else {
+            // Parse on main thread
+            try {
+                const parsed = JSON.parse(event.data);
+                this.handleParsedMessage(parsed);
+            } catch (error) {
+                this.log('Failed to parse message on main thread:', error);
+            }
+        }
+    };
+
+    private onClose = () => {
+        this.log('onClose');
+        this.wsReady = false;
+        this.onConnectionChange?.(false);
+
+        if (this.pingInterval !== null) {
+            clearInterval(this.pingInterval);
+            this.pingInterval = null;
+        }
+        if (!this.stopped) {
+            console.log(
+                `>>> [${this.socketName}] close reconnect`,
+                new Date().toISOString(),
+            );
+            setTimeout(() => {
+                if (!this.stopped) {
+                    this.reconnect();
+                }
+            }, RECONNECT_TIMEOUT_MS);
+        }
+    };
+
+    private handleWorkerMessage = (
+        event: MessageEvent,
+        workerIndex: number,
+    ) => {
+        if (event.data.error) {
+            this.log(`Worker ${workerIndex} parse error:`, event.data.error);
+        } else {
+            this.handleParsedMessage(event.data.parsed);
+        }
+    };
+
+    private handleParsedMessage = (msg: WsMsg) => {
+        if (msg.channel === 'subscriptionResponse') {
+            const subId = msg.data.id;
+            const sub = this.allSubscriptions[subId];
+            const success = msg.data.success;
+            if (sub && !success) {
+                this.log('subscription failed', sub.subscription);
+            }
+            return;
+        }
+        if (msg.channel === 'pong') {
+            this.log('pong received');
+            this.pongReceived = true;
+            return;
+        }
+        const identifier = wsMsgToIdentifier(msg);
+        if (!identifier) {
+            this.log('no identifier for', msg);
+            return;
+        }
+        const activeSubscriptions = this.activeSubscriptions[identifier];
+        if (!activeSubscriptions || activeSubscriptions.length === 0) {
+            if (identifier !== 'notification') {
+                this.log('no subscription for', identifier);
+            }
+            return;
+        }
+
+        for (const activeSub of activeSubscriptions) {
+            activeSub.callback(msg);
+            if (activeSub.multiCallbacks) {
+                for (const callback of activeSub.multiCallbacks) {
+                    callback(msg);
+                }
+            }
+        }
+    };
+
+    public subscribe = (
+        subscription: Subscription,
+        callback: Callback,
+        existingId?: number,
+    ) => {
+        const subscriptionId = existingId ?? this.subscriptionIdCounter++;
+        this.allSubscriptions[subscriptionId] = { subscription, callback };
+        const identifier = subscriptionToIdentifier(subscription);
+
+        if (!this.activeSubscriptions[identifier]) {
+            this.activeSubscriptions[identifier] = [];
+        }
+
+        const existingActiveSubscriptions =
+            this.activeSubscriptions[identifier];
+        let activeSubscription: ActiveSubscription | undefined;
+
+        if (existingActiveSubscriptions.length > 0) {
+            // special handling for userEvents and orderUpdates
+            if (identifier === 'userEvents' || identifier === 'orderUpdates') {
+                this.log(
+                    `Skipping duplicate subscription for ${identifier}. Only one subscription allowed.`,
+                );
+                activeSubscription = existingActiveSubscriptions[0];
+                if (!activeSubscription.multiCallbacks) {
+                    activeSubscription.multiCallbacks = [];
+                }
+                activeSubscription.multiCallbacks.push(callback);
+            } else {
+                const activeSubscriptionsToAdd =
+                    existingActiveSubscriptions.filter(
+                        (sub) =>
+                            JSON.stringify(sub.subscription) ===
+                            JSON.stringify(subscription),
+                    );
+
+                if (activeSubscriptionsToAdd.length > 0) {
+                    activeSubscription = activeSubscriptionsToAdd[0];
+                    if (!activeSubscription.multiCallbacks) {
+                        activeSubscription.multiCallbacks = [];
+                    }
+                    activeSubscription.multiCallbacks.push(callback);
+                }
+            }
+        }
+
+        if (!activeSubscription) {
+            activeSubscription = {
+                callback,
+                subscriptionId,
+                subscription,
+            };
+            existingActiveSubscriptions.push(activeSubscription);
+        }
+
+        if (!this.wsReady) {
+            this.log('subscription queued', subscription);
+            this.queuedSubscriptions.push({
+                subscription,
+                active: activeSubscription,
+            });
+        } else {
+            this.log('subscribing', subscription);
+            this.ws.send(
+                JSON.stringify({
+                    method: 'subscribe',
+                    subscription: { ...subscription, id: subscriptionId },
+                }),
+            );
+        }
+
+        const unsubscribe = () => {
+            this.unsubscribe(subscription, callback, subscriptionId);
+        };
+
+        return { unsubscribe };
+    };
+
+    public unsubscribe = (
+        subscription: Subscription,
+        callback: Callback,
+        subscriptionId: number,
+    ) => {
+        delete this.allSubscriptions[subscriptionId];
+        const identifier = subscriptionToIdentifier(subscription);
+        const activeSubscriptions = this.activeSubscriptions[identifier];
+        if (!activeSubscriptions) {
+            return;
+        }
+
+        const activeSubscriptionIndex = activeSubscriptions.findIndex(
+            (sub) => sub.subscriptionId === subscriptionId,
+        );
+
+        if (activeSubscriptionIndex !== -1) {
+            const activeSub = activeSubscriptions[activeSubscriptionIndex];
+
+            if (activeSub.callback === callback) {
+                activeSubscriptions.splice(activeSubscriptionIndex, 1);
+
+                if (activeSubscriptions.length === 0) {
+                    delete this.activeSubscriptions[identifier];
+
+                    if (this.wsReady) {
+                        this.log('unsubscribing', subscription);
+                        this.ws.send(
+                            JSON.stringify({
+                                method: 'unsubscribe',
+                                subscription: {
+                                    ...subscription,
+                                    id: subscriptionId,
+                                },
+                            }),
+                        );
+                    }
+                }
+            } else if (activeSub.multiCallbacks) {
+                const callbackIndex =
+                    activeSub.multiCallbacks.indexOf(callback);
+                if (callbackIndex !== -1) {
+                    activeSub.multiCallbacks.splice(callbackIndex, 1);
+                    if (activeSub.multiCallbacks.length === 0) {
+                        delete activeSub.multiCallbacks;
+                    }
+                }
+            }
+        }
+
+        const queuedIndex = this.queuedSubscriptions.findIndex(
+            (q) => q.active.subscriptionId === subscriptionId,
+        );
+        if (queuedIndex !== -1) {
+            this.queuedSubscriptions.splice(queuedIndex, 1);
+        }
+    };
+
+    public reconnect = () => {
+        this.log('reconnect');
+        this.ws.close();
+        this.connect();
+    };
+
+    public stop = () => {
+        this.stopped = true;
+        if (this.ws) {
+            this.ws.close();
+        }
+        if (this.pingInterval !== null) {
+            clearInterval(this.pingInterval);
+            this.pingInterval = null;
+        }
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+        this.workers.forEach((worker) => worker.terminate());
+        this.workers = [];
+        if (this.jsonParserWorkerBlobUrl) {
+            URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
+            this.jsonParserWorkerBlobUrl = null;
+        }
+    };
+
+    public enableSleepMode = () => {
+        this.log('Enabling sleep mode');
+        this.sleepMode = true;
+        this.pongCheckLock = true;
+
+        if (this.pongTimeout) {
+            clearTimeout(this.pongTimeout);
+            this.pongTimeout = null;
+        }
+    };
+
+    public disableSleepMode = () => {
+        this.log('Disabling sleep mode');
+        this.sleepMode = false;
+        this.pongCheckLock = false;
+    };
+
+    public getSocketType(): SocketType {
+        return this.socketType;
+    }
+
+    public getSocketName(): string {
+        return this.socketName;
+    }
+
+    public isConnected(): boolean {
+        return this.wsReady;
+    }
+
+    public setConnectionChangeHandler(handler: (connected: boolean) => void) {
+        this.onConnectionChange = handler;
+    }
+}

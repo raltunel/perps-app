@@ -1,0 +1,335 @@
+import { DEMO_USER, Exchange, type Environment } from '@perps-app/sdk';
+import {
+    MultiSocketInfo,
+    WebSocketPool,
+    WebSocketInstance,
+} from '@perps-app/sdk/src/websocket-pool';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
+import { useAppStateStore } from '~/stores/AppStateStore';
+import { useDebugStore } from '~/stores/DebugStore';
+import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
+import { useIsClient } from './useIsClient';
+
+type MultiSocketContextType = {
+    multiSocketInfo: MultiSocketInfo | null;
+    pool: WebSocketPool | null;
+    marketSocket: WebSocketInstance | null;
+    userSocket: WebSocketInstance | null;
+    exchange: Exchange | null;
+    lastSleepMs: number;
+    lastAwakeMs: number;
+};
+
+const MultiSocketContext = createContext<MultiSocketContextType | undefined>(
+    undefined,
+);
+
+interface MultiSocketProviderProps {
+    environment: Environment;
+    children: React.ReactNode;
+    marketEndpoint?: string;
+    userEndpoint?: string;
+}
+
+export const MultiSocketProvider: React.FC<MultiSocketProviderProps> = ({
+    environment,
+    children,
+    marketEndpoint,
+    userEndpoint,
+}) => {
+    const isClient = useIsClient();
+
+    const [multiSocketInfo, setMultiSocketInfo] =
+        useState<MultiSocketInfo | null>(null);
+    const [pool, setPool] = useState<WebSocketPool | null>(null);
+    const [marketSocket, setMarketSocket] = useState<WebSocketInstance | null>(
+        null,
+    );
+    const [userSocket, setUserSocket] = useState<WebSocketInstance | null>(
+        null,
+    );
+    const [exchange, setExchange] = useState<Exchange | null>(null);
+    const [shouldReconnect, setShouldReconnect] = useState(false);
+    const stashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [lastSleepMs, setLastSleepMs] = useState<number>(0);
+    const [lastAwakeMs, setLastAwakeMs] = useState<number>(0);
+
+    // Store stashed subscriptions per socket
+    const stashedSubsBySocket = useRef<Record<string, Record<string, any[]>>>(
+        {},
+    );
+
+    const {
+        internetConnected,
+        setWsReconnecting,
+        isWsStashed,
+        setIsWsStashed,
+        isTabActive,
+    } = useAppStateStore();
+    const { isWsSleepMode } = useDebugStore();
+
+    // Get base URL from environment
+    const getBaseUrl = useCallback((env: Environment): string => {
+        switch (env) {
+            case 'mainnet':
+                return 'https://api.hyperliquid.xyz';
+            case 'testnet':
+                return 'https://api.hyperliquid-testnet.xyz';
+            case 'local':
+                return 'http://localhost:3001';
+            case 'mock':
+                return 'https://api.hyperliquid.xyz'; // Mock uses mainnet URL
+            default:
+                return 'https://api.hyperliquid.xyz';
+        }
+    }, []);
+
+    // Initialize multi-socket system
+    useEffect(() => {
+        if (!isClient) return;
+
+        if (!multiSocketInfo) {
+            const baseUrl = getBaseUrl(environment);
+
+            // Use provided endpoints or default to same endpoint for both
+            const endpoints = {
+                market: marketEndpoint || baseUrl,
+                user: userEndpoint || baseUrl,
+            };
+
+            const newMultiSocketInfo = new MultiSocketInfo(endpoints, false);
+            setMultiSocketInfo(newMultiSocketInfo);
+
+            const newPool = newMultiSocketInfo.getPool();
+            setPool(newPool);
+            setMarketSocket(newMultiSocketInfo.getMarketSocket() || null);
+            setUserSocket(newMultiSocketInfo.getUserSocket() || null);
+
+            stashedSubsBySocket.current = {};
+        }
+
+        if (!exchange) {
+            setExchange(
+                new Exchange(
+                    {},
+                    {
+                        environment,
+                        accountAddress: DEMO_USER,
+                    },
+                ),
+            );
+        } else {
+            exchange.setEnvironment(environment);
+        }
+    }, [isClient, environment, marketEndpoint, userEndpoint, getBaseUrl]);
+
+    // Handle internet connection changes
+    useEffect(() => {
+        if (!internetConnected) {
+            setShouldReconnect(true);
+        }
+    }, [internetConnected]);
+
+    // Stash subscriptions for all sockets
+    const stashSubscriptions = useCallback(() => {
+        if (!pool) return;
+
+        const allSockets = pool.getAllSockets();
+        allSockets.forEach((socket, name) => {
+            // Access internal state - we'll need to expose this method in WebSocketInstance
+            // For now, we'll store the socket name as a placeholder
+            stashedSubsBySocket.current[name] = {};
+            console.log(
+                `>>> stashed subscriptions for ${name} socket`,
+                new Date().toISOString(),
+            );
+        });
+    }, [pool]);
+
+    // Stash all websockets
+    const stashWebsockets = useCallback(() => {
+        if (!pool) return;
+        pool.stopAll();
+        console.log('>>> stashed all websockets', new Date().toISOString());
+    }, [pool]);
+
+    // Re-initialize websockets
+    const reInitWebsockets = useCallback(() => {
+        if (!isClient || !multiSocketInfo) return;
+
+        // For now, we'll recreate the pool
+        // In a full implementation, we'd restore subscriptions
+        multiSocketInfo.getPool().reconnectAll();
+        console.log('>>> re-initialized websockets', new Date().toISOString());
+    }, [isClient, multiSocketInfo]);
+
+    // Handle reconnection when internet returns
+    useEffect(() => {
+        if (!isClient || !isTabActive) return;
+
+        if (internetConnected && shouldReconnect && pool) {
+            console.log('>>> multi-socket reconnect', new Date().toISOString());
+            pool.reconnectAll();
+            setWsReconnecting(true);
+            setShouldReconnect(false);
+        }
+
+        // Check connection status
+        const reconnectInterval = setInterval(() => {
+            if (pool) {
+                const status = pool.getConnectionStatus();
+                const allConnected = Object.values(status).every(
+                    (connected) => connected,
+                );
+                if (allConnected) {
+                    setWsReconnecting(false);
+                    clearInterval(reconnectInterval);
+                }
+            }
+        }, 200);
+
+        return () => {
+            clearInterval(reconnectInterval);
+        };
+    }, [internetConnected, isClient, pool, shouldReconnect, isTabActive]);
+
+    // Handle WebSocket stash/restore on tab visibility
+    useEffect(() => {
+        if (!isClient) return;
+
+        if (isWsStashed && isTabActive) {
+            console.log(
+                '>>> will re-init websockets',
+                new Date().toISOString(),
+            );
+            reInitWebsockets();
+            setWsReconnecting(true);
+        }
+
+        const reconnectInterval = setInterval(() => {
+            if (pool) {
+                const status = pool.getConnectionStatus();
+                const allConnected = Object.values(status).every(
+                    (connected) => connected,
+                );
+                if (allConnected) {
+                    setWsReconnecting(false);
+                    clearInterval(reconnectInterval);
+                }
+            }
+        }, 200);
+
+        return () => {
+            clearInterval(reconnectInterval);
+        };
+    }, [isWsStashed, isTabActive, reInitWebsockets, isClient, pool]);
+
+    // Handle sleep mode
+    useEffect(() => {
+        if (!isClient || !pool) return;
+
+        if (isWsSleepMode) {
+            pool.enableSleepMode();
+            setLastSleepMs(Date.now());
+            stashSubscriptions();
+        } else {
+            pool.disableSleepMode();
+            setLastAwakeMs(Date.now());
+        }
+    }, [isWsSleepMode, pool, isClient, stashSubscriptions]);
+
+    // Handle tab activity
+    useEffect(() => {
+        if (!isTabActive) {
+            console.log(
+                '>>> useMultiSocket | tab is inactive',
+                new Date().toISOString(),
+            );
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+
+            stashTimeoutRef.current = setTimeout(() => {
+                console.log(
+                    '>>> useMultiSocket | stashing',
+                    new Date().toISOString(),
+                );
+                stashWebsockets();
+                setIsWsStashed(true);
+            }, WS_SLEEP_MODE_STASH_CONNECTION);
+        } else {
+            if (pool) {
+                setTimeout(() => {
+                    const status = pool.getConnectionStatus();
+                    const anyDisconnected = Object.values(status).some(
+                        (connected) => !connected,
+                    );
+                    if (anyDisconnected) {
+                        setShouldReconnect(true);
+                    }
+                }, 2000);
+            }
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+            setIsWsStashed(false);
+        }
+
+        return () => {
+            if (stashTimeoutRef.current) {
+                clearTimeout(stashTimeoutRef.current);
+            }
+        };
+    }, [isTabActive, pool, stashWebsockets, setIsWsStashed]);
+
+    return (
+        <MultiSocketContext.Provider
+            value={{
+                multiSocketInfo,
+                pool,
+                marketSocket,
+                userSocket,
+                exchange,
+                lastSleepMs,
+                lastAwakeMs,
+            }}
+        >
+            {children}
+        </MultiSocketContext.Provider>
+    );
+};
+
+// Hook to use multi-socket system
+export const useMultiSocket = () => {
+    const context = useContext(MultiSocketContext);
+    if (!context) {
+        throw new Error(
+            'useMultiSocket must be used within a MultiSocketProvider',
+        );
+    }
+    return context;
+};
+
+// Convenience hooks for specific sockets
+export const useMarketSocket = () => {
+    const { marketSocket } = useMultiSocket();
+    return marketSocket;
+};
+
+export const useUserSocket = () => {
+    const { userSocket } = useMultiSocket();
+    return userSocket;
+};
+
+// Backward compatibility wrapper
+export const useMultiSocketInfo = () => {
+    const { multiSocketInfo } = useMultiSocket();
+    return multiSocketInfo;
+};
