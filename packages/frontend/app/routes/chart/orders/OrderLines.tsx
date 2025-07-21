@@ -7,6 +7,7 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import type { IPaneApi } from '~/tv/charting_library';
 import type { LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
+import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -133,7 +134,8 @@ export default function OrderLines({
             );
             const yPricePixel = labelInformation.pixel;
 
-            const visibleBuffer = labelInformation.textHeight * 0.8;
+            const visibleBuffer =
+                labelInformation.textHeight * MIN_VISIBLE_ORDER_LABEL_RATIO;
             const labelMaxPixel = Math.ceil(
                 yPricePixel + labelInformation.textHeight,
             );
