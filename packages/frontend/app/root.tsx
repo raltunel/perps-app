@@ -119,7 +119,9 @@ export default function App() {
                     endpoint='https://testnet.fogo.io/'
                     sponsor='8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w'
                     paymasterUrl='https://sessions-example.fogo.io/paymaster'
-                    // domain='https://perps.ambient.finance' // enable for local development
+                    {...(window.location.hostname === 'localhost' && {
+                        domain: 'https://perps.ambient.finance',
+                    })}
                     tokens={[NATIVE_MINT.toBase58()]}
                     defaultRequestedLimits={{
                         [NATIVE_MINT.toBase58()]: 1_500_000_000n,
