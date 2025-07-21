@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import styles from './LeverageSlider.module.css';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLeverageStore } from '~/stores/LeverageStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
+import styles from './LeverageSlider.module.css';
 
 interface LeverageSliderProps {
     value: number;
@@ -75,7 +75,9 @@ export default function LeverageSlider({
 
     // Use maxLeverage from symbolInfo, fallback to default if not available
     const maximumInputValue =
-        symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+        symbolInfo?.coin === 'BTC'
+            ? 100
+            : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -138,8 +140,9 @@ export default function LeverageSlider({
     };
 
     const handleMarketChange = useCallback(() => {
-        const effectiveSymbol = symbolInfo?.symbol || symbolInfo?.coin;
-        const currentMaxLeverage = symbolInfo?.maxLeverage;
+        const effectiveSymbol = symbolInfo?.coin;
+        const currentMaxLeverage =
+            effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
 
         if (!effectiveSymbol || !currentMaxLeverage) {
             return;
@@ -187,7 +190,6 @@ export default function LeverageSlider({
             }
         }
     }, [
-        symbolInfo?.symbol,
         symbolInfo?.coin,
         symbolInfo?.maxLeverage,
         currentMarket,
