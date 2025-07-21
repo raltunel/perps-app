@@ -245,7 +245,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 )}
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
-                        <button className={styles.actionButton}>Limit</button>
+                        {/* <button className={styles.actionButton}>Limit</button> */}
                         <button className={styles.actionButton}>Market</button>
                     </div>
                 </div>

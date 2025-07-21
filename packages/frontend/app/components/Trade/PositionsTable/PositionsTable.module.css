@@ -118,8 +118,11 @@
     cursor: pointer;
 }
 .closeCell {
-    text-align: right;
+    width: 70%;
+    display: flex;
+    text-align: end;
     justify-self: end;
+    align-items: end;
 }
 
 .headerContainer .closeCell {
