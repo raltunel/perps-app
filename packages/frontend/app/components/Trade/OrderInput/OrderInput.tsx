@@ -207,16 +207,35 @@ function OrderInput() {
         setSize('');
         setPrice('');
 
-        //  Apply leverage validation when symbol changes
-        if (symbol && symbolInfo?.maxLeverage) {
+        // Apply leverage validation when symbol changes
+        // BUT only if we have the correct symbolInfo for the current symbol
+        if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol === symbol
+        ) {
             const validatedLeverage = validateAndApplyLeverageForMarket(
                 symbol,
                 symbolInfo.maxLeverage,
                 minimumInputValue,
             );
             setLeverage(validatedLeverage);
+        } else if (
+            symbol &&
+            symbolInfo?.maxLeverage &&
+            symbolInfo?.symbol &&
+            symbolInfo.symbol !== symbol
+        ) {
+            console.log(
+                `OrderInput: Symbol mismatch - waiting for correct symbolInfo. Current: ${symbol}, symbolInfo: ${symbolInfo?.symbol}`,
+            );
         }
-    }, [symbol, symbolInfo?.maxLeverage, validateAndApplyLeverageForMarket]);
+    }, [
+        symbol,
+        symbolInfo?.maxLeverage,
+        symbolInfo?.symbol,
+        validateAndApplyLeverageForMarket,
+    ]);
 
     const handleTypeChange = () => {
         switch (marketOrderType) {

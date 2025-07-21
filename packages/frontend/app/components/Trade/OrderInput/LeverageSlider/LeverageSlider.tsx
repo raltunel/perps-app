@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import styles from './LeverageSlider.module.css';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
@@ -67,7 +67,6 @@ export default function LeverageSlider({
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
-        currentLeverage,
         currentMarket,
         setPreferredLeverage,
         validateAndApplyLeverageForMarket,
@@ -77,7 +76,6 @@ export default function LeverageSlider({
     // Use maxLeverage from symbolInfo, fallback to default if not available
     const maximumInputValue =
         symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
-    const currentSymbol = symbolInfo?.symbol;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -100,11 +98,11 @@ export default function LeverageSlider({
     // Helper function to get the actual rounded value (what user sees)
     const getRoundedDisplayValue = (val: number): number => {
         if (val < 3) {
-            // Round DOWN to nearest tenth
-            return Math.floor(val * 10) / 10;
+            // Round to nearest tenth
+            return Math.round(val * 10) / 10;
         } else {
-            // Round DOWN to nearest whole number
-            return Math.floor(val);
+            // Round to nearest whole number
+            return Math.round(val);
         }
     };
 
@@ -127,53 +125,10 @@ export default function LeverageSlider({
         return Math.floor(val).toString();
     };
 
-    // Updated rounding logic - rounds DOWN consistently
-    const roundValue = (val: number): number => {
-        return getRoundedDisplayValue(val);
-    };
-
     // New function for smooth slider movement (no rounding during drag)
     const constrainValue = (val: number): number => {
         return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
-
-    // Market change detection and leverage validation
-    useEffect(() => {
-        if (!currentSymbol || !symbolInfo?.maxLeverage) return;
-
-        // Check if market has changed or if this is the first initialization
-        const isMarketChange = currentMarket !== currentSymbol;
-        const isFirstLoad = !hasInitializedLeverage;
-
-        if (isMarketChange || isFirstLoad) {
-            // Validate and apply leverage for this market
-            const validatedLeverage = validateAndApplyLeverageForMarket(
-                currentSymbol,
-                symbolInfo.maxLeverage,
-                minimumInputValue,
-            );
-
-            // Round the validated leverage to display value before applying
-            const displayValue = getRoundedDisplayValue(validatedLeverage);
-            onChange(displayValue);
-            setHasInitializedLeverage(true);
-
-            // Get the preferred leverage for logging
-            const preferredLeverage = getPreferredLeverage();
-            console.log(
-                `Market: ${currentSymbol}, Preferred: ${preferredLeverage}x, Applied: ${displayValue}x, Max: ${symbolInfo.maxLeverage}x`,
-            );
-        }
-    }, [
-        currentSymbol,
-        symbolInfo?.maxLeverage,
-        currentMarket,
-        minimumInputValue,
-        onChange,
-        validateAndApplyLeverageForMarket,
-        getPreferredLeverage,
-        hasInitializedLeverage,
-    ]);
 
     // Handle leverage changes from parent component
     const handleLeverageChange = (newLeverage: number) => {
@@ -187,6 +142,69 @@ export default function LeverageSlider({
         // Also call the parent onChange with the display value
         onChange(displayValue);
     };
+    const handleMarketChange = useCallback(() => {
+        const effectiveSymbol = symbolInfo?.symbol || symbolInfo?.coin;
+        const currentMaxLeverage = symbolInfo?.maxLeverage;
+
+        if (!effectiveSymbol || !currentMaxLeverage) {
+            return;
+        }
+
+        // Check if market has changed or if this is the first initialization
+        const isMarketChange = currentMarket !== effectiveSymbol;
+        const isFirstLoad = !hasInitializedLeverage;
+
+        if (isMarketChange || isFirstLoad) {
+            console.log(
+                `LeverageSlider: Applying leverage for ${effectiveSymbol} (${currentMaxLeverage}x max)`,
+            );
+
+            // Validate and apply leverage for this market
+            const validatedLeverage = validateAndApplyLeverageForMarket(
+                effectiveSymbol,
+                currentMaxLeverage,
+                minimumInputValue,
+            );
+
+            // Round the validated leverage to display value before applying
+            const displayValue = getRoundedDisplayValue(validatedLeverage);
+            onChange(displayValue);
+            setHasInitializedLeverage(true);
+        } else {
+            // Even if no market change, ensure we have the right leverage for the current maxLeverage
+            const currentPreference = getPreferredLeverage();
+            const shouldUpdate =
+                currentPreference !== value ||
+                currentMaxLeverage !== maximumInputValue;
+
+            if (shouldUpdate) {
+                console.log(
+                    `LeverageSlider: Correcting leverage for ${effectiveSymbol} due to maxLeverage change`,
+                );
+
+                const validatedLeverage = validateAndApplyLeverageForMarket(
+                    effectiveSymbol,
+                    currentMaxLeverage,
+                    minimumInputValue,
+                );
+
+                const displayValue = getRoundedDisplayValue(validatedLeverage);
+                onChange(displayValue);
+            }
+        }
+    }, [
+        symbolInfo?.symbol,
+        symbolInfo?.coin,
+        symbolInfo?.maxLeverage,
+        currentMarket,
+        minimumInputValue,
+        hasInitializedLeverage,
+    ]);
+
+    // Market change detection and leverage validation
+    useEffect(() => {
+        handleMarketChange();
+    }, [handleMarketChange]);
 
     // Handle smooth leverage changes during dragging (no rounding)
     const handleSmoothLeverageChange = (newLeverage: number) => {
@@ -591,17 +609,6 @@ export default function LeverageSlider({
             #EE9A4F 75%, 
             #EF5350 100%)`;
     };
-
-    // Helper function to check if current leverage matches preference
-    const isCurrentLeveragePreferred = () => {
-        const preferredLeverage = getPreferredLeverage();
-        return Math.abs(currentValue - preferredLeverage) < 0.01; // Small tolerance for floating point comparison
-    };
-
-    // Optional: Get leverage status for styling
-    const leverageStatus = isCurrentLeveragePreferred()
-        ? 'preferred'
-        : 'adjusted';
 
     return (
         <div

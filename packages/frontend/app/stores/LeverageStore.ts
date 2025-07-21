@@ -117,35 +117,47 @@ export const useLeverageStore = create<LeverageStore>()(
             ) => {
                 const state = get();
 
-                // Get the stored preference for this market
+                // Defensive logic: If we know this market should have higher leverage, ignore suspiciously low values
+                const knownHighLeverageMarkets = [
+                    'ETH',
+                    'BTC',
+                    'ETHEREUM',
+                    'BITCOIN',
+                ];
+                const isHighLeverageMarket = knownHighLeverageMarkets.some(
+                    (market) => marketSymbol.toUpperCase().includes(market),
+                );
+
+                if (isHighLeverageMarket && maxLeverage <= 10) {
+                    console.warn(
+                        `⚠️ IGNORING: ${marketSymbol} has suspiciously low maxLeverage=${maxLeverage}. This looks like stale data from another market. Waiting for correct value.`,
+                    );
+                    return state.currentLeverage; // Return current leverage without changing anything
+                }
+
+                // Get the stored preference for this specific market
                 const storedPreference =
                     state.marketLeveragePreferences[marketSymbol];
 
                 let targetLeverage: number;
+                let isUsingStoredPreference = false;
 
                 if (storedPreference !== undefined) {
-                    // Use stored preference
+                    // Use stored preference for this specific market
                     targetLeverage = storedPreference;
+                    isUsingStoredPreference = true;
                     console.log(
                         `Using stored preference for ${marketSymbol}: ${targetLeverage}x`,
                     );
                 } else {
-                    // No preference exists, use default logic
+                    // No preference exists for this market, calculate fresh default
                     targetLeverage =
                         get().getDefaultLeverageForMarket(maxLeverage);
                     console.log(
-                        `No preference found for ${marketSymbol}, using default: ${targetLeverage}x`,
+                        `Using default leverage for ${marketSymbol}: ${targetLeverage}x (calculated from max ${maxLeverage}x)`,
                     );
 
-                    // Save this default as the preference for this market
-                    const updatedPreferences = {
-                        ...state.marketLeveragePreferences,
-                        [marketSymbol]: targetLeverage,
-                    };
-
-                    set({
-                        marketLeveragePreferences: updatedPreferences,
-                    });
+                    // DON'T save the default as a preference yet - only save when user manually changes
                 }
 
                 // Validate the target leverage against market limits
@@ -154,8 +166,12 @@ export const useLeverageStore = create<LeverageStore>()(
                     Math.min(targetLeverage, maxLeverage),
                 );
 
-                // If the validated leverage is different from target, we need to update the preference
-                if (validatedLeverage !== targetLeverage) {
+                // If the validated leverage is different from target AND we had a stored preference,
+                // update the preference to reflect the market limits
+                if (
+                    validatedLeverage !== targetLeverage &&
+                    isUsingStoredPreference
+                ) {
                     const updatedPreferences = {
                         ...state.marketLeveragePreferences,
                         [marketSymbol]: validatedLeverage,
@@ -166,7 +182,7 @@ export const useLeverageStore = create<LeverageStore>()(
                     });
 
                     console.log(
-                        `Adjusted leverage for ${marketSymbol} from ${targetLeverage}x to ${validatedLeverage}x due to market limits`,
+                        `Adjusted stored preference for ${marketSymbol} from ${targetLeverage}x to ${validatedLeverage}x due to market limits`,
                     );
                 }
 

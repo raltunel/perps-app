@@ -114,7 +114,7 @@ export const getLeverageIntervals = (
 };
 
 /**
- * Utility to check if a max leverage value has predefined intervals
+ * check if a max leverage value has predefined intervals
  */
 export const hasPredefinedIntervals = (maxLeverage: number): boolean => {
     return leverageIntervalsMap.has(maxLeverage);

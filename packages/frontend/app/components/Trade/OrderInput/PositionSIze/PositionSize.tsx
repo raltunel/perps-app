@@ -13,7 +13,7 @@ interface PositionSizeProps {
 }
 
 const POSITION_SIZE_CONFIG = {
-    // Step increment for dragging and rounding
+    // Step increment for final values and rounding
     DRAG_STEP: 5,
 
     // Minimum and maximum values
@@ -52,7 +52,7 @@ export default function PositionSize({
     const [inputValue, setInputValue] = useState<string>(value.toString());
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(POSITION_SIZE_UI_CONFIG.DEFAULT_SHOW_LABELS);
-    const [hoverValue, setHoverValue] = useState<number | null>(null);
+    const [dragPosition, setDragPosition] = useState<number | null>(null); // Smooth drag position
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -61,7 +61,7 @@ export default function PositionSize({
         setInputValue(value.toString());
     }, [value]);
 
-    //  get percentage from mouse position
+    // Get percentage from mouse position
     const getPercentageFromPosition = (clientX: number) => {
         if (!sliderRef.current) return 0;
 
@@ -76,57 +76,69 @@ export default function PositionSize({
             if (!isDragging || !sliderRef.current) return;
 
             const percentage = getPercentageFromPosition(e.clientX);
-
-            // Round to nearest DRAG_STEP increment
-            const newValue =
-                Math.round(percentage / POSITION_SIZE_CONFIG.DRAG_STEP) *
-                POSITION_SIZE_CONFIG.DRAG_STEP;
-            const clampedValue = Math.max(
+            const clampedPercentage = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
-                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, newValue),
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
 
-            // Update hover value during dragging for immediate visual feedback
-            setHoverValue(clampedValue);
-
-            if (clampedValue !== value) {
-                onChange(clampedValue);
-            }
+            // Update smooth drag position for immediate visual feedback
+            setDragPosition(clampedPercentage);
         };
 
         const handleTouchMove = (e: TouchEvent) => {
             if (!isDragging || !sliderRef.current || !e.touches[0]) return;
 
             const percentage = getPercentageFromPosition(e.touches[0].clientX);
-
-            // Round to nearest DRAG_STEP increment
-            const newValue =
-                Math.round(percentage / POSITION_SIZE_CONFIG.DRAG_STEP) *
-                POSITION_SIZE_CONFIG.DRAG_STEP;
-            const clampedValue = Math.max(
+            const clampedPercentage = Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
-                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, newValue),
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
             );
 
-            // Update hover value during dragging for immediate visual feedback
-            setHoverValue(clampedValue);
-
-            if (clampedValue !== value) {
-                onChange(clampedValue);
-            }
+            // Update smooth drag position for immediate visual feedback
+            setDragPosition(clampedPercentage);
 
             // Prevent scrolling while dragging
             e.preventDefault();
         };
 
         const handleMouseUp = () => {
+            if (dragPosition !== null) {
+                // Round to nearest DRAG_STEP increment when releasing
+                const snappedValue =
+                    Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
+                    POSITION_SIZE_CONFIG.DRAG_STEP;
+                const clampedValue = Math.max(
+                    POSITION_SIZE_CONFIG.MIN_VALUE,
+                    Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
+                );
+
+                if (clampedValue !== value) {
+                    onChange(clampedValue);
+                }
+            }
+
             setIsDragging(false);
-            setHoverValue(null); // Clear hover value when dragging ends
+            setDragPosition(null); // Clear drag position when dragging ends
         };
 
         const handleTouchEnd = () => {
+            if (dragPosition !== null) {
+                // Round to nearest DRAG_STEP increment when releasing
+                const snappedValue =
+                    Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
+                    POSITION_SIZE_CONFIG.DRAG_STEP;
+                const clampedValue = Math.max(
+                    POSITION_SIZE_CONFIG.MIN_VALUE,
+                    Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
+                );
+
+                if (clampedValue !== value) {
+                    onChange(clampedValue);
+                }
+            }
+
             setIsDragging(false);
-            setHoverValue(null); // Clear hover value when dragging ends
+            setDragPosition(null); // Clear drag position when dragging ends
         };
 
         if (isDragging) {
@@ -150,33 +162,24 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, value, onChange]);
+    }, [isDragging, dragPosition, value, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
+        // Initialize drag position with current value
+        setDragPosition(value);
     };
 
     const handleTrackMouseMove = (e: React.MouseEvent) => {
         if (!sliderRef.current || isDragging) return;
 
-        const percentage = getPercentageFromPosition(e.clientX);
-
-        // Round to nearest step increment for display
-        const roundedPercentage =
-            Math.round(percentage / POSITION_SIZE_CONFIG.DRAG_STEP) *
-            POSITION_SIZE_CONFIG.DRAG_STEP;
-        const clampedPercentage = Math.max(
-            POSITION_SIZE_CONFIG.MIN_VALUE,
-            Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, roundedPercentage),
-        );
-
-        setHoverValue(clampedPercentage);
+        // For hover effects, still show rounded values
     };
 
     const handleTrackMouseLeave = () => {
-        setHoverValue(null);
+        // Clear hover effects if any
     };
 
     const handleTrackClick = (e: React.MouseEvent) => {
@@ -212,7 +215,23 @@ export default function PositionSize({
 
     // Get position for the knob as percentage
     const getKnobPosition = () => {
-        return value; // Direct percentage positioning
+        // Use smooth drag position during dragging, otherwise use the actual value
+        return isDragging && dragPosition !== null ? dragPosition : value;
+    };
+
+    // Get the display value - show smooth position during drag, snapped value otherwise
+    const getDisplayValue = () => {
+        if (isDragging && dragPosition !== null) {
+            // During dragging, show the value that it will snap to
+            const snappedValue =
+                Math.round(dragPosition / POSITION_SIZE_CONFIG.DRAG_STEP) *
+                POSITION_SIZE_CONFIG.DRAG_STEP;
+            return Math.max(
+                POSITION_SIZE_CONFIG.MIN_VALUE,
+                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, snappedValue),
+            );
+        }
+        return value;
     };
 
     // Handle input change
@@ -260,7 +279,7 @@ export default function PositionSize({
                         {/* Gray background track */}
                         <div className={styles.sliderBackground}></div>
 
-                        {/* Colored active track */}
+                        {/* Colored active track - uses smooth position during drag */}
                         <div
                             className={styles.sliderActive}
                             style={{
@@ -275,7 +294,7 @@ export default function PositionSize({
                                 <div
                                     key={marker.value}
                                     className={`${styles.sliderMarker} ${
-                                        marker.value <= value
+                                        marker.value <= getKnobPosition()
                                             ? styles.active
                                             : ''
                                     } ${
@@ -286,7 +305,7 @@ export default function PositionSize({
                                     style={{
                                         left: `${marker.value}%`,
                                         borderColor:
-                                            marker.value <= value
+                                            marker.value <= getKnobPosition()
                                                 ? 'transparent'
                                                 : POSITION_SIZE_UI_CONFIG.ACCENT_COLOR,
                                     }}
@@ -317,7 +336,8 @@ export default function PositionSize({
                                         style={{
                                             left: `${marker.value}%`,
                                             color:
-                                                marker.value <= value
+                                                marker.value <=
+                                                getKnobPosition()
                                                     ? POSITION_SIZE_UI_CONFIG.ACTIVE_LABEL_COLOR
                                                     : POSITION_SIZE_UI_CONFIG.INACTIVE_LABEL_COLOR,
                                         }}
@@ -331,13 +351,13 @@ export default function PositionSize({
                     )}
                 </div>
 
-                {/* Current value display with input  */}
+                {/* Current value display with input - shows the snapped value during drag */}
                 <div className={styles.valueDisplay}>
                     <input
                         type='text'
                         value={
-                            isDragging && hoverValue !== null
-                                ? hoverValue.toString()
+                            isDragging
+                                ? getDisplayValue().toString()
                                 : inputValue
                         }
                         onChange={handleInputChange}
