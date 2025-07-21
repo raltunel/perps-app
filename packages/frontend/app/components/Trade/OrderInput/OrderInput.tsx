@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
@@ -13,7 +12,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -34,6 +33,7 @@ import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -144,8 +144,15 @@ function OrderInput() {
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, obChosenAmount, symbol, symbolInfo } =
-        useTradeDataStore();
+    const {
+        obChosenPrice,
+        obChosenAmount,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+    } = useTradeDataStore();
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -275,12 +282,11 @@ function OrderInput() {
         setActiveMargin(mode);
     }, []);
 
-    const handleMarginModeConfirm = () => {
-        if (activeMargin) {
-            console.log(`Confirmed: ${activeMargin} margin mode`);
-        }
+    const handleMarginModeConfirm = (mode: marginModesT): void => {
+        setMarginMode(mode);
         confirmOrderModal.close();
     };
+
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
     };
@@ -609,12 +615,14 @@ function OrderInput() {
                                 value={marketOrderType}
                                 onChange={handleMarketOrderTypeChange}
                             />
-                            <button
+                            <SimpleButton
+                                className={styles.margin_type_btn}
                                 onClick={() => confirmOrderModal.open('margin')}
-                                className={styles.isolatedButton}
+                                bg='dark3'
+                                hoverBg='accent1'
                             >
-                                Isolated <FiChevronDown size={24} />
-                            </button>
+                                {marginMode}
+                            </SimpleButton>
                             <button
                                 className={styles.trade_type_toggle}
                                 onClick={() => setShowLaunchpad(true)}
@@ -707,6 +715,7 @@ function OrderInput() {
                         >
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
+                                    active={marginMode}
                                     handleMarginModeChange={
                                         handleMarginModeChange
                                     }
