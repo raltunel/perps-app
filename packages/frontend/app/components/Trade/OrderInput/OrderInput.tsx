@@ -2,11 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { FiChevronDown } from 'react-icons/fi';
 import { GoZap } from 'react-icons/go';
-import { LuOctagonX } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
@@ -64,36 +61,37 @@ const marketOrderTypes = [
         blurb: 'Buy/Sell at a specific price or better',
         icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'stop_market',
-        label: 'Stop Market',
-        blurb: 'Triggers a market order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'stop_limit',
-        label: 'Stop Limit',
-        blurb: 'Triggers a limit order at a set price',
-        icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'twap',
-        label: 'TWAP',
-        blurb: 'Distributes trades across a specified time period',
-        icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'scale',
-        label: 'Scale',
-        blurb: 'Multiple orders at incrementing prices',
-        icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'chase_limit',
-        label: 'Chase Limit',
-        blurb: 'Adjusts limit price to follow the market',
-        icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-    },
+    // disabled code 21 Jul 25
+    // {
+    //     value: 'stop_market',
+    //     label: 'Stop Market',
+    //     blurb: 'Triggers a market order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'stop_limit',
+    //     label: 'Stop Limit',
+    //     blurb: 'Triggers a limit order at a set price',
+    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'twap',
+    //     label: 'TWAP',
+    //     blurb: 'Distributes trades across a specified time period',
+    //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'scale',
+    //     label: 'Scale',
+    //     blurb: 'Multiple orders at incrementing prices',
+    //     icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
+    // },
+    // {
+    //     value: 'chase_limit',
+    //     label: 'Chase Limit',
+    //     blurb: 'Adjusts limit price to follow the market',
+    //     icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+    // },
 ];
 
 // disabled code 07 Jul 25
@@ -132,6 +130,7 @@ function OrderInput() {
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minimumInputValue = 1;
+    // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
