@@ -53,7 +53,7 @@ export const OrderHistoryTableModel:
         sortable: true,
         className: 'sizeCell',
         exportable: true,
-        exportAction: (v: number) => v.toFixed(3),
+        exportAction: (v: number) => v.toFixed(4),
     },
     {
         name: 'Filled Size',
