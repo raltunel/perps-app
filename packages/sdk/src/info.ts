@@ -1,6 +1,6 @@
 import { API } from './api';
 import { WebsocketManager, type ActiveSubscription } from './ws';
-import { MultiSocketInfo, WebSocketEndpoints } from './websocket-pool';
+import { MultiSocketInfo, type WebSocketEndpoints } from './websocket-pool';
 import type {
     AllMidsData,
     CandleSnapshotData,

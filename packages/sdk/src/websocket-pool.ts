@@ -1,6 +1,6 @@
 import {
     WebSocketInstance,
-    WebSocketInstanceConfig,
+    type WebSocketInstanceConfig,
     type SocketType,
     type Callback,
 } from './websocket-instance';

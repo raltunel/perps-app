@@ -427,15 +427,16 @@ export class WebSocketInstance {
         }
     };
 
-    private handleParsedMessage = (msg: WsMsg) => {
+    private handleParsedMessage = (msg: WsMsg | any) => {
         if (!msg) {
             this.log('Received undefined message');
             return;
         }
+        // Handle subscription response which is not in the WsMsg type
         if (msg.channel === 'subscriptionResponse') {
-            const subId = msg.data.id;
+            const subId = msg.data?.id;
             const sub = this.allSubscriptions[subId];
-            const success = msg.data.success;
+            const success = msg.data?.success;
             if (sub && !success) {
                 console.error(
                     `[${this.socketName}] subscription failed`,
