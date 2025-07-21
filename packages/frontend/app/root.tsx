@@ -22,7 +22,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
-import { NATIVE_MINT } from '@solana/spl-token';
+// import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -122,9 +122,14 @@ export default function App() {
                     {...(window.location.hostname === 'localhost' && {
                         domain: 'https://perps.ambient.finance',
                     })}
-                    tokens={[NATIVE_MINT.toBase58()]}
+                    tokens={[
+                        // NATIVE_MINT.toBase58(),
+                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
+                    ]}
                     defaultRequestedLimits={{
-                        [NATIVE_MINT.toBase58()]: 1_500_000_000n,
+                        // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
+                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
+                            1_000_000_000n,
                     }}
                     enableUnlimited={true}
                 >
