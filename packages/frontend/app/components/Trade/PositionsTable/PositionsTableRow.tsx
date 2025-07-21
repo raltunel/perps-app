@@ -29,6 +29,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
 
+        const showTpSl = false;
+
         const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
 
@@ -146,7 +148,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         );
 
         return (
-            <div className={styles.rowContainer}>
+            <div
+                className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
+            >
                 <div
                     className={`${styles.cell} ${styles.coinCell}`}
                     style={gradientStyle}
@@ -231,12 +235,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         {formatNum(fundingToShow, 2, true, true, true)}
                     </Tooltip>
                 </div>
-                <div className={`${styles.cell} ${styles.tpslCell}`}>
-                    {getTpSl()}
-                    <button onClick={openTpSlModal}>
-                        <LuPen color='var(--text1)' size={10} />
-                    </button>
-                </div>
+                {showTpSl && (
+                    <div className={`${styles.cell} ${styles.tpslCell}`}>
+                        {getTpSl()}
+                        <button onClick={openTpSlModal}>
+                            <LuPen color='var(--text1)' size={10} />
+                        </button>
+                    </div>
+                )}
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
                         <button className={styles.actionButton}>Limit</button>

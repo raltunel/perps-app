@@ -8,6 +8,10 @@
     align-items: center;
 }
 
+.rowContainer.noTpSl {
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+}
+
 .headerContainer {
     background: var(--bg-dark2);
     width: 100%;
@@ -22,6 +26,10 @@
     top: 0;
 
     z-index: 10;
+}
+
+.headerContainer.noTpSl {
+    grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
 }
 
 .cell {
@@ -138,10 +146,16 @@
     justify-content: center;
     align-items: center;
 }
+
 @media (max-width: 1400px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
     }
 
     .fundingCell {
@@ -155,6 +169,11 @@
         grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
     }
 
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+    }
+
     .markPriceCell {
         display: none;
     }
@@ -166,6 +185,11 @@
         grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 0.8fr 1.2fr;
     }
 
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+    }
+
     .entryPriceCell {
         display: none;
     }
@@ -175,6 +199,11 @@
     .rowContainer,
     .headerContainer {
         grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 0.8fr 1.2fr;
+    }
+
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 0.8fr 1fr 0.8fr 1.2fr;
     }
 
     .sizeCell,
@@ -189,6 +218,11 @@
         grid-template-columns: 0.8fr 1fr 0.8fr 1.2fr;
     }
 
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 1fr 1.2fr;
+    }
+
     .tpslCell,
     .liqPriceCell {
         display: none;
@@ -200,6 +234,11 @@
     .headerContainer {
         grid-template-columns: 0.8fr 1fr 1.2fr;
         padding: 0 var(--padding-xs);
+    }
+
+    .rowContainer.noTpSl,
+    .headerContainer.noTpSl {
+        grid-template-columns: 0.8fr 1fr 1.2fr;
     }
 
     .positionValueCell {
