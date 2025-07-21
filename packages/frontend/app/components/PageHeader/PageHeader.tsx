@@ -302,7 +302,11 @@ export default function PageHeader() {
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
-                        {isDropdownMenuOpen && <DropdownMenu />}
+                        {isDropdownMenuOpen && (
+                            <DropdownMenu
+                                setIsDropdownMenuOpen={setIsDropdownMenuOpen}
+                            />
+                        )}
                     </section>
                 </div>
             </header>
