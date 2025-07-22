@@ -36,6 +36,8 @@ import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
 // import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+import { getUserTokenBalance, USD_MINT } from '@crocswap-libs/ambient-ember';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
@@ -131,6 +133,8 @@ function OrderInput() {
         setRawSizeInput('');
     }, [positionSizeInSymbolDenom]);
 
+    const sessionState = useSession();
+
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -186,7 +190,39 @@ function OrderInput() {
 
     const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
-    const availableToTrade = 10;
+    const [availableToTrade, setAvailableToTrade] = useState(0);
+
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        const fetchAvailableToTrade = async () => {
+            if (isEstablished(sessionState)) {
+                const availableToTrade = await getUserTokenBalance(
+                    sessionState.connection,
+                    sessionState.walletPublicKey,
+                    USD_MINT,
+                    {},
+                );
+                const normalized = Number(availableToTrade) / 1_000_000;
+                setAvailableToTrade(normalized);
+            }
+        };
+
+        fetchAvailableToTrade(); // Initial fetch on mount
+
+        if (isEstablished(sessionState)) {
+            intervalId = setInterval(() => {
+                fetchAvailableToTrade();
+            }, 2000); // Refresh every 2 seconds
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [sessionState]);
+
     const currentPosition = 50;
 
     const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
@@ -196,7 +232,7 @@ function OrderInput() {
     const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
 
     const displayNumAvailableToTrade = useMemo(() => {
-        return formatNumWithOnlyDecimals(availableToTrade);
+        return formatNumWithOnlyDecimals(availableToTrade, 2);
     }, [availableToTrade]);
 
     const displayNumCurrentPosition = useMemo(() => {
