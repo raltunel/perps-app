@@ -146,7 +146,7 @@ export const SdkProvider: React.FC<{
 
     const stashWebsocket = useCallback(() => {
         if (info?.multiSocketInfo) {
-            info?.multiSocketInfo?.stop();
+            info.multiSocketInfo.stop();
         } else {
             info?.wsManager?.stop();
         }
