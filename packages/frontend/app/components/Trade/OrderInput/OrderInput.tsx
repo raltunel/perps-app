@@ -173,7 +173,12 @@ function OrderInput({
 
     const markPx = symbolInfo?.markPx;
 
-    const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
+    const {
+        parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        activeGroupSeparator,
+        formatNum,
+    } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -213,12 +218,12 @@ function OrderInput({
     const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
 
     const displayNumAvailableToTrade = useMemo(() => {
-        return formatNumWithOnlyDecimals(availableToTrade, 2);
-    }, [availableToTrade]);
+        return formatNum(availableToTrade, 2);
+    }, [availableToTrade, activeGroupSeparator]);
 
     const displayNumCurrentPosition = useMemo(() => {
-        return formatNumWithOnlyDecimals(currentPosition);
-    }, [currentPosition]);
+        return formatNum(currentPosition, 6);
+    }, [currentPosition, activeGroupSeparator]);
 
     const inputDetailsData = useMemo(
         () => [
