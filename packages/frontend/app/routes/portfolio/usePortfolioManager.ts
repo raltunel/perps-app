@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useDepositService } from '~/hooks/useDepositService';
 
 interface PortfolioDataIF {

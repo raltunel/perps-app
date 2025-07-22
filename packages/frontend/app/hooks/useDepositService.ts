@@ -109,15 +109,47 @@ export function useDepositService(): UseDepositServiceReturn {
             setError(null);
 
             try {
-                // Use the same wallet key logic as refreshBalance
+                // Debug session state to find correct method name
+                console.log('🔍 Session state debug for sendTransaction:');
+                console.log(
+                    '  - sessionState keys:',
+                    Object.keys(sessionState),
+                );
+                console.log(
+                    '  - sendTransaction type:',
+                    typeof sessionState.sendTransaction,
+                );
+                console.log(
+                    '  - Available methods:',
+                    Object.keys(sessionState).filter(
+                        (key) => typeof sessionState[key] === 'function',
+                    ),
+                );
+
+                // Get both keys: session key for transaction building, user wallet key for PDAs
                 const userWalletKey =
                     sessionState.userPublicKey ||
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
+                // Ensure sendTransaction is available
+                if (typeof sessionState.sendTransaction !== 'function') {
+                    throw new Error(
+                        `sendTransaction is not available. Available methods: ${Object.keys(
+                            sessionState,
+                        )
+                            .filter(
+                                (key) =>
+                                    typeof sessionState[key] === 'function',
+                            )
+                            .join(', ')}`,
+                    );
+                }
+
                 const result = await depositService.executeDeposit(
                     amount,
-                    userWalletKey,
+                    sessionState.sessionPublicKey, // For transaction building
+                    userWalletKey, // For PDA construction
                     sessionState.sendTransaction,
                 );
 
