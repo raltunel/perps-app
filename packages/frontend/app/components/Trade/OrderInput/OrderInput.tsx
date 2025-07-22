@@ -143,7 +143,7 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 1;
+    const minimumInputValue = 0.99;
     // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
@@ -214,7 +214,8 @@ function OrderInput({
         return Math.floor(value * 1_000_000) / 1_000_000;
     }
 
-    const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
+    const positionSizeInUSD =
+        Math.floor(positionSizeInSymbolDenom * (markPx || 1) * 100) / 100;
 
     const collateralInsufficient =
         roundDownToMillionth(availableToTrade) <
@@ -258,17 +259,18 @@ function OrderInput({
     );
 
     const orderValue = useMemo(() => {
+        let orderValue = 0;
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
-            return positionSizeInSymbolDenom * parseNum(markPx || 0);
+            orderValue = positionSizeInSymbolDenom * parseNum(markPx || 0);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
             price &&
             price.length > 0 &&
             positionSizeInSymbolDenom
         ) {
-            return positionSizeInSymbolDenom * parseFormattedNum(price);
+            orderValue = positionSizeInSymbolDenom * parseFormattedNum(price);
         }
-        return 0;
+        return orderValue;
     }, [
         positionSizeInSymbolDenom,
         price,
@@ -352,27 +354,69 @@ function OrderInput({
         setLeverage(value);
     };
 
+    // 1. Keep displayQty constant and update positionSizeInSymbolDenom when markPx changes (and not in 'symbol' mode)
+    useEffect(() => {
+        if (
+            !isEditingSize &&
+            selectedMode !== 'symbol' &&
+            displayQty &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(displayQty);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setPositionSizeInSymbolDenom(parsedQty / markPx);
+            }
+        }
+        // Only depend on markPx here
+    }, [markPx]);
+
+    useEffect(() => {
+        if (
+            !isEditingSize &&
+            selectedMode !== 'symbol' &&
+            displayQty &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(displayQty);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setDisplayQty(formatNumWithOnlyDecimals(parsedQty * markPx, 2));
+            }
+        }
+        // Only depend on selectedMode here
+    }, [selectedMode, activeGroupSeparator]);
+
+    // 2. Update displayQty when positionSizeInSymbolDenom or selectedMode changes
     useEffect(() => {
         if (!isEditingSize) {
-            setDisplayQty(
-                positionSizeInSymbolDenom
-                    ? selectedMode === 'symbol'
+            if (selectedMode === 'symbol') {
+                setDisplayQty(
+                    positionSizeInSymbolDenom
                         ? formatNumWithOnlyDecimals(
                               positionSizeInSymbolDenom,
                               6,
                           )
-                        : formatNumWithOnlyDecimals(
-                              positionSizeInSymbolDenom * (markPx || 1),
+                        : '',
+                );
+            } else if (markPx) {
+                setDisplayQty(
+                    positionSizeInSymbolDenom
+                        ? formatNumWithOnlyDecimals(
+                              positionSizeInSymbolDenom * markPx,
                               2,
                           )
-                    : '',
-            );
+                        : '',
+                );
+            }
         }
-    }, [positionSizeInSymbolDenom, isEditingSize, markPx, selectedMode]);
+        // Depend on positionSizeInSymbolDenom, selectedMode, and isEditingSize
+    }, [positionSizeInSymbolDenom, selectedMode, isEditingSize, markPx]);
+
+    const handleOnFocus = () => {
+        setIsEditingSize(true);
+    };
 
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
-            setIsEditingSize(true);
             if (typeof event === 'string') {
                 setDisplayQty(event);
             } else {
@@ -618,6 +662,7 @@ function OrderInput({
         () => ({
             value: displayQty,
             onChange: handleSizeChange,
+            onFocus: handleOnFocus,
             onBlur: handleSizeBlur,
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
