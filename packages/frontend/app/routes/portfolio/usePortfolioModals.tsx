@@ -60,15 +60,14 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
     );
 
     const processWithdraw = useCallback(
-        (amount: number) => {
-            originalProcessWithdraw(amount);
-            setTimeout(() => {
-                if (!isProcessing) {
-                    closeAllPortfolioModals();
-                }
-            }, 2100);
+        async (amount: number) => {
+            const result = await originalProcessWithdraw(amount);
+            // Only close modal if transaction was successful and confirmed
+            // The modal will handle its own closing based on transaction status
+            // Don't auto-close anymore - let the modal control its state
+            return result; // Return the result so the modal can handle success/failure
         },
-        [originalProcessWithdraw, isProcessing],
+        [originalProcessWithdraw],
     );
 
     const processSend = useCallback(
