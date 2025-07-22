@@ -1,3 +1,9 @@
+import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
 import React, {
     useCallback,
@@ -6,8 +12,8 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { useApp } from '~/contexts/AppContext';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -17,9 +23,9 @@ import {
 } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 interface propsIF {
+    marginBucket: MarginBucketInfo | null;
     isDropdown?: boolean;
 }
 
@@ -48,13 +54,32 @@ const tooltipSvg = (
 );
 
 function DepositDropdown(props: propsIF) {
-    const { isDropdown } = props;
+    const { isDropdown, marginBucket } = props;
 
-    const { isUserConnected, setIsUserConnected } = useApp();
+    const [balanceNum, setBalanceNum] = useState<number>(0);
+    const [unrealizedPnlNum, setUnrealizedPnlNum] = useState<number>(0);
+
+    useEffect(() => {
+        if (marginBucket) {
+            const equityBigNum = marginBucket.calculations.equity;
+            const normalizedEquity = Number(equityBigNum) / 1e6;
+            setBalanceNum(normalizedEquity);
+            const unrealizedPnlBigNum = marginBucket.calculations.unrealizedPnl;
+            const normalizedUnrealizedPnl = Number(unrealizedPnlBigNum) / 1e6;
+            setUnrealizedPnlNum(normalizedUnrealizedPnl);
+        }
+    }, [marginBucket]);
+
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
+
     const notifications: NotificationStoreIF = useNotificationStore();
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
-    const { accountOverview, selectedCurrency } = useTradeDataStore();
+    const {
+        //   accountOverview,
+        selectedCurrency,
+    } = useTradeDataStore();
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
 
@@ -92,55 +117,55 @@ function DepositDropdown(props: propsIF) {
             {
                 label: 'Balance',
                 tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.balance, 2, true, true),
-                change: accountOverview.balanceChange,
+                value: formatNum(balanceNum, 2, true, true),
+                change: 0,
             },
             {
                 label: 'Unrealized PNL',
                 tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.unrealizedPnl, 2, true, true),
+                value: formatNum(unrealizedPnlNum, 2, true, true),
                 color:
-                    accountOverview.unrealizedPnl > 0
+                    unrealizedPnlNum > 0
                         ? bsColor.buy
-                        : accountOverview.unrealizedPnl < 0
+                        : unrealizedPnlNum < 0
                           ? bsColor.sell
                           : 'var(--text-)',
             },
-            {
-                label: 'Cross Margin Ratio',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.crossMarginRatio, 2) + '%',
-                color:
-                    accountOverview.crossMarginRatio > 0
-                        ? bsColor.buy
-                        : accountOverview.crossMarginRatio < 0
-                          ? bsColor.sell
-                          : 'var(--text-)',
-            },
-            {
-                label: 'Maintenance Margin',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(
-                    accountOverview.maintainanceMargin,
-                    2,
-                    true,
-                    true,
-                ),
-                change: accountOverview.maintainanceMarginChange,
-            },
-            {
-                label: 'Cross Account Leverage',
-                tooltipContent: 'this is tooltip data',
-                value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
-            },
+            // {
+            //     label: 'Cross Margin Ratio',
+            //     tooltipContent: 'this is tooltip data',
+            //     value: formatNum(accountOverview.crossMarginRatio, 2) + '%',
+            //     color:
+            //         accountOverview.crossMarginRatio > 0
+            //             ? bsColor.buy
+            //             : accountOverview.crossMarginRatio < 0
+            //               ? bsColor.sell
+            //               : 'var(--text-)',
+            // },
+            // {
+            //     label: 'Maintenance Margin',
+            //     tooltipContent: 'this is tooltip data',
+            //     value: formatNum(
+            //         accountOverview.maintainanceMargin,
+            //         2,
+            //         true,
+            //         true,
+            //     ),
+            //     change: accountOverview.maintainanceMarginChange,
+            // },
+            // {
+            //     label: 'Cross Account Leverage',
+            //     tooltipContent: 'this is tooltip data',
+            //     value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
+            // },
         ],
-        [accountOverview, selectedCurrency, bsColor, formatNum],
+        [balanceNum, unrealizedPnlNum, selectedCurrency, bsColor, formatNum],
     );
 
     // Memoize wallet connect handler
-    const handleConnectWallet = useCallback(() => {
-        setIsUserConnected(true);
-    }, [setIsUserConnected]);
+    // const handleConnectWallet = useCallback(() => {
+    //     console.log('connect wallet');
+    // }, []);
 
     // Memoize deposit/withdraw handlers
     const handleDeposit = useCallback(() => {
@@ -190,12 +215,7 @@ function DepositDropdown(props: propsIF) {
                         <p className={styles.notConnectedText}>
                             Connect your wallet to start trading with zero gas.
                         </p>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={handleConnectWallet}
-                        >
-                            Connect Wallet
-                        </SimpleButton>
+                        <SessionButton />
                     </div>
                 )}
                 {isUserConnected && (

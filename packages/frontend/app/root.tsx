@@ -9,11 +9,11 @@ import {
 } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
-import PageHeader from './components/PageHeader/PageHeader';
-
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import PageHeader from './components/PageHeader/PageHeader';
+import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
@@ -21,6 +21,10 @@ import './css/index.css';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
+
+import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { MARKET_WS_ENDPOINT, USER_WS_ENDPOINT } from './utils/Constants';
+// import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
 class ComponentErrorBoundary extends React.Component<
@@ -113,38 +117,64 @@ export default function App() {
     return (
         <>
             <Layout>
-                <AppProvider>
-                    <SdkProvider environment={wsEnvironment}>
-                        <TutorialProvider>
-                            <WsConnectionChecker />
-                            <div className='root-container'>
-                                {/* Added error boundary for header */}
-                                <ComponentErrorBoundary>
-                                    <PageHeader />
-                                </ComponentErrorBoundary>
-                                <main className='content'>
-                                    {/*  Added Suspense for async content loading */}
-                                    <Suspense fallback={<LoadingIndicator />}>
-                                        <ComponentErrorBoundary>
-                                            <Outlet />
-                                        </ComponentErrorBoundary>
-                                    </Suspense>
-                                </main>
-                                <ComponentErrorBoundary>
-                                    <footer className='mobile-footer'>
-                                        <MobileFooter />
-                                    </footer>
-                                </ComponentErrorBoundary>
+                <FogoSessionProvider
+                    endpoint='https://testnet.fogo.io/'
+                    sponsor='8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w'
+                    paymasterUrl='https://sessions-example.fogo.io/paymaster'
+                    {...(window.location.hostname === 'localhost' && {
+                        domain: 'https://perps.ambient.finance',
+                    })}
+                    tokens={[
+                        // NATIVE_MINT.toBase58(),
+                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
+                    ]}
+                    defaultRequestedLimits={{
+                        // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
+                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
+                            1_000_000_000n,
+                    }}
+                    enableUnlimited={true}
+                >
+                    <AppProvider>
+                        <SdkProvider
+                            environment={wsEnvironment}
+                            marketEndpoint={MARKET_WS_ENDPOINT}
+                            userEndpoint={USER_WS_ENDPOINT}
+                        >
+                            <TutorialProvider>
+                                <WsConnectionChecker />
+                                <WebSocketDebug />
+                                <div className='root-container'>
+                                    {/* Added error boundary for header */}
+                                    <ComponentErrorBoundary>
+                                        <PageHeader />
+                                    </ComponentErrorBoundary>
+                                    <main className='content'>
+                                        {/*  Added Suspense for async content loading */}
+                                        <Suspense
+                                            fallback={<LoadingIndicator />}
+                                        >
+                                            <ComponentErrorBoundary>
+                                                <Outlet />
+                                            </ComponentErrorBoundary>
+                                        </Suspense>
+                                    </main>
+                                    <ComponentErrorBoundary>
+                                        <footer className='mobile-footer'>
+                                            <MobileFooter />
+                                        </footer>
+                                    </ComponentErrorBoundary>
 
-                                {/* Added error boundary for notifications */}
-                                <ComponentErrorBoundary>
-                                    <Notifications />
-                                </ComponentErrorBoundary>
-                            </div>
-                        </TutorialProvider>
-                        <RuntimeDomManipulation />
-                    </SdkProvider>
-                </AppProvider>
+                                    {/* Added error boundary for notifications */}
+                                    <ComponentErrorBoundary>
+                                        <Notifications />
+                                    </ComponentErrorBoundary>
+                                </div>
+                            </TutorialProvider>
+                            <RuntimeDomManipulation />
+                        </SdkProvider>
+                    </AppProvider>
+                </FogoSessionProvider>
             </Layout>
         </>
     );

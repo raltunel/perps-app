@@ -50,7 +50,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     );
 
     useEffect(() => {
-        if (!value || value.length === 0) {
+        if (!value) {
             valueNum.current = null;
             return;
         }

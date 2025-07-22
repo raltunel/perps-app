@@ -24,6 +24,8 @@ export default function BalancesTableHeader({
 }: BalancesTableHeaderProps) {
     const { selectedCurrency } = useTradeDataStore();
 
+    const showSendButton = false;
+
     const tableHeaders: HeaderCell[] = [
         {
             name: 'Coin',
@@ -67,16 +69,22 @@ export default function BalancesTableHeader({
             sortable: false,
             className: styles.contractCell,
         },
-        {
-            name: '',
-            key: 'action',
-            sortable: false,
-            className: styles.actionCell,
-        },
+        ...(showSendButton
+            ? [
+                  {
+                      name: '',
+                      key: 'action',
+                      sortable: false,
+                      className: styles.actionCell,
+                  },
+              ]
+            : []),
     ];
 
     return (
-        <div className={styles.headerContainer}>
+        <div
+            className={`${styles.headerContainer} ${!showSendButton ? styles.noSendButton : ''}`}
+        >
             {tableHeaders.map((header) => (
                 <div
                     key={header.key}
