@@ -36,11 +36,17 @@ import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
 // import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
+import {
+    DFLT_EMBER_MARKET,
+    getUserMarginBucket,
+    USD_MINT,
+} from '@crocswap-libs/ambient-ember';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -120,10 +126,19 @@ function OrderInput() {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
     const [leverage, setLeverage] = useState(1);
-    const [size, setSize] = useState('');
     const [price, setPrice] = useState('');
     const [stopPrice, setStopPrice] = useState('');
-    const [positionSize, setPositionSize] = useState(0);
+    const [positionSliderPercentageValue, setPositionSliderPercentageValue] =
+        useState(0);
+    const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
+        useState(0);
+
+    useEffect(() => {
+        setRawSizeInput('');
+    }, [positionSizeInSymbolDenom]);
+
+    const sessionState = useSession();
+
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -159,6 +174,8 @@ function OrderInput() {
         setMarginMode,
     } = useTradeDataStore();
 
+    const markPx = symbolInfo?.markPx;
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -177,46 +194,101 @@ function OrderInput() {
 
     const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
+    const [availableToTrade, setAvailableToTrade] = useState(0);
+
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        const fetchAvailableToTrade = async () => {
+            if (isEstablished(sessionState)) {
+                const availableToTrade =
+                    (
+                        await getUserMarginBucket(
+                            sessionState.connection,
+                            // new PublicKey(
+                            //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
+                            // ),
+                            sessionState.walletPublicKey,
+                            BigInt(DFLT_EMBER_MARKET.mktId),
+                            USD_MINT,
+                            {},
+                        )
+                    )?.calculations?.collateralAvailableToWithdraw || 0;
+                const normalized = Number(availableToTrade) / 1_000_000;
+                setAvailableToTrade(normalized);
+            }
+        };
+
+        fetchAvailableToTrade(); // Initial fetch on mount
+
+        if (isEstablished(sessionState)) {
+            intervalId = setInterval(() => {
+                fetchAvailableToTrade();
+            }, 2000); // Refresh every 2 seconds
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [sessionState]);
+
+    const currentPosition = 50;
+
+    const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
+
+    const collateralInsufficient = availableToTrade < positionSizeInUSD;
+
+    const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
+
+    const displayNumAvailableToTrade = useMemo(() => {
+        return formatNumWithOnlyDecimals(availableToTrade, 2);
+    }, [availableToTrade]);
+
+    const displayNumCurrentPosition = useMemo(() => {
+        return formatNumWithOnlyDecimals(currentPosition);
+    }, [currentPosition]);
+
     const inputDetailsData = useMemo(
         () => [
             {
                 label: 'Available to Trade',
-                tooltipLabel: 'available to trade',
-                value: '0.00',
+                tooltipLabel: 'Deposited fUSD',
+                value: displayNumAvailableToTrade,
             },
             {
                 label: 'Current Position',
-                tooltipLabel: 'current position',
-                value: `0.000 ${symbol}`,
+                tooltipLabel: 'Current position size',
+                value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
-        [],
+        [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
     );
 
     const orderValue = useMemo(() => {
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
-            return parseFormattedNum(size) * parseNum(symbolInfo?.markPx || 0);
+            return positionSizeInSymbolDenom * parseNum(markPx || 0);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
             price &&
             price.length > 0 &&
-            size &&
-            size.length > 0
+            positionSizeInSymbolDenom
         ) {
-            return parseFormattedNum(size) * parseFormattedNum(price);
+            return positionSizeInSymbolDenom * parseFormattedNum(price);
         }
         return 0;
     }, [
-        size,
+        positionSizeInSymbolDenom,
         price,
         marketOrderType,
-        symbolInfo?.markPx,
+        markPx,
         parseNum,
         parseFormattedNum,
     ]);
 
     useEffect(() => {
-        setSize('');
+        setPositionSizeInSymbolDenom(0);
         setPrice('');
 
         // Apply leverage validation when symbol changes
@@ -289,26 +361,45 @@ function OrderInput() {
         setLeverage(value);
     };
 
+    const [rawSizeInput, setRawSizeInput] = useState('');
+
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
-                setSize(event);
+                setRawSizeInput(event);
             } else {
-                setSize(event.target.value);
+                setRawSizeInput(event.target.value);
             }
         },
         [],
     );
 
-    const handleSizeBlur = () => {
-        console.log('Input lost focus');
-    };
+    const handleSizeBlur = useCallback(() => {
+        const parsed = parseFloat(rawSizeInput);
+        if (!isNaN(parsed)) {
+            const adjusted =
+                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+
+            setPositionSizeInSymbolDenom(adjusted);
+
+            // Convert input symbol size to USD value
+            const usdValue = adjusted * (markPx || 1);
+
+            // Calculate new percentage, cap at 100%
+            const percent = Math.min((usdValue / availableToTrade) * 100, 100);
+            setPositionSliderPercentageValue(percent);
+
+            console.log('Committed size on blur:', adjusted);
+        } else {
+            console.log('Invalid size input:', rawSizeInput);
+        }
+    }, [availableToTrade, rawSizeInput, markPx, selectedMode]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', size);
+            console.log('Enter pressed:', positionSizeInSymbolDenom);
         }
     };
     // PRICE INPUT----------------------------------
@@ -354,9 +445,23 @@ function OrderInput() {
 
     // POSITION SIZE------------------------------
     const handlePositionSizeChange = (value: number) => {
-        setPositionSize(value);
-        console.log(`PositionSize changed to: ${value}x`);
+        setPositionSliderPercentageValue(value);
+
+        // Calculate USD value from slider percent
+        const usdValue = (value / 100) * availableToTrade;
+
+        // Convert USD to symbol size
+        const symbolSize = usdValue / (markPx || 1);
+
+        setPositionSizeInSymbolDenom(Number(symbolSize.toFixed(6)));
     };
+
+    // useEffect(() => {
+    //     console.log({ selectedMode, symbol, markPx });
+    //     if (selectedMode === 'symbol' && markPx) {
+    //         setSymbolSize((positionSliderPercentageValue / markPx).toString());
+    //     }
+    // }, [selectedMode, symbol, markPx, positionSliderPercentageValue]);
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
     // const handleChaseOptionChange = (value: string) => {
@@ -413,6 +518,16 @@ function OrderInput() {
             setPriceRangeTotalOrders(value);
         }
     };
+
+    const displayQty =
+        rawSizeInput !== ''
+            ? rawSizeInput
+            : formatNumWithOnlyDecimals(
+                  selectedMode === 'symbol'
+                      ? positionSizeInSymbolDenom
+                      : positionSizeInSymbolDenom * (markPx || 1),
+                  selectedMode === 'symbol' ? 6 : 2,
+              );
 
     const priceDistributionButtons = useMemo(
         () => (
@@ -515,7 +630,7 @@ function OrderInput() {
 
     const sizeInputProps = useMemo(
         () => ({
-            value: size,
+            value: displayQty,
             onChange: handleSizeChange,
             onBlur: handleSizeBlur,
             onKeyDown: handleSizeKeyDown,
@@ -526,16 +641,24 @@ function OrderInput() {
             setSelectedMode,
             useTotalSize,
         }),
-        [size, handleSizeChange, useTotalSize, selectedMode, symbol],
+        [
+            displayQty,
+            handleSizeChange,
+            handleSizeBlur,
+            handleSizeKeyDown,
+            selectedMode,
+            symbol,
+            useTotalSize,
+        ],
     );
 
-    const positionSizeProps = useMemo(
+    const positionSliderPercentageValueProps = useMemo(
         () => ({
             step: 5,
-            value: positionSize,
+            value: positionSliderPercentageValue,
             onChange: handlePositionSizeChange,
         }),
-        [positionSize, handlePositionSizeChange],
+        [positionSliderPercentageValue, handlePositionSizeChange],
     );
 
     const priceRangeProps = useMemo(
@@ -706,7 +829,7 @@ function OrderInput() {
                             <PriceInput {...priceInputProps} />
                         )}
                         <SizeInput {...sizeInputProps} />
-                        <PositionSize {...positionSizeProps} />
+                        <PositionSize {...positionSliderPercentageValueProps} />
 
                         {showPriceRangeComponent && (
                             <PriceRange {...priceRangeProps} />
@@ -753,6 +876,8 @@ function OrderInput() {
                         orderMarketPrice={marketOrderType}
                         orderValue={orderValue}
                         leverage={leverage}
+                        collateralInsufficient={collateralInsufficient}
+                        sizeLessThanMinimum={sizeLessThanMinimum}
                     />
                     {confirmOrderModal.isOpen && (
                         <Modal
@@ -802,8 +927,11 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='market_buy'
                                     size={{
-                                        qty: size,
-                                        denom: 'BTC',
+                                        qty: displayQty,
+                                        denom:
+                                            selectedMode === 'symbol'
+                                                ? symbolInfo?.symbol || ''
+                                                : 'USD',
                                     }}
                                     isEnabled={
                                         !activeOptions.skipOpenOrderConfirm
@@ -820,8 +948,11 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='market_sell'
                                     size={{
-                                        qty: size,
-                                        denom: 'BTC',
+                                        qty: displayQty,
+                                        denom:
+                                            selectedMode === 'symbol'
+                                                ? symbolInfo?.symbol || ''
+                                                : 'USD',
                                     }}
                                     submitFn={submitMarketSell}
                                     toggleEnabled={() =>
@@ -838,8 +969,11 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='limit_buy'
                                     size={{
-                                        qty: size,
-                                        denom: 'BTC',
+                                        qty: displayQty,
+                                        denom:
+                                            selectedMode === 'symbol'
+                                                ? symbolInfo?.symbol || ''
+                                                : 'USD',
                                     }}
                                     limitPrice={price}
                                     submitFn={submitLimitBuy}
@@ -857,8 +991,11 @@ function OrderInput() {
                                 <ConfirmationModal
                                     tx='limit_sell'
                                     size={{
-                                        qty: size,
-                                        denom: 'BTC',
+                                        qty: displayQty,
+                                        denom:
+                                            selectedMode === 'symbol'
+                                                ? symbolInfo?.symbol || ''
+                                                : 'USD',
                                     }}
                                     limitPrice={price}
                                     submitFn={submitLimitSell}
