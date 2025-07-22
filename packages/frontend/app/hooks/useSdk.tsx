@@ -110,7 +110,20 @@ export const SdkProvider: React.FC<{
         if (info?.multiSocketInfo) {
             // For multi-socket mode, we don't need to stash subscriptions
             // as they're managed internally by each socket
-            stashedSubs.current = {};
+            // stashedSubs.current = {};
+
+            const activeSubs =
+                info?.multiSocketInfo?.getActiveSubscriptions() || {};
+
+            if (Object.keys(activeSubs).length !== 0) {
+                // reset stashed subs if we can access active subs from ws object
+                stashedSubs.current = {};
+            }
+
+            Object.keys(activeSubs).forEach((key) => {
+                const subs = activeSubs[key];
+                stashedSubs.current[key] = subs;
+            });
         } else {
             const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
 
@@ -133,11 +146,10 @@ export const SdkProvider: React.FC<{
 
     const stashWebsocket = useCallback(() => {
         if (info?.multiSocketInfo) {
-            info.multiSocketInfo.stop();
+            info?.multiSocketInfo?.stop();
         } else {
             info?.wsManager?.stop();
         }
-        console.log('>>> stashed websocket', new Date().toISOString());
     }, [info]);
 
     const reInitWs = useCallback(() => {
@@ -145,7 +157,12 @@ export const SdkProvider: React.FC<{
 
         if (info?.multiSocketInfo) {
             // For multi-socket, just reconnect
-            info.multiSocketInfo.reconnect();
+
+            // [22-07-2025] disabled to activate reInit mechanism for multisocketinfo
+            // info.multiSocketInfo.reconnect();
+
+            // [22-07-2025] call to reInit
+            info.multiSocketInfo?.getPool().reInit(stashedSubs.current);
         } else {
             info?.wsManager?.reInit(stashedSubs.current);
         }
@@ -299,8 +316,11 @@ export const SdkProvider: React.FC<{
         } else {
             if (info) {
                 setTimeout(() => {
-                    if (!info.wsManager?.isWsReady()) {
-                        setShouldReconnect(true);
+                    if (!info.multiSocketInfo) {
+                        // [22-07-2025] was a mechanism for single socket mode
+                        if (!info.wsManager?.isWsReady()) {
+                            setShouldReconnect(true);
+                        }
                     }
                 }, 2000);
             }
