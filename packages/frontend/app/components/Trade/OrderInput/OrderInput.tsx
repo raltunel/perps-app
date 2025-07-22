@@ -127,6 +127,10 @@ function OrderInput() {
     const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
         useState(0);
 
+    useEffect(() => {
+        setRawSizeInput('');
+    }, [positionSizeInSymbolDenom]);
+
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -304,38 +308,39 @@ function OrderInput() {
         setLeverage(value);
     };
 
+    const [rawSizeInput, setRawSizeInput] = useState('');
+
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
-            let newSize = 0;
             if (typeof event === 'string') {
-                newSize = parseFloat(event);
+                setRawSizeInput(event);
             } else {
-                newSize =
-                    selectedMode === 'symbol'
-                        ? parseFloat(event.target.value)
-                        : parseFloat(event.target.value) / (markPx || 1);
-            }
-
-            if (!isNaN(newSize)) {
-                setPositionSizeInSymbolDenom(newSize);
-
-                // Convert input symbol size to USD value
-                const usdValue = newSize * (markPx || 1);
-
-                // Calculate new percentage, cap at 100%
-                const percent = Math.min(
-                    (usdValue / availableToTrade) * 100,
-                    100,
-                );
-                setPositionSliderPercentageValue(percent);
+                setRawSizeInput(event.target.value);
             }
         },
-        [availableToTrade, markPx],
+        [],
     );
 
-    const handleSizeBlur = () => {
-        console.log('Input lost focus');
-    };
+    const handleSizeBlur = useCallback(() => {
+        const parsed = parseFloat(rawSizeInput);
+        if (!isNaN(parsed)) {
+            const adjusted =
+                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+
+            setPositionSizeInSymbolDenom(adjusted);
+
+            // Convert input symbol size to USD value
+            const usdValue = adjusted * (markPx || 1);
+
+            // Calculate new percentage, cap at 100%
+            const percent = Math.min((usdValue / availableToTrade) * 100, 100);
+            setPositionSliderPercentageValue(percent);
+
+            console.log('Committed size on blur:', adjusted);
+        } else {
+            console.log('Invalid size input:', rawSizeInput);
+        }
+    }, [availableToTrade, rawSizeInput, markPx, selectedMode]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
@@ -461,12 +466,15 @@ function OrderInput() {
         }
     };
 
-    const displayQty = formatNumWithOnlyDecimals(
-        selectedMode === 'symbol'
-            ? positionSizeInSymbolDenom
-            : positionSizeInSymbolDenom * (markPx || 1),
-        selectedMode === 'symbol' ? 6 : 2,
-    );
+    const displayQty =
+        rawSizeInput !== ''
+            ? rawSizeInput
+            : formatNumWithOnlyDecimals(
+                  selectedMode === 'symbol'
+                      ? positionSizeInSymbolDenom
+                      : positionSizeInSymbolDenom * (markPx || 1),
+                  selectedMode === 'symbol' ? 6 : 2,
+              );
 
     const priceDistributionButtons = useMemo(
         () => (
