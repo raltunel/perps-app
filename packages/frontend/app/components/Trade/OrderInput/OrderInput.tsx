@@ -36,7 +36,11 @@ import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
 // import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
-import { getUserTokenBalance, USD_MINT } from '@crocswap-libs/ambient-ember';
+import {
+    DFLT_EMBER_MARKET,
+    getUserMarginBucket,
+    USD_MINT,
+} from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
@@ -197,12 +201,19 @@ function OrderInput() {
 
         const fetchAvailableToTrade = async () => {
             if (isEstablished(sessionState)) {
-                const availableToTrade = await getUserTokenBalance(
-                    sessionState.connection,
-                    sessionState.walletPublicKey,
-                    USD_MINT,
-                    {},
-                );
+                const availableToTrade =
+                    (
+                        await getUserMarginBucket(
+                            sessionState.connection,
+                            // new PublicKey(
+                            //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
+                            // ),
+                            sessionState.walletPublicKey,
+                            BigInt(DFLT_EMBER_MARKET.mktId),
+                            USD_MINT,
+                            {},
+                        )
+                    )?.calculations?.collateralAvailableToWithdraw || 0;
                 const normalized = Number(availableToTrade) / 1_000_000;
                 setAvailableToTrade(normalized);
             }
@@ -243,12 +254,12 @@ function OrderInput() {
         () => [
             {
                 label: 'Available to Trade',
-                tooltipLabel: 'available to trade',
+                tooltipLabel: 'Deposited fUSD',
                 value: displayNumAvailableToTrade,
             },
             {
                 label: 'Current Position',
-                tooltipLabel: 'current position',
+                tooltipLabel: 'Current position size',
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
