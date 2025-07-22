@@ -201,7 +201,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, symbolInfo?.coin]);
 
     useEffect(() => {
-        if (!info) return;
+        if (!info || !symbol) return;
         setOrderBookState(TableState.LOADING);
         if (selectedResolution) {
             const subKey = {
