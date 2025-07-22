@@ -1,34 +1,23 @@
-// import useFetchAmbientStats from '../../../App/hooks/useFetchAmbientStats';
-// import { FlexContainer } from '../../../styled/Common';
-// import TopPools from '../TopPools/TopPools';
-// import AnimatedGradientPaths from './AnimatedGradientPaths';
-import { Link, useNavigation } from 'react-router';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import TradeButton from '../TradeButton/TradeButton';
 import styles from './Hero.module.css';
-// import TradeNowButton from './TradeNowButton/TradeNowButton';
+import animationVideo from './animation.mp4'; // ✅ Import video file
+
 export default function Hero() {
-    // const { totalTvlString, totalVolumeString, totalFeesString } =
-    //     useFetchAmbientStats();
-    const navigation = useNavigation();
-
-    const { symbol } = useTradeDataStore();
-
-    function TradeButton({ symbol }: { symbol: string }) {
-        const isNavigating = navigation.state !== 'idle';
-
-        return (
-            <Link
-                to={`/v2/trade/${symbol}`}
-                className={styles.tradeButton}
-                viewTransition
-            >
-                {isNavigating ? 'Loading...' : 'Start Trading'}
-            </Link>
-        );
-    }
-
     return (
         <div className={styles.hero_container}>
+            {/* Background Video */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className={styles.background_video}
+            >
+                <source src={animationVideo} type='video/mp4' />
+                Your browser does not support the video tag.
+            </video>
+
+            {/* Hero Content */}
             <div className={styles.hero_heading}>
                 <h2>
                     Zero-to-<span>One</span>{' '}
@@ -41,8 +30,7 @@ export default function Hero() {
                 combining unique DeFi native products with a user experience
                 rivaling CEXes
             </p>
-
-            <TradeButton symbol={symbol} />
+            <TradeButton />
         </div>
     );
 }

@@ -10,6 +10,8 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
+import Section1 from '~/components/Home/Section1/Section1';
+import Investors from '~/components/Home/Investors/Investors';
 
 interface FloatingTokenProps {
     src: string;
@@ -156,7 +158,14 @@ export default function Home(): JSX.Element {
     }
     const yes = true;
 
-    if (yes) return <Hero />;
+    if (yes)
+        return (
+            <div className={styles.me}>
+                <Hero />
+                <Section1 />
+                <Investors />
+            </div>
+        );
 
     return (
         <section className={styles.hero}>
