@@ -20,6 +20,7 @@ import {
     type MarginBucketInfo,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { PublicKey } from '@solana/web3.js';
 import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
@@ -281,10 +282,10 @@ export default function Trade() {
             if (isEstablished(sessionState)) {
                 const marginBucket = await getUserMarginBucket(
                     sessionState.connection,
-                    // new PublicKey(
-                    //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                    // ),
-                    sessionState.walletPublicKey,
+                    new PublicKey(
+                        'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
+                    ),
+                    // sessionState.walletPublicKey,
                     BigInt(DFLT_EMBER_MARKET.mktId),
                     USD_MINT,
                     {},

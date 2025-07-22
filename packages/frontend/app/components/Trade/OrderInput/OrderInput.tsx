@@ -132,10 +132,6 @@ function OrderInput({
     const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
         useState(0);
 
-    useEffect(() => {
-        setRawSizeInput('');
-    }, [positionSizeInSymbolDenom]);
-
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -336,39 +332,53 @@ function OrderInput({
         setLeverage(value);
     };
 
-    const [rawSizeInput, setRawSizeInput] = useState('');
+    const [displayQty, setDisplayQty] = useState('');
+    const [isEditingSize, setIsEditingSize] = useState(false);
+
+    useEffect(() => {
+        if (!isEditingSize) {
+            setDisplayQty(
+                positionSizeInSymbolDenom
+                    ? selectedMode === 'symbol'
+                        ? formatNumWithOnlyDecimals(
+                              positionSizeInSymbolDenom,
+                              6,
+                          )
+                        : formatNumWithOnlyDecimals(
+                              positionSizeInSymbolDenom * (markPx || 1),
+                              2,
+                          )
+                    : '',
+            );
+        }
+    }, [positionSizeInSymbolDenom, isEditingSize, markPx, selectedMode]);
 
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
-                setRawSizeInput(event);
+                setDisplayQty(event);
             } else {
-                setRawSizeInput(event.target.value);
+                setDisplayQty(event.target.value);
             }
         },
         [],
     );
 
     const handleSizeBlur = useCallback(() => {
-        const parsed = parseFloat(rawSizeInput);
+        setIsEditingSize(false);
+        const parsed = parseFloat(displayQty.trim());
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-
             setPositionSizeInSymbolDenom(adjusted);
-
-            // Convert input symbol size to USD value
+            // No need to clear displayQty -- effect will set it.
             const usdValue = adjusted * (markPx || 1);
-
-            // Calculate new percentage, cap at 100%
             const percent = Math.min((usdValue / availableToTrade) * 100, 100);
             setPositionSliderPercentageValue(percent);
-
-            console.log('Committed size on blur:', adjusted);
-        } else {
-            console.log('Invalid size input:', rawSizeInput);
+        } else if (displayQty.trim() === '') {
+            setPositionSizeInSymbolDenom(0);
         }
-    }, [availableToTrade, rawSizeInput, markPx, selectedMode]);
+    }, [availableToTrade, markPx, displayQty, selectedMode]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
@@ -494,16 +504,6 @@ function OrderInput({
         }
     };
 
-    const displayQty =
-        rawSizeInput !== ''
-            ? rawSizeInput
-            : formatNumWithOnlyDecimals(
-                  selectedMode === 'symbol'
-                      ? positionSizeInSymbolDenom
-                      : positionSizeInSymbolDenom * (markPx || 1),
-                  selectedMode === 'symbol' ? 6 : 2,
-              );
-
     const priceDistributionButtons = useMemo(
         () => (
             <div className={styles.priceDistributionContainer}>
@@ -617,13 +617,13 @@ function OrderInput({
             useTotalSize,
         }),
         [
-            displayQty,
             handleSizeChange,
             handleSizeBlur,
             handleSizeKeyDown,
             selectedMode,
             symbol,
             useTotalSize,
+            displayQty,
         ],
     );
 
