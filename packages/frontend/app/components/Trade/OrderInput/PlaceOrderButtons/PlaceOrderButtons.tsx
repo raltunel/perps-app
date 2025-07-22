@@ -16,7 +16,7 @@ interface propsIF {
     sizeLessThanMinimum: boolean;
     isPriceInvalid: boolean;
     marginRequired: number;
-    orderValue?: number;
+    usdOrderValue?: number;
 }
 interface MarketInfoItem {
     label: string;
@@ -30,7 +30,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         buyFn,
         sellFn,
         orderMarketPrice,
-        orderValue,
+        usdOrderValue,
         collateralInsufficient,
         sizeLessThanMinimum,
         isPriceInvalid,
@@ -84,8 +84,8 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
             {
                 label: 'Order Value',
                 tooltipLabel: 'order value',
-                value: orderValue
-                    ? formatNum(orderValue, null, true, true)
+                value: usdOrderValue
+                    ? formatNum(usdOrderValue, null, true, true)
                     : 'N/A',
             },
             {
@@ -100,7 +100,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     }, [
         showLiquidationPrice,
         orderMarketPrice,
-        orderValue,
+        usdOrderValue,
         marginRequired,
         formatNum,
     ]);

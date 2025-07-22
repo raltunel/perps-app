@@ -208,12 +208,15 @@ function OrderInput({
 
     const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
+    const [userExceededAvailableMargin, setUserExceededAvailableMargin] =
+        useState(false);
+
     const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
         useState(0);
 
-    const [isEditingSize, setIsEditingSize] = useState(false);
+    const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
     useEffect(() => {
         const usdAvailableToTrade =
@@ -236,7 +239,12 @@ function OrderInput({
         Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
     useEffect(() => {
-        if (positionSliderPercentageValue === 100 && markPx && !isEditingSize) {
+        if (
+            positionSliderPercentageValue === 100 &&
+            markPx &&
+            !isEditingSizeInput &&
+            !userExceededAvailableMargin
+        ) {
             setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
         }
     }, [
@@ -244,7 +252,8 @@ function OrderInput({
         usdAvailableToTrade,
         leverage,
         markPx,
-        isEditingSize,
+        isEditingSizeInput,
+        userExceededAvailableMargin,
     ]);
 
     const sizeLessThanMinimum =
@@ -274,7 +283,7 @@ function OrderInput({
         [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
     );
 
-    const orderValue = useMemo(() => {
+    const usdOrderValue = useMemo(() => {
         let orderValue = 0;
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
             orderValue = notionalSymbolQtyNum * (markPx || 1);
@@ -297,8 +306,8 @@ function OrderInput({
     ]);
 
     const marginRequired = useMemo(() => {
-        return orderValue / leverage;
-    }, [orderValue, leverage]);
+        return usdOrderValue / leverage;
+    }, [usdOrderValue, leverage]);
 
     const collateralInsufficient =
         roundDownToMillionth(usdAvailableToTrade) <
@@ -381,7 +390,7 @@ function OrderInput({
     // 1. Keep sizeDisplay constant and update notionalSymbolQtyNum when markPx changes (and not in 'symbol' mode)
     useEffect(() => {
         if (
-            !isEditingSize &&
+            !isEditingSizeInput &&
             selectedMode !== 'symbol' &&
             sizeDisplay &&
             markPx
@@ -395,7 +404,12 @@ function OrderInput({
     }, [markPx]);
 
     useEffect(() => {
-        if (!isEditingSize && selectedMode === 'usd' && sizeDisplay && markPx) {
+        if (
+            !isEditingSizeInput &&
+            selectedMode === 'usd' &&
+            sizeDisplay &&
+            markPx
+        ) {
             const parsedQty = parseFormattedNum(sizeDisplay);
             if (!isNaN(parsedQty) && markPx !== 0) {
                 setSizeDisplay(
@@ -408,7 +422,7 @@ function OrderInput({
 
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
-        if (!isEditingSize) {
+        if (!isEditingSizeInput) {
             if (selectedMode === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
@@ -426,7 +440,13 @@ function OrderInput({
                 );
             }
         }
-    }, [notionalSymbolQtyNum, selectedMode, isEditingSize, markPx, leverage]);
+    }, [
+        notionalSymbolQtyNum,
+        selectedMode,
+        isEditingSizeInput,
+        markPx,
+        leverage,
+    ]);
 
     useEffect(() => {
         const percent = Math.min(
@@ -440,7 +460,7 @@ function OrderInput({
     }, [leverage]);
 
     const handleOnFocus = () => {
-        setIsEditingSize(true);
+        setIsEditingSizeInput(true);
     };
 
     const handleSizeChange = useCallback(
@@ -455,18 +475,21 @@ function OrderInput({
     );
 
     const handleSizeInputBlur = useCallback(() => {
-        setIsEditingSize(false);
+        setIsEditingSizeInput(false);
         const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(adjusted);
             const usdValue = adjusted * (markPx || 1);
-            const percent = Math.min(
-                (usdValue / leverage / usdAvailableToTrade) * 100,
-                100,
-            );
-            setPositionSliderPercentageValue(percent);
+            const percent = (usdValue / leverage / usdAvailableToTrade) * 100;
+            if (percent > 100) {
+                setUserExceededAvailableMargin(true);
+                setPositionSliderPercentageValue(100);
+            } else {
+                setUserExceededAvailableMargin(false);
+                setPositionSliderPercentageValue(percent);
+            }
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
         }
@@ -522,15 +545,28 @@ function OrderInput({
 
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
+        setIsEditingSizeInput(false);
+
         setPositionSliderPercentageValue(value);
 
-        setNotionalSymbolQtyNum(
-            Math.floor(
-                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
-                    leverage *
-                    100,
-            ) / 100,
-        );
+        if (marketOrderType === 'market') {
+            setNotionalSymbolQtyNum(
+                Math.floor(
+                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                        leverage *
+                        100,
+                ) / 100,
+            );
+        } else if (marketOrderType === 'limit') {
+            setNotionalSymbolQtyNum(
+                Math.floor(
+                    (((value / 100) * usdAvailableToTrade) /
+                        (parseFormattedNum(price) || 1)) *
+                        leverage *
+                        100,
+                ) / 100,
+            );
+        }
     };
 
     // CHASE OPTION---------------------------------------------------
@@ -695,6 +731,7 @@ function OrderInput({
             onChange: handleSizeChange,
             onFocus: handleOnFocus,
             onBlur: handleSizeInputBlur,
+            onUnfocus: () => setIsEditingSizeInput(false),
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
             ariaLabel: 'Size input',
@@ -941,7 +978,7 @@ function OrderInput({
                             }
                         }}
                         orderMarketPrice={marketOrderType}
-                        orderValue={orderValue}
+                        usdOrderValue={usdOrderValue}
                         marginRequired={marginRequired}
                         collateralInsufficient={collateralInsufficient}
                         sizeLessThanMinimum={sizeLessThanMinimum}
