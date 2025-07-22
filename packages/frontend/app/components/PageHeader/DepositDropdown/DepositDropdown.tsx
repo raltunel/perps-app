@@ -116,13 +116,13 @@ function DepositDropdown(props: propsIF) {
         () => [
             {
                 label: 'Balance',
-                tooltipContent: 'this is tooltip data',
+                tooltipContent: 'total account equity',
                 value: formatNum(balanceNum, 2, true, true),
                 change: 0,
             },
             {
                 label: 'Unrealized PNL',
-                tooltipContent: 'this is tooltip data',
+                tooltipContent: 'Unrealized profits and losses',
                 value: formatNum(unrealizedPnlNum, 2, true, true),
                 color:
                     unrealizedPnlNum > 0
