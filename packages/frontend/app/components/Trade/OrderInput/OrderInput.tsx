@@ -201,21 +201,27 @@ function OrderInput() {
 
         const fetchAvailableToTrade = async () => {
             if (isEstablished(sessionState)) {
+                const marginBucket = await getUserMarginBucket(
+                    sessionState.connection,
+                    // new PublicKey(
+                    //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
+                    // ),
+                    sessionState.walletPublicKey,
+                    BigInt(DFLT_EMBER_MARKET.mktId),
+                    USD_MINT,
+                    {},
+                );
                 const availableToTrade =
-                    (
-                        await getUserMarginBucket(
-                            sessionState.connection,
-                            // new PublicKey(
-                            //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                            // ),
-                            sessionState.walletPublicKey,
-                            BigInt(DFLT_EMBER_MARKET.mktId),
-                            USD_MINT,
-                            {},
-                        )
-                    )?.calculations?.collateralAvailableToWithdraw || 0;
-                const normalized = Number(availableToTrade) / 1_000_000;
-                setAvailableToTrade(normalized);
+                    marginBucket?.calculations?.collateralAvailableToWithdraw ||
+                    0;
+                const normalizedAvailableToTrade =
+                    Number(availableToTrade) / 1_000_000;
+                setAvailableToTrade(normalizedAvailableToTrade);
+
+                const currentPosition = marginBucket?.netPosition || 0;
+                const normalizedCurrentPosition =
+                    Number(currentPosition) / 100_000_000;
+                setCurrentPosition(normalizedCurrentPosition);
             }
         };
 
@@ -234,7 +240,7 @@ function OrderInput() {
         };
     }, [sessionState]);
 
-    const currentPosition = 50;
+    const [currentPosition, setCurrentPosition] = useState(0);
 
     const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
 
@@ -259,7 +265,7 @@ function OrderInput() {
             },
             {
                 label: 'Current Position',
-                tooltipLabel: 'Current position size',
+                tooltipLabel: `Current ${symbol} position size`,
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
