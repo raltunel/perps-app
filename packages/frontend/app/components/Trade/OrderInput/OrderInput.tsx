@@ -125,12 +125,21 @@ function OrderInput({
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
     const [leverage, setLeverage] = useState(1);
+
     const [price, setPrice] = useState('');
+
     const [stopPrice, setStopPrice] = useState('');
+
     const [positionSliderPercentageValue, setPositionSliderPercentageValue] =
         useState(0);
-    const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
-        useState(0);
+
+    const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] = useState(0);
+
+    useEffect(() => {
+        console.log({ notionalSymbolQtyNum });
+    }, [notionalSymbolQtyNum]);
+
+    const [sizeDisplay, setSizeDisplay] = useState('');
 
     const isPriceInvalid = useMemo(() => {
         return (
@@ -150,15 +159,15 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 0.99;
+    const minNotionalUsdOrderSize = 0.99;
     // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
-        // Generate a random maximum between minimumInputValue and 100
+        // Generate a random maximum between minNotionalUsdOrderSize and 100
         const newMaximumInputValue =
-            Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
-            minimumInputValue;
+            Math.floor(Math.random() * (100 - minNotionalUsdOrderSize + 1)) +
+            minNotionalUsdOrderSize;
 
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
@@ -199,55 +208,55 @@ function OrderInput({
 
     const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
-    const [availableToTrade, setAvailableToTrade] = useState(0);
+    const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
-    const [currentPosition, setCurrentPosition] = useState(0);
+    const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
+        useState(0);
 
-    const [displayQty, setDisplayQty] = useState('');
     const [isEditingSize, setIsEditingSize] = useState(false);
 
     useEffect(() => {
-        const availableToTrade =
+        const usdAvailableToTrade =
             marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
-        const normalizedAvailableToTrade = Number(availableToTrade) / 1_000_000;
-        setAvailableToTrade(normalizedAvailableToTrade);
+        const normalizedAvailableToTrade =
+            Number(usdAvailableToTrade) / 1_000_000;
+        setUsdAvailableToTrade(normalizedAvailableToTrade);
 
-        const currentPosition = marginBucket?.netPosition || 0;
-        const normalizedCurrentPosition = Number(currentPosition) / 100_000_000;
-        setCurrentPosition(normalizedCurrentPosition);
+        const currentPositionNotionalSize = marginBucket?.netPosition || 0;
+        const normalizedCurrentPosition =
+            Number(currentPositionNotionalSize) / 100_000_000;
+        setCurrentPositionNotionalSize(normalizedCurrentPosition);
     }, [marginBucket]);
 
     function roundDownToMillionth(value: number) {
         return Math.floor(value * 1_000_000) / 1_000_000;
     }
 
-    const positionSizeInUSD =
-        Math.floor(positionSizeInSymbolDenom * (markPx || 1) * 100) / 100;
-
-    const collateralInsufficient =
-        roundDownToMillionth(availableToTrade) <
-        roundDownToMillionth(positionSizeInUSD);
+    const notionalUsdOrderSizeNum =
+        Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
     useEffect(() => {
         if (positionSliderPercentageValue === 100 && markPx && !isEditingSize) {
-            setPositionSizeInSymbolDenom(availableToTrade / markPx);
+            setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
         }
     }, [
         positionSliderPercentageValue,
-        availableToTrade,
+        usdAvailableToTrade,
+        leverage,
         markPx,
         isEditingSize,
     ]);
 
-    const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
+    const sizeLessThanMinimum =
+        notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
-        return formatNum(availableToTrade, 2);
-    }, [availableToTrade, activeGroupSeparator]);
+        return formatNum(usdAvailableToTrade, 2);
+    }, [usdAvailableToTrade, activeGroupSeparator]);
 
     const displayNumCurrentPosition = useMemo(() => {
-        return formatNum(currentPosition, 6);
-    }, [currentPosition, activeGroupSeparator]);
+        return formatNum(currentPositionNotionalSize, 6);
+    }, [currentPositionNotionalSize, activeGroupSeparator]);
 
     const inputDetailsData = useMemo(
         () => [
@@ -268,18 +277,18 @@ function OrderInput({
     const orderValue = useMemo(() => {
         let orderValue = 0;
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
-            orderValue = positionSizeInSymbolDenom * parseNum(markPx || 0);
+            orderValue = notionalSymbolQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
             price &&
             price.length > 0 &&
-            positionSizeInSymbolDenom
+            notionalSymbolQtyNum
         ) {
-            orderValue = positionSizeInSymbolDenom * parseFormattedNum(price);
+            orderValue = notionalSymbolQtyNum * parseFormattedNum(price);
         }
         return orderValue;
     }, [
-        positionSizeInSymbolDenom,
+        notionalSymbolQtyNum,
         price,
         marketOrderType,
         markPx,
@@ -287,8 +296,16 @@ function OrderInput({
         parseFormattedNum,
     ]);
 
+    const marginRequired = useMemo(() => {
+        return orderValue / leverage;
+    }, [orderValue, leverage]);
+
+    const collateralInsufficient =
+        roundDownToMillionth(usdAvailableToTrade) <
+        roundDownToMillionth(marginRequired);
+
     useEffect(() => {
-        setPositionSizeInSymbolDenom(0);
+        setNotionalSymbolQtyNum(0);
         setPrice('');
 
         // Apply leverage validation when symbol changes
@@ -301,7 +318,7 @@ function OrderInput({
             const validatedLeverage = validateAndApplyLeverageForMarket(
                 symbol,
                 symbolInfo.maxLeverage,
-                minimumInputValue,
+                minNotionalUsdOrderSize,
             );
             setLeverage(validatedLeverage);
         } else if (
@@ -361,62 +378,66 @@ function OrderInput({
         setLeverage(value);
     };
 
-    // 1. Keep displayQty constant and update positionSizeInSymbolDenom when markPx changes (and not in 'symbol' mode)
+    // 1. Keep sizeDisplay constant and update notionalSymbolQtyNum when markPx changes (and not in 'symbol' mode)
     useEffect(() => {
         if (
             !isEditingSize &&
             selectedMode !== 'symbol' &&
-            displayQty &&
+            sizeDisplay &&
             markPx
         ) {
-            const parsedQty = parseFormattedNum(displayQty);
+            const parsedQty = parseFormattedNum(sizeDisplay);
             if (!isNaN(parsedQty) && markPx !== 0) {
-                setPositionSizeInSymbolDenom(parsedQty / markPx);
+                setNotionalSymbolQtyNum(parsedQty / markPx);
             }
         }
         // Only depend on markPx here
     }, [markPx]);
 
     useEffect(() => {
-        if (
-            !isEditingSize &&
-            selectedMode !== 'symbol' &&
-            displayQty &&
-            markPx
-        ) {
-            const parsedQty = parseFormattedNum(displayQty);
+        if (!isEditingSize && selectedMode === 'usd' && sizeDisplay && markPx) {
+            const parsedQty = parseFormattedNum(sizeDisplay);
             if (!isNaN(parsedQty) && markPx !== 0) {
-                setDisplayQty(formatNumWithOnlyDecimals(parsedQty * markPx, 2));
+                setSizeDisplay(
+                    formatNumWithOnlyDecimals(parsedQty * markPx, 2),
+                );
             }
         }
         // Only depend on selectedMode here
     }, [selectedMode, activeGroupSeparator]);
 
-    // 2. Update displayQty when positionSizeInSymbolDenom or selectedMode changes
+    // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
         if (!isEditingSize) {
             if (selectedMode === 'symbol') {
-                setDisplayQty(
-                    positionSizeInSymbolDenom
-                        ? formatNumWithOnlyDecimals(
-                              positionSizeInSymbolDenom,
-                              6,
-                          )
+                setSizeDisplay(
+                    notionalSymbolQtyNum
+                        ? formatNumWithOnlyDecimals(notionalSymbolQtyNum, 6)
                         : '',
                 );
             } else if (markPx) {
-                setDisplayQty(
-                    positionSizeInSymbolDenom
+                setSizeDisplay(
+                    notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
-                              positionSizeInSymbolDenom * markPx,
+                              notionalSymbolQtyNum * markPx,
                               2,
                           )
                         : '',
                 );
             }
         }
-        // Depend on positionSizeInSymbolDenom, selectedMode, and isEditingSize
-    }, [positionSizeInSymbolDenom, selectedMode, isEditingSize, markPx]);
+    }, [notionalSymbolQtyNum, selectedMode, isEditingSize, markPx, leverage]);
+
+    useEffect(() => {
+        const percent = Math.min(
+            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
+                usdAvailableToTrade) *
+                100,
+            100,
+        );
+        console.log({ percent });
+        setPositionSliderPercentageValue(percent);
+    }, [leverage]);
 
     const handleOnFocus = () => {
         setIsEditingSize(true);
@@ -425,34 +446,37 @@ function OrderInput({
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
-                setDisplayQty(event);
+                setSizeDisplay(event);
             } else {
-                setDisplayQty(event.target.value);
+                setSizeDisplay(event.target.value);
             }
         },
         [],
     );
 
-    const handleSizeBlur = useCallback(() => {
+    const handleSizeInputBlur = useCallback(() => {
         setIsEditingSize(false);
-        const parsed = parseFormattedNum(displayQty.trim());
+        const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-            setPositionSizeInSymbolDenom(adjusted);
+            setNotionalSymbolQtyNum(adjusted);
             const usdValue = adjusted * (markPx || 1);
-            const percent = Math.min((usdValue / availableToTrade) * 100, 100);
+            const percent = Math.min(
+                (usdValue / leverage / usdAvailableToTrade) * 100,
+                100,
+            );
             setPositionSliderPercentageValue(percent);
-        } else if (displayQty.trim() === '') {
-            setPositionSizeInSymbolDenom(0);
+        } else if (sizeDisplay.trim() === '') {
+            setNotionalSymbolQtyNum(0);
         }
-    }, [availableToTrade, markPx, displayQty, selectedMode]);
+    }, [usdAvailableToTrade, markPx, sizeDisplay, selectedMode]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', positionSizeInSymbolDenom);
+            console.log('Enter pressed:', sizeDisplay);
         }
     };
     // PRICE INPUT----------------------------------
@@ -497,16 +521,16 @@ function OrderInput({
     };
 
     // POSITION SIZE------------------------------
-    const handlePositionSizeChange = (value: number) => {
+    const handleSizeSliderChange = (value: number) => {
         setPositionSliderPercentageValue(value);
 
-        // Calculate USD value from slider percent
-        const usdValue =
-            Math.floor((value / 100) * availableToTrade * 100) / 100;
-
-        // Convert USD to symbol size
-        const symbolSize = usdValue / (markPx || 1);
-        setPositionSizeInSymbolDenom(symbolSize);
+        setNotionalSymbolQtyNum(
+            Math.floor(
+                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                    leverage *
+                    100,
+            ) / 100,
+        );
     };
 
     // CHASE OPTION---------------------------------------------------
@@ -625,7 +649,7 @@ function OrderInput({
         () => ({
             value: leverage,
             onChange: handleLeverageChange,
-            minimumInputValue: minimumInputValue,
+            minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
         }),
         [leverage, handleLeverageChange],
@@ -667,10 +691,10 @@ function OrderInput({
 
     const sizeInputProps = useMemo(
         () => ({
-            value: displayQty,
+            value: sizeDisplay,
             onChange: handleSizeChange,
             onFocus: handleOnFocus,
-            onBlur: handleSizeBlur,
+            onBlur: handleSizeInputBlur,
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
             ariaLabel: 'Size input',
@@ -681,12 +705,12 @@ function OrderInput({
         }),
         [
             handleSizeChange,
-            handleSizeBlur,
+            handleSizeInputBlur,
             handleSizeKeyDown,
             selectedMode,
             symbol,
             useTotalSize,
-            displayQty,
+            sizeDisplay,
         ],
     );
 
@@ -694,9 +718,9 @@ function OrderInput({
         () => ({
             step: 5,
             value: positionSliderPercentageValue,
-            onChange: handlePositionSizeChange,
+            onChange: handleSizeSliderChange,
         }),
-        [positionSliderPercentageValue, handlePositionSizeChange],
+        [positionSliderPercentageValue, handleSizeSliderChange],
     );
 
     const priceRangeProps = useMemo(
@@ -767,8 +791,8 @@ function OrderInput({
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
-    const formattedDisplayQty = formatNum(
-        parseFormattedNum(displayQty),
+    const formattedSizeDisplay = formatNum(
+        parseFormattedNum(sizeDisplay),
         selectedMode === 'symbol' ? 6 : 2,
     );
 
@@ -918,7 +942,7 @@ function OrderInput({
                         }}
                         orderMarketPrice={marketOrderType}
                         orderValue={orderValue}
-                        leverage={leverage}
+                        marginRequired={marginRequired}
                         collateralInsufficient={collateralInsufficient}
                         sizeLessThanMinimum={sizeLessThanMinimum}
                         isPriceInvalid={isPriceInvalid}
@@ -971,7 +995,7 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_buy'
                                     size={{
-                                        qty: formattedDisplayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
                                                 ? symbolInfo?.coin || ''
@@ -992,7 +1016,7 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_sell'
                                     size={{
-                                        qty: formattedDisplayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
                                                 ? symbolInfo?.coin || ''
@@ -1013,7 +1037,7 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_buy'
                                     size={{
-                                        qty: formattedDisplayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
                                                 ? symbolInfo?.coin || ''
@@ -1035,7 +1059,7 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_sell'
                                     size={{
-                                        qty: formattedDisplayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
                                                 ? symbolInfo?.coin || ''

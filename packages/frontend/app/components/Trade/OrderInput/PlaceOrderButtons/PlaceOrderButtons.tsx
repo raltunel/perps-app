@@ -12,10 +12,10 @@ interface propsIF {
     buyFn: () => void;
     sellFn: () => void;
     orderMarketPrice: string;
-    leverage: number;
     collateralInsufficient: boolean;
     sizeLessThanMinimum: boolean;
     isPriceInvalid: boolean;
+    marginRequired: number;
     orderValue?: number;
 }
 interface MarketInfoItem {
@@ -31,10 +31,10 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         sellFn,
         orderMarketPrice,
         orderValue,
-        leverage,
         collateralInsufficient,
         sizeLessThanMinimum,
         isPriceInvalid,
+        marginRequired,
     } = props;
 
     const { getBsColor } = useAppSettings();
@@ -91,8 +91,8 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
             {
                 label: 'Margin Required',
                 tooltipLabel: 'margin required',
-                value: orderValue
-                    ? formatNum(orderValue / leverage, null, true, true)
+                value: marginRequired
+                    ? formatNum(marginRequired, null, true, true)
                     : 'N/A',
             },
         ];
@@ -101,7 +101,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         showLiquidationPrice,
         orderMarketPrice,
         orderValue,
-        leverage,
+        marginRequired,
         formatNum,
     ]);
 
