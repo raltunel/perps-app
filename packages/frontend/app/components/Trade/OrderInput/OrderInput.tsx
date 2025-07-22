@@ -36,12 +36,7 @@ import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
 // import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
-import {
-    DFLT_EMBER_MARKET,
-    getUserMarginBucket,
-    USD_MINT,
-} from '@crocswap-libs/ambient-ember';
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
@@ -122,7 +117,11 @@ export type modalContentT =
     | 'limit_buy'
     | 'limit_sell';
 
-function OrderInput() {
+function OrderInput({
+    marginBucket,
+}: {
+    marginBucket: MarginBucketInfo | null;
+}) {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
     const [leverage, setLeverage] = useState(1);
@@ -136,8 +135,6 @@ function OrderInput() {
     useEffect(() => {
         setRawSizeInput('');
     }, [positionSizeInSymbolDenom]);
-
-    const sessionState = useSession();
 
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
@@ -196,45 +193,18 @@ function OrderInput() {
 
     const [availableToTrade, setAvailableToTrade] = useState(0);
 
+    const [currentPosition, setCurrentPosition] = useState(0);
+
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
+        const availableToTrade =
+            marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
+        const normalizedAvailableToTrade = Number(availableToTrade) / 1_000_000;
+        setAvailableToTrade(normalizedAvailableToTrade);
 
-        const fetchAvailableToTrade = async () => {
-            if (isEstablished(sessionState)) {
-                const availableToTrade =
-                    (
-                        await getUserMarginBucket(
-                            sessionState.connection,
-                            // new PublicKey(
-                            //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                            // ),
-                            sessionState.walletPublicKey,
-                            BigInt(DFLT_EMBER_MARKET.mktId),
-                            USD_MINT,
-                            {},
-                        )
-                    )?.calculations?.collateralAvailableToWithdraw || 0;
-                const normalized = Number(availableToTrade) / 1_000_000;
-                setAvailableToTrade(normalized);
-            }
-        };
-
-        fetchAvailableToTrade(); // Initial fetch on mount
-
-        if (isEstablished(sessionState)) {
-            intervalId = setInterval(() => {
-                fetchAvailableToTrade();
-            }, 2000); // Refresh every 2 seconds
-        }
-
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [sessionState]);
-
-    const currentPosition = 50;
+        const currentPosition = marginBucket?.netPosition || 0;
+        const normalizedCurrentPosition = Number(currentPosition) / 100_000_000;
+        setCurrentPosition(normalizedCurrentPosition);
+    }, [marginBucket]);
 
     const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
 
@@ -259,7 +229,7 @@ function OrderInput() {
             },
             {
                 label: 'Current Position',
-                tooltipLabel: 'Current position size',
+                tooltipLabel: `Current ${symbol} position size`,
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
