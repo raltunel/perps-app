@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styles from './DepositModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { LuChevronDown } from 'react-icons/lu';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
+import { useDepositService } from '~/hooks/useDepositService';
 
 interface DepositModalProps {
     vault: {
@@ -25,13 +26,21 @@ export default function DepositModal({
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken] = useState('USDe');
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const {
         formatCurrency,
-        validateAmount,
+        validateAmount: validateVaultAmount,
         // isValidNumberInput,
         getAvailableCapacity,
     } = useVaultManager();
+
+    const {
+        balance: walletBalance,
+        validateAmount: validateDepositAmount,
+        executeDeposit,
+        isLoading: isDepositLoading,
+    } = useDepositService();
 
     // Use the unit from the vault or default to USD
     const unitValue = vault.unit || 'USD';
@@ -48,42 +57,122 @@ export default function DepositModal({
         [],
     );
 
+    // Calculate max available amount (minimum of vault capacity and wallet balance)
+    const maxAvailableAmount = useMemo(() => {
+        const userWalletBalance = walletBalance?.decimalized || 0;
+        return Math.min(availableCapacity, userWalletBalance);
+    }, [availableCapacity, walletBalance]);
+
     const handleMaxClick = useCallback(() => {
-        setAmount(availableCapacity.toString());
+        setAmount(maxAvailableAmount.toString());
         setError(null);
-    }, [availableCapacity]);
+    }, [maxAvailableAmount]);
 
-    const handleDeposit = useCallback(() => {
+    const handleDeposit = useCallback(async () => {
         const depositAmount = parseFloat(amount);
+        setError(null);
+        setIsProcessing(true);
 
-        const validation = validateAmount(depositAmount, availableCapacity);
+        try {
+            // Validate minimum deposit amount ($10)
+            const depositValidation = validateDepositAmount(depositAmount);
+            if (!depositValidation.isValid) {
+                setError(depositValidation.message || 'Invalid deposit amount');
+                return;
+            }
 
-        if (!validation.isValid) {
-            setError(validation.message);
-            return;
+            // Validate against vault capacity and wallet balance
+            const vaultValidation = validateVaultAmount(
+                depositAmount,
+                maxAvailableAmount,
+            );
+            if (!vaultValidation.isValid) {
+                setError(vaultValidation.message || 'Invalid amount');
+                return;
+            }
+
+            // Execute the Solana transaction
+            const result = await executeDeposit(depositAmount);
+
+            if (result.success) {
+                // Update vault state through parent component
+                onDeposit(depositAmount);
+            } else {
+                setError(result.error || 'Deposit failed');
+            }
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'Deposit failed');
+        } finally {
+            setIsProcessing(false);
         }
-
-        onDeposit(depositAmount);
-    }, [amount, availableCapacity, validateAmount, onDeposit]);
+    }, [
+        amount,
+        maxAvailableAmount,
+        validateDepositAmount,
+        validateVaultAmount,
+        executeDeposit,
+        onDeposit,
+    ]);
 
     const infoItems = [
         {
             label: 'Available to deposit',
-            value: formatCurrency(availableCapacity, unitValue),
+            value: formatCurrency(maxAvailableAmount, unitValue),
             tooltip:
-                'The maximum amount you can deposit into this vault based on remaining capacity',
+                'The maximum amount you can deposit based on vault capacity and wallet balance',
+        },
+        {
+            label: 'Wallet balance',
+            value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
+            tooltip: 'Your current wallet balance',
         },
         {
             label: 'Network Fee',
-            value: unitValue === 'USD' ? '$0.001' : '0.00001 BTC',
-            tooltip: 'Fee charged for processing the deposit transaction',
+            value: 'Sponsored by Fogo',
+            tooltip: 'Transaction fees are sponsored by Fogo',
         },
     ];
 
-    const isButtonDisabled =
-        !amount ||
-        parseFloat(amount) <= 0 ||
-        parseFloat(amount) > availableCapacity;
+    // Enhanced button state logic
+    const isButtonDisabled = useMemo(() => {
+        if (!amount || isProcessing || isDepositLoading) return true;
+
+        const depositAmount = parseFloat(amount);
+        if (isNaN(depositAmount) || depositAmount <= 0) return true;
+
+        // Check minimum deposit requirement
+        const depositValidation = validateDepositAmount(depositAmount);
+        if (!depositValidation.isValid) return true;
+
+        // Check against available capacity and wallet balance
+        if (depositAmount > maxAvailableAmount) return true;
+
+        return false;
+    }, [
+        amount,
+        isProcessing,
+        isDepositLoading,
+        validateDepositAmount,
+        maxAvailableAmount,
+    ]);
+
+    // Enhanced button text logic
+    const buttonText = useMemo(() => {
+        if (isProcessing) return 'Processing...';
+        if (isDepositLoading) return 'Loading...';
+
+        if (amount) {
+            const depositAmount = parseFloat(amount);
+            if (!isNaN(depositAmount) && depositAmount > 0) {
+                const depositValidation = validateDepositAmount(depositAmount);
+                if (!depositValidation.isValid) {
+                    return depositValidation.message || 'Invalid Amount';
+                }
+            }
+        }
+
+        return 'Deposit';
+    }, [amount, isProcessing, isDepositLoading, validateDepositAmount]);
 
     return (
         <div className={styles.container}>
@@ -150,7 +239,7 @@ export default function DepositModal({
                 onClick={handleDeposit}
                 disabled={isButtonDisabled}
             >
-                Deposit
+                {buttonText}
             </button>
         </div>
     );
