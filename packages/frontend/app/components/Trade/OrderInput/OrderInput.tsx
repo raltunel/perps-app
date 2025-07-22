@@ -366,7 +366,7 @@ function OrderInput({
 
     const handleSizeBlur = useCallback(() => {
         setIsEditingSize(false);
-        const parsed = parseFloat(displayQty.trim());
+        const parsed = parseFormattedNum(displayQty.trim());
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
@@ -440,12 +440,6 @@ function OrderInput({
         setPositionSizeInSymbolDenom(symbolSize);
     };
 
-    // useEffect(() => {
-    //     console.log({ selectedMode, symbol, markPx });
-    //     if (selectedMode === 'symbol' && markPx) {
-    //         setSymbolSize((positionSliderPercentageValue / markPx).toString());
-    //     }
-    // }, [selectedMode, symbol, markPx, positionSliderPercentageValue]);
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
     // const handleChaseOptionChange = (value: string) => {
@@ -888,11 +882,11 @@ function OrderInput({
 
                             {confirmOrderModal.content === 'scale' && (
                                 <ScaleOrders
-                                    totalQuantity={parseFloat(
+                                    totalQuantity={parseFormattedNum(
                                         priceRangeTotalOrders,
                                     )}
-                                    minPrice={parseFloat(priceRangeMin)}
-                                    maxPrice={parseFloat(priceRangeMax)}
+                                    minPrice={parseFormattedNum(priceRangeMin)}
+                                    maxPrice={parseFormattedNum(priceRangeMax)}
                                     isModal
                                     onClose={confirmOrderModal.close}
                                 />
