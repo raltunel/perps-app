@@ -371,7 +371,6 @@ function OrderInput({
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setPositionSizeInSymbolDenom(adjusted);
-            // No need to clear displayQty -- effect will set it.
             const usdValue = adjusted * (markPx || 1);
             const percent = Math.min((usdValue / availableToTrade) * 100, 100);
             setPositionSliderPercentageValue(percent);
@@ -433,12 +432,12 @@ function OrderInput({
         setPositionSliderPercentageValue(value);
 
         // Calculate USD value from slider percent
-        const usdValue = (value / 100) * availableToTrade;
+        const usdValue =
+            Math.floor((value / 100) * availableToTrade * 100) / 100;
 
         // Convert USD to symbol size
         const symbolSize = usdValue / (markPx || 1);
-
-        setPositionSizeInSymbolDenom(Number(symbolSize.toFixed(6)));
+        setPositionSizeInSymbolDenom(symbolSize);
     };
 
     // useEffect(() => {
