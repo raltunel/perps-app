@@ -35,6 +35,7 @@ import {
 } from '~/routes/chart/data/utils/utils';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -89,6 +90,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
+
+    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const debugToolbarOpenRef = useRef(debugToolbarOpen);
+    debugToolbarOpenRef.current = debugToolbarOpen;
 
     const [isChartReady, setIsChartReady] = useState(false);
     const { marketId } = useParams<{ marketId: string }>();
@@ -388,6 +393,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             const isSingleChar = e.key.length === 1;
             const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
 
+            if (e.code === 'KeyD' && e.altKey) {
+                e.preventDefault();
+                setDebugToolbarOpen(!debugToolbarOpenRef.current);
+            }
             if (
                 !e.ctrlKey &&
                 !e.altKey &&
