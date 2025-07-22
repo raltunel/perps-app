@@ -426,7 +426,11 @@ function OrderInput({
             if (selectedMode === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
-                        ? formatNumWithOnlyDecimals(notionalSymbolQtyNum, 6)
+                        ? formatNumWithOnlyDecimals(
+                              notionalSymbolQtyNum,
+                              6,
+                              true,
+                          )
                         : '',
                 );
             } else if (markPx) {
@@ -435,6 +439,7 @@ function OrderInput({
                         ? formatNumWithOnlyDecimals(
                               notionalSymbolQtyNum * markPx,
                               2,
+                              true,
                           )
                         : '',
                 );

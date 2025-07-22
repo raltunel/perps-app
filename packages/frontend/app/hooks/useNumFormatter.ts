@@ -193,13 +193,32 @@ export function useNumFormatter() {
     );
 
     const formatNumWithOnlyDecimals = useCallback(
-        (num: number, precision?: number) => {
+        (
+            num: number,
+            precision?: number,
+            trimTrailingZeros: boolean = false,
+        ): string => {
             const { group } = getSeparators(numFormat.value);
-            precision = precision || getPrecisionFromNumber(num);
+            precision = precision ?? getPrecisionFromNumber(num);
 
-            const formattedNum = formatNum(num, precision);
+            let formattedNum = formatNum(num, precision);
 
-            return formattedNum.replace(new RegExp(`\\${group}`, 'g'), '');
+            // Remove group separators
+            formattedNum = formattedNum.replace(
+                new RegExp(`\\${group}`, 'g'),
+                '',
+            );
+
+            // Optionally remove trailing zeros in decimal part
+            if (trimTrailingZeros && formattedNum.includes('.')) {
+                // Remove trailing zeros after decimal point and optional trailing dot
+                formattedNum = formattedNum
+                    .replace(/(\.\d*?[1-9])0+$/g, '$1')
+                    .replace(/\.0+$/, '')
+                    .replace(/\.$/, '');
+            }
+
+            return formattedNum;
         },
         [formatNum, numFormat],
     );
