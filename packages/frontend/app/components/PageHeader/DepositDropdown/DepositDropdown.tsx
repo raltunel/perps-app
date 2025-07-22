@@ -17,10 +17,6 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import {
-    useNotificationStore,
-    type NotificationStoreIF,
-} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 
@@ -73,7 +69,6 @@ function DepositDropdown(props: propsIF) {
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
 
-    const notifications: NotificationStoreIF = useNotificationStore();
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
     const {
@@ -169,22 +164,12 @@ function DepositDropdown(props: propsIF) {
 
     // Memoize deposit/withdraw handlers
     const handleDeposit = useCallback(() => {
-        notifications.add({
-            title: 'Deposit Pending',
-            message: 'Deposit 420,000 USDC',
-            icon: 'spinner',
-        });
         openDepositModal();
-    }, [notifications, openDepositModal]);
+    }, [openDepositModal]);
 
     const handleWithdraw = useCallback(() => {
-        notifications.add({
-            title: 'Withdraw Pending',
-            message: 'Withdraw 420,000 USDC',
-            icon: 'spinner',
-        });
         openWithdrawModal();
-    }, [notifications, openWithdrawModal]);
+    }, [openWithdrawModal]);
 
     return (
         <>
