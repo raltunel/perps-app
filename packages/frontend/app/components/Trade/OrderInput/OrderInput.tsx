@@ -264,7 +264,16 @@ function OrderInput({
     }, [usdAvailableToTrade, activeGroupSeparator]);
 
     const displayNumCurrentPosition = useMemo(() => {
-        return formatNum(currentPositionNotionalSize, 6);
+        return formatNum(
+            currentPositionNotionalSize,
+            6,
+            false,
+            false,
+            false,
+            false,
+            10000,
+            true,
+        );
     }, [currentPositionNotionalSize, activeGroupSeparator]);
 
     const inputDetailsData = useMemo(
