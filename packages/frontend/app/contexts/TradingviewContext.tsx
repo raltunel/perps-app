@@ -379,6 +379,39 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     useEffect(() => {
+        const chartDiv = document.getElementById('tv_chart');
+        const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+        const iframeDoc =
+            iframe?.contentDocument || iframe?.contentWindow?.document;
+
+        const blockSymbolSearchKeys = (e: KeyboardEvent) => {
+            const isSingleChar = e.key.length === 1;
+            const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
+
+            if (
+                !e.ctrlKey &&
+                !e.altKey &&
+                !e.metaKey &&
+                isSingleChar &&
+                isAlphaNumeric
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+
+        iframeDoc?.addEventListener('keydown', blockSymbolSearchKeys, true);
+
+        return () => {
+            iframeDoc?.removeEventListener(
+                'keydown',
+                blockSymbolSearchKeys,
+                true,
+            );
+        };
+    }, [chart]);
+
+    useEffect(() => {
         if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
             const intervalMinutes = tvIntervalToMinutes(
                 chartInterval as ResolutionString,
