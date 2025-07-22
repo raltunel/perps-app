@@ -12,6 +12,7 @@ export interface DepositServiceResult {
     success: boolean;
     error?: string;
     signature?: string;
+    confirmed?: boolean;
 }
 
 export interface UserBalance {
@@ -253,24 +254,43 @@ export class DepositService {
                     '🔍 Starting transaction tracking for signature:',
                     signature,
                 );
-                this.trackTransactionConfirmation(signature, amount);
+
+                // Wait for confirmation
+                const isConfirmed = await this.trackTransactionConfirmation(
+                    signature,
+                    amount,
+                );
+
+                if (isConfirmed) {
+                    // Show success notification only after confirmation
+                    notificationService.showDepositSuccess({
+                        amount,
+                        signature,
+                        token: 'USD',
+                    });
+
+                    return {
+                        success: true,
+                        signature,
+                        confirmed: true,
+                    };
+                } else {
+                    return {
+                        success: false,
+                        error: 'Transaction failed or timed out',
+                        signature,
+                        confirmed: false,
+                    };
+                }
             } else {
                 console.warn(
                     '⚠️ No signature returned from sendTransaction - cannot track confirmation',
                 );
+                return {
+                    success: false,
+                    error: 'No transaction signature received',
+                };
             }
-
-            // Show success notification (transaction submitted, not necessarily confirmed)
-            notificationService.showDepositSuccess({
-                amount,
-                signature,
-                token: 'USD',
-            });
-
-            return {
-                success: true,
-                signature,
-            };
         } catch (error) {
             console.error('❌ Error executing deposit:', error);
             console.error('Execute deposit error details:', {
@@ -305,11 +325,12 @@ export class DepositService {
      * Track transaction confirmation on-chain
      * @param signature - Transaction signature to track
      * @param amount - Deposit amount for logging
+     * @returns Promise<boolean> - true if confirmed, false if failed or timed out
      */
     private async trackTransactionConfirmation(
         signature: string,
         amount: number,
-    ): Promise<void> {
+    ): Promise<boolean> {
         const maxRetries = 30; // Check for up to 60 seconds (30 * 2s intervals)
         let retryCount = 0;
 
@@ -317,129 +338,134 @@ export class DepositService {
             `📊 Starting transaction confirmation tracking for ${signature}`,
         );
 
-        const checkConfirmation = async (): Promise<void> => {
-            try {
-                retryCount++;
-                console.log(
-                    `🔄 Checking transaction confirmation (attempt ${retryCount}/${maxRetries})`,
-                );
-
-                const status =
-                    await this.connection.getSignatureStatus(signature);
-                console.log(`  - Signature status result:`, status);
-
-                if (status.value === null) {
+        return new Promise((resolve) => {
+            const checkConfirmation = async (): Promise<void> => {
+                try {
+                    retryCount++;
                     console.log(
-                        `  - Transaction not found yet (attempt ${retryCount})`,
+                        `🔄 Checking transaction confirmation (attempt ${retryCount}/${maxRetries})`,
                     );
-                } else {
-                    console.log(`  - Transaction found! Status:`, {
-                        slot: status.value.slot,
-                        confirmations: status.value.confirmations,
-                        err: status.value.err,
-                        confirmationStatus: status.value.confirmationStatus,
-                    });
 
-                    if (status.value.err) {
-                        console.error(
-                            '❌ Transaction failed on-chain:',
-                            status.value.err,
+                    const status =
+                        await this.connection.getSignatureStatus(signature);
+                    console.log(`  - Signature status result:`, status);
+
+                    if (status.value === null) {
+                        console.log(
+                            `  - Transaction not found yet (attempt ${retryCount})`,
                         );
-                        notificationService.showDepositError(
-                            `Transaction failed on-chain: ${JSON.stringify(status.value.err)}`,
-                            { signature, amount },
-                        );
-                        return;
-                    }
+                    } else {
+                        console.log(`  - Transaction found! Status:`, {
+                            slot: status.value.slot,
+                            confirmations: status.value.confirmations,
+                            err: status.value.err,
+                            confirmationStatus: status.value.confirmationStatus,
+                        });
 
-                    if (
-                        status.value.confirmationStatus === 'confirmed' ||
-                        status.value.confirmationStatus === 'finalized'
-                    ) {
-                        console.log('✅ Transaction confirmed on-chain!');
-
-                        // Get full transaction details
-                        try {
-                            const txDetails =
-                                await this.connection.getTransaction(
-                                    signature,
-                                    {
-                                        commitment: 'confirmed',
-                                        maxSupportedTransactionVersion: 0,
-                                    },
-                                );
-                            console.log(
-                                '📋 Full transaction details:',
-                                txDetails,
+                        if (status.value.err) {
+                            console.error(
+                                '❌ Transaction failed on-chain:',
+                                status.value.err,
                             );
-
-                            if (txDetails) {
-                                console.log(
-                                    '💰 Transaction confirmed successfully:',
-                                    {
-                                        signature,
-                                        slot: txDetails.slot,
-                                        blockTime: txDetails.blockTime,
-                                        fee: txDetails.meta?.fee,
-                                        computeUnitsConsumed:
-                                            txDetails.meta
-                                                ?.computeUnitsConsumed,
-                                        preBalances:
-                                            txDetails.meta?.preBalances,
-                                        postBalances:
-                                            txDetails.meta?.postBalances,
-                                    },
-                                );
-
-                                notificationService.showDepositSuccess({
-                                    amount,
-                                    signature,
-                                    token: 'USD',
-                                });
-                            }
-                        } catch (detailError) {
-                            console.warn(
-                                '⚠️ Could not fetch transaction details:',
-                                detailError,
+                            notificationService.showDepositError(
+                                `Transaction failed on-chain: ${JSON.stringify(status.value.err)}`,
+                                { signature, amount },
                             );
+                            resolve(false);
+                            return;
                         }
 
-                        return;
+                        if (
+                            status.value.confirmationStatus === 'confirmed' ||
+                            status.value.confirmationStatus === 'finalized'
+                        ) {
+                            console.log('✅ Transaction confirmed on-chain!');
+
+                            // Get full transaction details
+                            try {
+                                const txDetails =
+                                    await this.connection.getTransaction(
+                                        signature,
+                                        {
+                                            commitment: 'confirmed',
+                                            maxSupportedTransactionVersion: 0,
+                                        },
+                                    );
+                                console.log(
+                                    '📋 Full transaction details:',
+                                    txDetails,
+                                );
+
+                                if (txDetails) {
+                                    console.log(
+                                        '💰 Transaction confirmed successfully:',
+                                        {
+                                            signature,
+                                            slot: txDetails.slot,
+                                            blockTime: txDetails.blockTime,
+                                            fee: txDetails.meta?.fee,
+                                            computeUnitsConsumed:
+                                                txDetails.meta
+                                                    ?.computeUnitsConsumed,
+                                            preBalances:
+                                                txDetails.meta?.preBalances,
+                                            postBalances:
+                                                txDetails.meta?.postBalances,
+                                        },
+                                    );
+
+                                    // Don't show success here - it's handled in executeDeposit
+                                }
+                            } catch (detailError) {
+                                console.warn(
+                                    '⚠️ Could not fetch transaction details:',
+                                    detailError,
+                                );
+                            }
+
+                            resolve(true);
+                            return;
+                        }
+                    }
+
+                    // Continue checking if not confirmed and within retry limit
+                    if (retryCount < maxRetries) {
+                        setTimeout(checkConfirmation, 2000); // Check again in 2 seconds
+                    } else {
+                        console.warn(
+                            '⏰ Transaction confirmation timeout after',
+                            maxRetries,
+                            'attempts',
+                        );
+                        console.warn(
+                            'Transaction may still be processing. Check manually:',
+                            signature,
+                        );
+                        notificationService.showDepositError(
+                            'Transaction confirmation timeout - check manually',
+                            { signature, amount },
+                        );
+                        resolve(false);
+                    }
+                } catch (error) {
+                    console.error(
+                        '❌ Error checking transaction status:',
+                        error,
+                    );
+                    if (retryCount < maxRetries) {
+                        setTimeout(checkConfirmation, 2000); // Retry on error
+                    } else {
+                        notificationService.showDepositError(
+                            'Error tracking transaction confirmation',
+                            { signature, amount },
+                        );
+                        resolve(false);
                     }
                 }
+            };
 
-                // Continue checking if not confirmed and within retry limit
-                if (retryCount < maxRetries) {
-                    setTimeout(checkConfirmation, 2000); // Check again in 2 seconds
-                } else {
-                    console.warn(
-                        '⏰ Transaction confirmation timeout after',
-                        maxRetries,
-                        'attempts',
-                    );
-                    console.warn(
-                        'Transaction may still be processing. Check manually:',
-                        signature,
-                    );
-                    notificationService.showDepositError(
-                        'Transaction confirmation timeout - check manually',
-                        { signature, amount },
-                    );
-                }
-            } catch (error) {
-                console.error('❌ Error checking transaction status:', error);
-                if (retryCount < maxRetries) {
-                    setTimeout(checkConfirmation, 2000); // Retry on error
-                } else {
-                    notificationService.showDepositError(
-                        'Error tracking transaction confirmation',
-                        { signature, amount },
-                    );
-                }
-            }
-        };
-
-        // Start checking immediately
-        checkConfirmation();
+            // Start checking immediately
+            checkConfirmation();
+        });
     }
 }

@@ -67,6 +67,12 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
+        // Check minimum deposit of $10
+        if (depositAmount < 10) {
+            setError('Minimum deposit amount is $10.00');
+            return;
+        }
+
         if (depositAmount > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             return;
@@ -133,6 +139,13 @@ function PortfolioDeposit(props: propsIF) {
             formatCurrency(availableBalance, selectedToken.symbol),
     );
 
+    // Check if amount is below minimum
+    const isBelowMinimum = useMemo(() => {
+        if (!amount) return false;
+        const depositAmount = parseFloat(amount);
+        return !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 10;
+    }, [amount]);
+
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
@@ -157,7 +170,12 @@ function PortfolioDeposit(props: propsIF) {
             />
 
             <div className={styles.inputContainer}>
-                <h6>Amount</h6>
+                <h6>
+                    Amount{' '}
+                    {isBelowMinimum && (
+                        <span className={styles.minWarning}>(Min: $10)</span>
+                    )}
+                </h6>
                 <input
                     type='text'
                     value={amount}
@@ -165,7 +183,7 @@ function PortfolioDeposit(props: propsIF) {
                     aria-label='deposit input'
                     inputMode='numeric'
                     pattern='[0-9]*'
-                    placeholder='Enter amount'
+                    placeholder='Enter amount (min $10)'
                     min='0'
                     step='any'
                     disabled={isProcessing}
@@ -202,7 +220,7 @@ function PortfolioDeposit(props: propsIF) {
             <SimpleButton
                 bg='accent1'
                 onClick={handleDeposit}
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled || isBelowMinimum}
             >
                 {isProcessing ? 'Processing...' : 'Deposit'}
             </SimpleButton>

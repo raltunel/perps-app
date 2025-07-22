@@ -187,11 +187,13 @@ export function usePortfolioManager() {
                         error: result.error || 'Deposit transaction failed',
                     });
                 }
+                return result;
             } catch (error) {
                 setStatus({
                     isLoading: false,
                     error: (error as Error).message,
                 });
+                return { success: false, error: (error as Error).message };
             } finally {
                 setIsProcessing(false);
             }
