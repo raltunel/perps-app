@@ -223,7 +223,7 @@ export default function WebDataConsumer() {
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
-        [setCoins, setCoinPriceMap, info.multiSocketInfo],
+        [setCoins, setCoinPriceMap, info?.multiSocketInfo],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
