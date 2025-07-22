@@ -553,15 +553,11 @@ function OrderInput({
         setIsEditingSizeInput(false);
 
         setPositionSliderPercentageValue(value);
-
         if (marketOrderType === 'market') {
-            setNotionalSymbolQtyNum(
-                Math.floor(
-                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
-                        leverage *
-                        100,
-                ) / 100,
-            );
+            const notionalSymbolQtyNum =
+                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                leverage;
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
             setNotionalSymbolQtyNum(
                 Math.floor(
