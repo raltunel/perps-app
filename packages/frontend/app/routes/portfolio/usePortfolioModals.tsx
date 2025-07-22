@@ -54,6 +54,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
             // Only close modal if transaction was successful and confirmed
             // The modal will handle its own closing based on transaction status
             // Don't auto-close anymore - let the modal control its state
+            return result; // Return the result so the modal can handle success/failure
         },
         [originalProcessDeposit],
     );

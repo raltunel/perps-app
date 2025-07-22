@@ -5,6 +5,7 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { LuChevronDown } from 'react-icons/lu';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useDepositService } from '~/hooks/useDepositService';
+import { useNotificationStore } from '~/stores/NotificationStore';
 
 interface DepositModalProps {
     vault: {
@@ -21,8 +22,9 @@ interface DepositModalProps {
 export default function DepositModal({
     vault,
     onDeposit,
-    // onClose,
+    onClose,
 }: DepositModalProps) {
+    const notificationStore = useNotificationStore();
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [selectedToken] = useState('USDe');
@@ -99,8 +101,22 @@ export default function DepositModal({
                 return;
             }
 
-            // Execute the Solana transaction
-            const result = await executeDeposit(depositAmount);
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(
+                    () =>
+                        reject(
+                            new Error('Transaction timed out after 15 seconds'),
+                        ),
+                    15000,
+                );
+            });
+
+            // Race between the deposit and the timeout
+            const result = await Promise.race([
+                executeDeposit(depositAmount),
+                timeoutPromise,
+            ]);
 
             if (result.success && result.confirmed) {
                 setTransactionStatus('success');
@@ -108,6 +124,16 @@ export default function DepositModal({
                 onDeposit(depositAmount);
                 // Clear the form
                 setAmount('');
+
+                // Show success notification
+                notificationStore.add({
+                    title: 'Deposit Successful',
+                    message: `Successfully deposited $${depositAmount.toFixed(2)} USD`,
+                    icon: 'check',
+                });
+
+                // Close modal on success - notification will show after modal closes
+                onClose();
             } else {
                 setTransactionStatus('failed');
                 setError(

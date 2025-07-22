@@ -3,7 +3,7 @@ import {
     getUserTokenBalance,
     buildDepositMarginTx,
 } from '@crocswap-libs/ambient-ember';
-import { notificationService } from './notificationService';
+// Removed notificationService - notifications handled by components
 
 // USD token mint address from root.tsx configuration
 const USD_MINT = new PublicKey('fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry');
@@ -194,17 +194,14 @@ export class DepositService {
             // Validate amount first
             const validation = this.validateDepositAmount(amount);
             if (!validation.isValid) {
-                notificationService.showDepositError(
-                    validation.message || 'Invalid deposit amount',
-                );
+                // Note: Notifications are handled by the component using NotificationStore
                 return {
                     success: false,
                     error: validation.message,
                 };
             }
 
-            // Show pending notification
-            notificationService.showTransactionPending({ amount });
+            // Transaction pending notification handled by component
 
             // Build the transaction
             const transaction = await this.buildDepositTransaction(
@@ -262,12 +259,7 @@ export class DepositService {
                 );
 
                 if (isConfirmed) {
-                    // Show success notification only after confirmation
-                    notificationService.showDepositSuccess({
-                        amount,
-                        signature,
-                        token: 'USD',
-                    });
+                    // Note: Success notification should be handled by the component
 
                     return {
                         success: true,
@@ -311,8 +303,7 @@ export class DepositService {
                     ? error.message
                     : 'Unknown error occurred';
 
-            // Show error notification
-            notificationService.showDepositError(errorMessage);
+            // Note: Error notification should be handled by the component
 
             return {
                 success: false,
@@ -367,10 +358,7 @@ export class DepositService {
                                 '❌ Transaction failed on-chain:',
                                 status.value.err,
                             );
-                            notificationService.showDepositError(
-                                `Transaction failed on-chain: ${JSON.stringify(status.value.err)}`,
-                                { signature, amount },
-                            );
+                            // Error notification handled by component
                             resolve(false);
                             return;
                         }
@@ -441,10 +429,7 @@ export class DepositService {
                             'Transaction may still be processing. Check manually:',
                             signature,
                         );
-                        notificationService.showDepositError(
-                            'Transaction confirmation timeout - check manually',
-                            { signature, amount },
-                        );
+                        // Error notification handled by component
                         resolve(false);
                     }
                 } catch (error) {
@@ -455,10 +440,7 @@ export class DepositService {
                     if (retryCount < maxRetries) {
                         setTimeout(checkConfirmation, 2000); // Retry on error
                     } else {
-                        notificationService.showDepositError(
-                            'Error tracking transaction confirmation',
-                            { signature, amount },
-                        );
+                        // Error notification handled by component
                         resolve(false);
                     }
                 }
