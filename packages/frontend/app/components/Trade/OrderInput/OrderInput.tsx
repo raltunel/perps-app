@@ -196,6 +196,9 @@ function OrderInput({
 
     const [currentPosition, setCurrentPosition] = useState(0);
 
+    const [displayQty, setDisplayQty] = useState('');
+    const [isEditingSize, setIsEditingSize] = useState(false);
+
     useEffect(() => {
         const availableToTrade =
             marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
@@ -207,9 +210,26 @@ function OrderInput({
         setCurrentPosition(normalizedCurrentPosition);
     }, [marginBucket]);
 
+    function roundDownToMillionth(value: number) {
+        return Math.floor(value * 1_000_000) / 1_000_000;
+    }
+
     const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
 
-    const collateralInsufficient = availableToTrade < positionSizeInUSD;
+    const collateralInsufficient =
+        roundDownToMillionth(availableToTrade) <
+        roundDownToMillionth(positionSizeInUSD);
+
+    useEffect(() => {
+        if (positionSliderPercentageValue === 100 && markPx && !isEditingSize) {
+            setPositionSizeInSymbolDenom(availableToTrade / markPx);
+        }
+    }, [
+        positionSliderPercentageValue,
+        availableToTrade,
+        markPx,
+        isEditingSize,
+    ]);
 
     const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
 
@@ -332,9 +352,6 @@ function OrderInput({
         setLeverage(value);
     };
 
-    const [displayQty, setDisplayQty] = useState('');
-    const [isEditingSize, setIsEditingSize] = useState(false);
-
     useEffect(() => {
         if (!isEditingSize) {
             setDisplayQty(
@@ -355,6 +372,7 @@ function OrderInput({
 
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
+            setIsEditingSize(true);
             if (typeof event === 'string') {
                 setDisplayQty(event);
             } else {
