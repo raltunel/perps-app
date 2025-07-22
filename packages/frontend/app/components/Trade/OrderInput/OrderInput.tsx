@@ -132,6 +132,13 @@ function OrderInput({
     const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
         useState(0);
 
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
+
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
     // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
@@ -760,6 +767,11 @@ function OrderInput({
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
+    const formattedDisplayQty = formatNum(
+        parseFormattedNum(displayQty),
+        selectedMode === 'symbol' ? 6 : 2,
+    );
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
@@ -909,6 +921,7 @@ function OrderInput({
                         leverage={leverage}
                         collateralInsufficient={collateralInsufficient}
                         sizeLessThanMinimum={sizeLessThanMinimum}
+                        isPriceInvalid={isPriceInvalid}
                     />
                     {confirmOrderModal.isOpen && (
                         <Modal
@@ -958,10 +971,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_buy'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedDisplayQty,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     isEnabled={
@@ -979,10 +992,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_sell'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedDisplayQty,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     submitFn={submitMarketSell}
@@ -1000,10 +1013,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_buy'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedDisplayQty,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     limitPrice={price}
@@ -1022,10 +1035,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_sell'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedDisplayQty,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     limitPrice={price}

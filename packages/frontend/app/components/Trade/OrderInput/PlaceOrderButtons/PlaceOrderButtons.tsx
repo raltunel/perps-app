@@ -15,6 +15,7 @@ interface propsIF {
     leverage: number;
     collateralInsufficient: boolean;
     sizeLessThanMinimum: boolean;
+    isPriceInvalid: boolean;
     orderValue?: number;
 }
 interface MarketInfoItem {
@@ -33,6 +34,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         leverage,
         collateralInsufficient,
         sizeLessThanMinimum,
+        isPriceInvalid,
     } = props;
 
     const { getBsColor } = useAppSettings();
@@ -46,8 +48,14 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         () =>
             !isEstablished(sessionState) ||
             collateralInsufficient ||
+            sizeLessThanMinimum ||
+            isPriceInvalid,
+        [
+            sessionState,
+            collateralInsufficient,
             sizeLessThanMinimum,
-        [sessionState, collateralInsufficient, sizeLessThanMinimum],
+            isPriceInvalid,
+        ],
     );
 
     const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
