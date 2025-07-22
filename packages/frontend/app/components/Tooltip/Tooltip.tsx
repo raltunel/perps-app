@@ -50,7 +50,7 @@ const Tooltip: React.FC<TooltipProps> = ({
         const padding = 10;
         const gap = 8;
 
-        // If tooltip hasn't been measured yet (width/height is 0), try again
+        // If tooltip hasn't been measured yet , try again
         if (tooltipRect.width === 0 || tooltipRect.height === 0) {
             if (positionTimeoutRef.current) {
                 clearTimeout(positionTimeoutRef.current);
