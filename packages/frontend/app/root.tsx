@@ -13,6 +13,7 @@ import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
 import MobileFooter from './components/MobileFooter/MobileFooter';
 import PageHeader from './components/PageHeader/PageHeader';
+import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 import { AppProvider } from './contexts/AppContext';
 import './css/app.css';
@@ -22,6 +23,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { MARKET_WS_ENDPOINT, USER_WS_ENDPOINT } from './utils/Constants';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -134,9 +136,14 @@ export default function App() {
                     enableUnlimited={true}
                 >
                     <AppProvider>
-                        <SdkProvider environment={wsEnvironment}>
+                        <SdkProvider
+                            environment={wsEnvironment}
+                            marketEndpoint={MARKET_WS_ENDPOINT}
+                            userEndpoint={USER_WS_ENDPOINT}
+                        >
                             <TutorialProvider>
                                 <WsConnectionChecker />
+                                <WebSocketDebug />
                                 <div className='root-container'>
                                     {/* Added error boundary for header */}
                                     <ComponentErrorBoundary>
