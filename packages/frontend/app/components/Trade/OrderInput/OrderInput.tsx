@@ -166,6 +166,8 @@ function OrderInput() {
         setMarginMode,
     } = useTradeDataStore();
 
+    const markPx = symbolInfo?.markPx;
+
     const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -186,6 +188,12 @@ function OrderInput() {
 
     const availableToTrade = 10;
     const currentPosition = 50;
+
+    const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
+
+    const collateralInsufficient = availableToTrade < positionSizeInUSD;
+
+    const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
 
     const displayNumAvailableToTrade = useMemo(() => {
         return formatNumWithOnlyDecimals(availableToTrade);
@@ -210,8 +218,6 @@ function OrderInput() {
         ],
         [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
     );
-
-    const markPx = symbolInfo?.markPx;
 
     const orderValue = useMemo(() => {
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
@@ -823,6 +829,8 @@ function OrderInput() {
                         orderMarketPrice={marketOrderType}
                         orderValue={orderValue}
                         leverage={leverage}
+                        collateralInsufficient={collateralInsufficient}
+                        sizeLessThanMinimum={sizeLessThanMinimum}
                     />
                     {confirmOrderModal.isOpen && (
                         <Modal
