@@ -13,11 +13,18 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
+import {
+    DFLT_EMBER_MARKET,
+    getUserMarginBucket,
+    USD_MINT,
+    type MarginBucketInfo,
+} from '@crocswap-libs/ambient-ember';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import { motion } from 'framer-motion';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -40,6 +47,8 @@ export default function Trade() {
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
+
+    const sessionState = useSession();
 
     const visibilityRefs = useRef<{
         order: boolean;
@@ -200,6 +209,10 @@ export default function Trade() {
         [symbol, activeTab],
     );
 
+    const [marginBucket, setMarginBucket] = useState<MarginBucketInfo | null>(
+        null,
+    );
+
     // Mobile view
     if (isMobile && symbol) {
         return (
@@ -217,7 +230,9 @@ export default function Trade() {
                     }}
                 >
                     {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && <OrderInput />}
+                        visibilityRefs.current.order) && (
+                        <OrderInput marginBucket={marginBucket} />
+                    )}
                 </div>
                 <div
                     className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
@@ -258,6 +273,41 @@ export default function Trade() {
             </>
         );
     }
+
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        const fetchMarginBucket = async () => {
+            if (isEstablished(sessionState)) {
+                const marginBucket = await getUserMarginBucket(
+                    sessionState.connection,
+                    // new PublicKey(
+                    //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
+                    // ),
+                    sessionState.walletPublicKey,
+                    BigInt(DFLT_EMBER_MARKET.mktId),
+                    USD_MINT,
+                    {},
+                );
+                // console.log({ marginBucket });
+                setMarginBucket(marginBucket);
+            }
+        };
+
+        fetchMarginBucket(); // Initial fetch on mount
+
+        if (isEstablished(sessionState)) {
+            intervalId = setInterval(() => {
+                fetchMarginBucket();
+            }, 2000); // Refresh every 2 seconds
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+        };
+    }, [sessionState]);
 
     return (
         <>
@@ -306,7 +356,7 @@ export default function Trade() {
                             id='tradeModulesSection'
                             className={styles.tradeModules}
                         >
-                            <OrderInput />
+                            <OrderInput marginBucket={marginBucket} />
                         </div>
                     </section>
                     <section
@@ -317,7 +367,7 @@ export default function Trade() {
                             <MemoizedTradeTable />
                         </div>
                         <div className={styles.wallet}>
-                            <DepositDropdown />
+                            <DepositDropdown marginBucket={marginBucket} />
                         </div>
                     </section>
                 </div>

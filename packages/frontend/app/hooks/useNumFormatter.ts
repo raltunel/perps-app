@@ -195,8 +195,7 @@ export function useNumFormatter() {
     const formatNumWithOnlyDecimals = useCallback(
         (num: number, precision?: number) => {
             const { group } = getSeparators(numFormat.value);
-
-            precision = getPrecisionFromNumber(num);
+            precision = precision || getPrecisionFromNumber(num);
 
             const formattedNum = formatNum(num, precision);
 
