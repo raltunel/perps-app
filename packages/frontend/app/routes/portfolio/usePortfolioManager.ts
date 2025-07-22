@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useWithdrawService } from '~/hooks/useWithdrawService';
+import { useSession, isEstablished } from '@fogo/sessions-sdk-react';
 
 interface PortfolioDataIF {
     id: string;
@@ -118,6 +119,73 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 });
 
 export function usePortfolioManager() {
+    const sessionState = useSession();
+
+    // One-time comprehensive SessionState debug
+    useEffect(() => {
+        console.log(
+            '🎯 [usePortfolioManager] COMPREHENSIVE SessionState Debug:',
+        );
+        console.log('================================');
+        console.log('Full object:', sessionState);
+        console.log('Is Established:', isEstablished(sessionState));
+        console.log('Type:', typeof sessionState);
+        console.log('Constructor:', sessionState?.constructor?.name);
+        console.log('================================');
+
+        if (sessionState) {
+            console.log('🔑 All Properties:');
+            for (const [key, value] of Object.entries(sessionState)) {
+                const type = typeof value;
+                let displayValue = '';
+
+                if (type === 'function') {
+                    displayValue = `[Function: ${value.name || 'anonymous'}]`;
+                } else if (value === null) {
+                    displayValue = 'null';
+                } else if (value === undefined) {
+                    displayValue = 'undefined';
+                } else if (type === 'object') {
+                    if (
+                        value.toString &&
+                        value.toString !== Object.prototype.toString
+                    ) {
+                        displayValue = value.toString();
+                    } else {
+                        try {
+                            displayValue = JSON.stringify(value, null, 2);
+                        } catch {
+                            displayValue = '[Complex Object]';
+                        }
+                    }
+                } else {
+                    displayValue = String(value);
+                }
+
+                console.log(`  ${key}: (${type}) ${displayValue}`);
+            }
+
+            console.log('================================');
+            console.log(
+                '🔧 Methods available:',
+                Object.entries(sessionState)
+                    .filter(([_, v]) => typeof v === 'function')
+                    .map(([k]) => k),
+            );
+            console.log(
+                '🔑 PublicKey fields:',
+                Object.entries(sessionState)
+                    .filter(
+                        ([k]) =>
+                            k.toLowerCase().includes('key') ||
+                            k.toLowerCase().includes('public'),
+                    )
+                    .map(([k, v]) => `${k}: ${v?.toString ? v.toString() : v}`),
+            );
+        }
+        console.log('================================');
+    }, [sessionState]);
+
     const {
         balance: walletBalance,
         isLoading: isBalanceLoading,

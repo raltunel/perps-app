@@ -41,6 +41,38 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
         console.log('  - Session established:', isEstablished(sessionState));
         console.log('  - Session state:', sessionState);
 
+        console.log(
+            '🔍 [useWithdrawService] Full SessionState object:',
+            sessionState,
+        );
+        console.log(
+            '🔍 [useWithdrawService] SessionState keys:',
+            Object.keys(sessionState),
+        );
+        console.log('🔍 [useWithdrawService] SessionState details:', {
+            isEstablished: isEstablished(sessionState),
+            hasConnection: !!sessionState.connection,
+            connectionEndpoint: sessionState.connection?.rpcEndpoint,
+            sessionPublicKey: sessionState.sessionPublicKey?.toString(),
+            userPublicKey: sessionState.userPublicKey?.toString(),
+            walletPublicKey: sessionState.walletPublicKey?.toString(),
+            sessionToken: sessionState.sessionToken,
+            sendTransactionType: typeof sessionState.sendTransaction,
+            availableMethods: Object.keys(sessionState).filter(
+                (key) => typeof sessionState[key] === 'function',
+            ),
+            allProperties: Object.entries(sessionState).map(([key, value]) => ({
+                key,
+                type: typeof value,
+                value:
+                    typeof value === 'function'
+                        ? 'function'
+                        : value?.toString
+                          ? value.toString()
+                          : JSON.stringify(value),
+            })),
+        });
+
         if (isEstablished(sessionState)) {
             console.log(
                 '✅ Creating withdraw service with connection:',

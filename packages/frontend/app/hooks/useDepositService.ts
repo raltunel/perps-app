@@ -37,6 +37,38 @@ export function useDepositService(): UseDepositServiceReturn {
 
     // Initialize deposit service when session is established
     useEffect(() => {
+        console.log(
+            '🔍 [useDepositService] Full SessionState object:',
+            sessionState,
+        );
+        console.log(
+            '🔍 [useDepositService] SessionState keys:',
+            Object.keys(sessionState),
+        );
+        console.log('🔍 [useDepositService] SessionState details:', {
+            isEstablished: isEstablished(sessionState),
+            hasConnection: !!sessionState.connection,
+            connectionEndpoint: sessionState.connection?.rpcEndpoint,
+            sessionPublicKey: sessionState.sessionPublicKey?.toString(),
+            userPublicKey: sessionState.userPublicKey?.toString(),
+            walletPublicKey: sessionState.walletPublicKey?.toString(),
+            sessionToken: sessionState.sessionToken,
+            sendTransactionType: typeof sessionState.sendTransaction,
+            availableMethods: Object.keys(sessionState).filter(
+                (key) => typeof sessionState[key] === 'function',
+            ),
+            allProperties: Object.entries(sessionState).map(([key, value]) => ({
+                key,
+                type: typeof value,
+                value:
+                    typeof value === 'function'
+                        ? 'function'
+                        : value?.toString
+                          ? value.toString()
+                          : JSON.stringify(value),
+            })),
+        });
+
         if (isEstablished(sessionState)) {
             const service = new DepositService(sessionState.connection);
             setDepositService(service);
