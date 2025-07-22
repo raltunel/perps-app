@@ -3,6 +3,7 @@ import {
     type WebSocketInstanceConfig,
     type SocketType,
     type Callback,
+    type ActiveSubscription,
 } from './websocket-instance';
 import type { Subscription } from './utils/types';
 
@@ -217,7 +218,8 @@ export class WebSocketPool {
      */
     public stopAll() {
         this.sockets.forEach((socket) => socket.stop());
-        this.sockets.clear();
+        // [22-07-2025] clear is commented out to make reInit action working
+        // this.sockets.clear();
     }
 
     /**
@@ -278,6 +280,35 @@ export class WebSocketPool {
         };
 
         this.sockets.set(name, new WebSocketInstance(config));
+    }
+    // [22-07-2025] for stashing subs in useSdk hook
+    public getActiveSubscriptions() {
+        const activeSubs: Record<string, ActiveSubscription[]> = {};
+        this.sockets.forEach((socket) => {
+            const socketActiveSubs = socket.getActiveSubscriptions();
+            Object.keys(socketActiveSubs).forEach((key) => {
+                activeSubs[key] = socketActiveSubs[key];
+            });
+        });
+        return activeSubs;
+    }
+
+    // [22-07-2025] reInit action, passes stashed subs to related socket instance to re-activate sub after new connection
+    public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
+        Object.values(stashedSubs).forEach((subs) => {
+            subs.forEach((sub) => {
+                const socket = this.getSocketForSubscription(sub.subscription);
+                if (socket) {
+                    socket.addToQueuedSubs(sub);
+                }
+            });
+        });
+
+        setTimeout(() => {
+            this.sockets.forEach((socket) => {
+                socket.connect();
+            });
+        });
     }
 }
 
@@ -345,5 +376,10 @@ export class MultiSocketInfo {
 
     public getUserSocket(): WebSocketInstance | undefined {
         return this.pool.getSocket('user');
+    }
+
+    // [22-07-2025] returns all active subs for stashing in useSdk hook
+    public getActiveSubscriptions() {
+        return this.pool.getActiveSubscriptions();
     }
 }
