@@ -1,11 +1,11 @@
+import { motion } from 'framer-motion';
 import React, { useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { motion } from 'framer-motion';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
-import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 
 interface propsIF {
     buyFn: () => void;
@@ -139,6 +139,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                     style={{ backgroundColor: buyColor }}
                     className={styles.overlay_button}
                     onClick={buyFn}
+                    disabled={false}
                 >
                     Buy / Long
                 </button>
