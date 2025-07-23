@@ -21,7 +21,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -35,7 +35,6 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
@@ -875,13 +874,9 @@ function OrderInput({
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
                                     initial={marginMode}
-                                    handleConfirm={(m: marginModesT): void => {
-                                        setMarginMode(m);
-                                        confirmOrderModal.close();
-                                    }}
+                                    handleConfirm={setMarginMode}
                                 />
                             )}
-
                             {confirmOrderModal.content === 'scale' && (
                                 <ScaleOrders
                                     totalQuantity={parseFloat(

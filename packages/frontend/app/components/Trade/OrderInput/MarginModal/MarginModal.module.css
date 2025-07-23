@@ -1,26 +1,19 @@
 /* top-level return for `MarginModal.tsx` file */
 .margin_modal_content {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-m);
     width: 708px;
     height: auto;
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
     align-items: flex-start;
-    gap: var(--gap-s);
-}
-
-/* organizational wrapper for mode toggle buttons */
-.margin_modal_buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--gap-m);
 
     /* centralized CSS for border to apply situationally */
     --margin_modal_button_border: 1px solid var(--accent1);
 }
 
 /* clickable buttons to change the current margin mode */
-.margin_modal_buttons > button {
+.margin_modal_content > button {
     border-radius: var(--radius-m, 16px);
     border: 1px solid var(--bg-dark4);
     background: var(--bg-dark4, #27272c);
@@ -39,19 +32,18 @@
 }
 
 /* hover effect for margin mode buttons */
-.margin_modal_buttons > button:hover {
+.margin_modal_content > button:hover {
     border: var(--margin_modal_button_border) !important;
 }
 
 /* headline text inside each margin mode button */
-.margin_modal_buttons > button > h3 {
+.margin_modal_content > button > h3 {
     font-size: var(--font-size-m, 18px);
     color: var(--text1);
 }
 
 .selected {
     border: var(--margin_modal_button_border) !important;
-    background-color: green;
 }
 
 @media (max-width: 768px) {
@@ -59,7 +51,7 @@
         width: auto;
     }
 
-    .margin_modal_buttons {
+    .margin_modal_content {
         display: flex;
         flex-direction: column;
     }
