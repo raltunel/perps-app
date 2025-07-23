@@ -105,12 +105,14 @@ export class DepositService {
      * @param amount - Amount to deposit (in decimalized form)
      * @param sessionPublicKey - Session public key (for transaction building)
      * @param userWalletKey - User's actual wallet public key (for PDA construction)
+     * @param payerPublicKey - Payer public key from SessionState (for rent fees)
      * @returns Promise<Transaction>
      */
     async buildDepositTransaction(
         amount: number,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
+        payerPublicKey?: PublicKey,
     ): Promise<Transaction> {
         try {
             console.log('🔨 Building deposit transaction:');
@@ -134,12 +136,21 @@ export class DepositService {
                 this.connection.rpcEndpoint,
             );
 
+            // Use payer from SessionState if provided, otherwise use the previous hardcoded value
+            // Previous hardcoded value was: 8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w
+            const rentPayer =
+                payerPublicKey ||
+                new PublicKey('8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w');
+
+            console.log('  - Rent payer:', rentPayer.toString());
+
             const transaction = await buildDepositMarginTx(
                 this.connection,
                 nonDecimalizedAmount,
                 userWalletKey,
                 {
                     actor: sessionPublicKey, // sessionPublicKey as actor
+                    rentPayer: rentPayer, // payer from SessionState or fallback
                 },
             );
 
@@ -170,7 +181,7 @@ export class DepositService {
                     error instanceof Error ? error.message : 'Unknown error',
                 stack: error instanceof Error ? error.stack : 'No stack trace',
                 amount,
-                user: user.toString(),
+                sessionPublicKey: sessionPublicKey.toString(),
             });
             throw new Error(`Failed to build deposit transaction: ${error}`);
         }
@@ -182,6 +193,7 @@ export class DepositService {
      * @param sessionPublicKey - Session public key (for transaction building)
      * @param userWalletKey - User's actual wallet public key (for PDA construction)
      * @param sendTransaction - Function to send the transaction (from Fogo session)
+     * @param payerPublicKey - Payer public key from SessionState (for rent fees)
      * @returns Promise<DepositServiceResult>
      */
     async executeDeposit(
@@ -189,6 +201,7 @@ export class DepositService {
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         sendTransaction: (instructions: any[]) => Promise<any>,
+        payerPublicKey?: PublicKey,
     ): Promise<DepositServiceResult> {
         try {
             // Validate amount first
@@ -208,6 +221,7 @@ export class DepositService {
                 amount,
                 sessionPublicKey,
                 userWalletKey,
+                payerPublicKey,
             );
 
             // Extract instructions from the transaction
