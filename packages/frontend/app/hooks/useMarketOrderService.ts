@@ -87,7 +87,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                 }
 
                 // Get paymaster from SessionState if available
-                const paymaster = sessionState.paymaster || undefined;
+                const paymaster = sessionState.payer || undefined;
 
                 const result = await marketOrderService.executeMarketOrder(
                     params,
