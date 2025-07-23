@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSdk } from '~/hooks/useSdk';
 import './WebSocketDebug.css';
 
@@ -30,7 +30,10 @@ export default function WebSocketDebug() {
     // Toggle with Ctrl+Shift+W
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'W') {
+            if (
+                (e.code === 'KeyD' && e.altKey) ||
+                (e.ctrlKey && e.shiftKey && e.key === 'W')
+            ) {
                 setIsVisible((prev) => !prev);
             }
         };
