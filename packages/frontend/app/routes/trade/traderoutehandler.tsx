@@ -20,7 +20,7 @@ export default function TradeRouteHandler() {
     };
 
     const checkSymbol = async () => {
-        const urlSymbol = marketId;
+        const urlSymbol = marketId?.toUpperCase();
 
         if (urlSymbol === undefined || urlSymbol === null || urlSymbol === '') {
             return getSymbolFromLS();
