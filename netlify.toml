@@ -117,7 +117,7 @@
   status = 200
 
 [[redirects]]
-  from = "/v2"
+  from = "/v2/"
   to = "/v2/trade/BTC"
   status = 302
 
