@@ -72,7 +72,8 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC'],
+            // favKeys: ['BTC'],
+            favKeys: ['BTC', 'ETH', 'SOL'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (
