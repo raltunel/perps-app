@@ -54,11 +54,8 @@ export const TradeHistoryTableModel:
         className: 'sizeCell',
         exportable: true,
         exportAction: (v: number) => {
-            if (v >= 1) {
-                return Number(v.toFixed(2)).toString();
-            } else {
-                return Number(v.toFixed(4)).toString();
-            }
+            const str = v >= 1 ? v.toFixed(2) : v.toFixed(4);
+            return `="${str}"`;
         },
     },
     {
