@@ -80,9 +80,11 @@ export default function PositionSize({
             const percentage = getPercentageFromPosition(e.clientX);
 
             // Clamp to min/max
-            const clampedValue = Math.max(
-                POSITION_SIZE_CONFIG.MIN_VALUE,
-                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
+            const clampedValue = Math.floor(
+                Math.max(
+                    POSITION_SIZE_CONFIG.MIN_VALUE,
+                    Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
+                ),
             );
 
             // Update internal value immediately for smooth visual feedback
@@ -146,49 +148,48 @@ export default function PositionSize({
     };
 
     const handleTrackClick = (e: React.MouseEvent) => {
-        if (!sliderRef.current) return;
-
         const percentage = getPercentageFromPosition(e.clientX);
 
-        // For track clicks, snap to visual markers if we're close to them
-        const closestMarker = POSITION_SIZE_CONFIG.VISUAL_MARKERS.reduce(
-            (prev, curr) =>
-                Math.abs(curr.value - percentage) <
-                Math.abs(prev.value - percentage)
-                    ? curr
-                    : prev,
+        let snappedValue = percentage;
+
+        // Check for marker snapping
+        POSITION_SIZE_CONFIG.VISUAL_MARKERS.forEach((marker) => {
+            const distance = Math.abs(marker.value - percentage);
+            if (distance <= POSITION_SIZE_CONFIG.MARKER_SNAP_TOLERANCE) {
+                snappedValue = marker.value;
+            }
+        });
+
+        snappedValue = Math.min(
+            POSITION_SIZE_CONFIG.MAX_VALUE,
+            Math.max(POSITION_SIZE_CONFIG.MIN_VALUE, snappedValue),
         );
 
-        // Check if we're within snap tolerance to make it easier to hit markers
-        const distanceToMarker = Math.abs(closestMarker.value - percentage);
-        if (distanceToMarker <= POSITION_SIZE_CONFIG.MARKER_SNAP_TOLERANCE) {
-            const newValue = closestMarker.value;
-            setCurrentValue(newValue);
-            onChange(newValue);
-        } else {
-            // For clicks not near markers, use the rounded down percentage
-            const clampedValue = Math.max(
-                POSITION_SIZE_CONFIG.MIN_VALUE,
-                Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, percentage),
-            );
-            setCurrentValue(clampedValue);
-            onChange(clampedValue);
-        }
+        setCurrentValue(snappedValue);
+        onChange(snappedValue);
     };
 
-    // Handle input change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value;
-        const newValue = parseInt(inputValue);
+        const rawValue = e.target.value.replace(/[^\d]/g, ''); // Remove non-numeric
+        const newValue = parseInt(rawValue);
 
-        if (!isNaN(newValue)) {
-            const clampedValue = Math.max(
+        // Stop if empty or invalid
+        if (isNaN(newValue)) {
+            setCurrentValue(0); // Reset
+            onChange(0);
+            return;
+        }
+
+        // Clamp & update
+        const clampedValue = Math.floor(
+            Math.max(
                 POSITION_SIZE_CONFIG.MIN_VALUE,
                 Math.min(POSITION_SIZE_CONFIG.MAX_VALUE, newValue),
-            );
-            setCurrentValue(clampedValue);
-            onChange(clampedValue);
-        }
+            ),
+        );
+
+        setCurrentValue(clampedValue);
+        onChange(clampedValue);
     };
 
     // Handle input blur (when user finishes typing)
@@ -291,7 +292,7 @@ export default function PositionSize({
                         type='text'
                         inputMode='numeric'
                         pattern='[0-9]*'
-                        value={currentValue}
+                        value={Number.isNaN(currentValue) ? '' : currentValue}
                         onChange={handleInputChange}
                         onBlur={handleInputBlur}
                         onKeyDown={handleInputKeyDown}

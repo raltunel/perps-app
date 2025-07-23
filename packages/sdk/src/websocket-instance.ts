@@ -702,4 +702,18 @@ export class WebSocketInstance {
     public setConnectionChangeHandler(handler: (connected: boolean) => void) {
         this.onConnectionChange = handler;
     }
+
+    // [22-07-2025] for stashing subs in useSdk hook
+    public getActiveSubscriptions() {
+        return this.activeSubscriptions;
+    }
+
+    // [22-07-2025] is being used while re-initializing ws
+    public addToQueuedSubs(subscription: ActiveSubscription) {
+        console.log('>>> add to queue');
+        this.queuedSubscriptions.push({
+            subscription: subscription.subscription,
+            active: subscription,
+        });
+    }
 }

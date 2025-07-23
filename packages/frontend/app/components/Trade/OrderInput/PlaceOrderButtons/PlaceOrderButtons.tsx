@@ -1,17 +1,20 @@
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { motion } from 'framer-motion';
 import React, { useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { motion } from 'framer-motion';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
-import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 
 interface propsIF {
     buyFn: () => void;
     sellFn: () => void;
     orderMarketPrice: string;
     leverage: number;
+    collateralInsufficient: boolean;
+    sizeLessThanMinimum: boolean;
     orderValue?: number;
 }
 interface MarketInfoItem {
@@ -22,12 +25,30 @@ interface MarketInfoItem {
 
 // In case of any bugs or issues with this component, please reach out to Jr.
 const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
-    const { buyFn, sellFn, orderMarketPrice, orderValue, leverage } = props;
+    const {
+        buyFn,
+        sellFn,
+        orderMarketPrice,
+        orderValue,
+        leverage,
+        collateralInsufficient,
+        sizeLessThanMinimum,
+    } = props;
 
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
 
+    const sessionState = useSession();
+
     const [isExpanded, setIsExpanded] = useState(false);
+
+    const disableButtons = useMemo(
+        () =>
+            !isEstablished(sessionState) ||
+            collateralInsufficient ||
+            sizeLessThanMinimum,
+        [sessionState, collateralInsufficient, sizeLessThanMinimum],
+    );
 
     const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
     const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
@@ -139,6 +160,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                     style={{ backgroundColor: buyColor }}
                     className={styles.overlay_button}
                     onClick={buyFn}
+                    disabled={disableButtons}
                 >
                     Buy / Long
                 </button>
@@ -146,6 +168,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                     style={{ backgroundColor: sellColor }}
                     className={styles.overlay_button}
                     onClick={sellFn}
+                    disabled={disableButtons}
                 >
                     Sell / Short
                 </button>
