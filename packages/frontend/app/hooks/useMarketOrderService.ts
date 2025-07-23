@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { useCallback, useEffect, useState } from 'react';
 import {
     MarketOrderService,
     type MarketOrderParams,
@@ -63,7 +62,6 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
 
                 // Get user's wallet public key
                 const userWalletKey =
-                    sessionState.userPublicKey ||
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
@@ -75,13 +73,11 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                 // Ensure sendTransaction is available
                 if (typeof sessionState.sendTransaction !== 'function') {
                     throw new Error(
-                        `sendTransaction is not available. Available methods: ${Object.keys(
+                        `sendTransaction is not available. Available methods: ${Object.entries(
                             sessionState,
                         )
-                            .filter(
-                                (key) =>
-                                    typeof sessionState[key] === 'function',
-                            )
+                            .filter(([, value]) => typeof value === 'function')
+                            .map(([key]) => key)
                             .join(', ')}`,
                     );
                 }

@@ -1,12 +1,10 @@
-import { Connection, PublicKey } from '@solana/web3.js';
 import {
-    buildMarketBuyOrder,
-    buildMarketSellOrder,
     DFLT_EMBER_MARKET,
-    TimeInForce,
     OrderSide,
+    TimeInForce,
     buildOrderEntryTransaction,
 } from '@crocswap-libs/ambient-ember';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -132,6 +130,7 @@ export class MarketOrderService {
         params: MarketOrderParams,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sendTransaction: (instructions: any[]) => Promise<any>,
         rentPayer?: PublicKey,
     ): Promise<MarketOrderResult> {
