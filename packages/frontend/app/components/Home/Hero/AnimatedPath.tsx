@@ -8,6 +8,7 @@ const AnimatedPath = ({
     skew = 0.8,
     duration = '10s', // Default duration
     strokeWidth = '1', // Default stroke width
+    className = '', // Allow custom className
 }) => {
     const gradientId1 = `gradient1-${Math.random().toString(36).substr(2, 9)}`;
     const gradientId2 = `gradient2-${Math.random().toString(36).substr(2, 9)}`;
@@ -16,13 +17,11 @@ const AnimatedPath = ({
     const colors = [color1, color2, color3, color1];
 
     // Dynamically set stopOffsets1 based on beamLength
-    // const stopOffsets1 = [0, beamLength, beamLength * 2, beamLength * 2].map(offset => `${offset}%`);
     const stopOffsets1 = [0, beamLength * skew, beamLength, beamLength].map(
         (offset) => `${offset}%`,
     );
 
     // Set stopOffsets2 with its values calculated based on beamLength
-    // const stopOffsets2 = [100 - beamLength * 2, 100 - beamLength, 100, 100].map(offset => `${offset}%`);
     const stopOffsets2 = [
         100 - beamLength,
         100 - beamLength * (1 - skew),
@@ -32,11 +31,19 @@ const AnimatedPath = ({
 
     return (
         <svg
-            width='1921'
-            height='1024'
+            className={className}
+            width='100%'
+            height='100%'
             viewBox='0 0 1921 1024'
             fill='none'
             xmlns='http://www.w3.org/2000/svg'
+            preserveAspectRatio='xMidYMid slice'
+            style={{
+                width: '100%',
+                height: '100%',
+                minWidth: '100vw',
+                minHeight: '100vh',
+            }}
         >
             <defs>
                 <linearGradient
@@ -55,8 +62,8 @@ const AnimatedPath = ({
                     ))}
                     <animate
                         attributeName='x1'
-                        from='-100%'
-                        to='100%'
+                        from='-50%'
+                        to='150%'
                         dur={duration}
                         begin='0s'
                         fill='freeze'
@@ -64,8 +71,8 @@ const AnimatedPath = ({
                     />
                     <animate
                         attributeName='x2'
-                        from='0%'
-                        to='200%'
+                        from='50%'
+                        to='250%'
                         dur={duration}
                         begin='0s'
                         fill='freeze'
@@ -88,8 +95,8 @@ const AnimatedPath = ({
                     ))}
                     <animate
                         attributeName='x1'
-                        from='-100%'
-                        to='100%'
+                        from='-50%'
+                        to='150%'
                         dur={duration}
                         begin='0s'
                         fill='freeze'
@@ -97,8 +104,8 @@ const AnimatedPath = ({
                     />
                     <animate
                         attributeName='x2'
-                        from='0%'
-                        to='200%'
+                        from='50%'
+                        to='250%'
                         dur={duration}
                         begin='0s'
                         fill='freeze'

@@ -172,16 +172,32 @@
     }
 }
 
+/* Key fix: Only adjust alignment on short screens */
 @media (max-height: 900px) {
     .hero_container {
         gap: 1.5rem;
+        /* Switch to flex-start on short screens to prevent top cutoff */
+        justify-content: flex-start;
+        padding-top: 2rem;
+        /* Allow container to expand beyond viewport height */
+        min-height: 100%;
+        height: auto;
+    }
+}
+
+/* Additional fix for very short screens */
+@media (max-height: 600px) {
+    .hero_container {
+        gap: 1rem;
+        padding-top: 1rem;
+        /* Ensure content can scroll on very short screens */
+        min-height: 100%;
+        height: auto;
     }
 }
 
 @media (min-width: 1080px) {
     .hero_container {
-        /* height: 100%; */
-        justify-content: center;
         gap: 5rem;
         padding: 48px 160px;
     }
