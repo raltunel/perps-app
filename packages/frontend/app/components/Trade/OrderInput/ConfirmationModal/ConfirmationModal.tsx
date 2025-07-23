@@ -15,6 +15,7 @@ interface propsIF {
     limitPrice?: string;
     isEnabled: boolean;
     toggleEnabled: () => void;
+    isProcessing?: boolean;
 }
 type InfoItem = {
     label: string;
@@ -24,7 +25,15 @@ type InfoItem = {
 };
 
 export default function ConfirmationModal(props: propsIF) {
-    const { submitFn, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
+    const {
+        submitFn,
+        tx,
+        isEnabled,
+        toggleEnabled,
+        size,
+        limitPrice,
+        isProcessing,
+    } = props;
 
     const dataInfo: InfoItem[] = [
         {
@@ -92,11 +101,19 @@ export default function ConfirmationModal(props: propsIF) {
                 />
             </div>
             <SimpleButton
-                bg='accent1'
-                onClick={submitFn}
-                style={{ height: '47px' }}
+                bg={isProcessing ? 'dark2' : 'accent1'}
+                onClick={isProcessing ? undefined : submitFn}
+                style={{
+                    height: '47px',
+                    cursor: isProcessing ? 'not-allowed' : 'pointer',
+                }}
+                disabled={isProcessing}
             >
-                {tx.includes('buy') ? 'Buy / Long' : 'Sell / Short'}
+                {isProcessing
+                    ? 'Confirming Transaction...'
+                    : tx.includes('buy')
+                      ? 'Buy / Long'
+                      : 'Sell / Short'}
             </SimpleButton>
         </div>
     );

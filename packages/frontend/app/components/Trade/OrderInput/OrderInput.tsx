@@ -137,6 +137,9 @@ function OrderInput({
     const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
         useState(0);
 
+    // Track if we're processing an order
+    const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+
     useEffect(() => {
         setRawSizeInput('');
     }, [positionSizeInSymbolDenom]);
@@ -669,13 +672,7 @@ function OrderInput({
         }
 
         try {
-            // Show pending notification
-            notifications.add({
-                title: 'Buy / Long Market Order Pending',
-                message: `Buying ${positionSizeInSymbolDenom.toFixed(6)} ${symbol} at market price`,
-                icon: 'spinner',
-            });
-
+            setIsProcessingOrder(true);
             // Execute the market buy order
             const result = await executeMarketOrder({
                 quantity: positionSizeInSymbolDenom,
@@ -712,6 +709,7 @@ function OrderInput({
                 icon: 'cross',
             });
         } finally {
+            setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
     }
@@ -730,13 +728,7 @@ function OrderInput({
         }
 
         try {
-            // Show pending notification
-            notifications.add({
-                title: 'Sell / Short Market Order Pending',
-                message: `Selling ${positionSizeInSymbolDenom.toFixed(6)} ${symbol} at market price`,
-                icon: 'spinner',
-            });
-
+            setIsProcessingOrder(true);
             // Execute the market sell order
             const result = await executeMarketOrder({
                 quantity: positionSizeInSymbolDenom,
@@ -773,6 +765,7 @@ function OrderInput({
                 icon: 'cross',
             });
         } finally {
+            setIsProcessingOrder(false);
             confirmOrderModal.close();
         }
     }
@@ -1021,6 +1014,7 @@ function OrderInput({
                                         )
                                     }
                                     submitFn={submitMarketBuy}
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                             {confirmOrderModal.content === 'market_sell' && (
@@ -1042,6 +1036,7 @@ function OrderInput({
                                     isEnabled={
                                         !activeOptions.skipOpenOrderConfirm
                                     }
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                             {confirmOrderModal.content === 'limit_buy' && (
