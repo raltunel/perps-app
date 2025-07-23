@@ -1,21 +1,45 @@
 import TradeButton from '../TradeButton/TradeButton';
+import AnimatedPath from './AnimatedPath';
 import styles from './Hero.module.css';
-import animationVideo from './animation.mp4'; // ✅ Import video file
-
 export default function Hero() {
     return (
         <div className={styles.hero_container}>
-            {/* Background Video */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className={styles.background_video}
-            >
-                <source src={animationVideo} type='video/mp4' />
-                Your browser does not support the video tag.
-            </video>
+            {/* Animated Background with multiple layers for depth */}
+            <div className={styles.animated_background}>
+                {/* Primary animation layer */}
+                <AnimatedPath
+                    className={styles.animated_path_primary}
+                    color1='#1E1E24'
+                    color2='#7371FC'
+                    color3='#CDC1FF'
+                    beamLength={8}
+                    skew={0.8}
+                    duration='12s'
+                    strokeWidth='2'
+                />
+                {/* Secondary animation layer with different timing */}
+                <AnimatedPath
+                    className={styles.animated_path_secondary}
+                    color1='#2A2A35'
+                    color2='#5B59E8'
+                    color3='#A099FF'
+                    beamLength={6}
+                    skew={0.9}
+                    duration='15s'
+                    strokeWidth='1.5'
+                />
+                {/* Tertiary animation layer for extra depth */}
+                <AnimatedPath
+                    className={styles.animated_path_tertiary}
+                    color1='#0F0F13'
+                    color2='#4543D9'
+                    color3='#8B84F0'
+                    beamLength={10}
+                    skew={0.7}
+                    duration='18s'
+                    strokeWidth='1'
+                />
+            </div>
 
             {/* Hero Content */}
             <div className={styles.hero_heading}>

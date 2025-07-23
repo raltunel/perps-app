@@ -24,19 +24,53 @@
     flex-direction: column;
     justify-content: center;
     gap: 3rem;
-    height: 100vh;
+    height: 100%;
     z-index: 1;
 }
 
-.background_video {
+/* Animated background container */
+.animated_background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Primary animation layer */
+.animated_path_primary {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: 0;
-    pointer-events: none;
+}
+
+/* Secondary animation layer */
+.animated_path_secondary {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    transform: scale(1.1) rotate(2deg);
+}
+
+/* Tertiary animation layer */
+.animated_path_tertiary {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.4;
+    transform: scale(0.9) rotate(-1deg);
 }
 
 .hero_container h2,
