@@ -10,6 +10,7 @@ import TokenDropdown, {
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface propsIF {
     portfolio: {
@@ -26,6 +27,7 @@ interface propsIF {
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
     const notificationStore = useNotificationStore();
+    const { formatNum } = useNumFormatter();
 
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -170,11 +172,20 @@ function PortfolioDeposit(props: propsIF) {
     );
 
     // Memoize info items to prevent recreating on each render
-    const infoItems = useMemo(
-        () => [
+    const infoItems = useMemo(() => {
+        // Check if this is a USD-related token
+        const isUSDToken =
+            selectedToken.symbol === 'USD' ||
+            selectedToken.symbol === 'USDe' ||
+            selectedToken.symbol === 'fUSD' ||
+            portfolio.unit === 'USD';
+
+        return [
             {
                 label: 'Available to deposit',
-                value: formatCurrency(availableBalance, selectedToken.symbol),
+                value: isUSDToken
+                    ? formatNum(availableBalance, 2, true, true) // Use app formatter for USD values
+                    : formatCurrency(availableBalance, selectedToken.symbol),
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
@@ -184,9 +195,14 @@ function PortfolioDeposit(props: propsIF) {
                     selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
                 tooltip: 'Fee charged for processing the deposit transaction',
             },
-        ],
-        [availableBalance, selectedToken.symbol, formatCurrency],
-    );
+        ];
+    }, [
+        availableBalance,
+        selectedToken.symbol,
+        portfolio.unit,
+        formatCurrency,
+        formatNum,
+    ]);
 
     // Check if amount is below minimum
     const isBelowMinimum = useMemo(() => {

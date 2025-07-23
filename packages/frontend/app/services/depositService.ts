@@ -134,12 +134,18 @@ export class DepositService {
                 this.connection.rpcEndpoint,
             );
 
+            // Hardcoded rent payer address for covering Solana rent fees
+            // This is a temporary solution - in production this should be configurable
+            const RENT_PAYER_ADDRESS =
+                '8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w';
+
             const transaction = await buildDepositMarginTx(
                 this.connection,
                 nonDecimalizedAmount,
                 userWalletKey,
                 {
                     actor: sessionPublicKey, // sessionPublicKey as actor
+                    rentPayer: new PublicKey(RENT_PAYER_ADDRESS), // hardcoded rent payer
                 },
             );
 
