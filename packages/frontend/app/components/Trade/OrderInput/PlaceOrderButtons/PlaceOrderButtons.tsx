@@ -12,10 +12,11 @@ interface propsIF {
     buyFn: () => void;
     sellFn: () => void;
     orderMarketPrice: string;
-    leverage: number;
     collateralInsufficient: boolean;
     sizeLessThanMinimum: boolean;
-    orderValue?: number;
+    isPriceInvalid: boolean;
+    marginRequired: number;
+    usdOrderValue?: number;
 }
 interface MarketInfoItem {
     label: string;
@@ -29,10 +30,11 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         buyFn,
         sellFn,
         orderMarketPrice,
-        orderValue,
-        leverage,
+        usdOrderValue,
         collateralInsufficient,
         sizeLessThanMinimum,
+        isPriceInvalid,
+        marginRequired,
     } = props;
 
     const { getBsColor } = useAppSettings();
@@ -46,12 +48,18 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         () =>
             !isEstablished(sessionState) ||
             collateralInsufficient ||
+            sizeLessThanMinimum ||
+            isPriceInvalid,
+        [
+            sessionState,
+            collateralInsufficient,
             sizeLessThanMinimum,
-        [sessionState, collateralInsufficient, sizeLessThanMinimum],
+            isPriceInvalid,
+        ],
     );
 
-    const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
-    const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
 
     const showLiquidationPrice = useMemo(
         () =>
@@ -76,15 +84,15 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
             {
                 label: 'Order Value',
                 tooltipLabel: 'order value',
-                value: orderValue
-                    ? formatNum(orderValue, null, true, true)
+                value: usdOrderValue
+                    ? formatNum(usdOrderValue, null, true, true)
                     : 'N/A',
             },
             {
                 label: 'Margin Required',
                 tooltipLabel: 'margin required',
-                value: orderValue
-                    ? formatNum(orderValue / leverage, null, true, true)
+                value: marginRequired
+                    ? formatNum(marginRequired, null, true, true)
                     : 'N/A',
             },
         ];
@@ -92,8 +100,8 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     }, [
         showLiquidationPrice,
         orderMarketPrice,
-        orderValue,
-        leverage,
+        usdOrderValue,
+        marginRequired,
         formatNum,
     ]);
 
