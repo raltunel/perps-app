@@ -1,8 +1,5 @@
 import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 
-export const buyColor = '#26A69A';
-export const sellColor = '#E57373';
-
 export type LineLabelType =
     | 'PNL'
     | 'Limit'

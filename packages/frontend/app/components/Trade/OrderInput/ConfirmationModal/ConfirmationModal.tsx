@@ -4,6 +4,7 @@ import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { modalContentT } from '../OrderInput';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 interface propsIF {
     tx: modalContentT;
@@ -22,6 +23,7 @@ type InfoItem = {
     value: string;
     tooltip?: string;
     className?: string;
+    valueStyle?: React.CSSProperties;
 };
 
 export default function ConfirmationModal(props: propsIF) {
@@ -35,16 +37,26 @@ export default function ConfirmationModal(props: propsIF) {
         isProcessing,
     } = props;
 
+    const { getBsColor } = useAppSettings();
+
     const dataInfo: InfoItem[] = [
         {
             label: 'Action',
             value: tx.includes('buy') ? 'Buy' : 'Sell',
-            className: styles[tx.includes('buy') ? 'green' : 'red'],
+            valueStyle: {
+                color: tx.includes('buy')
+                    ? getBsColor().buy
+                    : getBsColor().sell,
+            },
         },
         {
             label: 'Size',
             value: `${size.qty || '--'} ${size.denom}`,
-            className: styles[tx.includes('buy') ? 'green' : 'red'],
+            valueStyle: {
+                color: tx.includes('buy')
+                    ? getBsColor().buy
+                    : getBsColor().sell,
+            },
         },
         {
             label: 'Price',
@@ -86,6 +98,9 @@ export default function ConfirmationModal(props: propsIF) {
                             className={`${styles.infoValue} ${
                                 info?.className && info.className
                             }`}
+                            style={{
+                                ...info?.valueStyle,
+                            }}
                         >
                             {info.value}
                         </div>
