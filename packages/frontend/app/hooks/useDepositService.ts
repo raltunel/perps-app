@@ -178,11 +178,21 @@ export function useDepositService(): UseDepositServiceReturn {
                     );
                 }
 
+                // Get payer from SessionState if available
+                const payerPublicKey = sessionState.payer || undefined;
+
+                console.log(
+                    '  - Using payer from SessionState:',
+                    payerPublicKey?.toString() ||
+                        'Not available, will use fallback',
+                );
+
                 const result = await depositService.executeDeposit(
                     amount,
                     sessionState.sessionPublicKey, // For transaction building
                     userWalletKey, // For PDA construction
                     sessionState.sendTransaction,
+                    payerPublicKey,
                 );
 
                 if (result.success) {
