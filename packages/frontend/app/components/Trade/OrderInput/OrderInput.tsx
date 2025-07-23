@@ -85,7 +85,7 @@ const marketOrderTypes = [
     // {
     //     value: 'twap',
     //     label: 'TWAP',
-    //     blurb: 'Distributes trades aerror a specified time period',
+    //     blurb: 'Distributes trades across a specified time period',
     //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
     // },
     // {
