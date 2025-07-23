@@ -7,6 +7,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { WS_SLEEP_MODE, WS_SLEEP_MODE_PRICE_CHECK } from '~/utils/Constants';
+import { Pages, usePage } from '~/hooks/usePage';
 
 export default function WsConnectionChecker() {
     // Use memoized value to prevent unnecessary re-renders
@@ -24,6 +25,19 @@ export default function WsConnectionChecker() {
     const { setTitleOverride, setIsTabActive } = useAppStateStore();
     const { formatNum } = useNumFormatter();
     const isTabPassive = useRef(false);
+    const [hideReconnectIndicator, setHideReconnectIndicator] = useState(false);
+
+    const sleepModeBlackList = new Set([Pages.HOME]);
+
+    const { page } = usePage();
+
+    useEffect(() => {
+        if (page && sleepModeBlackList.has(page)) {
+            setHideReconnectIndicator(true);
+        } else {
+            setHideReconnectIndicator(false);
+        }
+    }, [page]);
 
     useEffect(() => {
         const onlineListener = () => {
@@ -103,7 +117,9 @@ export default function WsConnectionChecker() {
     return (
         <>
             {!internetConnected && <NoConnectionIndicator />}
-            {wsReconnecting && <WsReconnectingIndicator />}
+            {wsReconnecting && !hideReconnectIndicator && (
+                <WsReconnectingIndicator />
+            )}
         </>
     );
 }

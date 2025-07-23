@@ -17,10 +17,6 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useAppSettings } from '~/stores/AppSettingsStore';
-import {
-    useNotificationStore,
-    type NotificationStoreIF,
-} from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 
@@ -73,7 +69,32 @@ function DepositDropdown(props: propsIF) {
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
 
-    const notifications: NotificationStoreIF = useNotificationStore();
+    // Debug SessionState
+    useEffect(() => {
+        console.log(
+            '🔍 [DepositDropdown] Full SessionState object:',
+            sessionState,
+        );
+        console.log('🔍 [DepositDropdown] SessionState exploration:', {
+            isEstablished: isEstablished(sessionState),
+            hasSession: !!sessionState,
+            sessionKeys: Object.keys(sessionState || {}),
+            sessionDetails: sessionState
+                ? Object.entries(sessionState).map(([key, value]) => ({
+                      key,
+                      type: typeof value,
+                      isFunction: typeof value === 'function',
+                      value:
+                          typeof value === 'function'
+                              ? 'function'
+                              : value?.toString
+                                ? value.toString().substring(0, 100)
+                                : JSON.stringify(value),
+                  }))
+                : 'No session state',
+        });
+    }, [sessionState]);
+
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
     const {
@@ -116,13 +137,13 @@ function DepositDropdown(props: propsIF) {
         () => [
             {
                 label: 'Balance',
-                tooltipContent: 'this is tooltip data',
+                tooltipContent: 'total account equity',
                 value: formatNum(balanceNum, 2, true, true),
                 change: 0,
             },
             {
                 label: 'Unrealized PNL',
-                tooltipContent: 'this is tooltip data',
+                tooltipContent: 'Unrealized profits and losses',
                 value: formatNum(unrealizedPnlNum, 2, true, true),
                 color:
                     unrealizedPnlNum > 0
@@ -169,22 +190,12 @@ function DepositDropdown(props: propsIF) {
 
     // Memoize deposit/withdraw handlers
     const handleDeposit = useCallback(() => {
-        notifications.add({
-            title: 'Deposit Pending',
-            message: 'Deposit 420,000 USDC',
-            icon: 'spinner',
-        });
         openDepositModal();
-    }, [notifications, openDepositModal]);
+    }, [openDepositModal]);
 
     const handleWithdraw = useCallback(() => {
-        notifications.add({
-            title: 'Withdraw Pending',
-            message: 'Withdraw 420,000 USDC',
-            icon: 'spinner',
-        });
         openWithdrawModal();
-    }, [notifications, openWithdrawModal]);
+    }, [openWithdrawModal]);
 
     return (
         <>
