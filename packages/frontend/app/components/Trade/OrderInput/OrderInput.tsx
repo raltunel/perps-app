@@ -1,3 +1,4 @@
+import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import React, {
     memo,
     useCallback,
@@ -9,8 +10,9 @@ import React, {
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
@@ -35,8 +37,6 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -62,12 +62,12 @@ const marketOrderTypes = [
         blurb: 'Buy/sell at the current price',
         icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'limit',
-        label: 'Limit',
-        blurb: 'Buy/Sell at a specific price or better',
-        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    },
+    // {
+    //     value: 'limit',
+    //     label: 'Limit',
+    //     blurb: 'Buy/Sell at a specific price or better',
+    //     icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    // },
     // disabled code 21 Jul 25
     // {
     //     value: 'stop_market',

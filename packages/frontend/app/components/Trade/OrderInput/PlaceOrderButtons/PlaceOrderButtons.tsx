@@ -58,8 +58,8 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
         ],
     );
 
-    const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
-    const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
 
     const showLiquidationPrice = useMemo(
         () =>
