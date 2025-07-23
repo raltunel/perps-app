@@ -27,7 +27,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { position } = props;
         const { coinPriceMap } = useTradeDataStore();
         const { formatNum } = useNumFormatter();
-        const { getBsColor } = useAppSettings();
+        const { getBsColor, bsColor } = useAppSettings();
 
         const showTpSl = false;
 
@@ -52,7 +52,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         }, [position.tp, position.sl, formatNum]);
 
         // Memoize buy/sell colors
-        const { buy, sell } = useMemo(() => getBsColor(), [getBsColor]);
+        const { buy, sell } = useMemo(
+            () => getBsColor(),
+            [bsColor, getBsColor],
+        );
         const baseColor = useMemo(
             () => (position.szi >= 0 ? buy : sell),
             [position.szi, buy, sell],
