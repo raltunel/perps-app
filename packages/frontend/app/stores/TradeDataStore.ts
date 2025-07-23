@@ -1,3 +1,4 @@
+import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
@@ -40,6 +41,8 @@ type TradeDataStore = UserTradeDataStore & {
     setFetchedChannels: (channels: Set<string>) => void;
     userNonFundingLedgerUpdates: TransactionData[];
     setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
+    marginBucket: MarginBucketInfo | null;
+    setMarginBucket: (marginBucket: MarginBucketInfo | null) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -69,7 +72,8 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC'],
+            // favKeys: ['BTC'],
+            favKeys: ['BTC', 'ETH', 'SOL'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (

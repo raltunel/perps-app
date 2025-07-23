@@ -1,3 +1,4 @@
+import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import { OrderHistoryLimits, TradeHistoryLimits } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -64,6 +65,10 @@ export const createUserTradesSlice = (set: any, get: any) => ({
                 (e) => e.coin === get().symbol,
             ),
         });
+    },
+    marginBucket: null,
+    setMarginBucket: (marginBucket: MarginBucketInfo | null) => {
+        set({ marginBucket });
     },
     filterOrderHistory: (orderHistory: OrderDataIF[], filterType?: string) => {
         if (!filterType) {

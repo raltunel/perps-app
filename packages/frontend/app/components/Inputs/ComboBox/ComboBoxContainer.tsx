@@ -109,8 +109,13 @@ export default function ComboBoxContainer() {
                         (async () => {
                             if (isEstablished(sessionState)) {
                                 console.log('established');
+                                const userWalletKey =
+                                    sessionState.userPublicKey ||
+                                    sessionState.walletPublicKey ||
+                                    sessionState.sessionPublicKey;
                                 const ix = instructions.pingIx(42n, {
                                     actor: sessionState.sessionPublicKey,
+                                    target: userWalletKey,
                                 });
                                 console.log({ ix, sessionState });
                                 const result =
