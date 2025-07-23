@@ -15,6 +15,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
@@ -123,6 +124,10 @@ function OrderInput({
     marginBucket: MarginBucketInfo | null;
 }) {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
+
+    // Market order service hook
+    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
+        useMarketOrderService();
 
     const [leverage, setLeverage] = useState(1);
     const [price, setPrice] = useState('');
@@ -651,23 +656,125 @@ function OrderInput({
     );
 
     // fn to submit a 'Buy' market order
-    function submitMarketBuy(): void {
-        notifications.add({
-            title: 'Buy / Long Market Order Pending',
-            message: 'Buying 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitMarketBuy(): Promise<void> {
+        // Validate position size
+        if (!positionSizeInSymbolDenom || positionSizeInSymbolDenom <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'cross',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Buy / Long Market Order Pending',
+                message: `Buying ${positionSizeInSymbolDenom.toFixed(6)} ${symbol} at market price`,
+                icon: 'spinner',
+            });
+
+            // Execute the market buy order
+            const result = await executeMarketOrder({
+                quantity: positionSizeInSymbolDenom,
+                side: 'buy',
+            });
+
+            if (result.success) {
+                // Show success notification
+                notifications.add({
+                    title: 'Buy Order Successful',
+                    message: `Successfully bought ${positionSizeInSymbolDenom.toFixed(6)} ${symbol}`,
+                    icon: 'check',
+                });
+                // Reset position size after successful order
+                setPositionSizeInSymbolDenom(0);
+                setPositionSliderPercentageValue(0);
+                setRawSizeInput('');
+            } else {
+                // Show error notification
+                notifications.add({
+                    title: 'Buy Order Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'cross',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting market buy order:', error);
+            notifications.add({
+                title: 'Buy Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'cross',
+            });
+        } finally {
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Sell' market order
-    function submitMarketSell(): void {
-        notifications.add({
-            title: 'Sell / Short Market Order Pending',
-            message: 'Selling 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitMarketSell(): Promise<void> {
+        // Validate position size
+        if (!positionSizeInSymbolDenom || positionSizeInSymbolDenom <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'cross',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Sell / Short Market Order Pending',
+                message: `Selling ${positionSizeInSymbolDenom.toFixed(6)} ${symbol} at market price`,
+                icon: 'spinner',
+            });
+
+            // Execute the market sell order
+            const result = await executeMarketOrder({
+                quantity: positionSizeInSymbolDenom,
+                side: 'sell',
+            });
+
+            if (result.success) {
+                // Show success notification
+                notifications.add({
+                    title: 'Sell Order Successful',
+                    message: `Successfully sold ${positionSizeInSymbolDenom.toFixed(6)} ${symbol}`,
+                    icon: 'check',
+                });
+                // Reset position size after successful order
+                setPositionSizeInSymbolDenom(0);
+                setPositionSliderPercentageValue(0);
+                setRawSizeInput('');
+            } else {
+                // Show error notification
+                notifications.add({
+                    title: 'Sell Order Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'cross',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting market sell order:', error);
+            notifications.add({
+                title: 'Sell Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'cross',
+            });
+        } finally {
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Buy' limit order
@@ -846,7 +953,9 @@ function OrderInput({
                         orderMarketPrice={marketOrderType}
                         orderValue={orderValue}
                         leverage={leverage}
-                        collateralInsufficient={collateralInsufficient}
+                        collateralInsufficient={
+                            collateralInsufficient || isMarketOrderLoading
+                        }
                         sizeLessThanMinimum={sizeLessThanMinimum}
                     />
                     {confirmOrderModal.isOpen && (
