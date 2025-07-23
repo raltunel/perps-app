@@ -1,19 +1,22 @@
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { motion } from 'framer-motion';
 import React, { useCallback, useMemo, useState } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { motion } from 'framer-motion';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
-import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
-import type { modalContentT } from '../OrderInput';
 
 interface propsIF {
-    isLimit: boolean;
+    buyFn: () => void;
+    sellFn: () => void;
     orderMarketPrice: string;
-    openModalWithContent: (content: modalContentT) => void;
-    leverage: number;
-    orderValue?: number;
+    collateralInsufficient: boolean;
+    sizeLessThanMinimum: boolean;
+    isPriceInvalid: boolean;
+    marginRequired: number;
+    usdOrderValue?: number;
 }
 interface MarketInfoItem {
     label: string;
@@ -24,20 +27,39 @@ interface MarketInfoItem {
 // In case of any bugs or issues with this component, please reach out to Jr.
 const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     const {
-        isLimit,
+        buyFn,
+        sellFn,
         orderMarketPrice,
-        openModalWithContent,
-        orderValue,
-        leverage,
+        usdOrderValue,
+        collateralInsufficient,
+        sizeLessThanMinimum,
+        isPriceInvalid,
+        marginRequired,
     } = props;
 
     const { getBsColor } = useAppSettings();
     const { formatNum } = useNumFormatter();
 
+    const sessionState = useSession();
+
     const [isExpanded, setIsExpanded] = useState(false);
 
-    const buyColor = useMemo(() => getBsColor().buy, [getBsColor]);
-    const sellColor = useMemo(() => getBsColor().sell, [getBsColor]);
+    const disableButtons = useMemo(
+        () =>
+            !isEstablished(sessionState) ||
+            collateralInsufficient ||
+            sizeLessThanMinimum ||
+            isPriceInvalid,
+        [
+            sessionState,
+            collateralInsufficient,
+            sizeLessThanMinimum,
+            isPriceInvalid,
+        ],
+    );
+
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
 
     const showLiquidationPrice = useMemo(
         () =>
@@ -62,15 +84,15 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
             {
                 label: 'Order Value',
                 tooltipLabel: 'order value',
-                value: orderValue
-                    ? formatNum(orderValue, null, true, true)
+                value: usdOrderValue
+                    ? formatNum(usdOrderValue, null, true, true)
                     : 'N/A',
             },
             {
                 label: 'Margin Required',
                 tooltipLabel: 'margin required',
-                value: orderValue
-                    ? formatNum(orderValue / leverage, null, true, true)
+                value: marginRequired
+                    ? formatNum(marginRequired, null, true, true)
                     : 'N/A',
             },
         ];
@@ -78,8 +100,8 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
     }, [
         showLiquidationPrice,
         orderMarketPrice,
-        orderValue,
-        leverage,
+        usdOrderValue,
+        marginRequired,
         formatNum,
     ]);
 
@@ -135,16 +157,6 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
 
     const hasMoreItems = useMemo(() => dataToUse.length > 2, [dataToUse]);
 
-    const handleBuyClick = useCallback(
-        () => openModalWithContent(isLimit ? 'limit_buy' : 'market_buy'),
-        [openModalWithContent, isLimit],
-    );
-
-    const handleSellClick = useCallback(
-        () => openModalWithContent(isLimit ? 'limit_sell' : 'market_sell'),
-        [openModalWithContent, isLimit],
-    );
-
     const handleToggleExpand = useCallback(() => {
         setIsExpanded((prev) => !prev);
     }, []);
@@ -155,14 +167,16 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                 <button
                     style={{ backgroundColor: buyColor }}
                     className={styles.overlay_button}
-                    onClick={handleBuyClick}
+                    onClick={buyFn}
+                    disabled={disableButtons}
                 >
                     Buy / Long
                 </button>
                 <button
                     style={{ backgroundColor: sellColor }}
                     className={styles.overlay_button}
-                    onClick={handleSellClick}
+                    onClick={sellFn}
+                    disabled={disableButtons}
                 >
                     Sell / Short
                 </button>

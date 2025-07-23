@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
-import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 
 interface PropsIF {
     value: string;
@@ -15,6 +15,7 @@ interface PropsIF {
     symbol: string;
     selectedMode: OrderBookMode;
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
+    onFocus: () => void;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -29,6 +30,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         symbol,
         selectedMode,
         setSelectedMode,
+        onFocus,
     } = props;
 
     // Memoized ComboBox options
@@ -56,6 +58,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 className={className}
                 aria-label={ariaLabel}
                 placeholder='Enter Size'
+                onFocus={onFocus}
             />
             <button className={styles.tokenButton}>
                 <ComboBox

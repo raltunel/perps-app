@@ -30,7 +30,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
         },
 
         onReady: (cb: any) => {
-            cb({
+            (cb({
                 supported_resolutions: supportedResolutions,
                 supports_marks: true,
             }),
@@ -41,7 +41,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 // supports_marks: false,
                 // supports_time: true,
 
-                0;
+                0);
         },
 
         resolveSymbol: (symbolName, onResolve, onError) => {
@@ -56,7 +56,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 supported_resolutions: supportedResolutions,
                 description: '',
                 type: '',
-                exchange: '',
+                exchange: 'Ambient',
                 listed_exchange: '',
                 format: 'price',
             };

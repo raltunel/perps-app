@@ -227,11 +227,20 @@ export function customThemes() {
         const lighterColors = interpolate('#ffffff', color);
         const darkerColors = interpolate(color, '#000000');
 
-        const colorGrades = [
-            ...lighterColors,
-            ...darkerColors.slice(0, -1),
-        ] as ColorGradient;
-        colorGradeArr.push(colorGrades);
+        if (color === '#7371FC') {
+            const perpColorGrades = [];
+
+            for (let i = 0; i < 19; i++) {
+                perpColorGrades.push('#7371FC');
+            }
+            colorGradeArr.push(perpColorGrades as ColorGradient);
+        } else {
+            const colorGrades = [
+                ...lighterColors,
+                ...darkerColors.slice(0, -1),
+            ] as ColorGradient;
+            colorGradeArr.push(colorGrades);
+        }
     });
 
     const lightTheme: CustomThemeColors = {

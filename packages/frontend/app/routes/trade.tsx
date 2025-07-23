@@ -13,11 +13,11 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
+import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import { motion } from 'framer-motion';
 import LiquidationsChartSection from './trade/liquidationsChart/LiquidationsChartSection';
 
 // Memoize components that don't need frequent re-renders
@@ -29,7 +29,7 @@ const MemoizedSymbolInfo = memo(SymbolInfo);
 type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol } = useTradeDataStore();
+    const { symbol, marginBucket } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
@@ -219,7 +219,9 @@ export default function Trade() {
                     }}
                 >
                     {(activeTab === 'order' ||
-                        visibilityRefs.current.order) && <OrderInput />}
+                        visibilityRefs.current.order) && (
+                        <OrderInput marginBucket={marginBucket} />
+                    )}
                 </div>
                 <div
                     className={`${styles.mobileSection} ${styles.mobileChart} ${activeTab === 'chart' ? styles.active : ''}`}
@@ -274,6 +276,7 @@ export default function Trade() {
                             className={`${styles.chartLayout} ${liquidationsActive ? styles.liqActive : ''}`}
                         >
                             <div
+                                id='trade-page-left-section'
                                 className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
                             >
                                 {debugToolbarOpen && (
@@ -323,7 +326,7 @@ export default function Trade() {
                             id='tradeModulesSection'
                             className={styles.tradeModules}
                         >
-                            <OrderInput />
+                            <OrderInput marginBucket={marginBucket} />
                         </div>
                     </section>
                     <section
@@ -334,7 +337,7 @@ export default function Trade() {
                             <MemoizedTradeTable />
                         </div>
                         <div className={styles.wallet}>
-                            <DepositDropdown />
+                            <DepositDropdown marginBucket={marginBucket} />
                         </div>
                     </section>
                 </div>

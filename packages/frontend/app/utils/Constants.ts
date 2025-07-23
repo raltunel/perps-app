@@ -126,6 +126,14 @@ const MINUTES = SECONDS * 60;
 
 export const WS_SLEEP_MODE = 0 * SECONDS;
 export const WS_SLEEP_MODE_PRICE_CHECK = 1 * MINUTES;
-export const WS_SLEEP_MODE_STASH_CONNECTION = 30 * MINUTES;
+export const WS_SLEEP_MODE_STASH_CONNECTION = 2 * MINUTES;
 
 export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
+
+export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
+
+export const MARKET_WS_ENDPOINT =
+    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+
+export const USER_WS_ENDPOINT =
+    import.meta.env.VITE_USER_WS_ENDPOINT || 'https://api.hyperliquid.xyz';

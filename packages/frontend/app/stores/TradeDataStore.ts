@@ -1,3 +1,4 @@
+import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
@@ -9,7 +10,11 @@ import {
     type UserTradeDataStore,
 } from './UserTradeDataStore';
 
+export type marginModesT = 'cross' | 'isolated';
+
 type TradeDataStore = UserTradeDataStore & {
+    marginMode: marginModesT;
+    setMarginMode: (m: marginModesT) => void;
     symbol: string;
     setSymbol: (symbol: string) => void;
     symbolInfo: SymbolInfoIF | null;
@@ -36,12 +41,16 @@ type TradeDataStore = UserTradeDataStore & {
     setFetchedChannels: (channels: Set<string>) => void;
     userNonFundingLedgerUpdates: TransactionData[];
     setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
+    marginBucket: MarginBucketInfo | null;
+    setMarginBucket: (marginBucket: MarginBucketInfo | null) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
+            marginMode: 'cross',
+            setMarginMode: (m: marginModesT) => set({ marginMode: m }),
             symbol: 'BTC',
             setSymbol: (symbol: string) => {
                 setLS('activeCoin', symbol);
@@ -119,6 +128,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         {
             name: 'TRADE_DATA',
             partialize: (state) => ({
+                marginMode: state.marginMode,
                 favKeys: state.favKeys,
                 symbol: state.symbol,
                 selectedTradeTab:

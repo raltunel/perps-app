@@ -1,10 +1,17 @@
-import { useCallback, useMemo, useReducer, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import { useDepositService } from '~/hooks/useDepositService';
+import { useWithdrawService } from '~/hooks/useWithdrawService';
+import { useSession, isEstablished } from '@fogo/sessions-sdk-react';
 
-export interface PortfolioData {
+interface PortfolioDataIF {
     id: string;
     name: string;
-    totalValueUSD: number;
-    availableBalance: number;
+    // totalValueUSD: number;
+    // availableBalance: number;
+    balances: {
+        contract: number;
+        wallet: number;
+    };
     unit: string;
     tradingVolume: {
         daily: number;
@@ -18,12 +25,18 @@ export interface PortfolioData {
     };
 }
 
+const CONTRACT_BALANCE = 1987654.32;
+
 // Mock data
-export const portfolioData: PortfolioData = {
+export const portfolioData: PortfolioDataIF = {
     id: 'main-portfolio',
     name: 'Main Portfolio',
-    totalValueUSD: 1987654.32,
-    availableBalance: 1987654.32,
+    // totalValueUSD: 1987654.32,
+    // availableBalance: 1987654.32,
+    balances: {
+        contract: CONTRACT_BALANCE,
+        wallet: 0, // Will be replaced with real balance
+    },
     unit: 'USD',
     tradingVolume: {
         daily: 215678.9,
@@ -37,20 +50,56 @@ export const portfolioData: PortfolioData = {
     },
 };
 
-function portfolioReducer(state: PortfolioData, action: any): PortfolioData {
+function portfolioReducer(
+    state: PortfolioDataIF,
+    action: any,
+): PortfolioDataIF {
     switch (action.type) {
         case 'DEPOSIT':
             return {
                 ...state,
-                availableBalance: state.availableBalance + action.amount,
-                totalValueUSD: state.totalValueUSD + action.amount,
+                // availableBalance: state.availableBalance + action.amount,
+                // totalValueUSD: state.totalValueUSD + action.amount,
+                balances: {
+                    contract: state.balances.contract + action.amount,
+                    wallet: state.balances.wallet - action.amount,
+                },
             };
         case 'WITHDRAW':
+            return {
+                ...state,
+                // availableBalance: state.availableBalance - action.amount,
+                // totalValueUSD: state.totalValueUSD - action.amount,
+                balances: {
+                    contract: state.balances.contract - action.amount,
+                    wallet: state.balances.wallet + action.amount,
+                },
+            };
         case 'SEND':
             return {
                 ...state,
-                availableBalance: state.availableBalance - action.amount,
-                totalValueUSD: state.totalValueUSD - action.amount,
+                // availableBalance: state.availableBalance - action.amount,
+                // totalValueUSD: state.totalValueUSD - action.amount,
+                balances: {
+                    contract: state.balances.contract - action.amount,
+                    wallet: state.balances.wallet,
+                },
+            };
+        case 'UPDATE_WALLET_BALANCE':
+            return {
+                ...state,
+                balances: {
+                    ...state.balances,
+                    wallet: action.balance,
+                },
+            };
+        case 'UPDATE_CONTRACT_BALANCE':
+            return {
+                ...state,
+                balances: {
+                    ...state.balances,
+                    contract: action.balance,
+                },
             };
         default:
             return state;
@@ -70,7 +119,132 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 });
 
 export function usePortfolioManager() {
-    const [portfolio, dispatch] = useReducer(portfolioReducer, portfolioData);
+    const sessionState = useSession();
+
+    // One-time comprehensive SessionState debug
+    useEffect(() => {
+        console.log(
+            '🎯 [usePortfolioManager] COMPREHENSIVE SessionState Debug:',
+        );
+        console.log('================================');
+        console.log('Full object:', sessionState);
+        console.log('Is Established:', isEstablished(sessionState));
+        console.log('Type:', typeof sessionState);
+        console.log('Constructor:', sessionState?.constructor?.name);
+        console.log('================================');
+
+        if (sessionState) {
+            console.log('🔑 All Properties:');
+            for (const [key, value] of Object.entries(sessionState)) {
+                const type = typeof value;
+                let displayValue = '';
+
+                if (type === 'function') {
+                    displayValue = `[Function: ${value.name || 'anonymous'}]`;
+                } else if (value === null) {
+                    displayValue = 'null';
+                } else if (value === undefined) {
+                    displayValue = 'undefined';
+                } else if (type === 'object') {
+                    if (
+                        value.toString &&
+                        value.toString !== Object.prototype.toString
+                    ) {
+                        displayValue = value.toString();
+                    } else {
+                        try {
+                            displayValue = JSON.stringify(value, null, 2);
+                        } catch {
+                            displayValue = '[Complex Object]';
+                        }
+                    }
+                } else {
+                    displayValue = String(value);
+                }
+
+                console.log(`  ${key}: (${type}) ${displayValue}`);
+            }
+
+            console.log('================================');
+            console.log(
+                '🔧 Methods available:',
+                Object.entries(sessionState)
+                    .filter(([_, v]) => typeof v === 'function')
+                    .map(([k]) => k),
+            );
+            console.log(
+                '🔑 PublicKey fields:',
+                Object.entries(sessionState)
+                    .filter(
+                        ([k]) =>
+                            k.toLowerCase().includes('key') ||
+                            k.toLowerCase().includes('public'),
+                    )
+                    .map(([k, v]) => `${k}: ${v?.toString ? v.toString() : v}`),
+            );
+        }
+        console.log('================================');
+    }, [sessionState]);
+
+    const {
+        balance: walletBalance,
+        isLoading: isBalanceLoading,
+        error: balanceError,
+        executeDeposit,
+        validateAmount,
+    } = useDepositService();
+
+    const {
+        availableBalance: withdrawableBalance,
+        isLoading: isWithdrawLoading,
+        error: withdrawError,
+        executeWithdraw,
+        validateAmount: validateWithdrawAmount,
+    } = useWithdrawService();
+
+    // Create initial portfolio data with real wallet balance and withdrawable balance
+    const initialPortfolioData = useMemo(
+        () => ({
+            ...portfolioData,
+            balances: {
+                contract: withdrawableBalance?.decimalized || CONTRACT_BALANCE,
+                wallet: walletBalance?.decimalized || 0,
+            },
+        }),
+        [walletBalance, withdrawableBalance],
+    );
+
+    const [portfolio, dispatch] = useReducer(
+        portfolioReducer,
+        initialPortfolioData,
+    );
+
+    // Update portfolio wallet balance when real balance changes
+    useEffect(() => {
+        if (walletBalance?.decimalized !== undefined) {
+            dispatch({
+                type: 'UPDATE_WALLET_BALANCE',
+                balance: walletBalance.decimalized,
+            });
+        }
+    }, [walletBalance]);
+
+    // Update portfolio contract balance when withdrawable balance changes
+    useEffect(() => {
+        console.log('💰 Withdrawable balance update:', withdrawableBalance);
+        if (withdrawableBalance?.decimalized !== undefined) {
+            console.log(
+                '📊 Updating contract balance to:',
+                withdrawableBalance.decimalized,
+            );
+            dispatch({
+                type: 'UPDATE_CONTRACT_BALANCE',
+                balance: withdrawableBalance.decimalized,
+            });
+        } else {
+            console.log('⚠️ No withdrawable balance to update');
+        }
+    }, [withdrawableBalance]);
 
     const [isProcessing, setIsProcessing] = useState(false);
     const [status, setStatus] = useState<{
@@ -95,61 +269,77 @@ export function usePortfolioManager() {
 
     const selectedPortfolio = useMemo(() => portfolio, [portfolio]);
 
-    const processDeposit = useCallback((amount: number) => {
-        // Set processing state to true
-        setIsProcessing(true);
-        setStatus({ isLoading: true, error: null });
+    const processDeposit = useCallback(
+        async (amount: number) => {
+            // Set processing state to true
+            setIsProcessing(true);
+            setStatus({ isLoading: true, error: null });
 
-        // Simulate network delay (2 seconds)
-        setTimeout(() => {
             try {
-                // Update portfolio balance using reducer
-                dispatch({ type: 'DEPOSIT', amount });
-                setStatus({ isLoading: false, error: null });
-                setIsProcessing(false);
+                // Execute the real Solana deposit transaction
+                const result = await executeDeposit(amount);
+
+                if (result.success) {
+                    // Update portfolio balance using reducer only after successful transaction
+                    dispatch({ type: 'DEPOSIT', amount });
+                    setStatus({ isLoading: false, error: null });
+                } else {
+                    setStatus({
+                        isLoading: false,
+                        error: result.error || 'Deposit transaction failed',
+                    });
+                }
+                return result;
             } catch (error) {
                 setStatus({
                     isLoading: false,
                     error: (error as Error).message,
                 });
+                return { success: false, error: (error as Error).message };
+            } finally {
                 setIsProcessing(false);
             }
-        }, 2000);
-    }, []);
+        },
+        [executeDeposit],
+    );
 
     const processWithdraw = useCallback(
-        (amount: number) => {
-            if (amount > portfolio.availableBalance) {
-                setStatus({ isLoading: false, error: 'Insufficient funds' });
-                return;
-            }
-
+        async (amount: number) => {
             // Set processing state to true
             setIsProcessing(true);
             setStatus({ isLoading: true, error: null });
 
-            // Simulate network delay (2 seconds)
-            setTimeout(() => {
-                try {
-                    // Update portfolio balance using reducer
+            try {
+                // Execute the real Solana withdraw transaction
+                const result = await executeWithdraw(amount);
+
+                if (result.success) {
+                    // Update portfolio balance using reducer only after successful transaction
                     dispatch({ type: 'WITHDRAW', amount });
                     setStatus({ isLoading: false, error: null });
-                    setIsProcessing(false);
-                } catch (error) {
+                } else {
                     setStatus({
                         isLoading: false,
-                        error: (error as Error).message,
+                        error: result.error || 'Withdraw transaction failed',
                     });
-                    setIsProcessing(false);
                 }
-            }, 2000);
+                return result;
+            } catch (error) {
+                setStatus({
+                    isLoading: false,
+                    error: (error as Error).message,
+                });
+                return { success: false, error: (error as Error).message };
+            } finally {
+                setIsProcessing(false);
+            }
         },
-        [portfolio.availableBalance],
+        [executeWithdraw],
     );
 
     const processSend = useCallback(
         (address: string, amount: number) => {
-            if (!address || amount > portfolio.availableBalance) {
+            if (!address || amount > portfolio.balances.contract) {
                 setStatus({
                     isLoading: false,
                     error: !address ? 'Invalid address' : 'Insufficient funds',
@@ -177,17 +367,22 @@ export function usePortfolioManager() {
                 }
             }, 2000);
         },
-        [portfolio.availableBalance],
+        [portfolio.balances.contract],
     );
 
     return {
         portfolio,
         selectedPortfolio,
-        isProcessing,
-        status,
+        isProcessing: isProcessing || isBalanceLoading || isWithdrawLoading,
+        status: balanceError
+            ? { isLoading: false, error: balanceError }
+            : withdrawError
+              ? { isLoading: false, error: withdrawError }
+              : status,
         formatCurrency,
         processDeposit,
         processWithdraw,
         processSend,
+        validateAmount,
     };
 }
