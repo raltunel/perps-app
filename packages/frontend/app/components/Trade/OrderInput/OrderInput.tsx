@@ -15,6 +15,7 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
@@ -53,7 +54,7 @@ export interface ChaseOption {
     label: string;
 }
 
-export type MarginMode = 'cross' | 'isolated' | null;
+export type MarginMode = 'error' | 'isolated' | null;
 
 const marketOrderTypes = [
     {
@@ -84,7 +85,7 @@ const marketOrderTypes = [
     // {
     //     value: 'twap',
     //     label: 'TWAP',
-    //     blurb: 'Distributes trades across a specified time period',
+    //     blurb: 'Distributes trades aerror a specified time period',
     //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
     // },
     // {
@@ -123,6 +124,10 @@ function OrderInput({
 }) {
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
 
+    // Market order service hook
+    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
+        useMarketOrderService();
+
     const [leverage, setLeverage] = useState(1);
 
     const [price, setPrice] = useState('');
@@ -133,6 +138,9 @@ function OrderInput({
         useState(0);
 
     const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] = useState(0);
+
+    // Track if we're processing an order
+    const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
     useEffect(() => {
         console.log({ notionalSymbolQtyNum });
@@ -789,23 +797,115 @@ function OrderInput({
     );
 
     // fn to submit a 'Buy' market order
-    function submitMarketBuy(): void {
-        notifications.add({
-            title: 'Buy / Long Market Order Pending',
-            message: 'Buying 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitMarketBuy(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        try {
+            setIsProcessingOrder(true);
+            // Execute the market buy order
+            const result = await executeMarketOrder({
+                quantity: notionalSymbolQtyNum,
+                side: 'buy',
+            });
+
+            if (result.success) {
+                // Show success notification
+                notifications.add({
+                    title: 'Buy Order Successful',
+                    message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    icon: 'check',
+                });
+                // Reset position size after successful order
+                setNotionalSymbolQtyNum(0);
+                setPositionSliderPercentageValue(0);
+                setSizeDisplay('');
+            } else {
+                // Show error notification
+                notifications.add({
+                    title: 'Buy Order Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting market buy order:', error);
+            notifications.add({
+                title: 'Buy Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Sell' market order
-    function submitMarketSell(): void {
-        notifications.add({
-            title: 'Sell / Short Market Order Pending',
-            message: 'Selling 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitMarketSell(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        try {
+            setIsProcessingOrder(true);
+            // Execute the market sell order
+            const result = await executeMarketOrder({
+                quantity: notionalSymbolQtyNum,
+                side: 'sell',
+            });
+
+            if (result.success) {
+                // Show success notification
+                notifications.add({
+                    title: 'Sell Order Successful',
+                    message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    icon: 'check',
+                });
+                // Reset position size after successful order
+                setNotionalSymbolQtyNum(0);
+                setPositionSliderPercentageValue(0);
+                setSizeDisplay('');
+            } else {
+                // Show error notification
+                notifications.add({
+                    title: 'Sell Order Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting market sell order:', error);
+            notifications.add({
+                title: 'Sell Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Buy' limit order
@@ -989,7 +1089,9 @@ function OrderInput({
                         orderMarketPrice={marketOrderType}
                         usdOrderValue={usdOrderValue}
                         marginRequired={marginRequired}
-                        collateralInsufficient={collateralInsufficient}
+                        collateralInsufficient={
+                            collateralInsufficient || isMarketOrderLoading
+                        }
                         sizeLessThanMinimum={sizeLessThanMinimum}
                         isPriceInvalid={isPriceInvalid}
                     />
@@ -1052,6 +1154,7 @@ function OrderInput({
                                         )
                                     }
                                     submitFn={submitMarketBuy}
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                             {confirmOrderModal.content === 'market_sell' && (
@@ -1073,6 +1176,7 @@ function OrderInput({
                                     isEnabled={
                                         !activeOptions.skipOpenOrderConfirm
                                     }
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                             {confirmOrderModal.content === 'limit_buy' && (
