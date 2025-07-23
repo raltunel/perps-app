@@ -31,11 +31,13 @@ export class MarketOrderService {
      * Build a market order transaction
      * @param params - Order parameters
      * @param userPublicKey - User's public key
+     * @param rentPayer - Optional rent payer public key
      * @returns Promise<Transaction>
      */
     private async buildMarketOrderTransaction(
         params: MarketOrderParams,
         userPublicKey: PublicKey,
+        rentPayer?: PublicKey,
     ) {
         try {
             console.log('🔨 Building market order transaction:', {
@@ -68,6 +70,9 @@ export class MarketOrderService {
                     orderId,
                     onChainQuantity,
                     userPublicKey,
+                    BigInt('999999999999'), // maxPrice
+                    'confirmed',
+                    rentPayer, // Pass rent payer
                 );
                 console.log('✅ Market buy order built successfully');
                 return transaction;
@@ -79,6 +84,9 @@ export class MarketOrderService {
                     orderId,
                     onChainQuantity,
                     userPublicKey,
+                    BigInt('1'), // minPrice
+                    'confirmed',
+                    rentPayer, // Pass rent payer
                 );
                 console.log('✅ Market sell order built successfully');
                 return transaction;
@@ -102,6 +110,7 @@ export class MarketOrderService {
      * @param sessionPublicKey - Session public key (for transaction building)
      * @param userWalletKey - User's actual wallet public key (for order owner)
      * @param sendTransaction - Function to send the transaction (from Fogo session)
+     * @param rentPayer - Optional rent payer public key
      * @returns Promise<MarketOrderResult>
      */
     async executeMarketOrder(
@@ -109,6 +118,7 @@ export class MarketOrderService {
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         sendTransaction: (instructions: any[]) => Promise<any>,
+        rentPayer?: PublicKey,
     ): Promise<MarketOrderResult> {
         try {
             console.log('📈 Executing market order:', {
@@ -123,6 +133,7 @@ export class MarketOrderService {
             const transaction = await this.buildMarketOrderTransaction(
                 params,
                 userWalletKey,
+                rentPayer,
             );
 
             // Extract instructions from the transaction

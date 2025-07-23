@@ -86,11 +86,15 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                     );
                 }
 
+                // Get paymaster from SessionState if available
+                const paymaster = sessionState.paymaster || undefined;
+
                 const result = await marketOrderService.executeMarketOrder(
                     params,
                     sessionState.sessionPublicKey, // For transaction building/signing
                     userWalletKey, // For order owner
                     sessionState.sendTransaction,
+                    paymaster, // Pass paymaster as rent payer
                 );
 
                 if (!result.success) {

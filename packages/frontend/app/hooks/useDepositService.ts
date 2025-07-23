@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { DepositService } from '~/services/depositService';
@@ -21,6 +21,8 @@ export interface UseDepositServiceReturn {
     executeDeposit: (amount: number) => Promise<DepositServiceResult>;
     refreshBalance: () => Promise<void>;
     validateAmount: (amount: number) => { isValid: boolean; message?: string };
+    startAutoRefresh: () => void;
+    stopAutoRefresh: () => void;
 }
 
 /**
@@ -34,6 +36,7 @@ export function useDepositService(): UseDepositServiceReturn {
     const [depositService, setDepositService] = useState<DepositService | null>(
         null,
     );
+    const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize deposit service when session is established
     useEffect(() => {
@@ -81,6 +84,45 @@ export function useDepositService(): UseDepositServiceReturn {
             refreshBalance();
         }
     }, [depositService, refreshBalance]);
+
+    // Start auto refresh function
+    const startAutoRefresh = useCallback(() => {
+        if (!depositService) return;
+
+        // Clear any existing interval
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+
+        // Refresh immediately
+        refreshBalance();
+
+        // Set up new interval
+        const intervalId = setInterval(() => {
+            refreshBalance();
+        }, 2000);
+
+        autoRefreshIntervalRef.current = intervalId;
+    }, [depositService, refreshBalance]);
+
+    // Stop auto refresh function
+    const stopAutoRefresh = useCallback(() => {
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+    }, []);
+
+    // Clean up interval on unmount
+    useEffect(() => {
+        return () => {
+            if (autoRefreshIntervalRef.current) {
+                clearInterval(autoRefreshIntervalRef.current);
+                autoRefreshIntervalRef.current = null;
+            }
+        };
+    }, []);
 
     // Execute deposit transaction
     const executeDeposit = useCallback(
@@ -170,5 +212,7 @@ export function useDepositService(): UseDepositServiceReturn {
         executeDeposit,
         refreshBalance,
         validateAmount,
+        startAutoRefresh,
+        stopAutoRefresh,
     };
 }

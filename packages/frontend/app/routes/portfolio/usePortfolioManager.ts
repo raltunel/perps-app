@@ -124,6 +124,8 @@ export function usePortfolioManager() {
         error: balanceError,
         executeDeposit,
         validateAmount,
+        startAutoRefresh: startDepositAutoRefresh,
+        stopAutoRefresh: stopDepositAutoRefresh,
     } = useDepositService();
 
     const {
@@ -132,6 +134,8 @@ export function usePortfolioManager() {
         error: withdrawError,
         executeWithdraw,
         validateAmount: validateWithdrawAmount,
+        startAutoRefresh: startWithdrawAutoRefresh,
+        stopAutoRefresh: stopWithdrawAutoRefresh,
     } = useWithdrawService();
 
     // Create initial portfolio data with real wallet balance and withdrawable balance
@@ -298,7 +302,7 @@ export function usePortfolioManager() {
     return {
         portfolio,
         selectedPortfolio,
-        isProcessing: isProcessing || isBalanceLoading || isWithdrawLoading,
+        isProcessing: isProcessing,
         status: balanceError
             ? { isLoading: false, error: balanceError }
             : withdrawError
@@ -309,5 +313,10 @@ export function usePortfolioManager() {
         processWithdraw,
         processSend,
         validateAmount,
+        // Expose auto refresh functions
+        startDepositAutoRefresh,
+        stopDepositAutoRefresh,
+        startWithdrawAutoRefresh,
+        stopWithdrawAutoRefresh,
     };
 }

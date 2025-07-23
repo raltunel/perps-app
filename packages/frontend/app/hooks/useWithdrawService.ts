@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { PublicKey } from '@solana/web3.js';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { WithdrawService } from '~/services/withdrawService';
@@ -21,6 +21,8 @@ export interface UseWithdrawServiceReturn {
     executeWithdraw: (amount: number) => Promise<WithdrawServiceResult>;
     refreshBalance: () => Promise<void>;
     validateAmount: (amount: number) => { isValid: boolean; message?: string };
+    startAutoRefresh: () => void;
+    stopAutoRefresh: () => void;
 }
 
 /**
@@ -34,6 +36,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
     const [error, setError] = useState<string | null>(null);
     const [withdrawService, setWithdrawService] =
         useState<WithdrawService | null>(null);
+    const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize withdraw service when session is established
     useEffect(() => {
@@ -97,6 +100,45 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
             refreshBalance();
         }
     }, [withdrawService, refreshBalance]);
+
+    // Start auto refresh function
+    const startAutoRefresh = useCallback(() => {
+        if (!withdrawService) return;
+
+        // Clear any existing interval
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+
+        // Refresh immediately
+        refreshBalance();
+
+        // Set up new interval
+        const intervalId = setInterval(() => {
+            refreshBalance();
+        }, 2000);
+
+        autoRefreshIntervalRef.current = intervalId;
+    }, [withdrawService, refreshBalance]);
+
+    // Stop auto refresh function
+    const stopAutoRefresh = useCallback(() => {
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+    }, []);
+
+    // Clean up interval on unmount
+    useEffect(() => {
+        return () => {
+            if (autoRefreshIntervalRef.current) {
+                clearInterval(autoRefreshIntervalRef.current);
+                autoRefreshIntervalRef.current = null;
+            }
+        };
+    }, []);
 
     // Execute withdraw transaction
     const executeWithdraw = useCallback(
@@ -189,5 +231,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
         executeWithdraw,
         refreshBalance,
         validateAmount,
+        startAutoRefresh,
+        stopAutoRefresh,
     };
 }

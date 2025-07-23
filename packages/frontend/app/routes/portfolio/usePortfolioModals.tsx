@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PortfolioDeposit from '~/components/Portfolio/PortfolioDeposit/PortfolioDeposit';
 import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
@@ -32,6 +32,10 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
         processDeposit: originalProcessDeposit,
         processWithdraw: originalProcessWithdraw,
         processSend: originalProcessSend,
+        startDepositAutoRefresh,
+        stopDepositAutoRefresh,
+        startWithdrawAutoRefresh,
+        stopWithdrawAutoRefresh,
     } = usePortfolioManager();
 
     // Determine which modal is currently open
@@ -46,6 +50,9 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
         depositModal.close();
         withdrawModal.close();
         sendModal.close();
+        // Stop all auto refresh when closing modals
+        stopDepositAutoRefresh();
+        stopWithdrawAutoRefresh();
     };
 
     const processDeposit = useCallback(
@@ -85,11 +92,15 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
     const openDepositModal = () => {
         closeAllPortfolioModals();
         depositModal.open();
+        // Start auto refresh when opening deposit modal
+        startDepositAutoRefresh();
     };
 
     const openWithdrawModal = () => {
         closeAllPortfolioModals();
         withdrawModal.open();
+        // Start auto refresh when opening withdraw modal
+        startWithdrawAutoRefresh();
     };
 
     const openSendModal = () => {
@@ -99,6 +110,43 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
 
     const activePortfolioModalType = getActiveModal();
     const isAnyPortfolioModalOpen = activePortfolioModalType !== null;
+
+    // Memoize portfolio data to prevent unnecessary re-renders
+    const depositPortfolioData = useMemo(
+        () =>
+            selectedPortfolio
+                ? {
+                      id: selectedPortfolio.id,
+                      name: selectedPortfolio.name,
+                      availableBalance: selectedPortfolio.balances.wallet,
+                      unit: selectedPortfolio.unit,
+                  }
+                : null,
+        [
+            selectedPortfolio?.id,
+            selectedPortfolio?.name,
+            selectedPortfolio?.balances.wallet,
+            selectedPortfolio?.unit,
+        ],
+    );
+
+    const withdrawPortfolioData = useMemo(
+        () =>
+            selectedPortfolio
+                ? {
+                      id: selectedPortfolio.id,
+                      name: selectedPortfolio.name,
+                      availableBalance: selectedPortfolio.balances.contract,
+                      unit: selectedPortfolio.unit,
+                  }
+                : null,
+        [
+            selectedPortfolio?.id,
+            selectedPortfolio?.name,
+            selectedPortfolio?.balances.contract,
+            selectedPortfolio?.unit,
+        ],
+    );
 
     const PortfolioModalsRenderer =
         isAnyPortfolioModalOpen && selectedPortfolio ? (
@@ -115,34 +163,25 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                             : ''
                 }
             >
-                {activePortfolioModalType === 'deposit' && (
-                    <PortfolioDeposit
-                        portfolio={{
-                            id: selectedPortfolio.id,
-                            name: selectedPortfolio.name,
-                            availableBalance: selectedPortfolio.balances.wallet,
-                            unit: selectedPortfolio.unit,
-                        }}
-                        onDeposit={processDeposit}
-                        onClose={closeAllPortfolioModals}
-                        isProcessing={isProcessing}
-                    />
-                )}
+                {activePortfolioModalType === 'deposit' &&
+                    depositPortfolioData && (
+                        <PortfolioDeposit
+                            portfolio={depositPortfolioData}
+                            onDeposit={processDeposit}
+                            onClose={closeAllPortfolioModals}
+                            isProcessing={isProcessing}
+                        />
+                    )}
 
-                {activePortfolioModalType === 'withdraw' && (
-                    <PortfolioWithdraw
-                        portfolio={{
-                            id: selectedPortfolio.id,
-                            name: selectedPortfolio.name,
-                            availableBalance:
-                                selectedPortfolio.balances.contract,
-                            unit: selectedPortfolio.unit,
-                        }}
-                        onWithdraw={processWithdraw}
-                        onClose={closeAllPortfolioModals}
-                        isProcessing={isProcessing}
-                    />
-                )}
+                {activePortfolioModalType === 'withdraw' &&
+                    withdrawPortfolioData && (
+                        <PortfolioWithdraw
+                            portfolio={withdrawPortfolioData}
+                            onWithdraw={processWithdraw}
+                            onClose={closeAllPortfolioModals}
+                            isProcessing={isProcessing}
+                        />
+                    )}
 
                 {activePortfolioModalType === 'send' && (
                     <PortfolioSend
