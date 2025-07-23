@@ -13,14 +13,6 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
-import {
-    DFLT_EMBER_MARKET,
-    getUserMarginBucket,
-    USD_MINT,
-    type MarginBucketInfo,
-} from '@crocswap-libs/ambient-ember';
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { PublicKey } from '@solana/web3.js';
 import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
@@ -36,7 +28,7 @@ const MemoizedSymbolInfo = memo(SymbolInfo);
 type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol } = useTradeDataStore();
+    const { symbol, marginBucket } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     const { orderBookMode } = useAppSettings();
@@ -48,8 +40,6 @@ export default function Trade() {
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
-
-    const sessionState = useSession();
 
     const visibilityRefs = useRef<{
         order: boolean;
@@ -210,10 +200,6 @@ export default function Trade() {
         [symbol, activeTab],
     );
 
-    const [marginBucket, setMarginBucket] = useState<MarginBucketInfo | null>(
-        null,
-    );
-
     // Mobile view
     if (isMobile && symbol) {
         return (
@@ -274,41 +260,6 @@ export default function Trade() {
             </>
         );
     }
-
-    useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-
-        const fetchMarginBucket = async () => {
-            if (isEstablished(sessionState)) {
-                const marginBucket = await getUserMarginBucket(
-                    sessionState.connection,
-                    new PublicKey(
-                        'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                    ),
-                    // sessionState.walletPublicKey,
-                    BigInt(DFLT_EMBER_MARKET.mktId),
-                    USD_MINT,
-                    {},
-                );
-                // console.log({ marginBucket });
-                setMarginBucket(marginBucket);
-            }
-        };
-
-        fetchMarginBucket(); // Initial fetch on mount
-
-        if (isEstablished(sessionState)) {
-            intervalId = setInterval(() => {
-                fetchMarginBucket();
-            }, 2000); // Refresh every 2 seconds
-        }
-
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [sessionState]);
 
     return (
         <>

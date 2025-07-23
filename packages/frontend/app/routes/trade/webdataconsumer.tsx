@@ -208,7 +208,7 @@ export default function WebDataConsumer() {
         ({ data }: { data: WebData2Output }) => {
             // When using multi-socket mode, market data comes from market socket
             // So we only process user data from the user socket's webData2
-            if (!info.multiSocketInfo) {
+            if (!info?.multiSocketInfo) {
                 // Legacy mode: process all data from single socket
                 setCoins(data.data.coins);
                 setCoinPriceMap(data.data.coinPriceMap);
