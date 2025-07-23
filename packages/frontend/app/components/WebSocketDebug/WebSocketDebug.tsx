@@ -13,6 +13,7 @@ export default function WebSocketDebug() {
         if (!info?.multiSocketInfo) return;
 
         const checkStatus = () => {
+            if (!info.multiSocketInfo) return;
             const pool = info.multiSocketInfo.getPool();
             const status = pool.getConnectionStatus();
             setConnectionStatus(status);
