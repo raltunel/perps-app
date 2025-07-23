@@ -53,7 +53,13 @@ export const TradeHistoryTableModel:
         sortable: true,
         className: 'sizeCell',
         exportable: true,
-        exportAction: (v: number) => `="${v.toFixed(5)}"`,
+        exportAction: (v: number) => {
+            if (v >= 1) {
+                return Number(v.toFixed(2)).toString();
+            } else {
+                return Number(v.toFixed(4)).toString();
+            }
+        },
     },
     {
         name: 'Trade Value',
