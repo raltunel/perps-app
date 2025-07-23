@@ -15,6 +15,7 @@ interface PropsIF {
     symbol: string;
     selectedMode: OrderBookMode;
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
+    onFocus: () => void;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -29,6 +30,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         symbol,
         selectedMode,
         setSelectedMode,
+        onFocus,
     } = props;
 
     // Memoized ComboBox options
@@ -56,6 +58,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 className={className}
                 aria-label={ariaLabel}
                 placeholder='Enter Size'
+                onFocus={onFocus}
             />
             <button className={styles.tokenButton}>
                 <ComboBox
