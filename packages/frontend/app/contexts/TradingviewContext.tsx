@@ -30,6 +30,7 @@ import {
     defaultDrawingToolColors,
     getChartDefaultColors,
     getChartThemeColors,
+    getLiquidationsSvgIcon,
     priceFormatterFactory,
     type ChartLayout,
 } from '~/routes/chart/data/utils/utils';
