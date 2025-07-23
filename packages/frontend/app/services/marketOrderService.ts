@@ -1,9 +1,10 @@
-import { Connection, PublicKey } from '@solana/web3.js';
 import {
-    buildMarketBuyOrder,
-    buildMarketSellOrder,
     DFLT_EMBER_MARKET,
+    OrderSide,
+    TimeInForce,
+    buildOrderEntryTransaction,
 } from '@crocswap-libs/ambient-ember';
+import { Connection, PublicKey } from '@solana/web3.js';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -37,6 +38,7 @@ export class MarketOrderService {
     private async buildMarketOrderTransaction(
         params: MarketOrderParams,
         userPublicKey: PublicKey,
+        sessionPublicKey?: PublicKey,
         rentPayer?: PublicKey,
     ) {
         try {
@@ -64,29 +66,40 @@ export class MarketOrderService {
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
-                const transaction = await buildMarketBuyOrder(
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
-                    marketId,
-                    orderId,
-                    onChainQuantity,
-                    userPublicKey,
-                    BigInt('999999999999'), // maxPrice
+                    {
+                        marketId: marketId,
+                        orderId: orderId,
+                        side: OrderSide.Bid,
+                        qty: onChainQuantity,
+                        price: BigInt('0'), // market order convention is to use 0
+                        tif: { type: TimeInForce.IOC },
+                        user: userPublicKey,
+                        actor: sessionPublicKey,
+                        rentPayer: rentPayer,
+                    },
                     'confirmed',
-                    rentPayer, // Pass rent payer
                 );
                 console.log('✅ Market buy order built successfully');
+                console.log('  - Transaction details:', transaction);
                 return transaction;
             } else {
                 console.log('  - Building market SELL order...');
-                const transaction = await buildMarketSellOrder(
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
-                    marketId,
-                    orderId,
-                    onChainQuantity,
-                    userPublicKey,
-                    BigInt('1'), // minPrice
+                    {
+                        marketId: marketId,
+                        orderId: orderId,
+                        side: OrderSide.Bid,
+                        qty: onChainQuantity,
+                        price: BigInt('0'), // market order convention is to use 0
+                        tif: { type: TimeInForce.IOC },
+                        user: userPublicKey,
+                        actor: sessionPublicKey,
+                        rentPayer: rentPayer,
+                    },
                     'confirmed',
-                    rentPayer, // Pass rent payer
                 );
                 console.log('✅ Market sell order built successfully');
                 return transaction;
@@ -117,6 +130,7 @@ export class MarketOrderService {
         params: MarketOrderParams,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sendTransaction: (instructions: any[]) => Promise<any>,
         rentPayer?: PublicKey,
     ): Promise<MarketOrderResult> {
@@ -133,6 +147,7 @@ export class MarketOrderService {
             const transaction = await this.buildMarketOrderTransaction(
                 params,
                 userWalletKey,
+                sessionPublicKey,
                 rentPayer,
             );
 
