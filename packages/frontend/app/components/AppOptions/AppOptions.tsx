@@ -40,14 +40,14 @@ export default function AppOptions() {
                     isChecked={activeOptions['skipOpenOrderConfirm']}
                     toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
                 />
-                <OptionLine
+                {/* <OptionLine
                     text='Skip Close Position Confirmations'
                     isChecked={activeOptions['skipClosePositionConfirm']}
                     toggle={() =>
-                        // activeOptions.toggle('skipClosePositionConfirm')
-                        activeOptions.enable('skipClosePositionConfirm')
+                        activeOptions.toggle('skipClosePositionConfirm')
+                        // activeOptions.enable('skipClosePositionConfirm')
                     }
-                />
+                /> */}
                 {/* <OptionLine
                     text='Opt Out of Spot Dusting'
                     isChecked={activeOptions['optOutSpotDusting']}
@@ -61,13 +61,13 @@ export default function AppOptions() {
                     }
                 /> */}
             </ul>
-            <div className={styles.horizontal_divider} />
+            {/* <div className={styles.horizontal_divider} /> */}
             <ul>
-                <OptionLine
+                {/* <OptionLine
                     text='Display Verbose Errors'
                     isChecked={activeOptions['displayVerboseErrors']}
                     toggle={() => activeOptions.toggle('displayVerboseErrors')}
-                />
+                /> */}
                 <OptionLine
                     text='Enable Transaction Notifications'
                     isChecked={activeOptions['enableTxNotifications']}
@@ -80,38 +80,38 @@ export default function AppOptions() {
                         activeOptions.toggle('enableBackgroundFillNotif')
                     }
                 />
-                <OptionLine
+                {/* <OptionLine
                     text='Play Sound for Fills'
                     isChecked={activeOptions['playFillSound']}
                     toggle={() => activeOptions.toggle('playFillSound')}
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Animate Order Book'
                     isChecked={activeOptions['animateOrderBook']}
                     toggle={() => activeOptions.toggle('animateOrderBook')}
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Order Book Set Size on Click'
                     isChecked={activeOptions['clickToSetOrderBookSize']}
                     toggle={() =>
                         activeOptions.toggle('clickToSetOrderBookSize')
                     }
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Show Buys and Sells on Chart'
                     isChecked={activeOptions['showBuysSellsOnChart']}
                     toggle={() => activeOptions.toggle('showBuysSellsOnChart')}
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Show PnL'
                     isChecked={activeOptions['showPnL']}
                     toggle={() => activeOptions.toggle('showPnL')}
-                />
-                <OptionLine
+                /> */}
+                {/* <OptionLine
                     text='Show All Warnings'
                     isChecked={activeOptions['showAllWarnings']}
                     toggle={() => activeOptions.toggle('showAllWarnings')}
-                />
+                /> */}
             </ul>
             <div className={styles.horizontal_divider} />
             <ul>
