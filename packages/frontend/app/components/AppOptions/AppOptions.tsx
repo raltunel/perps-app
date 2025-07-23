@@ -61,6 +61,7 @@ export default function AppOptions() {
                     }
                 /> */}
             </ul>
+            {/* divider */}
             {/* <div className={styles.horizontal_divider} /> */}
             <ul>
                 {/* <OptionLine
