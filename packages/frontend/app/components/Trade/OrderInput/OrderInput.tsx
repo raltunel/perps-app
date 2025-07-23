@@ -1,3 +1,4 @@
+import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import React, {
     memo,
     useCallback,
@@ -9,20 +10,21 @@ import React, {
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -36,9 +38,6 @@ import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
-// import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
-import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -55,7 +54,7 @@ export interface ChaseOption {
     label: string;
 }
 
-export type MarginMode = 'cross' | 'isolated' | null;
+export type MarginMode = 'error' | 'isolated' | null;
 
 const marketOrderTypes = [
     {
@@ -64,12 +63,12 @@ const marketOrderTypes = [
         blurb: 'Buy/sell at the current price',
         icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
-    {
-        value: 'limit',
-        label: 'Limit',
-        blurb: 'Buy/Sell at a specific price or better',
-        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    },
+    // {
+    //     value: 'limit',
+    //     label: 'Limit',
+    //     blurb: 'Buy/Sell at a specific price or better',
+    //     icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    // },
     // disabled code 21 Jul 25
     // {
     //     value: 'stop_market',
@@ -86,7 +85,7 @@ const marketOrderTypes = [
     // {
     //     value: 'twap',
     //     label: 'TWAP',
-    //     blurb: 'Distributes trades across a specified time period',
+    //     blurb: 'Distributes trades aerror a specified time period',
     //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
     // },
     // {
@@ -130,19 +129,31 @@ function OrderInput({
         useMarketOrderService();
 
     const [leverage, setLeverage] = useState(1);
+
     const [price, setPrice] = useState('');
+
     const [stopPrice, setStopPrice] = useState('');
+
     const [positionSliderPercentageValue, setPositionSliderPercentageValue] =
         useState(0);
-    const [positionSizeInSymbolDenom, setPositionSizeInSymbolDenom] =
-        useState(0);
+
+    const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] = useState(0);
 
     // Track if we're processing an order
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
     useEffect(() => {
-        setRawSizeInput('');
-    }, [positionSizeInSymbolDenom]);
+        console.log({ notionalSymbolQtyNum });
+    }, [notionalSymbolQtyNum]);
+
+    const [sizeDisplay, setSizeDisplay] = useState('');
+
+    const isPriceInvalid = useMemo(() => {
+        return (
+            marketOrderType === 'limit' &&
+            (price === '' || price === '0' || price === '0.0')
+        );
+    }, [price, marketOrderType]);
 
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
@@ -155,15 +166,15 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minimumInputValue = 1;
+    const minNotionalUsdOrderSize = 0.99;
     // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
     const generateRandomMaximumInput = () => {
-        // Generate a random maximum between minimumInputValue and 100
+        // Generate a random maximum between minNotionalUsdOrderSize and 100
         const newMaximumInputValue =
-            Math.floor(Math.random() * (100 - minimumInputValue + 1)) +
-            minimumInputValue;
+            Math.floor(Math.random() * (100 - minNotionalUsdOrderSize + 1)) +
+            minNotionalUsdOrderSize;
 
         setTempMaximumLeverageInput(newMaximumInputValue);
     };
@@ -181,7 +192,12 @@ function OrderInput({
 
     const markPx = symbolInfo?.markPx;
 
-    const { parseFormattedNum, formatNumWithOnlyDecimals } = useNumFormatter();
+    const {
+        parseFormattedNum,
+        formatNumWithOnlyDecimals,
+        activeGroupSeparator,
+        formatNum,
+    } = useNumFormatter();
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -199,34 +215,73 @@ function OrderInput({
 
     const { validateAndApplyLeverageForMarket } = useLeverageStore();
 
-    const [availableToTrade, setAvailableToTrade] = useState(0);
+    const [userExceededAvailableMargin, setUserExceededAvailableMargin] =
+        useState(false);
 
-    const [currentPosition, setCurrentPosition] = useState(0);
+    const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
+
+    const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
+        useState(0);
+
+    const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
     useEffect(() => {
-        const availableToTrade =
+        const usdAvailableToTrade =
             marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
-        const normalizedAvailableToTrade = Number(availableToTrade) / 1_000_000;
-        setAvailableToTrade(normalizedAvailableToTrade);
+        const normalizedAvailableToTrade =
+            Number(usdAvailableToTrade) / 1_000_000;
+        setUsdAvailableToTrade(normalizedAvailableToTrade);
 
-        const currentPosition = marginBucket?.netPosition || 0;
-        const normalizedCurrentPosition = Number(currentPosition) / 100_000_000;
-        setCurrentPosition(normalizedCurrentPosition);
+        const currentPositionNotionalSize = marginBucket?.netPosition || 0;
+        const normalizedCurrentPosition =
+            Number(currentPositionNotionalSize) / 100_000_000;
+        setCurrentPositionNotionalSize(normalizedCurrentPosition);
     }, [marginBucket]);
 
-    const positionSizeInUSD = positionSizeInSymbolDenom * (markPx || 1);
+    function roundDownToMillionth(value: number) {
+        return Math.floor(value * 1_000_000) / 1_000_000;
+    }
 
-    const collateralInsufficient = availableToTrade < positionSizeInUSD;
+    const notionalUsdOrderSizeNum =
+        Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
-    const sizeLessThanMinimum = positionSizeInUSD < minimumInputValue;
+    useEffect(() => {
+        if (
+            positionSliderPercentageValue === 100 &&
+            markPx &&
+            !isEditingSizeInput &&
+            !userExceededAvailableMargin
+        ) {
+            setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
+        }
+    }, [
+        positionSliderPercentageValue,
+        usdAvailableToTrade,
+        leverage,
+        markPx,
+        isEditingSizeInput,
+        userExceededAvailableMargin,
+    ]);
+
+    const sizeLessThanMinimum =
+        notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
-        return formatNumWithOnlyDecimals(availableToTrade, 2);
-    }, [availableToTrade]);
+        return formatNum(usdAvailableToTrade, 2);
+    }, [usdAvailableToTrade, activeGroupSeparator]);
 
     const displayNumCurrentPosition = useMemo(() => {
-        return formatNumWithOnlyDecimals(currentPosition);
-    }, [currentPosition]);
+        return formatNum(
+            currentPositionNotionalSize,
+            6,
+            false,
+            false,
+            false,
+            false,
+            10000,
+            true,
+        );
+    }, [currentPositionNotionalSize, activeGroupSeparator]);
 
     const inputDetailsData = useMemo(
         () => [
@@ -244,20 +299,21 @@ function OrderInput({
         [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
     );
 
-    const orderValue = useMemo(() => {
+    const usdOrderValue = useMemo(() => {
+        let orderValue = 0;
         if (marketOrderType === 'market' || marketOrderType === 'stop_market') {
-            return positionSizeInSymbolDenom * parseNum(markPx || 0);
+            orderValue = notionalSymbolQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
             price &&
             price.length > 0 &&
-            positionSizeInSymbolDenom
+            notionalSymbolQtyNum
         ) {
-            return positionSizeInSymbolDenom * parseFormattedNum(price);
+            orderValue = notionalSymbolQtyNum * parseFormattedNum(price);
         }
-        return 0;
+        return orderValue;
     }, [
-        positionSizeInSymbolDenom,
+        notionalSymbolQtyNum,
         price,
         marketOrderType,
         markPx,
@@ -265,8 +321,16 @@ function OrderInput({
         parseFormattedNum,
     ]);
 
+    const marginRequired = useMemo(() => {
+        return usdOrderValue / leverage;
+    }, [usdOrderValue, leverage]);
+
+    const collateralInsufficient =
+        roundDownToMillionth(usdAvailableToTrade) <
+        roundDownToMillionth(marginRequired);
+
     useEffect(() => {
-        setPositionSizeInSymbolDenom(0);
+        setNotionalSymbolQtyNum(0);
         setPrice('');
 
         // Apply leverage validation when symbol changes
@@ -279,7 +343,7 @@ function OrderInput({
             const validatedLeverage = validateAndApplyLeverageForMarket(
                 symbol,
                 symbolInfo.maxLeverage,
-                minimumInputValue,
+                minNotionalUsdOrderSize,
             );
             setLeverage(validatedLeverage);
         } else if (
@@ -339,45 +403,124 @@ function OrderInput({
         setLeverage(value);
     };
 
-    const [rawSizeInput, setRawSizeInput] = useState('');
+    // 1. Keep sizeDisplay constant and update notionalSymbolQtyNum when markPx changes (and not in 'symbol' mode)
+    useEffect(() => {
+        if (
+            !isEditingSizeInput &&
+            selectedMode !== 'symbol' &&
+            sizeDisplay &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(sizeDisplay);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setNotionalSymbolQtyNum(parsedQty / markPx);
+            }
+        }
+        // Only depend on markPx here
+    }, [markPx]);
+
+    useEffect(() => {
+        if (
+            !isEditingSizeInput &&
+            selectedMode === 'usd' &&
+            sizeDisplay &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(sizeDisplay);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setSizeDisplay(
+                    formatNumWithOnlyDecimals(parsedQty * markPx, 2),
+                );
+            }
+        }
+        // Only depend on selectedMode here
+    }, [selectedMode, activeGroupSeparator]);
+
+    // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
+    useEffect(() => {
+        if (!isEditingSizeInput) {
+            if (selectedMode === 'symbol') {
+                setSizeDisplay(
+                    notionalSymbolQtyNum
+                        ? formatNumWithOnlyDecimals(
+                              notionalSymbolQtyNum,
+                              6,
+                              true,
+                          )
+                        : '',
+                );
+            } else if (markPx) {
+                setSizeDisplay(
+                    notionalSymbolQtyNum
+                        ? formatNumWithOnlyDecimals(
+                              notionalSymbolQtyNum * markPx,
+                              2,
+                              true,
+                          )
+                        : '',
+                );
+            }
+        }
+    }, [
+        notionalSymbolQtyNum,
+        selectedMode,
+        isEditingSizeInput,
+        markPx,
+        leverage,
+    ]);
+
+    useEffect(() => {
+        const percent = Math.min(
+            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
+                usdAvailableToTrade) *
+                100,
+            100,
+        );
+        console.log({ percent });
+        setPositionSliderPercentageValue(percent);
+    }, [leverage]);
+
+    const handleOnFocus = () => {
+        setIsEditingSizeInput(true);
+    };
 
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
-                setRawSizeInput(event);
+                setSizeDisplay(event);
             } else {
-                setRawSizeInput(event.target.value);
+                setSizeDisplay(event.target.value);
             }
         },
         [],
     );
 
-    const handleSizeBlur = useCallback(() => {
-        const parsed = parseFloat(rawSizeInput);
+    const handleSizeInputBlur = useCallback(() => {
+        setIsEditingSizeInput(false);
+        const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-
-            setPositionSizeInSymbolDenom(adjusted);
-
-            // Convert input symbol size to USD value
+            setNotionalSymbolQtyNum(adjusted);
             const usdValue = adjusted * (markPx || 1);
-
-            // Calculate new percentage, cap at 100%
-            const percent = Math.min((usdValue / availableToTrade) * 100, 100);
-            setPositionSliderPercentageValue(percent);
-
-            console.log('Committed size on blur:', adjusted);
-        } else {
-            console.log('Invalid size input:', rawSizeInput);
+            const percent = (usdValue / leverage / usdAvailableToTrade) * 100;
+            if (percent > 100) {
+                setUserExceededAvailableMargin(true);
+                setPositionSliderPercentageValue(100);
+            } else {
+                setUserExceededAvailableMargin(false);
+                setPositionSliderPercentageValue(percent);
+            }
+        } else if (sizeDisplay.trim() === '') {
+            setNotionalSymbolQtyNum(0);
         }
-    }, [availableToTrade, rawSizeInput, markPx, selectedMode]);
+    }, [usdAvailableToTrade, markPx, sizeDisplay, selectedMode]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', positionSizeInSymbolDenom);
+            console.log('Enter pressed:', sizeDisplay);
         }
     };
     // PRICE INPUT----------------------------------
@@ -422,24 +565,27 @@ function OrderInput({
     };
 
     // POSITION SIZE------------------------------
-    const handlePositionSizeChange = (value: number) => {
+    const handleSizeSliderChange = (value: number) => {
+        setIsEditingSizeInput(false);
+
         setPositionSliderPercentageValue(value);
-
-        // Calculate USD value from slider percent
-        const usdValue = (value / 100) * availableToTrade;
-
-        // Convert USD to symbol size
-        const symbolSize = usdValue / (markPx || 1);
-
-        setPositionSizeInSymbolDenom(Number(symbolSize.toFixed(6)));
+        if (marketOrderType === 'market') {
+            const notionalSymbolQtyNum =
+                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                leverage;
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+        } else if (marketOrderType === 'limit') {
+            setNotionalSymbolQtyNum(
+                Math.floor(
+                    (((value / 100) * usdAvailableToTrade) /
+                        (parseFormattedNum(price) || 1)) *
+                        leverage *
+                        100,
+                ) / 100,
+            );
+        }
     };
 
-    // useEffect(() => {
-    //     console.log({ selectedMode, symbol, markPx });
-    //     if (selectedMode === 'symbol' && markPx) {
-    //         setSymbolSize((positionSliderPercentageValue / markPx).toString());
-    //     }
-    // }, [selectedMode, symbol, markPx, positionSliderPercentageValue]);
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
     // const handleChaseOptionChange = (value: string) => {
@@ -496,16 +642,6 @@ function OrderInput({
             setPriceRangeTotalOrders(value);
         }
     };
-
-    const displayQty =
-        rawSizeInput !== ''
-            ? rawSizeInput
-            : formatNumWithOnlyDecimals(
-                  selectedMode === 'symbol'
-                      ? positionSizeInSymbolDenom
-                      : positionSizeInSymbolDenom * (markPx || 1),
-                  selectedMode === 'symbol' ? 6 : 2,
-              );
 
     const priceDistributionButtons = useMemo(
         () => (
@@ -566,7 +702,7 @@ function OrderInput({
         () => ({
             value: leverage,
             onChange: handleLeverageChange,
-            minimumInputValue: minimumInputValue,
+            minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
         }),
         [leverage, handleLeverageChange],
@@ -608,9 +744,11 @@ function OrderInput({
 
     const sizeInputProps = useMemo(
         () => ({
-            value: displayQty,
+            value: sizeDisplay,
             onChange: handleSizeChange,
-            onBlur: handleSizeBlur,
+            onFocus: handleOnFocus,
+            onBlur: handleSizeInputBlur,
+            onUnfocus: () => setIsEditingSizeInput(false),
             onKeyDown: handleSizeKeyDown,
             className: 'custom-input',
             ariaLabel: 'Size input',
@@ -620,13 +758,13 @@ function OrderInput({
             useTotalSize,
         }),
         [
-            displayQty,
             handleSizeChange,
-            handleSizeBlur,
+            handleSizeInputBlur,
             handleSizeKeyDown,
             selectedMode,
             symbol,
             useTotalSize,
+            sizeDisplay,
         ],
     );
 
@@ -634,9 +772,9 @@ function OrderInput({
         () => ({
             step: 5,
             value: positionSliderPercentageValue,
-            onChange: handlePositionSizeChange,
+            onChange: handleSizeSliderChange,
         }),
-        [positionSliderPercentageValue, handlePositionSizeChange],
+        [positionSliderPercentageValue, handleSizeSliderChange],
     );
 
     const priceRangeProps = useMemo(
@@ -661,11 +799,11 @@ function OrderInput({
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // Validate position size
-        if (!positionSizeInSymbolDenom || positionSizeInSymbolDenom <= 0) {
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
                 title: 'Invalid Order Size',
                 message: 'Please enter a valid order size',
-                icon: 'cross',
+                icon: 'error',
             });
             confirmOrderModal.close();
             return;
@@ -675,7 +813,7 @@ function OrderInput({
             setIsProcessingOrder(true);
             // Execute the market buy order
             const result = await executeMarketOrder({
-                quantity: positionSizeInSymbolDenom,
+                quantity: notionalSymbolQtyNum,
                 side: 'buy',
             });
 
@@ -683,19 +821,19 @@ function OrderInput({
                 // Show success notification
                 notifications.add({
                     title: 'Buy Order Successful',
-                    message: `Successfully bought ${positionSizeInSymbolDenom.toFixed(6)} ${symbol}`,
+                    message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
                 // Reset position size after successful order
-                setPositionSizeInSymbolDenom(0);
+                setNotionalSymbolQtyNum(0);
                 setPositionSliderPercentageValue(0);
-                setRawSizeInput('');
+                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
-                    icon: 'cross',
+                    icon: 'error',
                 });
             }
         } catch (error) {
@@ -706,7 +844,7 @@ function OrderInput({
                     error instanceof Error
                         ? error.message
                         : 'Unknown error occurred',
-                icon: 'cross',
+                icon: 'error',
             });
         } finally {
             setIsProcessingOrder(false);
@@ -717,11 +855,11 @@ function OrderInput({
     // fn to submit a 'Sell' market order
     async function submitMarketSell(): Promise<void> {
         // Validate position size
-        if (!positionSizeInSymbolDenom || positionSizeInSymbolDenom <= 0) {
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
                 title: 'Invalid Order Size',
                 message: 'Please enter a valid order size',
-                icon: 'cross',
+                icon: 'error',
             });
             confirmOrderModal.close();
             return;
@@ -731,7 +869,7 @@ function OrderInput({
             setIsProcessingOrder(true);
             // Execute the market sell order
             const result = await executeMarketOrder({
-                quantity: positionSizeInSymbolDenom,
+                quantity: notionalSymbolQtyNum,
                 side: 'sell',
             });
 
@@ -739,19 +877,19 @@ function OrderInput({
                 // Show success notification
                 notifications.add({
                     title: 'Sell Order Successful',
-                    message: `Successfully sold ${positionSizeInSymbolDenom.toFixed(6)} ${symbol}`,
+                    message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
                 // Reset position size after successful order
-                setPositionSizeInSymbolDenom(0);
+                setNotionalSymbolQtyNum(0);
                 setPositionSliderPercentageValue(0);
-                setRawSizeInput('');
+                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
-                    icon: 'cross',
+                    icon: 'error',
                 });
             }
         } catch (error) {
@@ -762,7 +900,7 @@ function OrderInput({
                     error instanceof Error
                         ? error.message
                         : 'Unknown error occurred',
-                icon: 'cross',
+                icon: 'error',
             });
         } finally {
             setIsProcessingOrder(false);
@@ -798,6 +936,11 @@ function OrderInput({
 
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
+
+    const formattedSizeDisplay = formatNum(
+        parseFormattedNum(sizeDisplay),
+        selectedMode === 'symbol' ? 6 : 2,
+    );
 
     return (
         <div className={styles.mainContainer}>
@@ -944,12 +1087,13 @@ function OrderInput({
                             }
                         }}
                         orderMarketPrice={marketOrderType}
-                        orderValue={orderValue}
-                        leverage={leverage}
+                        usdOrderValue={usdOrderValue}
+                        marginRequired={marginRequired}
                         collateralInsufficient={
                             collateralInsufficient || isMarketOrderLoading
                         }
                         sizeLessThanMinimum={sizeLessThanMinimum}
+                        isPriceInvalid={isPriceInvalid}
                     />
                     {confirmOrderModal.isOpen && (
                         <Modal
@@ -977,20 +1121,16 @@ function OrderInput({
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
                                     initial={marginMode}
-                                    handleConfirm={(m: marginModesT): void => {
-                                        setMarginMode(m);
-                                        confirmOrderModal.close();
-                                    }}
+                                    handleConfirm={setMarginMode}
                                 />
                             )}
-
                             {confirmOrderModal.content === 'scale' && (
                                 <ScaleOrders
-                                    totalQuantity={parseFloat(
+                                    totalQuantity={parseFormattedNum(
                                         priceRangeTotalOrders,
                                     )}
-                                    minPrice={parseFloat(priceRangeMin)}
-                                    maxPrice={parseFloat(priceRangeMax)}
+                                    minPrice={parseFormattedNum(priceRangeMin)}
+                                    maxPrice={parseFormattedNum(priceRangeMax)}
                                     isModal
                                     onClose={confirmOrderModal.close}
                                 />
@@ -999,10 +1139,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_buy'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     isEnabled={
@@ -1021,10 +1161,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='market_sell'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     submitFn={submitMarketSell}
@@ -1043,10 +1183,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_buy'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     limitPrice={price}
@@ -1065,10 +1205,10 @@ function OrderInput({
                                 <ConfirmationModal
                                     tx='limit_sell'
                                     size={{
-                                        qty: displayQty,
+                                        qty: formattedSizeDisplay,
                                         denom:
                                             selectedMode === 'symbol'
-                                                ? symbolInfo?.symbol || ''
+                                                ? symbolInfo?.coin || ''
                                                 : 'USD',
                                     }}
                                     limitPrice={price}

@@ -5,6 +5,7 @@ import styles from './NumFormattedInput.module.css';
 interface NumFormattedInputProps {
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
+    onFocus?: () => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     className?: string;
@@ -15,6 +16,7 @@ interface NumFormattedInputProps {
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     value,
     onChange,
+    onFocus,
     onBlur,
     onKeyDown,
     className,
@@ -63,6 +65,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 type='text'
                 value={value}
                 onChange={handleChange}
+                onFocus={onFocus}
                 onBlur={onBlur}
                 onKeyDown={onKeyDown}
                 className={styles.numFormattedInput + ' ' + className}
