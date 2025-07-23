@@ -3,14 +3,14 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import {
-    buyColor,
     quantityTextFormatWithComma,
-    sellColor,
     type LineLabel,
 } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 export const useOpenOrderLines = (): LineData[] => {
+    const { bsColor, getBsColor } = useAppSettings();
     const { chart } = useTradingView();
     const { userSymbolOrders, positions, symbol } = useTradeDataStore();
     const { debugWallet } = useDebugStore();
@@ -49,7 +49,8 @@ export const useOpenOrderLines = (): LineData[] => {
                     oid,
                 } = order;
 
-                const color = side === 'buy' ? buyColor : sellColor;
+                const color =
+                    side === 'buy' ? getBsColor().buy : getBsColor().sell;
                 const xLoc = 0.4;
                 const tempTriggerCondition =
                     triggerCondition && triggerCondition !== 'N/A'
@@ -115,6 +116,7 @@ export const useOpenOrderLines = (): LineData[] => {
         debugWallet,
         symbol,
         JSON.stringify(pnlSzi),
+        bsColor,
     ]);
 
     return lines;
