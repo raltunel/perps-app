@@ -112,14 +112,14 @@
   status = 200
 
 [[redirects]]
-  from = "/v2/*"
-  to = "/index.html"
-  status = 200
-
-[[redirects]]
   from = "/v2/"
   to = "/v2/trade/BTC"
   status = 302
+
+[[redirects]]
+  from = "/v2/*"
+  to = "/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"
