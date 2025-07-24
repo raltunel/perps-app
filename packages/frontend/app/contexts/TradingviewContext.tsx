@@ -348,7 +348,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             setChart(tvWidget);
         });
-    }, [chartState, info]);
+    }, [chartState, info, symbol]);
 
     useEffect(() => {
         initChart();
