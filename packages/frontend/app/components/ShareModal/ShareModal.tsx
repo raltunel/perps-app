@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { LuCopy } from 'react-icons/lu';
-import { RiArrowDownLine, RiTwitterFill } from 'react-icons/ri';
+import { RiTwitterFill } from 'react-icons/ri';
 import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -118,16 +117,16 @@ export default function ShareModal(props: propsIF) {
                             </div>
                         </div>
                     </div>
-                    <div className={styles.price}>
+                    {/* <div className={styles.price}>
                         <div>Referral code:</div>
                         <div>{referralLink}</div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className={styles.info}>
-                    <div className={styles.referral_code}>
+                    {/* <div className={styles.referral_code}>
                         <div>Referral Code:</div>
                         <div>{REFERRAL_CODE}</div>
-                    </div>
+                    </div> */}
                     <div className={styles.custom_text}>
                         <label htmlFor={TEXTAREA_ID_FOR_DOM}>
                             Customize your text
@@ -141,12 +140,12 @@ export default function ShareModal(props: propsIF) {
                         />
                     </div>
                     <div className={styles.button_bank}>
-                        <button>
+                        {/* <button>
                             Save Image <RiArrowDownLine />
                         </button>
                         <button>
                             Copy Link <LuCopy />
-                        </button>
+                        </button> */}
                         <button
                             onClick={() => {
                                 const width = 550;
