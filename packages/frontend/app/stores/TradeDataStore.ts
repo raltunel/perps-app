@@ -133,6 +133,29 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
+            version: 1, // Bump version for migration!
+            migrate: (persistedState: unknown, version: number) => {
+                if (version < 1) {
+                    const safeState =
+                        persistedState ?? ({} as Partial<TradeDataStore>);
+
+                    const currentFavKeys =
+                        (safeState as TradeDataStore).favKeys ?? [];
+                    const mustHave = ['ETH', 'SOL'];
+
+                    for (const coin of mustHave) {
+                        if (!currentFavKeys.includes(coin)) {
+                            currentFavKeys.push(coin);
+                        }
+                    }
+
+                    return {
+                        ...safeState,
+                        favKeys: currentFavKeys,
+                    };
+                }
+                return persistedState ?? {};
+            },
             partialize: (state) => ({
                 marginMode: state.marginMode,
                 favKeys: state.favKeys,
