@@ -1,20 +1,8 @@
-import { useState, useEffect } from 'react';
 import TradeButton from '../TradeButton/TradeButton';
 import AnimatedPath from './AnimatedPath';
 import styles from './Hero.module.css';
 
 export default function Hero() {
-    const [duration, setDuration] = useState('4s'); // Start fast
-
-    useEffect(() => {
-        // After 2 seconds (enough time for the star to appear), switch to slow duration
-        const timer = setTimeout(() => {
-            setDuration('15s');
-        }, 2000);
-
-        return () => clearTimeout(timer);
-    }, []);
-
     return (
         <div className={styles.hero_container}>
             {/* Animated Background with multiple layers for depth */}
@@ -27,7 +15,6 @@ export default function Hero() {
                     color3='#CDC1FF'
                     beamLength={8}
                     skew={0.8}
-                    duration={duration}
                     strokeWidth='2'
                 />
                 {/* Secondary animation layer with different timing */}
@@ -38,7 +25,6 @@ export default function Hero() {
                     color3='#A099FF'
                     beamLength={6}
                     skew={0.9}
-                    duration='15s'
                     strokeWidth='1.5'
                 /> */}
                 {/* Tertiary animation layer for extra depth */}
@@ -49,7 +35,6 @@ export default function Hero() {
                     color3='#8B84F0'
                     beamLength={10}
                     skew={0.7}
-                    duration='18s'
                     strokeWidth='1'
                 /> */}
             </div>

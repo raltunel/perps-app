@@ -1,12 +1,10 @@
-import React from 'react';
-
 const AnimatedPath = ({
     color1 = '#1E1E24', // First color
     color2 = '#7371FC', // Second color
     color3 = '#CDC1FF', // Third color
     beamLength = 6, // Beam length parameter
     skew = 0.8,
-    duration = '10s', // Default duration
+    duration = '15s', // Default duration
     strokeWidth = '1', // Default stroke width
     className = '', // Allow custom className
 }) => {
@@ -48,9 +46,9 @@ const AnimatedPath = ({
             <defs>
                 <linearGradient
                     id={gradientId1}
-                    x1='0%'
+                    x1='-100%'
                     y1='0%'
-                    x2='0%'
+                    x2='-100%'
                     y2='0%'
                 >
                     {colors.map((color, index) => (
@@ -62,28 +60,28 @@ const AnimatedPath = ({
                     ))}
                     <animate
                         attributeName='x1'
-                        from='-50%'
+                        from='-100%'
                         to='150%'
                         dur={duration}
-                        begin='0s'
+                        begin='-14s'
                         fill='freeze'
                         repeatCount='indefinite'
                     />
                     <animate
                         attributeName='x2'
-                        from='50%'
+                        from='0%'
                         to='250%'
                         dur={duration}
-                        begin='0s'
+                        begin='-14s'
                         fill='freeze'
                         repeatCount='indefinite'
                     />
                 </linearGradient>
                 <linearGradient
                     id={gradientId2}
-                    x1='0%'
+                    x1='-100%'
                     y1='0%'
-                    x2='0%'
+                    x2='-100%'
                     y2='0%'
                 >
                     {colors.map((color, index) => (
@@ -95,19 +93,19 @@ const AnimatedPath = ({
                     ))}
                     <animate
                         attributeName='x1'
-                        from='-50%'
+                        from='-100%'
                         to='150%'
                         dur={duration}
-                        begin='0s'
+                        begin='-14s'
                         fill='freeze'
                         repeatCount='indefinite'
                     />
                     <animate
                         attributeName='x2'
-                        from='50%'
+                        from='0%'
                         to='250%'
                         dur={duration}
-                        begin='0s'
+                        begin='-14s'
                         fill='freeze'
                         repeatCount='indefinite'
                     />
