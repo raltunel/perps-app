@@ -34,7 +34,7 @@ import LeverageSlider from './LeverageSlider/LeverageSlider';
 import MarginModal from './MarginModal/MarginModal';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import styles from './OrderInput.module.css';
-import PlaceOrderButtons from './PlaceOrderButtons/PlaceOrderButtons';
+import TradeDirection from './TradeDirection/TradeDirection';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
@@ -42,6 +42,8 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import OrderDetails from './OrderDetails/OrderDetails';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -53,6 +55,7 @@ export interface ChaseOption {
     value: string;
     label: string;
 }
+export type OrderSide = 'buy' | 'sell';
 
 export type MarginMode = 'error' | 'isolated' | null;
 
@@ -122,7 +125,12 @@ function OrderInput({
 }: {
     marginBucket: MarginBucketInfo | null;
 }) {
+    const { getBsColor } = useAppSettings();
+
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
+    const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
 
     // Market order service hook
     const { executeMarketOrder, isLoading: isMarketOrderLoading } =
@@ -942,6 +950,61 @@ function OrderInput({
         selectedMode === 'symbol' ? 6 : 2,
     );
 
+    const handleSubmitOrder = () => {
+        if (tradeDirection === 'buy') {
+            if (marketOrderType === 'market') {
+                if (activeOptions.skipOpenOrderConfirm) {
+                    submitMarketBuy();
+                } else {
+                    confirmOrderModal.open('market_buy');
+                }
+            } else if (marketOrderType === 'limit') {
+                if (activeOptions.skipOpenOrderConfirm) {
+                    submitLimitBuy();
+                } else {
+                    confirmOrderModal.open('limit_buy');
+                }
+            }
+        } else {
+            if (marketOrderType === 'market') {
+                if (activeOptions.skipOpenOrderConfirm) {
+                    submitMarketSell();
+                } else {
+                    confirmOrderModal.open('market_sell');
+                }
+            } else if (marketOrderType === 'limit') {
+                if (activeOptions.skipOpenOrderConfirm) {
+                    submitLimitSell();
+                } else {
+                    confirmOrderModal.open('limit_sell');
+                }
+            }
+        }
+    };
+    const getDisabledReason = (
+        collateralInsufficient: boolean,
+        sizeLessThanMinimum: boolean,
+        isPriceInvalid: boolean,
+        isMarketOrderLoading: boolean,
+    ) => {
+        if (isMarketOrderLoading) return 'Processing order...';
+        if (collateralInsufficient) return 'Insufficient collateral';
+        if (sizeLessThanMinimum) return 'Order size below minimum';
+        if (isPriceInvalid) return 'Invalid price';
+        return null;
+    };
+    const isDisabled =
+        collateralInsufficient ||
+        sizeLessThanMinimum ||
+        isPriceInvalid ||
+        isMarketOrderLoading;
+    const disabledReason = getDisabledReason(
+        collateralInsufficient,
+        sizeLessThanMinimum,
+        isPriceInvalid,
+        isMarketOrderLoading,
+    );
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
@@ -1004,6 +1067,10 @@ function OrderInput({
                                 <PiSquaresFour />
                             </button>
                         </div>
+                        <TradeDirection
+                            tradeDirection={tradeDirection}
+                            setTradeDirection={setTradeDirection}
+                        />
 
                         <LeverageSlider {...leverageSliderProps} />
 
@@ -1055,46 +1122,32 @@ function OrderInput({
                             {...reduceAndProfitToggleProps}
                         /> */}
                     </div>
-                    <PlaceOrderButtons
-                        buyFn={() => {
-                            if (marketOrderType === 'market') {
-                                if (activeOptions.skipOpenOrderConfirm) {
-                                    submitMarketBuy();
-                                } else {
-                                    confirmOrderModal.open('market_buy');
-                                }
-                            } else if (marketOrderType === 'limit') {
-                                if (activeOptions.skipOpenOrderConfirm) {
-                                    submitLimitBuy();
-                                } else {
-                                    confirmOrderModal.open('limit_buy');
-                                }
-                            }
-                        }}
-                        sellFn={() => {
-                            if (marketOrderType === 'market') {
-                                if (activeOptions.skipOpenOrderConfirm) {
-                                    submitMarketSell();
-                                } else {
-                                    confirmOrderModal.open('market_sell');
-                                }
-                            } else if (marketOrderType === 'limit') {
-                                if (activeOptions.skipOpenOrderConfirm) {
-                                    submitLimitSell();
-                                } else {
-                                    confirmOrderModal.open('limit_sell');
-                                }
-                            }
-                        }}
-                        orderMarketPrice={marketOrderType}
-                        usdOrderValue={usdOrderValue}
-                        marginRequired={marginRequired}
-                        collateralInsufficient={
-                            collateralInsufficient || isMarketOrderLoading
-                        }
-                        sizeLessThanMinimum={sizeLessThanMinimum}
-                        isPriceInvalid={isPriceInvalid}
-                    />
+                    <div className={styles.button_details_container}>
+                        <Tooltip
+                            content={disabledReason}
+                            position='top'
+                            disabled={!isDisabled}
+                        >
+                            <button
+                                className={styles.submit_button}
+                                style={{
+                                    backgroundColor:
+                                        tradeDirection === 'buy'
+                                            ? buyColor
+                                            : sellColor,
+                                }}
+                                onClick={handleSubmitOrder}
+                                disabled={isDisabled}
+                            >
+                                Submit
+                            </button>
+                        </Tooltip>
+                        <OrderDetails
+                            orderMarketPrice={marketOrderType}
+                            usdOrderValue={usdOrderValue}
+                            marginRequired={marginRequired}
+                        />
+                    </div>
                     {confirmOrderModal.isOpen && (
                         <Modal
                             close={confirmOrderModal.close}
