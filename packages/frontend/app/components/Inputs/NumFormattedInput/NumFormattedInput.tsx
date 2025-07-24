@@ -3,6 +3,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './NumFormattedInput.module.css';
 
 interface NumFormattedInputProps {
+    id?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onFocus?: () => void;
@@ -14,6 +15,7 @@ interface NumFormattedInputProps {
 }
 
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
+    id,
     value,
     onChange,
     onFocus,
@@ -62,6 +64,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     return (
         <>
             <input
+                {...(id && { id })}
                 type='text'
                 value={value}
                 onChange={handleChange}
