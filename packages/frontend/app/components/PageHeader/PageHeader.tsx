@@ -16,17 +16,16 @@ import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
-import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-// import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
@@ -45,7 +44,7 @@ export default function PageHeader() {
     const location = useLocation();
 
     // symbol for active market
-    const { symbol, marginBucket, setMarginBucket } = useTradeDataStore();
+    const { symbol, setMarginBucket } = useTradeDataStore();
 
     // data to generate nav links in page header
     const navLinks = [
@@ -100,6 +99,8 @@ export default function PageHeader() {
         },
         [],
     );
+
+    const { openDepositModal, PortfolioModalsRenderer } = usePortfolioModals();
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
@@ -222,21 +223,10 @@ export default function PageHeader() {
                         >
                             <button
                                 className={styles.depositButton}
-                                onClick={() =>
-                                    setIsDepositDropdownOpen(
-                                        !isDepositDropdownOpen,
-                                    )
-                                }
+                                onClick={() => openDepositModal()}
                             >
                                 Deposit
                             </button>
-
-                            {isDepositDropdownOpen && (
-                                <DepositDropdown
-                                    isDropdown
-                                    marginBucket={marginBucket}
-                                />
-                            )}
                         </section>
                     )}
 
@@ -363,6 +353,7 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
+            {PortfolioModalsRenderer}
         </>
     );
 }
