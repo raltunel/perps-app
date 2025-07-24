@@ -20,11 +20,18 @@ export default function TradeRouteHandler() {
     };
 
     const checkSymbol = async () => {
-        const urlSymbol = marketId?.toUpperCase();
+        let urlSymbol = marketId;
 
         if (urlSymbol === undefined || urlSymbol === null || urlSymbol === '') {
             return getSymbolFromLS();
         } else {
+            // Convert lowercased url patterns into uppercase
+            // except coins like kPEPE, kBONK, etc.
+            const kTokenPattern = /^k[A-Z]+$/;
+            if (!kTokenPattern.test(urlSymbol)) {
+                urlSymbol = urlSymbol.toUpperCase();
+            }
+
             const response = await fetch(`https://api.hyperliquid.xyz/info`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

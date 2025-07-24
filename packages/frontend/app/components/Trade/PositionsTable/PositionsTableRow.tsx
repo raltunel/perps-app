@@ -91,10 +91,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             modalCtrl.open();
         }, [modalCtrl]);
 
-        const openLeverageModal = useCallback(() => {
-            setModalContent('leverage');
-            modalCtrl.open();
-        }, [modalCtrl]);
+        // const openLeverageModal = useCallback(() => {
+        //     setModalContent('leverage');
+        //     modalCtrl.open();
+        // }, [modalCtrl]);
 
         // Memoize modal content
         const renderModalContent = useCallback(() => {
@@ -160,7 +160,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     >
                         {position.coin}
                     </span>
-                    {position.leverage.value && (
+                    {/* {position.leverage.value && (
                         <span
                             className={styles.badge}
                             onClick={openLeverageModal}
@@ -171,7 +171,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         >
                             {position.leverage.value}x
                         </span>
-                    )}
+                    )} */}
                 </div>
                 <div
                     className={`${styles.cell} ${styles.sizeCell}`}

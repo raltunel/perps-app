@@ -142,6 +142,7 @@ export default function PositionSize({
     }, [isDragging, onChange]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+        (e.target as HTMLElement).focus();
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
@@ -248,6 +249,7 @@ export default function PositionSize({
 
                         {/* Draggable knob */}
                         <div
+                            tabIndex={-1}
                             ref={knobRef}
                             className={styles.sliderKnob}
                             style={{

@@ -43,6 +43,8 @@ type TradeDataStore = UserTradeDataStore & {
     setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
     marginBucket: MarginBucketInfo | null;
     setMarginBucket: (marginBucket: MarginBucketInfo | null) => void;
+    isTradeInfoExpanded: boolean;
+    setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -125,6 +127,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             userNonFundingLedgerUpdates: [],
             setUserNonFundingLedgerUpdates: (updates: TransactionData[]) =>
                 set({ userNonFundingLedgerUpdates: updates }),
+            isTradeInfoExpanded: false,
+            setIsTradeInfoExpanded: (shouldExpand: boolean) =>
+                set({ isTradeInfoExpanded: shouldExpand }),
         }),
         {
             name: 'TRADE_DATA',
@@ -137,6 +142,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                         ? 'Positions'
                         : state.selectedTradeTab,
                 userNonFundingLedgerUpdates: state.userNonFundingLedgerUpdates,
+                isTradeInfoExpanded: state.isTradeInfoExpanded,
             }),
         },
     ),

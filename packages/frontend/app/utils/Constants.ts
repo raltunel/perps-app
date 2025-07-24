@@ -104,7 +104,8 @@ export * from './feeSchedule';
 
 export const TWITTER_CHARACTER_LIMIT = 240;
 
-export const PERPS_TWITTER = '@AmbientPerps';
+export const PERPS_TWITTER = '@ambient_finance';
+export const FOGO_TWITTER = '@FogoChain';
 
 export enum WsChannels {
     ORDERBOOK = 'l2Book',

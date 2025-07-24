@@ -1,12 +1,13 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './PlaceOrderButtons.module.css';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 interface propsIF {
     buyFn: () => void;
@@ -42,7 +43,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
 
     const sessionState = useSession();
 
-    const [isExpanded, setIsExpanded] = useState(false);
+    const { isTradeInfoExpanded, setIsTradeInfoExpanded } = useTradeDataStore();
 
     const disableButtons = useMemo(
         () =>
@@ -157,10 +158,6 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
 
     const hasMoreItems = useMemo(() => dataToUse.length > 2, [dataToUse]);
 
-    const handleToggleExpand = useCallback(() => {
-        setIsExpanded((prev) => !prev);
-    }, []);
-
     return (
         <div className={styles.place_order_buttons}>
             <div className={styles.buttons_wrapper}>
@@ -182,7 +179,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                 </button>
             </div>
             <motion.div
-                className={`${styles.input_details} ${isExpanded ? styles.expanded : ''}`}
+                className={`${styles.input_details} ${isTradeInfoExpanded ? styles.expanded : ''}`}
                 layout
                 transition={{
                     duration: 0.3,
@@ -192,7 +189,7 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                 <div className={styles.details_viewport}>
                     <motion.div className={styles.details_container} layout>
                         {dataToUse.map((data: MarketInfoItem, idx: number) => {
-                            const isVisible = idx < 2 || isExpanded;
+                            const isVisible = idx < 2 || isTradeInfoExpanded;
 
                             if (!isVisible) return null;
 
@@ -235,16 +232,20 @@ const PlaceOrderButtons: React.FC<propsIF> = React.memo((props) => {
                 {hasMoreItems && (
                     <motion.button
                         className={styles.scroll_button}
-                        onClick={handleToggleExpand}
+                        onClick={() =>
+                            setIsTradeInfoExpanded(!isTradeInfoExpanded)
+                        }
                         aria-label={
-                            isExpanded ? 'Collapse details' : 'Expand details'
+                            isTradeInfoExpanded
+                                ? 'Collapse details'
+                                : 'Expand details'
                         }
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                         transition={{ duration: 0.2 }}
                     >
                         <motion.div
-                            animate={{ rotate: isExpanded ? 180 : 0 }}
+                            animate={{ rotate: isTradeInfoExpanded ? 180 : 0 }}
                             transition={{
                                 duration: 0.2,
                                 ease: [0.4, 0.0, 0.2, 1],
