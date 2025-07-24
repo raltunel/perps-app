@@ -3,7 +3,11 @@ import { RiTwitterFill } from 'react-icons/ri';
 import { tokenBackgroundMap } from '~/assets/tokens/tokenBackgroundMap';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { PERPS_TWITTER, TWITTER_CHARACTER_LIMIT } from '~/utils/Constants';
+import {
+    FOGO_TWITTER,
+    PERPS_TWITTER,
+    TWITTER_CHARACTER_LIMIT,
+} from '~/utils/Constants';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import Modal from '../Modal/Modal';
 import perpsLogo from './perpsLogo.png';
@@ -132,7 +136,7 @@ export default function ShareModal(props: propsIF) {
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            defaultValue={`Trade $${memPosition.coin} perps on ${PERPS_TWITTER} using my referral code`}
+                            defaultValue={`Trade $${memPosition.coin} perps at ${PERPS_TWITTER} on ${FOGO_TWITTER} now`}
                         />
                     </div>
                     <div className={styles.button_bank}>
