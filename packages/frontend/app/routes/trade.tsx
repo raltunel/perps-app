@@ -122,7 +122,7 @@ export default function Trade() {
 
     useEffect(() => {
         if (!marketId)
-            navigate(`/v2/trade/${symbol.toUpperCase()}`, {
+            navigate(`/v2/trade/${symbol}`, {
                 replace: true,
                 viewTransition: true,
             });
