@@ -1,4 +1,4 @@
-import { OrderSide, type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
 import React, {
     memo,
     useCallback,
@@ -981,6 +981,29 @@ function OrderInput({
             }
         }
     };
+    const getDisabledReason = (
+        collateralInsufficient: boolean,
+        sizeLessThanMinimum: boolean,
+        isPriceInvalid: boolean,
+        isMarketOrderLoading: boolean,
+    ) => {
+        if (isMarketOrderLoading) return 'Processing order...';
+        if (collateralInsufficient) return 'Insufficient collateral';
+        if (sizeLessThanMinimum) return 'Order size below minimum';
+        if (isPriceInvalid) return 'Invalid price';
+        return null;
+    };
+    const isDisabled =
+        collateralInsufficient ||
+        sizeLessThanMinimum ||
+        isPriceInvalid ||
+        isMarketOrderLoading;
+    const disabledReason = getDisabledReason(
+        collateralInsufficient,
+        sizeLessThanMinimum,
+        isPriceInvalid,
+        isMarketOrderLoading,
+    );
 
     return (
         <div className={styles.mainContainer}>
@@ -1100,24 +1123,30 @@ function OrderInput({
                         /> */}
                     </div>
                     <div className={styles.button_details_container}>
-                        <button
-                            className={styles.submit_button}
-                            style={{
-                                backgroundColor:
-                                    tradeDirection === 'buy'
-                                        ? buyColor
-                                        : sellColor,
-                            }}
-                            onClick={handleSubmitOrder}
-                            // disabled={
-                            //     collateralInsufficient ||
-                            //     sizeLessThanMinimum ||
-                            //     isPriceInvalid ||
-                            //     isMarketOrderLoading
-                            // }
+                        <Tooltip
+                            content={disabledReason}
+                            position='top'
+                            disabled={!isDisabled}
                         >
-                            Submit
-                        </button>
+                            <button
+                                className={styles.submit_button}
+                                style={{
+                                    backgroundColor:
+                                        tradeDirection === 'buy'
+                                            ? buyColor
+                                            : sellColor,
+                                }}
+                                onClick={handleSubmitOrder}
+                                disabled={
+                                    collateralInsufficient ||
+                                    sizeLessThanMinimum ||
+                                    isPriceInvalid ||
+                                    isMarketOrderLoading
+                                }
+                            >
+                                Submit
+                            </button>
+                        </Tooltip>
                         <OrderDetails
                             orderMarketPrice={marketOrderType}
                             usdOrderValue={usdOrderValue}

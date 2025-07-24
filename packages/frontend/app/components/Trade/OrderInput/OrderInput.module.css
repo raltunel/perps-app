@@ -252,15 +252,11 @@
     background: var(--accent1);
 }
 .submit_button:disabled {
-    background: var(--bg-dark4, #27272c);
+    background: var(--bg-dark4, #27272c) !important;
     color: var(--text2, #bcbcc4);
     cursor: not-allowed;
 }
-.submit_button:disabled:hover {
-    background: var(--bg-dark4, #27272c);
-    color: var(--text2, #bcbcc4);
-    cursor: not-allowed;
-}
+
 .submit_button::before {
     content: '';
     position: absolute;
@@ -276,4 +272,12 @@
 
 .submit_button:hover::before {
     background: rgba(0, 0, 0, 0.15);
+}
+
+.submit_button:disabled::before {
+    display: none;
+}
+
+.submit_button:disabled:hover {
+    background: var(--bg-dark4, #27272c) !important;
 }
