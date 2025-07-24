@@ -1137,12 +1137,7 @@ function OrderInput({
                                             : sellColor,
                                 }}
                                 onClick={handleSubmitOrder}
-                                disabled={
-                                    collateralInsufficient ||
-                                    sizeLessThanMinimum ||
-                                    isPriceInvalid ||
-                                    isMarketOrderLoading
-                                }
+                                disabled={isDisabled}
                             >
                                 Submit
                             </button>
