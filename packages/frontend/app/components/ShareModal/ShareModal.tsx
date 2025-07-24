@@ -27,7 +27,7 @@ export default function ShareModal(props: propsIF) {
     const { formatNum } = useNumFormatter();
     const { coinPriceMap } = useTradeDataStore();
 
-    const REFERRAL_CODE = '0x1';
+    // const REFERRAL_CODE = '0x1';
 
     const TEXTAREA_ID_FOR_DOM = 'share_card_custom_text';
 
@@ -41,7 +41,8 @@ export default function ShareModal(props: propsIF) {
     const bgType =
         tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
 
-    const referralLink = `https://ambient.finance/v2/join/` + REFERRAL_CODE;
+    const referralLink = 'https://perps.ambient.finance';
+    // const referralLink = `https://ambient.finance/v2/join/` + REFERRAL_CODE;
 
     return (
         <Modal title='' close={close}>
@@ -136,7 +137,7 @@ export default function ShareModal(props: propsIF) {
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            defaultValue={`Trade $${memPosition.coin} perps at ${PERPS_TWITTER} on ${FOGO_TWITTER} now`}
+                            defaultValue={`Trade $${memPosition.coin} perps at ${PERPS_TWITTER} on ${FOGO_TWITTER} Testnet now`}
                         />
                     </div>
                     <div className={styles.button_bank}>
