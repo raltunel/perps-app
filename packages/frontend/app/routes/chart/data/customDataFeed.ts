@@ -10,6 +10,7 @@ import {
     getMarkColorData,
     getMarkFillData,
     updateCandleCache,
+    updateMarkDataWithSubscription,
 } from './candleDataCache';
 import { processWSCandleMessage } from './processChartData';
 import {
@@ -179,6 +180,12 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                     poolFills.sort((a: any, b: any) => b.time - a.time);
 
                     fillMarks(poolFills);
+
+                    updateMarkDataWithSubscription(
+                        symbolInfo.name,
+                        poolFills,
+                        userWallet,
+                    );
 
                     const markArray = [
                         ...bSideOrderHistoryMarks.values(),
