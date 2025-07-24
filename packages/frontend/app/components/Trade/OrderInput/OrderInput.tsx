@@ -434,7 +434,7 @@ function OrderInput({
             }
         }
         // Only depend on selectedMode here
-    }, [selectedMode, activeGroupSeparator]);
+    }, [selectedMode]);
 
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
