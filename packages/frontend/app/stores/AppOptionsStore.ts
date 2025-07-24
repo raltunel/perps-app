@@ -4,7 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 // default values for the state values managed by this hook
 const DEFAULTS = {
     skipOpenOrderConfirm: false,
-    skipClosePositionConfirm: true,
+    skipClosePositionConfirm: false,
     optOutSpotDusting: false,
     persistTradingConnection: false,
     displayVerboseErrors: false,
