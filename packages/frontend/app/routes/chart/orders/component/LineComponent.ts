@@ -14,6 +14,9 @@ export type LineData = {
     type: 'PNL' | 'LIMIT' | 'LIQ';
     labelLocations?: LabelLocation[];
     oid?: number;
+    lineStyle: number;
+    lineWidth: number;
+    styleType?: number;
 };
 
 interface LineProps {
@@ -124,6 +127,8 @@ const LineComponent = ({
                             chart,
                             line.yPrice,
                             line.color,
+                            line.lineStyle,
+                            line.lineWidth,
                         ),
                     };
                     orderLineItemsRef.current.push(shapeRefs);
@@ -151,6 +156,8 @@ const LineComponent = ({
                 activeLine.setProperties({
                     linecolor: lineData.color,
                     borderColor: lineData.color,
+                    linestyle: lineData.lineStyle,
+                    linewidth: lineData.lineWidth,
                 });
             }
         };

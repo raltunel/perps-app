@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useOpenOrderLines } from './useOpenOrderLines';
-import { usePositionOrderLines } from './usePositionOrderLines';
+// import { useOpenOrderLines } from './useOpenOrderLines';
+// import { usePositionOrderLines } from './usePositionOrderLines';
 import LineComponent, { type LineData } from './component/LineComponent';
 import LabelComponent from './component/LabelComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
@@ -8,6 +8,7 @@ import type { IPaneApi } from '~/tv/charting_library';
 import type { LabelLocationData } from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
+import { useOpenOrderLines } from './useOpenOrderLines';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -30,7 +31,7 @@ export default function OrderLines({
     const { chart } = useTradingView();
 
     const openLines = useOpenOrderLines();
-    const positionLines = usePositionOrderLines();
+    // const positionLines = usePositionOrderLines();
 
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
@@ -48,13 +49,121 @@ export default function OrderLines({
     >(undefined);
 
     useEffect(() => {
-        const updatedLines = openLines.map((line) =>
+        console.log({ openLines });
+
+        if (!chart || !scaleData) return;
+
+        setLines([
+            {
+                xLoc: 0.4,
+                yPrice: Math.ceil(scaleData.yScale.invert(100)),
+                textValue: {
+                    type: 'Limit',
+                    price: Math.ceil(scaleData.yScale.invert(100)),
+                    triggerCondition: '',
+                },
+                quantityTextValue: 0.00021,
+                color: '#26A69A',
+                type: 'LIMIT',
+                oid: 119130072218,
+                lineStyle: 3,
+                lineWidth: 1,
+            },
+            {
+                xLoc: 0.2,
+                yPrice: scaleData.yScale.invert(120),
+                textValue: {
+                    type: 'Liq',
+                    text: ' Liq. Price',
+                },
+                color: '#EF5350',
+                type: 'LIQ',
+                lineStyle: 0,
+                lineWidth: 2,
+                styleType: 3,
+            },
+
+            {
+                xLoc: 0.2,
+                yPrice: scaleData.yScale.invert(145),
+                textValue: {
+                    type: 'Liq',
+                    text: ' Liq. Price',
+                },
+                color: '#EF5350',
+                type: 'LIQ',
+                lineStyle: 5,
+                lineWidth: 2,
+                styleType: 4,
+            },
+
+            {
+                xLoc: 0.2,
+                yPrice: scaleData.yScale.invert(170),
+                textValue: {
+                    type: 'Liq',
+                    text: ' Liq. Price',
+                },
+                color: '#EF5350',
+                type: 'LIQ',
+                lineStyle: 5,
+                lineWidth: 2,
+                styleType: 5,
+            },
+            // {
+            //     xLoc: 0.2,
+            //     yPrice: scaleData.yScale.invert(200),
+            //     textValue: {
+            //         type: 'Liq',
+            //         text: ' Liq. Price',
+            //     },
+            //     color: '#EF5350',
+            //     type: 'LIQ',
+            //     lineStyle: 5,
+            //     lineWidth: 3,
+            //     styleType: 2,
+            // },
+
+            // {
+            //     xLoc: 0.2,
+            //     yPrice: scaleData.yScale.invert(250),
+            //     textValue: {
+            //         type: 'Liq',
+            //         text: ' Liq. Price',
+            //     },
+            //     color: '#EF5350',
+            //     type: 'LIQ',
+            //     lineStyle: 5,
+            //     lineWidth: 3,
+            //     styleType: 1,
+            // },
+            {
+                xLoc: 0.2,
+                yPrice: scaleData.yScale.invert(60),
+                textValue: {
+                    type: 'Liq',
+                    text: ' Liq. Price',
+                },
+                color: '#EF5350',
+                type: 'LIQ',
+                lineStyle: 5,
+                lineWidth: 2,
+                styleType: 0,
+            },
+        ]);
+
+        /*   const updatedLines = openLines.map((line) =>
             selectedLine && line.oid === selectedLine.parentLine.oid
                 ? selectedLine.parentLine
                 : line,
         );
-        setLines([...updatedLines, ...positionLines]);
-    }, [openLines, positionLines, selectedLine]);
+        setLines([...updatedLines, ...positionLines]); */
+    }, [
+        /* openLines, positionLines, */ selectedLine,
+        openLines,
+        chart,
+        JSON.stringify(scaleData?.yScale.domain()),
+    ]);
 
     useEffect(() => {
         if (!chart || !scaleData) return;

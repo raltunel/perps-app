@@ -28,6 +28,8 @@ export const addCustomOrderLine = async (
     chart: IChartingLibraryWidget,
     orderPrice: number,
     lineColor: string,
+    lineStyle: number,
+    lineWidth: number,
 ) => {
     const orderLine = await chart
         .activeChart()
@@ -40,8 +42,8 @@ export const addCustomOrderLine = async (
             overrides: {
                 linecolor: lineColor,
                 borderColor: lineColor,
-                linestyle: 3,
-                linewidth: 1,
+                linestyle: lineStyle,
+                linewidth: lineWidth,
             },
         });
 
@@ -76,9 +78,10 @@ export const getPricetoPixel = (
     chartHeight?: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData?: any,
+    textHeight = 15,
 ) => {
     const dpr = window.devicePixelRatio || 1;
-    const textHeight = 15 * dpr;
+    const orgTextHeight = textHeight * dpr;
     let pixel = 0;
     const priceScalePane = chart.activeChart().getPanes()[0] as IPaneApi;
 
@@ -101,20 +104,20 @@ export const getPricetoPixel = (
             scaleData.scaleSymlog.constant(coordOffset);
             const logPrice = scaleData.scaleSymlog(price) * dpr;
 
-            pixel = logPrice - textHeight / 2;
+            pixel = logPrice - orgTextHeight / 2;
         } else {
             const priceDifference = maxPrice - minPrice;
             const relativePrice = price - minPrice;
             const pixelCoordinate =
                 (relativePrice / priceDifference) * chartHeightTemp;
 
-            pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
+            pixel = chartHeightTemp - pixelCoordinate - orgTextHeight / 2;
         }
 
         return {
             pixel: pixel,
             chartHeight: chartHeightTemp,
-            textHeight: textHeight,
+            textHeight: orgTextHeight,
         };
     }
 

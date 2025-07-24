@@ -41,6 +41,8 @@ export const usePositionOrderLines = (): LineData[] => {
                     quantityTextValue: order.szi,
                     color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
                     type: 'PNL',
+                    lineStyle: 3,
+                    lineWidth: 1,
                 });
             }
 
@@ -55,6 +57,8 @@ export const usePositionOrderLines = (): LineData[] => {
                     quantityTextValue: undefined,
                     color: getBsColor().sell,
                     type: 'LIQ',
+                    lineStyle: 3,
+                    lineWidth: 1,
                 });
             }
 

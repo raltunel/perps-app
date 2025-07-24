@@ -11,7 +11,15 @@ import {
     getPricetoPixel,
     quantityTextFormatWithComma,
 } from '../customOrderLineUtils';
-import { drawLabel, type LabelType } from '../orderLineUtils';
+import {
+    drawLabel,
+    drawLiqLabel,
+    drawLiqLabel2,
+    drawLiqLabel3,
+    drawLiqLabel4,
+    drawLiqLabel5,
+    type LabelType,
+} from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import type { IPaneApi } from '~/tv/charting_library';
 
@@ -104,6 +112,7 @@ const LabelComponent = ({
                     line.yPrice,
                     heightAttr,
                     scaleData,
+                    line.type === 'LIQ' ? 18 : 15,
                 ).pixel;
 
                 const xPixel = widthAttr * line.xLoc;
@@ -142,16 +151,87 @@ const LabelComponent = ({
                         : []),
                 ];
 
-                const labelLocations = drawLabel(ctx, {
-                    x: xPixel,
-                    y: yPricePixel,
-                    labelOptions,
-                });
+                if (line.type !== 'LIQ') {
+                    const labelLocations = drawLabel(ctx, {
+                        x: xPixel,
+                        y: yPricePixel,
+                        labelOptions,
+                    });
 
-                return {
-                    ...line,
-                    labelLocations,
-                };
+                    return {
+                        ...line,
+                        labelLocations,
+                    };
+                } else {
+                    let labelLocations;
+                    if (line.styleType === 0) {
+                        labelLocations = drawLabel(ctx, {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                        });
+                    }
+                    if (line.styleType === 1) {
+                        labelLocations = drawLiqLabel(ctx, {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                        });
+                    }
+
+                    if (line.styleType === 2) {
+                        labelLocations = drawLiqLabel2(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                            },
+                            canvasSize?.width,
+                        );
+                    }
+
+                    if (line.styleType === 3) {
+                        labelLocations = drawLiqLabel3(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                            },
+                            canvasSize?.width,
+                        );
+                    }
+
+                    if (line.styleType === 4) {
+                        labelLocations = drawLiqLabel4(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                            },
+                            canvasSize?.width,
+                        );
+                    }
+
+                    if (line.styleType === 5) {
+                        labelLocations = drawLiqLabel5(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                            },
+                            canvasSize?.width,
+                        );
+                    }
+
+                    return {
+                        ...line,
+                        labelLocations,
+                    };
+                }
             });
 
             drawnLabelsRef.current = linesWithLabels;

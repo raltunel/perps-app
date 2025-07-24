@@ -98,6 +98,9 @@ export const useOpenOrderLines = (): LineData[] => {
                     quantityTextValue = sz ?? pnlSzi ?? 0;
                 }
 
+                const lineStyle = 3;
+                const lineWidth = 1;
+
                 return {
                     xLoc,
                     yPrice,
@@ -106,6 +109,8 @@ export const useOpenOrderLines = (): LineData[] => {
                     color,
                     type,
                     oid,
+                    lineStyle,
+                    lineWidth,
                 };
             });
 
