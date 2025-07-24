@@ -548,6 +548,7 @@ export default function LeverageSlider({
     }, [isDragging, minimumInputValue, maximumInputValue, currentValue]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+        (e.target as HTMLElement).focus();
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
@@ -685,6 +686,7 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
+                            tabIndex={-1}
                         ></div>
                     </div>
 
