@@ -126,9 +126,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             ...currentSellData.map((d) => d.px),
         );
 
-        // Add 20px gap in center: sell area (0 to center-10px), buy area (center+10px to bottom)
+        // mid gap
         const centerY = chartHeight / 2;
-        const gapSize = 10; // 10px on each side = 20px total gap
+        const gapSize = 12;
 
         const buyYScale = d3
             .scaleLinear()
@@ -143,7 +143,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyYScaleRef.current = buyYScale;
         sellYScaleRef.current = sellYScale;
 
-        // Create D3 series
         const canvas = d3
             .select(d3CanvasLiq.current)
             .select('canvas')
