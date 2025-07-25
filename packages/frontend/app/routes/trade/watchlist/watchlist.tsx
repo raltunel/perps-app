@@ -10,6 +10,8 @@ const WatchList: React.FC = () => {
     const { favCoins, favKeys, symbol, addToFavKeys, removeFromFavKeys } =
         useTradeDataStore();
 
+    const whiteListedCoins = new Set(['BTC']);
+
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
         'dollar',
     );
@@ -69,6 +71,7 @@ const WatchList: React.FC = () => {
                                 prevDayPx={e.prevDayPx}
                                 isActive={false}
                                 showMode={watchListMode}
+                                disabled={!whiteListedCoins.has(e.coin)}
                             />
                         ))}
                 </div>

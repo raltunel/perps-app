@@ -10,9 +10,14 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
 import type {
     OrderBookMode,
+    OrderBookRowIF,
     OrderRowResolutionIF,
 } from '~/utils/orderbook/OrderBookIFs';
-import { getResolutionListForSymbol } from '~/utils/orderbook/OrderBookUtils';
+import {
+    createRandomOrderBookLiq,
+    getResolutionListForSymbol,
+    interpolateOrderBookData,
+} from '~/utils/orderbook/OrderBookUtils';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -28,6 +33,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         sells,
         highResBuys,
         highResSells,
+        setHighResBuys,
+        setHighResSells,
         selectedResolution,
         selectedMode,
         orderBookState,
@@ -35,6 +42,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         setSelectedMode,
         liqBuys,
         liqSells,
+        setLiqBuys,
+        setLiqSells,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
 
@@ -45,7 +54,34 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const liquidationsChartTabs = useMemo(() => ['Distribution', 'Feed'], []);
     const [activeTab, setActiveTab] = useState(liquidationsChartTabs[0]);
 
+    const buysRef = useRef<OrderBookRowIF[]>([]);
+    const sellsRef = useRef<OrderBookRowIF[]>([]);
+    buysRef.current = buys;
+    sellsRef.current = sells;
+
     const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+
+    const genRandomData = useCallback(() => {
+        const highResBuys = interpolateOrderBookData(buysRef.current);
+        const highResSells = interpolateOrderBookData(sellsRef.current);
+        setHighResBuys(highResBuys);
+        setHighResSells(highResSells);
+        const { liqBuys, liqSells } = createRandomOrderBookLiq(
+            buysRef.current,
+            sellsRef.current,
+        );
+        setLiqBuys(liqBuys);
+        setLiqSells(liqSells);
+    }, [setHighResBuys, setHighResSells, setLiqBuys, setLiqSells]);
+
+    useEffect(() => {
+        genRandomData();
+        const randomDataInterval = setInterval(() => {
+            genRandomData();
+        }, 1000);
+
+        return () => clearInterval(randomDataInterval);
+    }, []);
 
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
@@ -61,7 +97,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         const updateDimensions = () => {
             if (tabContentRef.current) {
                 const rect = tabContentRef.current.getBoundingClientRect();
-                setDimensions({ width: rect.width, height: rect.height - 20 });
+                setDimensions({ width: rect.width, height: rect.height - 40 });
             }
         };
 
@@ -192,6 +228,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 />
             </div>
             <div ref={tabContentRef} className={styles.tabContent}>
+                <div className={styles.startGap} />
                 {renderTabContent()}
             </div>
         </div>

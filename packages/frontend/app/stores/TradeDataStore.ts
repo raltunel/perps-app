@@ -43,6 +43,8 @@ type TradeDataStore = UserTradeDataStore & {
     setUserNonFundingLedgerUpdates: (updates: TransactionData[]) => void;
     marginBucket: MarginBucketInfo | null;
     setMarginBucket: (marginBucket: MarginBucketInfo | null) => void;
+    isTradeInfoExpanded: boolean;
+    setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -72,7 +74,8 @@ const useTradeDataStore = create<TradeDataStore>()(
                 }
                 set({ symbolInfo });
             },
-            favKeys: ['BTC'],
+            // favKeys: ['BTC'],
+            favKeys: ['BTC', 'ETH', 'SOL'],
             setFavKeys: (favs: string[]) => set({ favKeys: favs }),
             addToFavKeys: (coin: string) => {
                 if (
@@ -124,9 +127,32 @@ const useTradeDataStore = create<TradeDataStore>()(
             userNonFundingLedgerUpdates: [],
             setUserNonFundingLedgerUpdates: (updates: TransactionData[]) =>
                 set({ userNonFundingLedgerUpdates: updates }),
+            isTradeInfoExpanded: false,
+            setIsTradeInfoExpanded: (shouldExpand: boolean) =>
+                set({ isTradeInfoExpanded: shouldExpand }),
         }),
         {
             name: 'TRADE_DATA',
+            version: 1, // Bump version for migration!
+            migrate: (persistedState: unknown, version: number) => {
+                if (version < 1) {
+                    const currentFavKeys =
+                        (persistedState as TradeDataStore).favKeys ?? [];
+                    const mustHave = ['ETH', 'SOL'];
+
+                    for (const coin of mustHave) {
+                        if (!currentFavKeys.includes(coin)) {
+                            currentFavKeys.push(coin);
+                        }
+                    }
+
+                    return {
+                        ...(persistedState as TradeDataStore),
+                        favKeys: currentFavKeys,
+                    };
+                }
+                return persistedState ?? {};
+            },
             partialize: (state) => ({
                 marginMode: state.marginMode,
                 favKeys: state.favKeys,
@@ -136,6 +162,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                         ? 'Positions'
                         : state.selectedTradeTab,
                 userNonFundingLedgerUpdates: state.userNonFundingLedgerUpdates,
+                isTradeInfoExpanded: state.isTradeInfoExpanded,
             }),
         },
     ),

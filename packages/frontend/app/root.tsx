@@ -6,6 +6,7 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    useLocation,
 } from 'react-router';
 import Notifications from '~/components/Notifications/Notifications';
 import type { Route } from './+types/root';
@@ -113,7 +114,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
-
+    const location = useLocation();
+    const isHomePage = location.pathname === '/' || location.pathname === '';
     return (
         <>
             <Layout>
@@ -149,7 +151,9 @@ export default function App() {
                                     <ComponentErrorBoundary>
                                         <PageHeader />
                                     </ComponentErrorBoundary>
-                                    <main className='content'>
+                                    <main
+                                        className={`content ${isHomePage ? 'home-page' : ''}`}
+                                    >
                                         {/*  Added Suspense for async content loading */}
                                         <Suspense
                                             fallback={<LoadingIndicator />}
@@ -159,11 +163,11 @@ export default function App() {
                                             </ComponentErrorBoundary>
                                         </Suspense>
                                     </main>
-                                    <ComponentErrorBoundary>
+                                    {/* <ComponentErrorBoundary>
                                         <footer className='mobile-footer'>
                                             <MobileFooter />
                                         </footer>
-                                    </ComponentErrorBoundary>
+                                    </ComponentErrorBoundary> */}
 
                                     {/* Added error boundary for notifications */}
                                     <ComponentErrorBoundary>

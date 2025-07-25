@@ -97,7 +97,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     debugToolbarOpenRef.current = debugToolbarOpen;
 
     const [isChartReady, setIsChartReady] = useState(false);
-    const { marketId } = useParams<{ marketId: string }>();
     useEffect(() => {
         const res = getChartLayout();
         if (res?.interval) {
@@ -211,7 +210,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
-            symbol: marketId,
+            symbol: symbol,
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
@@ -347,7 +346,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             setChart(tvWidget);
         });
-    }, [chartState, info]);
+    }, [chartState, info, symbol]);
 
     useEffect(() => {
         initChart();
