@@ -53,7 +53,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const chartWidth = width;
 
     const animFrameRef = useRef<number | null>(null);
-    const animDuration = 10000;
+    const animDuration = 5000;
     const isAnimating = useRef(false);
     const isInitialized = useRef(false);
 
