@@ -456,6 +456,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         liqBuys,
         liqSells,
         updateScalesAndSeries,
+        width,
+        height,
     ]);
 
     // Cleanup on unmount
