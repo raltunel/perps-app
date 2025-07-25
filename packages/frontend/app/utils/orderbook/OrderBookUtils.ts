@@ -2,6 +2,7 @@ import type { TableSortDirection } from '../CommonIFs';
 import type { SymbolInfoIF } from '../SymbolInfoIFs';
 import type { ActiveTwapIF } from '../UserDataIFs';
 import type {
+    OrderBookLiqIF,
     OrderBookRowIF,
     OrderDataIF,
     OrderDataSortBy,
@@ -333,4 +334,51 @@ export const interpolateOrderBookData = (
     }
 
     return highResOrders;
+};
+
+export const createRandomOrderBookLiq = (
+    buys: OrderBookRowIF[],
+    sells: OrderBookRowIF[],
+): { liqBuys: OrderBookLiqIF[]; liqSells: OrderBookLiqIF[] } => {
+    const liqBuys: OrderBookLiqIF[] = [];
+    const liqSells: OrderBookLiqIF[] = [];
+
+    buys.forEach((buy) => {
+        liqBuys.push({
+            sz: buy.sz * Math.random() * 0.5,
+            type: 'buy',
+            px: buy.px,
+        });
+    });
+
+    sells.forEach((sell) => {
+        liqSells.push({
+            sz: sell.sz * Math.random() * 0.5,
+            type: 'sell',
+            px: sell.px,
+        });
+    });
+
+    let maxSz = 0;
+
+    liqBuys.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqSells.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqBuys.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+    liqSells.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+
+    return { liqBuys, liqSells };
 };
