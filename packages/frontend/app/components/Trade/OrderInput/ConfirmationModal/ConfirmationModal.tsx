@@ -2,7 +2,6 @@ import styles from './ConfirmationModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { modalContentT } from '../OrderInput';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 
@@ -38,6 +37,9 @@ export default function ConfirmationModal(props: propsIF) {
     } = props;
 
     const { getBsColor } = useAppSettings();
+
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
 
     const dataInfo: InfoItem[] = [
         {
@@ -115,12 +117,13 @@ export default function ConfirmationModal(props: propsIF) {
                     // reverse
                 />
             </div>
-            <SimpleButton
-                bg={isProcessing ? 'dark2' : 'accent1'}
+            <button
+                className={styles.confirmButton}
                 onClick={isProcessing ? undefined : submitFn}
                 style={{
                     height: '47px',
                     cursor: isProcessing ? 'not-allowed' : 'pointer',
+                    backgroundColor: tx.includes('buy') ? buyColor : sellColor,
                 }}
                 disabled={isProcessing}
             >
@@ -129,7 +132,7 @@ export default function ConfirmationModal(props: propsIF) {
                     : tx.includes('buy')
                       ? 'Buy / Long'
                       : 'Sell / Short'}
-            </SimpleButton>
+            </button>
         </div>
     );
 }
