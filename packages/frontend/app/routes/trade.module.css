@@ -135,6 +135,7 @@ body {
     display: grid;
     gap: var(--gap-s);
     grid-template-columns: minmax(0, 1fr);
+    height: 100%;
 }
 
 .chartLayout.liqActive {

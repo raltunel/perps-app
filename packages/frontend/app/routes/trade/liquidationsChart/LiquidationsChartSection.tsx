@@ -97,7 +97,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         const updateDimensions = () => {
             if (tabContentRef.current) {
                 const rect = tabContentRef.current.getBoundingClientRect();
-                setDimensions({ width: rect.width, height: rect.height - 60 });
+                setDimensions({ width: rect.width, height: rect.height - 40 });
             }
         };
 
