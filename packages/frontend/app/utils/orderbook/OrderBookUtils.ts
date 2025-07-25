@@ -2,6 +2,7 @@ import type { TableSortDirection } from '../CommonIFs';
 import type { SymbolInfoIF } from '../SymbolInfoIFs';
 import type { ActiveTwapIF } from '../UserDataIFs';
 import type {
+    OrderBookRowIF,
     OrderDataIF,
     OrderDataSortBy,
     OrderRowResolutionIF,
@@ -284,4 +285,52 @@ export const genRandomActiveTwap = (): ActiveTwapIF => {
         ).getTime(),
         user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     };
+};
+
+export const interpolateOrderBookData = (
+    orders: OrderBookRowIF[],
+    subRanges: number = 3,
+): OrderBookRowIF[] => {
+    if (orders.length === 0) return [];
+
+    const highResOrders: OrderBookRowIF[] = [orders[0]];
+
+    for (let i = 1; i < orders.length; i++) {
+        const pxDiff = orders[i].px - orders[i - 1].px;
+        let ratioDiff = 0;
+        if (orders[i].ratio && orders[i - 1].ratio) {
+            const r2 = orders[i].ratio;
+            const r1 = orders[i - 1].ratio;
+            ratioDiff = (r2 || 0) - (r1 || 0);
+        }
+
+        let usedSz = 0;
+
+        for (let j = 0; j < subRanges; j++) {
+            let midSz = 0;
+            if (j === subRanges - 1) {
+                midSz = orders[i].sz - usedSz;
+            } else {
+                midSz = ((orders[i].sz - usedSz) * Math.random()) / 2;
+                usedSz += midSz;
+            }
+            const midPx = orders[i - 1].px + (pxDiff / subRanges) * (j + 1);
+
+            let midRatio = (ratioDiff * midSz) / orders[i].sz;
+
+            if (midRatio < 0) {
+                console.log('>>> negative ratio');
+            }
+
+            const newOrder = {
+                ...orders[i],
+                px: midPx,
+                sz: midSz,
+                ratio: (orders[i].ratio || 0) + midRatio,
+            };
+            highResOrders.push(newOrder);
+        }
+    }
+
+    return highResOrders;
 };
