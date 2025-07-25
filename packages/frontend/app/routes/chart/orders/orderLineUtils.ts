@@ -110,8 +110,8 @@ export function drawLiqLabel(
         const warningIconRightBuffer = 15 * dpr;
         const iconY = y + warningIconTopBuffer;
         const iconX = chartWidth - warningIconRightBuffer;
-        const radius = WARNING_ICON_RADIUS;
-        const strokeCircleRADIUS = WARNING_ICON_RADIUS + 2;
+        const radius = WARNING_ICON_RADIUS * dpr;
+        const strokeCircleRADIUS = WARNING_ICON_RADIUS + 2 * dpr;
 
         // Warning Icon
         ctx.beginPath();
