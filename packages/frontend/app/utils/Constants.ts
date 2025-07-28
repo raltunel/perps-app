@@ -87,6 +87,10 @@ export const debugWallets: DebugWallet[] = [
         address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     },
     {
+        label: 'account2',
+        address: '0x68b36200a9066ba777504b64e2b07e5ec2c0d70f',
+    },
+    {
         label: 'strobie',
         address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
     },
