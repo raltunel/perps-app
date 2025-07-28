@@ -21,7 +21,7 @@ export default function WsConnectionChecker() {
 
     const { fetchTokenId, fetchTokenDetails } = useInfoApi();
 
-    const { symbol } = useTradeDataStore();
+    const { symbol, updateSymbolInfo } = useTradeDataStore();
     const { setTitleOverride, setIsTabActive } = useAppStateStore();
     const { formatNum } = useNumFormatter();
     const isTabPassive = useRef(false);
@@ -87,6 +87,7 @@ export default function WsConnectionChecker() {
     useEffect(() => {
         if (symbol && isWsSleepMode) {
             const fetcher = async () => {
+                console.log('>>> fetch token id', new Date().toISOString());
                 const tokenId = await fetchTokenId(symbol);
                 setTokenId(tokenId);
             };
@@ -95,9 +96,11 @@ export default function WsConnectionChecker() {
             titleSetterIntervalRef.current = setInterval(async () => {
                 if (tokenId) {
                     const tokenDetails = await fetchTokenDetails(tokenId);
+                    // update page title
                     setTitleOverride(
                         `${tokenDetails.markPx ? '$' + formatNum(tokenDetails.markPx) + ' | ' : ''} ${symbol?.toUpperCase() ? symbol?.toUpperCase() + ' | ' : ''}Ambient`,
                     );
+                    updateSymbolInfo(tokenDetails); // update symbol price in store also
                 }
             }, WS_SLEEP_MODE_PRICE_CHECK);
         } else {
