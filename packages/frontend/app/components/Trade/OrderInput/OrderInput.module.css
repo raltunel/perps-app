@@ -140,8 +140,9 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-s) 0px;
-    font-size: var(--font-size-m);
+    /* padding: var(--padding-s) 0px;
+    font-size: var(--font-size-m); */
+    height: 32px;
 }
 
 .launchpad > header > div {
