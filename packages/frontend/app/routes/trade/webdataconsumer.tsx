@@ -33,6 +33,8 @@ export default function WebDataConsumer() {
         setFavCoins,
         setUserOrders,
         symbol,
+        symbolInfo,
+        setSymbolInfo,
         setCoins,
         coins,
         setPositions,
@@ -58,7 +60,6 @@ export default function WebDataConsumer() {
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet?.address?.toLowerCase();
-    const { setSymbolInfo } = useTradeDataStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -84,6 +85,27 @@ export default function WebDataConsumer() {
         }
     }, [symbol, coins]);
 
+    // Add a periodic check to ensure symbolInfo stays updated
+    useEffect(() => {
+        const updateInterval = setInterval(() => {
+            const foundCoin = coins.find((coin) => coin.coin === symbol);
+            if (foundCoin && symbolInfo) {
+                // Only update if data has actually changed to avoid unnecessary re-renders
+                if (
+                    foundCoin.markPx !== symbolInfo.markPx ||
+                    foundCoin.oraclePx !== symbolInfo.oraclePx ||
+                    foundCoin.dayNtlVlm !== symbolInfo.dayNtlVlm ||
+                    foundCoin.funding !== symbolInfo.funding ||
+                    foundCoin.openInterest !== symbolInfo.openInterest
+                ) {
+                    setSymbolInfo(foundCoin);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(updateInterval);
+    }, [symbol, coins, symbolInfo, setSymbolInfo]);
+
     useEffect(() => {
         if (!info) return;
         setFetchedChannels(new Set());
@@ -97,6 +119,35 @@ export default function WebDataConsumer() {
         activeTwapsRef.current = [];
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
+
+        // Add connection monitoring
+        const monitorInterval = setInterval(() => {
+            const timeSinceLastData = Date.now() - lastDataTimestampRef.current;
+            if (timeSinceLastData > 30000) {
+                // 30 seconds without data
+                console.warn(
+                    `[WebDataConsumer] No market data received for ${Math.floor(timeSinceLastData / 1000)}s`,
+                );
+
+                // Check connection status
+                if (info.multiSocketInfo) {
+                    const pool = info.multiSocketInfo.getPool();
+                    const status = pool.getConnectionStatus();
+                    console.log('[WebDataConsumer] Connection status:', status);
+
+                    // Try to reconnect if disconnected
+                    const hasActiveConnection = Object.values(status).some(
+                        (connected) => connected,
+                    );
+                    if (!hasActiveConnection) {
+                        console.log(
+                            '[WebDataConsumer] No active connections, attempting reconnect...',
+                        );
+                        info.multiSocketInfo.reconnect();
+                    }
+                }
+            }
+        }, 10000); // Check every 10 seconds
 
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
@@ -189,6 +240,7 @@ export default function WebDataConsumer() {
 
         return () => {
             clearInterval(userDataInterval);
+            clearInterval(monitorInterval);
             unsubscribe();
             unsubscribeMarketData?.();
             unsubscribeOrderHistory();
@@ -204,8 +256,13 @@ export default function WebDataConsumer() {
         acccountOverviewPrevRef.current = accountOverview;
     }, [accountOverview]);
 
+    const lastDataTimestampRef = useRef<number>(Date.now());
+
     const handleWebData2WorkerResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
+            // Update last data timestamp
+            lastDataTimestampRef.current = Date.now();
+
             // When using multi-socket mode, market data comes from market socket
             // So we only process user data from the user socket's webData2
             if (!info?.multiSocketInfo) {
@@ -234,6 +291,9 @@ export default function WebDataConsumer() {
     // Handler for market-only data from market socket
     const handleWebData2MarketOnlyResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
+            // Update last data timestamp
+            lastDataTimestampRef.current = Date.now();
+
             // Only update market data (coins and price map)
             // This ensures market data always comes from the market endpoint
             setCoins(data.data.coins);
