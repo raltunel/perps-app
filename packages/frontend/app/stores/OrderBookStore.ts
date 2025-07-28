@@ -28,6 +28,8 @@ interface OrderBookStore {
     setTrades: (trades: OrderBookTradeIF[]) => void;
     setLiqBuys: (liqBuys: OrderBookLiqIF[]) => void;
     setLiqSells: (liqSells: OrderBookLiqIF[]) => void;
+    orderCount: number;
+    setOrderCount: (orderCount: number) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
@@ -57,4 +59,6 @@ export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
     setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
     setHighResBuys: (highResBuys: OrderBookRowIF[]) => set({ highResBuys }),
     setHighResSells: (highResSells: OrderBookRowIF[]) => set({ highResSells }),
+    orderCount: 9,
+    setOrderCount: (orderCount: number) => set({ orderCount }),
 }));

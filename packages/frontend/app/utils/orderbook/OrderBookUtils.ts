@@ -290,11 +290,45 @@ export const genRandomActiveTwap = (): ActiveTwapIF => {
 
 export const interpolateOrderBookData = (
     orders: OrderBookRowIF[],
+    closestPx: number,
     subRanges: number = 3,
 ): OrderBookRowIF[] => {
     if (orders.length === 0) return [];
 
-    const highResOrders: OrderBookRowIF[] = [orders[0]];
+    const highResOrders: OrderBookRowIF[] = [];
+
+    // Add subRows for before first point -------------------------
+    const closestPxDiff = (orders[0].px - closestPx) / 2;
+    const ratioDiff = orders[0].ratio || 0;
+    let usedSz = 0;
+    let usedRatio = 0;
+
+    const firstSubRanges = subRanges * 1;
+
+    for (let i = 0; i < firstSubRanges; i++) {
+        const midPx =
+            orders[0].px -
+            (closestPxDiff - (closestPxDiff / firstSubRanges) * i);
+        const midSz = (orders[0].sz / (firstSubRanges + 1)) * Math.random();
+        usedSz += midSz;
+
+        const midRatio = (ratioDiff * midSz) / orders[0].sz;
+        usedRatio += midRatio;
+
+        const newOrder = {
+            ...orders[0],
+            px: midPx,
+            sz: midSz,
+            ratio: midRatio,
+        };
+        highResOrders.push(newOrder);
+    }
+
+    highResOrders.push({
+        ...orders[0],
+        sz: orders[0].sz - usedSz,
+        ratio: (orders[0].ratio || 0) - usedRatio,
+    });
 
     for (let i = 1; i < orders.length; i++) {
         const pxDiff = orders[i].px - orders[i - 1].px;

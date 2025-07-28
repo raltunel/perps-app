@@ -53,7 +53,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const chartWidth = width;
 
     const animFrameRef = useRef<number | null>(null);
-    const animDuration = 5000;
+    const animDuration = 1000;
     const isAnimating = useRef(false);
     const isInitialized = useRef(false);
 
@@ -68,6 +68,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const xScale = xScaleRef.current;
             const buyYScale = buyYScaleRef.current;
+            console.log('>>>', buyYScale);
             const sellYScale = sellYScaleRef.current;
 
             context.save();
@@ -77,7 +78,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = 2;
             currentLiqBuysRef.current.forEach((liq) => {
                 const yPos = buyYScale(liq.px);
-                const xStart = xScale(liq.ratio || 0);
+                // const xStart = xScale(liq.ratio || 0);
+                const xStart = 0;
                 const xEnd = chartWidth;
                 context.beginPath();
                 context.moveTo(xStart, yPos);
@@ -90,7 +92,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = 2;
             currentLiqSellsRef.current.forEach((liq) => {
                 const yPos = sellYScale(liq.px);
-                const xStart = xScale(liq.ratio || 0);
+                // const xStart = xScale(liq.ratio || 0);
+                const xStart = 0;
                 const xEnd = chartWidth;
                 context.beginPath();
                 context.moveTo(xStart, yPos);
