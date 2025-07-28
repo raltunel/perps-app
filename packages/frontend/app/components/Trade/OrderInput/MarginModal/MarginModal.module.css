@@ -6,17 +6,11 @@
     gap: var(--gap-m);
 }
 
+/* wrapper for the two margin mode buttons */
 .margin_buttons {
-    /* display: grid;
-    grid-template-columns: repeat(2, 1fr); */
-    /* gap: var(--gap-m); */
-    /* width: 708px; */
-    /* height: auto; */
     display: flex;
     flex-direction: row;
     gap: var(--gap-m);
-
-    /* align-items: flex-start; */
 
     /* centralized CSS for border to apply situationally */
     --margin_modal_button_border: 1px solid var(--accent1);
@@ -28,7 +22,7 @@
     flex-direction: column;
     align-items: center;
     /* width is specified in Figma */
-    width: 330px;
+    width: 340px;
     gap: var(--gap-m);
     padding: var(--padding-m);
     border: 1px solid var(--bg-dark4);
@@ -42,7 +36,7 @@
 
 /* hover effect for margin mode buttons */
 .margin_buttons > button:hover {
-    border: var(--margin_modal_button_border) !important;
+    border: var(--margin_modal_button_border);
 }
 
 /* headline text inside each margin mode button */
@@ -51,6 +45,7 @@
     color: var(--text1);
 }
 
+/* main CTA to accept current selection and close the modal */
 .margin_modal_content > button {
     padding: 12px var(--padding-m);
     width: 100%;
@@ -59,6 +54,7 @@
     font-size: var(--font-size-m);
 }
 
+/* CSS to add the purple border to whichever button is clicked */
 .selected {
     border: var(--margin_modal_button_border) !important;
 }

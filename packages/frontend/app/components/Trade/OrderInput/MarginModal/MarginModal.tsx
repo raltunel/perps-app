@@ -10,6 +10,7 @@ interface propsIF {
 export default function MarginModal(props: propsIF) {
     const { initial, handleConfirm } = props;
 
+    // hook to track current user selection until CTA is clicked
     const [intermediate, setIntermediate] = useState<marginModesT>(initial);
 
     return (
