@@ -66,21 +66,21 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         if (buysRef.current.length === 0 || sellsRef.current.length === 0)
             return;
         const highResBuys = interpolateOrderBookData(
-            buysRef.current.slice(0, orderCount),
+            buysRef.current,
             sellsRef.current[0].px,
         );
         const highResSells = interpolateOrderBookData(
-            sellsRef.current.slice(0, orderCount),
+            sellsRef.current,
             buysRef.current[0].px,
         );
         setHighResBuys(highResBuys);
         setHighResSells(highResSells);
         const { liqBuys, liqSells } = createRandomOrderBookLiq(
-            buysRef.current.slice(0, orderCount),
-            sellsRef.current.slice(0, orderCount),
+            buysRef.current,
+            sellsRef.current,
         );
         setLiqBuys(liqBuys);
-        setLiqSells(liqSells);
+        setLiqSells(liqSells.reverse());
     }, [setHighResBuys, setHighResSells, setLiqBuys, setLiqSells, orderCount]);
 
     useEffect(() => {
@@ -128,17 +128,17 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             buyBlockHeight + sellBlockHeight + midHeaderHeight;
                     }
 
-                    console.log('>>>', height, rect.width);
                     setDimensions({ width: rect.width, height: height });
                 }
             }, 200);
         };
 
-        updateDimensions();
         window.addEventListener('resize', updateDimensions);
 
+        updateDimensions();
+
         return () => window.removeEventListener('resize', updateDimensions);
-    }, [orderCount]);
+    }, [orderCount, orderBookState]);
 
     const highResOrderCount = useMemo(() => {
         if (!highResBuys.length) return 30;

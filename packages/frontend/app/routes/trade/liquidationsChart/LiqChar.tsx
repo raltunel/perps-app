@@ -6,6 +6,7 @@ import type {
     OrderBookRowIF,
 } from '~/utils/orderbook/OrderBookIFs';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -27,7 +28,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
-    const gap = 0;
+    const gap = 12;
 
     // All refs instead of state
     const xScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
@@ -48,13 +49,17 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const currentLiqBuysRef = useRef<OrderBookLiqIF[]>([]);
     const currentLiqSellsRef = useRef<OrderBookLiqIF[]>([]);
 
+    const { orderCount } = useOrderBookStore();
+    const orderCountRef = useRef(0);
+    orderCountRef.current = orderCount;
+
     const { getBsColor } = useAppSettings();
 
     const chartHeight = height;
     const chartWidth = width;
 
     const animFrameRef = useRef<number | null>(null);
-    const animDuration = 1000;
+    const animDuration = 5000;
     const isAnimating = useRef(false);
     const isInitialized = useRef(false);
 
@@ -69,8 +74,20 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const xScale = xScaleRef.current;
             const buyYScale = buyYScaleRef.current;
-            console.log('>>>', buyYScale);
             const sellYScale = sellYScaleRef.current;
+
+            const midHeader = document.getElementById('orderBookMidHeader');
+            const obBuyBlock = document.getElementById('orderbook-buy-block');
+            const obSellBlock = document.getElementById('orderbook-sell-block');
+
+            const obBuyBlockHeight =
+                obBuyBlock?.getBoundingClientRect().height || 0;
+            const obSellBlockHeight =
+                obSellBlock?.getBoundingClientRect().height || 0;
+            const midHeaderHeight =
+                midHeader?.getBoundingClientRect().height || 0;
+
+            const rowHeight = obBuyBlockHeight / orderCountRef.current;
 
             context.save();
 
@@ -79,47 +96,63 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.textAlign = 'left';
             context.textBaseline = 'middle';
 
-            // Draw buy liquidation lines (in sell section)
+            // Get the Y ranges for each section
+            const buyYRange = buyYScale.range();
+            const sellYRange = sellYScale.range();
+
+            // Draw buy liquidation lines (in buy section) with equal spacing
             context.strokeStyle = getBsColor().sell;
-            context.lineWidth = 2;
-            currentLiqBuysRef.current.forEach((liq) => {
-                const yPos = buyYScale(liq.px);
-                // const xStart = xScale(liq.ratio || 0);
-                const xStart = 0;
-                const xEnd = chartWidth;
-                context.beginPath();
-                context.moveTo(xStart, yPos);
-                context.lineTo(xEnd, yPos);
-                context.stroke();
+            context.lineWidth = 1;
+            const buyLiqCount = currentLiqBuysRef.current.length;
+            if (buyLiqCount > 0) {
+                currentLiqBuysRef.current.forEach((liq, index) => {
+                    if (index >= orderCountRef.current) return;
+                    const yPos =
+                        obSellBlockHeight +
+                        midHeaderHeight +
+                        rowHeight * index +
+                        rowHeight / 2 +
+                        4;
+                    const xStart = 0;
+                    const xEnd = chartWidth;
+                    context.beginPath();
+                    context.moveTo(xStart, yPos);
+                    context.lineTo(xEnd, yPos);
+                    context.stroke();
 
-                // Draw px value text
-                context.fillStyle = getBsColor().sell;
-                const pxText = liq.px.toFixed(2);
-                context.fillText(pxText, xEnd - 60, yPos - 3);
-            });
+                    // Draw px value text
+                    context.fillStyle = getBsColor().sell;
+                    const pxText = liq.px.toFixed(2);
+                    context.fillText(pxText, xEnd - 60, yPos - 3);
+                });
+            }
 
-            // Draw sell liquidation lines (in buy section)
+            // Draw sell liquidation lines (in sell section) with equal spacing
             context.strokeStyle = getBsColor().buy;
-            context.lineWidth = 2;
-            currentLiqSellsRef.current.forEach((liq) => {
-                const yPos = sellYScale(liq.px);
-                // const xStart = xScale(liq.ratio || 0);
-                const xStart = 0;
-                const xEnd = chartWidth;
-                context.beginPath();
-                context.moveTo(xStart, yPos);
-                context.lineTo(xEnd, yPos);
-                context.stroke();
+            // context.strokeStyle = 'gray';
+            context.lineWidth = 1;
+            const sellLiqCount = currentLiqSellsRef.current.length;
+            if (sellLiqCount > 0) {
+                currentLiqSellsRef.current.forEach((liq, index) => {
+                    if (index >= orderCountRef.current) return;
+                    const yPos = rowHeight * index + rowHeight / 2;
+                    const xStart = 0;
+                    const xEnd = chartWidth;
+                    context.beginPath();
+                    context.moveTo(xStart, yPos);
+                    context.lineTo(xEnd, yPos);
+                    context.stroke();
 
-                // Draw px value text
-                context.fillStyle = getBsColor().buy;
-                const pxText = liq.px.toFixed(2);
-                context.fillText(pxText, xEnd - 60, yPos - 3);
-            });
+                    // Draw px value text
+                    context.fillStyle = getBsColor().buy;
+                    const pxText = liq.px.toFixed(2);
+                    context.fillText(pxText, xEnd - 60, yPos - 3);
+                });
+            }
 
             context.restore();
         },
-        [chartWidth, getBsColor],
+        [chartWidth, chartHeight, getBsColor],
     );
 
     const updateScalesAndSeries = useCallback(() => {
