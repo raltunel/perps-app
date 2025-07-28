@@ -1,43 +1,50 @@
 /* top-level return for `MarginModal.tsx` file */
 .margin_modal_content {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    flex-direction: column;
+}
+
+.margin_buttons {
+    /* display: grid;
+    grid-template-columns: repeat(2, 1fr); */
+    /* gap: var(--gap-m); */
+    /* width: 708px; */
+    /* height: auto; */
+    display: flex;
+    flex-direction: row;
     gap: var(--gap-m);
-    width: 708px;
-    height: auto;
     padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
-    align-items: flex-start;
+    /* align-items: flex-start; */
 
     /* centralized CSS for border to apply situationally */
     --margin_modal_button_border: 1px solid var(--accent1);
 }
 
 /* clickable buttons to change the current margin mode */
-.margin_modal_content > button {
-    border-radius: var(--radius-m, 16px);
-    border: 1px solid var(--bg-dark4);
-    background: var(--bg-dark4, #27272c);
+.margin_buttons > button {
     display: flex;
-    padding: var(--padding-m);
     flex-direction: column;
     align-items: center;
+    /* width is specified in Figma */
+    width: 330px;
     gap: var(--gap-m);
-    flex: 1 0 0;
-    align-self: stretch;
-    color: var(--text2, #bcbcc4);
-    cursor: pointer;
+    padding: var(--padding-m);
+    border: 1px solid var(--bg-dark4);
+    border-radius: var(--radius-m, 16px);
     font-size: var(--font-size-s, 12px);
-    transition: all var(--ease-in-out-med);
+    color: var(--text2, #bcbcc4);
+    background-color: var(--bg-dark4, #27272c);
     text-align: start;
+    transition: all var(--ease-in-out-med);
 }
 
 /* hover effect for margin mode buttons */
-.margin_modal_content > button:hover {
+.margin_buttons > button:hover {
     border: var(--margin_modal_button_border) !important;
 }
 
 /* headline text inside each margin mode button */
-.margin_modal_content > button > h3 {
+.margin_buttons > button > h3 {
     font-size: var(--font-size-m, 18px);
     color: var(--text1);
 }
@@ -49,10 +56,5 @@
 @media (max-width: 768px) {
     .margin_modal_content {
         width: auto;
-    }
-
-    .margin_modal_content {
-        display: flex;
-        flex-direction: column;
     }
 }
