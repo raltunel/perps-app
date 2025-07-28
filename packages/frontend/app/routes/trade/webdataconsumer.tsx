@@ -290,9 +290,8 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.orderHistory &&
-            data.orderHistory.length > 0 &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const orders: OrderDataIF[] = [];
             data.orderHistory.forEach((order: any) => {
@@ -325,7 +324,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fills = processUserFills(data);
             fills.sort((a, b) => b.time - a.time);
@@ -343,7 +342,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
             if (data.isSnapshot) {
@@ -363,7 +362,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const history = processUserTwapHistory(data);
             if (data.isSnapshot) {
@@ -383,7 +382,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fundings = processUserFundings(data.fundings);
             fundings.sort((a, b) => b.time - a.time);
