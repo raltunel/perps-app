@@ -27,6 +27,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
+    const gap = 0;
 
     // All refs instead of state
     const xScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
@@ -73,6 +74,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             context.save();
 
+            // Set text properties
+            context.font = '12px Arial';
+            context.textAlign = 'left';
+            context.textBaseline = 'middle';
+
             // Draw buy liquidation lines (in sell section)
             context.strokeStyle = getBsColor().sell;
             context.lineWidth = 2;
@@ -85,6 +91,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.moveTo(xStart, yPos);
                 context.lineTo(xEnd, yPos);
                 context.stroke();
+
+                // Draw px value text
+                context.fillStyle = getBsColor().sell;
+                const pxText = liq.px.toFixed(2);
+                context.fillText(pxText, xEnd - 60, yPos - 3);
             });
 
             // Draw sell liquidation lines (in buy section)
@@ -99,6 +110,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.moveTo(xStart, yPos);
                 context.lineTo(xEnd, yPos);
                 context.stroke();
+
+                // Draw px value text
+                context.fillStyle = getBsColor().buy;
+                const pxText = liq.px.toFixed(2);
+                context.fillText(pxText, xEnd - 60, yPos - 3);
             });
 
             context.restore();
@@ -131,7 +147,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         // mid gap
         const centerY = chartHeight / 2;
-        const gapSize = 12;
+        const gapSize = gap;
 
         const buyYScale = d3
             .scaleLinear()
@@ -263,7 +279,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         // Add 20px gap in center: sell area (0 to center-10px), buy area (center+10px to bottom)
         const centerY = chartHeight / 2;
-        const gapSize = 10; // 10px on each side = 20px total gap
+        const gapSize = gap; // 10px on each side = 20px total gap
 
         const buyYScale = d3
             .scaleLinear()
