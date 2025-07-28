@@ -15,6 +15,7 @@ import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 // import TwapTable from '../TwapTable/TwapTable';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 export interface FilterOption {
@@ -49,6 +50,7 @@ interface TradeTableProps {
 
 export default function TradeTable(props: TradeTableProps) {
     const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -57,11 +59,15 @@ export default function TradeTable(props: TradeTableProps) {
         userFills,
         userFundings,
         userOrders,
+        resetUserData,
     } = useTradeDataStore();
+
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
     const { page } = usePage();
+
+    const sessionState = useSession();
 
     const { debugWallet, setDebugWallet } = useDebugStore();
 
@@ -106,6 +112,20 @@ export default function TradeTable(props: TradeTableProps) {
             setDebugWallet(debugWallets[0]);
         }
     }, [vaultPage]);
+
+    useEffect(() => {
+        if (isEstablished(sessionState)) {
+            // if wallet public key starts with alpha char, use debug wallet 1, else use debug wallet 2
+            setDebugWallet(
+                sessionState.walletPublicKey.toString().match(/^[a-zA-Z]/)
+                    ? debugWallets[0]
+                    : debugWallets[1],
+            );
+        } else {
+            setDebugWallet(debugWallets[2]); // set to empty account
+            resetUserData();
+        }
+    }, [isEstablished(sessionState)]);
 
     useEffect(() => {
         if (page === Pages.TRADE) {

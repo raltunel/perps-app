@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useSdk } from '~/hooks/useSdk';
@@ -57,6 +58,8 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
+    const sessionState = useSession();
+
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet?.address?.toLowerCase();
@@ -113,49 +116,13 @@ export default function WebDataConsumer() {
         setUserOrders([]);
         setUserSymbolOrders([]);
         setPositions([]);
+        setUserBalances([]);
         positionsRef.current = [];
         openOrdersRef.current = [];
         userFundingsRef.current = [];
         activeTwapsRef.current = [];
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
-
-        // TODO this block can be removed, it was blocking reconnect mechanism for ws sleep mode
-        // we are already updating page header and symbol info on WsConnectionChecker.tsx component
-        // by creating an interval to fetch token info with REST
-
-        // // Add connection monitoring
-        // const monitorInterval = setInterval(() => {
-        //     const timeSinceLastData = Date.now() - lastDataTimestampRef.current;
-        //     if (timeSinceLastData > 30000) {
-        //         // 30 seconds without data
-        //         console.warn(
-        //             `[WebDataConsumer] No market data received for ${Math.floor(timeSinceLastData / 1000)}s`,
-        //         );
-
-        //         // Check connection status
-        //         if (info.multiSocketInfo) {
-        //             const pool = info.multiSocketInfo.getPool();
-        //             const status = pool.getConnectionStatus();
-        //             console.log('[WebDataConsumer] Connection status:', status);
-
-        //             // Try to reconnect if disconnected
-        //             const hasActiveConnection = Object.values(status).some(
-        //                 (connected) => connected,
-        //             );
-        //             if (!hasActiveConnection) {
-        //                 console.log(
-        //                     '[WebDataConsumer] No active connections, attempting reconnect...',
-        //                 );
-        //                 console.log(
-        //                     '>>>> reconnect from webadataconsumer',
-        //                     new Date().toISOString(),
-        //                 );
-        //                 info.multiSocketInfo.reconnect();
-        //             }
-        //         }
-        //     }
-        // }, 10000); // Check every 10 seconds
 
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
@@ -279,7 +246,10 @@ export default function WebDataConsumer() {
                 setCoinPriceMap(data.data.coinPriceMap);
             }
 
-            if (data.data.user?.toLowerCase() === addressRef.current) {
+            if (
+                isEstablished(sessionState) &&
+                data.data.user?.toLowerCase() === addressRef.current
+            ) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
@@ -288,7 +258,7 @@ export default function WebDataConsumer() {
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
-        [setCoins, setCoinPriceMap, info?.multiSocketInfo],
+        [setCoins, setCoinPriceMap, info?.multiSocketInfo, sessionState],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
@@ -320,9 +290,8 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.orderHistory &&
-            data.orderHistory.length > 0 &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const orders: OrderDataIF[] = [];
             data.orderHistory.forEach((order: any) => {
@@ -355,7 +324,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fills = processUserFills(data);
             fills.sort((a, b) => b.time - a.time);
@@ -373,7 +342,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
             if (data.isSnapshot) {
@@ -393,7 +362,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const history = processUserTwapHistory(data);
             if (data.isSnapshot) {
@@ -413,7 +382,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fundings = processUserFundings(data.fundings);
             fundings.sort((a, b) => b.time - a.time);
@@ -467,6 +436,25 @@ export default function WebDataConsumer() {
             setFavCoins(favs);
         }
     }, [favKeys, coins]);
+
+    const resetRefs = useCallback(() => {
+        openOrdersRef.current = [];
+        positionsRef.current = [];
+        userBalancesRef.current = [];
+        userOrderHistoryRef.current = [];
+        userFillsRef.current = [];
+        twapHistoryRef.current = [];
+        twapSliceFillsRef.current = [];
+        userFundingsRef.current = [];
+        activeTwapsRef.current = [];
+        userNonFundingLedgerUpdatesRef.current = [];
+    }, []);
+
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            resetRefs();
+        }
+    }, [isEstablished(sessionState)]);
 
     return <></>;
 }
