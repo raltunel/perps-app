@@ -38,6 +38,7 @@ export default function MarginModal(props: propsIF) {
                     </p>
                 </button>
             </div>
+            <button>Confirm</button>
         </section>
     );
 }

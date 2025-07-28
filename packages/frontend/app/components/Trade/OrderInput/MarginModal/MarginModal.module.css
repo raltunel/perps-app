@@ -2,6 +2,8 @@
 .margin_modal_content {
     display: flex;
     flex-direction: column;
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
+    gap: var(--gap-m);
 }
 
 .margin_buttons {
@@ -13,7 +15,7 @@
     display: flex;
     flex-direction: row;
     gap: var(--gap-m);
-    padding: var(--padding-s) var(--padding-m) var(--padding-m) 16px;
+
     /* align-items: flex-start; */
 
     /* centralized CSS for border to apply situationally */
@@ -47,6 +49,14 @@
 .margin_buttons > button > h3 {
     font-size: var(--font-size-m, 18px);
     color: var(--text1);
+}
+
+.margin_modal_content > button {
+    padding: 12px var(--padding-m);
+    width: 100%;
+    background-color: var(--accent1);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-m);
 }
 
 .selected {
