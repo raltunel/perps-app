@@ -1,4 +1,5 @@
 import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     memo,
     useCallback,
@@ -44,7 +45,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -130,7 +130,10 @@ function OrderInput({
 
     const sessionState = useSession();
 
-    const isUserConnected = isEstablished(sessionState);
+    const isUserConnected = useMemo(
+        () => isEstablished(sessionState),
+        [sessionState],
+    );
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
