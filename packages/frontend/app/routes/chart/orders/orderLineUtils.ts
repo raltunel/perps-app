@@ -1,6 +1,6 @@
 export type LabelType = 'Main' | 'Quantity' | 'Cancel';
 
-export const LIQ_PRICE_LINE_COLOR = '#CC2E2E';
+export const LIQ_PRICE_LINE_COLOR = '#DC5E1E';
 export const LIQ_PRICE_WARNING_COLOR = '#FFC107';
 export const WARNING_ICON_RADIUS = 10;
 
