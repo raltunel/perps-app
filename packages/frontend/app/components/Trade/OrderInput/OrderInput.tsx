@@ -44,6 +44,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -126,6 +127,10 @@ function OrderInput({
     marginBucket: MarginBucketInfo | null;
 }) {
     const { getBsColor } = useAppSettings();
+
+    const sessionState = useSession();
+
+    const isUserConnected = isEstablished(sessionState);
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
@@ -1133,25 +1138,27 @@ function OrderInput({
                         /> */}
                     </div>
                     <div className={styles.button_details_container}>
-                        <Tooltip
-                            content={disabledReason}
-                            position='top'
-                            disabled={!isDisabled}
-                        >
-                            <button
-                                className={styles.submit_button}
-                                style={{
-                                    backgroundColor:
-                                        tradeDirection === 'buy'
-                                            ? buyColor
-                                            : sellColor,
-                                }}
-                                onClick={handleSubmitOrder}
-                                disabled={isDisabled}
+                        {isUserConnected && (
+                            <Tooltip
+                                content={disabledReason}
+                                position='top'
+                                disabled={!isDisabled}
                             >
-                                Submit
-                            </button>
-                        </Tooltip>
+                                <button
+                                    className={styles.submit_button}
+                                    style={{
+                                        backgroundColor:
+                                            tradeDirection === 'buy'
+                                                ? buyColor
+                                                : sellColor,
+                                    }}
+                                    onClick={handleSubmitOrder}
+                                    disabled={isDisabled}
+                                >
+                                    Submit
+                                </button>
+                            </Tooltip>
+                        )}
                         <OrderDetails
                             orderMarketPrice={marketOrderType}
                             usdOrderValue={usdOrderValue}
