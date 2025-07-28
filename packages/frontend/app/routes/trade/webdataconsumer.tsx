@@ -437,5 +437,24 @@ export default function WebDataConsumer() {
         }
     }, [favKeys, coins]);
 
+    const resetRefs = useCallback(() => {
+        openOrdersRef.current = [];
+        positionsRef.current = [];
+        userBalancesRef.current = [];
+        userOrderHistoryRef.current = [];
+        userFillsRef.current = [];
+        twapHistoryRef.current = [];
+        twapSliceFillsRef.current = [];
+        userFundingsRef.current = [];
+        activeTwapsRef.current = [];
+        userNonFundingLedgerUpdatesRef.current = [];
+    }, []);
+
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            resetRefs();
+        }
+    }, [isEstablished(sessionState)]);
+
     return <></>;
 }
