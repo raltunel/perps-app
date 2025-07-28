@@ -21,7 +21,7 @@ export default function BalancesTable() {
     return (
         <GenericTable
             storageKey={`BalancesTable_${currentUserRef.current}`}
-            data={userBalances}
+            data={userBalances.filter((balance) => balance.type === 'margin')}
             renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                 <BalancesTableHeader
                     sortBy={sortBy}
