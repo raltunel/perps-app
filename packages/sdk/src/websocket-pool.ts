@@ -307,7 +307,7 @@ export class WebSocketPool {
         setTimeout(() => {
             this.sockets.forEach((socket) => {
                 socket.connect();
-            });
+            }, 200);
         });
     }
 }
