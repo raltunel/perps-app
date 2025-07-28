@@ -19,6 +19,7 @@ import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     useNotificationStore,
@@ -32,9 +33,9 @@ import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import LeverageSlider from './LeverageSlider/LeverageSlider';
 import MarginModal from './MarginModal/MarginModal';
+import OrderDetails from './OrderDetails/OrderDetails';
 import OrderDropdown from './OrderDropdown/OrderDropdown';
 import styles from './OrderInput.module.css';
-import TradeDirection from './TradeDirection/TradeDirection';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
@@ -42,8 +43,7 @@ import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import OrderDetails from './OrderDetails/OrderDetails';
+import TradeDirection from './TradeDirection/TradeDirection';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -572,11 +572,7 @@ function OrderInput({
         }
     };
 
-    // POSITION SIZE------------------------------
-    const handleSizeSliderChange = (value: number) => {
-        setIsEditingSizeInput(false);
-
-        setPositionSliderPercentageValue(value);
+    const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
         if (marketOrderType === 'market') {
             const notionalSymbolQtyNum =
                 (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
@@ -593,6 +589,20 @@ function OrderInput({
             );
         }
     };
+
+    // POSITION SIZE------------------------------
+    const handleSizeSliderChange = (value: number) => {
+        setIsEditingSizeInput(false);
+
+        setPositionSliderPercentageValue(value);
+        setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+    };
+
+    useEffect(() => {
+        setNotionalSymbolQtyNumFromUsdAvailableToTrade(
+            positionSliderPercentageValue,
+        );
+    }, [usdAvailableToTrade]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
