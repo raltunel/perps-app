@@ -120,43 +120,6 @@ export default function WebDataConsumer() {
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
 
-        // TODO this block can be removed, it was blocking reconnect mechanism for ws sleep mode
-        // we are already updating page header and symbol info on WsConnectionChecker.tsx component
-        // by creating an interval to fetch token info with REST
-
-        // // Add connection monitoring
-        // const monitorInterval = setInterval(() => {
-        //     const timeSinceLastData = Date.now() - lastDataTimestampRef.current;
-        //     if (timeSinceLastData > 30000) {
-        //         // 30 seconds without data
-        //         console.warn(
-        //             `[WebDataConsumer] No market data received for ${Math.floor(timeSinceLastData / 1000)}s`,
-        //         );
-
-        //         // Check connection status
-        //         if (info.multiSocketInfo) {
-        //             const pool = info.multiSocketInfo.getPool();
-        //             const status = pool.getConnectionStatus();
-        //             console.log('[WebDataConsumer] Connection status:', status);
-
-        //             // Try to reconnect if disconnected
-        //             const hasActiveConnection = Object.values(status).some(
-        //                 (connected) => connected,
-        //             );
-        //             if (!hasActiveConnection) {
-        //                 console.log(
-        //                     '[WebDataConsumer] No active connections, attempting reconnect...',
-        //                 );
-        //                 console.log(
-        //                     '>>>> reconnect from webadataconsumer',
-        //                     new Date().toISOString(),
-        //                 );
-        //                 info.multiSocketInfo.reconnect();
-        //             }
-        //         }
-        //     }
-        // }, 10000); // Check every 10 seconds
-
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: debugWallet.address },

@@ -50,6 +50,7 @@ interface TradeTableProps {
 
 export default function TradeTable(props: TradeTableProps) {
     const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -58,7 +59,9 @@ export default function TradeTable(props: TradeTableProps) {
         userFills,
         userFundings,
         userOrders,
+        resetUserData,
     } = useTradeDataStore();
+
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
@@ -118,6 +121,9 @@ export default function TradeTable(props: TradeTableProps) {
                     ? debugWallets[0]
                     : debugWallets[1],
             );
+        } else {
+            setDebugWallet(debugWallets[2]); // set to empty account
+            resetUserData();
         }
     }, [isEstablished(sessionState)]);
 
