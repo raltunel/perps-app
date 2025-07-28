@@ -46,6 +46,7 @@ import {
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
+import { processSymbolUrlParam } from '~/utils/AppUtils';
 
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
@@ -94,6 +95,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
+
+    const { marketId } = useParams<{ marketId: string }>();
 
     const [isChartReady, setIsChartReady] = useState(false);
     useEffect(() => {
@@ -203,11 +206,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
         dataFeedRef.current = createDataFeed(info);
 
+        const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
+
         const tvWidget = new widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
-            symbol: symbol,
+            symbol: processedSymbol,
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
@@ -348,7 +353,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             setChart(tvWidget);
         });
-    }, [chartState, info, symbol]);
+    }, [chartState, info]);
 
     useEffect(() => {
         initChart();
