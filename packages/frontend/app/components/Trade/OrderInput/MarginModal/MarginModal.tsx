@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import styles from './MarginModal.module.css';
 import { type marginModesT } from '~/stores/TradeDataStore';
 
@@ -9,12 +10,16 @@ interface propsIF {
 export default function MarginModal(props: propsIF) {
     const { initial, handleConfirm } = props;
 
+    const [intermediate, setIntermediate] = useState<marginModesT>(initial);
+
     return (
         <section className={styles.margin_modal_content}>
             <div className={styles.margin_buttons}>
                 <button
-                    className={styles[initial === 'cross' ? 'selected' : '']}
-                    onClick={() => handleConfirm('cross')}
+                    className={
+                        styles[intermediate === 'cross' ? 'selected' : '']
+                    }
+                    onClick={() => setIntermediate('cross')}
                 >
                     <h3>Cross Margin</h3>
                     <p>
@@ -25,8 +30,10 @@ export default function MarginModal(props: propsIF) {
                     </p>
                 </button>
                 <button
-                    className={styles[initial === 'isolated' ? 'selected' : '']}
-                    onClick={() => handleConfirm('isolated')}
+                    className={
+                        styles[intermediate === 'isolated' ? 'selected' : '']
+                    }
+                    onClick={() => setIntermediate('isolated')}
                 >
                     <h3>Isolated Mode</h3>
                     <p>
@@ -38,7 +45,7 @@ export default function MarginModal(props: propsIF) {
                     </p>
                 </button>
             </div>
-            <button>Confirm</button>
+            <button onClick={() => handleConfirm(intermediate)}>Confirm</button>
         </section>
     );
 }

@@ -24,7 +24,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -1174,7 +1174,10 @@ function OrderInput({
                             {confirmOrderModal.content === 'margin' && (
                                 <MarginModal
                                     initial={marginMode}
-                                    handleConfirm={setMarginMode}
+                                    handleConfirm={(m: marginModesT) => {
+                                        setMarginMode(m);
+                                        confirmOrderModal.close();
+                                    }}
                                 />
                             )}
                             {confirmOrderModal.content === 'scale' && (
