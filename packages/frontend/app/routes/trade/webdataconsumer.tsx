@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useSdk } from '~/hooks/useSdk';
@@ -57,6 +58,8 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
+    const sessionState = useSession();
+
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet?.address?.toLowerCase();
@@ -113,6 +116,7 @@ export default function WebDataConsumer() {
         setUserOrders([]);
         setUserSymbolOrders([]);
         setPositions([]);
+        setUserBalances([]);
         positionsRef.current = [];
         openOrdersRef.current = [];
         userFundingsRef.current = [];
@@ -242,7 +246,10 @@ export default function WebDataConsumer() {
                 setCoinPriceMap(data.data.coinPriceMap);
             }
 
-            if (data.data.user?.toLowerCase() === addressRef.current) {
+            if (
+                isEstablished(sessionState) &&
+                data.data.user?.toLowerCase() === addressRef.current
+            ) {
                 openOrdersRef.current = data.data.userOpenOrders;
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
@@ -251,7 +258,7 @@ export default function WebDataConsumer() {
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
-        [setCoins, setCoinPriceMap, info?.multiSocketInfo],
+        [setCoins, setCoinPriceMap, info?.multiSocketInfo, sessionState],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
