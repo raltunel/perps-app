@@ -1,10 +1,15 @@
+import { useTradingView } from '~/contexts/TradingviewContext';
 import OverlayCanvasLayer from '../OverlayCanvasLayer';
 
 const LiquidationOverlayCanvas: React.FC = () => {
+    const { isLiqChartVisible } = useTradingView();
+
     return (
-        <OverlayCanvasLayer id='liqudation-overlay' zIndex={1}>
-            {() => <></>}
-        </OverlayCanvasLayer>
+        isLiqChartVisible && (
+            <OverlayCanvasLayer id='liquidation-overlay' zIndex={1}>
+                {() => <></>}
+            </OverlayCanvasLayer>
+        )
     );
 };
 

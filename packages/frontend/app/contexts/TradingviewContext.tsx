@@ -50,11 +50,13 @@ import {
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
     isChartReady: boolean;
+    isLiqChartVisible: boolean;
 }
 
 export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
     isChartReady: false,
+    isLiqChartVisible: false,
 });
 
 export interface ChartContainerProps {
@@ -83,13 +85,20 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { debugWallet } = useDebugStore();
 
-    const { showBuysSellsOnChart } = useAppOptions();
+    const { showBuysSellsOnChart, enable, disable } = useAppOptions();
 
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
     );
 
     const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
+
+    const [isLiqChartVisible, setIsLiqChartVisible] = useState(false);
+    const liqChartVisibleRef = useRef(false);
+
+    useEffect(() => {
+        liqChartVisibleRef.current = isLiqChartVisible;
+    }, [isLiqChartVisible]);
 
     const [isChartReady, setIsChartReady] = useState(false);
     const { marketId } = useParams<{ marketId: string }>();
@@ -252,13 +261,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         tvWidget.headerReady().then(() => {
             const liquidationsButton = tvWidget.createButton();
 
-            let isToggled = false;
-
             const updateButtonStyle = () => {
+                const isVisible = liqChartVisibleRef.current;
+
                 const svg = getLiquidationsSvgIcon(
-                    isToggled ? '#7371fc' : '#cbcaca',
+                    isVisible ? '#7371fc' : '#cbcaca',
                 );
-                liquidationsButton.style.color = isToggled
+                liquidationsButton.style.color = isVisible
                     ? '#7371fc'
                     : '#cbcaca';
 
@@ -272,14 +281,17 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             updateButtonStyle();
 
             const onClick = () => {
-                isToggled = !isToggled;
-                updateButtonStyle();
-
-                if (isToggled) {
-                    console.log('Open');
-                } else {
-                    console.log('Close');
-                }
+                setIsLiqChartVisible((prev) => {
+                    const newVal = !prev;
+                    liqChartVisibleRef.current = newVal;
+                    updateButtonStyle();
+                    if (newVal) {
+                        disable('showBuysSellsOnChart');
+                    } else {
+                        enable('showBuysSellsOnChart');
+                    }
+                    return newVal;
+                });
             };
             const onMouseEnter = () => {
                 const wrapper = liquidationsButton.querySelector(
@@ -420,7 +432,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         if (debugWallet.address) {
             getMarkFillData(symbol, debugWallet.address).then(() => {
-                if (chart) {
+                if (chart && isLiqChartVisible) {
                     chart.chart().clearMarks();
                     showBuysSellsOnChart && chart.chart().refreshMarks();
                 }
@@ -436,7 +448,9 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [showBuysSellsOnChart]);
 
     return (
-        <TradingViewContext.Provider value={{ chart, isChartReady }}>
+        <TradingViewContext.Provider
+            value={{ chart, isChartReady, isLiqChartVisible }}
+        >
             {children}
         </TradingViewContext.Provider>
     );
