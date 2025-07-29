@@ -346,7 +346,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 buyArea?.context(context);
                 buyLine?.context(context);
             });
-    }, [width, height, drawLiquidationLines, bsColor]);
+    }, [width, height, drawLiquidationLines]);
 
     const updateScalesOnly = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
