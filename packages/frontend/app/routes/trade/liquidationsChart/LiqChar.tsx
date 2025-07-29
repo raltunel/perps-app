@@ -199,7 +199,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
             context.beginPath();
-            context.moveTo(0, yPos);
+            context.moveTo(20, yPos);
             context.lineTo(widthRef.current, yPos);
             context.stroke();
 
@@ -211,8 +211,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const updateScalesAndSeries = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
         const currentSellData = currentSellDataRef.current;
-        const currentLiqBuys = currentLiqBuysRef.current;
-        const currentLiqSells = currentLiqSellsRef.current;
 
         if (
             !currentBuyData ||
@@ -416,6 +414,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const interpolatedData: OrderBookRowIF[] = [];
 
+            if (fromData.length != toData.length) {
+                return toData;
+            }
+
             for (let i = 0; i < fromData.length; i++) {
                 const fromRow = fromData[i];
                 const toRow = toData[i];
@@ -452,6 +454,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             if (pauseLiqAnimationRef.current) return fromData;
 
             const interpolatedData: OrderBookLiqIF[] = [];
+
+            if (fromData.length != toData.length) {
+                return toData;
+            }
 
             for (let i = 0; i < fromData.length; i++) {
                 const fromRow = fromData[i];
