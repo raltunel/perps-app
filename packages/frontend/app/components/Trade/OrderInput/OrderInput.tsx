@@ -1063,7 +1063,6 @@ function OrderInput({
                     <div className={styles.mainContent}>
                         <div
                             className={styles.orderTypeDropdownContainer}
-                            style={{ background: 'red' }}
                             id='tutorial-order-type'
                         >
                             <OrderDropdown
