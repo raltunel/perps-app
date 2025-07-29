@@ -303,14 +303,17 @@ export const interpolateOrderBookData = (
     let usedSz = 0;
     let usedRatio = 0;
 
-    const firstSubRanges = subRanges * 1;
+    const firstSubRanges = subRanges * 2;
 
     for (let i = 0; i < firstSubRanges; i++) {
         const midPx =
             orders[0].px -
             (closestPxDiff - (closestPxDiff / firstSubRanges) * i);
-        const midSz = (orders[0].sz / (firstSubRanges + 1)) * Math.random();
-        usedSz += midSz;
+        let midSz = 0;
+        if (i > 0) {
+            midSz = (orders[0].sz / (firstSubRanges + 1)) * Math.random();
+            usedSz += midSz;
+        }
 
         const midRatio = (ratioDiff * usedSz) / orders[0].sz;
         usedRatio += midRatio;

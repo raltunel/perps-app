@@ -54,7 +54,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const orderCountRef = useRef(0);
     orderCountRef.current = orderCount;
 
-    const { getBsColor } = useAppSettings();
+    const { bsColor, getBsColor } = useAppSettings();
 
     const { pauseLiqAnimation } = useDebugStore();
     const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
@@ -74,6 +74,19 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const showAreaText = useRef(false);
 
     const minLiqLine = 10;
+    const liqLineWidth = 2;
+
+    const buyColorRef = useRef(getBsColor().buy);
+    const sellColorRef = useRef(getBsColor().sell);
+
+    useEffect(() => {
+        buyColorRef.current = getBsColor().buy;
+        sellColorRef.current = getBsColor().sell;
+
+        if (isInitialized.current) {
+            updateScalesAndSeries();
+        }
+    }, [bsColor]);
 
     const drawLiquidationLines = useCallback(
         (context: CanvasRenderingContext2D) => {
@@ -105,8 +118,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.textBaseline = 'middle';
 
             // Draw buy liquidation lines (in buy section) with equal spacing
-            context.strokeStyle = getBsColor().sell;
-            context.lineWidth = 1;
+            context.strokeStyle = sellColorRef.current;
+            context.lineWidth = liqLineWidth;
             const buyLiqCount = currentLiqBuysRef.current.length;
             if (buyLiqCount > 0) {
                 currentLiqBuysRef.current.forEach((liq, index) => {
@@ -129,7 +142,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
                     if (showLiqText.current) {
                         // Draw px value text
-                        context.fillStyle = getBsColor().sell;
+                        context.fillStyle = sellColorRef.current;
                         const pxText =
                             liq.sz.toFixed(2) + ' ' + liq.ratio?.toFixed(2);
                         context.fillText(pxText, 20, yPos - 3);
@@ -138,9 +151,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             }
 
             // Draw sell liquidation lines (in sell section) with equal spacing
-            context.strokeStyle = getBsColor().buy;
+            context.strokeStyle = buyColorRef.current;
             // context.strokeStyle = 'gray';
-            context.lineWidth = 1;
+            context.lineWidth = liqLineWidth;
             const sellLiqCount = currentLiqSellsRef.current.length;
             if (sellLiqCount > 0) {
                 currentLiqSellsRef.current.forEach((liq, index) => {
@@ -158,7 +171,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
                     if (showLiqText.current) {
                         // Draw px value text
-                        context.fillStyle = getBsColor().buy;
+                        context.fillStyle = buyColorRef.current;
                         const pxText =
                             liq.sz.toFixed(2) + ' ' + liq.ratio?.toFixed(2);
                         context.fillText(pxText, 20, yPos - 3);
@@ -180,9 +193,19 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 });
             }
 
+            //  add mid line
+            const yPos = obBuyBlockHeight + midHeaderHeight / 2;
+            context.strokeStyle = '#BCBCC4';
+            context.lineWidth = liqLineWidth;
+            context.setLineDash([4, 4]);
+            context.beginPath();
+            context.moveTo(0, yPos);
+            context.lineTo(widthRef.current, yPos);
+            context.stroke();
+
             context.restore();
         },
-        [getBsColor],
+        [],
     );
 
     const updateScalesAndSeries = useCallback(() => {
@@ -236,9 +259,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const context = canvas.getContext('2d');
         if (!context) return;
 
-        const curve = d3.curveStepAfter;
-        const buyRgbaColor = getBsColor().sell;
-        const sellRgbaColor = getBsColor().buy;
+        // const curve = d3.curveStepAfter;
+
+        const curve = d3.curveLinear;
+
+        const buyRgbaColor = sellColorRef.current;
+        const sellRgbaColor = buyColorRef.current;
         const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
         const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
         if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
@@ -320,7 +346,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 buyArea?.context(context);
                 buyLine?.context(context);
             });
-    }, [width, height, getBsColor, drawLiquidationLines]);
+    }, [width, height, drawLiquidationLines, bsColor]);
 
     const updateScalesOnly = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
