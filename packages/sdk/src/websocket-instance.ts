@@ -221,8 +221,20 @@ export class WebSocketInstance {
 
         this.isConnecting = true;
 
-        const wsUrl =
-            'wss' + this.baseUrl.slice(this.baseUrl.indexOf(':')) + '/ws';
+        // Detect protocol from baseUrl to support both ws:// and wss://
+        const protocol = this.baseUrl.startsWith('https://')
+            ? 'wss'
+            : this.baseUrl.startsWith('http://')
+              ? 'ws'
+              : this.baseUrl.startsWith('wss://')
+                ? 'wss'
+                : this.baseUrl.startsWith('ws://')
+                  ? 'ws'
+                  : 'wss';
+
+        // Extract the base path after the protocol
+        const basePath = this.baseUrl.replace(/^(https?|wss?):\/\//, '');
+        const wsUrl = `${protocol}://${basePath}/ws`;
         console.log(`[${this.socketName}] Connecting to`, wsUrl);
 
         // Create WebSocket
