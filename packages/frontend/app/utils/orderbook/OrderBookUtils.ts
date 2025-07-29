@@ -290,11 +290,48 @@ export const genRandomActiveTwap = (): ActiveTwapIF => {
 
 export const interpolateOrderBookData = (
     orders: OrderBookRowIF[],
-    subRanges: number = 3,
+    closestPx: number,
+    subRanges: number = 2,
 ): OrderBookRowIF[] => {
     if (orders.length === 0) return [];
 
-    const highResOrders: OrderBookRowIF[] = [orders[0]];
+    const highResOrders: OrderBookRowIF[] = [];
+
+    // Add subRows for before first point -------------------------
+    const closestPxDiff = (orders[0].px - closestPx) / 2;
+    const ratioDiff = orders[0].ratio || 0;
+    let usedSz = 0;
+    let usedRatio = 0;
+
+    const firstSubRanges = subRanges * 2;
+
+    for (let i = 0; i < firstSubRanges; i++) {
+        const midPx =
+            orders[0].px -
+            (closestPxDiff - (closestPxDiff / firstSubRanges) * i);
+        let midSz = 0;
+        if (i > 0) {
+            midSz = (orders[0].sz / (firstSubRanges + 1)) * Math.random();
+            usedSz += midSz;
+        }
+
+        const midRatio = (ratioDiff * usedSz) / orders[0].sz;
+        usedRatio += midRatio;
+
+        const newOrder = {
+            ...orders[0],
+            px: midPx,
+            sz: midSz,
+            ratio: midRatio,
+        };
+        highResOrders.push(newOrder);
+    }
+
+    highResOrders.push({
+        ...orders[0],
+        sz: orders[0].sz - usedSz,
+        ratio: orders[0].ratio,
+    });
 
     for (let i = 1; i < orders.length; i++) {
         const pxDiff = orders[i].px - orders[i - 1].px;
@@ -311,13 +348,14 @@ export const interpolateOrderBookData = (
             let midSz = 0;
             if (j === subRanges - 1) {
                 midSz = orders[i].sz - usedSz;
+                usedSz = orders[i].sz;
             } else {
                 midSz = ((orders[i].sz - usedSz) * Math.random()) / 2;
                 usedSz += midSz;
             }
             const midPx = orders[i - 1].px + (pxDiff / subRanges) * (j + 1);
 
-            let midRatio = (ratioDiff * midSz) / orders[i].sz;
+            let midRatio = (ratioDiff * usedSz) / orders[i].sz;
 
             if (midRatio < 0) {
                 console.log('>>> negative ratio');
@@ -327,7 +365,7 @@ export const interpolateOrderBookData = (
                 ...orders[i],
                 px: midPx,
                 sz: midSz,
-                ratio: (orders[i].ratio || 0) + midRatio,
+                ratio: (orders[i - 1].ratio || 0) + midRatio,
             };
             highResOrders.push(newOrder);
         }

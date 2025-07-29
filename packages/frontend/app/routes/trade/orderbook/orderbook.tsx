@@ -462,7 +462,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     background: `linear-gradient(to top,  ${getBsColor().buy} 0%, var(--bg-dark2) 100%)`,
                                 }}
                             ></div>
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-sell-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {sellPlaceHolderCount === 1 ? (
                                     <div className={styles.orderRowWrapper}>
                                         <div
@@ -549,7 +552,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
                             {midHeader('orderBookMidHeader')}
 
-                            <div className={styles.orderBookBlock}>
+                            <div
+                                id={'orderbook-buy-block'}
+                                className={styles.orderBookBlock}
+                            >
                                 {buys
                                     .slice(0, orderCount)
                                     .map((order, index) => (

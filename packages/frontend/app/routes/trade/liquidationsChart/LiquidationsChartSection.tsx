@@ -18,6 +18,7 @@ import {
     getResolutionListForSymbol,
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -44,6 +45,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         liqSells,
         setLiqBuys,
         setLiqSells,
+        orderCount,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
 
@@ -60,19 +62,36 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     sellsRef.current = sells;
 
     const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+    const { pauseLiqAnimation } = useDebugStore();
+    const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
+    pauseLiqAnimationRef.current = pauseLiqAnimation;
 
     const genRandomData = useCallback(() => {
-        const highResBuys = interpolateOrderBookData(buysRef.current);
-        const highResSells = interpolateOrderBookData(sellsRef.current);
+        if (
+            buysRef.current.length === 0 ||
+            sellsRef.current.length === 0 ||
+            pauseLiqAnimationRef.current
+        )
+            return;
+        const highResBuys = interpolateOrderBookData(
+            buysRef.current,
+            sellsRef.current[0].px,
+        );
+        const highResSells = interpolateOrderBookData(
+            sellsRef.current,
+            buysRef.current[0].px,
+        );
         setHighResBuys(highResBuys);
         setHighResSells(highResSells);
+        // setHighResBuys(buysRef.current);
+        // setHighResSells(sellsRef.current);
         const { liqBuys, liqSells } = createRandomOrderBookLiq(
             buysRef.current,
             sellsRef.current,
         );
         setLiqBuys(liqBuys);
-        setLiqSells(liqSells);
-    }, [setHighResBuys, setHighResSells, setLiqBuys, setLiqSells]);
+        setLiqSells(liqSells.reverse());
+    }, [setHighResBuys, setHighResSells, setLiqBuys, setLiqSells, orderCount]);
 
     useEffect(() => {
         genRandomData();
@@ -81,7 +100,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         }, 1000);
 
         return () => clearInterval(randomDataInterval);
-    }, []);
+    }, [orderCount, genRandomData]);
 
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
@@ -95,19 +114,43 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
     useEffect(() => {
         const updateDimensions = () => {
-            if (tabContentRef.current) {
-                const rect = tabContentRef.current.getBoundingClientRect();
-                setDimensions({ width: rect.width, height: rect.height - 40 });
-            }
+            setTimeout(() => {
+                if (tabContentRef.current) {
+                    const rect = tabContentRef.current.getBoundingClientRect();
+                    let height = rect.height;
+                    const buyBlock = document.getElementById(
+                        'orderbook-buy-block',
+                    );
+                    const sellBlock = document.getElementById(
+                        'orderbook-sell-block',
+                    );
+                    const midHeader =
+                        document.getElementById('orderBookMidHeader');
+
+                    if (buyBlock && sellBlock && midHeader) {
+                        const buyBlockHeight =
+                            buyBlock.getBoundingClientRect().height;
+                        const sellBlockHeight =
+                            sellBlock.getBoundingClientRect().height;
+                        const midHeaderHeight =
+                            midHeader.getBoundingClientRect().height;
+                        height =
+                            buyBlockHeight + sellBlockHeight + midHeaderHeight;
+                    }
+
+                    setDimensions({ width: rect.width, height: height });
+                }
+            }, 200);
         };
 
-        updateDimensions();
         window.addEventListener('resize', updateDimensions);
 
-        return () => window.removeEventListener('resize', updateDimensions);
-    }, []);
+        updateDimensions();
 
-    const orderCount = useMemo(() => {
+        return () => window.removeEventListener('resize', updateDimensions);
+    }, [orderCount, orderBookState]);
+
+    const highResOrderCount = useMemo(() => {
         if (!highResBuys.length) return 30;
         return highResBuys.length;
     }, [highResBuys]);
@@ -117,15 +160,18 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             let rand;
             if (inverse) {
                 rand =
-                    100 / orderCount +
-                    index * (100 / orderCount) +
+                    100 / highResOrderCount +
+                    index * (100 / highResOrderCount) +
                     Math.random() * 20;
             } else {
-                rand = 100 - index * (100 / orderCount) + Math.random() * 20;
+                rand =
+                    100 -
+                    index * (100 / highResOrderCount) +
+                    Math.random() * 20;
             }
             return rand < 100 ? rand + '%' : '100%';
         },
-        [orderCount],
+        [highResOrderCount],
     );
 
     const renderTabContent = useCallback(() => {
@@ -147,18 +193,22 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             gap: '4px',
                         }}
                     >
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <SkeletonNode
-                                width={getRandWidth(index)}
-                                height='16px'
-                            />
-                        ))}
-                        {Array.from({ length: orderCount }).map((_, index) => (
-                            <SkeletonNode
-                                width={getRandWidth(index, true)}
-                                height='16px'
-                            />
-                        ))}
+                        {Array.from({ length: highResOrderCount }).map(
+                            (_, index) => (
+                                <SkeletonNode
+                                    width={getRandWidth(index)}
+                                    height='16px'
+                                />
+                            ),
+                        )}
+                        {Array.from({ length: highResOrderCount }).map(
+                            (_, index) => (
+                                <SkeletonNode
+                                    width={getRandWidth(index, true)}
+                                    height='16px'
+                                />
+                            ),
+                        )}
                     </motion.div>
                 );
             }
@@ -174,7 +224,12 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 10 }}
                         transition={{ duration: 0.2 }}
-                        style={{ width: '100%', height: '100%' }}
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}
                     >
                         <LiquidationsChart
                             buyData={highResBuys}
