@@ -29,7 +29,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
-    const gap = 12;
+    const gap = 4;
 
     // All refs instead of state
     const xScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
