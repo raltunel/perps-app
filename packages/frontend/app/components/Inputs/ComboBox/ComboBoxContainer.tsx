@@ -120,7 +120,6 @@ export default function ComboBoxContainer() {
                             if (isEstablished(sessionState)) {
                                 console.log('established');
                                 const userWalletKey =
-                                    sessionState.userPublicKey ||
                                     sessionState.walletPublicKey ||
                                     sessionState.sessionPublicKey;
                                 const ix = instructions.pingIx(42n, {

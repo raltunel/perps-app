@@ -1,15 +1,20 @@
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useIsClient } from '~/hooks/useIsClient';
 import {
     TableState,
     type HeaderCell,
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import { useIsClient } from '~/hooks/useIsClient';
 
 interface GenericTableProps<
     T,
@@ -51,6 +56,8 @@ export default function GenericTable<
 >(props: GenericTableProps<T, S, F>) {
     const id = useId();
     const navigate = useNavigate();
+
+    const sessionState = useSession();
 
     const {
         data,
@@ -369,6 +376,10 @@ export default function GenericTable<
         };
     }, [tableState, checkShadow, id]);
 
+    const isSessionEstablished = useMemo(() => {
+        return isEstablished(sessionState);
+    }, [sessionState]);
+
     return (
         <div
             className={styles.tableWrapper}
@@ -397,7 +408,13 @@ export default function GenericTable<
                     >
                         {tableState === TableState.FILLED &&
                             dataToShow.map(renderRow)}
-                        {tableState === TableState.EMPTY && <NoDataRow />}
+                        {tableState === TableState.EMPTY &&
+                            isSessionEstablished && <NoDataRow />}
+                        {!isSessionEstablished && (
+                            <div className={styles.sessionButtonContainer}>
+                                <SessionButton />
+                            </div>
+                        )}
 
                         {sortedData.length > 0 && (
                             <div

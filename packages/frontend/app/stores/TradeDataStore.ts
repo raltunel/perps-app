@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { setLS } from '~/utils/AppUtils';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
-import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
+import type { SymbolInfoIF, TokenDetailsIF } from '~/utils/SymbolInfoIFs';
 import {
     createUserTradesSlice,
     type UserTradeDataStore,
@@ -45,6 +45,7 @@ type TradeDataStore = UserTradeDataStore & {
     setMarginBucket: (marginBucket: MarginBucketInfo | null) => void;
     isTradeInfoExpanded: boolean;
     setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
+    updateSymbolInfo: (symbolInfo: TokenDetailsIF) => void; // used for updating symbol info from REST API while ws is sleeping
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -130,6 +131,19 @@ const useTradeDataStore = create<TradeDataStore>()(
             isTradeInfoExpanded: false,
             setIsTradeInfoExpanded: (shouldExpand: boolean) =>
                 set({ isTradeInfoExpanded: shouldExpand }),
+            updateSymbolInfo: (tokenDetails: TokenDetailsIF) => {
+                const currentSymbolInfo = get().symbolInfo;
+                if (
+                    tokenDetails.name === currentSymbolInfo?.coin ||
+                    (tokenDetails.name === 'UBTC' &&
+                        currentSymbolInfo?.coin === 'BTC')
+                ) {
+                    currentSymbolInfo.markPx = tokenDetails.markPx;
+                    currentSymbolInfo.lastPriceChange =
+                        tokenDetails.markPx - currentSymbolInfo.markPx;
+                    set({ symbolInfo: currentSymbolInfo });
+                }
+            },
         }),
         {
             name: 'TRADE_DATA',
