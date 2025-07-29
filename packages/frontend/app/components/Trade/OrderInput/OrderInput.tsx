@@ -272,6 +272,7 @@ function OrderInput({
     ]);
 
     const sizeLessThanMinimum =
+        !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
