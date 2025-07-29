@@ -1,9 +1,27 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import OrderLines from '../orders/OrderLines';
 import * as d3 from 'd3';
 
-const OverlayCanvas: React.FC = () => {
+interface OverlayCanvasLayerProps {
+    id: string;
+    zIndex?: number;
+    pointerEvents?: 'none' | 'auto';
+    children: (props: {
+        canvasRef: React.RefObject<HTMLCanvasElement>;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        canvasSize: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        scaleData: any;
+        mousePositionRef: React.MutableRefObject<{ x: number; y: number }>;
+    }) => React.ReactNode;
+}
+
+const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
+    id,
+    zIndex = 0,
+    pointerEvents = 'none',
+    children,
+}) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart } = useTradingView();
 
@@ -11,43 +29,39 @@ const OverlayCanvas: React.FC = () => {
     const [canvasSize, setCanvasSize] = useState<any>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [scaleData, setScaleData] = useState<any>();
-
-    const overlayCanvasMousePositionRef = useRef({ x: 0, y: 0 });
+    const mousePositionRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
         if (!chart) return;
 
         const yScale = d3.scaleLinear();
+        const xScale = d3.scaleTime();
         const scaleSymlog = d3.scaleSymlog();
-        setScaleData(() => {
-            return { yScale: yScale, scaleSymlog: scaleSymlog };
-        });
+        setScaleData({ yScale, xScale, scaleSymlog });
+
         const chartDiv = document.getElementById('tv_chart');
         const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
         const iframeDoc =
             iframe?.contentDocument || iframe?.contentWindow?.document;
-
         if (!iframeDoc) return;
 
         const paneCanvas = iframeDoc.querySelector(
             'canvas[data-name="pane-canvas"]',
         ) as HTMLCanvasElement;
-
         if (!paneCanvas || !paneCanvas.parentNode) return;
 
         if (!canvasRef.current) {
             const newCanvas = iframeDoc.createElement('canvas');
-            newCanvas.id = 'overlay-canvas';
+            newCanvas.id = id;
             newCanvas.style.position = 'absolute';
             newCanvas.style.top = '0';
             newCanvas.style.left = '0';
             newCanvas.style.cursor = 'pointer';
-            newCanvas.style.pointerEvents = 'none';
-            newCanvas.style.zIndex = '5';
+            newCanvas.style.pointerEvents = pointerEvents;
+            newCanvas.style.zIndex = zIndex.toString();
             newCanvas.width = paneCanvas.width;
-            newCanvas.height = paneCanvas?.height;
+            newCanvas.height = paneCanvas.height;
             paneCanvas.parentNode.appendChild(newCanvas);
-
             canvasRef.current = newCanvas;
         }
 
@@ -57,40 +71,35 @@ const OverlayCanvas: React.FC = () => {
             const rect = canvas.getBoundingClientRect();
             const offsetX = e.clientX - rect.left;
             const offsetY = e.clientY - rect.top;
-
-            overlayCanvasMousePositionRef.current = { x: offsetX, y: offsetY };
+            mousePositionRef.current = { x: offsetX, y: offsetY };
         };
 
         canvas.addEventListener('mousemove', handleMouseMove);
 
         const updateCanvasSize = () => {
             const width = paneCanvas.width;
-            const height = paneCanvas?.height;
-
+            const height = paneCanvas.height;
             canvas.width = width;
-            canvas.style.width = `${width}px`;
-
             canvas.height = height;
-            canvas.style.height = `${height}px`;
-
-            yScale.range([canvas.height, 0]);
-            scaleSymlog.range([canvas.height, 0]);
+            yScale.range([height, 0]);
+            xScale.range([0, width]);
+            scaleSymlog.range([height, 0]);
         };
 
         updateCanvasSize();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const observer = new ResizeObserver((result: any) => {
-            if (result) {
-                setCanvasSize({
-                    styleWidth: result[0].contentRect.width,
-                    styleHeight: result[0].contentRect?.height,
-                    width: paneCanvas.width,
-                    height: paneCanvas?.height,
-                });
 
-                yScale.range([result[0].contentRect?.height, 0]);
-                scaleSymlog.range([result[0].contentRect?.height, 0]);
-            }
+        const observer = new ResizeObserver((entries) => {
+            const rect = entries[0].contentRect;
+            setCanvasSize({
+                styleWidth: rect.width,
+                styleHeight: rect.height,
+                width: paneCanvas.width,
+                height: paneCanvas.height,
+            });
+
+            yScale.range([rect.height, 0]);
+            xScale.range([0, rect.width]);
+            scaleSymlog.range([rect.height, 0]);
         });
 
         observer.observe(paneCanvas);
@@ -106,13 +115,8 @@ const OverlayCanvas: React.FC = () => {
     }, [chart]);
 
     return (
-        <OrderLines
-            overlayCanvasRef={canvasRef}
-            canvasSize={canvasSize}
-            scaleData={scaleData}
-            overlayCanvasMousePositionRef={overlayCanvasMousePositionRef}
-        />
+        <>{children({ canvasRef, canvasSize, scaleData, mousePositionRef })}</>
     );
 };
 
-export default OverlayCanvas;
+export default OverlayCanvasLayer;

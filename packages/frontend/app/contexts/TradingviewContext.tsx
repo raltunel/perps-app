@@ -84,7 +84,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const { debugWallet } = useDebugStore();
 
-    const { showBuysSellsOnChart } = useAppOptions();
+    const { showBuysSellsOnChart, enable, disable } = useAppOptions();
 
     const [chartInterval, setChartInterval] = useState<string | undefined>(
         chartState?.interval,
@@ -96,6 +96,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
+    const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
+    const liqChartVisibleRef = useRef(false);
+    liqChartVisibleRef.current = liquidationsActive;
+
     const [isChartReady, setIsChartReady] = useState(false);
     useEffect(() => {
         const res = getChartLayout();
@@ -104,8 +108,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         }
         setChartState(res);
     }, []);
-
-    const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
 
     const defaultProps: Omit<ChartContainerProps, 'container'> = {
         symbolName: 'BTC',
@@ -152,12 +154,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             }
         }
     }
-
-    useEffect(() => {
-        if (chart) {
-            showBuysSellsOnChart && chart.chart().refreshMarks();
-        }
-    }, [bsColor, chart, showBuysSellsOnChart]);
 
     useEffect(() => {
         if (!isChartReady && chart) {
@@ -258,13 +254,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         tvWidget.headerReady().then(() => {
             const liquidationsButton = tvWidget.createButton();
 
-            let isToggled = liquidationsActive;
-
             const updateButtonStyle = () => {
+                const isVisible = liqChartVisibleRef.current;
+
                 const svg = getLiquidationsSvgIcon(
-                    isToggled ? '#7371fc' : '#cbcaca',
+                    isVisible ? '#7371fc' : '#cbcaca',
                 );
-                liquidationsButton.style.color = isToggled
+                liquidationsButton.style.color = isVisible
                     ? '#7371fc'
                     : '#cbcaca';
 
@@ -278,8 +274,14 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             updateButtonStyle();
 
             const onClick = () => {
-                isToggled = !isToggled;
-                setLiquidationsActive(isToggled);
+                const newVal = !liqChartVisibleRef.current;
+                liqChartVisibleRef.current = newVal;
+                setLiquidationsActive(newVal);
+                if (newVal) {
+                    disable('showBuysSellsOnChart');
+                } else {
+                    enable('showBuysSellsOnChart');
+                }
                 updateButtonStyle();
             };
             const onMouseEnter = () => {
@@ -456,22 +458,22 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [chart]);
 
     useEffect(() => {
-        if (debugWallet.address) {
+        if (liquidationsActive) {
+            if (chart) {
+                chart.chart().clearMarks();
+            }
+        } else if (debugWallet.address && chart) {
             getMarkFillData(symbol, debugWallet.address).then(() => {
-                if (chart) {
-                    chart.chart().clearMarks();
-                    showBuysSellsOnChart && chart.chart().refreshMarks();
-                }
+                chart.chart().refreshMarks();
             });
         }
-    }, [debugWallet, chart, symbol]);
+    }, [debugWallet, chart, symbol, liquidationsActive]);
 
     useEffect(() => {
         if (chart) {
-            showBuysSellsOnChart || chart.chart().clearMarks();
             showBuysSellsOnChart && chart.chart().refreshMarks();
         }
-    }, [showBuysSellsOnChart]);
+    }, [bsColor, chart, showBuysSellsOnChart]);
 
     return (
         <TradingViewContext.Provider value={{ chart, isChartReady }}>
