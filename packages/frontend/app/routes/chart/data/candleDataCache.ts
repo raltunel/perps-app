@@ -127,6 +127,37 @@ export async function getMarkFillData(coin: string, user?: string) {
     return [];
 }
 
+export function updateMarkDataWithSubscription(
+    coin: string,
+    newMarks: any[],
+    user: string,
+) {
+    const cacheKey = `${coin}-fillData`;
+
+    const cachedData = dataCacheWithUser.get(cacheKey);
+
+    if (cachedData) {
+        const existingMarks = cachedData.dataCache;
+
+        newMarks.forEach((newMark) => {
+            const exists = existingMarks.some(
+                (oldMark) => oldMark.oid === newMark.oid,
+            );
+
+            if (!exists) {
+                existingMarks.push(newMark);
+            }
+        });
+
+        const fetchedDataWithUser = {
+            user: user,
+            dataCache: existingMarks,
+        };
+
+        dataCacheWithUser.set(cacheKey, fetchedDataWithUser);
+    }
+}
+
 export function getMarkColorData() {
     const candleSettings = localStorage.getItem(
         'tradingview.chartproperties.mainSeriesProperties',

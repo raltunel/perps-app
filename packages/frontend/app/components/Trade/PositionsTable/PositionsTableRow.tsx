@@ -29,8 +29,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
 
+        const showTpSl = false;
+
         const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
+
+        const baseColor =
+            position.szi >= 0 ? getBsColor().buy : getBsColor().sell;
 
         // Memoize TP/SL string
         const getTpSl = useCallback(() => {
@@ -48,13 +53,6 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             }
             return ret;
         }, [position.tp, position.sl, formatNum]);
-
-        // Memoize buy/sell colors
-        const { buy, sell } = useMemo(() => getBsColor(), [getBsColor]);
-        const baseColor = useMemo(
-            () => (position.szi >= 0 ? buy : sell),
-            [position.szi, buy, sell],
-        );
 
         // Memoize hexToRgba
         const hexToRgba = useCallback((hex: string, alpha: number): string => {
@@ -93,10 +91,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             modalCtrl.open();
         }, [modalCtrl]);
 
-        const openLeverageModal = useCallback(() => {
-            setModalContent('leverage');
-            modalCtrl.open();
-        }, [modalCtrl]);
+        // const openLeverageModal = useCallback(() => {
+        //     setModalContent('leverage');
+        //     modalCtrl.open();
+        // }, [modalCtrl]);
 
         // Memoize modal content
         const renderModalContent = useCallback(() => {
@@ -146,18 +144,23 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         );
 
         return (
-            <div className={styles.rowContainer}>
+            <div
+                className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
+            >
                 <div
                     className={`${styles.cell} ${styles.coinCell}`}
                     style={gradientStyle}
                 >
                     <span
-                        style={{ color: baseColor, cursor: 'pointer' }}
+                        style={{
+                            color: baseColor,
+                            cursor: 'pointer',
+                        }}
                         onClick={handleCoinClick}
                     >
                         {position.coin}
                     </span>
-                    {position.leverage.value && (
+                    {/* {position.leverage.value && (
                         <span
                             className={styles.badge}
                             onClick={openLeverageModal}
@@ -168,12 +171,12 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         >
                             {position.leverage.value}x
                         </span>
-                    )}
+                    )} */}
                 </div>
                 <div
                     className={`${styles.cell} ${styles.sizeCell}`}
                     style={{
-                        color: position.szi >= 0 ? buy : sell,
+                        color: baseColor,
                     }}
                 >
                     {Math.abs(position.szi)} {position.coin}
@@ -193,9 +196,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     style={{
                         color:
                             position.unrealizedPnl > 0
-                                ? buy
+                                ? getBsColor().buy
                                 : position.unrealizedPnl < 0
-                                  ? sell
+                                  ? getBsColor().sell
                                   : 'var(--text2)',
                     }}
                 >
@@ -221,9 +224,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     style={{
                         color:
                             fundingToShow > 0
-                                ? buy
+                                ? getBsColor().buy
                                 : fundingToShow < 0
-                                  ? sell
+                                  ? getBsColor().sell
                                   : 'var(--text2)',
                     }}
                 >
@@ -231,15 +234,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         {formatNum(fundingToShow, 2, true, true, true)}
                     </Tooltip>
                 </div>
-                <div className={`${styles.cell} ${styles.tpslCell}`}>
-                    {getTpSl()}
-                    <button onClick={openTpSlModal}>
-                        <LuPen color='var(--text1)' size={10} />
-                    </button>
-                </div>
+                {showTpSl && (
+                    <div className={`${styles.cell} ${styles.tpslCell}`}>
+                        {getTpSl()}
+                        <button onClick={openTpSlModal}>
+                            <LuPen color='var(--text1)' size={10} />
+                        </button>
+                    </div>
+                )}
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
-                        <button className={styles.actionButton}>Limit</button>
+                        {/* <button className={styles.actionButton}>Limit</button> */}
                         <button className={styles.actionButton}>Market</button>
                     </div>
                 </div>

@@ -1,8 +1,5 @@
 import type { IChartingLibraryWidget, IPaneApi } from '~/tv/charting_library';
 
-export const buyColor = '#26A69A';
-export const sellColor = '#E57373';
-
 export type LineLabelType =
     | 'PNL'
     | 'Limit'
@@ -93,7 +90,7 @@ export const getPricetoPixel = (
             ? chartHeight
             : priceScalePane.getHeight();
 
-        if (!priceRange) return { pixel: 0, chartHeight: 0 };
+        if (!priceRange) return { pixel: 0, chartHeight: 0, textHeight: 0 };
 
         const maxPrice = priceRange.to;
         const minPrice = priceRange.from;
@@ -114,10 +111,14 @@ export const getPricetoPixel = (
             pixel = chartHeightTemp - pixelCoordinate - textHeight / 2;
         }
 
-        return { pixel: pixel, chartHeight: chartHeightTemp };
+        return {
+            pixel: pixel,
+            chartHeight: chartHeightTemp,
+            textHeight: textHeight,
+        };
     }
 
-    return { pixel: 0, chartHeight: 0 };
+    return { pixel: 0, chartHeight: 0, textHeight: 0 };
 };
 
 export function estimateTextWidth(text: string, fontSize: number = 10): number {

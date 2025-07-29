@@ -1,3 +1,4 @@
+import type { DetailedHTMLProps, HTMLAttributes } from 'react';
 import { bsColorSets, type colorSetIF } from '~/stores/AppSettingsStore';
 import type { ResolutionString } from '~/tv/charting_library';
 
@@ -7,6 +8,26 @@ import type {
     CustomThemes,
     LibrarySymbolInfo,
 } from '~/tv/charting_library/charting_library';
+
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace JSX {
+        interface IntrinsicElements {
+            'd3fc-group': DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+            >;
+            'd3fc-svg': DetailedHTMLProps<
+                HTMLAttributes<HTMLDivElement>,
+                HTMLDivElement
+            >;
+            'd3fc-canvas': DetailedHTMLProps<
+                HTMLAttributes<HTMLCanvasElement | HTMLDivElement>,
+                HTMLCanvasElement | HTMLDivElement
+            >;
+        }
+    }
+}
 
 export type ChartLayout = {
     chartLayout: object;
@@ -206,11 +227,20 @@ export function customThemes() {
         const lighterColors = interpolate('#ffffff', color);
         const darkerColors = interpolate(color, '#000000');
 
-        const colorGrades = [
-            ...lighterColors,
-            ...darkerColors.slice(0, -1),
-        ] as ColorGradient;
-        colorGradeArr.push(colorGrades);
+        if (color === '#7371FC') {
+            const perpColorGrades = [];
+
+            for (let i = 0; i < 19; i++) {
+                perpColorGrades.push('#7371FC');
+            }
+            colorGradeArr.push(perpColorGrades as ColorGradient);
+        } else {
+            const colorGrades = [
+                ...lighterColors,
+                ...darkerColors.slice(0, -1),
+            ] as ColorGradient;
+            colorGradeArr.push(colorGrades);
+        }
     });
 
     const lightTheme: CustomThemeColors = {

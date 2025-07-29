@@ -2,6 +2,8 @@ import type { TableSortDirection } from '../CommonIFs';
 import type { SymbolInfoIF } from '../SymbolInfoIFs';
 import type { ActiveTwapIF } from '../UserDataIFs';
 import type {
+    OrderBookLiqIF,
+    OrderBookRowIF,
     OrderDataIF,
     OrderDataSortBy,
     OrderRowResolutionIF,
@@ -245,6 +247,15 @@ export const sortOrderData = (
                         ? (a.triggerPx ?? 0) - (b.triggerPx ?? 0)
                         : (b.triggerPx ?? 0) - (a.triggerPx ?? 0),
                 );
+            case 'reduceOnly':
+                return [...orderData].sort((a, b) => {
+                    if (a.reduceOnly === b.reduceOnly) return 0;
+
+                    if (sortDirection === 'asc') {
+                        return a.reduceOnly ? 1 : -1;
+                    }
+                    return a.reduceOnly ? -1 : 1;
+                });
             default:
                 return orderData;
         }
@@ -275,4 +286,133 @@ export const genRandomActiveTwap = (): ActiveTwapIF => {
         ).getTime(),
         user: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     };
+};
+
+export const interpolateOrderBookData = (
+    orders: OrderBookRowIF[],
+    closestPx: number,
+    subRanges: number = 3,
+): OrderBookRowIF[] => {
+    if (orders.length === 0) return [];
+
+    const highResOrders: OrderBookRowIF[] = [];
+
+    // Add subRows for before first point -------------------------
+    const closestPxDiff = (orders[0].px - closestPx) / 2;
+    const ratioDiff = orders[0].ratio || 0;
+    let usedSz = 0;
+    let usedRatio = 0;
+
+    const firstSubRanges = subRanges * 1;
+
+    for (let i = 0; i < firstSubRanges; i++) {
+        const midPx =
+            orders[0].px -
+            (closestPxDiff - (closestPxDiff / firstSubRanges) * i);
+        const midSz = (orders[0].sz / (firstSubRanges + 1)) * Math.random();
+        usedSz += midSz;
+
+        const midRatio = (ratioDiff * midSz) / orders[0].sz;
+        usedRatio += midRatio;
+
+        const newOrder = {
+            ...orders[0],
+            px: midPx,
+            sz: midSz,
+            ratio: midRatio,
+        };
+        highResOrders.push(newOrder);
+    }
+
+    highResOrders.push({
+        ...orders[0],
+        sz: orders[0].sz - usedSz,
+        ratio: (orders[0].ratio || 0) - usedRatio,
+    });
+
+    for (let i = 1; i < orders.length; i++) {
+        const pxDiff = orders[i].px - orders[i - 1].px;
+        let ratioDiff = 0;
+        if (orders[i].ratio && orders[i - 1].ratio) {
+            const r2 = orders[i].ratio;
+            const r1 = orders[i - 1].ratio;
+            ratioDiff = (r2 || 0) - (r1 || 0);
+        }
+
+        let usedSz = 0;
+
+        for (let j = 0; j < subRanges; j++) {
+            let midSz = 0;
+            if (j === subRanges - 1) {
+                midSz = orders[i].sz - usedSz;
+            } else {
+                midSz = ((orders[i].sz - usedSz) * Math.random()) / 2;
+                usedSz += midSz;
+            }
+            const midPx = orders[i - 1].px + (pxDiff / subRanges) * (j + 1);
+
+            let midRatio = (ratioDiff * midSz) / orders[i].sz;
+
+            if (midRatio < 0) {
+                console.log('>>> negative ratio');
+            }
+
+            const newOrder = {
+                ...orders[i],
+                px: midPx,
+                sz: midSz,
+                ratio: (orders[i].ratio || 0) + midRatio,
+            };
+            highResOrders.push(newOrder);
+        }
+    }
+
+    return highResOrders;
+};
+
+export const createRandomOrderBookLiq = (
+    buys: OrderBookRowIF[],
+    sells: OrderBookRowIF[],
+): { liqBuys: OrderBookLiqIF[]; liqSells: OrderBookLiqIF[] } => {
+    const liqBuys: OrderBookLiqIF[] = [];
+    const liqSells: OrderBookLiqIF[] = [];
+
+    buys.forEach((buy) => {
+        liqBuys.push({
+            sz: buy.sz * Math.random() * 0.5,
+            type: 'buy',
+            px: buy.px,
+        });
+    });
+
+    sells.forEach((sell) => {
+        liqSells.push({
+            sz: sell.sz * Math.random() * 0.5,
+            type: 'sell',
+            px: sell.px,
+        });
+    });
+
+    let maxSz = 0;
+
+    liqBuys.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqSells.forEach((liq) => {
+        if (liq.sz > maxSz) {
+            maxSz = liq.sz;
+        }
+    });
+
+    liqBuys.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+    liqSells.map((liq) => {
+        liq.ratio = liq.sz / maxSz;
+    });
+
+    return { liqBuys, liqSells };
 };

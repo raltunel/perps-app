@@ -36,6 +36,7 @@ import {
 } from '~/routes/chart/data/utils/utils';
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
@@ -50,13 +51,11 @@ import {
 interface TradingViewContextType {
     chart: IChartingLibraryWidget | null;
     isChartReady: boolean;
-    isLiqChartVisible: boolean;
 }
 
 export const TradingViewContext = createContext<TradingViewContextType>({
     chart: null,
     isChartReady: false,
-    isLiqChartVisible: false,
 });
 
 export interface ChartContainerProps {
@@ -93,15 +92,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
 
-    const [isLiqChartVisible, setIsLiqChartVisible] = useState(false);
-    const liqChartVisibleRef = useRef(false);
+    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const debugToolbarOpenRef = useRef(debugToolbarOpen);
+    debugToolbarOpenRef.current = debugToolbarOpen;
 
-    useEffect(() => {
-        liqChartVisibleRef.current = isLiqChartVisible;
-    }, [isLiqChartVisible]);
+    const { liquidationsActive, setLiquidationsActive } = useAppStateStore();
+    const liqChartVisibleRef = useRef(false);
+    liqChartVisibleRef.current = liquidationsActive;
 
     const [isChartReady, setIsChartReady] = useState(false);
-    const { marketId } = useParams<{ marketId: string }>();
     useEffect(() => {
         const res = getChartLayout();
         if (res?.interval) {
@@ -157,12 +156,6 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     useEffect(() => {
-        if (chart) {
-            showBuysSellsOnChart && chart.chart().refreshMarks();
-        }
-    }, [bsColor, chart, showBuysSellsOnChart]);
-
-    useEffect(() => {
         if (!isChartReady && chart) {
             const intervalId = setInterval(() => {
                 const isReady = chart.chart().dataReady();
@@ -213,7 +206,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
             timezone: 'Etc/UTC',
-            symbol: marketId,
+            symbol: symbol,
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
@@ -281,17 +274,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             updateButtonStyle();
 
             const onClick = () => {
-                setIsLiqChartVisible((prev) => {
-                    const newVal = !prev;
-                    liqChartVisibleRef.current = newVal;
-                    updateButtonStyle();
-                    if (newVal) {
-                        disable('showBuysSellsOnChart');
-                    } else {
-                        enable('showBuysSellsOnChart');
-                    }
-                    return newVal;
-                });
+                const newVal = !liqChartVisibleRef.current;
+                liqChartVisibleRef.current = newVal;
+                setLiquidationsActive(newVal);
+                if (newVal) {
+                    disable('showBuysSellsOnChart');
+                } else {
+                    enable('showBuysSellsOnChart');
+                }
+                updateButtonStyle();
             };
             const onMouseEnter = () => {
                 const wrapper = liquidationsButton.querySelector(
@@ -357,7 +348,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
             setChart(tvWidget);
         });
-    }, [chartState, info]);
+    }, [chartState, info, symbol]);
 
     useEffect(() => {
         initChart();
@@ -390,6 +381,43 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
         return intervalNum * coef;
     }, []);
+
+    useEffect(() => {
+        const chartDiv = document.getElementById('tv_chart');
+        const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+        const iframeDoc =
+            iframe?.contentDocument || iframe?.contentWindow?.document;
+
+        const blockSymbolSearchKeys = (e: KeyboardEvent) => {
+            const isSingleChar = e.key.length === 1;
+            const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
+
+            if (e.code === 'KeyD' && e.altKey) {
+                e.preventDefault();
+                setDebugToolbarOpen(!debugToolbarOpenRef.current);
+            }
+            if (
+                !e.ctrlKey &&
+                !e.altKey &&
+                !e.metaKey &&
+                isSingleChar &&
+                isAlphaNumeric
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        };
+
+        iframeDoc?.addEventListener('keydown', blockSymbolSearchKeys, true);
+
+        return () => {
+            iframeDoc?.removeEventListener(
+                'keydown',
+                blockSymbolSearchKeys,
+                true,
+            );
+        };
+    }, [chart]);
 
     useEffect(() => {
         if (lastAwakeMs > lastSleepMs && lastSleepMs > 0) {
@@ -430,27 +458,25 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [chart]);
 
     useEffect(() => {
-        if (debugWallet.address) {
+        if (liquidationsActive) {
+            if (chart) {
+                chart.chart().clearMarks();
+            }
+        } else if (debugWallet.address && chart) {
             getMarkFillData(symbol, debugWallet.address).then(() => {
-                if (chart && isLiqChartVisible) {
-                    chart.chart().clearMarks();
-                    showBuysSellsOnChart && chart.chart().refreshMarks();
-                }
+                chart.chart().refreshMarks();
             });
         }
-    }, [debugWallet, chart, symbol]);
+    }, [debugWallet, chart, symbol, liquidationsActive]);
 
     useEffect(() => {
         if (chart) {
-            showBuysSellsOnChart || chart.chart().clearMarks();
             showBuysSellsOnChart && chart.chart().refreshMarks();
         }
-    }, [showBuysSellsOnChart]);
+    }, [bsColor, chart, showBuysSellsOnChart]);
 
     return (
-        <TradingViewContext.Provider
-            value={{ chart, isChartReady, isLiqChartVisible }}
-        >
+        <TradingViewContext.Provider value={{ chart, isChartReady }}>
             {children}
         </TradingViewContext.Provider>
     );

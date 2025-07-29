@@ -10,6 +10,7 @@ import {
     getMarkColorData,
     getMarkFillData,
     updateCandleCache,
+    updateMarkDataWithSubscription,
 } from './candleDataCache';
 import { processWSCandleMessage } from './processChartData';
 import {
@@ -30,7 +31,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
         },
 
         onReady: (cb: any) => {
-            cb({
+            (cb({
                 supported_resolutions: supportedResolutions,
                 supports_marks: true,
             }),
@@ -41,7 +42,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 // supports_marks: false,
                 // supports_time: true,
 
-                0;
+                0);
         },
 
         resolveSymbol: (symbolName, onResolve, onError) => {
@@ -56,7 +57,7 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 supported_resolutions: supportedResolutions,
                 description: '',
                 type: '',
-                exchange: '',
+                exchange: 'Ambient',
                 listed_exchange: '',
                 format: 'price',
             };
@@ -179,6 +180,12 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                     poolFills.sort((a: any, b: any) => b.time - a.time);
 
                     fillMarks(poolFills);
+
+                    updateMarkDataWithSubscription(
+                        symbolInfo.name,
+                        poolFills,
+                        userWallet,
+                    );
 
                     const markArray = [
                         ...bSideOrderHistoryMarks.values(),
