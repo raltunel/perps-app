@@ -690,6 +690,7 @@ export class WebSocketInstance {
     };
 
     public stop = () => {
+        console.log('>>> stop');
         this.stopped = true;
         if (this.ws) {
             this.ws.close();
@@ -712,6 +713,10 @@ export class WebSocketInstance {
             URL.revokeObjectURL(this.jsonParserWorkerBlobUrl);
             this.jsonParserWorkerBlobUrl = null;
         }
+
+        this.wsReady = false;
+        this.queuedSubscriptions = [];
+        this.activeSubscriptions = {};
     };
 
     public enableSleepMode = () => {
