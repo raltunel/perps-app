@@ -18,6 +18,7 @@ import {
     getResolutionListForSymbol,
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -61,9 +62,16 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     sellsRef.current = sells;
 
     const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+    const { pauseLiqAnimation } = useDebugStore();
+    const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
+    pauseLiqAnimationRef.current = pauseLiqAnimation;
 
     const genRandomData = useCallback(() => {
-        if (buysRef.current.length === 0 || sellsRef.current.length === 0)
+        if (
+            buysRef.current.length === 0 ||
+            sellsRef.current.length === 0 ||
+            pauseLiqAnimationRef.current
+        )
             return;
         const highResBuys = interpolateOrderBookData(
             buysRef.current,
@@ -75,6 +83,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         );
         setHighResBuys(highResBuys);
         setHighResSells(highResSells);
+        // setHighResBuys(buysRef.current);
+        // setHighResSells(sellsRef.current);
         const { liqBuys, liqSells } = createRandomOrderBookLiq(
             buysRef.current,
             sellsRef.current,

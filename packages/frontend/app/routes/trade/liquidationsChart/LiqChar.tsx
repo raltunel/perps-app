@@ -56,7 +56,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const { getBsColor } = useAppSettings();
 
-    const { pauseLiqAnimation, setPauseLiqAnimation } = useDebugStore();
+    const { pauseLiqAnimation } = useDebugStore();
     const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
     pauseLiqAnimationRef.current = pauseLiqAnimation;
 
@@ -71,6 +71,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const isInitialized = useRef(false);
 
     const showLiqText = useRef(false);
+    const showAreaText = useRef(false);
+
+    const minLiqLine = 10;
 
     const drawLiquidationLines = useCallback(
         (context: CanvasRenderingContext2D) => {
@@ -115,7 +118,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         rowHeight / 2 +
                         4;
                     const xStart =
-                        widthRef.current - widthRef.current * (liq.ratio || 0);
+                        widthRef.current -
+                        widthRef.current * (liq.ratio || 0) -
+                        minLiqLine;
                     const xEnd = widthRef.current;
                     context.beginPath();
                     context.moveTo(xStart, yPos);
@@ -142,7 +147,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     if (index >= orderCountRef.current) return;
                     const yPos = rowHeight * index + rowHeight / 2;
                     const xStart =
-                        widthRef.current - widthRef.current * (liq.ratio || 0);
+                        widthRef.current -
+                        widthRef.current * (liq.ratio || 0) -
+                        minLiqLine;
                     const xEnd = widthRef.current;
                     context.beginPath();
                     context.moveTo(xStart, yPos);
@@ -156,6 +163,20 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                             liq.sz.toFixed(2) + ' ' + liq.ratio?.toFixed(2);
                         context.fillText(pxText, 20, yPos - 3);
                     }
+                });
+            }
+
+            if (showAreaText.current) {
+                context.font = '8px Arial';
+                context.textAlign = 'left';
+                context.textBaseline = 'middle';
+                context.fillStyle = 'white';
+                currentSellDataRef.current.forEach((d, index) => {
+                    const yPos = sellYScaleRef.current
+                        ? sellYScaleRef.current(d.px)
+                        : 0;
+                    context.fillStyle = 'white';
+                    context.fillText(d.ratio?.toFixed(2) || '0', 20, yPos - 3);
                 });
             }
 
