@@ -1,4 +1,5 @@
 import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     memo,
     useCallback,
@@ -131,6 +132,12 @@ function OrderInput({
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
+
+    const sessionState = useSession();
+
+    const isUserLoggedIn = useMemo(() => {
+        return isEstablished(sessionState);
+    }, [sessionState]);
 
     // Market order service hook
     const { executeMarketOrder, isLoading: isMarketOrderLoading } =
@@ -448,7 +455,7 @@ function OrderInput({
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
         if (!isEditingSizeInput) {
-            if (selectedMode === 'symbol') {
+            if (selectedMode === 'symbol' && notionalSymbolQtyNum) {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -458,7 +465,7 @@ function OrderInput({
                           )
                         : '',
                 );
-            } else if (markPx) {
+            } else if (notionalSymbolQtyNum && markPx) {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -511,19 +518,28 @@ function OrderInput({
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(adjusted);
-            const usdValue = adjusted * (markPx || 1);
-            const percent = (usdValue / leverage / usdAvailableToTrade) * 100;
-            if (percent > 100) {
-                setUserExceededAvailableMargin(true);
-                setPositionSliderPercentageValue(100);
-            } else {
-                setUserExceededAvailableMargin(false);
-                setPositionSliderPercentageValue(percent);
+            if (isUserLoggedIn) {
+                const usdValue = adjusted * (markPx || 1);
+                const percent =
+                    (usdValue / leverage / usdAvailableToTrade) * 100;
+                if (percent > 100) {
+                    setUserExceededAvailableMargin(true);
+                    setPositionSliderPercentageValue(100);
+                } else {
+                    setUserExceededAvailableMargin(false);
+                    setPositionSliderPercentageValue(percent);
+                }
             }
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
         }
-    }, [usdAvailableToTrade, markPx, sizeDisplay, selectedMode]);
+    }, [
+        usdAvailableToTrade,
+        markPx,
+        sizeDisplay,
+        selectedMode,
+        isUserLoggedIn,
+    ]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
