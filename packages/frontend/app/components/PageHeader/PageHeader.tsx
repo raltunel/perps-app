@@ -119,6 +119,8 @@ export default function PageHeader() {
                 );
                 // console.log({ marginBucket });
                 setMarginBucket(marginBucket);
+            } else {
+                setMarginBucket(null);
             }
         };
 
