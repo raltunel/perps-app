@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
+import ChartLoading from '~/routes/chart/ChartLoading/ChartLoading';
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 
 export const LazyTradingView: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
+
+    const [isChartReadyForFirstOpen, setIsChartReadyForFirstOpen] =
+        useState(false);
 
     useEffect(() => {
         // Only load the TradingView script when the component mounts
@@ -33,27 +37,26 @@ export const LazyTradingView: React.FC = () => {
         };
     }, []);
 
-    if (!isLoaded) {
-        return (
-            <div
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '100%',
-                    backgroundColor: 'var(--bg-dark2)',
-                }}
-            >
-                <div className='loading-spinner'>Loading chart...</div>
-            </div>
-        );
-    }
-
     return (
-        <TradingViewProvider>
-            <TradingViewChart />
-            <OverlayCanvas />
-        </TradingViewProvider>
+        <div
+            style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'var(--bg-dark2)',
+                display: 'grid',
+            }}
+        >
+            {isLoaded && (
+                <TradingViewProvider
+                    setIsChartReadyForFirstOpen={setIsChartReadyForFirstOpen}
+                >
+                    <TradingViewChart />
+                    <OverlayCanvas />
+                </TradingViewProvider>
+            )}
+
+            {(!isLoaded || !isChartReadyForFirstOpen) && <ChartLoading />}
+        </div>
     );
 };
 
