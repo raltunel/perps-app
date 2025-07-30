@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import ChartLoading from '~/components/ChartLoading/ChartLoading';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
-import ChartLoading from '~/routes/chart/ChartLoading/ChartLoading';
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 
 export const LazyTradingView: React.FC = () => {

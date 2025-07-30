@@ -1,4 +1,4 @@
-import styles from './chartLoading.module.css';
+import styles from './ChartLoading.module.css';
 export default function ChartLoading() {
     return (
         <div className={`${styles.spinner_container}`}>

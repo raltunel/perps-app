@@ -31,7 +31,7 @@ import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import ChartLoading from './chart/ChartLoading/chartLoading';
+import ChartLoading from '../components/ChartLoading/ChartLoading';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
