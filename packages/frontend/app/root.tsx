@@ -124,6 +124,62 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         target.media = 'all';
                     }}
                 />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
                 <Links />
             </head>
             <body>
