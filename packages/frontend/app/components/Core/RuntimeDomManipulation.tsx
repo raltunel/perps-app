@@ -5,7 +5,6 @@ export default function RuntimeDomManipulation() {
     useEffect(() => {
         const disableSpellcheck = (root: HTMLElement) => {
             const inputs = root.querySelectorAll('input, textarea');
-            console.log(inputs);
             inputs.forEach((el) =>
                 el.classList.contains('spellcheck-enabled')
                     ? el.setAttribute('spellcheck', 'true')
