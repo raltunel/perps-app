@@ -180,6 +180,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         target.media = 'all';
                     }}
                 />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.gstatic.com/s/lexenddeca/v24/K2F1fZFYk-dHSE0UPPuwQ5qnJy8.woff2'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.gstatic.com/s/lexenddeca/v24/K2F1fZFYk-dHSE0UPPuwQ5qnJy8.woff2'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
                 <Links />
             </head>
             <body>
