@@ -1,9 +1,17 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    lazy,
+    memo,
+    Suspense,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
-import TradingViewWrapper from '~/components/Tradingview/TradingviewWrapper';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
@@ -13,17 +21,25 @@ import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
 
+// Lazy load the TradingView component
+const LazyTradingView = lazy(
+    () => import('~/components/Tradingview/LazyTradingView'),
+);
+
 import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import ChartLoading from '../components/ChartLoading/ChartLoading';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
-const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
+
+// Loading fallback for the lazy-loaded component
+const TradingViewFallback = () => <ChartLoading />;
 
 type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
@@ -206,8 +222,10 @@ export default function Trade() {
             <>
                 <TradeRouteHandler />
                 <WebDataConsumer />
-                <div className={styles.symbolInfoContainer}>
-                    <MemoizedSymbolInfo />
+                <div className={styles.tradingViewContainer}>
+                    <Suspense fallback={<TradingViewFallback />}>
+                        <LazyTradingView />
+                    </Suspense>
                 </div>
                 {MobileTabNavigation}
                 <div
@@ -229,7 +247,9 @@ export default function Trade() {
                 >
                     {(activeTab === 'chart' ||
                         visibilityRefs.current.chart) && (
-                        <MemoizedTradingViewWrapper />
+                        <Suspense fallback={<TradingViewFallback />}>
+                            <LazyTradingView />
+                        </Suspense>
                     )}
                 </div>
                 <div
@@ -298,7 +318,9 @@ export default function Trade() {
                                 <MemoizedSymbolInfo />
                             </div>
                             <div id='chartSection' className={styles.chart}>
-                                <MemoizedTradingViewWrapper />
+                                <Suspense fallback={<TradingViewFallback />}>
+                                    <LazyTradingView />
+                                </Suspense>
                             </div>
                         </div>
                         <div id='orderBookSection' className={styles.orderBook}>
