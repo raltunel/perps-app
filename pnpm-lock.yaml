@@ -21,8 +21,8 @@ importers:
   packages/frontend:
     dependencies:
       '@crocswap-libs/ambient-ember':
-        specifier: ^0.1.29
-        version: 0.1.29(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ^0.1.30
+        version: 0.1.30(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
         specifier: ^0.0.3
         version: 0.0.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -804,8 +804,8 @@ packages:
     peerDependencies:
       '@solana/web3.js': ^1.69.0
 
-  '@crocswap-libs/ambient-ember@0.1.29':
-    resolution: {integrity: sha512-9PAKo7tHszaVZm26DMQcWwXpnpLSXXYJGtLhAolvO6DLSqGAWKGhqBB9gMg2EdWlBcmVBjYXB+aa3PjM9XadOQ==}
+  '@crocswap-libs/ambient-ember@0.1.30':
+    resolution: {integrity: sha512-OEEP7dHwOr1m1otjR3FWAo8I0GRa+JwmHL2LVlMQUqBeRTEjZHiFVAsTYAtaMOg6N9MUkKlErakjHyCIg18fkg==}
 
   '@d3fc/d3fc-annotation@3.0.16':
     resolution: {integrity: sha512-4tA7RHLUbj/i3KqWRqCVDOHi435qBRXbAFrAajVYM2juNzFdX5RCoF3opyXKOFncs339caxgeySGStTVfulO9w==}
@@ -7055,6 +7055,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   sourcemap-codec@1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
@@ -8758,7 +8759,7 @@ snapshots:
       bn.js: 5.2.2
       buffer-layout: 1.2.2
 
-  '@crocswap-libs/ambient-ember@0.1.29(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@crocswap-libs/ambient-ember@0.1.30(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
       '@noble/ed25519': 2.3.0

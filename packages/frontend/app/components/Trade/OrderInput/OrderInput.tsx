@@ -850,6 +850,7 @@ function OrderInput({
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'buy',
+                leverage: leverage,
             });
 
             if (result.success) {
@@ -906,6 +907,7 @@ function OrderInput({
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'sell',
+                leverage: leverage,
             });
 
             if (result.success) {
