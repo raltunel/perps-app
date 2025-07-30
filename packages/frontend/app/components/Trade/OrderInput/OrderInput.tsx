@@ -557,7 +557,7 @@ function OrderInput({
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
         if (!isEditingSizeInput) {
-            if (selectedMode === 'symbol' && notionalSymbolQtyNum) {
+            if (selectedMode === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -567,7 +567,7 @@ function OrderInput({
                           )
                         : '',
                 );
-            } else if (notionalSymbolQtyNum && markPx) {
+            } else if (markPx) {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
