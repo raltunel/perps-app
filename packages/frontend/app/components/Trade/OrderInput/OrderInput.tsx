@@ -130,17 +130,10 @@ function OrderInput({
 
     const sessionState = useSession();
 
-    const isUserConnected = useMemo(
-        () => isEstablished(sessionState),
-        [sessionState],
-    );
-
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
-
-    const sessionState = useSession();
 
     const isUserLoggedIn = useMemo(() => {
         return isEstablished(sessionState);
@@ -1165,7 +1158,7 @@ function OrderInput({
                         /> */}
                     </div>
                     <div className={styles.button_details_container}>
-                        {isUserConnected && (
+                        {isUserLoggedIn && (
                             <Tooltip
                                 content={disabledReason}
                                 position='top'
