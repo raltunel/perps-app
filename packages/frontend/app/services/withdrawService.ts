@@ -2,6 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import {
     buildWithdrawMarginTx,
     getUserMarginBucket,
+    USD_MINT,
 } from '@crocswap-libs/ambient-ember';
 
 export interface WithdrawServiceResult {
@@ -29,10 +30,12 @@ export class WithdrawService {
     /**
      * Get available balance to withdraw from margin bucket
      * @param userPublicKey - User's public key
+     * @param marketId - Market ID (defaults to BTC market)
      * @returns Promise<AvailableWithdrawBalance | null>
      */
     async getAvailableWithdrawBalance(
         userPublicKey: PublicKey,
+        marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
             console.log(
@@ -40,6 +43,7 @@ export class WithdrawService {
                 userPublicKey.toString(),
             );
             console.log('📡 Connection endpoint:', this.connection.rpcEndpoint);
+            console.log('🏪 Market ID:', marketId.toString());
 
             let marginBucket;
             try {
@@ -57,10 +61,17 @@ export class WithdrawService {
                 });
 
                 marginBucket = await Promise.race([
-                    getUserMarginBucket(this.connection, userPublicKey),
+                    getUserMarginBucket(
+                        this.connection,
+                        userPublicKey,
+                        marketId,
+                        USD_MINT,
+                        {},
+                    ),
                     timeoutPromise,
                 ]);
                 console.log('✅ getUserMarginBucket call completed');
+                console.log(marginBucket);
             } catch (marginError) {
                 console.error(
                     '❌ Error calling getUserMarginBucket:',
@@ -77,38 +88,25 @@ export class WithdrawService {
 
             // Don't use JSON.stringify with BigInt values
             console.log('📊 Margin bucket data:', marginBucket);
-            console.log('📊 Calculations:', marginBucket.calculations);
             console.log(
                 '📊 All margin bucket keys:',
                 Object.keys(marginBucket),
             );
 
-            // If calculations exist, log its keys
-            if (marginBucket.calculations) {
-                console.log(
-                    '📊 Calculations keys:',
-                    Object.keys(marginBucket.calculations),
-                );
-                // Log each calculation value separately to handle BigInts
-                for (const [key, value] of Object.entries(
-                    marginBucket.calculations,
-                )) {
-                    console.log(
-                        `  - ${key}:`,
-                        value?.toString ? value.toString() : value,
-                    );
-                }
-            }
+            // Log key fields from margin bucket
+            console.log('📊 Key margin bucket values:', {
+                availToWithdraw: marginBucket.availToWithdraw?.toString(),
+                availToBuy: marginBucket.availToBuy?.toString(),
+                availToSell: marginBucket.availToSell?.toString(),
+                equity: marginBucket.equity?.toString(),
+                unrealizedPnl: marginBucket.unrealizedPnl?.toString(),
+                committedCollateral:
+                    marginBucket.committedCollateral?.toString(),
+                netPosition: marginBucket.netPosition?.toString(),
+            });
 
-            // Get available to withdraw from calculations
-            // Try different possible field names
-            let availableToWithdraw =
-                marginBucket.calculations?.collateralAvailableToWithdraw ||
-                marginBucket.collateralAvailableToWithdraw ||
-                marginBucket.availableToWithdraw ||
-                marginBucket.calculations?.availableToWithdraw ||
-                marginBucket.calculations?.available_to_withdraw ||
-                0;
+            // Get available to withdraw - SDK v0.1.30 uses availToWithdraw
+            let availableToWithdraw = marginBucket.availToWithdraw || 0;
 
             console.log('💰 Raw available to withdraw:', availableToWithdraw);
             console.log(

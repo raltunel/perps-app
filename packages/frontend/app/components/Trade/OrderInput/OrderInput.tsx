@@ -1,4 +1,4 @@
-import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import { type MarginBucketAvail } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     memo,
@@ -124,7 +124,7 @@ export type modalContentT =
 function OrderInput({
     marginBucket,
 }: {
-    marginBucket: MarginBucketInfo | null;
+    marginBucket: MarginBucketAvail | null;
 }) {
     const { getBsColor } = useAppSettings();
 
@@ -241,8 +241,7 @@ function OrderInput({
     const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
     useEffect(() => {
-        const usdAvailableToTrade =
-            marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
+        const usdAvailableToTrade = marginBucket?.availToWithdraw || 0;
         const normalizedAvailableToTrade =
             Number(usdAvailableToTrade) / 1_000_000;
         setUsdAvailableToTrade(normalizedAvailableToTrade);

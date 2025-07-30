@@ -1,4 +1,4 @@
-import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
 import {
     isEstablished,
     SessionButton,
@@ -21,7 +21,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 
 interface propsIF {
-    marginBucket: MarginBucketInfo | null;
+    marginBucket: MarginBucketAvail | null;
     isDropdown?: boolean;
 }
 
@@ -57,10 +57,10 @@ function DepositDropdown(props: propsIF) {
 
     useEffect(() => {
         if (marginBucket) {
-            const equityBigNum = marginBucket.calculations.equity;
+            const equityBigNum = marginBucket.equity;
             const normalizedEquity = Number(equityBigNum) / 1e6;
             setBalanceNum(normalizedEquity);
-            const unrealizedPnlBigNum = marginBucket.calculations.unrealizedPnl;
+            const unrealizedPnlBigNum = marginBucket.unrealizedPnl;
             const normalizedUnrealizedPnl = Number(unrealizedPnlBigNum) / 1e6;
             setUnrealizedPnlNum(normalizedUnrealizedPnl);
         }
