@@ -121,8 +121,6 @@ export default function App() {
             <Layout>
                 <FogoSessionProvider
                     endpoint='https://testnet.fogo.io/'
-                    sponsor='8HnaXmgFJbvvJxSdjeNyWwMXZb85E35NM4XNg6rxuw3w'
-                    paymasterUrl='https://sessions-example.fogo.io/paymaster'
                     {...(window.location.hostname === 'localhost' && {
                         domain: 'https://perps.ambient.finance',
                     })}
