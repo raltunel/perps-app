@@ -1,37 +1,37 @@
 import {
+    lazy,
     memo,
+    Suspense,
     useCallback,
     useEffect,
     useMemo,
     useRef,
     useState,
-    lazy,
-    Suspense,
 } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
+import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
+import TradeRouteHandler from './trade/traderoutehandler';
+import WatchList from './trade/watchlist/watchlist';
+import WebDataConsumer from './trade/webdataconsumer';
 
 // Lazy load the TradingView component
 const LazyTradingView = lazy(
     () => import('~/components/Tradingview/LazyTradingView'),
 );
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import styles from './trade.module.css';
-import TradeRouteHandler from './trade/traderoutehandler';
-import WatchList from './trade/watchlist/watchlist';
-import WebDataConsumer from './trade/webdataconsumer';
 
 import { motion } from 'framer-motion';
 import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import ChartLoading from './chart/ChartLoading/ChartLoading';
+import ChartLoading from './chart/ChartLoading/chartLoading';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
