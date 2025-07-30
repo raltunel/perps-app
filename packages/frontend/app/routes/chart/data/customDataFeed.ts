@@ -138,10 +138,7 @@ export const createDataFeed = (
                 });
             };
 
-            const markRes = (await getMarkFillData(
-                symbolInfo.name,
-                // debugWallet.address,
-            )) as any;
+            const markRes = (await getMarkFillData(symbolInfo.name)) as any;
 
             const fillHistory = markRes.dataCache;
             const userWallet = markRes.user;

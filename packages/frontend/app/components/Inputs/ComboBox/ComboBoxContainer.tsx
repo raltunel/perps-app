@@ -6,9 +6,11 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import ComboBox from './ComboBox';
 import styles from './ComboBox.module.css';
+import { useUserDataStore } from '~/stores/UserDataStore';
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
+    const { userAddress } = useUserDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const {
@@ -24,6 +26,8 @@ export default function ComboBoxContainer() {
         setSdkEnabled,
         isWsSleepMode,
         setIsWsSleepMode,
+        isDebugWalletActive,
+        setIsDebugWalletActive,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -69,7 +73,6 @@ export default function ComboBoxContainer() {
                     }
                 />
             </div>
-
             <div className={styles.currencySelector}>
                 <ComboBox
                     value={selectedCurrency}
@@ -77,7 +80,7 @@ export default function ComboBoxContainer() {
                     onChange={(value) => setSelectedCurrency(value)}
                 />
             </div>
-
+            <div className={styles.divider} />
             <div
                 className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
                 onClick={() => setIsWsEnabled(!isWsEnabled)}
@@ -103,6 +106,19 @@ export default function ComboBoxContainer() {
                     {sdkEnabled ? 'SDK' : 'SDK'}
                 </div>
             </div>
+
+            <div className={styles.divider} />
+            <div
+                className={`${styles.sdkToggle} ${isDebugWalletActive ? styles.active : styles.disabled}`}
+                onClick={() => setIsDebugWalletActive(!isDebugWalletActive)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {isDebugWalletActive ? 'Debug Wallet' : 'Nightly Wallet'}
+                </div>
+            </div>
+            <div className={styles.subInfo}>{userAddress}</div>
+
+            <div className={styles.divider} />
             {isEstablished(sessionState) && (
                 <button
                     onClick={() => {

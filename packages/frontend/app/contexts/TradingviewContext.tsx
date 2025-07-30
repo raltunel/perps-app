@@ -36,8 +36,8 @@ import {
 import { useAppOptions } from '~/stores/AppOptionsStore';
 import { useAppSettings, type colorSetIF } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import {
     widget,
     type IBasicDataFeed,
@@ -82,7 +82,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const { showBuysSellsOnChart } = useAppOptions();
 
@@ -452,7 +452,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         setIsChartReady(false);
-    }, [debugWallet]);
+    }, [userAddress]);
 
     useEffect(() => {
         if (!chart) return;
@@ -463,15 +463,15 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     }, [chart]);
 
     useEffect(() => {
-        if (debugWallet.address) {
-            getMarkFillData(symbol, debugWallet.address).then(() => {
+        if (userAddress) {
+            getMarkFillData(symbol, userAddress).then(() => {
                 if (chart) {
                     chart.chart().clearMarks();
                     showBuysSellsOnChart && chart.chart().refreshMarks();
                 }
             });
         }
-    }, [debugWallet, chart, symbol]);
+    }, [userAddress, chart, symbol]);
 
     useEffect(() => {
         if (chart) {
