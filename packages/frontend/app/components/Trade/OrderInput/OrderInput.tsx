@@ -1032,41 +1032,49 @@ function OrderInput({
         isMarketOrderLoading,
     );
 
+    const launchPadContent = (
+        <div className={styles.launchpad}>
+            <header>
+                <div
+                    className={styles.exit_launchpad}
+                    onClick={() => setShowLaunchpad(false)}
+                >
+                    <MdKeyboardArrowLeft />
+                </div>
+                <h3>Order Types</h3>
+                <button
+                    className={styles.trade_type_toggle}
+                    onClick={() => setShowLaunchpad(false)}
+                >
+                    <PiSquaresFour />
+                </button>
+            </header>
+            <ul className={styles.launchpad_clickables}>
+                {marketOrderTypes.map((mo: OrderTypeOption) => (
+                    <li
+                        key={JSON.stringify(mo)}
+                        onClick={() => {
+                            handleMarketOrderTypeChange(mo.value);
+                            setShowLaunchpad(false);
+                        }}
+                    >
+                        <div className={styles.name_and_icon}>
+                            {mo.icon}
+                            <h4>{mo.label}</h4>
+                        </div>
+                        <div>
+                            <p>{mo.blurb}</p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
-                <div className={styles.launchpad}>
-                    <header>
-                        <div
-                            className={styles.exit_launchpad}
-                            onClick={() => setShowLaunchpad(false)}
-                        >
-                            <MdKeyboardArrowLeft />
-                        </div>
-                        <h3>Order Types</h3>
-                        {/* empty <div> helps with spacing */}
-                        <div />
-                    </header>
-                    <ul className={styles.launchpad_clickables}>
-                        {marketOrderTypes.map((mo: OrderTypeOption) => (
-                            <li
-                                key={JSON.stringify(mo)}
-                                onClick={() => {
-                                    handleMarketOrderTypeChange(mo.value);
-                                    setShowLaunchpad(false);
-                                }}
-                            >
-                                <div className={styles.name_and_icon}>
-                                    {mo.icon}
-                                    <h4>{mo.label}</h4>
-                                </div>
-                                <div>
-                                    <p>{mo.blurb}</p>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                launchPadContent
             ) : (
                 <>
                     <div className={styles.mainContent}>
