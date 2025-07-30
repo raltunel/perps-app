@@ -128,6 +128,13 @@ function OrderInput({
 }) {
     const { getBsColor } = useAppSettings();
 
+    const sessionState = useSession();
+
+    const isUserConnected = useMemo(
+        () => isEstablished(sessionState),
+        [sessionState],
+    );
+
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
@@ -1158,25 +1165,27 @@ function OrderInput({
                         /> */}
                     </div>
                     <div className={styles.button_details_container}>
-                        <Tooltip
-                            content={disabledReason}
-                            position='top'
-                            disabled={!isDisabled}
-                        >
-                            <button
-                                className={styles.submit_button}
-                                style={{
-                                    backgroundColor:
-                                        tradeDirection === 'buy'
-                                            ? buyColor
-                                            : sellColor,
-                                }}
-                                onClick={handleSubmitOrder}
-                                disabled={isDisabled}
+                        {isUserConnected && (
+                            <Tooltip
+                                content={disabledReason}
+                                position='top'
+                                disabled={!isDisabled}
                             >
-                                Submit
-                            </button>
-                        </Tooltip>
+                                <button
+                                    className={styles.submit_button}
+                                    style={{
+                                        backgroundColor:
+                                            tradeDirection === 'buy'
+                                                ? buyColor
+                                                : sellColor,
+                                    }}
+                                    onClick={handleSubmitOrder}
+                                    disabled={isDisabled}
+                                >
+                                    Submit
+                                </button>
+                            </Tooltip>
+                        )}
                         <OrderDetails
                             orderMarketPrice={marketOrderType}
                             usdOrderValue={usdOrderValue}
