@@ -155,10 +155,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             // context.strokeStyle = 'gray';
             context.lineWidth = liqLineWidth;
             const sellLiqCount = currentLiqSellsRef.current.length;
+
+            const diff = rowHeight - sellLiqCount;
+
             if (sellLiqCount > 0) {
                 currentLiqSellsRef.current.forEach((liq, index) => {
                     if (index >= orderCountRef.current) return;
-                    const yPos = rowHeight * index + rowHeight / 2;
+
+                    const matchingYPos =
+                        rowHeight * (diff < 1 && diff > 0 ? index + 1 : index) +
+                        rowHeight / 2;
+                    const fillerYPos =
+                        obSellBlockHeight -
+                        rowHeight * (sellLiqCount - index) +
+                        rowHeight / 2;
+
+                    const yPos = diff > 1 ? fillerYPos : matchingYPos;
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
