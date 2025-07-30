@@ -31,6 +31,7 @@ import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import ChartLoading from './chart/ChartLoading/ChartLoading';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -38,20 +39,7 @@ const MemoizedOrderBookSection = memo(OrderBookSection);
 const MemoizedSymbolInfo = memo(SymbolInfo);
 
 // Loading fallback for the lazy-loaded component
-const TradingViewFallback = () => (
-    <div
-        style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%',
-            backgroundColor: 'var(--bg-dark2)',
-            color: 'var(--text1)',
-        }}
-    >
-        Loading chart...
-    </div>
-);
+const TradingViewFallback = () => <ChartLoading />;
 
 type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
