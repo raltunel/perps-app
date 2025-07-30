@@ -1,4 +1,8 @@
-import { type MarginBucketAvail } from '@crocswap-libs/ambient-ember';
+import {
+    type MarginBucketAvail,
+    calcMarginAvail,
+    calcLiqPriceOnNewOrder,
+} from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     memo,
@@ -27,6 +31,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -157,10 +162,6 @@ function OrderInput({
     // Track if we're processing an order
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
-    useEffect(() => {
-        console.log({ notionalSymbolQtyNum });
-    }, [notionalSymbolQtyNum]);
-
     const [sizeDisplay, setSizeDisplay] = useState('');
 
     const isPriceInvalid = useMemo(() => {
@@ -205,6 +206,8 @@ function OrderInput({
         setMarginMode,
     } = useTradeDataStore();
 
+    const { buys, sells } = useOrderBookStore();
+
     const markPx = symbolInfo?.markPx;
 
     const {
@@ -240,17 +243,117 @@ function OrderInput({
 
     const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
+    const [liquidationPrice, setLiquidationPrice] = useState<number | null>(
+        null,
+    );
+
     useEffect(() => {
-        const usdAvailableToTrade = marginBucket?.availToWithdraw || 0;
+        if (!marginBucket) {
+            setUsdAvailableToTrade(0);
+            setCurrentPositionNotionalSize(0);
+            return;
+        }
+
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+
+        // Generate new MarginBucketAvail with leverage-adjusted values
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+
+        // Use the appropriate availToBuy or availToSell based on order side
+        const usdAvailableToTrade =
+            tradeDirection === 'buy'
+                ? releveragedBucket?.availToBuy || 0
+                : releveragedBucket?.availToSell || 0;
+
         const normalizedAvailableToTrade =
             Number(usdAvailableToTrade) / 1_000_000;
+
         setUsdAvailableToTrade(normalizedAvailableToTrade);
 
         const currentPositionNotionalSize = marginBucket?.netPosition || 0;
         const normalizedCurrentPosition =
             Number(currentPositionNotionalSize) / 100_000_000;
         setCurrentPositionNotionalSize(normalizedCurrentPosition);
-    }, [marginBucket]);
+    }, [marginBucket, leverage, tradeDirection]);
+
+    // Calculate liquidation price
+    useEffect(() => {
+        if (
+            !marginBucket ||
+            !notionalSymbolQtyNum ||
+            notionalSymbolQtyNum === 0
+        ) {
+            setLiquidationPrice(null);
+            return;
+        }
+
+        // Get best bid or ask price based on trade direction
+        let predictedEntryPrice: number | null = null;
+
+        if (tradeDirection === 'buy' && sells.length > 0) {
+            // For buy orders, use best ask (lowest sell price)
+            predictedEntryPrice = sells[0].px;
+        } else if (tradeDirection === 'sell' && buys.length > 0) {
+            // For sell orders, use best bid (highest buy price)
+            predictedEntryPrice = buys[0].px;
+        }
+
+        // If no orderbook data, fall back to mark price
+        if (!predictedEntryPrice && markPx) {
+            predictedEntryPrice = markPx;
+        }
+
+        if (!predictedEntryPrice) {
+            setLiquidationPrice(null);
+            return;
+        }
+
+        try {
+            // Prepare inputs for calcLiqPriceOnNewOrder. calcLiqPrice function takes unscaled decimal values
+            // *not* scaled fixed points. So adjust where needed.
+            const collateral = Number(marginBucket.committedCollateral) / 1e6;
+
+            const position = {
+                qty: Number(marginBucket.netPosition) / 1e8,
+                entryPrice: Number(marginBucket.avgEntryPrice) / 1e6,
+            };
+
+            // Order quantity: positive for buy, negative for sell
+            // notionalSymbolQtyNum is already in human-readable format, need to scale to 10^8
+            const orderQty =
+                notionalSymbolQtyNum * (tradeDirection === 'buy' ? 1 : -1);
+
+            const order = {
+                qty: orderQty,
+                entryPrice: predictedEntryPrice,
+            };
+
+            const mmBps = (marginBucket.marketMmBps || 50) / 10000;
+
+            const liqPrice = calcLiqPriceOnNewOrder(
+                collateral,
+                position,
+                order,
+                mmBps,
+            );
+
+            // Rescale back to decimalized, because the display assumes the result is fixed point
+            const normalizedLiqPrice = liqPrice ? liqPrice * 1e6 : null;
+
+            setLiquidationPrice(normalizedLiqPrice);
+        } catch (error) {
+            console.error('Error calculating liquidation price:', error);
+            setLiquidationPrice(null);
+        }
+    }, [
+        marginBucket,
+        notionalSymbolQtyNum,
+        tradeDirection,
+        buys,
+        sells,
+        markPx,
+    ]);
 
     function roundDownToMillionth(value: number) {
         return Math.floor(value * 1_000_000) / 1_000_000;
@@ -491,7 +594,6 @@ function OrderInput({
                 100,
             100,
         );
-        console.log({ percent });
         setPositionSliderPercentageValue(percent);
     }, [leverage]);
 
@@ -1184,6 +1286,7 @@ function OrderInput({
                             orderMarketPrice={marketOrderType}
                             usdOrderValue={usdOrderValue}
                             marginRequired={marginRequired}
+                            liquidationPrice={liquidationPrice}
                         />
                     </div>
                     {confirmOrderModal.isOpen && (
