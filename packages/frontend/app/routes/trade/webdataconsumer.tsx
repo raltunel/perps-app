@@ -123,6 +123,7 @@ export default function WebDataConsumer() {
         activeTwapsRef.current = [];
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
+        resetRefs();
 
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
