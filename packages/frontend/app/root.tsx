@@ -99,6 +99,31 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
+                {/* Preload Google Fonts */}
+                <link
+                    rel='preconnect'
+                    href='https://fonts.googleapis.com'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preconnect'
+                    href='https://fonts.gstatic.com'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='style'
+                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&family=Inconsolata:wght@500&display=swap'
+                />
+                <link
+                    rel='stylesheet'
+                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&family=Inconsolata:wght@500&display=swap'
+                    media='print'
+                    onLoad={(e) => {
+                        const target = e.target as HTMLLinkElement;
+                        target.media = 'all';
+                    }}
+                />
                 <Links />
             </head>
             <body>
