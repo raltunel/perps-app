@@ -99,7 +99,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
-                {/* Preload Google Fonts */}
+                {/* Preconnect to Google Fonts domains */}
                 <link
                     rel='preconnect'
                     href='https://fonts.googleapis.com'
@@ -110,14 +110,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     href='https://fonts.gstatic.com'
                     crossOrigin='anonymous'
                 />
+
+                {/* Single consolidated font request with all needed weights and families */}
                 <link
                     rel='preload'
                     as='style'
-                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&family=Inconsolata:wght@500&display=swap'
+                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Funnel+Display:wght@300..800&family=Inconsolata:wght@500&family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&display=swap&display=swap'
                 />
                 <link
                     rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&family=Inconsolata:wght@500&display=swap'
+                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Funnel+Display:wght@300..800&family=Inconsolata:wght@500&family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&display=swap&display=swap'
                     media='print'
                     onLoad={(e) => {
                         const target = e.target as HTMLLinkElement;
@@ -126,87 +128,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <link
                     rel='preload'
-                    as='style'
-                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
-                />
-                <link
-                    rel='preload'
-                    as='style'
-                    href='https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&display=swap'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
-                />
-                <link
-                    rel='preload'
-                    as='style'
-                    href='https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
-                />
-                <link
-                    rel='preload'
-                    as='style'
-                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100;300&display=swap'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
-                />
-                <link
-                    rel='preload'
-                    as='style'
+                    as='font'
+                    type='font/woff2'
                     href='https://fonts.gstatic.com/s/lexenddeca/v24/K2F1fZFYk-dHSE0UPPuwQ5qnJy8.woff2'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.gstatic.com/s/lexenddeca/v24/K2F1fZFYk-dHSE0UPPuwQ5qnJy8.woff2'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
+                    crossOrigin='anonymous'
                 />
                 <link
                     rel='preload'
-                    as='style'
+                    as='font'
+                    type='font/woff2'
                     href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
+                    crossOrigin='anonymous'
                 />
                 <Links />
             </head>
