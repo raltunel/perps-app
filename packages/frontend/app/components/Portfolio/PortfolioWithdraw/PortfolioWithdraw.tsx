@@ -231,7 +231,12 @@ function PortfolioWithdraw({
             </div>
 
             <div className={styles.inputContainer}>
-                <h6>Amount</h6>
+                <h6>
+                    Amount{' '}
+                    {isBelowMinimum.dbd && (
+                        <span className={styles.minWarning}>(Min: $10)</span>
+                    )}
+                </h6>
                 <input
                     type='text'
                     value={amount}

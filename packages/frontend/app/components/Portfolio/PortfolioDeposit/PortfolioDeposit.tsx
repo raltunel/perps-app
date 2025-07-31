@@ -11,6 +11,8 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import useDebounce from '~/hooks/useDebounce';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 
 interface propsIF {
     portfolio: {
@@ -62,6 +64,19 @@ function PortfolioDeposit(props: propsIF) {
 
         return () => clearTimeout(timeoutId);
     }, [amt.rawValue]);
+
+    // indicate invalid state
+    const usdDiffGreaterThanThreshold: boolean = validateAmount(amt.rawValue);
+
+    // debounced invalid state
+    const usdDiffGreaterThanThresholdDebounced = useDebounce<boolean>(
+        usdDiffGreaterThanThreshold,
+        500,
+    );
+
+    const shouldWarn = usdDiffGreaterThanThreshold
+        ? usdDiffGreaterThanThresholdDebounced
+        : false;
 
     const handleMaxClick = useCallback(() => {
         setError(null);
@@ -252,11 +267,11 @@ function PortfolioDeposit(props: propsIF) {
             <div className={styles.inputContainer}>
                 <h6>
                     Amount{' '}
-                    {isBelowMinimum.dbd && (
+                    {shouldWarn && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
                 </h6>
-                <input
+                {/* <input
                     type='text'
                     value={amt.rawValue}
                     onChange={(e) =>
@@ -275,6 +290,23 @@ function PortfolioDeposit(props: propsIF) {
                         );
                     }}
                     placeholder='Enter amount (min $10)'
+                    min='0'
+                    step='any'
+                    disabled={isProcessing}
+                /> */}
+                <NumFormattedInput
+                    placeholder='Enter amount (min $10)'
+                    type='text'
+                    value={amt.rawValue}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onChange={(e: { currentTarget: { value: any } }) =>
+                        setAmt({
+                            ...amt,
+                            rawValue: e.currentTarget.value,
+                        })
+                    }
+                    aria-label='deposit input'
+                    inputMode='numeric'
                     min='0'
                     step='any'
                     disabled={isProcessing}
