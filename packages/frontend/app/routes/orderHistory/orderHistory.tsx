@@ -27,17 +27,12 @@ function OrderHistory() {
 
     const { fetchOrderHistory } = useInfoApi();
 
-    // TODO: live update is disabled for now, because websocket snapshots were sending limited data
     const isCurrentUser = useMemo(() => {
-        return false;
-        // if (address) {
-        //     return (
-        //         address.toLocaleLowerCase() ===
-        //         debugWallet.address.toLocaleLowerCase()
-        //     );
-        // } else {
-        //     return true;
-        // }
+        if (address) {
+            return address.toLowerCase() === debugWallet.address.toLowerCase();
+        } else {
+            return true;
+        }
     }, [address, debugWallet.address]);
 
     useEffect(() => {
@@ -57,7 +52,15 @@ function OrderHistory() {
         } else {
             return fetchedHistoryData;
         }
-    }, [isCurrentUser, orderHistory, fetchedHistoryData]);
+    }, [
+        isCurrentUser,
+        orderHistory,
+        fetchedHistoryData,
+        orderHistoryFetched,
+        isFetched,
+        address,
+        debugWallet.address,
+    ]);
 
     return (
         <ExternalPage title='Order History'>
