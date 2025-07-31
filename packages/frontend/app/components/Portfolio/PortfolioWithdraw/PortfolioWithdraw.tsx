@@ -1,5 +1,4 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 import styles from './PortfolioWithdraw.module.css';
@@ -265,7 +264,7 @@ function PortfolioWithdraw({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

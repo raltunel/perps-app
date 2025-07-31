@@ -12,7 +12,6 @@ import React, {
     useState,
     type JSX,
 } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiSquaresFour } from 'react-icons/pi';
@@ -50,6 +49,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -790,7 +790,7 @@ function OrderInput({
                             content={'price distribution'}
                             position='right'
                         >
-                            <AiOutlineQuestionCircle size={13} />
+                            <LuCircleHelp size={12} />
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
@@ -1217,9 +1217,7 @@ function OrderInput({
                                             content={data?.tooltipLabel}
                                             position='right'
                                         >
-                                            <AiOutlineQuestionCircle
-                                                size={13}
-                                            />
+                                            <LuCircleHelp size={12} />
                                         </Tooltip>
                                     </div>
                                     <span className={styles.inputDetailValue}>

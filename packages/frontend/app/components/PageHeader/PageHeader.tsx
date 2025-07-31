@@ -4,7 +4,6 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useState } from 'react';
-// import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     DFLT_EMBER_MARKET,
     getUserMarginBucket,
@@ -308,7 +307,7 @@ export default function PageHeader() {
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
                             }
                         >
-                            <AiOutlineQuestionCircle
+                            <LuCircleHelp
                                 size={18}
                                 color='var(--text2)'
                             />

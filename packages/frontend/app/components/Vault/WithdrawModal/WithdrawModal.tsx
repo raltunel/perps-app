@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import styles from './WithdrawModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface WithdrawModalProps {
     vault: {
@@ -120,7 +120,7 @@ export default function WithdrawModal({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>
