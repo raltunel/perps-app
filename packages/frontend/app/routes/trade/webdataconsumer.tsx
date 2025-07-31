@@ -14,6 +14,7 @@ import {
 } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useMarginBucketStore } from '~/stores/MarginBucketStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -27,6 +28,12 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
+import {
+    getUserMarginBucket,
+    USD_MINT,
+    DFLT_EMBER_MARKET,
+    type MarginBucketAvail,
+} from '@crocswap-libs/ambient-ember';
 
 export default function WebDataConsumer() {
     const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -64,6 +71,13 @@ export default function WebDataConsumer() {
     const { debugWallet } = useDebugStore();
     const addressRef = useRef<string>(null);
     addressRef.current = debugWallet?.address?.toLowerCase();
+
+    const {
+        setBalance,
+        setIsLoading,
+        setError,
+        reset: resetMarginBucket,
+    } = useMarginBucketStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -454,8 +468,90 @@ export default function WebDataConsumer() {
     useEffect(() => {
         if (!isEstablished(sessionState)) {
             resetRefs();
+            resetMarginBucket();
         }
-    }, [isEstablished(sessionState)]);
+    }, [isEstablished(sessionState), resetMarginBucket]);
+
+    // Margin bucket polling
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            return;
+        }
+
+        const fetchMarginBucket = async () => {
+            try {
+                const marginBucket: MarginBucketAvail | null =
+                    await getUserMarginBucket(
+                        sessionState.connection,
+                        sessionState.walletPublicKey,
+                        BigInt(DFLT_EMBER_MARKET.mktId),
+                        USD_MINT,
+                        {},
+                    );
+
+                if (!marginBucket) {
+                    setBalance(null);
+                    setError('No margin bucket found');
+                    return;
+                }
+
+                // Extract values from margin bucket
+                const committedCollateral =
+                    Number(marginBucket.committedCollateral || 0n) /
+                    Math.pow(10, 6);
+                const availToWithdraw =
+                    Number(marginBucket.availToWithdraw || 0n) /
+                    Math.pow(10, 6);
+                const hold = committedCollateral - availToWithdraw;
+
+                // Create balance object
+                const newBalance: UserBalanceIF = {
+                    coin: 'fUSD',
+                    type: 'margin',
+                    total: committedCollateral,
+                    available: availToWithdraw,
+                    hold: hold,
+                    entryNtl: 0,
+                    sortName: '\x01',
+                    usdcValue: committedCollateral,
+                    pnlValue: 0,
+                    metaIndex: 0,
+                    buyingPower: availToWithdraw,
+                    contractAddress:
+                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
+                };
+
+                setBalance(newBalance);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching margin bucket:', err);
+                setError(
+                    err instanceof Error
+                        ? err.message
+                        : 'Failed to fetch balance',
+                );
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        // Initial fetch
+        fetchMarginBucket();
+
+        // Set up polling
+        const intervalId = setInterval(fetchMarginBucket, 2000);
+
+        // Cleanup
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [
+        isEstablished(sessionState),
+        sessionState,
+        setBalance,
+        setError,
+        setIsLoading,
+    ]);
 
     return <></>;
 }

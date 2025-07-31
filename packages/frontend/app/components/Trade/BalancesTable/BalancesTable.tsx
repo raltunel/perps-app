@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useMarginBucketPolling } from '~/hooks/useMarginBucketPolling';
+import { useMarginBucketStore } from '~/stores/MarginBucketStore';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
@@ -11,8 +11,8 @@ export default function BalancesTable() {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    // Use RPC polling instead of websocket data
-    const { balance, isLoading, error } = useMarginBucketPolling(2000);
+    // Use global store data instead of local polling
+    const { balance, isLoading, error } = useMarginBucketStore();
 
     // Create array with single balance or empty array
     const balanceData = balance ? [balance] : [];
