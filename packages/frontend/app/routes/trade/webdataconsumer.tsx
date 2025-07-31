@@ -29,6 +29,7 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
+    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
     const {
         favKeys,
         setFavCoins,
@@ -141,7 +142,7 @@ export default function WebDataConsumer() {
                     postWebData2MarketOnly(msg);
                 };
                 const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: debugWallet.address },
+                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
                     marketDataCallback,
                 );
                 unsubscribeMarketData = result.unsubscribe;

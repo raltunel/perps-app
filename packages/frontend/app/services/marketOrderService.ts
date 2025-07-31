@@ -16,6 +16,7 @@ export interface MarketOrderResult {
 export interface MarketOrderParams {
     quantity: number; // User input quantity (will be multiplied by 100_000_000)
     side: 'buy' | 'sell';
+    leverage?: number; // Optional leverage multiplier for calculating userSetImBps
 }
 
 /**
@@ -63,22 +64,37 @@ export class MarketOrderService {
             console.log('  - Display quantity:', params.quantity);
             console.log('  - On-chain quantity:', onChainQuantity.toString());
 
+            // Calculate userSetImBps from leverage if provided
+            let userSetImBps: number | undefined;
+            if (params.leverage && params.leverage > 0) {
+                userSetImBps = Math.floor((1 / params.leverage) * 10000) - 1;
+                console.log('  - Leverage:', params.leverage);
+                console.log('  - Calculated userSetImBps:', userSetImBps);
+            }
+
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
+                const orderParams: any = {
+                    marketId: marketId,
+                    orderId: orderId,
+                    side: OrderSide.Bid,
+                    qty: onChainQuantity,
+                    price: BigInt('0'), // market order convention is to use 0
+                    tif: { type: TimeInForce.IOC },
+                    user: userPublicKey,
+                    actor: sessionPublicKey,
+                    rentPayer: rentPayer,
+                };
+
+                // Only add userSetImBps if it's defined
+                if (userSetImBps !== undefined) {
+                    orderParams.userSetImBps = userSetImBps;
+                }
+
                 const transaction = buildOrderEntryTransaction(
                     this.connection,
-                    {
-                        marketId: marketId,
-                        orderId: orderId,
-                        side: OrderSide.Bid,
-                        qty: onChainQuantity,
-                        price: BigInt('0'), // market order convention is to use 0
-                        tif: { type: TimeInForce.IOC },
-                        user: userPublicKey,
-                        actor: sessionPublicKey,
-                        rentPayer: rentPayer,
-                    },
+                    orderParams,
                     'confirmed',
                 );
                 console.log('✅ Market buy order built successfully');
@@ -86,19 +102,26 @@ export class MarketOrderService {
                 return transaction;
             } else {
                 console.log('  - Building market SELL order...');
+                const orderParams: any = {
+                    marketId: marketId,
+                    orderId: orderId,
+                    side: OrderSide.Bid,
+                    qty: onChainQuantity,
+                    price: BigInt('0'), // market order convention is to use 0
+                    tif: { type: TimeInForce.IOC },
+                    user: userPublicKey,
+                    actor: sessionPublicKey,
+                    rentPayer: rentPayer,
+                };
+
+                // Only add userSetImBps if it's defined
+                if (userSetImBps !== undefined) {
+                    orderParams.userSetImBps = userSetImBps;
+                }
+
                 const transaction = buildOrderEntryTransaction(
                     this.connection,
-                    {
-                        marketId: marketId,
-                        orderId: orderId,
-                        side: OrderSide.Bid,
-                        qty: onChainQuantity,
-                        price: BigInt('0'), // market order convention is to use 0
-                        tif: { type: TimeInForce.IOC },
-                        user: userPublicKey,
-                        actor: sessionPublicKey,
-                        rentPayer: rentPayer,
-                    },
+                    orderParams,
                     'confirmed',
                 );
                 console.log('✅ Market sell order built successfully');

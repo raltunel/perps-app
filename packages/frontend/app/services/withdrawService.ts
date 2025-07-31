@@ -2,6 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import {
     buildWithdrawMarginTx,
     getUserMarginBucket,
+    USD_MINT,
 } from '@crocswap-libs/ambient-ember';
 
 export interface WithdrawServiceResult {
@@ -29,10 +30,12 @@ export class WithdrawService {
     /**
      * Get available balance to withdraw from margin bucket
      * @param userPublicKey - User's public key
+     * @param marketId - Market ID (defaults to BTC market)
      * @returns Promise<AvailableWithdrawBalance | null>
      */
     async getAvailableWithdrawBalance(
         userPublicKey: PublicKey,
+        marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
             let marginBucket;
@@ -51,7 +54,13 @@ export class WithdrawService {
                 });
 
                 marginBucket = await Promise.race([
-                    getUserMarginBucket(this.connection, userPublicKey),
+                    getUserMarginBucket(
+                        this.connection,
+                        userPublicKey,
+                        marketId,
+                        USD_MINT,
+                        {},
+                    ),
                     timeoutPromise,
                 ]);
             } catch (marginError) {
@@ -68,15 +77,8 @@ export class WithdrawService {
                 return { balance: 0, decimalized: 0 };
             }
 
-            // Get available to withdraw from calculations
-            // Try different possible field names
-            let availableToWithdraw =
-                marginBucket.calculations?.collateralAvailableToWithdraw ||
-                marginBucket.collateralAvailableToWithdraw ||
-                marginBucket.availableToWithdraw ||
-                marginBucket.calculations?.availableToWithdraw ||
-                marginBucket.calculations?.available_to_withdraw ||
-                0;
+            // Get available to withdraw - SDK v0.1.30 uses availToWithdraw
+            let availableToWithdraw = marginBucket.availToWithdraw || 0;
 
             // Convert to decimalized value (assuming 6 decimals for USD)
             const decimalized = availableToWithdraw / Math.pow(10, 6);

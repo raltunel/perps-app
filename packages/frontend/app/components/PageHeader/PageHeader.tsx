@@ -117,7 +117,8 @@ export default function PageHeader() {
                     USD_MINT,
                     {},
                 );
-                // console.log({ marginBucket });
+                console.log('🔍 [PageHeader] marginBucket', marginBucket);
+                console.log({ marginBucket });
                 setMarginBucket(marginBucket);
             } else {
                 setMarginBucket(null);
