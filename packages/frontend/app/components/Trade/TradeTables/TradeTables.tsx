@@ -190,7 +190,7 @@ export default function TradeTable(props: TradeTableProps) {
                 return (
                     <OpenOrdersTable
                         selectedFilter={selectedFilter}
-                        isFetched={webDataFetched}
+                        isFetched={orderHistoryFetched}
                         data={userOrders}
                     />
                 );

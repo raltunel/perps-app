@@ -268,7 +268,7 @@ export default function WebDataConsumer() {
                 isEstablished(sessionState) &&
                 data.data.user?.toLowerCase() === addressRef.current
             ) {
-                openOrdersRef.current = data.data.userOpenOrders;
+                // Open orders now come from order history subscription
                 positionsRef.current = data.data.positions;
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
@@ -312,10 +312,6 @@ export default function WebDataConsumer() {
 
     const postUserHistoricalOrders = useCallback(
         (payload: any) => {
-            console.log(
-                '[ORDER HISTORY] Received payload:',
-                JSON.stringify(payload, null, 2),
-            );
             const data = payload.data;
 
             if (!data) {
@@ -343,6 +339,11 @@ export default function WebDataConsumer() {
                 if (data.isSnapshot) {
                     orders.sort((a, b) => b.timestamp - a.timestamp);
                     userOrderHistoryRef.current = orders;
+                    // Extract open orders for the open orders table
+                    const openOrders = orders.filter(
+                        (order) => order.status === 'open',
+                    );
+                    openOrdersRef.current = openOrders;
                 } else {
                     userOrderHistoryRef.current = [
                         ...orders.sort((a, b) => b.timestamp - a.timestamp),
@@ -351,6 +352,11 @@ export default function WebDataConsumer() {
                     userOrderHistoryRef.current.sort(
                         (a, b) => b.timestamp - a.timestamp,
                     );
+                    // Update open orders - filter all orders with status 'open'
+                    const allOpenOrders = userOrderHistoryRef.current.filter(
+                        (order) => order.status === 'open',
+                    );
+                    openOrdersRef.current = allOpenOrders;
                 }
                 fetchedChannelsRef.current.add(
                     WsChannels.USER_HISTORICAL_ORDERS,
