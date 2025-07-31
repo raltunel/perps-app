@@ -64,17 +64,21 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                 sessionState.walletPublicKey ||
                 sessionState.sessionPublicKey;
 
+            // Get marketId from TradeDataStore (default to BTC market if not available)
+            const marketId = BigInt(64); // TODO: Get from TradeDataStore when available
+
             // Try session key first (as that's what's used for transactions)
             let balance = await withdrawService.getAvailableWithdrawBalance(
                 sessionState.sessionPublicKey,
+                marketId,
             );
 
             // If no balance with session key, try wallet key
             if (!balance || balance.decimalized === 0) {
-                balance =
-                    await withdrawService.getAvailableWithdrawBalance(
-                        userWalletKey,
-                    );
+                balance = await withdrawService.getAvailableWithdrawBalance(
+                    userWalletKey,
+                    marketId,
+                );
             }
 
             if (balance) {

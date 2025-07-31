@@ -30,6 +30,7 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
+    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
     const {
         favKeys,
         setFavCoins,
