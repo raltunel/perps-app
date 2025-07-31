@@ -253,7 +253,7 @@ export default function GenericTable<
         } else {
             setTableState(TableState.FILLED);
         }
-    }, [isFetched, dataToShow]);
+    }, [isFetched, dataToShow, storageKey]);
 
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
