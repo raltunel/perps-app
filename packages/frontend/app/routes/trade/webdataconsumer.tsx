@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import { useSdk } from '~/hooks/useSdk';
@@ -129,6 +130,9 @@ export default function WebDataConsumer() {
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: userAddress },
             postWebData2,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
+            },
         );
 
         // Also subscribe to webData2 on market socket for market data
@@ -155,26 +159,43 @@ export default function WebDataConsumer() {
                 user: userAddress,
             },
             postUserHistoricalOrders,
+            () => {
+                fetchedChannelsRef.current.add(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                );
+            },
         );
 
         const { unsubscribe: unsubscribeUserFills } = info.subscribe(
             { type: WsChannels.USER_FILLS, user: userAddress },
             postUserFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
             { type: WsChannels.TWAP_SLICE_FILLS, user: userAddress },
             postUserTwapSliceFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
             { type: WsChannels.TWAP_HISTORY, user: userAddress },
             postUserTwapHistory,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+            },
         );
 
         const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
             { type: WsChannels.USER_FUNDINGS, user: userAddress },
             postUserFundings,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserNonFundingLedgerUpdates } =
@@ -184,6 +205,11 @@ export default function WebDataConsumer() {
                     user: userAddress,
                 },
                 postUserNonFundingLedgerUpdates,
+                () => {
+                    fetchedChannelsRef.current.add(
+                        WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                    );
+                },
             );
 
         const userDataInterval = setInterval(() => {
@@ -256,8 +282,8 @@ export default function WebDataConsumer() {
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
                 activeTwapsRef.current = data.data.activeTwaps;
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             }
-            fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
         [setCoins, setCoinPriceMap, info?.multiSocketInfo, sessionState],
     );
