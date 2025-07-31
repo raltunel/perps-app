@@ -15,6 +15,7 @@ import {
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useMarginBucketStore } from '~/stores/MarginBucketStore';
+import { usePositionsStore } from '~/stores/PositionsStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -34,6 +35,7 @@ import {
     DFLT_EMBER_MARKET,
     type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
+import { convertMarginBucketToPosition } from '~/utils/convertMarginBucketToPosition';
 
 export default function WebDataConsumer() {
     const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -79,6 +81,14 @@ export default function WebDataConsumer() {
         setError,
         reset: resetMarginBucket,
     } = useMarginBucketStore();
+
+    const {
+        setPositions: setPositionsStoreData,
+        setMarginBucket: setPositionsMarginBucket,
+        setIsLoading: setPositionsLoading,
+        setError: setPositionsError,
+        reset: resetPositions,
+    } = usePositionsStore();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -131,7 +141,7 @@ export default function WebDataConsumer() {
         fetchedChannelsRef.current = new Set();
         setUserOrders([]);
         setUserSymbolOrders([]);
-        setPositions([]);
+        // Positions are now managed by PositionsStore, not webData2
         setUserBalances([]);
         positionsRef.current = [];
         openOrdersRef.current = [];
@@ -205,7 +215,7 @@ export default function WebDataConsumer() {
 
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
-            setPositions(positionsRef.current);
+            // Positions now come from RPC polling, not webData2
             setUserBalances(userBalancesRef.current);
             setUserFills(userFillsRef.current);
             setOrderHistory(userOrderHistoryRef.current);
@@ -269,7 +279,7 @@ export default function WebDataConsumer() {
                 data.data.user?.toLowerCase() === addressRef.current
             ) {
                 // Open orders now come from order history subscription
-                positionsRef.current = data.data.positions;
+                // Positions now come from RPC polling
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
                 activeTwapsRef.current = data.data.activeTwaps;
@@ -515,8 +525,9 @@ export default function WebDataConsumer() {
         if (!isEstablished(sessionState)) {
             resetRefs();
             resetMarginBucket();
+            resetPositions();
         }
-    }, [isEstablished(sessionState), resetMarginBucket]);
+    }, [isEstablished(sessionState), resetMarginBucket, resetPositions]);
 
     // Margin bucket polling
     useEffect(() => {
@@ -597,6 +608,83 @@ export default function WebDataConsumer() {
         setBalance,
         setError,
         setIsLoading,
+    ]);
+
+    // Positions polling from RPC
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            return;
+        }
+
+        const fetchPositions = async () => {
+            try {
+                const marginBucket: MarginBucketAvail | null =
+                    await getUserMarginBucket(
+                        sessionState.connection,
+                        sessionState.walletPublicKey,
+                        BigInt(DFLT_EMBER_MARKET.mktId), // BTC market ID 64
+                        USD_MINT,
+                        {},
+                    );
+
+                if (!marginBucket) {
+                    setPositionsMarginBucket(null);
+                    setPositionsStoreData([]);
+                    setPositions([]);
+                    setPositionsError('No margin bucket found');
+                    return;
+                }
+
+                // Store the raw margin bucket
+                setPositionsMarginBucket(marginBucket);
+
+                // Convert to position format
+                const position = convertMarginBucketToPosition(
+                    marginBucket,
+                    BigInt(DFLT_EMBER_MARKET.mktId),
+                );
+
+                if (position) {
+                    setPositionsStoreData([position]); // Update PositionsStore
+                    // Update positions in TradeDataStore for compatibility
+                    setPositions([position]);
+                } else {
+                    setPositionsStoreData([]); // Update PositionsStore
+                    // Update positions in TradeDataStore for compatibility
+                    setPositions([]);
+                }
+
+                setPositionsError(null);
+            } catch (err) {
+                console.error('Error fetching positions:', err);
+                setPositionsError(
+                    err instanceof Error
+                        ? err.message
+                        : 'Failed to fetch positions',
+                );
+            } finally {
+                setPositionsLoading(false);
+            }
+        };
+
+        // Initial fetch
+        fetchPositions();
+
+        // Set up polling
+        const intervalId = setInterval(fetchPositions, 2000);
+
+        // Cleanup
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [
+        isEstablished(sessionState),
+        sessionState,
+        setPositions,
+        setPositionsStoreData,
+        setPositionsMarginBucket,
+        setPositionsError,
+        setPositionsLoading,
     ]);
 
     return <></>;

@@ -4,6 +4,7 @@ import Tabs from '~/components/Tabs/Tabs';
 import { Pages, usePage } from '~/hooks/usePage';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { usePositionsStore } from '~/stores/PositionsStore';
 import { debugWallets, WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
@@ -70,6 +71,7 @@ export default function TradeTable(props: TradeTableProps) {
     const sessionState = useSession();
 
     const { debugWallet, setDebugWallet } = useDebugStore();
+    const { isLoading: positionsLoading } = usePositionsStore();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -182,7 +184,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={webDataFetched}
+                        isFetched={!positionsLoading}
                         selectedFilter={selectedFilter}
                     />
                 );
