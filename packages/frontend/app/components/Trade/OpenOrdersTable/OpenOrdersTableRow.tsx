@@ -79,7 +79,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
-                    message: result.error || 'Failed to cancel order',
+                    message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
                 });
             }

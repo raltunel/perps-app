@@ -118,7 +118,7 @@ export class CancelOrderService {
             if (
                 transactionResult &&
                 transactionResult.signature &&
-                transactionResult.success
+                !('error' in transactionResult)
             ) {
                 console.log(
                     '✅ Cancel order transaction successful:',
@@ -131,8 +131,11 @@ export class CancelOrderService {
                 };
             } else {
                 const errorMessage =
-                    transactionResult?.error ||
-                    'Cancel order transaction failed';
+                    typeof transactionResult?.error === 'string'
+                        ? transactionResult.error
+                        : transactionResult?.error?.message ||
+                          transactionResult?.error?.toString() ||
+                          'Cancel order transaction failed';
                 console.error('❌ Cancel order failed:', errorMessage);
                 return {
                     success: false,
