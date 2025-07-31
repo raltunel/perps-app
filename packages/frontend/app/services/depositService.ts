@@ -42,10 +42,6 @@ export class DepositService {
     ): Promise<UserBalance> {
         try {
             const mintToUse = mint || USD_MINT;
-            console.log('🔍 Debugging getUserBalance call:');
-            console.log('  - Connection:', this.connection);
-            console.log('  - User wallet pubkey:', userWallet.toString());
-            console.log('  - Mint address:', mintToUse.toString());
 
             const balance = await getUserTokenBalance(
                 this.connection,
@@ -53,20 +49,13 @@ export class DepositService {
                 mintToUse,
             );
 
-            console.log('  - Raw balance from SDK:', balance);
-            console.log('  - Balance type:', typeof balance);
-
             // Convert from non-decimalized to decimalized (divide by 10^6)
             const decimalized = Number(balance) / Math.pow(10, 6);
-
-            console.log('  - Decimalized balance:', decimalized);
 
             const result = {
                 balance: Number(balance),
                 decimalized,
             };
-
-            console.log('  - Final result:', result);
 
             return result;
         } catch (error) {
