@@ -62,6 +62,7 @@ export class CancelOrderService {
                     marketId: marketId,
                     orderId: orderIdBigInt,
                     user: userPublicKey,
+                    actor: sessionPublicKey,
                     rentPayer: rentPayer,
                 },
             );
@@ -90,7 +91,7 @@ export class CancelOrderService {
         params: CancelOrderParams,
         sessionPublicKey: PublicKey,
         userPublicKey: PublicKey,
-        sendTransaction: (transaction: any) => Promise<any>,
+        sendTransaction: (instructions: any[]) => Promise<any>,
         rentPayer?: PublicKey,
     ): Promise<CancelOrderResult> {
         try {
@@ -106,8 +107,11 @@ export class CancelOrderService {
 
             console.log('📤 Sending cancel order transaction...');
 
+            console.log(transaction);
             // Send the transaction
-            const transactionResult = await sendTransaction(transaction);
+            const transactionResult = await sendTransaction(
+                transaction.instructions,
+            );
 
             console.log('📥 Transaction result:', transactionResult);
 
