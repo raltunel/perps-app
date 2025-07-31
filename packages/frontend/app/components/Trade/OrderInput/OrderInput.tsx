@@ -588,6 +588,7 @@ function OrderInput({
     ]);
 
     useEffect(() => {
+        if (!usdAvailableToTrade) return;
         const percent = Math.min(
             (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
                 usdAvailableToTrade) *
@@ -595,7 +596,7 @@ function OrderInput({
             100,
         );
         setPositionSliderPercentageValue(percent);
-    }, [leverage]);
+    }, [leverage, !!usdAvailableToTrade]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
