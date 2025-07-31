@@ -37,25 +37,25 @@ function subscriptionToIdentifier(subscription: Subscription): string {
         case 'userEvents':
             return 'userEvents';
         case 'userFills':
-            return `userFills:${subscription.user.toLowerCase()}`;
+            return `userFills:${subscription.user?.toLowerCase()}`;
         case 'candle':
             return `candle:${subscription.coin.toLowerCase()},${subscription.interval}`;
         case 'orderUpdates':
             return 'orderUpdates';
         case 'userFundings':
-            return `userFundings:${subscription.user.toLowerCase()}`;
+            return `userFundings:${subscription.user?.toLowerCase()}`;
         case 'userNonFundingLedgerUpdates':
-            return `userNonFundingLedgerUpdates:${subscription.user.toLowerCase()}`;
+            return `userNonFundingLedgerUpdates:${subscription.user?.toLowerCase()}`;
         case 'webData2':
-            return `webData2:${subscription.user.toLowerCase()}`;
+            return `webData2:${subscription.user?.toLowerCase()}`;
         case 'notification':
             return `notification`;
         case 'userHistoricalOrders':
-            return `userHistoricalOrders:${subscription.user.toLowerCase()}`;
+            return `userHistoricalOrders:${subscription.user?.toLowerCase()}`;
         case 'userTwapSliceFills':
-            return `userTwapSliceFills:${subscription.user.toLowerCase()}`;
+            return `userTwapSliceFills:${subscription.user?.toLowerCase()}`;
         case 'userTwapHistory':
-            return `userTwapHistory:${subscription.user.toLowerCase()}`;
+            return `userTwapHistory:${subscription.user?.toLowerCase()}`;
         default:
             throw new Error('Unknown subscription type');
     }
@@ -76,25 +76,25 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
         case 'user':
             return 'userEvents';
         case 'userFills':
-            return `userFills:${wsMsg.data.user.toLowerCase()}`;
+            return `userFills:${wsMsg.data.user?.toLowerCase()}`;
         case 'candle':
             return `candle:${wsMsg.data.s?.toLowerCase?.() ?? wsMsg.data.coin?.toLowerCase?.()},${wsMsg.data.i ?? wsMsg.data.interval}`;
         case 'orderUpdates':
             return 'orderUpdates';
         case 'userFundings':
-            return `userFundings:${wsMsg.data.user.toLowerCase()}`;
+            return `userFundings:${wsMsg.data.user?.toLowerCase()}`;
         case 'userNonFundingLedgerUpdates':
-            return `userNonFundingLedgerUpdates:${wsMsg.data.user.toLowerCase()}`;
+            return `userNonFundingLedgerUpdates:${wsMsg.data.user?.toLowerCase()}`;
         case 'webData2':
-            return `webData2:${wsMsg.data.user.toLowerCase()}`;
+            return `webData2:${wsMsg.data.user?.toLowerCase()}`;
         case 'notification':
             return 'notification';
         case 'userHistoricalOrders':
-            return `userHistoricalOrders:${wsMsg.data.user.toLowerCase()}`;
+            return `userHistoricalOrders:${wsMsg.data.user?.toLowerCase()}`;
         case 'userTwapSliceFills':
-            return `userTwapSliceFills:${wsMsg.data.user.toLowerCase()}`;
+            return `userTwapSliceFills:${wsMsg.data.user?.toLowerCase()}`;
         case 'userTwapHistory':
-            return `userTwapHistory:${wsMsg.data.user.toLowerCase()}`;
+            return `userTwapHistory:${wsMsg.data.user?.toLowerCase()}`;
         default:
             return undefined;
     }
