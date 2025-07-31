@@ -5,6 +5,7 @@ import styles from './PortfolioWithdraw.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface propsIF {
     portfolio: {
