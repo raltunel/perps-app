@@ -73,14 +73,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 tooltipLabel: 'order value',
                 value: usdOrderValue
                     ? formatNum(usdOrderValue, null, true, true)
-                    : 'N/A',
+                    : '-',
             },
             {
                 label: 'Margin Required',
                 tooltipLabel: 'margin required',
                 value: marginRequired
                     ? formatNum(marginRequired, null, true, true)
-                    : 'N/A',
+                    : '-',
             },
         ];
         return arr.filter(Boolean) as MarketInfoItem[];
