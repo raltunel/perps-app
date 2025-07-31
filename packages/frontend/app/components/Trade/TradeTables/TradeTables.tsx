@@ -71,7 +71,11 @@ export default function TradeTable(props: TradeTableProps) {
     const sessionState = useSession();
 
     const { debugWallet, setDebugWallet } = useDebugStore();
-    const { isLoading: positionsLoading } = useUnifiedMarginData();
+    const {
+        isLoading: positionsLoading,
+        positions,
+        lastUpdateTime,
+    } = useUnifiedMarginData();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -184,7 +188,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={!positionsLoading}
+                        isFetched={!positionsLoading || lastUpdateTime > 0}
                         selectedFilter={selectedFilter}
                     />
                 );

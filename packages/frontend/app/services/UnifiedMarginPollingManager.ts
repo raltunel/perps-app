@@ -93,6 +93,12 @@ class UnifiedMarginPollingManager {
             this.intervalId = null;
         }
 
+        // Don't set loading if we already have data
+        const store = useUnifiedMarginStore.getState();
+        if (!store.marginBucket && store.lastUpdateTime === 0) {
+            store.setIsLoading(true);
+        }
+
         // Initial fetch
         this.fetchData();
 
