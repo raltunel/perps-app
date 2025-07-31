@@ -282,8 +282,8 @@ export default function WebDataConsumer() {
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
                 activeTwapsRef.current = data.data.activeTwaps;
-                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             }
+            fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
         },
         [setCoins, setCoinPriceMap, info?.multiSocketInfo, sessionState],
     );
