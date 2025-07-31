@@ -3,6 +3,7 @@ import {
     buildWithdrawMarginTx,
     getUserMarginBucket,
     USD_MINT,
+    type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 
 export interface WithdrawServiceResult {
@@ -38,7 +39,7 @@ export class WithdrawService {
         marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
-            let marginBucket;
+            let marginBucket: MarginBucketAvail | null = null;
             try {
                 // Add timeout to prevent hanging
                 const timeoutPromise = new Promise((_, reject) => {
@@ -78,13 +79,14 @@ export class WithdrawService {
             }
 
             // Get available to withdraw - SDK v0.1.30 uses availToWithdraw
-            let availableToWithdraw = marginBucket.availToWithdraw || 0;
+            let availableToWithdraw: bigint =
+                marginBucket.availToWithdraw || 0n;
 
             // Convert to decimalized value (assuming 6 decimals for USD)
-            const decimalized = availableToWithdraw / Math.pow(10, 6);
+            const decimalized = Number(availableToWithdraw) / Math.pow(10, 6);
 
             return {
-                balance: availableToWithdraw,
+                balance: Number(availableToWithdraw),
                 decimalized,
             };
         } catch (error) {
