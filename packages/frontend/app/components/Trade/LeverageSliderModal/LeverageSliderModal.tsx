@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import styles from './LeverageSliderModal.module.css';
 import Modal from '~/components/Modal/Modal';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { BsQuestionCircle } from 'react-icons/bs';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -50,7 +50,7 @@ export default function LeverageSliderModal({
                             content='max position at current level'
                             position='right'
                         >
-                            <BsQuestionCircle size={12} />
+                            <LuCircleHelp size={12} />
                         </Tooltip>
                     </p>
                     <span>100,000 USD</span>
