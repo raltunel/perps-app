@@ -44,11 +44,14 @@ export function useMarginBucketPolling(pollingInterval: number = 2000): {
 
             // Extract values from margin bucket
             const committedCollateral =
-                Number(marginBucket.collateral || 0n) / Math.pow(10, 6);
+                Number(marginBucket.committedCollateral || 0n) /
+                Math.pow(10, 6);
             const availToWithdraw =
                 Number(marginBucket.availToWithdraw || 0n) / Math.pow(10, 6);
             const hold = committedCollateral - availToWithdraw;
 
+            console.log(marginBucket);
+            console.log('Committed Collateral:', committedCollateral);
             // Create balance object
             const newBalance: UserBalanceIF = {
                 coin: 'fUSD',
