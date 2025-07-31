@@ -66,7 +66,10 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 </div>
             )}
             <div className={`${styles.cell} ${styles.statusCell}`}>
-                {order.status}
+                {order.status
+                    ? order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)
+                    : ''}
             </div>
             <div className={`${styles.cell} ${styles.orderIdCell}`}>
                 {order.oid}
