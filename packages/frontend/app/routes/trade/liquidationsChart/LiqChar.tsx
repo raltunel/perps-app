@@ -156,7 +156,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = liqLineWidth;
             const sellLiqCount = currentLiqSellsRef.current.length;
 
-            const diff = rowHeight - sellLiqCount;
+            const diff = orderCountRef.current - sellLiqCount;
 
             if (sellLiqCount > 0) {
                 currentLiqSellsRef.current.forEach((liq, index) => {
