@@ -409,6 +409,13 @@ export const TradingViewProvider: React.FC<{
             iframe?.contentDocument || iframe?.contentWindow?.document;
 
         const blockSymbolSearchKeys = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+
+            const isInInput = target && target.tagName === 'INPUT';
+            const isInTextArea = target && target.tagName === 'TEXTAREA';
+
+            if (isInInput || isInTextArea) return;
+
             const isSingleChar = e.key.length === 1;
             const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
 
