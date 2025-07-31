@@ -146,8 +146,8 @@ export const TradingViewProvider: React.FC<{
                         .activeChart()
                         .getStudyById(volumeStudyId.id);
                     volume.applyOverrides({
-                        'volume.color.0': c.buy,
-                        'volume.color.1': c.sell,
+                        'volume.color.0': c.sell,
+                        'volume.color.1': c.buy,
                     });
                 }
             }
