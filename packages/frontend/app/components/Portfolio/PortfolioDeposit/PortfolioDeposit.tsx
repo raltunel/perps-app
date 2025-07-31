@@ -1,8 +1,8 @@
-import { useState, useCallback, memo, useMemo } from 'react';
+import { useState, useCallback, memo, useMemo, useEffect } from 'react';
 import styles from './PortfolioDeposit.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { useDebouncedCallback } from '~/hooks/useDebounce';
+// import { useDebouncedCallback } from '~/hooks/useDebounce';
 import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
@@ -29,7 +29,6 @@ function PortfolioDeposit(props: propsIF) {
     const notificationStore = useNotificationStore();
     const { formatNum } = useNumFormatter();
 
-    const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
@@ -43,28 +42,33 @@ function PortfolioDeposit(props: propsIF) {
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-    const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        setAmount(newValue);
-        setError(null);
-    }, 20);
+    const [amt, setAmt] = useState({
+        rawValue: '',
+        dbdValue: '',
+    });
 
-    const handleInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            debouncedHandleChange(newValue);
-            // Clear transaction status when user starts typing
-            setTransactionStatus('idle');
-        },
-        [debouncedHandleChange],
-    );
+    const DEBOUNCE_TIME_MS = 1500;
+
+    useEffect(() => {
+        const timeoutId = setTimeout(
+            () => {
+                setAmt({
+                    ...amt,
+                    dbdValue: amt.rawValue,
+                });
+            },
+            amt.rawValue === '' ? 0 : DEBOUNCE_TIME_MS,
+        );
+
+        return () => clearTimeout(timeoutId);
+    }, [amt.rawValue]);
 
     const handleMaxClick = useCallback(() => {
-        setAmount(availableBalance.toString());
         setError(null);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
-        const depositAmount = parseFloat(amount);
+        const depositAmount = parseFloat(amt.rawValue);
         setError(null);
         setTransactionStatus('pending');
 
@@ -117,7 +121,11 @@ function PortfolioDeposit(props: propsIF) {
                 setError(result.error || 'Transaction failed');
             } else {
                 setTransactionStatus('success');
-                setAmount(''); // Clear form on success
+                // clear form and state on success
+                setAmt({
+                    ...amt,
+                    rawValue: '',
+                });
 
                 // Show success notification
                 notificationStore.add({
@@ -135,7 +143,7 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [amount, availableBalance, onDeposit]);
+    }, [amt, availableBalance, onDeposit]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
@@ -204,20 +212,27 @@ function PortfolioDeposit(props: propsIF) {
         formatNum,
     ]);
 
+    // fn to determine if an arbirtary string is a number in valid range
+    function validateAmount(a: string): boolean {
+        const asFloat: number = parseFloat(a);
+        return !isNaN(asFloat) && asFloat > 0 && asFloat < 10;
+    }
+
     // Check if amount is below minimum
     const isBelowMinimum = useMemo(() => {
-        if (!amount) return false;
-        const depositAmount = parseFloat(amount);
-        return !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 10;
-    }, [amount]);
+        return {
+            raw: validateAmount(amt.rawValue),
+            dbd: validateAmount(amt.dbdValue),
+        };
+    }, [amt]);
 
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
-            !amount ||
-            parseFloat(amount) <= 0 ||
-            parseFloat(amount) > availableBalance,
-        [isProcessing, amount, availableBalance],
+            !amt.rawValue ||
+            parseFloat(amt.rawValue) <= 0 ||
+            parseFloat(amt.rawValue) > availableBalance,
+        [isProcessing, amt.rawValue, availableBalance],
     );
 
     return (
@@ -237,17 +252,28 @@ function PortfolioDeposit(props: propsIF) {
             <div className={styles.inputContainer}>
                 <h6>
                     Amount{' '}
-                    {isBelowMinimum && (
+                    {isBelowMinimum.dbd && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
                 </h6>
                 <input
                     type='text'
-                    value={amount}
-                    onChange={handleInputChange}
+                    value={amt.rawValue}
+                    onChange={(e) =>
+                        setAmt({
+                            ...amt,
+                            rawValue: e.currentTarget.value,
+                        })
+                    }
                     aria-label='deposit input'
                     inputMode='numeric'
-                    pattern='[0-9]*'
+                    onInput={(e) => {
+                        // prevent input of characters other than numerals and periods
+                        e.currentTarget.value = e.currentTarget.value.replace(
+                            /[^0-9.]/g,
+                            '',
+                        );
+                    }}
                     placeholder='Enter amount (min $10)'
                     min='0'
                     step='any'
@@ -290,7 +316,7 @@ function PortfolioDeposit(props: propsIF) {
             <SimpleButton
                 bg='accent1'
                 onClick={handleDeposit}
-                disabled={isButtonDisabled || isBelowMinimum}
+                disabled={isButtonDisabled || isBelowMinimum.raw}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'
