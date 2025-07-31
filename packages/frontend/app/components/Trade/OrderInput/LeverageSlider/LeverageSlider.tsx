@@ -106,6 +106,10 @@ export default function LeverageSlider({
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
+    const currentValueRef = useRef<number>(currentValue);
+    useEffect(() => {
+        currentValueRef.current = currentValue;
+    }, [currentValue]);
 
     // Helper function to get the actual rounded value (what user sees)
     const getRoundedDisplayValue = (val: number): number => {
@@ -325,7 +329,7 @@ export default function LeverageSlider({
 
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
-        if (isNaN(currentValue)) {
+        if (isNaN(currentValue) || !isFinite(currentValue)) {
             return 0;
         }
         return valueToPercentage(currentValue);
@@ -334,6 +338,10 @@ export default function LeverageSlider({
     // Get color based on position
     const getColorAtPosition = (position: number): string => {
         const colorStops = SLIDER_CONFIG.COLOR_STOPS;
+        // Safety check for NaN or invalid values
+        if (isNaN(position) || !isFinite(position)) {
+            return colorStops[0].color; // Return default color (teal)
+        }
 
         // Ensure position is between 0 and 100
         const boundedPosition = Math.max(0, Math.min(100, position));
@@ -430,16 +438,11 @@ export default function LeverageSlider({
         setHoverValue(null);
         setHoveredTickIndex(null);
     };
-
-    // Handle track click to set value
-    const handleTrackClick = (e: React.MouseEvent) => {
-        if (!sliderRef.current) return;
+    const calculateValueFromPosition = (clientX: number): number => {
+        if (!sliderRef.current) return currentValue;
 
         const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = Math.max(
-            0,
-            Math.min(e.clientX - rect.left, rect.width),
-        );
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
 
         // Account for knob margins when calculating percentage
         const knobRadius = SLIDER_CONFIG.KNOB_RADIUS;
@@ -451,16 +454,45 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value (no rounding for smooth movement)
+        // Convert percentage to value
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = constrainValue(newValue);
+        return constrainValue(newValue);
+    };
 
-        // Use the exact value for clicks (no rounding)
+    // Handle track click to set value
+    const handleTrackClick = (e: React.MouseEvent) => {
+        const boundedValue = calculateValueFromPosition(e.clientX);
         handleLeverageChange(boundedValue);
     };
 
+    const handleTrackTouchStart = (e: React.TouchEvent) => {
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
+
+        if (!e.touches[0]) return;
+
+        const boundedValue = calculateValueFromPosition(e.touches[0].clientX);
+        handleLeverageChange(boundedValue);
+        setIsDragging(true);
+        e.preventDefault();
+    };
+
+    const handleTrackMouseDown = (e: React.MouseEvent) => {
+        // Don't interfere if clicking on the knob
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
+
+        // Handle the click first
+        handleTrackClick(e);
+
+        // Then set up for potential dragging
+        setIsDragging(true);
+        e.preventDefault();
+    };
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -530,7 +562,7 @@ export default function LeverageSlider({
         const handleMouseUp = () => {
             if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
-                setPreferredLeverage(currentValue);
+                setPreferredLeverage(currentValueRef.current);
             }
             setIsDragging(false);
         };
@@ -538,7 +570,7 @@ export default function LeverageSlider({
         const handleTouchEnd = () => {
             if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
-                setPreferredLeverage(currentValue);
+                setPreferredLeverage(currentValueRef.current);
             }
             setIsDragging(false);
         };
@@ -568,7 +600,7 @@ export default function LeverageSlider({
         isDragging,
         minimumInputValue,
         maximumInputValue,
-        currentValue,
+        // currentValue,
         modalMode,
     ]);
 
@@ -661,7 +693,8 @@ export default function LeverageSlider({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
-                        onClick={handleTrackClick}
+                        onMouseDown={handleTrackMouseDown}
+                        onTouchStart={handleTrackTouchStart}
                         onMouseMove={handleTrackMouseMove}
                         onMouseLeave={handleTrackMouseLeave}
                     >
@@ -674,7 +707,10 @@ export default function LeverageSlider({
                             style={{
                                 width: `${getKnobPosition()}%`,
                                 background: createGradientString(),
-                                backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
+                                backgroundSize:
+                                    getKnobPosition() > 0
+                                        ? `${100 / (getKnobPosition() / 100)}% 100%`
+                                        : '100% 100%',
                                 backgroundPosition: 'left center',
                             }}
                         ></div>
@@ -763,9 +799,10 @@ export default function LeverageSlider({
                                                 ? tickColor
                                                 : UI_CONFIG.INACTIVE_LABEL_COLOR,
                                     }}
-                                    onClick={() =>
-                                        handleLeverageChange(tickValue)
-                                    }
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLeverageChange(tickValue);
+                                    }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
                                 >
@@ -791,7 +828,8 @@ export default function LeverageSlider({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
-                        onClick={handleTrackClick}
+                        onMouseDown={handleTrackMouseDown}
+                        onTouchStart={handleTrackTouchStart}
                         onMouseMove={handleTrackMouseMove}
                         onMouseLeave={handleTrackMouseLeave}
                     >
@@ -804,7 +842,11 @@ export default function LeverageSlider({
                             style={{
                                 width: `${getKnobPosition()}%`,
                                 background: createGradientString(),
-                                backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
+                                backgroundSize:
+                                    getKnobPosition() > 0
+                                        ? `${100 / (getKnobPosition() / 100)}% 100%`
+                                        : '100% 100%',
+
                                 backgroundPosition: 'left center',
                             }}
                         ></div>
@@ -849,6 +891,10 @@ export default function LeverageSlider({
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLeverageChange(tickValue);
+                                    }}
                                 ></div>
                             );
                         })}
