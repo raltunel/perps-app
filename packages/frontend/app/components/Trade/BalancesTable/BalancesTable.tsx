@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useMarginBucketStore } from '~/stores/MarginBucketStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
@@ -11,8 +11,8 @@ export default function BalancesTable() {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    // Use global store data instead of local polling
-    const { balance, isLoading, error } = useMarginBucketStore();
+    // Use unified margin data
+    const { balance, isLoading, error } = useUnifiedMarginData();
 
     // Create array with single balance or empty array
     const balanceData = balance ? [balance] : [];

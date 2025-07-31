@@ -14,8 +14,7 @@ import {
 } from '~/processors/processUserFills';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useMarginBucketStore } from '~/stores/MarginBucketStore';
-import { usePositionsStore } from '~/stores/PositionsStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -29,13 +28,6 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
-import {
-    getUserMarginBucket,
-    USD_MINT,
-    DFLT_EMBER_MARKET,
-    type MarginBucketAvail,
-} from '@crocswap-libs/ambient-ember';
-import { convertMarginBucketToPosition } from '~/utils/convertMarginBucketToPosition';
 
 export default function WebDataConsumer() {
     const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -75,20 +67,8 @@ export default function WebDataConsumer() {
     // Always use lowercase for comparison
     addressRef.current = debugWallet?.address?.toLowerCase();
 
-    const {
-        setBalance,
-        setIsLoading,
-        setError,
-        reset: resetMarginBucket,
-    } = useMarginBucketStore();
-
-    const {
-        setPositions: setPositionsStoreData,
-        setMarginBucket: setPositionsMarginBucket,
-        setIsLoading: setPositionsLoading,
-        setError: setPositionsError,
-        reset: resetPositions,
-    } = usePositionsStore();
+    // Use unified margin data for both balance and positions
+    const { balance, positions: unifiedPositions } = useUnifiedMarginData();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -524,168 +504,15 @@ export default function WebDataConsumer() {
     useEffect(() => {
         if (!isEstablished(sessionState)) {
             resetRefs();
-            resetMarginBucket();
-            resetPositions();
         }
-    }, [isEstablished(sessionState), resetMarginBucket, resetPositions]);
+    }, [isEstablished(sessionState)]);
 
-    // Margin bucket polling
+    // Update positions in TradeDataStore when unified data changes
     useEffect(() => {
-        if (!isEstablished(sessionState)) {
-            return;
+        if (unifiedPositions) {
+            setPositions(unifiedPositions);
         }
-
-        const fetchMarginBucket = async () => {
-            try {
-                const marginBucket: MarginBucketAvail | null =
-                    await getUserMarginBucket(
-                        sessionState.connection,
-                        sessionState.walletPublicKey,
-                        BigInt(DFLT_EMBER_MARKET.mktId),
-                        USD_MINT,
-                        {},
-                    );
-
-                if (!marginBucket) {
-                    setBalance(null);
-                    setError('No margin bucket found');
-                    return;
-                }
-
-                // Extract values from margin bucket
-                const committedCollateral =
-                    Number(marginBucket.committedCollateral || 0n) /
-                    Math.pow(10, 6);
-                const availToWithdraw =
-                    Number(marginBucket.availToWithdraw || 0n) /
-                    Math.pow(10, 6);
-                const hold = committedCollateral - availToWithdraw;
-
-                // Create balance object
-                const newBalance: UserBalanceIF = {
-                    coin: 'fUSD',
-                    type: 'margin',
-                    total: committedCollateral,
-                    available: availToWithdraw,
-                    hold: hold,
-                    entryNtl: 0,
-                    sortName: '\x01',
-                    usdcValue: committedCollateral,
-                    pnlValue: 0,
-                    metaIndex: 0,
-                    buyingPower: availToWithdraw,
-                    contractAddress:
-                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
-                };
-
-                setBalance(newBalance);
-                setError(null);
-            } catch (err) {
-                console.error('Error fetching margin bucket:', err);
-                setError(
-                    err instanceof Error
-                        ? err.message
-                        : 'Failed to fetch balance',
-                );
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        // Initial fetch
-        fetchMarginBucket();
-
-        // Set up polling
-        const intervalId = setInterval(fetchMarginBucket, 2000);
-
-        // Cleanup
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [
-        isEstablished(sessionState),
-        sessionState,
-        setBalance,
-        setError,
-        setIsLoading,
-    ]);
-
-    // Positions polling from RPC
-    useEffect(() => {
-        if (!isEstablished(sessionState)) {
-            return;
-        }
-
-        const fetchPositions = async () => {
-            try {
-                const marginBucket: MarginBucketAvail | null =
-                    await getUserMarginBucket(
-                        sessionState.connection,
-                        sessionState.walletPublicKey,
-                        BigInt(DFLT_EMBER_MARKET.mktId), // BTC market ID 64
-                        USD_MINT,
-                        {},
-                    );
-
-                if (!marginBucket) {
-                    setPositionsMarginBucket(null);
-                    setPositionsStoreData([]);
-                    setPositions([]);
-                    setPositionsError('No margin bucket found');
-                    return;
-                }
-
-                // Store the raw margin bucket
-                setPositionsMarginBucket(marginBucket);
-
-                // Convert to position format
-                const position = convertMarginBucketToPosition(
-                    marginBucket,
-                    BigInt(DFLT_EMBER_MARKET.mktId),
-                );
-
-                if (position) {
-                    setPositionsStoreData([position]); // Update PositionsStore
-                    // Update positions in TradeDataStore for compatibility
-                    setPositions([position]);
-                } else {
-                    setPositionsStoreData([]); // Update PositionsStore
-                    // Update positions in TradeDataStore for compatibility
-                    setPositions([]);
-                }
-
-                setPositionsError(null);
-            } catch (err) {
-                console.error('Error fetching positions:', err);
-                setPositionsError(
-                    err instanceof Error
-                        ? err.message
-                        : 'Failed to fetch positions',
-                );
-            } finally {
-                setPositionsLoading(false);
-            }
-        };
-
-        // Initial fetch
-        fetchPositions();
-
-        // Set up polling
-        const intervalId = setInterval(fetchPositions, 2000);
-
-        // Cleanup
-        return () => {
-            clearInterval(intervalId);
-        };
-    }, [
-        isEstablished(sessionState),
-        sessionState,
-        setPositions,
-        setPositionsStoreData,
-        setPositionsMarginBucket,
-        setPositionsError,
-        setPositionsLoading,
-    ]);
+    }, [unifiedPositions, setPositions]);
 
     return <></>;
 }

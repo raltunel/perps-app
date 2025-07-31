@@ -5,11 +5,6 @@ import {
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import {
-    DFLT_EMBER_MARKET,
-    getUserMarginBucket,
-    USD_MINT,
-} from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
@@ -18,6 +13,7 @@ import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
@@ -45,6 +41,9 @@ export default function PageHeader() {
 
     // symbol for active market
     const { symbol, setMarginBucket } = useTradeDataStore();
+
+    // Use unified margin data
+    const { marginBucket } = useUnifiedMarginData();
 
     // data to generate nav links in page header
     const navLinks = [
@@ -102,41 +101,10 @@ export default function PageHeader() {
 
     const { openDepositModal, PortfolioModalsRenderer } = usePortfolioModals();
 
+    // Update TradeDataStore when unified margin data changes
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-
-        const fetchMarginBucket = async () => {
-            if (isEstablished(sessionState)) {
-                const marginBucket = await getUserMarginBucket(
-                    sessionState.connection,
-                    // new PublicKey(
-                    //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                    // ),
-                    sessionState.walletPublicKey,
-                    BigInt(DFLT_EMBER_MARKET.mktId),
-                    USD_MINT,
-                    {},
-                );
-                setMarginBucket(marginBucket);
-            } else {
-                setMarginBucket(null);
-            }
-        };
-
-        fetchMarginBucket(); // Initial fetch on mount
-
-        if (isEstablished(sessionState)) {
-            intervalId = setInterval(() => {
-                fetchMarginBucket();
-            }, 2000); // Refresh every 2 seconds
-        }
-
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [sessionState]);
+        setMarginBucket(marginBucket);
+    }, [marginBucket, setMarginBucket]);
 
     return (
         <>

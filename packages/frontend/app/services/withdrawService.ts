@@ -1,10 +1,6 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import {
-    buildWithdrawMarginTx,
-    getUserMarginBucket,
-    USD_MINT,
-    type MarginBucketAvail,
-} from '@crocswap-libs/ambient-ember';
+import { buildWithdrawMarginTx } from '@crocswap-libs/ambient-ember';
+import { getUnifiedMarginData } from '~/utils/getUnifiedMarginData';
 
 export interface WithdrawServiceResult {
     success: boolean;
@@ -39,55 +35,37 @@ export class WithdrawService {
         marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
-            let marginBucket: MarginBucketAvail | null = null;
-            try {
-                // Add timeout to prevent hanging
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(
-                        () =>
-                            reject(
-                                new Error(
-                                    'getUserMarginBucket timeout after 10 seconds',
-                                ),
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                setTimeout(
+                    () =>
+                        reject(
+                            new Error(
+                                'getUnifiedMarginData timeout after 10 seconds',
                             ),
-                        10000,
-                    );
-                });
-
-                marginBucket = await Promise.race([
-                    getUserMarginBucket(
-                        this.connection,
-                        userPublicKey,
-                        marketId,
-                        USD_MINT,
-                        {},
-                    ),
-                    timeoutPromise,
-                ]);
-            } catch (marginError) {
-                console.error(
-                    '❌ Error calling getUserMarginBucket:',
-                    marginError,
+                        ),
+                    10000,
                 );
-                // Don't throw, just return 0 balance
-                return { balance: 0, decimalized: 0 };
-            }
+            });
 
-            if (!marginBucket) {
+            const result = await Promise.race([
+                getUnifiedMarginData({
+                    connection: this.connection,
+                    walletPublicKey: userPublicKey,
+                    forceRefresh: true, // Always get fresh data for withdrawals
+                    marketId,
+                }),
+                timeoutPromise,
+            ]);
+
+            if (!result.marginBucket) {
                 console.warn('⚠️ No margin bucket found for user');
                 return { balance: 0, decimalized: 0 };
             }
 
-            // Get available to withdraw - SDK v0.1.30 uses availToWithdraw
-            let availableToWithdraw: bigint =
-                marginBucket.availToWithdraw || 0n;
-
-            // Convert to decimalized value (assuming 6 decimals for USD)
-            const decimalized = Number(availableToWithdraw) / Math.pow(10, 6);
-
             return {
-                balance: Number(availableToWithdraw),
-                decimalized,
+                balance: Number(result.availableToWithdraw),
+                decimalized: result.decimalized,
             };
         } catch (error) {
             console.error(
