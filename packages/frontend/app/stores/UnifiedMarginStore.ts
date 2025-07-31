@@ -23,7 +23,6 @@ interface UnifiedMarginStore {
     setIsLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     setLastUpdateTime: (time: number) => void;
-    reset: () => void;
 
     // For manual refresh requests
     refreshPromise: Promise<void> | null;
@@ -46,14 +45,4 @@ export const useUnifiedMarginStore = create<UnifiedMarginStore>((set) => ({
     setError: (error) => set({ error }),
     setLastUpdateTime: (time) => set({ lastUpdateTime: time }),
     setRefreshPromise: (promise) => set({ refreshPromise: promise }),
-    reset: () =>
-        set({
-            marginBucket: null,
-            balance: null,
-            positions: [],
-            isLoading: true,
-            error: null,
-            lastUpdateTime: 0,
-            refreshPromise: null,
-        }),
 }));

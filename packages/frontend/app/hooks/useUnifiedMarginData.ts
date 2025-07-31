@@ -6,7 +6,7 @@ import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingMana
 export function useUnifiedMarginData() {
     const sessionState = useSession();
     const hasSubscribedRef = useRef(false);
-    const isSessionEstablished = isEstablished(sessionState);
+    const lastSessionStateRef = useRef<boolean>(false);
 
     // Get store data using selectors to avoid re-renders
     const marginBucket = useUnifiedMarginStore((state) => state.marginBucket);
@@ -18,9 +18,16 @@ export function useUnifiedMarginData() {
         (state) => state.lastUpdateTime,
     );
 
+    const isSessionEstablished = isEstablished(sessionState);
+
     useEffect(() => {
+        // Track session state changes
+        const sessionChanged =
+            lastSessionStateRef.current !== isSessionEstablished;
+        lastSessionStateRef.current = isSessionEstablished;
+
         if (!isSessionEstablished) {
-            // Clean up if we were subscribed
+            // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
                 unifiedMarginPollingManager.unsubscribe();
@@ -28,8 +35,8 @@ export function useUnifiedMarginData() {
             return;
         }
 
-        // Subscribe if not already subscribed
-        if (!hasSubscribedRef.current) {
+        // Subscribe only if not already subscribed and session just became established
+        if (!hasSubscribedRef.current && sessionChanged) {
             hasSubscribedRef.current = true;
             unifiedMarginPollingManager.subscribe(
                 sessionState.connection,
@@ -37,18 +44,14 @@ export function useUnifiedMarginData() {
             );
         }
 
-        // Cleanup on unmount
+        // Cleanup function - only runs on unmount
         return () => {
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
                 unifiedMarginPollingManager.unsubscribe();
             }
         };
-    }, [
-        isSessionEstablished,
-        sessionState.connection,
-        sessionState.walletPublicKey,
-    ]);
+    }, [isSessionEstablished]); // Only depend on session established state
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished) {

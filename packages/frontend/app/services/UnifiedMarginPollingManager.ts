@@ -26,9 +26,7 @@ class UnifiedMarginPollingManager {
     private minFetchInterval = 900; // Minimum time between fetches in ms
     private pollingInterval = 1000; // Poll every 1 second
 
-    private constructor() {
-        console.log('[UnifiedMarginPollingManager] Instance created');
-    }
+    private constructor() {}
 
     static getInstance(): UnifiedMarginPollingManager {
         if (!UnifiedMarginPollingManager.instance) {
@@ -40,18 +38,11 @@ class UnifiedMarginPollingManager {
 
     subscribe(connection: Connection, walletPublicKey: PublicKey): void {
         this.subscriberCount++;
-        console.log(
-            '[UnifiedMarginPollingManager] Subscriber added, total:',
-            this.subscriberCount,
-        );
 
         // Update connection info if changed
         const walletChanged =
             this.walletPublicKey?.toString() !== walletPublicKey.toString();
         if (walletChanged) {
-            console.log(
-                '[UnifiedMarginPollingManager] Wallet changed, restarting polling',
-            );
             this.stop();
         }
 
@@ -66,10 +57,6 @@ class UnifiedMarginPollingManager {
 
     unsubscribe(): void {
         this.subscriberCount--;
-        console.log(
-            '[UnifiedMarginPollingManager] Subscriber removed, remaining:',
-            this.subscriberCount,
-        );
 
         if (this.subscriberCount <= 0) {
             this.subscriberCount = 0; // Ensure it doesn't go negative
@@ -82,9 +69,6 @@ class UnifiedMarginPollingManager {
             return;
         }
 
-        console.log(
-            '[UnifiedMarginPollingManager] Starting polling (every 1 second)',
-        );
         this.isPolling = true;
 
         // Clear any existing interval
@@ -109,8 +93,6 @@ class UnifiedMarginPollingManager {
     }
 
     private stop(): void {
-        console.log('[UnifiedMarginPollingManager] Stopping polling');
-
         if (this.intervalId) {
             clearInterval(this.intervalId);
             this.intervalId = null;
@@ -118,8 +100,16 @@ class UnifiedMarginPollingManager {
 
         this.isPolling = false;
 
-        // Reset store when stopping
-        useUnifiedMarginStore.getState().reset();
+        // Clear data when stopping - do it asynchronously to avoid React render issues
+        setTimeout(() => {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
+            store.setBalance(null);
+            store.setPositions([]);
+            store.setError(null);
+            store.setIsLoading(true);
+            store.setLastUpdateTime(0);
+        }, 0);
     }
 
     private async fetchData(): Promise<void> {
@@ -130,9 +120,6 @@ class UnifiedMarginPollingManager {
         // Prevent fetching too frequently
         const now = Date.now();
         if (now - this.lastFetchTime < this.minFetchInterval) {
-            console.warn(
-                '[UnifiedMarginPollingManager] Skipping fetch, too soon since last fetch',
-            );
             return;
         }
         this.lastFetchTime = now;
