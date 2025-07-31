@@ -21,7 +21,7 @@ importers:
   packages/frontend:
     dependencies:
       '@crocswap-libs/ambient-ember':
-        specifier: ^0.1.29
+        specifier: ^0.1.32
         version: 0.1.32(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
         specifier: ^0.0.3
