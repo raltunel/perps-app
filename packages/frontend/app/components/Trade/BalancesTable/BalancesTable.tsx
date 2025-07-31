@@ -1,9 +1,8 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useDebugStore } from '~/stores/DebugStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
+import { useMarginBucketPolling } from '~/hooks/useMarginBucketPolling';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
@@ -12,16 +11,16 @@ export default function BalancesTable() {
     const currentUserRef = useRef<string>('');
     currentUserRef.current = debugWallet.address;
 
-    const { userBalances, fetchedChannels } = useTradeDataStore();
+    // Use RPC polling instead of websocket data
+    const { balance, isLoading, error } = useMarginBucketPolling(2000);
 
-    const webDataFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.WEB_DATA2);
-    }, [fetchedChannels]);
+    // Create array with single balance or empty array
+    const balanceData = balance ? [balance] : [];
 
     return (
         <GenericTable
             storageKey={`BalancesTable_${currentUserRef.current}`}
-            data={userBalances.filter((balance) => balance.type === 'margin')}
+            data={balanceData}
             renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                 <BalancesTableHeader
                     sortBy={sortBy}
@@ -33,10 +32,10 @@ export default function BalancesTable() {
                 <BalancesTableRow key={`balance-${index}`} balance={balance} />
             )}
             sorterMethod={sortUserBalances}
-            isFetched={webDataFetched}
+            isFetched={!isLoading}
             pageMode={false}
             viewAllLink={''}
-            skeletonRows={7}
+            skeletonRows={1}
             skeletonColRatios={[1, 2, 2, 1, 1, 1, 3]}
             defaultSortBy={'usdcValue'}
             defaultSortDirection={'desc'}
