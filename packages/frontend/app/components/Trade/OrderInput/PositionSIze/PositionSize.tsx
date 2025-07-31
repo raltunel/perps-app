@@ -249,6 +249,39 @@ export default function PositionSize({
             e.currentTarget.blur();
         }
     };
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        let newValue = currentValue;
+        const step = 5; // 5% increments
+
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                newValue = Math.min(
+                    POSITION_SIZE_CONFIG.MAX_VALUE,
+                    currentValue + step,
+                );
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                newValue = Math.max(
+                    POSITION_SIZE_CONFIG.MIN_VALUE,
+                    currentValue - step,
+                );
+                break;
+            case 'Home':
+                newValue = POSITION_SIZE_CONFIG.MIN_VALUE;
+                break;
+            case 'End':
+                newValue = POSITION_SIZE_CONFIG.MAX_VALUE;
+                break;
+            default:
+                return;
+        }
+
+        e.preventDefault();
+        setCurrentValue(newValue);
+        onChange(newValue);
+    };
 
     return (
         <div className={`${styles.positionSliderContainer} ${className} `}>
@@ -257,6 +290,14 @@ export default function PositionSize({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Position size percentage'
+                        aria-valuemin={POSITION_SIZE_CONFIG.MIN_VALUE}
+                        aria-valuemax={POSITION_SIZE_CONFIG.MAX_VALUE}
+                        aria-valuenow={currentValue}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
                         onMouseDown={handleTrackMouseDown}
                         onTouchStart={handleTrackTouchStart}
                     >
@@ -295,7 +336,7 @@ export default function PositionSize({
 
                         {/* Draggable knob */}
                         <div
-                            tabIndex={-1}
+                            // tabIndex={-1}
                             ref={knobRef}
                             className={styles.sliderKnob}
                             style={{
