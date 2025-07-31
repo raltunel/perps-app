@@ -1,7 +1,7 @@
 import {
-    type MarginBucketAvail,
-    calcMarginAvail,
     calcLiqPriceOnNewOrder,
+    calcMarginAvail,
+    type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
@@ -30,8 +30,8 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -961,10 +961,6 @@ function OrderInput({
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
@@ -1018,10 +1014,6 @@ function OrderInput({
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
