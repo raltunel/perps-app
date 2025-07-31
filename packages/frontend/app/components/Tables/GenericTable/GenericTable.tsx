@@ -387,80 +387,79 @@ export default function GenericTable<
                 height: heightOverride,
             }}
         >
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={skeletonRows}
-                    colRatios={skeletonColRatios}
-                />
-            ) : (
-                <>
-                    <span
-                        id={`${id}-headerContainer`}
-                        className={styles.headerContainer}
-                    >
-                        {renderHeader(sortDirection, handleSort, sortBy)}
-                    </span>
-                    <div
-                        id={`${id}-tableBody`}
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : styles.notPage
-                        }`}
-                    >
-                        {tableState === TableState.FILLED &&
-                            dataToShow.map(renderRow)}
-                        {tableState === TableState.EMPTY &&
-                            isSessionEstablished && <NoDataRow />}
-                        {!isSessionEstablished && (
-                            <div className={styles.sessionButtonContainer}>
-                                <SessionButton />
-                            </div>
-                        )}
-
-                        {sortedData.length > 0 && (
-                            <div
-                                id={`${id}-actionsContainer`}
-                                className={styles.actionsContainer}
-                            >
-                                {sortedData.length > slicedLimit &&
-                                    !pageMode &&
-                                    viewAllLink &&
-                                    viewAllLink.length > 0 && (
-                                        <a
-                                            href='#'
-                                            className={styles.viewAllLink}
-                                            onClick={handleViewAll}
-                                        >
-                                            View All
-                                        </a>
-                                    )}
-                                {tableModel &&
-                                    (pageMode || csvDataFetcher) &&
-                                    tableModel.some(
-                                        (header) => header.exportable,
-                                    ) && (
-                                        <a
-                                            href='#'
-                                            className={styles.exportLink}
-                                            onClick={handleExportCsv}
-                                        >
-                                            Export as CSV
-                                        </a>
-                                    )}
-                            </div>
-                        )}
-
-                        {pageMode && (
-                            <GenericTablePagination
-                                totalCount={sortedData.length}
-                                page={page}
-                                setPage={setPage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={setRowsPerPage}
-                            />
-                        )}
+            <span
+                id={`${id}-headerContainer`}
+                className={styles.headerContainer}
+            >
+                {tableState === TableState.LOADING ? (
+                    <div /> // for header during loading
+                ) : (
+                    renderHeader(sortDirection, handleSort, sortBy)
+                )}
+            </span>
+            <div
+                id={`${id}-tableBody`}
+                className={`${styles.tableBody} ${
+                    pageMode ? styles.pageMode : styles.notPage
+                }`}
+            >
+                {tableState === TableState.LOADING && (
+                    <SkeletonTable
+                        rows={skeletonRows}
+                        colRatios={skeletonColRatios}
+                    />
+                )}
+                {tableState === TableState.FILLED && dataToShow.map(renderRow)}
+                {tableState === TableState.EMPTY && isSessionEstablished && (
+                    <NoDataRow />
+                )}
+                {!isSessionEstablished && (
+                    <div className={styles.sessionButtonContainer}>
+                        <SessionButton />
                     </div>
-                </>
-            )}
+                )}
+
+                {sortedData.length > 0 && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={styles.actionsContainer}
+                    >
+                        {sortedData.length > slicedLimit &&
+                            !pageMode &&
+                            viewAllLink &&
+                            viewAllLink.length > 0 && (
+                                <a
+                                    href='#'
+                                    className={styles.viewAllLink}
+                                    onClick={handleViewAll}
+                                >
+                                    View All
+                                </a>
+                            )}
+                        {tableModel &&
+                            (pageMode || csvDataFetcher) &&
+                            tableModel.some((header) => header.exportable) && (
+                                <a
+                                    href='#'
+                                    className={styles.exportLink}
+                                    onClick={handleExportCsv}
+                                >
+                                    Export as CSV
+                                </a>
+                            )}
+                    </div>
+                )}
+
+                {pageMode && (
+                    <GenericTablePagination
+                        totalCount={sortedData.length}
+                        page={page}
+                        setPage={setPage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={setRowsPerPage}
+                    />
+                )}
+            </div>
         </div>
     );
 }
