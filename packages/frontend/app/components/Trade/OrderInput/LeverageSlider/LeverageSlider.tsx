@@ -103,6 +103,7 @@ export default function LeverageSlider({
     );
     const [hasInitializedLeverage, setHasInitializedLeverage] =
         useState<boolean>(false);
+    const [announceText, setAnnounceText] = useState<string>('');
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
@@ -144,6 +145,15 @@ export default function LeverageSlider({
     const constrainValue = (val: number): number => {
         return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
+    const announceValueChange = (value: number) => {
+        const formattedValue = formatValue(value);
+        setAnnounceText('');
+        setTimeout(() => {
+            setAnnounceText(`Leverage ${formattedValue}x`);
+        }, 100);
+        // Clear after announcement
+        setTimeout(() => setAnnounceText(''), 1500);
+    };
 
     const handleLeverageChange = (newLeverage: number) => {
         // In modal mode, skip store updates
@@ -154,6 +164,7 @@ export default function LeverageSlider({
 
         // Always call the parent onChange with the exact value
         onChange(newLeverage);
+        announceValueChange(newLeverage);
     };
 
     const handleMarketChange = useCallback(() => {
@@ -493,6 +504,48 @@ export default function LeverageSlider({
         setIsDragging(true);
         e.preventDefault();
     };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        let newValue = currentValue;
+        const step =
+            maximumInputValue <= LEVERAGE_CONFIG.MAX_LEVERAGE_FOR_DECIMALS
+                ? 0.1
+                : 1;
+
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                newValue = Math.min(maximumInputValue, currentValue + step);
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                newValue = Math.max(minimumInputValue, currentValue - step);
+                break;
+            case 'Home':
+                newValue = minimumInputValue;
+                break;
+            case 'End':
+                newValue = maximumInputValue;
+                break;
+            case 'PageUp':
+                newValue = Math.min(
+                    maximumInputValue,
+                    currentValue + step * 10,
+                );
+                break;
+            case 'PageDown':
+                newValue = Math.max(
+                    minimumInputValue,
+                    currentValue - step * 10,
+                );
+                break;
+            default:
+                return; // Don't prevent default for other keys
+        }
+
+        e.preventDefault();
+        handleLeverageChange(newValue);
+    };
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -693,6 +746,14 @@ export default function LeverageSlider({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Leverage amount'
+                        aria-valuemin={minimumInputValue}
+                        aria-valuemax={maximumInputValue}
+                        aria-valuenow={Math.round(currentValue * 10) / 10}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
                         onMouseDown={handleTrackMouseDown}
                         onTouchStart={handleTrackTouchStart}
                         onMouseMove={handleTrackMouseMove}
@@ -731,6 +792,9 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.sliderMarker} ${
                                         isActive ? styles.active : ''
                                     } ${
@@ -753,6 +817,16 @@ export default function LeverageSlider({
                                                 ? 'transparent'
                                                 : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
                                 ></div>
@@ -770,7 +844,7 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
-                            tabIndex={-1}
+                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -787,6 +861,9 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.valueLabel} ${
                                         isHovered
                                             ? styles.valueLabelHovered
@@ -798,6 +875,16 @@ export default function LeverageSlider({
                                             isActive || isHovered
                                                 ? tickColor
                                                 : UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // ADD THIS
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            handleLeverageChange(tickValue);
+                                        }
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -811,6 +898,20 @@ export default function LeverageSlider({
                             );
                         })}
                     </div>
+                </div>
+                <div
+                    aria-live='assertive'
+                    aria-atomic='true'
+                    className='sr-only'
+                    style={{
+                        position: 'absolute',
+                        left: '-10000px',
+                        width: '1px',
+                        height: '1px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {announceText}
                 </div>
             </div>
         );
@@ -828,6 +929,14 @@ export default function LeverageSlider({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Leverage amount'
+                        aria-valuemin={minimumInputValue}
+                        aria-valuemax={maximumInputValue}
+                        aria-valuenow={Math.round(currentValue * 10) / 10}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
                         onMouseDown={handleTrackMouseDown}
                         onTouchStart={handleTrackTouchStart}
                         onMouseMove={handleTrackMouseMove}
@@ -867,6 +976,9 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.sliderMarker} ${
                                         isActive ? styles.active : ''
                                     } ${
@@ -895,6 +1007,16 @@ export default function LeverageSlider({
                                         e.stopPropagation();
                                         handleLeverageChange(tickValue);
                                     }}
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
                                 ></div>
                             );
                         })}
@@ -910,7 +1032,7 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
-                            tabIndex={-1}
+                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -927,6 +1049,9 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.valueLabel} ${
                                         isHovered
                                             ? styles.valueLabelHovered
@@ -942,6 +1067,15 @@ export default function LeverageSlider({
                                     onClick={() =>
                                         handleLeverageChange(tickValue)
                                     }
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
                                 >
@@ -971,6 +1105,20 @@ export default function LeverageSlider({
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>
+            </div>
+            <div
+                aria-live='assertive'
+                aria-atomic='true'
+                className='sr-only'
+                style={{
+                    position: 'absolute',
+                    left: '-10000px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                }}
+            >
+                {announceText}
             </div>
         </div>
     );
