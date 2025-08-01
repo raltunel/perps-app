@@ -242,7 +242,7 @@ function OrderInput({
         return midPrice;
     };
 
-    useEffect(() => {
+    const setMidPriceAsPriceInput = () => {
         if (
             marketOrderType === 'limit' &&
             buys.length > 0 &&
@@ -257,7 +257,28 @@ function OrderInput({
             );
             setPrice(formattedMidPrice);
         }
+    };
+
+    useEffect(() => {
+        // set mid price input as default price when market changes
+        setMidPriceAsPriceInput();
+        setIsMidModeActive(false);
     }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
+
+    const [isMidModeActive, setIsMidModeActive] = useState(false);
+
+    useEffect(() => {
+        if (isMidModeActive) {
+            setMidPriceAsPriceInput();
+        }
+    }, [
+        isMidModeActive,
+        marketOrderType,
+        !buys.length,
+        !sells.length,
+        buys?.[0]?.px,
+        sells?.[0]?.px,
+    ]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -547,6 +568,7 @@ function OrderInput({
         /* ----------------------------------------------------------------------------------------------- */
 
         if (obChosenPrice > 0) {
+            setIsMidModeActive(false);
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
@@ -695,6 +717,7 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
+        setIsMidModeActive(false);
         if (typeof event === 'string') {
             setPrice(event);
         } else {
@@ -914,9 +937,19 @@ function OrderInput({
             className: 'custom-input',
             ariaLabel: 'Price input',
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
-            getMidPrice,
+            setMidPriceAsPriceInput,
+            isMidModeActive,
+            setIsMidModeActive,
         }),
-        [price, handlePriceChange, marketOrderType, markPx],
+        [
+            price,
+            handlePriceChange,
+            marketOrderType,
+            markPx,
+            isMidModeActive,
+            setIsMidModeActive,
+            setMidPriceAsPriceInput,
+        ],
     );
 
     const sizeInputProps = useMemo(

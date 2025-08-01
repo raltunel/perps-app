@@ -1,5 +1,4 @@
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './PriceInput.module.css';
 
 interface PropsIF {
@@ -10,7 +9,9 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     showMidButton: boolean;
-    getMidPrice: () => number | null;
+    setMidPriceAsPriceInput: () => void;
+    isMidModeActive: boolean;
+    setIsMidModeActive: (value: boolean) => void;
 }
 export default function PriceInput(props: PropsIF) {
     const {
@@ -21,10 +22,10 @@ export default function PriceInput(props: PropsIF) {
         className,
         ariaLabel,
         showMidButton,
-        getMidPrice,
+        setMidPriceAsPriceInput,
+        isMidModeActive,
+        setIsMidModeActive,
     } = props;
-
-    const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     return (
         <div
@@ -42,18 +43,17 @@ export default function PriceInput(props: PropsIF) {
             />
             {showMidButton && (
                 <button
-                    className={styles.midButton}
-                    onClick={() =>
-                        onChange(
-                            formatNumWithOnlyDecimals(
-                                getMidPrice() || 0,
-                                6,
-                                true,
-                            ),
-                        )
-                    }
+                    className={`${styles.midButton} ${isMidModeActive ? styles.midButtonActive : ''}`}
+                    onClick={() => {
+                        if (!isMidModeActive) {
+                            setMidPriceAsPriceInput();
+                            setIsMidModeActive(true);
+                        } else {
+                            setIsMidModeActive(false);
+                        }
+                    }}
                 >
-                    Mid{' '}
+                    Mid
                 </button>
             )}
         </div>
