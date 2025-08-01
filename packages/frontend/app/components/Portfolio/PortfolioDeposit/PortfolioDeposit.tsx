@@ -121,8 +121,6 @@ function PortfolioDeposit(props: propsIF) {
                 setError(result.error || 'Transaction failed');
             } else {
                 setTransactionStatus('success');
-                // clear form and state on success
-                setRawInputString('');
 
                 // Show success notification
                 notificationStore.add({
@@ -255,6 +253,15 @@ function PortfolioDeposit(props: propsIF) {
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label='deposit input'
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (
+                            e.key === 'Enter' &&
+                            !isButtonDisabled &&
+                            !isSizeInvalid
+                        ) {
+                            handleDeposit();
+                        }
+                    }}
                 />
                 <button
                     onClick={handleMaxClick}
