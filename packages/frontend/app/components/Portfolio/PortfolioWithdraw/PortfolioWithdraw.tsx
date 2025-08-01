@@ -1,11 +1,11 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { LuCircleHelp } from 'react-icons/lu';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
-import styles from './PortfolioWithdraw.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import styles from './PortfolioWithdraw.module.css';
 
 interface propsIF {
     portfolio: {
@@ -231,12 +231,7 @@ function PortfolioWithdraw({
             </div>
 
             <div className={styles.inputContainer}>
-                <h6>
-                    Amount{' '}
-                    {isBelowMinimum.dbd && (
-                        <span className={styles.minWarning}>(Min: $10)</span>
-                    )}
-                </h6>
+                <h6>Amount</h6>
                 <input
                     type='text'
                     value={amount}
@@ -270,7 +265,7 @@ function PortfolioWithdraw({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

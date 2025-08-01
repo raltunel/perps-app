@@ -1,9 +1,9 @@
 import styles from './ConfirmationModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import type { modalContentT } from '../OrderInput';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface propsIF {
     tx: modalContentT;
@@ -92,7 +92,7 @@ export default function ConfirmationModal(props: propsIF) {
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

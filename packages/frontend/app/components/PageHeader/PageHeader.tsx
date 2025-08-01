@@ -4,7 +4,6 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useState } from 'react';
-// import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import {
     DFLT_EMBER_MARKET,
     getUserMarginBucket,
@@ -117,7 +116,8 @@ export default function PageHeader() {
                     USD_MINT,
                     {},
                 );
-                // console.log({ marginBucket });
+                console.log('🔍 [PageHeader] marginBucket', marginBucket);
+                console.log({ marginBucket });
                 setMarginBucket(marginBucket);
             } else {
                 setMarginBucket(null);
@@ -148,6 +148,7 @@ export default function PageHeader() {
                         alt='Perps Logo'
                         width='70px'
                         height='70px'
+                        loading='eager'
                     />
                 </Link>
                 <nav
@@ -306,7 +307,7 @@ export default function PageHeader() {
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
                             }
                         >
-                            <AiOutlineQuestionCircle
+                            <LuCircleHelp
                                 size={18}
                                 color='var(--text2)'
                             />

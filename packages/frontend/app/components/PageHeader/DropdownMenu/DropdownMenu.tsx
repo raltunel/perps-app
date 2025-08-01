@@ -18,7 +18,7 @@ const menuItems = [
     // { name: 'Medium', icon: <FaMediumM /> },
     // { name: 'Privacy', icon: <FaUserSecret /> },
     // { name: 'Terms of Service', icon: <FaFileAlt /> },
-    // { name: 'FAQ', icon: <FaQuestionCircle /> },
+    // { name: 'FAQ', icon: <LuCircleHelp /> },
 ];
 
 interface DropdownMenuProps {

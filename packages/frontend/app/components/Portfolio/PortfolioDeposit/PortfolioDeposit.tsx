@@ -1,18 +1,18 @@
-import { useState, useCallback, memo, useMemo, useEffect } from 'react';
-import styles from './PortfolioDeposit.module.css';
+import { memo, useCallback, useMemo, useState } from 'react';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import styles from './PortfolioDeposit.module.css';
 // import { useDebouncedCallback } from '~/hooks/useDebounce';
+import { LuCircleHelp } from 'react-icons/lu';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import FogoLogo from '../../../assets/tokens/FOGO.svg';
-import { useNotificationStore } from '~/stores/NotificationStore';
-import useNumFormatter from '~/hooks/useNumFormatter';
 import useDebounce from '~/hooks/useDebounce';
-import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
     portfolio: {
@@ -21,6 +21,7 @@ interface propsIF {
         availableBalance: number;
         unit?: string;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDeposit: (amount: number) => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
@@ -29,7 +30,11 @@ interface propsIF {
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
     const notificationStore = useNotificationStore();
-    const { formatNum } = useNumFormatter();
+    const {
+        formatNum,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+    } = useNumFormatter();
 
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
@@ -44,69 +49,49 @@ function PortfolioDeposit(props: propsIF) {
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-    const [amt, setAmt] = useState({
-        rawValue: '',
-        dbdValue: '',
-    });
+    const [rawInputString, setRawInputString] = useState('');
 
-    const DEBOUNCE_TIME_MS = 1500;
+    const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
-    useEffect(() => {
-        const timeoutId = setTimeout(
-            () => {
-                setAmt({
-                    ...amt,
-                    dbdValue: amt.rawValue,
-                });
-            },
-            amt.rawValue === '' ? 0 : DEBOUNCE_TIME_MS,
-        );
-
-        return () => clearTimeout(timeoutId);
-    }, [amt.rawValue]);
-
-    // indicate invalid state
-    const usdDiffGreaterThanThreshold: boolean = validateAmount(amt.rawValue);
+    const isSizeInvalid: boolean =
+        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 10;
 
     // debounced invalid state
-    const usdDiffGreaterThanThresholdDebounced = useDebounce<boolean>(
-        usdDiffGreaterThanThreshold,
-        500,
-    );
+    const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
 
-    const shouldWarn = usdDiffGreaterThanThreshold
-        ? usdDiffGreaterThanThresholdDebounced
+    const showInvalidSizeWarning = isSizeInvalid
+        ? isSizeInvalidDebounced
         : false;
 
     const handleMaxClick = useCallback(() => {
+        setRawInputString(formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
-        const depositAmount = parseFloat(amt.rawValue);
         setError(null);
         setTransactionStatus('pending');
 
-        if (!depositAmount || isNaN(depositAmount)) {
+        if (!depositInputNum || isNaN(depositInputNum)) {
             setError('Please enter a valid amount');
             setTransactionStatus('idle');
             return;
         }
 
-        if (depositAmount <= 0) {
+        if (depositInputNum <= 0) {
             setError('Amount must be greater than 0');
             setTransactionStatus('idle');
             return;
         }
 
         // Check minimum deposit of $10
-        if (depositAmount < 10) {
+        if (depositInputNum < 10) {
             setError('Minimum deposit amount is $10.00');
             setTransactionStatus('idle');
             return;
         }
 
-        if (depositAmount > availableBalance) {
+        if (depositInputNum > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             setTransactionStatus('idle');
             return;
@@ -126,7 +111,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                onDeposit(depositAmount),
+                onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
@@ -137,15 +122,12 @@ function PortfolioDeposit(props: propsIF) {
             } else {
                 setTransactionStatus('success');
                 // clear form and state on success
-                setAmt({
-                    ...amt,
-                    rawValue: '',
-                });
+                setRawInputString('');
 
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited $${depositAmount.toFixed(2)} USD`,
+                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
                     icon: 'check',
                 });
 
@@ -158,7 +140,7 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [amt, availableBalance, onDeposit]);
+    }, [availableBalance, onDeposit, formatNum, depositInputNum]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
@@ -191,7 +173,7 @@ function PortfolioDeposit(props: propsIF) {
             }
             return `${OTHER_FORMATTER.format(value)} ${unit}`;
         },
-        [USD_FORMATTER, OTHER_FORMATTER],
+        [USD_FORMATTER, OTHER_FORMATTER, formatNum],
     );
 
     // Memoize info items to prevent recreating on each render
@@ -227,27 +209,24 @@ function PortfolioDeposit(props: propsIF) {
         formatNum,
     ]);
 
-    // fn to determine if an arbirtary string is a number in valid range
-    function validateAmount(a: string): boolean {
-        const asFloat: number = parseFloat(a);
-        return !isNaN(asFloat) && asFloat > 0 && asFloat < 10;
-    }
-
-    // Check if amount is below minimum
-    const isBelowMinimum = useMemo(() => {
-        return {
-            raw: validateAmount(amt.rawValue),
-            dbd: validateAmount(amt.dbdValue),
-        };
-    }, [amt]);
-
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
-            !amt.rawValue ||
-            parseFloat(amt.rawValue) <= 0 ||
-            parseFloat(amt.rawValue) > availableBalance,
-        [isProcessing, amt.rawValue, availableBalance],
+            !depositInputNum ||
+            depositInputNum <= 0 ||
+            depositInputNum > availableBalance,
+        [isProcessing, depositInputNum, availableBalance],
+    );
+
+    const handleDepositChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement> | string) => {
+            if (typeof event === 'string') {
+                setRawInputString(event);
+            } else {
+                setRawInputString(event.target.value);
+            }
+        },
+        [],
     );
 
     return (
@@ -267,49 +246,15 @@ function PortfolioDeposit(props: propsIF) {
             <div className={styles.inputContainer}>
                 <h6>
                     Amount{' '}
-                    {shouldWarn && (
+                    {showInvalidSizeWarning && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
                 </h6>
-                {/* <input
-                    type='text'
-                    value={amt.rawValue}
-                    onChange={(e) =>
-                        setAmt({
-                            ...amt,
-                            rawValue: e.currentTarget.value,
-                        })
-                    }
-                    aria-label='deposit input'
-                    inputMode='numeric'
-                    onInput={(e) => {
-                        // prevent input of characters other than numerals and periods
-                        e.currentTarget.value = e.currentTarget.value.replace(
-                            /[^0-9.]/g,
-                            '',
-                        );
-                    }}
-                    placeholder='Enter amount (min $10)'
-                    min='0'
-                    step='any'
-                    disabled={isProcessing}
-                /> */}
                 <NumFormattedInput
                     placeholder='Enter amount (min $10)'
-                    type='text'
-                    value={amt.rawValue}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    onChange={(e: { currentTarget: { value: any } }) =>
-                        setAmt({
-                            ...amt,
-                            rawValue: e.currentTarget.value,
-                        })
-                    }
+                    value={rawInputString}
+                    onChange={handleDepositChange}
                     aria-label='deposit input'
-                    inputMode='numeric'
-                    min='0'
-                    step='any'
-                    disabled={isProcessing}
                 />
                 <button
                     onClick={handleMaxClick}
@@ -336,7 +281,7 @@ function PortfolioDeposit(props: propsIF) {
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>
@@ -348,7 +293,7 @@ function PortfolioDeposit(props: propsIF) {
             <SimpleButton
                 bg='accent1'
                 onClick={handleDeposit}
-                disabled={isButtonDisabled || isBelowMinimum.raw}
+                disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

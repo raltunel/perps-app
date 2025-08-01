@@ -71,14 +71,15 @@ export interface ChartContainerProps {
     container: string;
 }
 
-export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
-    children,
-}) => {
+export const TradingViewProvider: React.FC<{
+    children: React.ReactNode;
+    setIsChartReadyForFirstOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ children, setIsChartReadyForFirstOpen }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
-    const { symbol } = useTradeDataStore();
+    const { symbol, addToFetchedChannels } = useTradeDataStore();
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -135,18 +136,20 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             });
 
             if (chart) {
-                const volumeStudyId = chart
+                const volumeStudies = chart
                     .activeChart()
                     .getAllStudies()
-                    .find((x) => x.name === 'Volume');
+                    .filter((x) => x.name === 'Volume');
 
-                if (volumeStudyId) {
-                    const volume = chart
-                        .activeChart()
-                        .getStudyById(volumeStudyId.id);
-                    volume.applyOverrides({
-                        'volume.color.0': c.buy,
-                        'volume.color.1': c.sell,
+                if (volumeStudies) {
+                    volumeStudies.forEach((item) => {
+                        const volume = chart
+                            .activeChart()
+                            .getStudyById(item.id);
+                        volume.applyOverrides({
+                            'volume.color.0': c.sell,
+                            'volume.color.1': c.buy,
+                        });
                     });
                 }
             }
@@ -190,6 +193,16 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
                 saveChartLayout(chart);
                 showBuysSellsOnChart && chart.chart().refreshMarks();
             });
+
+            chart.subscribe('study_event', (studyId) => {
+                const studyElement = chart.activeChart().getStudyById(studyId);
+
+                const colors = getBsColor();
+                studyElement.applyOverrides({
+                    'volume.color.0': colors.sell,
+                    'volume.color.1': colors.buy,
+                });
+            });
         }
     }, [chart]);
 
@@ -204,7 +217,7 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
     const initChart = useCallback(() => {
         if (!info) return;
 
-        dataFeedRef.current = createDataFeed(info);
+        dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 
         const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
 
@@ -322,6 +335,8 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
         // });
 
         tvWidget.onChartReady(() => {
+            setIsChartReadyForFirstOpen(true);
+
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane
@@ -394,6 +409,13 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
             iframe?.contentDocument || iframe?.contentWindow?.document;
 
         const blockSymbolSearchKeys = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+
+            const isInInput = target && target.tagName === 'INPUT';
+            const isInTextArea = target && target.tagName === 'TEXTAREA';
+
+            if (isInInput || isInTextArea) return;
+
             const isSingleChar = e.key.length === 1;
             const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
 

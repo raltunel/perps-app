@@ -1,4 +1,8 @@
-import { type MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import {
+    calcLiqPriceOnNewOrder,
+    calcMarginAvail,
+    type MarginBucketAvail,
+} from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     memo,
@@ -8,7 +12,6 @@ import React, {
     useState,
     type JSX,
 } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiSquaresFour } from 'react-icons/pi';
@@ -26,6 +29,7 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
@@ -45,6 +49,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -124,16 +129,16 @@ export type modalContentT =
 function OrderInput({
     marginBucket,
 }: {
-    marginBucket: MarginBucketInfo | null;
+    marginBucket: MarginBucketAvail | null;
 }) {
     const { getBsColor } = useAppSettings();
+
+    const sessionState = useSession();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
-
-    const sessionState = useSession();
 
     const isUserLoggedIn = useMemo(() => {
         return isEstablished(sessionState);
@@ -156,10 +161,6 @@ function OrderInput({
 
     // Track if we're processing an order
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
-
-    useEffect(() => {
-        console.log({ notionalSymbolQtyNum });
-    }, [notionalSymbolQtyNum]);
 
     const [sizeDisplay, setSizeDisplay] = useState('');
 
@@ -205,6 +206,8 @@ function OrderInput({
         setMarginMode,
     } = useTradeDataStore();
 
+    const { buys, sells } = useOrderBookStore();
+
     const markPx = symbolInfo?.markPx;
 
     const {
@@ -240,18 +243,117 @@ function OrderInput({
 
     const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
+    const [liquidationPrice, setLiquidationPrice] = useState<number | null>(
+        null,
+    );
+
     useEffect(() => {
+        if (!marginBucket) {
+            setUsdAvailableToTrade(0);
+            setCurrentPositionNotionalSize(0);
+            return;
+        }
+
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+
+        // Generate new MarginBucketAvail with leverage-adjusted values
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+
+        // Use the appropriate availToBuy or availToSell based on order side
         const usdAvailableToTrade =
-            marginBucket?.calculations?.collateralAvailableToWithdraw || 0;
+            tradeDirection === 'buy'
+                ? releveragedBucket?.availToBuy || 0
+                : releveragedBucket?.availToSell || 0;
+
         const normalizedAvailableToTrade =
             Number(usdAvailableToTrade) / 1_000_000;
+
         setUsdAvailableToTrade(normalizedAvailableToTrade);
 
         const currentPositionNotionalSize = marginBucket?.netPosition || 0;
         const normalizedCurrentPosition =
             Number(currentPositionNotionalSize) / 100_000_000;
         setCurrentPositionNotionalSize(normalizedCurrentPosition);
-    }, [marginBucket]);
+    }, [marginBucket, leverage, tradeDirection]);
+
+    // Calculate liquidation price
+    useEffect(() => {
+        if (
+            !marginBucket ||
+            !notionalSymbolQtyNum ||
+            notionalSymbolQtyNum === 0
+        ) {
+            setLiquidationPrice(null);
+            return;
+        }
+
+        // Get best bid or ask price based on trade direction
+        let predictedEntryPrice: number | null = null;
+
+        if (tradeDirection === 'buy' && sells.length > 0) {
+            // For buy orders, use best ask (lowest sell price)
+            predictedEntryPrice = sells[0].px;
+        } else if (tradeDirection === 'sell' && buys.length > 0) {
+            // For sell orders, use best bid (highest buy price)
+            predictedEntryPrice = buys[0].px;
+        }
+
+        // If no orderbook data, fall back to mark price
+        if (!predictedEntryPrice && markPx) {
+            predictedEntryPrice = markPx;
+        }
+
+        if (!predictedEntryPrice) {
+            setLiquidationPrice(null);
+            return;
+        }
+
+        try {
+            // Prepare inputs for calcLiqPriceOnNewOrder. calcLiqPrice function takes unscaled decimal values
+            // *not* scaled fixed points. So adjust where needed.
+            const collateral = Number(marginBucket.committedCollateral) / 1e6;
+
+            const position = {
+                qty: Number(marginBucket.netPosition) / 1e8,
+                entryPrice: Number(marginBucket.avgEntryPrice) / 1e6,
+            };
+
+            // Order quantity: positive for buy, negative for sell
+            // notionalSymbolQtyNum is already in human-readable format, need to scale to 10^8
+            const orderQty =
+                notionalSymbolQtyNum * (tradeDirection === 'buy' ? 1 : -1);
+
+            const order = {
+                qty: orderQty,
+                entryPrice: predictedEntryPrice,
+            };
+
+            const mmBps = (marginBucket.marketMmBps || 50) / 10000;
+
+            const liqPrice = calcLiqPriceOnNewOrder(
+                collateral,
+                position,
+                order,
+                mmBps,
+            );
+
+            // Rescale back to decimalized, because the display assumes the result is fixed point
+            const normalizedLiqPrice = liqPrice ? liqPrice * 1e6 : null;
+
+            setLiquidationPrice(normalizedLiqPrice);
+        } catch (error) {
+            console.error('Error calculating liquidation price:', error);
+            setLiquidationPrice(null);
+        }
+    }, [
+        marginBucket,
+        notionalSymbolQtyNum,
+        tradeDirection,
+        buys,
+        sells,
+        markPx,
+    ]);
 
     function roundDownToMillionth(value: number) {
         return Math.floor(value * 1_000_000) / 1_000_000;
@@ -455,7 +557,7 @@ function OrderInput({
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
         if (!isEditingSizeInput) {
-            if (selectedMode === 'symbol' && notionalSymbolQtyNum) {
+            if (selectedMode === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -465,7 +567,7 @@ function OrderInput({
                           )
                         : '',
                 );
-            } else if (notionalSymbolQtyNum && markPx) {
+            } else if (markPx) {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -486,15 +588,15 @@ function OrderInput({
     ]);
 
     useEffect(() => {
+        if (!usdAvailableToTrade) return;
         const percent = Math.min(
             (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
                 usdAvailableToTrade) *
                 100,
             100,
         );
-        console.log({ percent });
         setPositionSliderPercentageValue(percent);
-    }, [leverage]);
+    }, [leverage, !!usdAvailableToTrade]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
@@ -688,7 +790,7 @@ function OrderInput({
                             content={'price distribution'}
                             position='right'
                         >
-                            <AiOutlineQuestionCircle size={13} />
+                            <LuCircleHelp size={12} />
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
@@ -850,6 +952,7 @@ function OrderInput({
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'buy',
+                leverage: leverage,
             });
 
             if (result.success) {
@@ -859,10 +962,6 @@ function OrderInput({
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
@@ -906,6 +1005,7 @@ function OrderInput({
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'sell',
+                leverage: leverage,
             });
 
             if (result.success) {
@@ -915,10 +1015,6 @@ function OrderInput({
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
@@ -1032,41 +1128,49 @@ function OrderInput({
         isMarketOrderLoading,
     );
 
+    const launchPadContent = (
+        <div className={styles.launchpad}>
+            <header>
+                <div
+                    className={styles.exit_launchpad}
+                    onClick={() => setShowLaunchpad(false)}
+                >
+                    <MdKeyboardArrowLeft />
+                </div>
+                <h3>Order Types</h3>
+                <button
+                    className={styles.trade_type_toggle}
+                    onClick={() => setShowLaunchpad(false)}
+                >
+                    <PiSquaresFour />
+                </button>
+            </header>
+            <ul className={styles.launchpad_clickables}>
+                {marketOrderTypes.map((mo: OrderTypeOption) => (
+                    <li
+                        key={JSON.stringify(mo)}
+                        onClick={() => {
+                            handleMarketOrderTypeChange(mo.value);
+                            setShowLaunchpad(false);
+                        }}
+                    >
+                        <div className={styles.name_and_icon}>
+                            {mo.icon}
+                            <h4>{mo.label}</h4>
+                        </div>
+                        <div>
+                            <p>{mo.blurb}</p>
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+
     return (
         <div className={styles.mainContainer}>
             {showLaunchpad ? (
-                <div className={styles.launchpad}>
-                    <header>
-                        <div
-                            className={styles.exit_launchpad}
-                            onClick={() => setShowLaunchpad(false)}
-                        >
-                            <MdKeyboardArrowLeft />
-                        </div>
-                        <h3>Order Types</h3>
-                        {/* empty <div> helps with spacing */}
-                        <div />
-                    </header>
-                    <ul className={styles.launchpad_clickables}>
-                        {marketOrderTypes.map((mo: OrderTypeOption) => (
-                            <li
-                                key={JSON.stringify(mo)}
-                                onClick={() => {
-                                    handleMarketOrderTypeChange(mo.value);
-                                    setShowLaunchpad(false);
-                                }}
-                            >
-                                <div className={styles.name_and_icon}>
-                                    {mo.icon}
-                                    <h4>{mo.label}</h4>
-                                </div>
-                                <div>
-                                    <p>{mo.blurb}</p>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                launchPadContent
             ) : (
                 <>
                     <div className={styles.mainContent}>
@@ -1113,9 +1217,7 @@ function OrderInput({
                                             content={data?.tooltipLabel}
                                             position='right'
                                         >
-                                            <AiOutlineQuestionCircle
-                                                size={13}
-                                            />
+                                            <LuCircleHelp size={12} />
                                         </Tooltip>
                                     </div>
                                     <span className={styles.inputDetailValue}>
@@ -1150,29 +1252,32 @@ function OrderInput({
                         /> */}
                     </div>
                     <div className={styles.button_details_container}>
-                        <Tooltip
-                            content={disabledReason}
-                            position='top'
-                            disabled={!isDisabled}
-                        >
-                            <button
-                                className={styles.submit_button}
-                                style={{
-                                    backgroundColor:
-                                        tradeDirection === 'buy'
-                                            ? buyColor
-                                            : sellColor,
-                                }}
-                                onClick={handleSubmitOrder}
-                                disabled={isDisabled}
+                        {isUserLoggedIn && (
+                            <Tooltip
+                                content={disabledReason}
+                                position='top'
+                                disabled={!isDisabled}
                             >
-                                Submit
-                            </button>
-                        </Tooltip>
+                                <button
+                                    className={styles.submit_button}
+                                    style={{
+                                        backgroundColor:
+                                            tradeDirection === 'buy'
+                                                ? buyColor
+                                                : sellColor,
+                                    }}
+                                    onClick={handleSubmitOrder}
+                                    disabled={isDisabled}
+                                >
+                                    Submit
+                                </button>
+                            </Tooltip>
+                        )}
                         <OrderDetails
                             orderMarketPrice={marketOrderType}
                             usdOrderValue={usdOrderValue}
                             marginRequired={marginRequired}
+                            liquidationPrice={liquidationPrice}
                         />
                     </div>
                     {confirmOrderModal.isOpen && (

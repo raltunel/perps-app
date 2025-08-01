@@ -2,6 +2,8 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import {
     buildWithdrawMarginTx,
     getUserMarginBucket,
+    USD_MINT,
+    type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 
 export interface WithdrawServiceResult {
@@ -29,19 +31,15 @@ export class WithdrawService {
     /**
      * Get available balance to withdraw from margin bucket
      * @param userPublicKey - User's public key
+     * @param marketId - Market ID (defaults to BTC market)
      * @returns Promise<AvailableWithdrawBalance | null>
      */
     async getAvailableWithdrawBalance(
         userPublicKey: PublicKey,
+        marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
-            console.log(
-                '🔍 Fetching available withdraw balance for:',
-                userPublicKey.toString(),
-            );
-            console.log('📡 Connection endpoint:', this.connection.rpcEndpoint);
-
-            let marginBucket;
+            let marginBucket: MarginBucketAvail | null = null;
             try {
                 // Add timeout to prevent hanging
                 const timeoutPromise = new Promise((_, reject) => {
@@ -57,10 +55,15 @@ export class WithdrawService {
                 });
 
                 marginBucket = await Promise.race([
-                    getUserMarginBucket(this.connection, userPublicKey),
+                    getUserMarginBucket(
+                        this.connection,
+                        userPublicKey,
+                        marketId,
+                        USD_MINT,
+                        {},
+                    ),
                     timeoutPromise,
                 ]);
-                console.log('✅ getUserMarginBucket call completed');
             } catch (marginError) {
                 console.error(
                     '❌ Error calling getUserMarginBucket:',
@@ -71,67 +74,19 @@ export class WithdrawService {
             }
 
             if (!marginBucket) {
-                console.log('⚠️ No margin bucket found for user');
+                console.warn('⚠️ No margin bucket found for user');
                 return { balance: 0, decimalized: 0 };
             }
 
-            // Don't use JSON.stringify with BigInt values
-            console.log('📊 Margin bucket data:', marginBucket);
-            console.log('📊 Calculations:', marginBucket.calculations);
-            console.log(
-                '📊 All margin bucket keys:',
-                Object.keys(marginBucket),
-            );
-
-            // If calculations exist, log its keys
-            if (marginBucket.calculations) {
-                console.log(
-                    '📊 Calculations keys:',
-                    Object.keys(marginBucket.calculations),
-                );
-                // Log each calculation value separately to handle BigInts
-                for (const [key, value] of Object.entries(
-                    marginBucket.calculations,
-                )) {
-                    console.log(
-                        `  - ${key}:`,
-                        value?.toString ? value.toString() : value,
-                    );
-                }
-            }
-
-            // Get available to withdraw from calculations
-            // Try different possible field names
-            let availableToWithdraw =
-                marginBucket.calculations?.collateralAvailableToWithdraw ||
-                marginBucket.collateralAvailableToWithdraw ||
-                marginBucket.availableToWithdraw ||
-                marginBucket.calculations?.availableToWithdraw ||
-                marginBucket.calculations?.available_to_withdraw ||
-                0;
-
-            console.log('💰 Raw available to withdraw:', availableToWithdraw);
-            console.log(
-                '💰 Type of available to withdraw:',
-                typeof availableToWithdraw,
-            );
-
-            // Convert BigInt to number if necessary
-            if (typeof availableToWithdraw === 'bigint') {
-                availableToWithdraw = Number(availableToWithdraw);
-                console.log(
-                    '💰 Converted from BigInt to number:',
-                    availableToWithdraw,
-                );
-            }
+            // Get available to withdraw - SDK v0.1.30 uses availToWithdraw
+            let availableToWithdraw: bigint =
+                marginBucket.availToWithdraw || 0n;
 
             // Convert to decimalized value (assuming 6 decimals for USD)
-            const decimalized = availableToWithdraw / Math.pow(10, 6);
-
-            console.log('💵 Decimalized available to withdraw:', decimalized);
+            const decimalized = Number(availableToWithdraw) / Math.pow(10, 6);
 
             return {
-                balance: availableToWithdraw,
+                balance: Number(availableToWithdraw),
                 decimalized,
             };
         } catch (error) {
@@ -218,14 +173,6 @@ export class WithdrawService {
             const nonDecimalizedAmount = BigInt(
                 Math.floor(amount * Math.pow(10, 6)),
             );
-            console.log(
-                '💰 Non-decimalized amount:',
-                nonDecimalizedAmount.toString(),
-            );
-            console.log(
-                '💰 Non-decimalized amount type:',
-                typeof nonDecimalizedAmount,
-            );
 
             // Build the transaction using the SDK
             const transaction = await buildWithdrawMarginTx(
@@ -306,24 +253,6 @@ export class WithdrawService {
             const instructions = transaction.instructions;
 
             console.log('📤 Sending withdraw transaction:');
-            console.log('  - Instructions to send:', instructions.length);
-            console.log(
-                '  - Instruction details:',
-                instructions.map((ix, index) => ({
-                    index,
-                    programId: ix.programId.toString(),
-                    keysCount: ix.keys.length,
-                    dataLength: ix.data.length,
-                    firstFewDataBytes: Array.from(ix.data.slice(0, 8)),
-                })),
-            );
-
-            // Send the transaction using Fogo session (pass raw instructions like deposit does)
-            console.log('  - Calling sendTransaction with instructions...');
-            console.log(
-                '  - sendTransaction function type:',
-                typeof sendTransaction,
-            );
             console.log('  - Instructions array:', instructions);
             const result = await sendTransaction(instructions);
 
@@ -355,11 +284,6 @@ export class WithdrawService {
 
             // Track transaction confirmation
             if (signature) {
-                console.log(
-                    '🔍 Starting transaction tracking for signature:',
-                    signature,
-                );
-
                 // Wait for confirmation
                 const isConfirmed = await this.trackTransactionConfirmation(
                     signature,
