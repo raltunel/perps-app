@@ -13,8 +13,9 @@ import React, {
     type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
+import { LuCircleHelp } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { PiSquaresFour } from 'react-icons/pi';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -32,7 +33,6 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
@@ -49,7 +49,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -72,12 +71,12 @@ const marketOrderTypes = [
         blurb: 'Buy/sell at the current price',
         icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
-    // {
-    //     value: 'limit',
-    //     label: 'Limit',
-    //     blurb: 'Buy/Sell at a specific price or better',
-    //     icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    // },
+    {
+        value: 'limit',
+        label: 'Limit',
+        blurb: 'Buy/Sell at a specific price or better',
+        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    },
     // disabled code 21 Jul 25
     // {
     //     value: 'stop_market',
@@ -216,6 +215,29 @@ function OrderInput({
         activeGroupSeparator,
         formatNum,
     } = useNumFormatter();
+
+    const getMidPrice = () => {
+        if (!buys.length || !sells.length) return null;
+        const midPrice = (buys[0].px + sells[0].px) / 2;
+        return midPrice;
+    };
+
+    useEffect(() => {
+        if (
+            marketOrderType === 'limit' &&
+            buys.length > 0 &&
+            sells.length > 0
+        ) {
+            const midPrice = getMidPrice();
+            if (!midPrice) return;
+            const formattedMidPrice = formatNumWithOnlyDecimals(
+                midPrice,
+                6,
+                true,
+            );
+            setPrice(formattedMidPrice);
+        }
+    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -435,7 +457,6 @@ function OrderInput({
         price,
         marketOrderType,
         markPx,
-        parseNum,
         parseFormattedNum,
     ]);
 
@@ -573,7 +594,7 @@ function OrderInput({
                         ? formatNumWithOnlyDecimals(
                               notionalSymbolQtyNum * markPx,
                               2,
-                              true,
+                              false,
                           )
                         : '',
                 );
@@ -698,14 +719,12 @@ function OrderInput({
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
-            setNotionalSymbolQtyNum(
-                Math.floor(
-                    (((value / 100) * usdAvailableToTrade) /
-                        (parseFormattedNum(price) || 1)) *
-                        leverage *
-                        100,
-                ) / 100,
-            );
+            if (!price || !usdAvailableToTrade) return;
+            const notionalSymbolQtyNum =
+                (((value / 100) * usdAvailableToTrade) /
+                    (parseFormattedNum(price) || 1)) *
+                leverage;
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
 
@@ -721,7 +740,7 @@ function OrderInput({
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(
             positionSliderPercentageValue,
         );
-    }, [usdAvailableToTrade]);
+    }, [usdAvailableToTrade, price]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -875,9 +894,10 @@ function OrderInput({
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            getMidPrice,
         }),
-        [price, handlePriceChange],
+        [price, handlePriceChange, marketOrderType, markPx],
     );
 
     const sizeInputProps = useMemo(

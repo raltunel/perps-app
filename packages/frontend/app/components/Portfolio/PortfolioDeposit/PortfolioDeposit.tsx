@@ -1,16 +1,18 @@
-import { useState, useCallback, memo, useMemo } from 'react';
-import styles from './PortfolioDeposit.module.css';
+import { memo, useCallback, useMemo, useState } from 'react';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { useDebouncedCallback } from '~/hooks/useDebounce';
+import styles from './PortfolioDeposit.module.css';
+// import { useDebouncedCallback } from '~/hooks/useDebounce';
+import { LuCircleHelp } from 'react-icons/lu';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import TokenDropdown, {
     AVAILABLE_TOKENS,
     type Token,
 } from '~/components/TokenDropdown/TokenDropdown';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import FogoLogo from '../../../assets/tokens/FOGO.svg';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { LuCircleHelp } from 'react-icons/lu';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
     portfolio: {
@@ -19,6 +21,7 @@ interface propsIF {
         availableBalance: number;
         unit?: string;
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onDeposit: (amount: number) => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
@@ -27,9 +30,13 @@ interface propsIF {
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
     const notificationStore = useNotificationStore();
-    const { formatNum } = useNumFormatter();
+    const {
+        formatNum,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+        activeDecimalSeparator,
+    } = useNumFormatter();
 
-    const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
@@ -43,51 +50,49 @@ function PortfolioDeposit(props: propsIF) {
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-    const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        setAmount(newValue);
-        setError(null);
-    }, 20);
+    const [rawInputString, setRawInputString] = useState('');
 
-    const handleInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            debouncedHandleChange(newValue);
-            // Clear transaction status when user starts typing
-            setTransactionStatus('idle');
-        },
-        [debouncedHandleChange],
-    );
+    const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
+
+    const isSizeInvalid: boolean =
+        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 10;
+
+    // debounced invalid state
+    const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
+
+    const showInvalidSizeWarning = isSizeInvalid
+        ? isSizeInvalidDebounced
+        : false;
 
     const handleMaxClick = useCallback(() => {
-        setAmount(availableBalance.toString());
+        setRawInputString('$' + formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
-        const depositAmount = parseFloat(amount);
         setError(null);
         setTransactionStatus('pending');
 
-        if (!depositAmount || isNaN(depositAmount)) {
+        if (!depositInputNum || isNaN(depositInputNum)) {
             setError('Please enter a valid amount');
             setTransactionStatus('idle');
             return;
         }
 
-        if (depositAmount <= 0) {
+        if (depositInputNum <= 0) {
             setError('Amount must be greater than 0');
             setTransactionStatus('idle');
             return;
         }
 
         // Check minimum deposit of $10
-        if (depositAmount < 10) {
+        if (depositInputNum < 10) {
             setError('Minimum deposit amount is $10.00');
             setTransactionStatus('idle');
             return;
         }
 
-        if (depositAmount > availableBalance) {
+        if (depositInputNum > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             setTransactionStatus('idle');
             return;
@@ -107,7 +112,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                onDeposit(depositAmount),
+                onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
@@ -117,12 +122,11 @@ function PortfolioDeposit(props: propsIF) {
                 setError(result.error || 'Transaction failed');
             } else {
                 setTransactionStatus('success');
-                setAmount(''); // Clear form on success
 
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited $${depositAmount.toFixed(2)} USD`,
+                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
                     icon: 'check',
                 });
 
@@ -135,41 +139,11 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [amount, availableBalance, onDeposit]);
+    }, [availableBalance, onDeposit, formatNum, depositInputNum]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
     }, []);
-
-    const USD_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }),
-        [],
-    );
-
-    const OTHER_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 8,
-            }),
-        [],
-    );
-
-    const formatCurrency = useCallback(
-        (value: number, unit: string) => {
-            if (unit === 'USD') {
-                return USD_FORMATTER.format(value);
-            }
-            return `${OTHER_FORMATTER.format(value)} ${unit}`;
-        },
-        [USD_FORMATTER, OTHER_FORMATTER],
-    );
 
     // Memoize info items to prevent recreating on each render
     const infoItems = useMemo(() => {
@@ -183,41 +157,36 @@ function PortfolioDeposit(props: propsIF) {
         return [
             {
                 label: 'Available to deposit',
-                value: isUSDToken
-                    ? formatNum(availableBalance, 2, true, true) // Use app formatter for USD values
-                    : formatCurrency(availableBalance, selectedToken.symbol),
+                value: formatNum(
+                    availableBalance,
+                    isUSDToken ? 2 : 8,
+                    true,
+                    isUSDToken,
+                ),
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
-            {
-                label: 'Network Fee',
-                value:
-                    selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
-                tooltip: 'Fee charged for processing the deposit transaction',
-            },
         ];
-    }, [
-        availableBalance,
-        selectedToken.symbol,
-        portfolio.unit,
-        formatCurrency,
-        formatNum,
-    ]);
-
-    // Check if amount is below minimum
-    const isBelowMinimum = useMemo(() => {
-        if (!amount) return false;
-        const depositAmount = parseFloat(amount);
-        return !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 10;
-    }, [amount]);
+    }, [availableBalance, selectedToken.symbol, portfolio.unit, formatNum]);
 
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
-            !amount ||
-            parseFloat(amount) <= 0 ||
-            parseFloat(amount) > availableBalance,
-        [isProcessing, amount, availableBalance],
+            !depositInputNum ||
+            depositInputNum <= 0 ||
+            depositInputNum > availableBalance,
+        [isProcessing, depositInputNum, availableBalance],
+    );
+
+    const handleDepositChange = useCallback(
+        (event: React.ChangeEvent<HTMLInputElement> | string) => {
+            if (typeof event === 'string') {
+                setRawInputString(event);
+            } else {
+                setRawInputString(event.target.value);
+            }
+        },
+        [],
     );
 
     return (
@@ -237,21 +206,28 @@ function PortfolioDeposit(props: propsIF) {
             <div className={styles.inputContainer}>
                 <h6>
                     Amount{' '}
-                    {isBelowMinimum && (
+                    {showInvalidSizeWarning && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
                 </h6>
-                <input
-                    type='text'
-                    value={amount}
-                    onChange={handleInputChange}
-                    aria-label='deposit input'
-                    inputMode='numeric'
-                    pattern='[0-9]*'
+                <NumFormattedInput
                     placeholder='Enter amount (min $10)'
-                    min='0'
-                    step='any'
-                    disabled={isProcessing}
+                    value={rawInputString}
+                    onChange={handleDepositChange}
+                    aria-label='deposit input'
+                    autoFocus
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (
+                            e.key === 'Enter' &&
+                            !isButtonDisabled &&
+                            !isSizeInvalid
+                        ) {
+                            handleDeposit();
+                        }
+                    }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
                 />
                 <button
                     onClick={handleMaxClick}
@@ -290,7 +266,7 @@ function PortfolioDeposit(props: propsIF) {
             <SimpleButton
                 bg='accent1'
                 onClick={handleDeposit}
-                disabled={isButtonDisabled || isBelowMinimum}
+                disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

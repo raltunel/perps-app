@@ -1,7 +1,8 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -9,7 +10,6 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -28,10 +28,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     };
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     const { symbol } = useTradeDataStore();
 
@@ -55,8 +55,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
-        return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${debugWallet.address}`;
-    }, [debugWallet.address]);
+        return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${userAddress}`;
+    }, [userAddress]);
 
     return (
         <>

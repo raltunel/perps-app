@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortTwapHistory } from '~/processors/processUserFills';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { TableState } from '~/utils/CommonIFs';
+import { useUserDataStore } from '~/stores/UserDataStore';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { TwapHistoryIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import HistoryTwapTableHeader from './HistoryTwapTableHeader';
 import HistoryTwapTableRow from './HistoryTwapTableRow';
-import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 interface HistoryTwapTableProps {
     data: TwapHistoryIF[];
     isFetched: boolean;
@@ -21,14 +19,14 @@ export default function HistoryTwapTable(props: HistoryTwapTableProps) {
 
     const { symbol } = useTradeDataStore();
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     const viewAllLink = useMemo(() => {
         return `${EXTERNAL_PAGE_URL_PREFIX}/twapHistory/${currentUserRef.current}`;
-    }, [debugWallet.address]);
+    }, [userAddress]);
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {

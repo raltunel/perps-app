@@ -7,12 +7,12 @@ import { useSdk } from '~/hooks/useSdk';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
 import { useViewed } from '~/stores/AlreadySeenStore';
 import { useAppOptions } from '~/stores/AppOptionsStore';
-import { useDebugStore } from '~/stores/DebugStore';
 import {
     useNotificationStore,
     type notificationIF,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import SimpleButton from '../SimpleButton/SimpleButton';
 import Notification from './Notification';
@@ -30,23 +30,23 @@ export default function Notifications() {
     const data: NotificationStoreIF = useNotificationStore();
     const backgroundFillNotifRef = useRef(false);
     backgroundFillNotifRef.current = enableBackgroundFillNotif;
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
     const { info } = useSdk();
 
     const { showReload, setShowReload } = useVersionCheck();
 
     useEffect(() => {
         if (!info) return;
-        if (!debugWallet.address) return;
+        if (!userAddress || userAddress === '') return;
         const { unsubscribe } = info.subscribe(
             {
                 type: WsChannels.NOTIFICATION,
-                user: debugWallet.address,
+                user: userAddress,
             },
             postNotification,
         );
         return unsubscribe;
-    }, [debugWallet, info]);
+    }, [userAddress, info]);
 
     const postNotification = useCallback((payload: NotificationMsg) => {
         if (!payload || !payload.data) return;
