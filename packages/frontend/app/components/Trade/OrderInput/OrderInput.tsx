@@ -1,7 +1,7 @@
 import {
-    type MarginBucketAvail,
-    calcMarginAvail,
     calcLiqPriceOnNewOrder,
+    calcMarginAvail,
+    type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
@@ -12,7 +12,6 @@ import React, {
     useState,
     type JSX,
 } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { GoZap } from 'react-icons/go';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiSquaresFour } from 'react-icons/pi';
@@ -30,8 +29,8 @@ import {
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
-import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -50,6 +49,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -588,6 +588,7 @@ function OrderInput({
     ]);
 
     useEffect(() => {
+        if (!usdAvailableToTrade) return;
         const percent = Math.min(
             (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
                 usdAvailableToTrade) *
@@ -595,7 +596,7 @@ function OrderInput({
             100,
         );
         setPositionSliderPercentageValue(percent);
-    }, [leverage]);
+    }, [leverage, !!usdAvailableToTrade]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
@@ -789,7 +790,7 @@ function OrderInput({
                             content={'price distribution'}
                             position='right'
                         >
-                            <AiOutlineQuestionCircle size={13} />
+                            <LuCircleHelp size={12} />
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
@@ -961,10 +962,6 @@ function OrderInput({
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
@@ -1018,10 +1015,6 @@ function OrderInput({
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                 });
-                // Reset position size after successful order
-                setNotionalSymbolQtyNum(0);
-                setPositionSliderPercentageValue(0);
-                setSizeDisplay('');
             } else {
                 // Show error notification
                 notifications.add({
@@ -1224,9 +1217,7 @@ function OrderInput({
                                             content={data?.tooltipLabel}
                                             position='right'
                                         >
-                                            <AiOutlineQuestionCircle
-                                                size={13}
-                                            />
+                                            <LuCircleHelp size={12} />
                                         </Tooltip>
                                     </div>
                                     <span className={styles.inputDetailValue}>

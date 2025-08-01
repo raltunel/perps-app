@@ -5,6 +5,11 @@ import {
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import {
+    DFLT_EMBER_MARKET,
+    getUserMarginBucket,
+    USD_MINT,
+} from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation } from 'react-router';
@@ -274,7 +279,7 @@ export default function PageHeader() {
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
                             }
                         >
-                            <AiOutlineQuestionCircle
+                            <LuCircleHelp
                                 size={18}
                                 color='var(--text2)'
                             />

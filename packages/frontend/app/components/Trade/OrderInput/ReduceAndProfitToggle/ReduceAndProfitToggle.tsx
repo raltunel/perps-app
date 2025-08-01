@@ -1,10 +1,10 @@
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import styles from './ReduceAndProfitToggle.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useState } from 'react';
 import { BsChevronDown } from 'react-icons/bs';
 import ChaseDistance from '../ChaseDistance/ChaseDistance';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -155,7 +155,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                 <div className={styles.inputDetailsLabel}>
                     <span>Chasing Interval</span>
                     <Tooltip content={'chasing interval'} position='right'>
-                        <AiOutlineQuestionCircle size={13} />
+                        <LuCircleHelp size={12} />
                     </Tooltip>
                 </div>
                 <span className={styles.inputDetailValue}>Atomic</span>
