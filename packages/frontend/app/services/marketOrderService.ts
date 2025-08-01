@@ -105,7 +105,7 @@ export class MarketOrderService {
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
-                    side: OrderSide.Bid,
+                    side: OrderSide.Ask,
                     qty: onChainQuantity,
                     price: BigInt('0'), // market order convention is to use 0
                     tif: { type: TimeInForce.IOC },

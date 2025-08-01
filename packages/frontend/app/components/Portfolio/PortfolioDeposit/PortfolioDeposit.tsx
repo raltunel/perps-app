@@ -1,7 +1,6 @@
 import { useState, useCallback, memo, useMemo } from 'react';
 import styles from './PortfolioDeposit.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 import TokenDropdown, {
     AVAILABLE_TOKENS,
@@ -11,6 +10,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface propsIF {
     portfolio: {
@@ -278,7 +278,7 @@ function PortfolioDeposit(props: propsIF) {
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

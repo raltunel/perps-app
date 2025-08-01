@@ -4,7 +4,7 @@ import styles from './symbolinfofield.module.css';
 import { motion } from 'framer-motion';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface SymbolInfoFieldProps {
     label: string;
@@ -85,7 +85,7 @@ const SymbolInfoField: React.FC<SymbolInfoFieldProps> = ({
                     {tooltipContent && (
                         <div className={styles.tooltip}>
                             <Tooltip content={tooltipContent} position='right'>
-                                <AiOutlineQuestionCircle size={13} />
+                                <LuCircleHelp size={12} />
                             </Tooltip>
                         </div>
                     )}
