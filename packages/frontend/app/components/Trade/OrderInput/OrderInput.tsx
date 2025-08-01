@@ -237,7 +237,7 @@ function OrderInput({
             );
             setPrice(formattedMidPrice);
         }
-    }, [marketOrderType, !buys.length, !sells.length, buys?.[0].coin]);
+    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
