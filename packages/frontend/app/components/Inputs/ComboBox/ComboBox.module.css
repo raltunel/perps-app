@@ -157,3 +157,11 @@
 .subInfo {
     color: var(--text2);
 }
+
+.walletSelector {
+    transition: all 0.2s ease-in-out;
+}
+
+.walletSelector.passive {
+    opacity: 0.5;
+}

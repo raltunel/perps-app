@@ -3,6 +3,7 @@ import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useApp } from '~/contexts/AppContext';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';

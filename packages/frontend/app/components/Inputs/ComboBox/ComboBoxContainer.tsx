@@ -57,22 +57,6 @@ export default function ComboBoxContainer() {
                     />
                 )}
             </div>
-            <div className={styles.walletSelector}>
-                <ComboBox
-                    value={debugWallet.label}
-                    options={debugWallets}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setDebugWallet({
-                            label: value,
-                            address:
-                                debugWallets.find(
-                                    (wallet) => wallet.label === value,
-                                )?.address || '',
-                        })
-                    }
-                />
-            </div>
             <div className={styles.currencySelector}>
                 <ComboBox
                     value={selectedCurrency}
@@ -108,6 +92,24 @@ export default function ComboBoxContainer() {
             </div>
 
             <div className={styles.divider} />
+            <div
+                className={`${styles.walletSelector} ${!isDebugWalletActive ? styles.passive : ' '}`}
+            >
+                <ComboBox
+                    value={debugWallet.label}
+                    options={debugWallets}
+                    fieldName='label'
+                    onChange={(value) =>
+                        setDebugWallet({
+                            label: value,
+                            address:
+                                debugWallets.find(
+                                    (wallet) => wallet.label === value,
+                                )?.address || '',
+                        })
+                    }
+                />
+            </div>
             <div
                 className={`${styles.sdkToggle} ${isDebugWalletActive ? styles.active : styles.disabled}`}
                 onClick={() => setIsDebugWalletActive(!isDebugWalletActive)}

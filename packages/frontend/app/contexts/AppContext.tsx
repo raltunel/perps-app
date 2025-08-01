@@ -32,7 +32,8 @@ export interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const [isUserConnected, setIsUserConnected] = useState(false);
 
-    const { isDebugWalletActive, debugWallet } = useDebugStore();
+    const { isDebugWalletActive, debugWallet, setDebugWallet } =
+        useDebugStore();
 
     const { setUserAddress } = useUserDataStore();
 
@@ -40,14 +41,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const sessionState = useSession();
     const [fogoAddress, setFogoAddress] = useState('');
-
-    useEffect(() => {
-        if (isEstablished(sessionState)) {
-            setFogoAddress(sessionState.walletPublicKey.toString());
-        } else {
-            setFogoAddress('');
-        }
-    }, [isEstablished(sessionState)]);
 
     const bindEmptyAddress = () => {
         setUserAddress(debugWallets[2].address);
@@ -59,9 +52,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             if (fogoAddress === '') {
                 bindEmptyAddress();
             } else {
-                fogoAddress.match(/^[a-zA-Z]/)
-                    ? setUserAddress(debugWallets[0].address)
-                    : setUserAddress(debugWallets[1].address);
+                const walletToSet = fogoAddress.match(/^[a-zA-Z]/)
+                    ? debugWallets[0]
+                    : debugWallets[1];
+                setUserAddress(walletToSet.address);
+                setDebugWallet(walletToSet);
             }
         } else {
             if (fogoAddress === '') {
@@ -71,6 +66,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
             }
         }
     }, [fogoAddress, isDebugWalletActive]);
+
+    useEffect(() => {
+        if (isEstablished(sessionState)) {
+            setFogoAddress(sessionState.walletPublicKey.toString());
+            assignDefaultAddress();
+        } else {
+            bindEmptyAddress();
+        }
+    }, [isEstablished(sessionState)]);
 
     useEffect(() => {
         assignDefaultAddress();

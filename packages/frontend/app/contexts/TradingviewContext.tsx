@@ -9,7 +9,10 @@ import React, {
 import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
-import { createDataFeed } from '~/routes/chart/data/customDataFeed';
+import {
+    createDataFeed,
+    type CustomDataFeedType,
+} from '~/routes/chart/data/customDataFeed';
 import {
     drawingEvent,
     drawingEventUnsubscribe,
@@ -42,7 +45,6 @@ import {
     widget,
     type IBasicDataFeed,
     type IChartingLibraryWidget,
-    type IDatafeedChartApi,
     type ResolutionString,
     type TradingTerminalFeatureset,
 } from '~/tv/charting_library';
@@ -91,7 +93,7 @@ export const TradingViewProvider: React.FC<{
         chartState?.interval,
     );
 
-    const dataFeedRef = useRef<IDatafeedChartApi | null>(null);
+    const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
@@ -473,8 +475,13 @@ export const TradingViewProvider: React.FC<{
     }, [symbol]);
 
     useEffect(() => {
-        setIsChartReady(false);
-    }, [userAddress]);
+        if (dataFeedRef.current && userAddress && chart) {
+            chart.chart().clearMarks();
+            dataFeedRef.current.updateUserAddress(userAddress);
+            getMarkFillData(symbol, userAddress);
+            chart.chart().refreshMarks();
+        }
+    }, [userAddress, chart, symbol]);
 
     useEffect(() => {
         if (!chart) return;
@@ -483,17 +490,6 @@ export const TradingViewProvider: React.FC<{
         intervalChangedSubscribe(chart, setIsChartReady);
         visibleRangeChangedSubscribe(chart);
     }, [chart]);
-
-    useEffect(() => {
-        if (userAddress) {
-            getMarkFillData(symbol, userAddress).then(() => {
-                if (chart) {
-                    chart.chart().clearMarks();
-                    showBuysSellsOnChart && chart.chart().refreshMarks();
-                }
-            });
-        }
-    }, [userAddress, chart, symbol]);
 
     useEffect(() => {
         if (chart) {
