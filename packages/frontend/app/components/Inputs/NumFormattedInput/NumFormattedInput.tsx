@@ -13,6 +13,7 @@ interface NumFormattedInputProps {
     ariaLabel?: string;
     placeholder?: string;
     inputRegexOverride?: RegExp;
+    autoFocus?: boolean;
 }
 
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
@@ -26,6 +27,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     ariaLabel,
     placeholder,
     inputRegexOverride,
+    autoFocus,
 }) => {
     const {
         inputRegex,
@@ -86,6 +88,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 inputMode='numeric'
                 pattern='[0-9]*'
                 placeholder={placeholder}
+                autoFocus={autoFocus}
             />
         </>
     );
