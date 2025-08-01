@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useApp } from '~/contexts/AppContext';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -12,8 +14,8 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -61,9 +63,9 @@ export default function WebDataConsumer() {
 
     const sessionState = useSession();
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet?.address?.toLowerCase();
+    addressRef.current = userAddress?.toLowerCase();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -124,11 +126,15 @@ export default function WebDataConsumer() {
         activeTwapsRef.current = [];
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
+        resetRefs();
 
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
-            { type: WsChannels.WEB_DATA2, user: debugWallet.address },
+            { type: WsChannels.WEB_DATA2, user: userAddress },
             postWebData2,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
+            },
         );
 
         // Also subscribe to webData2 on market socket for market data
@@ -142,7 +148,7 @@ export default function WebDataConsumer() {
                     postWebData2MarketOnly(msg);
                 };
                 const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
+                    { type: WsChannels.WEB_DATA2, user: userAddress },
                     marketDataCallback,
                 );
                 unsubscribeMarketData = result.unsubscribe;
@@ -152,38 +158,60 @@ export default function WebDataConsumer() {
         const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
             {
                 type: WsChannels.USER_HISTORICAL_ORDERS,
-                user: debugWallet.address,
+                user: userAddress,
             },
             postUserHistoricalOrders,
+            () => {
+                fetchedChannelsRef.current.add(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                );
+            },
         );
 
         const { unsubscribe: unsubscribeUserFills } = info.subscribe(
-            { type: WsChannels.USER_FILLS, user: debugWallet.address },
+            { type: WsChannels.USER_FILLS, user: userAddress },
             postUserFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
-            { type: WsChannels.TWAP_SLICE_FILLS, user: debugWallet.address },
+            { type: WsChannels.TWAP_SLICE_FILLS, user: userAddress },
             postUserTwapSliceFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
-            { type: WsChannels.TWAP_HISTORY, user: debugWallet.address },
+            { type: WsChannels.TWAP_HISTORY, user: userAddress },
             postUserTwapHistory,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+            },
         );
 
         const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
-            { type: WsChannels.USER_FUNDINGS, user: debugWallet.address },
+            { type: WsChannels.USER_FUNDINGS, user: userAddress },
             postUserFundings,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserNonFundingLedgerUpdates } =
             info.subscribe(
                 {
                     type: WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
-                    user: debugWallet.address,
+                    user: userAddress,
                 },
                 postUserNonFundingLedgerUpdates,
+                () => {
+                    fetchedChannelsRef.current.add(
+                        WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                    );
+                },
             );
 
         const userDataInterval = setInterval(() => {
@@ -226,7 +254,7 @@ export default function WebDataConsumer() {
             unsubscribeUserFundings();
             unsubscribeUserNonFundingLedgerUpdates();
         };
-    }, [debugWallet.address, info]);
+    }, [userAddress, info]);
 
     useEffect(() => {
         acccountOverviewPrevRef.current = accountOverview;
