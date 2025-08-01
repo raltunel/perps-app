@@ -232,7 +232,7 @@ function OrderInput({
             if (!midPrice) return;
             const formattedMidPrice = formatNumWithOnlyDecimals(
                 midPrice,
-                8,
+                6,
                 true,
             );
             setPrice(formattedMidPrice);
@@ -894,7 +894,7 @@ function OrderInput({
             className: 'custom-input',
             ariaLabel: 'Price input',
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
-            markPx,
+            getMidPrice,
         }),
         [price, handlePriceChange, marketOrderType, markPx],
     );
