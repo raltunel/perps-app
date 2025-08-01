@@ -14,9 +14,11 @@ import React, {
     type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
-import { LuCircleHelp } from 'react-icons/lu';
+import { LuCircleHelp, LuOctagonX } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
+import { RiBarChartHorizontalLine } from 'react-icons/ri';
+import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -51,9 +53,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { LuCircleHelp, LuOctagonX } from 'react-icons/lu';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
 
 export interface OrderTypeOption {
     value: string;
