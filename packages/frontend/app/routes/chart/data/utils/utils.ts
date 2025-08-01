@@ -43,8 +43,9 @@ export function resolutionToSeconds(resolution: string): number {
 
 export function resolutionToSecondsMiliSeconds(resolution: string): number {
     if (resolution === '1D') return 86400000;
-    if (resolution === 'W') return 604800000;
-    if (resolution === 'M') return 2629746000;
+    if (resolution === '3D') return 3 * 86400000;
+    if (resolution === '1W') return 604800000;
+    if (resolution === '1M') return 2629746000;
 
     return Number(resolution) * 60 * 1000;
 }
