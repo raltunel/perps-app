@@ -33,7 +33,6 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
@@ -435,7 +434,6 @@ function OrderInput({
         price,
         marketOrderType,
         markPx,
-        parseNum,
         parseFormattedNum,
     ]);
 

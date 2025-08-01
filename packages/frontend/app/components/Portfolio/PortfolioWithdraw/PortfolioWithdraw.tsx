@@ -199,8 +199,9 @@ function PortfolioWithdraw({
         () =>
             isProcessing ||
             !rawInputString ||
-            parseFloat(rawInputString) <= 0 ||
-            parseFloat(rawInputString) > portfolio.availableBalance,
+            parseFormattedWithOnlyDecimals(rawInputString) <= 0 ||
+            parseFormattedWithOnlyDecimals(rawInputString) >
+                portfolio.availableBalance,
         [isProcessing, rawInputString, portfolio.availableBalance],
     );
 
