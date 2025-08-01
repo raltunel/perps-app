@@ -841,6 +841,7 @@ function OrderInput({
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
+            minimumValue: 5,
         }),
         [leverage, handleLeverageChange],
     );

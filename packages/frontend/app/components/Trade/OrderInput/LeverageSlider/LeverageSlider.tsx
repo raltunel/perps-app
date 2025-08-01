@@ -14,6 +14,7 @@ interface LeverageSliderProps {
     modalMode?: boolean;
     maxLeverage?: number;
     hideTitle?: boolean;
+    minimumValue?: number;
 }
 
 const LEVERAGE_CONFIG = {
@@ -73,6 +74,7 @@ export default function LeverageSlider({
     modalMode = false,
     maxLeverage,
     hideTitle = false,
+    minimumValue,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -88,6 +90,9 @@ export default function LeverageSlider({
         : symbolInfo?.coin === 'BTC'
           ? 100
           : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+
+    const effectiveMinimum =
+        minimumValue !== undefined ? minimumValue : minimumInputValue;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -143,8 +148,13 @@ export default function LeverageSlider({
     };
 
     const constrainValue = (val: number): number => {
-        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+        return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
+
+    // Check if current value is at the minimum threshold
+    const isAtMinimumThreshold =
+        minimumValue !== undefined &&
+        Math.abs(currentValue - minimumValue) < 0.01;
     const announceValueChange = (value: number) => {
         const formattedValue = formatValue(value);
         setAnnounceText('');
@@ -719,7 +729,14 @@ export default function LeverageSlider({
                 className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
             >
                 {!hideTitle && (
-                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    <div className={styles.titleWithWarning}>
+                        <h3 className={styles.containerTitle}>Leverage</h3>
+                        {isAtMinimumThreshold && (
+                            <div className={styles.minimumWarning}>
+                                Minimum leverage reached
+                            </div>
+                        )}
+                    </div>
                 )}
 
                 {/* Input at top for modal mode */}
@@ -922,8 +939,16 @@ export default function LeverageSlider({
         <div
             className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
         >
-            {!hideTitle && <h3 className={styles.containerTitle}>Leverage</h3>}
-
+            {!hideTitle && (
+                <div className={styles.titleWithWarning}>
+                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    {isAtMinimumThreshold && (
+                        <div className={styles.minimumWarning}>
+                            Minimum leverage reached
+                        </div>
+                    )}
+                </div>
+            )}
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -1106,6 +1131,7 @@ export default function LeverageSlider({
                     <span className={styles.valueSuffix}>x</span>
                 </div>
             </div>
+
             <div
                 aria-live='assertive'
                 aria-atomic='true'
