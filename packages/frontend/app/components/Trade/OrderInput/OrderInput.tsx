@@ -548,6 +548,7 @@ function OrderInput({
         /* ----------------------------------------------------------------------------------------------- */
 
         if (obChosenPrice > 0) {
+            setIsMidModeActive(false);
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
@@ -696,6 +697,7 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
+        setIsMidModeActive(false);
         if (typeof event === 'string') {
             setPrice(event);
         } else {
