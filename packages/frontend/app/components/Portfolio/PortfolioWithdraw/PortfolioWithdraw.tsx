@@ -1,11 +1,12 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import Tooltip from '~/components/Tooltip/Tooltip';
-import { useDebouncedCallback } from '~/hooks/useDebounce';
-import styles from './PortfolioWithdraw.module.css';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import FogoLogo from '../../../assets/tokens/FOGO.svg';
-import { useNotificationStore } from '~/stores/NotificationStore';
 import { LuCircleHelp } from 'react-icons/lu';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import styles from './PortfolioWithdraw.module.css';
 
 interface propsIF {
     portfolio: {
@@ -26,17 +27,22 @@ function PortfolioWithdraw({
     isProcessing = false,
 }: propsIF) {
     const notificationStore = useNotificationStore();
-    const [amount, setAmount] = useState<string>('');
+    const [rawInputString, setRawInputString] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
 
-    const unitValue = portfolio.unit || 'fUSD';
+    const {
+        formatNum,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+        activeDecimalSeparator,
+    } = useNumFormatter();
 
-    // const isValidNumberInput = useCallback(() => {
-    //     return true
-    // }, []);
+    const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
+
+    const unitValue = portfolio.unit || 'fUSD';
 
     const USD_FORMATTER = useMemo(
         () =>
@@ -96,28 +102,13 @@ function PortfolioWithdraw({
         };
     }, []);
 
-    const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        setAmount(newValue);
-        setError(null);
-    }, 20);
-
-    const handleInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            debouncedHandleChange(newValue);
-            // Clear transaction status when user starts typing
-            setTransactionStatus('idle');
-        },
-        [debouncedHandleChange],
-    );
-
     const handleMaxClick = useCallback(() => {
-        setAmount(portfolio.availableBalance.toString());
-        setError(null);
+        setRawInputString(
+            '$' + formatNumWithOnlyDecimals(portfolio.availableBalance),
+        );
     }, [portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
-        const withdrawAmount = parseFloat(amount);
         setError(null);
         setTransactionStatus('pending');
 
@@ -156,12 +147,11 @@ function PortfolioWithdraw({
                 setError(result.error || 'Transaction failed');
             } else {
                 setTransactionStatus('success');
-                setAmount(''); // Clear form on success
 
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
-                    message: `Successfully withdrew $${withdrawAmount.toFixed(2)} USD`,
+                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} USD`,
                     icon: 'check',
                 });
 
@@ -177,7 +167,7 @@ function PortfolioWithdraw({
             );
         }
     }, [
-        amount,
+        withdrawAmount,
         portfolio.availableBalance,
         onWithdraw,
         validateAmount,
@@ -208,10 +198,10 @@ function PortfolioWithdraw({
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
-            !amount ||
-            parseFloat(amount) <= 0 ||
-            parseFloat(amount) > portfolio.availableBalance,
-        [isProcessing, amount, portfolio.availableBalance],
+            !rawInputString ||
+            parseFloat(rawInputString) <= 0 ||
+            parseFloat(rawInputString) > portfolio.availableBalance,
+        [isProcessing, rawInputString, portfolio.availableBalance],
     );
 
     return (
@@ -232,17 +222,28 @@ function PortfolioWithdraw({
 
             <div className={styles.inputContainer}>
                 <h6>Amount</h6>
-                <input
-                    type='text'
-                    value={amount}
-                    onChange={handleInputChange}
-                    aria-label='withdraw input'
-                    inputMode='numeric'
-                    pattern='[0-9]*'
+                <NumFormattedInput
                     placeholder='Enter amount'
-                    min='0'
-                    step='any'
-                    disabled={isProcessing}
+                    value={rawInputString}
+                    onChange={(
+                        event: string | React.ChangeEvent<HTMLInputElement>,
+                    ) => {
+                        if (typeof event === 'string') {
+                            setRawInputString(event);
+                        } else {
+                            setRawInputString(event.target.value);
+                        }
+                    }}
+                    autoFocus
+                    aria-label='withdraw input'
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === 'Enter' && !isButtonDisabled) {
+                            handleWithdraw();
+                        }
+                    }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max

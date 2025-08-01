@@ -1,16 +1,16 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
 export default function BalancesTable() {
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     const { userBalances, fetchedChannels } = useTradeDataStore();
 
