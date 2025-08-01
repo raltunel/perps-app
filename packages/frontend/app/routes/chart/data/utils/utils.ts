@@ -207,9 +207,9 @@ export function customThemes() {
         const darkerColors = interpolate(color, '#000000');
 
         if (color === '#7371FC') {
-            const perpColorGrades = [];
+            const perpColorGrades = ['rgba(115, 113, 252, 0.3)'];
 
-            for (let i = 0; i < 19; i++) {
+            for (let i = 0; i < 18; i++) {
                 perpColorGrades.push('#7371FC');
             }
             colorGradeArr.push(perpColorGrades as ColorGradient);
