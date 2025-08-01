@@ -573,7 +573,7 @@ function OrderInput({
                         ? formatNumWithOnlyDecimals(
                               notionalSymbolQtyNum * markPx,
                               2,
-                              true,
+                              false,
                           )
                         : '',
                 );
@@ -698,19 +698,11 @@ function OrderInput({
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
+            if (!price || !usdAvailableToTrade) return;
             const notionalSymbolQtyNum =
-                Math.floor(
-                    (((value / 100) * usdAvailableToTrade) /
-                        (parseFormattedNum(price) || 1)) *
-                        leverage *
-                        100,
-                ) / 100;
-            console.log({
-                notionalSymbolQtyNum,
-                usdAvailableToTrade,
-                price,
-                leverage,
-            });
+                (((value / 100) * usdAvailableToTrade) /
+                    (parseFormattedNum(price) || 1)) *
+                leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
@@ -727,7 +719,7 @@ function OrderInput({
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(
             positionSliderPercentageValue,
         );
-    }, [usdAvailableToTrade]);
+    }, [usdAvailableToTrade, price]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
