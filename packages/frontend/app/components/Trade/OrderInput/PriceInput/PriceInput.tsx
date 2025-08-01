@@ -1,4 +1,5 @@
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './PriceInput.module.css';
 
 interface PropsIF {
@@ -9,6 +10,7 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     showMidButton: boolean;
+    markPx?: number;
 }
 export default function PriceInput(props: PropsIF) {
     const {
@@ -19,7 +21,10 @@ export default function PriceInput(props: PropsIF) {
         className,
         ariaLabel,
         showMidButton,
+        markPx,
     } = props;
+
+    const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     return (
         <div
@@ -36,7 +41,18 @@ export default function PriceInput(props: PropsIF) {
                 placeholder='Enter Price'
             />
             {showMidButton && (
-                <button className={styles.midButton}>Mid </button>
+                <button
+                    className={styles.midButton}
+                    onClick={() =>
+                        onChange(
+                            markPx
+                                ? formatNumWithOnlyDecimals(markPx, 6, true)
+                                : '',
+                        )
+                    }
+                >
+                    Mid{' '}
+                </button>
             )}
         </div>
     );
