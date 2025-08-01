@@ -33,7 +33,6 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
@@ -216,6 +215,29 @@ function OrderInput({
         activeGroupSeparator,
         formatNum,
     } = useNumFormatter();
+
+    const getMidPrice = () => {
+        if (!buys.length || !sells.length) return null;
+        const midPrice = (buys[0].px + sells[0].px) / 2;
+        return midPrice;
+    };
+
+    useEffect(() => {
+        if (
+            marketOrderType === 'limit' &&
+            buys.length > 0 &&
+            sells.length > 0
+        ) {
+            const midPrice = getMidPrice();
+            if (!midPrice) return;
+            const formattedMidPrice = formatNumWithOnlyDecimals(
+                midPrice,
+                6,
+                true,
+            );
+            setPrice(formattedMidPrice);
+        }
+    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -435,7 +457,6 @@ function OrderInput({
         price,
         marketOrderType,
         markPx,
-        parseNum,
         parseFormattedNum,
     ]);
 
@@ -874,7 +895,7 @@ function OrderInput({
             className: 'custom-input',
             ariaLabel: 'Price input',
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
-            markPx,
+            getMidPrice,
         }),
         [price, handlePriceChange, marketOrderType, markPx],
     );
