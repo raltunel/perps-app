@@ -1,11 +1,11 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDebouncedCallback } from '~/hooks/useDebounce';
 import styles from './PortfolioWithdraw.module.css';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface propsIF {
     portfolio: {
@@ -265,7 +265,7 @@ function PortfolioWithdraw({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

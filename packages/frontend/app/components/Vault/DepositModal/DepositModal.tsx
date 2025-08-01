@@ -1,8 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import styles from './DepositModal.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import { LuChevronDown } from 'react-icons/lu';
+import { LuChevronDown, LuCircleHelp } from 'react-icons/lu';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useNotificationStore } from '~/stores/NotificationStore';
@@ -309,7 +308,7 @@ export default function DepositModal({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>

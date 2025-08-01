@@ -136,18 +136,20 @@ export const TradingViewProvider: React.FC<{
             });
 
             if (chart) {
-                const volumeStudyId = chart
+                const volumeStudies = chart
                     .activeChart()
                     .getAllStudies()
-                    .find((x) => x.name === 'Volume');
+                    .filter((x) => x.name === 'Volume');
 
-                if (volumeStudyId) {
-                    const volume = chart
-                        .activeChart()
-                        .getStudyById(volumeStudyId.id);
-                    volume.applyOverrides({
-                        'volume.color.0': c.buy,
-                        'volume.color.1': c.sell,
+                if (volumeStudies) {
+                    volumeStudies.forEach((item) => {
+                        const volume = chart
+                            .activeChart()
+                            .getStudyById(item.id);
+                        volume.applyOverrides({
+                            'volume.color.0': c.sell,
+                            'volume.color.1': c.buy,
+                        });
                     });
                 }
             }
@@ -190,6 +192,16 @@ export const TradingViewProvider: React.FC<{
 
                 saveChartLayout(chart);
                 showBuysSellsOnChart && chart.chart().refreshMarks();
+            });
+
+            chart.subscribe('study_event', (studyId) => {
+                const studyElement = chart.activeChart().getStudyById(studyId);
+
+                const colors = getBsColor();
+                studyElement.applyOverrides({
+                    'volume.color.0': colors.sell,
+                    'volume.color.1': colors.buy,
+                });
             });
         }
     }, [chart]);
@@ -397,6 +409,13 @@ export const TradingViewProvider: React.FC<{
             iframe?.contentDocument || iframe?.contentWindow?.document;
 
         const blockSymbolSearchKeys = (e: KeyboardEvent) => {
+            const target = e.target as HTMLElement;
+
+            const isInInput = target && target.tagName === 'INPUT';
+            const isInTextArea = target && target.tagName === 'TEXTAREA';
+
+            if (isInInput || isInTextArea) return;
+
             const isSingleChar = e.key.length === 1;
             const isAlphaNumeric = /^[a-zA-Z0-9]$/.test(e.key);
 

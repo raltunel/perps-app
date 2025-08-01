@@ -52,6 +52,10 @@ export default function PositionSize({
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
+    const currentValueRef = useRef<number>(currentValue);
+    useEffect(() => {
+        currentValueRef.current = currentValue;
+    }, [currentValue]);
 
     // Update internal value when prop changes (but not during drag)
     useEffect(() => {
@@ -139,7 +143,7 @@ export default function PositionSize({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, onChange]);
+    }, [isDragging]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         (e.target as HTMLElement).focus();
@@ -169,7 +173,48 @@ export default function PositionSize({
         setCurrentValue(snappedValue);
         onChange(snappedValue);
     };
+    const handleTrackTouchStart = (e: React.TouchEvent) => {
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
 
+        if (!e.touches[0]) return;
+
+        // Get the percentage directly from touch position
+        const percentage = getPercentageFromPosition(e.touches[0].clientX);
+
+        let snappedValue = percentage;
+
+        // Check for marker snapping (same logic as handleTrackClick)
+        POSITION_SIZE_CONFIG.VISUAL_MARKERS.forEach((marker) => {
+            const distance = Math.abs(marker.value - percentage);
+            if (distance <= POSITION_SIZE_CONFIG.MARKER_SNAP_TOLERANCE) {
+                snappedValue = marker.value;
+            }
+        });
+
+        snappedValue = Math.min(
+            POSITION_SIZE_CONFIG.MAX_VALUE,
+            Math.max(POSITION_SIZE_CONFIG.MIN_VALUE, snappedValue),
+        );
+
+        setCurrentValue(snappedValue);
+        onChange(snappedValue);
+        setIsDragging(true);
+        e.preventDefault();
+    };
+    const handleTrackMouseDown = (e: React.MouseEvent) => {
+        // Don't interfere if clicking on the knob
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
+
+        // Handle the click first
+        handleTrackClick(e);
+
+        setIsDragging(true);
+        e.preventDefault();
+    };
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value.replace(/[^\d]/g, ''); // Remove non-numeric
         const newValue = parseInt(rawValue);
@@ -204,6 +249,39 @@ export default function PositionSize({
             e.currentTarget.blur();
         }
     };
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        let newValue = currentValue;
+        const step = 5; // 5% increments
+
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                newValue = Math.min(
+                    POSITION_SIZE_CONFIG.MAX_VALUE,
+                    currentValue + step,
+                );
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                newValue = Math.max(
+                    POSITION_SIZE_CONFIG.MIN_VALUE,
+                    currentValue - step,
+                );
+                break;
+            case 'Home':
+                newValue = POSITION_SIZE_CONFIG.MIN_VALUE;
+                break;
+            case 'End':
+                newValue = POSITION_SIZE_CONFIG.MAX_VALUE;
+                break;
+            default:
+                return;
+        }
+
+        e.preventDefault();
+        setCurrentValue(newValue);
+        onChange(newValue);
+    };
 
     return (
         <div className={`${styles.positionSliderContainer} ${className} `}>
@@ -212,7 +290,16 @@ export default function PositionSize({
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
-                        onClick={handleTrackClick}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Position size percentage'
+                        aria-valuemin={POSITION_SIZE_CONFIG.MIN_VALUE}
+                        aria-valuemax={POSITION_SIZE_CONFIG.MAX_VALUE}
+                        aria-valuenow={currentValue}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
+                        onMouseDown={handleTrackMouseDown}
+                        onTouchStart={handleTrackTouchStart}
                     >
                         {/* Gray background track */}
                         <div className={styles.sliderBackground}></div>
@@ -249,7 +336,7 @@ export default function PositionSize({
 
                         {/* Draggable knob */}
                         <div
-                            tabIndex={-1}
+                            // tabIndex={-1}
                             ref={knobRef}
                             className={styles.sliderKnob}
                             style={{

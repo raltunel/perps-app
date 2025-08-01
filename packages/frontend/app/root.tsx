@@ -162,9 +162,7 @@ export default function App() {
             <Layout>
                 <FogoSessionProvider
                     endpoint='https://testnet.fogo.io/'
-                    {...(window.location.hostname === 'localhost' && {
-                        domain: 'https://perps.ambient.finance',
-                    })}
+                    domain='https://perps.ambient.finance'
                     tokens={[
                         // NATIVE_MINT.toBase58(),
                         'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',

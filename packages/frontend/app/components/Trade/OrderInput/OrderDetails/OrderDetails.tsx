@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderDetails.module.css';
+import { LuCircleHelp } from 'react-icons/lu';
 
 interface MarketInfoItem {
     label: string;
@@ -73,14 +73,14 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 tooltipLabel: 'order value',
                 value: usdOrderValue
                     ? formatNum(usdOrderValue, null, true, true)
-                    : 'N/A',
+                    : '-',
             },
             {
                 label: 'Margin Required',
                 tooltipLabel: 'margin required',
                 value: marginRequired
                     ? formatNum(marginRequired, null, true, true)
-                    : 'N/A',
+                    : '-',
             },
         ];
         return arr.filter(Boolean) as MarketInfoItem[];
@@ -184,7 +184,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                                         content={data.tooltipLabel}
                                         position='right'
                                     >
-                                        <AiOutlineQuestionCircle size={13} />
+                                        <LuCircleHelp size={12} />
                                     </Tooltip>
                                 </div>
                                 <span className={styles.detail_value}>
