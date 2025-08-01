@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
@@ -151,10 +157,84 @@ export default function LeverageSlider({
         return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
 
-    // Check if current value is at the minimum threshold
-    const isAtMinimumThreshold =
-        minimumValue !== undefined &&
-        Math.abs(currentValue - minimumValue) < 0.01;
+    const [showMinimumWarning, setShowMinimumWarning] = useState(false);
+    const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
+        null,
+    );
+    const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
+
+    // Check conditions for showing minimum warning
+    const shouldShowInteractiveWarning = useMemo(() => {
+        if (minimumValue === undefined) return false;
+
+        // Show if user is dragging AND current value is below minimum
+        const isDraggingBelowMinimum =
+            isDragging && currentValue <= minimumValue + 0.01;
+
+        // Show if user is hovering below minimum (but not dragging)
+        const isHoveringBelowMinimum =
+            !isDragging &&
+            isHovering &&
+            hoverValue !== null &&
+            hoverValue <= minimumValue + 0.01;
+
+        return isDraggingBelowMinimum || isHoveringBelowMinimum;
+    }, [minimumValue, currentValue, isDragging, isHovering, hoverValue]);
+
+    // Effect to handle warning display logic
+    useEffect(() => {
+        if (minimumValue === undefined) return;
+
+        const isCurrentAtMinimum = Math.abs(currentValue - minimumValue) < 0.01;
+
+        if (shouldShowInteractiveWarning) {
+            // Show immediately for interactive conditions and stop any auto-hide
+            setShowMinimumWarning(true);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
+            // Show warning when reaching minimum for the first time, then auto-hide after 3 seconds
+            setShowMinimumWarning(true);
+            setHasShownMinimumWarning(true);
+
+            const timeout = setTimeout(() => {
+                setShowMinimumWarning(false);
+                setWarningTimeout(null);
+            }, 3000);
+
+            setWarningTimeout(timeout);
+        } else if (!isCurrentAtMinimum) {
+            // Reset the "has shown" flag and hide warning when user moves above minimum
+            setHasShownMinimumWarning(false);
+            setShowMinimumWarning(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
+            // Hide warning when interactive conditions stop and we've already shown the minimum warning
+            setShowMinimumWarning(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        }
+
+        return () => {
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+            }
+        };
+    }, [
+        currentValue,
+        minimumValue,
+        shouldShowInteractiveWarning,
+        hasShownMinimumWarning,
+        warningTimeout,
+    ]);
+
     const announceValueChange = (value: number) => {
         const formattedValue = formatValue(value);
         setAnnounceText('');
@@ -731,7 +811,7 @@ export default function LeverageSlider({
                 {!hideTitle && (
                     <div className={styles.titleWithWarning}>
                         <h3 className={styles.containerTitle}>Leverage</h3>
-                        {isAtMinimumThreshold && (
+                        {showMinimumWarning && (
                             <div className={styles.minimumWarning}>
                                 Minimum leverage reached
                             </div>
@@ -942,7 +1022,7 @@ export default function LeverageSlider({
             {!hideTitle && (
                 <div className={styles.titleWithWarning}>
                     <h3 className={styles.containerTitle}>Leverage</h3>
-                    {isAtMinimumThreshold && (
+                    {showMinimumWarning && (
                         <div className={styles.minimumWarning}>
                             Minimum leverage reached
                         </div>
