@@ -184,12 +184,6 @@ function PortfolioWithdraw({
                 tooltip:
                     'The total amount you have available to withdraw from your portfolio',
             },
-            {
-                label: 'Network Fee',
-                value: unitValue === 'USD' ? '$0.001' : '0.0001 BTC',
-                tooltip:
-                    'Fee charged for processing the withdrawal transaction',
-            },
         ],
         [portfolio.availableBalance, unitValue, formatCurrency],
     );
@@ -213,11 +207,6 @@ function PortfolioWithdraw({
                 <h4>Withdraw fUSD to Fogo</h4>
                 <div>
                     <p>fUSD will be sent to your address.</p>
-                    <p>
-                        A {unitValue === 'USD' ? '$0.001' : '0.0001 BTC'} fee
-                        will be deducted from the fUSD withdrawn.
-                    </p>
-                    <p>Withdrawals should arrive within 5 minutes.</p>
                 </div>
             </div>
 

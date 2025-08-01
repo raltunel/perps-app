@@ -193,12 +193,6 @@ function PortfolioDeposit(props: propsIF) {
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
-            {
-                label: 'Network Fee',
-                value:
-                    selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
-                tooltip: 'Fee charged for processing the deposit transaction',
-            },
         ];
     }, [
         availableBalance,
