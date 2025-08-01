@@ -10,7 +10,7 @@ interface PropsIF {
     className?: string;
     ariaLabel?: string;
     showMidButton: boolean;
-    markPx?: number;
+    getMidPrice: () => number | null;
 }
 export default function PriceInput(props: PropsIF) {
     const {
@@ -21,7 +21,7 @@ export default function PriceInput(props: PropsIF) {
         className,
         ariaLabel,
         showMidButton,
-        markPx,
+        getMidPrice,
     } = props;
 
     const { formatNumWithOnlyDecimals } = useNumFormatter();
@@ -45,9 +45,11 @@ export default function PriceInput(props: PropsIF) {
                     className={styles.midButton}
                     onClick={() =>
                         onChange(
-                            markPx
-                                ? formatNumWithOnlyDecimals(markPx, 6, true)
-                                : '',
+                            formatNumWithOnlyDecimals(
+                                getMidPrice() || 0,
+                                6,
+                                true,
+                            ),
                         )
                     }
                 >

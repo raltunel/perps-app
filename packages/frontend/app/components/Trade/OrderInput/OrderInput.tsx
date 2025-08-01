@@ -216,6 +216,29 @@ function OrderInput({
         formatNum,
     } = useNumFormatter();
 
+    const getMidPrice = () => {
+        if (!buys.length || !sells.length) return null;
+        const midPrice = (buys[0].px + sells[0].px) / 2;
+        return midPrice;
+    };
+
+    useEffect(() => {
+        if (
+            marketOrderType === 'limit' &&
+            buys.length > 0 &&
+            sells.length > 0
+        ) {
+            const midPrice = getMidPrice();
+            if (!midPrice) return;
+            const formattedMidPrice = formatNumWithOnlyDecimals(
+                midPrice,
+                6,
+                true,
+            );
+            setPrice(formattedMidPrice);
+        }
+    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
+
     const confirmOrderModal = useModal<modalContentT>('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
@@ -871,7 +894,7 @@ function OrderInput({
             className: 'custom-input',
             ariaLabel: 'Price input',
             showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
-            markPx,
+            getMidPrice,
         }),
         [price, handlePriceChange, marketOrderType, markPx],
     );
