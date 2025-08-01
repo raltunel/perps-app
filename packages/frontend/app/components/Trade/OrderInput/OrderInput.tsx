@@ -13,8 +13,9 @@ import React, {
     type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
+import { LuCircleHelp } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { PiSquaresFour } from 'react-icons/pi';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -49,7 +50,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -72,12 +72,12 @@ const marketOrderTypes = [
         blurb: 'Buy/sell at the current price',
         icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
-    // {
-    //     value: 'limit',
-    //     label: 'Limit',
-    //     blurb: 'Buy/Sell at a specific price or better',
-    //     icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    // },
+    {
+        value: 'limit',
+        label: 'Limit',
+        blurb: 'Buy/Sell at a specific price or better',
+        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    },
     // disabled code 21 Jul 25
     // {
     //     value: 'stop_market',
@@ -698,14 +698,20 @@ function OrderInput({
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
-            setNotionalSymbolQtyNum(
+            const notionalSymbolQtyNum =
                 Math.floor(
                     (((value / 100) * usdAvailableToTrade) /
                         (parseFormattedNum(price) || 1)) *
                         leverage *
                         100,
-                ) / 100,
-            );
+                ) / 100;
+            console.log({
+                notionalSymbolQtyNum,
+                usdAvailableToTrade,
+                price,
+                leverage,
+            });
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
 
@@ -874,9 +880,10 @@ function OrderInput({
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            markPx,
         }),
-        [price, handlePriceChange],
+        [price, handlePriceChange, marketOrderType, markPx],
     );
 
     const sizeInputProps = useMemo(
