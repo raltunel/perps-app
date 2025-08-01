@@ -34,6 +34,7 @@ function PortfolioDeposit(props: propsIF) {
         formatNum,
         parseFormattedWithOnlyDecimals,
         formatNumWithOnlyDecimals,
+        activeDecimalSeparator,
     } = useNumFormatter();
 
     const [error, setError] = useState<string | null>(null);
@@ -64,7 +65,7 @@ function PortfolioDeposit(props: propsIF) {
         : false;
 
     const handleMaxClick = useCallback(() => {
-        setRawInputString(formatNumWithOnlyDecimals(availableBalance, 2));
+        setRawInputString('$' + formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
     }, [availableBalance]);
 
@@ -262,6 +263,9 @@ function PortfolioDeposit(props: propsIF) {
                             handleDeposit();
                         }
                     }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
                 />
                 <button
                     onClick={handleMaxClick}

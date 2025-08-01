@@ -243,6 +243,7 @@ export function useNumFormatter() {
             const { group, decimal } = getSeparators(numFormat.value);
 
             const cleaned = str
+                .replace(/^\$/, '') // Remove leading $ if present
                 .replace(new RegExp(`\\${group}`, 'g'), '')
                 .replace(decimal, '.');
 
@@ -288,7 +289,7 @@ export function useNumFormatter() {
     }, [numFormat]);
 
     const inputRegex = useMemo(() => {
-        return new RegExp(`^\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
+        return new RegExp(`^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
     }, [activeDecimalSeparator]);
 
     const getPrecisionFromNumber = useCallback((value: number) => {

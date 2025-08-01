@@ -12,6 +12,7 @@ interface NumFormattedInputProps {
     className?: string;
     ariaLabel?: string;
     placeholder?: string;
+    inputRegexOverride?: RegExp;
 }
 
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
@@ -24,6 +25,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     className,
     ariaLabel,
     placeholder,
+    inputRegexOverride,
 }) => {
     const {
         inputRegex,
@@ -45,12 +47,20 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     const handleChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
-            if (inputRegex.test(newValue) && newValue.length <= 12) {
+            if (
+                (inputRegexOverride || inputRegex).test(newValue) &&
+                newValue.length <= 12
+            ) {
                 onChange(event);
                 valueNum.current = parseFormattedWithOnlyDecimals(newValue);
             }
         },
-        [inputRegex, onChange, parseFormattedWithOnlyDecimals],
+        [
+            inputRegex,
+            onChange,
+            parseFormattedWithOnlyDecimals,
+            inputRegexOverride,
+        ],
     );
 
     useEffect(() => {

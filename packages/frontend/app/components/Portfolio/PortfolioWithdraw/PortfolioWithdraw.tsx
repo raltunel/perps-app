@@ -37,6 +37,7 @@ function PortfolioWithdraw({
         formatNum,
         parseFormattedWithOnlyDecimals,
         formatNumWithOnlyDecimals,
+        activeDecimalSeparator,
     } = useNumFormatter();
 
     const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
@@ -103,7 +104,7 @@ function PortfolioWithdraw({
 
     const handleMaxClick = useCallback(() => {
         setRawInputString(
-            formatNumWithOnlyDecimals(portfolio.availableBalance),
+            '$' + formatNumWithOnlyDecimals(portfolio.availableBalance),
         );
     }, [portfolio.availableBalance]);
 
@@ -239,6 +240,9 @@ function PortfolioWithdraw({
                             handleWithdraw();
                         }
                     }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
