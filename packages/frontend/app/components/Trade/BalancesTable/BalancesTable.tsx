@@ -3,13 +3,16 @@ import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserBalances } from '~/processors/processUserBalance';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
+import { WsChannels } from '~/utils/Constants';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
 export default function BalancesTable() {
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     // Use unified margin data
     const { balance, isLoading, error } = useUnifiedMarginData();

@@ -243,6 +243,7 @@ export function useNumFormatter() {
             const { group, decimal } = getSeparators(numFormat.value);
 
             const cleaned = str
+                .replace(/^\$/, '') // Remove leading $ if present
                 .replace(new RegExp(`\\${group}`, 'g'), '')
                 .replace(decimal, '.');
 

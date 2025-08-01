@@ -2,10 +2,9 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { Pages, usePage } from '~/hooks/usePage';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
-import { debugWallets, WsChannels } from '~/utils/Constants';
+import { WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
@@ -16,7 +15,7 @@ import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 // import TwapTable from '../TwapTable/TwapTable';
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { useApp } from '~/contexts/AppContext';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 export interface FilterOption {
@@ -60,17 +59,15 @@ export default function TradeTable(props: TradeTableProps) {
         userFills,
         userFundings,
         userOrders,
-        resetUserData,
     } = useTradeDataStore();
 
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
+    const { assignDefaultAddress } = useApp();
+
     const { page } = usePage();
 
-    const sessionState = useSession();
-
-    const { debugWallet, setDebugWallet } = useDebugStore();
     const {
         isLoading: positionsLoading,
         positions,
@@ -109,29 +106,10 @@ export default function TradeTable(props: TradeTableProps) {
 
     // reset wallet on trade tables after switch back from vaults
     useEffect(() => {
-        if (
-            !vaultPage &&
-            !debugWallets.reduce((acc, wallet) => {
-                return acc || wallet.address === debugWallet.address;
-            }, false)
-        ) {
-            setDebugWallet(debugWallets[0]);
+        if (!vaultPage) {
+            assignDefaultAddress();
         }
     }, [vaultPage]);
-
-    useEffect(() => {
-        if (isEstablished(sessionState)) {
-            // if wallet public key starts with alpha char, use debug wallet 1, else use debug wallet 2
-            setDebugWallet(
-                sessionState.walletPublicKey.toString().match(/^[a-zA-Z]/)
-                    ? debugWallets[0]
-                    : debugWallets[1],
-            );
-        } else {
-            setDebugWallet(debugWallets[2]); // set to empty account
-            resetUserData();
-        }
-    }, [isEstablished(sessionState)]);
 
     useEffect(() => {
         if (page === Pages.TRADE) {

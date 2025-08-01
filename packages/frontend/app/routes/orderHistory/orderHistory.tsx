@@ -3,9 +3,10 @@ import { useParams } from 'react-router';
 import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
+import { useDebugStore } from '~/stores/DebugStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 function OrderHistory() {
@@ -13,9 +14,11 @@ function OrderHistory() {
 
     const [isFetched, setIsFetched] = useState(false);
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const { orderHistory, fetchedChannels } = useTradeDataStore();
+
+    const { debugWallet } = useDebugStore();
 
     const orderHistoryFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
@@ -33,7 +36,7 @@ function OrderHistory() {
         } else {
             return true;
         }
-    }, [address, debugWallet.address]);
+    }, [address, debugWallet.address, userAddress]);
 
     useEffect(() => {
         if (!isCurrentUser && address) {

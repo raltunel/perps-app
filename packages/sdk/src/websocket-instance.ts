@@ -7,6 +7,7 @@ import { createJsonParserWorker } from './utils/workers';
 import type { Subscription, WsMsg } from './utils/types';
 
 export type Callback = (msg: WsMsg) => void;
+export type ErrCallback = (msg: WsMsg) => void;
 export type SocketType = 'market' | 'user' | 'custom';
 
 export interface ActiveSubscription {
@@ -14,6 +15,7 @@ export interface ActiveSubscription {
     multiCallbacks?: Callback[];
     subscriptionId: number;
     subscription: Subscription;
+    errorCallback?: ErrCallback;
 }
 
 export interface WebSocketInstanceConfig {
@@ -94,7 +96,9 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
         case 'userTwapSliceFills':
             return `userTwapSliceFills:${wsMsg.data.user?.toLowerCase()}`;
         case 'userTwapHistory':
-            return `userTwapHistory:${wsMsg.data.user?.toLowerCase()}`;
+            return `userTwapHistory:${wsMsg.data.user.toLowerCase()}`;
+        case 'error':
+            return 'error';
         default:
             return undefined;
     }
@@ -111,7 +115,11 @@ export class WebSocketInstance {
     private activeSubscriptions: Record<string, ActiveSubscription[]> = {};
     private allSubscriptions: Record<
         number,
-        { subscription: Subscription; callback: Callback }
+        {
+            subscription: Subscription;
+            callback: Callback;
+            errorCallback?: ErrCallback;
+        }
     > = {};
     private pingInterval: number | null = null;
     private stopped: boolean = false;
@@ -368,6 +376,7 @@ export class WebSocketInstance {
             // Parse on main thread
             try {
                 const parsed = JSON.parse(message);
+                console.log('>>> parsed', parsed);
                 this.handleParsedMessage(parsed);
             } catch (error) {
                 this.log('Failed to parse message on main thread:', error);
@@ -465,6 +474,31 @@ export class WebSocketInstance {
             this.pongReceived = true;
             return;
         }
+        if (msg.channel === 'error') {
+            const jsonMatch = msg.data.match(/\{.*\}$/);
+
+            if (jsonMatch) {
+                const str = jsonMatch[0];
+                const jsonObject = JSON.parse(str);
+                if (jsonObject.subscription) {
+                    const sub = subscriptionToIdentifier(
+                        jsonObject.subscription,
+                    );
+
+                    const activeSubscriptions = this.activeSubscriptions[sub];
+                    if (activeSubscriptions) {
+                        activeSubscriptions.forEach((sub) => {
+                            if (sub.errorCallback) {
+                                sub.errorCallback(msg);
+                            }
+                        });
+                    }
+                }
+            }
+
+            this.log('error received', msg.data);
+            return;
+        }
         const identifier = wsMsgToIdentifier(msg);
         if (!identifier) {
             this.log('no identifier for', msg);
@@ -494,12 +528,16 @@ export class WebSocketInstance {
         subscription: Subscription,
         callback: Callback,
         existingId?: number,
+        errorCallback?: ErrCallback,
     ) => {
         const identifier = subscriptionToIdentifier(subscription);
 
         const existingSubs = this.activeSubscriptions[identifier] || [];
         if (existingSubs.length > 0) {
             const sub = existingSubs[0];
+            if (errorCallback) {
+                sub.errorCallback = errorCallback;
+            }
             // if that subscription is not a multi callback subscription, check if the callback is the same
             if (!sub.multiCallbacks || sub.multiCallbacks.length === 0) {
                 // return sub id if callback is the same
@@ -509,6 +547,7 @@ export class WebSocketInstance {
                             subscription,
                             callback,
                             sub.subscriptionId,
+                            errorCallback,
                         );
                     };
 
@@ -522,6 +561,7 @@ export class WebSocketInstance {
                             subscription,
                             callback,
                             sub.subscriptionId,
+                            errorCallback,
                         );
                     };
 
@@ -544,6 +584,7 @@ export class WebSocketInstance {
                         subscription,
                         callback,
                         sub.subscriptionId,
+                        errorCallback,
                     );
                 };
 
@@ -553,7 +594,11 @@ export class WebSocketInstance {
 
         const subscriptionId = existingId ?? this.subscriptionIdCounter++;
 
-        this.allSubscriptions[subscriptionId] = { subscription, callback };
+        this.allSubscriptions[subscriptionId] = {
+            subscription,
+            callback,
+            errorCallback,
+        };
 
         if (!this.wsReady || this.ws.readyState !== WebSocket.OPEN) {
             this.log('enqueueing subscription', subscription, subscriptionId);
@@ -564,7 +609,12 @@ export class WebSocketInstance {
             ) {
                 this.queuedSubscriptions.push({
                     subscription,
-                    active: { callback, subscriptionId, subscription },
+                    active: {
+                        callback,
+                        subscriptionId,
+                        subscription,
+                        errorCallback,
+                    },
                 });
             }
         } else {
@@ -597,6 +647,7 @@ export class WebSocketInstance {
                     callback,
                     subscriptionId,
                     subscription,
+                    errorCallback,
                 });
                 this.ws.send(
                     JSON.stringify({ method: 'subscribe', subscription }),
@@ -605,7 +656,12 @@ export class WebSocketInstance {
         }
 
         const unsubscribe = () => {
-            this.unsubscribe(subscription, callback, subscriptionId);
+            this.unsubscribe(
+                subscription,
+                callback,
+                subscriptionId,
+                errorCallback,
+            );
         };
 
         return { unsubscribe };
@@ -615,6 +671,7 @@ export class WebSocketInstance {
         subscription: Subscription,
         callback: Callback,
         subscriptionId: number,
+        errorCallback?: ErrCallback,
     ) => {
         delete this.allSubscriptions[subscriptionId];
         const identifier = subscriptionToIdentifier(subscription);

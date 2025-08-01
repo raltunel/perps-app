@@ -1,14 +1,14 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { DepositAndWithDrawalSortBy } from '~/utils/UserDataIFs';
 import DepositsWithdrawalsTableHeader from './DepositsWithdrawalsTableHeader';
 import DepositsWithdrawalsTableRow, {
     type TransactionData,
 } from './DepositsWithdrawalsTableRow';
-import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 
 function sortTransactionData(
     data: TransactionData[],
@@ -71,12 +71,12 @@ export default function DepositsWithdrawalsTable(
         [transactions],
     );
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
-    const viewAllLink = debugWallet.address
-        ? `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals/${debugWallet.address}`
+    const viewAllLink = userAddress
+        ? `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals/${userAddress}`
         : `${EXTERNAL_PAGE_URL_PREFIX}/depositsandwithdrawals`;
 
     return (
