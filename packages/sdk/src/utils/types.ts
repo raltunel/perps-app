@@ -316,7 +316,8 @@ export type WsMsg =
     | NotificationMsg
     | UserHistoricalOrdersMsg
     | UserTwapSliceFillsMsg
-    | UserTwapHistoryMsg;
+    | UserTwapHistoryMsg
+    | ErrorMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder
@@ -645,4 +646,9 @@ export interface OpenOrderRawData {
     origSz: string;
     tif: string;
     cloid: string;
+}
+
+export interface ErrorMsg {
+    channel: 'error';
+    data: string;
 }

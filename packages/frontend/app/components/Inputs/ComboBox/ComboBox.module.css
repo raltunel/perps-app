@@ -147,3 +147,21 @@
     font-size: var(--font-size-s) !important;
     padding: 0 var(--padding-s);
 }
+
+.divider {
+    width: 1px;
+    height: 80%;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.subInfo {
+    color: var(--text2);
+}
+
+.walletSelector {
+    transition: all 0.2s ease-in-out;
+}
+
+.walletSelector.passive {
+    opacity: 0.5;
+}

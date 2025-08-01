@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useModal } from '~/hooks/useModal';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
@@ -21,10 +21,10 @@ export default function PositionsTable(props: PositionsTableProps) {
     const { coinPriceMap, positions, symbol } = useTradeDataStore();
     const appSettingsModal = useModal('closed');
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 

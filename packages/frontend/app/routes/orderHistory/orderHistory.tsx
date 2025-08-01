@@ -3,8 +3,8 @@ import { useParams } from 'react-router';
 import ExternalPage from '~/components/ExternalPage/ExternalPage';
 import OrderHistoryTable from '~/components/Trade/OrderHistoryTable/OrderHistoryTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
@@ -13,7 +13,7 @@ function OrderHistory() {
 
     const [isFetched, setIsFetched] = useState(false);
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const { orderHistory, fetchedChannels } = useTradeDataStore();
 
@@ -33,12 +33,12 @@ function OrderHistory() {
         // if (address) {
         //     return (
         //         address.toLocaleLowerCase() ===
-        //         debugWallet.address.toLocaleLowerCase()
+        //         userAddress.toLocaleLowerCase()
         //     );
         // } else {
         //     return true;
         // }
-    }, [address, debugWallet.address]);
+    }, [address, userAddress]);
 
     useEffect(() => {
         if (!isCurrentUser && address) {
