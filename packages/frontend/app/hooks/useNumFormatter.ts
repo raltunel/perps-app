@@ -289,7 +289,7 @@ export function useNumFormatter() {
     }, [numFormat]);
 
     const inputRegex = useMemo(() => {
-        return new RegExp(`^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
+        return new RegExp(`^\\d*(?:\\${activeDecimalSeparator}\\d*)?$`);
     }, [activeDecimalSeparator]);
 
     const getPrecisionFromNumber = useCallback((value: number) => {
