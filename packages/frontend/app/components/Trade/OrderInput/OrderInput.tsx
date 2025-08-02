@@ -21,6 +21,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
+import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
@@ -150,6 +151,8 @@ function OrderInput({
         isLoading: isMarketOrderLoading,
         signature,
     } = useMarketOrderService();
+
+    const { executeLimitOrder } = useLimitOrderService();
 
     const [leverage, setLeverage] = useState(1);
 
@@ -1115,23 +1118,157 @@ function OrderInput({
     }
 
     // fn to submit a 'Buy' limit order
-    function submitLimitBuy(): void {
-        notifications.add({
-            title: 'Buy / Long Limit Order Pending',
-            message: 'Buying 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitLimitBuy(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Buy / Long Limit Order Pending',
+                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: notionalSymbolQtyNum,
+                price: limitPrice,
+                side: 'buy',
+                leverage: leverage,
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    link: {
+                        url: `${blockExplorer}/tx/${result.signature}`,
+                        text: 'View Transaction',
+                    },
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit buy order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Sell' limit order
-    function submitLimitSell(): void {
-        notifications.add({
-            title: 'Sell / Short Limit Order Pending',
-            message: 'Selling 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitLimitSell(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Sell / Short Limit Order Pending',
+                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: notionalSymbolQtyNum,
+                price: limitPrice,
+                side: 'sell',
+                leverage: leverage,
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    link: {
+                        url: `${blockExplorer}/tx/${result.signature}`,
+                        text: 'View Transaction',
+                    },
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit sell order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // logic to dispatch a notification on demand
@@ -1462,6 +1599,7 @@ function OrderInput({
                                     isEnabled={
                                         !activeOptions.skipOpenOrderConfirm
                                     }
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                             {confirmOrderModal.content === 'limit_sell' && (
@@ -1484,6 +1622,7 @@ function OrderInput({
                                     isEnabled={
                                         !activeOptions.skipOpenOrderConfirm
                                     }
+                                    isProcessing={isProcessingOrder}
                                 />
                             )}
                         </Modal>
