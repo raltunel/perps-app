@@ -205,6 +205,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         const isLinkDisabled = position.coin.toLowerCase() !== 'btc';
 
+        const liquidationDisp = useMemo(() => {
+            if (position.liquidationPx === null) return '-';
+            if (position.liquidationPx <= 0) {
+                return '0';
+            }
+            if (position.liquidationPx > 1_000_000) {
+                return '>' + formatNum(1_000_000);
+            }
+            return formatNum(position.liquidationPx);
+        }, [position.liquidationPx, formatNum]);
+
         return (
             <div
                 className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
@@ -277,7 +288,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <RiExternalLinkLine color='var(--text2)' />
                 </div>
                 <div className={`${styles.cell} ${styles.liqPriceCell}`}>
-                    {formatNum(position.liquidationPx)}
+                    {liquidationDisp}
                 </div>
                 <div className={`${styles.cell} ${styles.marginCell}`}>
                     {formatNum(position.marginUsed, 2)}
