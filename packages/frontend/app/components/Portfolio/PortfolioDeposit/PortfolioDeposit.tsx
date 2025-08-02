@@ -126,7 +126,9 @@ function PortfolioDeposit(props: propsIF) {
                     message: result.error || 'Transaction failed',
                     icon: 'error',
                     removeAfter: 15000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 setTransactionStatus('success');
@@ -136,7 +138,9 @@ function PortfolioDeposit(props: propsIF) {
                     title: 'Deposit Successful',
                     message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 10000,
                 });
 

@@ -120,7 +120,9 @@ function PortfolioWithdraw({
                     message: result.error || 'Transaction failed',
                     icon: 'error',
                     removeAfter: 15000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 setTransactionStatus('success');
@@ -130,7 +132,9 @@ function PortfolioWithdraw({
                     title: 'Withdrawal Successful',
                     message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} USD`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 10000,
                 });
 
