@@ -79,10 +79,10 @@ export class MarketOrderService {
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
-                    side: OrderSide.Ask,
+                    side: OrderSide.Bid,
                     qty: onChainQuantity,
                     orderPrice: BigInt('0'), // market order convention is to use 0
-                    fillPrice: BigInt('110000000000'),
+                    fillPrice: BigInt('120000000000'),
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
