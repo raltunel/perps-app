@@ -1,7 +1,7 @@
-import { useEffect, useRef, useCallback } from 'react';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
+import { useCallback, useEffect, useRef } from 'react';
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 
 export function useUnifiedMarginData() {
     const sessionState = useSession();

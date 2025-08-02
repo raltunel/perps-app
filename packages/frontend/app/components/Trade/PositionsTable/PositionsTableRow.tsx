@@ -232,7 +232,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     backgroundColor: hexToRgba(baseColor, 0.15),
                                 }}
                             >
-                                {position.leverage.value}x
+                                {Math.floor(position.leverage.value)}x
                             </span>
                         )}
                 </div>

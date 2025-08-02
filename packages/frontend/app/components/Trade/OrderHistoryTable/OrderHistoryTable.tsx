@@ -72,6 +72,7 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
                 tableModel={OrderHistoryTableModel}
+                noDataMessage='No order history'
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
             />
