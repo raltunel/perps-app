@@ -4,6 +4,7 @@ import {
     type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, {
     memo,
     useCallback,
@@ -51,6 +52,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -66,51 +68,67 @@ export type OrderSide = 'buy' | 'sell';
 
 export type MarginMode = 'error' | 'isolated' | null;
 
-const marketOrderTypes = [
-    {
-        value: 'market',
-        label: 'Market',
-        blurb: 'Buy/sell at the current price',
-        icon: <GoZap color={'var(--accent1)'} size={25} />,
-    },
-    {
-        value: 'limit',
-        label: 'Limit',
-        blurb: 'Buy/Sell at a specific price or better',
-        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    },
-    // disabled code 21 Jul 25
-    // {
-    //     value: 'stop_market',
-    //     label: 'Stop Market',
-    //     blurb: 'Triggers a market order at a set price',
-    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    // },
-    // {
-    //     value: 'stop_limit',
-    //     label: 'Stop Limit',
-    //     blurb: 'Triggers a limit order at a set price',
-    //     icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-    // },
-    // {
-    //     value: 'twap',
-    //     label: 'TWAP',
-    //     blurb: 'Distributes trades across a specified time period',
-    //     icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-    // },
-    // {
-    //     value: 'scale',
-    //     label: 'Scale',
-    //     blurb: 'Multiple orders at incrementing prices',
-    //     icon: <RiBarChartHorizontalLine color={'var(--accent1)'} size={25} />,
-    // },
-    // {
-    //     value: 'chase_limit',
-    //     label: 'Chase Limit',
-    //     blurb: 'Adjusts limit price to follow the market',
-    //     icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-    // },
-];
+const useOnlyMarket = false;
+
+const marketOrderTypes = useOnlyMarket
+    ? [
+          {
+              value: 'market',
+              label: 'Market',
+              blurb: 'Buy/sell at the current price',
+              icon: <GoZap color={'var(--accent1)'} size={25} />,
+          },
+      ]
+    : [
+          {
+              value: 'market',
+              label: 'Market',
+              blurb: 'Buy/sell at the current price',
+              icon: <GoZap color={'var(--accent1)'} size={25} />,
+          },
+          {
+              value: 'limit',
+              label: 'Limit',
+              blurb: 'Buy/Sell at a specific price or better',
+              icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+          },
+          // disabled code 21 Jul 25
+          //   {
+          //       value: 'stop_market',
+          //       label: 'Stop Market',
+          //       blurb: 'Triggers a market order at a set price',
+          //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'stop_limit',
+          //       label: 'Stop Limit',
+          //       blurb: 'Triggers a limit order at a set price',
+          //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'twap',
+          //       label: 'TWAP',
+          //       blurb: 'Distributes trades across a specified time period',
+          //       icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'scale',
+          //       label: 'Scale',
+          //       blurb: 'Multiple orders at incrementing prices',
+          //       icon: (
+          //           <RiBarChartHorizontalLine
+          //               color={'var(--accent1)'}
+          //               size={25}
+          //           />
+          //       ),
+          //   },
+          //   {
+          //       value: 'chase_limit',
+          //       label: 'Chase Limit',
+          //       blurb: 'Adjusts limit price to follow the market',
+          //       icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+          //   },
+      ];
 
 // disabled code 07 Jul 25
 // const chaseOptionTypes = [
@@ -1158,10 +1176,7 @@ function OrderInput({
                     title: 'Limit Order Placed',
                     message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    link: {
-                        url: `${blockExplorer}/tx/${result.signature}`,
-                        text: 'View Transaction',
-                    },
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 notifications.add({
@@ -1235,10 +1250,7 @@ function OrderInput({
                     title: 'Limit Order Placed',
                     message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    link: {
-                        url: `${blockExplorer}/tx/${result.signature}`,
-                        text: 'View Transaction',
-                    },
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 notifications.add({
@@ -1374,253 +1386,299 @@ function OrderInput({
 
     return (
         <div className={styles.mainContainer}>
-            {showLaunchpad ? (
-                launchPadContent
-            ) : (
-                <>
-                    <div className={styles.mainContent}>
-                        <div
-                            className={styles.orderTypeDropdownContainer}
-                            id='tutorial-order-type'
-                        >
-                            <OrderDropdown
-                                options={marketOrderTypes}
-                                value={marketOrderType}
-                                onChange={handleMarketOrderTypeChange}
-                            />
-                            <SimpleButton
-                                className={styles.margin_type_btn}
-                                onClick={() => confirmOrderModal.open('margin')}
-                                bg='dark3'
-                                hoverBg='accent1'
+            <AnimatePresence mode='wait'>
+                {showLaunchpad ? (
+                    <motion.div
+                        key='launchpad'
+                        className={styles.launchpad}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 50 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                        <header>
+                            <div
+                                className={styles.exit_launchpad}
+                                onClick={() => setShowLaunchpad(false)}
                             >
-                                {marginMode}
-                            </SimpleButton>
+                                <MdKeyboardArrowLeft />
+                            </div>
+                            <h3>Order Types</h3>
                             <button
                                 className={styles.trade_type_toggle}
-                                onClick={() => setShowLaunchpad(true)}
+                                onClick={() => setShowLaunchpad(false)}
                             >
                                 <PiSquaresFour />
                             </button>
-                        </div>
-                        <TradeDirection
-                            tradeDirection={tradeDirection}
-                            setTradeDirection={setTradeDirection}
-                        />
-
-                        <LeverageSlider {...leverageSliderProps} />
-
-                        <div className={styles.inputDetailsDataContainer}>
-                            {inputDetailsData.map((data, idx) => (
-                                <div
-                                    key={idx}
-                                    className={styles.inputDetailsDataContent}
+                        </header>
+                        <ul className={styles.launchpad_clickables}>
+                            {marketOrderTypes.map((mo: OrderTypeOption) => (
+                                <li
+                                    key={JSON.stringify(mo)}
+                                    onClick={() => {
+                                        handleMarketOrderTypeChange(mo.value);
+                                        setShowLaunchpad(false);
+                                    }}
                                 >
-                                    <div className={styles.inputDetailsLabel}>
-                                        <span>{data.label}</span>
-                                        <Tooltip
-                                            content={data?.tooltipLabel}
-                                            position='right'
-                                        >
-                                            <LuCircleHelp size={12} />
-                                        </Tooltip>
+                                    <div className={styles.name_and_icon}>
+                                        {mo.icon}
+                                        <h4>{mo.label}</h4>
                                     </div>
-                                    <span className={styles.inputDetailValue}>
-                                        {data.value}
-                                    </span>
-                                </div>
+                                    <div>
+                                        <p>{mo.blurb}</p>
+                                    </div>
+                                </li>
                             ))}
-                        </div>
-
-                        {/* {marketOrderType === 'chase_limit' && (
-                            <ChasePrice {...chasePriceProps} / predu>
-                        )} */}
-
-                        {showStopPriceComponent && (
-                            <StopPrice {...stopPriceProps} />
-                        )}
-                        {showPriceInputComponent && (
-                            <PriceInput {...priceInputProps} />
-                        )}
-                        <SizeInput {...sizeInputProps} />
-                        <PositionSize {...positionSliderPercentageValueProps} />
-
-                        {showPriceRangeComponent && (
-                            <PriceRange {...priceRangeProps} />
-                        )}
-                        {marketOrderType === 'scale' &&
-                            priceDistributionButtons}
-                        {marketOrderType === 'twap' && <RunningTime />}
-
-                        {/* <ReduceAndProfitToggle
-                            {...reduceAndProfitToggleProps}
-                        /> */}
-                    </div>
-                    <div className={styles.button_details_container}>
-                        {isUserLoggedIn && (
-                            <Tooltip
-                                content={disabledReason}
-                                position='top'
-                                disabled={!isDisabled}
-                            >
-                                <button
-                                    className={styles.submit_button}
-                                    style={{
-                                        backgroundColor:
-                                            tradeDirection === 'buy'
-                                                ? buyColor
-                                                : sellColor,
-                                    }}
-                                    onClick={handleSubmitOrder}
-                                    disabled={isDisabled}
-                                >
-                                    Submit
-                                </button>
-                            </Tooltip>
-                        )}
-                        <OrderDetails
-                            orderMarketPrice={marketOrderType}
-                            usdOrderValue={usdOrderValue}
-                            marginRequired={marginRequired}
-                            liquidationPrice={liquidationPrice}
-                        />
-                    </div>
-                    {confirmOrderModal.isOpen && (
-                        <Modal
-                            close={confirmOrderModal.close}
-                            title={
-                                confirmOrderModal.content === 'margin'
-                                    ? 'Margin Mode'
-                                    : confirmOrderModal.content === 'scale'
-                                      ? 'Scale Options'
-                                      : confirmOrderModal.content ===
-                                          'market_buy'
-                                        ? 'Confirm Buy Order'
-                                        : confirmOrderModal.content ===
-                                            'market_sell'
-                                          ? 'Confirm Sell Order'
-                                          : confirmOrderModal.content ===
-                                              'limit_buy'
-                                            ? 'Confirm Limit Buy'
-                                            : confirmOrderModal.content ===
-                                                'limit_sell'
-                                              ? 'Confirm Limit Sale'
-                                              : ''
-                            }
+                        </ul>
+                    </motion.div>
+                ) : (
+                    <>
+                        <motion.div
+                            key='orderinput'
+                            className={styles.mainContent}
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -50 }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
                         >
-                            {confirmOrderModal.content === 'margin' && (
-                                <MarginModal
-                                    initial={marginMode}
-                                    handleConfirm={(m: marginModesT) => {
-                                        setMarginMode(m);
-                                        confirmOrderModal.close();
-                                    }}
+                            <div
+                                className={styles.orderTypeDropdownContainer}
+                                id='tutorial-order-type'
+                            >
+                                <OrderDropdown
+                                    options={marketOrderTypes}
+                                    value={marketOrderType}
+                                    onChange={handleMarketOrderTypeChange}
                                 />
+                                <SimpleButton
+                                    className={styles.margin_type_btn}
+                                    onClick={() =>
+                                        confirmOrderModal.open('margin')
+                                    }
+                                    bg='dark3'
+                                    hoverBg='accent1'
+                                >
+                                    {marginMode}
+                                </SimpleButton>
+                                <button
+                                    className={styles.trade_type_toggle}
+                                    onClick={() => setShowLaunchpad(true)}
+                                >
+                                    <PiSquaresFour />
+                                </button>
+                            </div>
+                            <TradeDirection
+                                tradeDirection={tradeDirection}
+                                setTradeDirection={setTradeDirection}
+                            />
+
+                            <LeverageSlider {...leverageSliderProps} />
+
+                            <div className={styles.inputDetailsDataContainer}>
+                                {inputDetailsData.map((data, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={
+                                            styles.inputDetailsDataContent
+                                        }
+                                    >
+                                        <div
+                                            className={styles.inputDetailsLabel}
+                                        >
+                                            <span>{data.label}</span>
+                                            <Tooltip
+                                                content={data?.tooltipLabel}
+                                                position='right'
+                                            >
+                                                <LuCircleHelp size={12} />
+                                            </Tooltip>
+                                        </div>
+                                        <span
+                                            className={styles.inputDetailValue}
+                                        >
+                                            {data.value}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* {marketOrderType === 'chase_limit' && (
+                                <ChasePrice {...chasePriceProps} / predu>
+                            )} */}
+
+                            {showStopPriceComponent && (
+                                <StopPrice {...stopPriceProps} />
                             )}
-                            {confirmOrderModal.content === 'scale' && (
-                                <ScaleOrders
-                                    totalQuantity={parseFormattedNum(
-                                        priceRangeTotalOrders,
-                                    )}
-                                    minPrice={parseFormattedNum(priceRangeMin)}
-                                    maxPrice={parseFormattedNum(priceRangeMax)}
-                                    isModal
-                                    onClose={confirmOrderModal.close}
-                                />
+                            {showPriceInputComponent && (
+                                <PriceInput {...priceInputProps} />
                             )}
-                            {confirmOrderModal.content === 'market_buy' && (
-                                <ConfirmationModal
-                                    tx='market_buy'
-                                    size={{
-                                        qty: formattedSizeDisplay,
-                                        denom:
-                                            selectedMode === 'symbol'
-                                                ? symbolInfo?.coin || ''
-                                                : 'USD',
-                                    }}
-                                    isEnabled={
-                                        !activeOptions.skipOpenOrderConfirm
-                                    }
-                                    toggleEnabled={() =>
-                                        activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
-                                        )
-                                    }
-                                    submitFn={submitMarketBuy}
-                                    isProcessing={isProcessingOrder}
-                                />
+                            <SizeInput {...sizeInputProps} />
+                            <PositionSize
+                                {...positionSliderPercentageValueProps}
+                            />
+
+                            {showPriceRangeComponent && (
+                                <PriceRange {...priceRangeProps} />
                             )}
-                            {confirmOrderModal.content === 'market_sell' && (
-                                <ConfirmationModal
-                                    tx='market_sell'
-                                    size={{
-                                        qty: formattedSizeDisplay,
-                                        denom:
-                                            selectedMode === 'symbol'
-                                                ? symbolInfo?.coin || ''
-                                                : 'USD',
-                                    }}
-                                    submitFn={submitMarketSell}
-                                    toggleEnabled={() =>
-                                        activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
-                                        )
-                                    }
-                                    isEnabled={
-                                        !activeOptions.skipOpenOrderConfirm
-                                    }
-                                    isProcessing={isProcessingOrder}
-                                />
+                            {marketOrderType === 'scale' &&
+                                priceDistributionButtons}
+                            {marketOrderType === 'twap' && <RunningTime />}
+
+                            {/* <ReduceAndProfitToggle
+                                {...reduceAndProfitToggleProps}
+                            /> */}
+                        </motion.div>
+                        <motion.div
+                            key='buttondetails'
+                            className={styles.button_details_container}
+                            initial={{ opacity: 0, x: -50 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -50 }}
+                            transition={{ duration: 0.25, ease: 'easeInOut' }}
+                        >
+                            {isUserLoggedIn && (
+                                <Tooltip
+                                    content={disabledReason}
+                                    position='top'
+                                    disabled={!isDisabled}
+                                >
+                                    <button
+                                        className={styles.submit_button}
+                                        style={{
+                                            backgroundColor:
+                                                tradeDirection === 'buy'
+                                                    ? buyColor
+                                                    : sellColor,
+                                        }}
+                                        onClick={handleSubmitOrder}
+                                        disabled={isDisabled}
+                                    >
+                                        Submit
+                                    </button>
+                                </Tooltip>
                             )}
-                            {confirmOrderModal.content === 'limit_buy' && (
-                                <ConfirmationModal
-                                    tx='limit_buy'
-                                    size={{
-                                        qty: formattedSizeDisplay,
-                                        denom:
-                                            selectedMode === 'symbol'
-                                                ? symbolInfo?.coin || ''
-                                                : 'USD',
-                                    }}
-                                    limitPrice={price}
-                                    submitFn={submitLimitBuy}
-                                    toggleEnabled={() =>
-                                        activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
-                                        )
-                                    }
-                                    isEnabled={
-                                        !activeOptions.skipOpenOrderConfirm
-                                    }
-                                    isProcessing={isProcessingOrder}
-                                />
-                            )}
-                            {confirmOrderModal.content === 'limit_sell' && (
-                                <ConfirmationModal
-                                    tx='limit_sell'
-                                    size={{
-                                        qty: formattedSizeDisplay,
-                                        denom:
-                                            selectedMode === 'symbol'
-                                                ? symbolInfo?.coin || ''
-                                                : 'USD',
-                                    }}
-                                    limitPrice={price}
-                                    submitFn={submitLimitSell}
-                                    toggleEnabled={() =>
-                                        activeOptions.toggle(
-                                            'skipOpenOrderConfirm',
-                                        )
-                                    }
-                                    isEnabled={
-                                        !activeOptions.skipOpenOrderConfirm
-                                    }
-                                    isProcessing={isProcessingOrder}
-                                />
-                            )}
-                        </Modal>
+                            <OrderDetails
+                                orderMarketPrice={marketOrderType}
+                                usdOrderValue={usdOrderValue}
+                                marginRequired={marginRequired}
+                                liquidationPrice={liquidationPrice}
+                            />
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+            {confirmOrderModal.isOpen && (
+                <Modal
+                    close={confirmOrderModal.close}
+                    title={
+                        confirmOrderModal.content === 'margin'
+                            ? 'Margin Mode'
+                            : confirmOrderModal.content === 'scale'
+                              ? 'Scale Options'
+                              : confirmOrderModal.content === 'market_buy'
+                                ? 'Confirm Buy Order'
+                                : confirmOrderModal.content === 'market_sell'
+                                  ? 'Confirm Sell Order'
+                                  : confirmOrderModal.content === 'limit_buy'
+                                    ? 'Confirm Limit Buy'
+                                    : confirmOrderModal.content === 'limit_sell'
+                                      ? 'Confirm Limit Sale'
+                                      : ''
+                    }
+                >
+                    {confirmOrderModal.content === 'margin' && (
+                        <MarginModal
+                            initial={marginMode}
+                            handleConfirm={(m: marginModesT) => {
+                                setMarginMode(m);
+                                confirmOrderModal.close();
+                            }}
+                        />
                     )}
-                </>
+                    {confirmOrderModal.content === 'scale' && (
+                        <ScaleOrders
+                            totalQuantity={parseFormattedNum(
+                                priceRangeTotalOrders,
+                            )}
+                            minPrice={parseFormattedNum(priceRangeMin)}
+                            maxPrice={parseFormattedNum(priceRangeMax)}
+                            isModal
+                            onClose={confirmOrderModal.close}
+                        />
+                    )}
+                    {confirmOrderModal.content === 'market_buy' && (
+                        <ConfirmationModal
+                            tx='market_buy'
+                            size={{
+                                qty: formattedSizeDisplay,
+                                denom:
+                                    selectedMode === 'symbol'
+                                        ? symbolInfo?.coin || ''
+                                        : 'USD',
+                            }}
+                            isEnabled={!activeOptions.skipOpenOrderConfirm}
+                            toggleEnabled={() =>
+                                activeOptions.toggle('skipOpenOrderConfirm')
+                            }
+                            submitFn={submitMarketBuy}
+                            isProcessing={isProcessingOrder}
+                        />
+                    )}
+                    {confirmOrderModal.content === 'market_sell' && (
+                        <ConfirmationModal
+                            tx='market_sell'
+                            size={{
+                                qty: formattedSizeDisplay,
+                                denom:
+                                    selectedMode === 'symbol'
+                                        ? symbolInfo?.coin || ''
+                                        : 'USD',
+                            }}
+                            submitFn={submitMarketSell}
+                            toggleEnabled={() =>
+                                activeOptions.toggle('skipOpenOrderConfirm')
+                            }
+                            isEnabled={!activeOptions.skipOpenOrderConfirm}
+                            isProcessing={isProcessingOrder}
+                        />
+                    )}
+                    {confirmOrderModal.content === 'limit_buy' && (
+                        <ConfirmationModal
+                            tx='limit_buy'
+                            size={{
+                                qty: formattedSizeDisplay,
+                                denom:
+                                    selectedMode === 'symbol'
+                                        ? symbolInfo?.coin || ''
+                                        : 'USD',
+                            }}
+                            limitPrice={price}
+                            submitFn={submitLimitBuy}
+                            toggleEnabled={() =>
+                                activeOptions.toggle('skipOpenOrderConfirm')
+                            }
+                            isEnabled={!activeOptions.skipOpenOrderConfirm}
+                        />
+                    )}
+                    {confirmOrderModal.content === 'limit_sell' && (
+                        <ConfirmationModal
+                            tx='limit_sell'
+                            size={{
+                                qty: formattedSizeDisplay,
+                                denom:
+                                    selectedMode === 'symbol'
+                                        ? symbolInfo?.coin || ''
+                                        : 'USD',
+                            }}
+                            limitPrice={price}
+                            submitFn={submitLimitSell}
+                            toggleEnabled={() =>
+                                activeOptions.toggle('skipOpenOrderConfirm')
+                            }
+                            isEnabled={!activeOptions.skipOpenOrderConfirm}
+                        />
+                    )}
+                </Modal>
             )}
         </div>
     );
