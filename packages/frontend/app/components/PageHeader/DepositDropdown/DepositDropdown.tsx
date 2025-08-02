@@ -69,32 +69,6 @@ function DepositDropdown(props: propsIF) {
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
 
-    // Debug SessionState
-    useEffect(() => {
-        console.log(
-            '🔍 [DepositDropdown] Full SessionState object:',
-            sessionState,
-        );
-        console.log('🔍 [DepositDropdown] SessionState exploration:', {
-            isEstablished: isEstablished(sessionState),
-            hasSession: !!sessionState,
-            sessionKeys: Object.keys(sessionState || {}),
-            sessionDetails: sessionState
-                ? Object.entries(sessionState).map(([key, value]) => ({
-                      key,
-                      type: typeof value,
-                      isFunction: typeof value === 'function',
-                      value:
-                          typeof value === 'function'
-                              ? 'function'
-                              : value?.toString
-                                ? value.toString().substring(0, 100)
-                                : JSON.stringify(value),
-                  }))
-                : 'No session state',
-        });
-    }, [sessionState]);
-
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
     const {

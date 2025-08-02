@@ -174,3 +174,14 @@
 .cell.negative {
     color: var(--red);
 }
+
+.contractLink {
+    color: var(--accent1, #7371fc);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.contractLink:hover {
+    color: var(--text1, #f0f0f8);
+    text-decoration: underline;
+}

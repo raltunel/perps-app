@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { Pages, usePage } from '~/hooks/usePage';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
@@ -66,6 +67,12 @@ export default function TradeTable(props: TradeTableProps) {
     const { assignDefaultAddress } = useApp();
 
     const { page } = usePage();
+
+    const {
+        isLoading: positionsLoading,
+        positions,
+        lastUpdateTime,
+    } = useUnifiedMarginData();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -159,7 +166,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={webDataFetched}
+                        isFetched={!positionsLoading || lastUpdateTime > 0}
                         selectedFilter={selectedFilter}
                     />
                 );
@@ -167,7 +174,7 @@ export default function TradeTable(props: TradeTableProps) {
                 return (
                     <OpenOrdersTable
                         selectedFilter={selectedFilter}
-                        isFetched={webDataFetched}
+                        isFetched={orderHistoryFetched}
                         data={userOrders}
                     />
                 );
