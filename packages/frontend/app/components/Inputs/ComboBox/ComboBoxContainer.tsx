@@ -3,10 +3,10 @@ import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useRef } from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import ComboBox from './ComboBox';
 import styles from './ComboBox.module.css';
-import { useUserDataStore } from '~/stores/UserDataStore';
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
@@ -115,7 +115,7 @@ export default function ComboBoxContainer() {
                 onClick={() => setIsDebugWalletActive(!isDebugWalletActive)}
             >
                 <div className={styles.sdkToggleButton}>
-                    {isDebugWalletActive ? 'Debug Wallet' : 'Nightly Wallet'}
+                    {isDebugWalletActive ? 'Debug Wallet' : 'Sessions Wallet'}
                 </div>
             </div>
             <div className={styles.subInfo}>{userAddress}</div>

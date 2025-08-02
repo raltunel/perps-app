@@ -12,6 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -120,6 +121,13 @@ function PortfolioDeposit(props: propsIF) {
             if (result && result.success === false) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
+                notificationStore.add({
+                    title: 'Deposit Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                });
             } else {
                 setTransactionStatus('success');
 
@@ -128,6 +136,8 @@ function PortfolioDeposit(props: propsIF) {
                     title: 'Deposit Successful',
                     message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
                     icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
 
                 // Close modal on success - notification will show after modal closes
@@ -145,36 +155,6 @@ function PortfolioDeposit(props: propsIF) {
         setSelectedToken(token);
     }, []);
 
-    const USD_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }),
-        [],
-    );
-
-    const OTHER_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 8,
-            }),
-        [],
-    );
-
-    const formatCurrency = useCallback(
-        (value: number, unit: string) => {
-            if (unit === 'USD') {
-                return USD_FORMATTER.format(value);
-            }
-            return `${OTHER_FORMATTER.format(value)} ${unit}`;
-        },
-        [USD_FORMATTER, OTHER_FORMATTER, formatNum],
-    );
-
     // Memoize info items to prevent recreating on each render
     const infoItems = useMemo(() => {
         // Check if this is a USD-related token
@@ -187,26 +167,17 @@ function PortfolioDeposit(props: propsIF) {
         return [
             {
                 label: 'Available to deposit',
-                value: isUSDToken
-                    ? formatNum(availableBalance, 2, true, true) // Use app formatter for USD values
-                    : formatCurrency(availableBalance, selectedToken.symbol),
+                value: formatNum(
+                    availableBalance,
+                    isUSDToken ? 2 : 8,
+                    true,
+                    isUSDToken,
+                ),
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
-            {
-                label: 'Network Fee',
-                value:
-                    selectedToken.symbol === 'BTC' ? '0.00001 BTC' : '$0.001',
-                tooltip: 'Fee charged for processing the deposit transaction',
-            },
         ];
-    }, [
-        availableBalance,
-        selectedToken.symbol,
-        portfolio.unit,
-        formatCurrency,
-        formatNum,
-    ]);
+    }, [availableBalance, selectedToken.symbol, portfolio.unit, formatNum]);
 
     const isButtonDisabled = useMemo(
         () =>

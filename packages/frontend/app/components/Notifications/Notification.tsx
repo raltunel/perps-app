@@ -22,7 +22,7 @@ export default function Notification(props: propsIF) {
     const { getBsColor } = useAppSettings();
 
     // time period (ms) after which to auto-dismiss the notification
-    const DISMISS_AFTER = 5000;
+    const DISMISS_AFTER = data.removeAfter || 5000;
 
     // logic to remove this elem from the DOM after a timeout, yes the
     // ... logic shown is convoluted, any changes will result in all
@@ -111,6 +111,16 @@ export default function Notification(props: propsIF) {
                 />
             </header>
             <p>{formatMessage(data.message)}</p>
+            {data.txLink && (
+                <a
+                    href={data.txLink}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className={styles.txLink}
+                >
+                    View on explorer
+                </a>
+            )}
         </section>
     );
 }

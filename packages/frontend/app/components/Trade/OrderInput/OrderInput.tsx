@@ -13,8 +13,9 @@ import React, {
     type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
+import { LuCircleHelp } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
-import { PiSquaresFour } from 'react-icons/pi';
+import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -31,8 +32,8 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
-import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
@@ -49,7 +50,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { LuCircleHelp } from 'react-icons/lu';
 export interface OrderTypeOption {
     value: string;
     label: string;
@@ -72,12 +72,12 @@ const marketOrderTypes = [
         blurb: 'Buy/sell at the current price',
         icon: <GoZap color={'var(--accent1)'} size={25} />,
     },
-    // {
-    //     value: 'limit',
-    //     label: 'Limit',
-    //     blurb: 'Buy/Sell at a specific price or better',
-    //     icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
-    // },
+    {
+        value: 'limit',
+        label: 'Limit',
+        blurb: 'Buy/Sell at a specific price or better',
+        icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
+    },
     // disabled code 21 Jul 25
     // {
     //     value: 'stop_market',
@@ -145,8 +145,11 @@ function OrderInput({
     }, [sessionState]);
 
     // Market order service hook
-    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
-        useMarketOrderService();
+    const {
+        executeMarketOrder,
+        isLoading: isMarketOrderLoading,
+        signature,
+    } = useMarketOrderService();
 
     const [leverage, setLeverage] = useState(1);
 
@@ -216,6 +219,50 @@ function OrderInput({
         activeGroupSeparator,
         formatNum,
     } = useNumFormatter();
+
+    const getMidPrice = () => {
+        if (!buys.length || !sells.length) return null;
+        const midPrice = (buys[0].px + sells[0].px) / 2;
+        return midPrice;
+    };
+
+    const setMidPriceAsPriceInput = () => {
+        if (
+            marketOrderType === 'limit' &&
+            buys.length > 0 &&
+            sells.length > 0
+        ) {
+            const midPrice = getMidPrice();
+            if (!midPrice) return;
+            const formattedMidPrice = formatNumWithOnlyDecimals(
+                midPrice,
+                6,
+                true,
+            );
+            setPrice(formattedMidPrice);
+        }
+    };
+
+    useEffect(() => {
+        // set mid price input as default price when market changes
+        setMidPriceAsPriceInput();
+        setIsMidModeActive(false);
+    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
+
+    const [isMidModeActive, setIsMidModeActive] = useState(false);
+
+    useEffect(() => {
+        if (isMidModeActive) {
+            setMidPriceAsPriceInput();
+        }
+    }, [
+        isMidModeActive,
+        marketOrderType,
+        !buys.length,
+        !sells.length,
+        buys?.[0]?.px,
+        sells?.[0]?.px,
+    ]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
 
@@ -435,7 +482,6 @@ function OrderInput({
         price,
         marketOrderType,
         markPx,
-        parseNum,
         parseFormattedNum,
     ]);
 
@@ -506,6 +552,7 @@ function OrderInput({
         /* ----------------------------------------------------------------------------------------------- */
 
         if (obChosenPrice > 0) {
+            setIsMidModeActive(false);
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
@@ -573,7 +620,7 @@ function OrderInput({
                         ? formatNumWithOnlyDecimals(
                               notionalSymbolQtyNum * markPx,
                               2,
-                              true,
+                              false,
                           )
                         : '',
                 );
@@ -654,6 +701,7 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
+        setIsMidModeActive(false);
         if (typeof event === 'string') {
             setPrice(event);
         } else {
@@ -698,14 +746,12 @@ function OrderInput({
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
-            setNotionalSymbolQtyNum(
-                Math.floor(
-                    (((value / 100) * usdAvailableToTrade) /
-                        (parseFormattedNum(price) || 1)) *
-                        leverage *
-                        100,
-                ) / 100,
-            );
+            if (!price || !usdAvailableToTrade) return;
+            const notionalSymbolQtyNum =
+                (((value / 100) * usdAvailableToTrade) /
+                    (parseFormattedNum(price) || 1)) *
+                leverage;
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
 
@@ -721,7 +767,7 @@ function OrderInput({
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(
             positionSliderPercentageValue,
         );
-    }, [usdAvailableToTrade]);
+    }, [usdAvailableToTrade, price]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -874,9 +920,20 @@ function OrderInput({
             onKeyDown: handlePriceKeyDown,
             className: 'custom-input',
             ariaLabel: 'Price input',
-            showMidButton: ['stop_limit'].includes(marketOrderType),
+            showMidButton: ['stop_limit', 'limit'].includes(marketOrderType),
+            setMidPriceAsPriceInput,
+            isMidModeActive,
+            setIsMidModeActive,
         }),
-        [price, handlePriceChange],
+        [
+            price,
+            handlePriceChange,
+            marketOrderType,
+            markPx,
+            isMidModeActive,
+            setIsMidModeActive,
+            setMidPriceAsPriceInput,
+        ],
     );
 
     const sizeInputProps = useMemo(
@@ -961,6 +1018,8 @@ function OrderInput({
                     title: 'Buy Order Successful',
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 // Show error notification
@@ -968,6 +1027,8 @@ function OrderInput({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             }
         } catch (error) {
@@ -979,6 +1040,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1014,6 +1076,8 @@ function OrderInput({
                     title: 'Sell Order Successful',
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 // Show error notification
@@ -1021,6 +1085,8 @@ function OrderInput({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             }
         } catch (error) {
@@ -1032,6 +1098,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);

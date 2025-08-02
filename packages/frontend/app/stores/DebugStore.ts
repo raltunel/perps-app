@@ -52,7 +52,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
     setSdkEnabled: (sdkEnabled: boolean) => set({ sdkEnabled }),
     isWsSleepMode: false,
     setIsWsSleepMode: (isWsSleepMode: boolean) => set({ isWsSleepMode }),
-    isDebugWalletActive: true,
+    isDebugWalletActive: false,
     setIsDebugWalletActive: (isDebugWalletActive: boolean) =>
         set({ isDebugWalletActive }),
 }));
