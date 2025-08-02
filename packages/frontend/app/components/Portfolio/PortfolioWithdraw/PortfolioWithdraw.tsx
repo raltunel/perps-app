@@ -5,6 +5,7 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
 
@@ -42,38 +43,6 @@ function PortfolioWithdraw({
 
     const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
 
-    const unitValue = portfolio.unit || 'fUSD';
-
-    const USD_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }),
-        [],
-    );
-
-    const OTHER_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 8,
-            }),
-        [],
-    );
-
-    const formatCurrency = useCallback(
-        (value: number, unit: string) => {
-            if (unit === 'USD') {
-                return USD_FORMATTER.format(value);
-            }
-            return `${OTHER_FORMATTER.format(value)} ${unit}`;
-        },
-        [USD_FORMATTER, OTHER_FORMATTER],
-    );
-
     const validateAmount = useCallback((amount: number, maxAmount: number) => {
         if (!amount || isNaN(amount)) {
             return {
@@ -104,7 +73,8 @@ function PortfolioWithdraw({
 
     const handleMaxClick = useCallback(() => {
         setRawInputString(
-            '$' + formatNumWithOnlyDecimals(portfolio.availableBalance),
+            '$' +
+                formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
         );
     }, [portfolio.availableBalance]);
 
@@ -145,6 +115,13 @@ function PortfolioWithdraw({
             if (result && result.success === false) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
+                notificationStore.add({
+                    title: 'Withdrawal Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                });
             } else {
                 setTransactionStatus('success');
 
@@ -153,6 +130,8 @@ function PortfolioWithdraw({
                     title: 'Withdrawal Successful',
                     message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} USD`,
                     icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
 
                 // Close modal on success - notification will show after modal closes
@@ -180,18 +159,12 @@ function PortfolioWithdraw({
         () => [
             {
                 label: 'Available to withdraw',
-                value: formatCurrency(portfolio.availableBalance, unitValue),
+                value: formatNum(portfolio.availableBalance, 2, true, true),
                 tooltip:
                     'The total amount you have available to withdraw from your portfolio',
             },
-            {
-                label: 'Network Fee',
-                value: unitValue === 'USD' ? '$0.001' : '0.0001 BTC',
-                tooltip:
-                    'Fee charged for processing the withdrawal transaction',
-            },
         ],
-        [portfolio.availableBalance, unitValue, formatCurrency],
+        [portfolio.availableBalance, formatNum],
     );
 
     // Memoize button disabled state calculation
@@ -199,8 +172,9 @@ function PortfolioWithdraw({
         () =>
             isProcessing ||
             !rawInputString ||
-            parseFloat(rawInputString) <= 0 ||
-            parseFloat(rawInputString) > portfolio.availableBalance,
+            parseFormattedWithOnlyDecimals(rawInputString) <= 0 ||
+            parseFormattedWithOnlyDecimals(rawInputString) >
+                portfolio.availableBalance,
         [isProcessing, rawInputString, portfolio.availableBalance],
     );
 
@@ -212,11 +186,6 @@ function PortfolioWithdraw({
                 <h4>Withdraw fUSD to Fogo</h4>
                 <div>
                     <p>fUSD will be sent to your address.</p>
-                    <p>
-                        A {unitValue === 'USD' ? '$0.001' : '0.0001 BTC'} fee
-                        will be deducted from the fUSD withdrawn.
-                    </p>
-                    <p>Withdrawals should arrive within 5 minutes.</p>
                 </div>
             </div>
 
