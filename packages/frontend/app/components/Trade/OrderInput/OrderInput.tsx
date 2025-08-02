@@ -420,7 +420,6 @@ function OrderInput({
         }
     }, [
         positionSliderPercentageValue,
-        usdAvailableToTrade,
         leverage,
         markPx,
         isEditingSizeInput,
@@ -767,7 +766,7 @@ function OrderInput({
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(
             positionSliderPercentageValue,
         );
-    }, [usdAvailableToTrade, price]);
+    }, [price]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
