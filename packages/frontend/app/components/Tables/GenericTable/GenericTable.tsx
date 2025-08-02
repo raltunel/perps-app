@@ -140,6 +140,8 @@ export default function GenericTable<
 
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
+    const isHttpInfoCallsDisabled = true;
+
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
             `${id}-tableBody`,
@@ -419,12 +421,13 @@ export default function GenericTable<
                     </div>
                 )}
 
-                {sortedData.length > 0 && (
+                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
                     <div
                         id={`${id}-actionsContainer`}
                         className={styles.actionsContainer}
                     >
-                        {sortedData.length > slicedLimit &&
+                        {!isHttpInfoCallsDisabled &&
+                            sortedData.length > slicedLimit &&
                             !pageMode &&
                             viewAllLink &&
                             viewAllLink.length > 0 && (
@@ -436,7 +439,8 @@ export default function GenericTable<
                                     View All
                                 </a>
                             )}
-                        {tableModel &&
+                        {!isHttpInfoCallsDisabled &&
+                            tableModel &&
                             (pageMode || csvDataFetcher) &&
                             tableModel.some((header) => header.exportable) && (
                                 <a
