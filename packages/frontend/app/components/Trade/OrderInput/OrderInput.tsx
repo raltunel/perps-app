@@ -172,7 +172,9 @@ function OrderInput({
 
     const { executeLimitOrder } = useLimitOrderService();
 
-    const [leverage, setLeverage] = useState(1);
+    // Get the current leverage from the store and subscribe to changes
+    const leverage = useLeverageStore((state) => state.currentLeverage);
+    const setLeverage = useLeverageStore((state) => state.setPreferredLeverage);
 
     const [price, setPrice] = useState('');
 
@@ -1020,6 +1022,15 @@ function OrderInput({
 
         try {
             setIsProcessingOrder(true);
+            if (activeOptions.skipOpenOrderConfirm) {
+                confirmOrderModal.close();
+                notifications.add({
+                    title: 'Order Submitted',
+                    message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    icon: 'spinner',
+                    removeAfter: 5000,
+                });
+            }
             // Execute the market buy order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1082,6 +1093,15 @@ function OrderInput({
 
         try {
             setIsProcessingOrder(true);
+            if (activeOptions.skipOpenOrderConfirm) {
+                confirmOrderModal.close();
+                notifications.add({
+                    title: 'Order Submitted',
+                    message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    icon: 'spinner',
+                    removeAfter: 5000,
+                });
+            }
             // Execute the market sell order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1156,14 +1176,17 @@ function OrderInput({
 
         setIsProcessingOrder(true);
 
-        try {
+        if (activeOptions.skipOpenOrderConfirm) {
+            confirmOrderModal.close();
             // Show pending notification
             notifications.add({
                 title: 'Buy / Long Limit Order Pending',
                 message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
             });
+        }
 
+        try {
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1230,14 +1253,17 @@ function OrderInput({
 
         setIsProcessingOrder(true);
 
-        try {
+        if (activeOptions.skipOpenOrderConfirm) {
+            confirmOrderModal.close();
             // Show pending notification
             notifications.add({
                 title: 'Sell / Short Limit Order Pending',
                 message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
             });
+        }
 
+        try {
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1292,6 +1318,9 @@ function OrderInput({
     );
 
     const handleSubmitOrder = () => {
+        if (submitButtonRecentlyClicked) return;
+        if (activeOptions.skipOpenOrderConfirm)
+            setSubmitButtonRecentlyClicked(true);
         if (tradeDirection === 'buy') {
             if (marketOrderType === 'market') {
                 if (activeOptions.skipOpenOrderConfirm) {
@@ -1334,11 +1363,25 @@ function OrderInput({
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
+
+    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
+        useState(false);
+
+    useEffect(() => {
+        if (submitButtonRecentlyClicked) {
+            const timeout = setTimeout(() => {
+                setSubmitButtonRecentlyClicked(false);
+            }, 1000);
+            return () => clearTimeout(timeout);
+        }
+    }, [submitButtonRecentlyClicked]);
+
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
         isPriceInvalid ||
-        isMarketOrderLoading;
+        submitButtonRecentlyClicked;
+
     const disabledReason = getDisabledReason(
         collateralInsufficient,
         sizeLessThanMinimum,
@@ -1623,6 +1666,7 @@ function OrderInput({
                             }
                             submitFn={submitMarketBuy}
                             isProcessing={isProcessingOrder}
+                            setIsProcessingOrder={setIsProcessingOrder}
                         />
                     )}
                     {confirmOrderModal.content === 'market_sell' && (
@@ -1641,6 +1685,7 @@ function OrderInput({
                             }
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
+                            setIsProcessingOrder={setIsProcessingOrder}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_buy' && (
@@ -1659,6 +1704,8 @@ function OrderInput({
                                 activeOptions.toggle('skipOpenOrderConfirm')
                             }
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
+                            isProcessing={isProcessingOrder}
+                            setIsProcessingOrder={setIsProcessingOrder}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_sell' && (
@@ -1677,6 +1724,8 @@ function OrderInput({
                                 activeOptions.toggle('skipOpenOrderConfirm')
                             }
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
+                            isProcessing={isProcessingOrder}
+                            setIsProcessingOrder={setIsProcessingOrder}
                         />
                     )}
                 </Modal>

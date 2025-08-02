@@ -1,9 +1,10 @@
-import styles from './ConfirmationModal.module.css';
+import { useEffect } from 'react';
+import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import type { modalContentT } from '../OrderInput';
-import { useAppSettings } from '~/stores/AppSettingsStore';
-import { LuCircleHelp } from 'react-icons/lu';
+import styles from './ConfirmationModal.module.css';
 
 interface propsIF {
     tx: modalContentT;
@@ -16,6 +17,7 @@ interface propsIF {
     isEnabled: boolean;
     toggleEnabled: () => void;
     isProcessing?: boolean;
+    setIsProcessingOrder?: (value: boolean) => void;
 }
 type InfoItem = {
     label: string;
@@ -34,12 +36,19 @@ export default function ConfirmationModal(props: propsIF) {
         size,
         limitPrice,
         isProcessing,
+        setIsProcessingOrder,
     } = props;
 
     const { getBsColor } = useAppSettings();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
+
+    useEffect(() => {
+        if (isProcessing) {
+            setIsProcessingOrder?.(false);
+        }
+    }, []);
 
     const dataInfo: InfoItem[] = [
         {

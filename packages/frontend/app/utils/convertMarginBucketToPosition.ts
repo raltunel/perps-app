@@ -1,5 +1,9 @@
-import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
+import {
+    calcLiqPrice,
+    type MarginBucketAvail,
+} from '@crocswap-libs/ambient-ember';
 import type { PositionIF } from '~/utils/position/PositionIFs';
+import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
 /**
  * Convert a MarginBucketAvail from RPC to PositionIF format for display
@@ -10,6 +14,7 @@ import type { PositionIF } from '~/utils/position/PositionIFs';
 export function convertMarginBucketToPosition(
     marginBucket: MarginBucketAvail,
     marketId: bigint = 64n,
+    symbolInfo: SymbolInfoIF | null,
 ): PositionIF | null {
     // If no position exists, return null
     if (marginBucket.netPosition === 0n) {
@@ -18,18 +23,21 @@ export function convertMarginBucketToPosition(
 
     // Convert bigint values to numbers with proper decimal scaling
     const netPositionNum = Number(marginBucket.netPosition) / 1e8; // 8 decimals for position size
-    const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e8; // 8 decimals for price
-    const markPriceNum = Number(marginBucket.markPrice) / 1e8; // 8 decimals for price
-    const committedCollateralNum =
-        Number(marginBucket.committedCollateral) / 1e6; // 6 decimals for USDC
+    const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e6; // 6 decimals for price (matches on-chain format)
+    // const markPriceNum = Number(marginBucket.markPrice) / 1e6; // 6 decimals for price (matches on-chain format)
+    const markPriceNum = symbolInfo?.markPx || 0;
+
     const unrealizedPnlNum = Number(marginBucket.unrealizedPnl) / 1e6; // 6 decimals for USDC
 
     // Calculate position value (size * mark price)
     const positionValue = Math.abs(netPositionNum * markPriceNum);
 
     // Calculate leverage based on position value and committed collateral
-    const leverage =
-        committedCollateralNum > 0 ? positionValue / committedCollateralNum : 0;
+    const leverage = marginBucket.effectiveImBps
+        ? 10000 / marginBucket.effectiveImBps
+        : 20;
+
+    const committedCollateralNum = positionValue / leverage;
 
     // Calculate max leverage from effective IM basis points
     // IM% = 100 / maxLeverage, so maxLeverage = 10000 / imBps
@@ -38,19 +46,28 @@ export function convertMarginBucketToPosition(
             ? 10000 / marginBucket.effectiveImBps
             : 100; // Default max leverage
 
-    // Calculate liquidation price
-    // For long: liqPrice = entryPrice * (1 - 1/leverage * maintenanceMarginRatio)
-    // For short: liqPrice = entryPrice * (1 + 1/leverage * maintenanceMarginRatio)
-    // Using MM as 50% of IM (typical ratio)
-    const mmRatio = marginBucket.marketMmBps / 10000; // Convert basis points to ratio
+    // Calculate liquidation price using the SDK's calcLiqPrice function
+    // The SDK function expects:
+    // - collateral in raw units (with decimals)
+    // - position with qty and entryPrice in raw units
+    // - mmBps as maintenance margin in basis points
     let liquidationPx = 0;
-    if (leverage > 0 && avgEntryPriceNum > 0) {
-        if (netPositionNum > 0) {
-            // Long position
-            liquidationPx = avgEntryPriceNum * (1 - mmRatio / leverage);
-        } else {
-            // Short position
-            liquidationPx = avgEntryPriceNum * (1 + mmRatio / leverage);
+    if (marginBucket.netPosition !== 0n && marginBucket.avgEntryPrice > 0n) {
+        try {
+            liquidationPx = calcLiqPrice(
+                Number(marginBucket.committedCollateral) / 1e6, // Collateral in USDC (6 decimals)
+                {
+                    qty: Number(marginBucket.netPosition) / 1e8, // Position size in BTC (8 decimals)
+                    entryPrice: Number(marginBucket.avgEntryPrice) / 1e6, // Entry price in BTC (6 decimals)
+                },
+                marginBucket.marketMmBps / 10000,
+            );
+
+            if (liquidationPx < 0) {
+                liquidationPx = 0; // Ensure non-negative liquidation price
+            }
+        } catch (error) {
+            liquidationPx = 0; // If calculation fails, set to 0
         }
     }
 

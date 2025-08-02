@@ -1,15 +1,13 @@
 import {
+    DFLT_EMBER_MARKET,
     getUserMarginBucket,
     USD_MINT,
-    DFLT_EMBER_MARKET,
-    type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
-import type { Connection } from '@solana/web3.js';
-import type { PublicKey } from '@solana/web3.js';
+import type { Connection, PublicKey } from '@solana/web3.js';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { convertMarginBucketToPosition } from '~/utils/convertMarginBucketToPosition';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
-import type { PositionIF } from '~/utils/position/PositionIFs';
-import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 
 /**
  * Singleton manager for unified margin polling
@@ -160,10 +158,13 @@ class UnifiedMarginPollingManager {
                 contractAddress: 'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
             };
 
+            const symbolInfo = useTradeDataStore.getState().symbolInfo;
+
             // Convert to position format
             const position = convertMarginBucketToPosition(
                 marginBucket,
                 BigInt(DFLT_EMBER_MARKET.mktId),
+                symbolInfo,
             );
 
             // Update store
