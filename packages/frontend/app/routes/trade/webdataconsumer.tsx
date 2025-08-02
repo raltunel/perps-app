@@ -153,7 +153,7 @@ export default function WebDataConsumer() {
                     postWebData2MarketOnly(msg);
                 };
                 const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: userAddress },
+                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
                     marketDataCallback,
                 );
                 unsubscribeMarketData = result.unsubscribe;
