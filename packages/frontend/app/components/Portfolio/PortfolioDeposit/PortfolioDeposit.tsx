@@ -12,6 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -120,6 +121,15 @@ function PortfolioDeposit(props: propsIF) {
             if (result && result.success === false) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
+                notificationStore.add({
+                    title: 'Deposit Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
             } else {
                 setTransactionStatus('success');
 
@@ -128,6 +138,10 @@ function PortfolioDeposit(props: propsIF) {
                     title: 'Deposit Successful',
                     message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 10000,
                 });
 
                 // Close modal on success - notification will show after modal closes

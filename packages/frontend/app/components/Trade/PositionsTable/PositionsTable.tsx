@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useModal } from '~/hooks/useModal';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
@@ -18,7 +19,8 @@ interface PositionsTableProps {
 
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
-    const { coinPriceMap, positions, symbol } = useTradeDataStore();
+    const { coinPriceMap, symbol } = useTradeDataStore();
+    const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
 
     const { userAddress } = useUserDataStore();

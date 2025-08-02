@@ -333,6 +333,10 @@ export function processUserTwapSliceFills(
     data: UserTwapSliceFillsData,
 ): TwapSliceFillIF[] {
     const ret: TwapSliceFillIF[] = [];
+    if (!data || !data.twapSliceFills) {
+        console.warn('[TWAP SLICE FILLS] No twapSliceFills data found');
+        return ret;
+    }
     data.twapSliceFills.forEach((f) => {
         ret.push({
             coin: f.fill.coin,

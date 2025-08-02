@@ -18,6 +18,7 @@ export interface UserBalanceIF {
     available: number;
     metaIndex: number;
     buyingPower: number;
+    contractAddress?: string;
 }
 
 export interface AccountOverviewIF {

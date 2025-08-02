@@ -47,12 +47,18 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 {order.filledSz ? formatNum(order.filledSz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
-                {order.sz
-                    ? formatNum(order.sz * order.limitPx, null, true, true)
-                    : '--'}
+                {order.limitPx === 0
+                    ? 'Market'
+                    : order.sz
+                      ? formatNum(order.sz * order.limitPx, null, true, true)
+                      : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
-                {order.limitPx ? formatNum(order.limitPx) : '--'}
+                {order.limitPx === 0
+                    ? 'Market'
+                    : order.limitPx
+                      ? formatNum(order.limitPx)
+                      : '--'}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
                 {order.reduceOnly === false ? 'No' : 'Yes'}
@@ -66,7 +72,10 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 </div>
             )}
             <div className={`${styles.cell} ${styles.statusCell}`}>
-                {order.status}
+                {order.status
+                    ? order.status.charAt(0).toUpperCase() +
+                      order.status.slice(1)
+                    : ''}
             </div>
             <div className={`${styles.cell} ${styles.orderIdCell}`}>
                 {order.oid}
