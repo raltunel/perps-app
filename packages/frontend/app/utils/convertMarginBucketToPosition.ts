@@ -18,8 +18,8 @@ export function convertMarginBucketToPosition(
 
     // Convert bigint values to numbers with proper decimal scaling
     const netPositionNum = Number(marginBucket.netPosition) / 1e8; // 8 decimals for position size
-    const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e8; // 8 decimals for price
-    const markPriceNum = Number(marginBucket.markPrice) / 1e8; // 8 decimals for price
+    const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e6; // 6 decimals for price (matches on-chain format)
+    const markPriceNum = Number(marginBucket.markPrice) / 1e6; // 6 decimals for price (matches on-chain format)
     const committedCollateralNum =
         Number(marginBucket.committedCollateral) / 1e6; // 6 decimals for USDC
     const unrealizedPnlNum = Number(marginBucket.unrealizedPnl) / 1e6; // 6 decimals for USDC
