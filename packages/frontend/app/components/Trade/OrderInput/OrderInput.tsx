@@ -20,8 +20,8 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
-import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
@@ -764,12 +764,6 @@ function OrderInput({
         setPositionSliderPercentageValue(value);
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
     };
-
-    useEffect(() => {
-        setNotionalSymbolQtyNumFromUsdAvailableToTrade(
-            positionSliderPercentageValue,
-        );
-    }, [price]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
