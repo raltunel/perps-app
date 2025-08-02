@@ -41,7 +41,7 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 {order.side === 'buy' ? 'Long' : 'Short'}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
-                {order.sz ? formatNum(order.sz) : '--'}
+                {order.origSz ? formatNum(order.origSz) : '--'}
             </div>
             <div className={`${styles.cell} ${styles.filledSizeCell}`}>
                 {order.filledSz ? formatNum(order.filledSz) : '--'}
