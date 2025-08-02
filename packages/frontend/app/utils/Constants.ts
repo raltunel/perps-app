@@ -145,4 +145,8 @@ export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
 
 export const USER_WS_ENDPOINT =
-    import.meta.env.VITE_USER_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_USER_WS_ENDPOINT ||
+    'https://embindexer.net/ember/tradesocket';
+
+export const blockExplorer =
+    import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';

@@ -14,15 +14,14 @@ import React, {
     type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
-import { LuCircleHelp, LuOctagonX } from 'react-icons/lu';
+import { LuCircleHelp } from 'react-icons/lu';
 import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
-import { RiBarChartHorizontalLine } from 'react-icons/ri';
-import { TbArrowBigUpLine, TbClockPlus } from 'react-icons/tb';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useKeydown } from '~/hooks/useKeydown';
+import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -35,6 +34,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -93,41 +93,41 @@ const marketOrderTypes = useOnlyMarket
               icon: <PiArrowLineDown color={'var(--accent1)'} size={25} />,
           },
           // disabled code 21 Jul 25
-          {
-              value: 'stop_market',
-              label: 'Stop Market',
-              blurb: 'Triggers a market order at a set price',
-              icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-          },
-          {
-              value: 'stop_limit',
-              label: 'Stop Limit',
-              blurb: 'Triggers a limit order at a set price',
-              icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
-          },
-          {
-              value: 'twap',
-              label: 'TWAP',
-              blurb: 'Distributes trades across a specified time period',
-              icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
-          },
-          {
-              value: 'scale',
-              label: 'Scale',
-              blurb: 'Multiple orders at incrementing prices',
-              icon: (
-                  <RiBarChartHorizontalLine
-                      color={'var(--accent1)'}
-                      size={25}
-                  />
-              ),
-          },
-          {
-              value: 'chase_limit',
-              label: 'Chase Limit',
-              blurb: 'Adjusts limit price to follow the market',
-              icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
-          },
+          //   {
+          //       value: 'stop_market',
+          //       label: 'Stop Market',
+          //       blurb: 'Triggers a market order at a set price',
+          //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'stop_limit',
+          //       label: 'Stop Limit',
+          //       blurb: 'Triggers a limit order at a set price',
+          //       icon: <LuOctagonX color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'twap',
+          //       label: 'TWAP',
+          //       blurb: 'Distributes trades across a specified time period',
+          //       icon: <TbClockPlus color={'var(--accent1)'} size={25} />,
+          //   },
+          //   {
+          //       value: 'scale',
+          //       label: 'Scale',
+          //       blurb: 'Multiple orders at incrementing prices',
+          //       icon: (
+          //           <RiBarChartHorizontalLine
+          //               color={'var(--accent1)'}
+          //               size={25}
+          //           />
+          //       ),
+          //   },
+          //   {
+          //       value: 'chase_limit',
+          //       label: 'Chase Limit',
+          //       blurb: 'Adjusts limit price to follow the market',
+          //       icon: <TbArrowBigUpLine color={'var(--accent1)'} size={25} />,
+          //   },
       ];
 
 // disabled code 07 Jul 25
@@ -164,8 +164,13 @@ function OrderInput({
     }, [sessionState]);
 
     // Market order service hook
-    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
-        useMarketOrderService();
+    const {
+        executeMarketOrder,
+        isLoading: isMarketOrderLoading,
+        signature,
+    } = useMarketOrderService();
+
+    const { executeLimitOrder } = useLimitOrderService();
 
     const [leverage, setLeverage] = useState(1);
 
@@ -436,7 +441,6 @@ function OrderInput({
         }
     }, [
         positionSliderPercentageValue,
-        usdAvailableToTrade,
         leverage,
         markPx,
         isEditingSizeInput,
@@ -779,12 +783,6 @@ function OrderInput({
         setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
     };
 
-    useEffect(() => {
-        setNotionalSymbolQtyNumFromUsdAvailableToTrade(
-            positionSliderPercentageValue,
-        );
-    }, [usdAvailableToTrade, price]);
-
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
     // const handleChaseOptionChange = (value: string) => {
@@ -1034,6 +1032,10 @@ function OrderInput({
                     title: 'Buy Order Successful',
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 // Show error notification
@@ -1041,6 +1043,10 @@ function OrderInput({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1052,6 +1058,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1087,6 +1094,10 @@ function OrderInput({
                     title: 'Sell Order Successful',
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 // Show error notification
@@ -1094,6 +1105,10 @@ function OrderInput({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1105,6 +1120,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1113,23 +1129,151 @@ function OrderInput({
     }
 
     // fn to submit a 'Buy' limit order
-    function submitLimitBuy(): void {
-        notifications.add({
-            title: 'Buy / Long Limit Order Pending',
-            message: 'Buying 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitLimitBuy(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Buy / Long Limit Order Pending',
+                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: notionalSymbolQtyNum,
+                price: limitPrice,
+                side: 'buy',
+                leverage: leverage,
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit buy order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // fn to submit a 'Sell' limit order
-    function submitLimitSell(): void {
-        notifications.add({
-            title: 'Sell / Short Limit Order Pending',
-            message: 'Selling 0.0001 ETH at $2,300',
-            icon: 'spinner',
-        });
-        confirmOrderModal.close();
+    async function submitLimitSell(): Promise<void> {
+        // Validate position size
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            confirmOrderModal.close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Sell / Short Limit Order Pending',
+                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: notionalSymbolQtyNum,
+                price: limitPrice,
+                side: 'sell',
+                leverage: leverage,
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit sell order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            confirmOrderModal.close();
+        }
     }
 
     // logic to dispatch a notification on demand

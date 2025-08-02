@@ -9,6 +9,8 @@ import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
@@ -28,6 +30,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { coinPriceMap } = useTradeDataStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
+        const notifications = useNotificationStore();
+        const { executeMarketOrder } = useMarketOrderService();
+        const [isClosing, setIsClosing] = useState(false);
 
         const showTpSl = false;
 
@@ -127,6 +132,58 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const handleCoinClick = useCallback(() => {
             navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
+
+        // Handle market close
+        const handleMarketClose = useCallback(async () => {
+            if (isClosing || !position.szi) return;
+
+            setIsClosing(true);
+
+            try {
+                // Show pending notification
+                notifications.add({
+                    title: 'Closing Position',
+                    message: `Market closing ${Math.abs(position.szi)} ${position.coin}`,
+                    icon: 'spinner',
+                });
+
+                // Execute market order in opposite direction
+                const result = await executeMarketOrder({
+                    quantity: Math.abs(position.szi), // Use absolute value of position size
+                    side: position.szi > 0 ? 'sell' : 'buy', // Opposite side to close
+                    leverage: position.leverage?.value,
+                });
+
+                if (result.success) {
+                    notifications.add({
+                        title: 'Position Closed',
+                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                        icon: 'check',
+                    });
+                } else {
+                    notifications.add({
+                        title: 'Close Failed',
+                        message: String(
+                            result.error || 'Failed to close position',
+                        ),
+                        icon: 'error',
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error closing position:', error);
+                notifications.add({
+                    title: 'Close Failed',
+                    message: String(
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error occurred',
+                    ),
+                    icon: 'error',
+                });
+            } finally {
+                setIsClosing(false);
+            }
+        }, [position, executeMarketOrder, notifications, isClosing]);
 
         // Memoize funding values and tooltip
         const fundingToShow = useMemo(
@@ -247,7 +304,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
                         {/* <button className={styles.actionButton}>Limit</button> */}
-                        <button className={styles.actionButton}>Market</button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={handleMarketClose}
+                            disabled={isClosing}
+                        >
+                            {isClosing ? 'Closing...' : 'Market'}
+                        </button>
                     </div>
                 </div>
                 {modalCtrl.isOpen && renderModalContent()}
