@@ -332,6 +332,12 @@ export default function WebDataConsumer() {
                 return;
             }
 
+            console.log('[ORDER HISTORY] Received subscription data:', {
+                isSnapshot: data.isSnapshot,
+                orderCount: data.orderHistory?.length,
+                user: data.user,
+            });
+
             if (
                 data &&
                 data.orderHistory &&
@@ -340,14 +346,25 @@ export default function WebDataConsumer() {
             ) {
                 const orders: OrderDataIF[] = [];
                 data.orderHistory.forEach((order: any) => {
+                    console.log('[ORDER HISTORY] Processing order:', {
+                        oid: order.order?.oid,
+                        status: order.status,
+                        coin: order.order?.coin,
+                        side: order.order?.side,
+                        sz: order.order?.sz,
+                        limitPx: order.order?.limitPx,
+                    });
                     const processedOrder = processUserOrder(
                         order.order,
                         order.status,
                     );
+                    console.log(processedOrder);
                     if (processedOrder) {
                         orders.push(processedOrder);
                     }
                 });
+
+                const previousOpenOrders = [...openOrdersRef.current];
 
                 if (data.isSnapshot) {
                     orders.sort((a, b) => b.timestamp - a.timestamp);
@@ -357,19 +374,89 @@ export default function WebDataConsumer() {
                         (order) => order.status === 'open',
                     );
                     openOrdersRef.current = openOrders;
-                } else {
-                    userOrderHistoryRef.current = [
-                        ...orders.sort((a, b) => b.timestamp - a.timestamp),
-                        ...userOrderHistoryRef.current,
-                    ];
-                    userOrderHistoryRef.current.sort(
-                        (a, b) => b.timestamp - a.timestamp,
+
+                    console.log(
+                        '[OPEN ORDERS] Snapshot - Setting open orders:',
+                        {
+                            totalOrders: orders.length,
+                            openOrdersCount: openOrders.length,
+                            openOrderOids: openOrders.map((o) => ({
+                                oid: o.oid,
+                                coin: o.coin,
+                                status: o.status,
+                            })),
+                        },
                     );
-                    // Update open orders - filter all orders with status 'open'
+                } else {
+                    // For updates, merge new/updated orders with existing ones
+                    // Create a map to track the latest status of each order by oid
+                    const orderMap = new Map<number, OrderDataIF>();
+
+                    // First, add all existing orders to the map
+                    userOrderHistoryRef.current.forEach((order) => {
+                        orderMap.set(order.oid, order);
+                    });
+
+                    // Then, update or add new orders (this will overwrite with latest status)
+                    orders.forEach((order) => {
+                        const existingOrder = orderMap.get(order.oid);
+                        console.log(
+                            '[ORDER HISTORY] Update - Order status change:',
+                            {
+                                oid: order.oid,
+                                coin: order.coin,
+                                oldStatus: existingOrder?.status,
+                                newStatus: order.status,
+                                isNewOrder: !existingOrder,
+                            },
+                        );
+                        orderMap.set(order.oid, order);
+                    });
+
+                    // Convert back to array and sort
+                    userOrderHistoryRef.current = Array.from(
+                        orderMap.values(),
+                    ).sort((a, b) => b.timestamp - a.timestamp);
+
+                    // Update open orders - filter only orders with status 'open'
                     const allOpenOrders = userOrderHistoryRef.current.filter(
                         (order) => order.status === 'open',
                     );
                     openOrdersRef.current = allOpenOrders;
+
+                    // Log changes to open orders
+                    const removedOrders = previousOpenOrders.filter(
+                        (prevOrder) =>
+                            !allOpenOrders.find(
+                                (order) => order.oid === prevOrder.oid,
+                            ),
+                    );
+                    const addedOrders = allOpenOrders.filter(
+                        (order) =>
+                            !previousOpenOrders.find(
+                                (prevOrder) => prevOrder.oid === order.oid,
+                            ),
+                    );
+
+                    if (removedOrders.length > 0 || addedOrders.length > 0) {
+                        console.log(
+                            '[OPEN ORDERS] Update - Changes detected:',
+                            {
+                                previousCount: previousOpenOrders.length,
+                                newCount: allOpenOrders.length,
+                                removed: removedOrders.map((o) => ({
+                                    oid: o.oid,
+                                    coin: o.coin,
+                                    status: o.status,
+                                })),
+                                added: addedOrders.map((o) => ({
+                                    oid: o.oid,
+                                    coin: o.coin,
+                                    status: o.status,
+                                })),
+                            },
+                        );
+                    }
                 }
                 fetchedChannelsRef.current.add(
                     WsChannels.USER_HISTORICAL_ORDERS,
@@ -390,20 +477,67 @@ export default function WebDataConsumer() {
     const postUserFills = useCallback(
         (payload: any) => {
             const data = payload.data;
+
+            console.log('[USER FILLS] Received subscription data:', {
+                isSnapshot: data?.isSnapshot,
+                fillsCount: data?.fills?.length,
+                user: data?.user,
+            });
+
             if (
                 data &&
                 data.user &&
                 data.user?.toLowerCase() === addressRef.current?.toLowerCase()
             ) {
+                console.log('[USER FILLS] Processing fills:', {
+                    rawFills: data.fills?.slice(0, 3).map((fill: any) => ({
+                        coin: fill.coin,
+                        side: fill.side,
+                        px: fill.px,
+                        sz: fill.sz,
+                        oid: fill.oid,
+                        tid: fill.tid,
+                        time: fill.time,
+                    })),
+                });
+
                 const fills = processUserFills(data);
                 fills.sort((a, b) => b.time - a.time);
+
+                console.log('[USER FILLS] Processed fills:', {
+                    processedCount: fills.length,
+                    firstFewFills: fills.slice(0, 3).map((fill) => ({
+                        coin: fill.coin,
+                        side: fill.side,
+                        px: fill.px,
+                        sz: fill.sz,
+                        oid: fill.oid,
+                        tid: fill.tid,
+                        time: fill.time,
+                    })),
+                });
+
                 if (data.isSnapshot) {
                     userFillsRef.current = fills;
+                    console.log(
+                        '[USER FILLS] Set snapshot fills:',
+                        fills.length,
+                    );
                 } else {
+                    const previousCount = userFillsRef.current.length;
                     userFillsRef.current = [...fills, ...userFillsRef.current];
+                    console.log('[USER FILLS] Added update fills:', {
+                        newFillsCount: fills.length,
+                        previousTotal: previousCount,
+                        newTotal: userFillsRef.current.length,
+                    });
                 }
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));
+            } else {
+                console.warn(
+                    '[USER FILLS] Skipping - user mismatch or missing data',
+                );
             }
         },
         [setFetchedChannels],
