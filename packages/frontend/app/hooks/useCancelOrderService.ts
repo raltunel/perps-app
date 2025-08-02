@@ -26,14 +26,7 @@ export function useCancelOrderService(): UseCancelOrderServiceReturn {
 
     // Initialize cancel order service when session is established
     useEffect(() => {
-        console.log('🔄 Cancel order service initialization check');
-        console.log('  - Session established:', isEstablished(sessionState));
-
         if (isEstablished(sessionState)) {
-            console.log(
-                '✅ Creating cancel order service with connection:',
-                sessionState.connection,
-            );
             const service = new CancelOrderService(sessionState.connection);
             setCancelOrderService(service);
         } else {

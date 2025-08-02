@@ -28,14 +28,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
 
     // Initialize market order service when session is established
     useEffect(() => {
-        console.log('🔄 Market order service initialization check');
-        console.log('  - Session established:', isEstablished(sessionState));
-
         if (isEstablished(sessionState)) {
-            console.log(
-                '✅ Creating market order service with connection:',
-                sessionState.connection,
-            );
             const service = new MarketOrderService(sessionState.connection);
             setMarketOrderService(service);
         } else {
