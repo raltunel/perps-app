@@ -21,13 +21,6 @@ export function convertMarginBucketToPosition(
         return null;
     }
 
-    console.log('Converting margin bucket to position:', {
-        netPosition: marginBucket.netPosition.toString(),
-        avgEntryPrice: marginBucket.avgEntryPrice.toString(),
-        committedCollateral: marginBucket.committedCollateral.toString(),
-        marketMmBps: marginBucket.marketMmBps,
-    });
-
     // Convert bigint values to numbers with proper decimal scaling
     const netPositionNum = Number(marginBucket.netPosition) / 1e8; // 8 decimals for position size
     const avgEntryPriceNum = Number(marginBucket.avgEntryPrice) / 1e6; // 6 decimals for price (matches on-chain format)
