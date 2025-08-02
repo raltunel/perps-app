@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
+import { create } from 'zustand';
 import type { UserBalanceIF } from '~/utils/UserDataIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 

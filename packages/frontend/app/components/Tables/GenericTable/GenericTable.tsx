@@ -405,14 +405,16 @@ export default function GenericTable<
                     pageMode ? styles.pageMode : styles.notPage
                 }`}
             >
-                {tableState === TableState.LOADING && (
+                {isSessionEstablished && tableState === TableState.LOADING && (
                     <SkeletonTable
                         rows={skeletonRows}
                         colRatios={skeletonColRatios}
                     />
                 )}
-                {tableState === TableState.FILLED && dataToShow.map(renderRow)}
-                {tableState === TableState.EMPTY && isSessionEstablished && (
+                {isSessionEstablished &&
+                    tableState === TableState.FILLED &&
+                    dataToShow.map(renderRow)}
+                {isSessionEstablished && tableState === TableState.EMPTY && (
                     <NoDataRow />
                 )}
                 {!isSessionEstablished && (
