@@ -426,8 +426,7 @@ export default function GenericTable<
                         id={`${id}-actionsContainer`}
                         className={styles.actionsContainer}
                     >
-                        {!isHttpInfoCallsDisabled &&
-                            sortedData.length > slicedLimit &&
+                        {sortedData.length > slicedLimit &&
                             !pageMode &&
                             viewAllLink &&
                             viewAllLink.length > 0 && (
@@ -439,8 +438,7 @@ export default function GenericTable<
                                     View All
                                 </a>
                             )}
-                        {!isHttpInfoCallsDisabled &&
-                            tableModel &&
+                        {tableModel &&
                             (pageMode || csvDataFetcher) &&
                             tableModel.some((header) => header.exportable) && (
                                 <a
