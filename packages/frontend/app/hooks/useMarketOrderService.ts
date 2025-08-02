@@ -9,6 +9,7 @@ import {
 export interface UseMarketOrderServiceReturn {
     isLoading: boolean;
     error: string | null;
+    signature?: string;
     executeMarketOrder: (
         params: MarketOrderParams,
     ) => Promise<MarketOrderResult>;
@@ -21,6 +22,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
     const sessionState = useSession();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [signature, setSignature] = useState<string | undefined>(undefined);
     const [marketOrderService, setMarketOrderService] =
         useState<MarketOrderService | null>(null);
 
@@ -93,6 +95,11 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                     paymaster, // Pass paymaster as rent payer
                 );
 
+                // Update the signature state if available
+                if (result.signature) {
+                    setSignature(result.signature);
+                }
+
                 if (!result.success) {
                     setError(result.error || 'Market order failed');
                 }
@@ -117,5 +124,6 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
         isLoading,
         error,
         executeMarketOrder,
+        signature,
     };
 }

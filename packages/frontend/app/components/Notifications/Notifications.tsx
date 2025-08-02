@@ -143,7 +143,9 @@ export default function Notifications() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            transition={{ duration: 0.3 }}
+                            transition={{
+                                duration: 0.3,
+                            }}
                             layout // Optional: enables smooth stacking animations
                         >
                             <Notification data={n} dismiss={data.remove} />

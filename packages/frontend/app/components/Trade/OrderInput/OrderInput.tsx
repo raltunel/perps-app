@@ -32,6 +32,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -144,8 +145,11 @@ function OrderInput({
     }, [sessionState]);
 
     // Market order service hook
-    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
-        useMarketOrderService();
+    const {
+        executeMarketOrder,
+        isLoading: isMarketOrderLoading,
+        signature,
+    } = useMarketOrderService();
 
     const [leverage, setLeverage] = useState(1);
 
@@ -1014,6 +1018,8 @@ function OrderInput({
                     title: 'Buy Order Successful',
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 // Show error notification
@@ -1021,6 +1027,8 @@ function OrderInput({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             }
         } catch (error) {
@@ -1032,6 +1040,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1067,6 +1076,8 @@ function OrderInput({
                     title: 'Sell Order Successful',
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
+                    removeAfter: 10000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             } else {
                 // Show error notification
@@ -1074,6 +1085,8 @@ function OrderInput({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
                 });
             }
         } catch (error) {
@@ -1085,6 +1098,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
+                removeAfter: 15000,
             });
         } finally {
             setIsProcessingOrder(false);
