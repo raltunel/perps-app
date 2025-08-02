@@ -1019,7 +1019,9 @@ function OrderInput({
                     message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                     removeAfter: 10000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 // Show error notification
@@ -1028,7 +1030,9 @@ function OrderInput({
                     message: result.error || 'Transaction failed',
                     icon: 'error',
                     removeAfter: 15000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1077,7 +1081,9 @@ function OrderInput({
                     message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
                     icon: 'check',
                     removeAfter: 10000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             } else {
                 // Show error notification
@@ -1086,7 +1092,9 @@ function OrderInput({
                     message: result.error || 'Transaction failed',
                     icon: 'error',
                     removeAfter: 15000,
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
