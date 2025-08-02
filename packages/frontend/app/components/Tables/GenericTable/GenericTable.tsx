@@ -22,6 +22,7 @@ interface GenericTableProps<
     F extends (...args: Parameters<F>) => Promise<T[]>,
 > {
     data: T[];
+    noDataMessage?: string;
     renderHeader: (
         sortDirection: TableSortDirection,
         sortClickHandler: (key: S) => void,
@@ -61,6 +62,7 @@ export default function GenericTable<
 
     const {
         data,
+        noDataMessage,
         renderHeader,
         renderRow,
         sorterMethod,
@@ -415,7 +417,7 @@ export default function GenericTable<
                     tableState === TableState.FILLED &&
                     dataToShow.map(renderRow)}
                 {isSessionEstablished && tableState === TableState.EMPTY && (
-                    <NoDataRow />
+                    <NoDataRow text={noDataMessage} />
                 )}
                 {!isSessionEstablished && (
                     <div className={styles.sessionButtonContainer}>

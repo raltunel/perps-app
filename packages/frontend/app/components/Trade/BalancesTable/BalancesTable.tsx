@@ -1,11 +1,8 @@
 import { useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
-import { sortUserBalances } from '~/processors/processUserBalance';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { sortUserBalances } from '~/processors/processUserBalance';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { WsChannels } from '~/utils/Constants';
 import BalancesTableHeader from './BalancesTableHeader';
 import BalancesTableRow from './BalancesTableRow';
 
@@ -16,6 +13,8 @@ export default function BalancesTable() {
 
     // Use unified margin data
     const { balance, isLoading, error } = useUnifiedMarginData();
+
+    // console.log({ balance });
 
     // Create array with single balance or empty array
     const balanceData = balance ? [balance] : [];

@@ -132,7 +132,27 @@ class UnifiedMarginPollingManager {
             );
 
             if (!marginBucket) {
-                throw new Error('No margin bucket found');
+                const balance: UserBalanceIF = {
+                    coin: 'fUSD',
+                    type: 'margin',
+                    total: 0,
+                    available: 0,
+                    hold: 0,
+                    entryNtl: 0,
+                    sortName: '\x01',
+                    usdcValue: 0,
+                    pnlValue: 0,
+                    metaIndex: 0,
+                    buyingPower: 0,
+                    contractAddress:
+                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
+                };
+                const store = useUnifiedMarginStore.getState();
+                store.setBalance(balance);
+                store.setIsLoading(false);
+                store.setError(null);
+                store.setLastUpdateTime(Date.now());
+                return;
             }
 
             // Convert to balance format
@@ -166,7 +186,6 @@ class UnifiedMarginPollingManager {
                 BigInt(DFLT_EMBER_MARKET.mktId),
                 symbolInfo,
             );
-
             // Update store
             const store = useUnifiedMarginStore.getState();
             store.setMarginBucket(marginBucket);

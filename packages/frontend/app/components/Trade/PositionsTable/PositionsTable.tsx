@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useModal } from '~/hooks/useModal';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
 import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
@@ -47,6 +47,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     return (
         <>
             <GenericTable
+                noDataMessage='No open positions'
                 storageKey={`PositionsTable_${currentUserRef.current}`}
                 data={filteredData as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
