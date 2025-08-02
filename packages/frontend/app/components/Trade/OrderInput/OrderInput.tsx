@@ -172,7 +172,9 @@ function OrderInput({
 
     const { executeLimitOrder } = useLimitOrderService();
 
-    const [leverage, setLeverage] = useState(1);
+    // Get the current leverage from the store and subscribe to changes
+    const leverage = useLeverageStore((state) => state.currentLeverage);
+    const setLeverage = useLeverageStore((state) => state.setPreferredLeverage);
 
     const [price, setPrice] = useState('');
 

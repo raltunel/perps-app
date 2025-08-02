@@ -111,8 +111,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 return (
                     <LeverageSliderModal
                         currentLeverage={position.leverage.value}
-                        maxLeverage={position.maxLeverage}
+                        // maxLeverage={position.maxLeverage}
                         onClose={modalCtrl.close}
+                        onConfirm={(value) => {
+                            console.log({ value });
+                        }}
                     />
                 );
             } else if (modalContent === 'tpsl') {
