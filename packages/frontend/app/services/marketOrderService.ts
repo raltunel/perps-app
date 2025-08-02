@@ -3,6 +3,7 @@ import {
     OrderSide,
     TimeInForce,
     buildOrderEntryTransaction,
+    buildOrderEntryWithFillTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 
@@ -78,13 +79,15 @@ export class MarketOrderService {
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
-                    side: OrderSide.Bid,
+                    side: OrderSide.Ask,
                     qty: onChainQuantity,
-                    price: BigInt('0'), // market order convention is to use 0
+                    orderPrice: BigInt('0'), // market order convention is to use 0
+                    fillPrice: BigInt('110000000000'),
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    keeper: sessionPublicKey,
                 };
 
                 // Only add userSetImBps if it's defined
@@ -92,7 +95,7 @@ export class MarketOrderService {
                     orderParams.userSetImBps = userSetImBps;
                 }
 
-                const transaction = buildOrderEntryTransaction(
+                const transaction = buildOrderEntryWithFillTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',
@@ -107,11 +110,13 @@ export class MarketOrderService {
                     orderId: orderId,
                     side: OrderSide.Ask,
                     qty: onChainQuantity,
-                    price: BigInt('0'), // market order convention is to use 0
+                    orderPrice: BigInt('0'), // market order convention is to use 0
+                    fillPrice: BigInt('110000000000'),
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    keeper: sessionPublicKey,
                 };
 
                 // Only add userSetImBps if it's defined
@@ -119,7 +124,7 @@ export class MarketOrderService {
                     orderParams.userSetImBps = userSetImBps;
                 }
 
-                const transaction = buildOrderEntryTransaction(
+                const transaction = buildOrderEntryWithFillTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',
