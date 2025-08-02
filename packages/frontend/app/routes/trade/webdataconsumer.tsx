@@ -374,7 +374,9 @@ export default function WebDataConsumer() {
                 fetchedChannelsRef.current.add(
                     WsChannels.USER_HISTORICAL_ORDERS,
                 );
-                // Update store immediately
+                // Update store immediately for both snapshot and updates
+                setOrderHistory(userOrderHistoryRef.current);
+                setUserOrders(openOrdersRef.current);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));
             } else {
                 console.warn(
