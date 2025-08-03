@@ -23,7 +23,7 @@ interface propsIF {
         unit?: string;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onDeposit: (amount: number) => void | Promise<any>;
+    onDeposit: (amount?: number) => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -96,7 +96,7 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        if (depositInputNum > availableBalance) {
+        if (!maxActive && depositInputNum > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             setTransactionStatus('idle');
             return;
@@ -156,7 +156,7 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [availableBalance, onDeposit, formatNum, depositInputNum]);
+    }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
@@ -191,9 +191,11 @@ function PortfolioDeposit(props: propsIF) {
             isProcessing ||
             !depositInputNum ||
             depositInputNum <= 0 ||
-            depositInputNum > availableBalance,
-        [isProcessing, depositInputNum, availableBalance],
+            (!maxActive && depositInputNum > availableBalance),
+        [isProcessing, depositInputNum, availableBalance, maxActive],
     );
+
+    console.log({ isButtonDisabled, depositInputNum, availableBalance });
 
     const handleDepositChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {

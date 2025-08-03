@@ -56,7 +56,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
     };
 
     const processDeposit = useCallback(
-        async (amount: number) => {
+        async (amount?: number) => {
             const result = await originalProcessDeposit(amount);
             // Only close modal if transaction was successful and confirmed
             // The modal will handle its own closing based on transaction status
