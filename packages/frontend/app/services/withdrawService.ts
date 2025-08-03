@@ -155,11 +155,10 @@ export class WithdrawService {
             // Build the transaction using the SDK
             const transaction = await buildWithdrawMarginTx(
                 this.connection,
-                nonDecimalizedAmount,
                 user,
                 {
+                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: actor || user,
-                    target: target, // User's wallet for PDA construction
                 },
             );
 
@@ -224,7 +223,8 @@ export class WithdrawService {
                 amount,
                 userWalletKey, // user (wallet key)
                 sessionPublicKey, // actor (session key for signing)
-                undefined, // target (not needed for withdraw?)
+                undefined, // target (not needed for withdraw)
+                undefined, // rent payer (not needed for withdraw)
             );
 
             // Extract instructions from the transaction

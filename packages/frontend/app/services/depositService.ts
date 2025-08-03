@@ -135,9 +135,9 @@ export class DepositService {
 
             const transaction = await buildDepositMarginTx(
                 this.connection,
-                nonDecimalizedAmount,
                 userWalletKey,
                 {
+                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: sessionPublicKey, // sessionPublicKey as actor
                     rentPayer: rentPayer, // payer from SessionState or fallback
                 },
