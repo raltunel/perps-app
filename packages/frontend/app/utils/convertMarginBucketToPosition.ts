@@ -27,7 +27,11 @@ export function convertMarginBucketToPosition(
     // const markPriceNum = Number(marginBucket.markPrice) / 1e6; // 6 decimals for price (matches on-chain format)
     const markPriceNum = symbolInfo?.markPx || 0;
 
-    const unrealizedPnlNum = Number(marginBucket.unrealizedPnl) / 1e6; // 6 decimals for USDC
+    // Calculate PnL using streamed mark price instead of on-chain value
+    // PnL = (markPrice - entryPrice) * signedNetPosition
+    // For longs: positive position, profit when mark > entry
+    // For shorts: negative position, profit when mark < entry
+    const unrealizedPnlNum = (markPriceNum - avgEntryPriceNum) * netPositionNum;
 
     // Calculate position value (size * mark price)
     const positionValue = Math.abs(netPositionNum * markPriceNum);
@@ -37,7 +41,8 @@ export function convertMarginBucketToPosition(
         ? 10000 / marginBucket.effectiveImBps
         : 20;
 
-    const committedCollateralNum = positionValue / leverage;
+    // Calculate margin used (position value / leverage) - this is what's displayed in the table
+    const marginUsed = positionValue / leverage;
 
     // Calculate max leverage from effective IM basis points
     // IM% = 100 / maxLeverage, so maxLeverage = 10000 / imBps
@@ -71,11 +76,9 @@ export function convertMarginBucketToPosition(
         }
     }
 
-    // Calculate return on equity (ROE) as unrealized PnL / committed collateral
-    const returnOnEquity =
-        committedCollateralNum > 0
-            ? (unrealizedPnlNum / committedCollateralNum) * 100
-            : 0;
+    // Calculate return on equity (ROE) as unrealized PnL / margin used
+    // ROE = (PnL / marginUsed) * 100
+    const returnOnEquity = marginUsed > 0 ? unrealizedPnlNum / marginUsed : 0;
 
     // Map to the coin based on market ID
     // Currently only BTC is supported (market ID 64)
@@ -89,7 +92,7 @@ export function convertMarginBucketToPosition(
             value: Math.round(leverage * 10) / 10, // Round to 1 decimal place
         },
         liquidationPx,
-        marginUsed: committedCollateralNum,
+        marginUsed,
         maxLeverage,
         positionValue,
         returnOnEquity,

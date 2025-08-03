@@ -1,11 +1,11 @@
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
+import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderDetails.module.css';
-import { LuCircleHelp } from 'react-icons/lu';
 
 interface MarketInfoItem {
     label: string;
@@ -90,6 +90,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         usdOrderValue,
         marginRequired,
         formatNum,
+        liquidationPrice,
     ]);
 
     const twapInfoData: MarketInfoItem[] = useMemo(
