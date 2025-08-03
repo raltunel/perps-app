@@ -174,12 +174,14 @@ function PortfolioDeposit(props: propsIF) {
         return [
             {
                 label: 'Available to deposit',
-                value: formatNum(
-                    availableBalance,
-                    isUSDToken ? 2 : 8,
-                    true,
-                    isUSDToken,
-                ),
+                value: !isNaN(availableBalance)
+                    ? formatNum(
+                          availableBalance,
+                          isUSDToken ? 2 : 8,
+                          true,
+                          isUSDToken,
+                      )
+                    : '-',
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },

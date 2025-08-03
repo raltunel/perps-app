@@ -169,7 +169,9 @@ function PortfolioWithdraw({
         () => [
             {
                 label: 'Available to withdraw',
-                value: formatNum(portfolio.availableBalance, 2, true, true),
+                value: !isNaN(portfolio.availableBalance)
+                    ? formatNum(portfolio.availableBalance, 2, true, true)
+                    : '-',
                 tooltip:
                     'The total amount you have available to withdraw from your portfolio',
             },
