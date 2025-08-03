@@ -1,4 +1,4 @@
-import { useSession } from '@fogo/sessions-sdk-react';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
@@ -75,15 +75,11 @@ export default function Tabs(props: TabsProps) {
 
     const { positions, balance } = useUnifiedMarginData();
 
-    const {
-        orderHistory,
-        fetchedChannels,
-        userFills,
-        userFundings,
-        userOrders,
-    } = useTradeDataStore();
+    const { orderHistory, userFills, userFundings, userOrders } =
+        useTradeDataStore();
 
-    const isSessionEstablished = useSession();
+    const sessionState = useSession();
+    const isSessionEstablished = isEstablished(sessionState);
 
     const positionsCount = isSessionEstablished ? positions.length : 0;
 
