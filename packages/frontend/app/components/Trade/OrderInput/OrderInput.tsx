@@ -164,11 +164,8 @@ function OrderInput({
     }, [sessionState]);
 
     // Market order service hook
-    const {
-        executeMarketOrder,
-        isLoading: isMarketOrderLoading,
-        signature,
-    } = useMarketOrderService();
+    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
+        useMarketOrderService();
 
     const { executeLimitOrder } = useLimitOrderService();
 
@@ -578,6 +575,22 @@ function OrderInput({
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
+        const midPrice = getMidPrice();
+        if (!midPrice) return;
+        if (obChosenPrice > midPrice) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
+        }
+        // uncomment once markPx more in line with orderbook
+        // if (markPx && obChosenPrice) {
+        //     console.log({ markPx, obChosenPrice });
+        //     if (obChosenPrice > markPx) {
+        //         setTradeDirection('sell');
+        //     } else {
+        //         setTradeDirection('buy');
+        //     }
+        // }
     }, [obChosenAmount, obChosenPrice]);
 
     const activeOptions: useAppOptionsIF = useAppOptions();
@@ -1398,44 +1411,44 @@ function OrderInput({
         isMarketOrderLoading,
     );
 
-    const launchPadContent = (
-        <div className={styles.launchpad}>
-            <header>
-                <div
-                    className={styles.exit_launchpad}
-                    onClick={() => setShowLaunchpad(false)}
-                >
-                    <MdKeyboardArrowLeft />
-                </div>
-                <h3>Order Types</h3>
-                <button
-                    className={styles.trade_type_toggle}
-                    onClick={() => setShowLaunchpad(false)}
-                >
-                    <PiSquaresFour />
-                </button>
-            </header>
-            <ul className={styles.launchpad_clickables}>
-                {marketOrderTypes.map((mo: OrderTypeOption) => (
-                    <li
-                        key={JSON.stringify(mo)}
-                        onClick={() => {
-                            handleMarketOrderTypeChange(mo.value);
-                            setShowLaunchpad(false);
-                        }}
-                    >
-                        <div className={styles.name_and_icon}>
-                            {mo.icon}
-                            <h4>{mo.label}</h4>
-                        </div>
-                        <div>
-                            <p>{mo.blurb}</p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+    // const launchPadContent = (
+    //     <div className={styles.launchpad}>
+    //         <header>
+    //             <div
+    //                 className={styles.exit_launchpad}
+    //                 onClick={() => setShowLaunchpad(false)}
+    //             >
+    //                 <MdKeyboardArrowLeft />
+    //             </div>
+    //             <h3>Order Types</h3>
+    //             <button
+    //                 className={styles.trade_type_toggle}
+    //                 onClick={() => setShowLaunchpad(false)}
+    //             >
+    //                 <PiSquaresFour />
+    //             </button>
+    //         </header>
+    //         <ul className={styles.launchpad_clickables}>
+    //             {marketOrderTypes.map((mo: OrderTypeOption) => (
+    //                 <li
+    //                     key={JSON.stringify(mo)}
+    //                     onClick={() => {
+    //                         handleMarketOrderTypeChange(mo.value);
+    //                         setShowLaunchpad(false);
+    //                     }}
+    //                 >
+    //                     <div className={styles.name_and_icon}>
+    //                         {mo.icon}
+    //                         <h4>{mo.label}</h4>
+    //                     </div>
+    //                     <div>
+    //                         <p>{mo.blurb}</p>
+    //                     </div>
+    //                 </li>
+    //             ))}
+    //         </ul>
+    //     </div>
+    // );
 
     return (
         <div className={styles.mainContainer}>
