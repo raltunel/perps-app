@@ -575,13 +575,22 @@ function OrderInput({
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
-        if (markPx && obChosenPrice) {
-            if (obChosenPrice > markPx) {
-                setTradeDirection('sell');
-            } else {
-                setTradeDirection('buy');
-            }
+        const midPrice = getMidPrice();
+        if (!midPrice) return;
+        if (obChosenPrice > midPrice) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
         }
+        // uncomment once markPx more in line with orderbook
+        // if (markPx && obChosenPrice) {
+        //     console.log({ markPx, obChosenPrice });
+        //     if (obChosenPrice > markPx) {
+        //         setTradeDirection('sell');
+        //     } else {
+        //         setTradeDirection('buy');
+        //     }
+        // }
     }, [obChosenAmount, obChosenPrice]);
 
     const activeOptions: useAppOptionsIF = useAppOptions();
