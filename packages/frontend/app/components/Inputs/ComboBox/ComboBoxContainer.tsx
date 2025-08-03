@@ -3,12 +3,14 @@ import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useRef } from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { debugWallets, wsEnvironments, wsUrls } from '~/utils/Constants';
 import ComboBox from './ComboBox';
 import styles from './ComboBox.module.css';
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
+    const { userAddress } = useUserDataStore();
     const symbolRef = useRef(symbol);
     symbolRef.current = symbol;
     const {
@@ -24,6 +26,8 @@ export default function ComboBoxContainer() {
         setSdkEnabled,
         isWsSleepMode,
         setIsWsSleepMode,
+        isDebugWalletActive,
+        setIsDebugWalletActive,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -53,23 +57,6 @@ export default function ComboBoxContainer() {
                     />
                 )}
             </div>
-            <div className={styles.walletSelector}>
-                <ComboBox
-                    value={debugWallet.label}
-                    options={debugWallets}
-                    fieldName='label'
-                    onChange={(value) =>
-                        setDebugWallet({
-                            label: value,
-                            address:
-                                debugWallets.find(
-                                    (wallet) => wallet.label === value,
-                                )?.address || '',
-                        })
-                    }
-                />
-            </div>
-
             <div className={styles.currencySelector}>
                 <ComboBox
                     value={selectedCurrency}
@@ -77,7 +64,7 @@ export default function ComboBoxContainer() {
                     onChange={(value) => setSelectedCurrency(value)}
                 />
             </div>
-
+            <div className={styles.divider} />
             <div
                 className={`${styles.wsToggle} ${isWsEnabled ? styles.wsToggleRunning : styles.wsTogglePaused}`}
                 onClick={() => setIsWsEnabled(!isWsEnabled)}
@@ -103,6 +90,37 @@ export default function ComboBoxContainer() {
                     {sdkEnabled ? 'SDK' : 'SDK'}
                 </div>
             </div>
+
+            <div className={styles.divider} />
+            <div
+                className={`${styles.walletSelector} ${!isDebugWalletActive ? styles.passive : ' '}`}
+            >
+                <ComboBox
+                    value={debugWallet.label}
+                    options={debugWallets}
+                    fieldName='label'
+                    onChange={(value) =>
+                        setDebugWallet({
+                            label: value,
+                            address:
+                                debugWallets.find(
+                                    (wallet) => wallet.label === value,
+                                )?.address || '',
+                        })
+                    }
+                />
+            </div>
+            <div
+                className={`${styles.sdkToggle} ${isDebugWalletActive ? styles.active : styles.disabled}`}
+                onClick={() => setIsDebugWalletActive(!isDebugWalletActive)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {isDebugWalletActive ? 'Debug Wallet' : 'Sessions Wallet'}
+                </div>
+            </div>
+            <div className={styles.subInfo}>{userAddress}</div>
+
+            <div className={styles.divider} />
             {isEstablished(sessionState) && (
                 <button
                     onClick={() => {
@@ -110,7 +128,6 @@ export default function ComboBoxContainer() {
                             if (isEstablished(sessionState)) {
                                 console.log('established');
                                 const userWalletKey =
-                                    sessionState.userPublicKey ||
                                     sessionState.walletPublicKey ||
                                     sessionState.sessionPublicKey;
                                 const ix = instructions.pingIx(42n, {

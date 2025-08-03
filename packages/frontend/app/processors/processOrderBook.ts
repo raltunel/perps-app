@@ -91,6 +91,7 @@ export function processUserOrder(
             status: status,
             limitPx: parseNum(data.limitPx),
             origSz: parseNum(data.origSz),
+            filledSz: parseNum(data.origSz - data.sz),
             reduceOnly: data.reduceOnly,
             isPositionTpsl: data.isPositionTpsl,
             isTrigger: data.isTrigger,

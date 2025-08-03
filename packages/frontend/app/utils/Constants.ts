@@ -87,6 +87,14 @@ export const debugWallets: DebugWallet[] = [
         address: '0x1cFd5AAa6893f7d91e2A0aA073EB7f634e871353',
     },
     {
+        label: 'account2',
+        address: '0x68b36200a9066ba777504b64e2b07e5ec2c0d70f',
+    },
+    {
+        label: 'emptyAccount',
+        address: '0x350736dff5e36bB79Fd3Ce2677d2e73A82b051a8',
+    },
+    {
         label: 'strobie',
         address: '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00',
     },
@@ -104,7 +112,8 @@ export * from './feeSchedule';
 
 export const TWITTER_CHARACTER_LIMIT = 240;
 
-export const PERPS_TWITTER = '@AmbientPerps';
+export const PERPS_TWITTER = '@ambient_finance';
+export const FOGO_TWITTER = '@FogoChain';
 
 export enum WsChannels {
     ORDERBOOK = 'l2Book',
@@ -125,7 +134,7 @@ const SECONDS = 1000;
 const MINUTES = SECONDS * 60;
 
 export const WS_SLEEP_MODE = 0 * SECONDS;
-export const WS_SLEEP_MODE_PRICE_CHECK = 1 * MINUTES;
+export const WS_SLEEP_MODE_PRICE_CHECK = 20 * SECONDS;
 export const WS_SLEEP_MODE_STASH_CONNECTION = 2 * MINUTES;
 
 export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
@@ -136,4 +145,11 @@ export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
 
 export const USER_WS_ENDPOINT =
-    import.meta.env.VITE_USER_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_USER_WS_ENDPOINT ||
+    'https://embindexer.net/ember/tradesocket';
+
+export const blockExplorer =
+    import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';
+
+export const RPC_ENDPOINT =
+    import.meta.env.VITE_RPC_ENDPOINT || 'https://testnet.fogo.io';

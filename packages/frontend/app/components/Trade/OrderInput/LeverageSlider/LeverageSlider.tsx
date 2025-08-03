@@ -9,7 +9,11 @@ interface LeverageSliderProps {
     onChange: (value: number) => void;
     className?: string;
     minimumInputValue?: number;
-    generateRandomMaximumInput: () => void;
+    generateRandomMaximumInput?: () => void;
+    // NEW: Modal mode props
+    modalMode?: boolean;
+    maxLeverage?: number;
+    hideTitle?: boolean;
 }
 
 const LEVERAGE_CONFIG = {
@@ -23,7 +27,7 @@ const LEVERAGE_CONFIG = {
     DECIMAL_INCREMENT: 0.1,
 
     // Default fallback max leverage when symbolInfo is not available
-    DEFAULT_MAX_LEVERAGE: 1,
+    DEFAULT_MAX_LEVERAGE: 100,
 
     // Number of tick marks to show on slider
     TICK_COUNT_HIGH_LEVERAGE: 7,
@@ -64,6 +68,11 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
+    generateRandomMaximumInput,
+    // NEW: Modal mode props with defaults
+    modalMode = false,
+    maxLeverage,
+    hideTitle = false,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -73,11 +82,12 @@ export default function LeverageSlider({
         getPreferredLeverage,
     } = useLeverageStore();
 
-    // Use maxLeverage from symbolInfo, fallback to default if not available
-    const maximumInputValue =
-        symbolInfo?.coin === 'BTC'
-            ? 100
-            : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
+    // Use maxLeverage from props (modal mode) or symbolInfo, fallback to default if not available
+    const maximumInputValue = modalMode
+        ? maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE
+        : symbolInfo?.coin === 'BTC'
+          ? 100
+          : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
@@ -93,9 +103,14 @@ export default function LeverageSlider({
     );
     const [hasInitializedLeverage, setHasInitializedLeverage] =
         useState<boolean>(false);
+    const [announceText, setAnnounceText] = useState<string>('');
 
     const sliderRef = useRef<HTMLDivElement>(null);
     const knobRef = useRef<HTMLDivElement>(null);
+    const currentValueRef = useRef<number>(currentValue);
+    useEffect(() => {
+        currentValueRef.current = currentValue;
+    }, [currentValue]);
 
     // Helper function to get the actual rounded value (what user sees)
     const getRoundedDisplayValue = (val: number): number => {
@@ -130,13 +145,24 @@ export default function LeverageSlider({
     const constrainValue = (val: number): number => {
         return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
     };
+    const announceValueChange = (value: number) => {
+        const formattedValue = formatValue(value);
+        setAnnounceText('');
+        setTimeout(() => {
+            setAnnounceText(`Leverage ${formattedValue}x`);
+        }, 100);
+        // Clear after announcement
+        setTimeout(() => setAnnounceText(''), 1500);
+    };
 
     const handleLeverageChange = (newLeverage: number) => {
         // Update the preferred leverage in store with the exact value (no rounding)
+        console.log({ newLeverage });
         setPreferredLeverage(newLeverage);
 
-        // Also call the parent onChange with the exact value
+        // Always call the parent onChange with the exact value
         onChange(newLeverage);
+        announceValueChange(newLeverage);
     };
 
     const handleMarketChange = useCallback(() => {
@@ -306,7 +332,7 @@ export default function LeverageSlider({
 
     // Get position for the knob as percentage
     const getKnobPosition = (): number => {
-        if (isNaN(currentValue)) {
+        if (isNaN(currentValue) || !isFinite(currentValue)) {
             return 0;
         }
         return valueToPercentage(currentValue);
@@ -315,6 +341,10 @@ export default function LeverageSlider({
     // Get color based on position
     const getColorAtPosition = (position: number): string => {
         const colorStops = SLIDER_CONFIG.COLOR_STOPS;
+        // Safety check for NaN or invalid values
+        if (isNaN(position) || !isFinite(position)) {
+            return colorStops[0].color; // Return default color (teal)
+        }
 
         // Ensure position is between 0 and 100
         const boundedPosition = Math.max(0, Math.min(100, position));
@@ -411,16 +441,11 @@ export default function LeverageSlider({
         setHoverValue(null);
         setHoveredTickIndex(null);
     };
-
-    // Handle track click to set value
-    const handleTrackClick = (e: React.MouseEvent) => {
-        if (!sliderRef.current) return;
+    const calculateValueFromPosition = (clientX: number): number => {
+        if (!sliderRef.current) return currentValue;
 
         const rect = sliderRef.current.getBoundingClientRect();
-        const offsetX = Math.max(
-            0,
-            Math.min(e.clientX - rect.left, rect.width),
-        );
+        const offsetX = Math.max(0, Math.min(clientX - rect.left, rect.width));
 
         // Account for knob margins when calculating percentage
         const knobRadius = SLIDER_CONFIG.KNOB_RADIUS;
@@ -432,16 +457,87 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value (no rounding for smooth movement)
+        // Convert percentage to value
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = constrainValue(newValue);
+        return constrainValue(newValue);
+    };
 
-        // Use the exact value for clicks (no rounding)
+    // Handle track click to set value
+    const handleTrackClick = (e: React.MouseEvent) => {
+        const boundedValue = calculateValueFromPosition(e.clientX);
         handleLeverageChange(boundedValue);
     };
 
+    const handleTrackTouchStart = (e: React.TouchEvent) => {
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
+
+        if (!e.touches[0]) return;
+
+        const boundedValue = calculateValueFromPosition(e.touches[0].clientX);
+        handleLeverageChange(boundedValue);
+        setIsDragging(true);
+        e.preventDefault();
+    };
+
+    const handleTrackMouseDown = (e: React.MouseEvent) => {
+        // Don't interfere if clicking on the knob
+        if ((e.target as HTMLElement).closest(`.${styles.sliderKnob}`)) {
+            return;
+        }
+
+        // Handle the click first
+        handleTrackClick(e);
+
+        // Then set up for potential dragging
+        setIsDragging(true);
+        e.preventDefault();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        let newValue = currentValue;
+        const step =
+            maximumInputValue <= LEVERAGE_CONFIG.MAX_LEVERAGE_FOR_DECIMALS
+                ? 0.1
+                : 1;
+
+        switch (e.key) {
+            case 'ArrowRight':
+            case 'ArrowUp':
+                newValue = Math.min(maximumInputValue, currentValue + step);
+                break;
+            case 'ArrowLeft':
+            case 'ArrowDown':
+                newValue = Math.max(minimumInputValue, currentValue - step);
+                break;
+            case 'Home':
+                newValue = minimumInputValue;
+                break;
+            case 'End':
+                newValue = maximumInputValue;
+                break;
+            case 'PageUp':
+                newValue = Math.min(
+                    maximumInputValue,
+                    currentValue + step * 10,
+                );
+                break;
+            case 'PageDown':
+                newValue = Math.max(
+                    minimumInputValue,
+                    currentValue - step * 10,
+                );
+                break;
+            default:
+                return; // Don't prevent default for other keys
+        }
+
+        e.preventDefault();
+        handleLeverageChange(newValue);
+    };
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -509,17 +605,17 @@ export default function LeverageSlider({
         };
 
         const handleMouseUp = () => {
-            if (isDragging) {
+            if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
-                setPreferredLeverage(currentValue);
+                setPreferredLeverage(currentValueRef.current);
             }
             setIsDragging(false);
         };
 
         const handleTouchEnd = () => {
-            if (isDragging) {
+            if (isDragging && !modalMode) {
                 // Keep the exact value when dragging ends (no rounding/snapping)
-                setPreferredLeverage(currentValue);
+                setPreferredLeverage(currentValueRef.current);
             }
             setIsDragging(false);
         };
@@ -545,9 +641,16 @@ export default function LeverageSlider({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [isDragging, minimumInputValue, maximumInputValue, currentValue]);
+    }, [
+        isDragging,
+        minimumInputValue,
+        maximumInputValue,
+        // currentValue,
+        modalMode,
+    ]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
+        (e.target as HTMLElement).focus();
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
@@ -601,18 +704,50 @@ export default function LeverageSlider({
             #EF5350 100%)`;
     };
 
-    return (
-        <div
-            className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
-        >
-            <h3 className={styles.containerTitle}>Leverage</h3>
+    if (modalMode) {
+        // Modal layout: Input at top, slider below
+        return (
+            <div
+                className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
+            >
+                {!hideTitle && (
+                    <h3 className={styles.containerTitle}>Leverage</h3>
+                )}
 
-            <div className={styles.sliderWithValue}>
-                <div className={styles.sliderContainer}>
+                {/* Input at top for modal mode */}
+                <div className={styles.modalInputContainer}>
+                    <input
+                        type='text'
+                        value={
+                            isDragging ? formatValue(currentValue) : inputValue
+                        }
+                        onChange={handleInputChange}
+                        onBlur={handleInputBlur}
+                        onKeyDown={handleInputKeyDown}
+                        className={styles.modalValueInput}
+                        aria-label='Leverage value'
+                        style={{
+                            color: isDragging ? getKnobColor() : 'inherit',
+                        }}
+                        placeholder=''
+                    />
+                </div>
+
+                {/* Slider container for modal mode */}
+                <div className={styles.modalSliderContainer}>
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
-                        onClick={handleTrackClick}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Leverage amount'
+                        aria-valuemin={minimumInputValue}
+                        aria-valuemax={maximumInputValue}
+                        aria-valuenow={Math.round(currentValue * 10) / 10}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
+                        onMouseDown={handleTrackMouseDown}
+                        onTouchStart={handleTrackTouchStart}
                         onMouseMove={handleTrackMouseMove}
                         onMouseLeave={handleTrackMouseLeave}
                     >
@@ -625,7 +760,10 @@ export default function LeverageSlider({
                             style={{
                                 width: `${getKnobPosition()}%`,
                                 background: createGradientString(),
-                                backgroundSize: `${100 / (getKnobPosition() / 100)}% 100%`,
+                                backgroundSize:
+                                    getKnobPosition() > 0
+                                        ? `${100 / (getKnobPosition() / 100)}% 100%`
+                                        : '100% 100%',
                                 backgroundPosition: 'left center',
                             }}
                         ></div>
@@ -646,6 +784,193 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                                    className={`${styles.sliderMarker} ${
+                                        isActive ? styles.active : ''
+                                    } ${
+                                        isCurrent
+                                            ? styles.sliderMarkerCurrent
+                                            : ''
+                                    } ${
+                                        isHovered
+                                            ? styles.sliderMarkerHovered
+                                            : ''
+                                    }`}
+                                    style={{
+                                        left: `${position}%`,
+                                        backgroundColor:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : 'transparent',
+                                        borderColor:
+                                            isActive || isHovered
+                                                ? 'transparent'
+                                                : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
+                                ></div>
+                            );
+                        })}
+
+                        {/* Draggable knob */}
+                        <div
+                            ref={knobRef}
+                            className={styles.sliderKnob}
+                            style={{
+                                left: `${getKnobPosition()}%`,
+                                borderColor: getKnobColor(),
+                                backgroundColor: 'transparent',
+                            }}
+                            onMouseDown={handleKnobMouseDown}
+                            onTouchStart={handleKnobMouseDown}
+                            // tabIndex={-1}
+                        ></div>
+                    </div>
+
+                    <div className={styles.labelContainer}>
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= value;
+                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
+                            const isHovered =
+                                hoveredTickIndex === index ||
+                                (hoverValue === tickValue && isHovering);
+                            const tickColor = getColorAtPosition(position);
+
+                            return (
+                                <div
+                                    key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                                    className={`${styles.valueLabel} ${
+                                        isHovered
+                                            ? styles.valueLabelHovered
+                                            : ''
+                                    }`}
+                                    style={{
+                                        left: `${position}%`,
+                                        color:
+                                            isActive || isHovered
+                                                ? tickColor
+                                                : UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                    }}
+                                    onKeyDown={(e) => {
+                                        // ADD THIS
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLeverageChange(tickValue);
+                                    }}
+                                    onMouseEnter={() => handleTickHover(index)}
+                                    onMouseLeave={handleTickLeave}
+                                >
+                                    {formatLabelValue(tickValue)}x
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+                <div
+                    aria-live='assertive'
+                    aria-atomic='true'
+                    className='sr-only'
+                    style={{
+                        position: 'absolute',
+                        left: '-10000px',
+                        width: '1px',
+                        height: '1px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {announceText}
+                </div>
+            </div>
+        );
+    }
+
+    // Regular layout: Slider and input side by side
+    return (
+        <div
+            className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
+        >
+            {!hideTitle && <h3 className={styles.containerTitle}>Leverage</h3>}
+
+            <div className={styles.sliderWithValue}>
+                <div className={styles.sliderContainer}>
+                    <div
+                        ref={sliderRef}
+                        className={styles.sliderTrack}
+                        role='slider'
+                        tabIndex={0}
+                        aria-label='Leverage amount'
+                        aria-valuemin={minimumInputValue}
+                        aria-valuemax={maximumInputValue}
+                        aria-valuenow={Math.round(currentValue * 10) / 10}
+                        aria-orientation='horizontal'
+                        onKeyDown={handleKeyDown}
+                        onMouseDown={handleTrackMouseDown}
+                        onTouchStart={handleTrackTouchStart}
+                        onMouseMove={handleTrackMouseMove}
+                        onMouseLeave={handleTrackMouseLeave}
+                    >
+                        {/* Dark background track */}
+                        <div className={styles.sliderBackground}></div>
+
+                        {/* Active colored portion - using fixed position gradient */}
+                        <div
+                            className={styles.sliderActive}
+                            style={{
+                                width: `${getKnobPosition()}%`,
+                                background: createGradientString(),
+                                backgroundSize:
+                                    getKnobPosition() > 0
+                                        ? `${100 / (getKnobPosition() / 100)}% 100%`
+                                        : '100% 100%',
+
+                                backgroundPosition: 'left center',
+                            }}
+                        ></div>
+
+                        {/* Slider markers */}
+                        {tickMarks.map((tickValue, index) => {
+                            const position = valueToPercentage(tickValue);
+                            const isActive = tickValue <= currentValue;
+                            const isCurrent =
+                                Math.abs(tickValue - value) <
+                                SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
+                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
+                            const isHovered =
+                                hoveredTickIndex === index ||
+                                (hoverValue === tickValue && isHovering);
+                            const tickColor = getColorAtPosition(position);
+
+                            return (
+                                <div
+                                    key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.sliderMarker} ${
                                         isActive ? styles.active : ''
                                     } ${
@@ -670,6 +995,20 @@ export default function LeverageSlider({
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLeverageChange(tickValue);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
                                 ></div>
                             );
                         })}
@@ -685,6 +1024,7 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
+                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -701,6 +1041,9 @@ export default function LeverageSlider({
                             return (
                                 <div
                                     key={index}
+                                    role='button'
+                                    tabIndex={0}
+                                    aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
                                     className={`${styles.valueLabel} ${
                                         isHovered
                                             ? styles.valueLabelHovered
@@ -716,6 +1059,15 @@ export default function LeverageSlider({
                                     onClick={() =>
                                         handleLeverageChange(tickValue)
                                     }
+                                    onKeyDown={(e) => {
+                                        if (
+                                            e.key === 'Enter' ||
+                                            e.key === ' '
+                                        ) {
+                                            e.preventDefault();
+                                            handleLeverageChange(tickValue);
+                                        }
+                                    }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
                                 >
@@ -745,6 +1097,20 @@ export default function LeverageSlider({
                     />
                     <span className={styles.valueSuffix}>x</span>
                 </div>
+            </div>
+            <div
+                aria-live='assertive'
+                aria-atomic='true'
+                className='sr-only'
+                style={{
+                    position: 'absolute',
+                    left: '-10000px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                }}
+            >
+                {announceText}
             </div>
         </div>
     );

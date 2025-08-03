@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import Tabs from '~/components/Tabs/Tabs';
 import { Pages, usePage } from '~/hooks/usePage';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { debugWallets, WsChannels } from '~/utils/Constants';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import { WsChannels } from '~/utils/Constants';
 import type { VaultFollowerStateIF } from '~/utils/VaultIFs';
 import BalancesTable from '../BalancesTable/BalancesTable';
 import DepositsWithdrawalsTable from '../DepositsWithdrawalsTable/DepositsWithdrawalsTable';
@@ -15,6 +15,7 @@ import OrderHistoryTable from '../OrderHistoryTable/OrderHistoryTable';
 import PositionsTable from '../PositionsTable/PositionsTable';
 import TradeHistoryTable from '../TradeHistoryTable/TradeHistoryTable';
 // import TwapTable from '../TwapTable/TwapTable';
+import { useApp } from '~/contexts/AppContext';
 import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 export interface FilterOption {
@@ -49,6 +50,7 @@ interface TradeTableProps {
 
 export default function TradeTable(props: TradeTableProps) {
     const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+
     const {
         selectedTradeTab,
         setSelectedTradeTab,
@@ -58,12 +60,19 @@ export default function TradeTable(props: TradeTableProps) {
         userFundings,
         userOrders,
     } = useTradeDataStore();
+
     const [selectedFilter, setSelectedFilter] = useState<string>('all');
     // const [hideSmallBalances, setHideSmallBalances] = useState(false);
 
+    const { assignDefaultAddress } = useApp();
+
     const { page } = usePage();
 
-    const { debugWallet, setDebugWallet } = useDebugStore();
+    const {
+        isLoading: positionsLoading,
+        positions,
+        lastUpdateTime,
+    } = useUnifiedMarginData();
 
     const tabs = useMemo(() => {
         if (!page) return [];
@@ -97,13 +106,8 @@ export default function TradeTable(props: TradeTableProps) {
 
     // reset wallet on trade tables after switch back from vaults
     useEffect(() => {
-        if (
-            !vaultPage &&
-            !debugWallets.reduce((acc, wallet) => {
-                return acc || wallet.address === debugWallet.address;
-            }, false)
-        ) {
-            setDebugWallet(debugWallets[0]);
+        if (!vaultPage) {
+            assignDefaultAddress();
         }
     }, [vaultPage]);
 
@@ -162,7 +166,7 @@ export default function TradeTable(props: TradeTableProps) {
             case 'Positions':
                 return (
                     <PositionsTable
-                        isFetched={tradeHistoryFetched}
+                        isFetched={!positionsLoading || lastUpdateTime > 0}
                         selectedFilter={selectedFilter}
                     />
                 );
@@ -170,7 +174,7 @@ export default function TradeTable(props: TradeTableProps) {
                 return (
                     <OpenOrdersTable
                         selectedFilter={selectedFilter}
-                        isFetched={webDataFetched}
+                        isFetched={orderHistoryFetched}
                         data={userOrders}
                     />
                 );

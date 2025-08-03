@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import type { WsMsg } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useApp } from '~/contexts/AppContext';
 import { useSdk } from '~/hooks/useSdk';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -11,8 +14,9 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
-import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
@@ -28,11 +32,14 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
+    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
     const {
         favKeys,
         setFavCoins,
         setUserOrders,
         symbol,
+        symbolInfo,
+        setSymbolInfo,
         setCoins,
         coins,
         setPositions,
@@ -55,10 +62,15 @@ export default function WebDataConsumer() {
     const favKeysRef = useRef<string[]>(null);
     favKeysRef.current = favKeys;
 
-    const { debugWallet } = useDebugStore();
+    const sessionState = useSession();
+
+    const { userAddress } = useUserDataStore();
     const addressRef = useRef<string>(null);
-    addressRef.current = debugWallet?.address?.toLowerCase();
-    const { setSymbolInfo } = useTradeDataStore();
+    // Always use lowercase for comparison
+    addressRef.current = userAddress?.toLowerCase();
+
+    // Use unified margin data for both balance and positions
+    const { balance, positions: unifiedPositions } = useUnifiedMarginData();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -84,24 +96,50 @@ export default function WebDataConsumer() {
         }
     }, [symbol, coins]);
 
+    // Add a periodic check to ensure symbolInfo stays updated
+    useEffect(() => {
+        const updateInterval = setInterval(() => {
+            const foundCoin = coins.find((coin) => coin.coin === symbol);
+            if (foundCoin && symbolInfo) {
+                // Only update if data has actually changed to avoid unnecessary re-renders
+                if (
+                    foundCoin.markPx !== symbolInfo.markPx ||
+                    foundCoin.oraclePx !== symbolInfo.oraclePx ||
+                    foundCoin.dayNtlVlm !== symbolInfo.dayNtlVlm ||
+                    foundCoin.funding !== symbolInfo.funding ||
+                    foundCoin.openInterest !== symbolInfo.openInterest
+                ) {
+                    setSymbolInfo(foundCoin);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(updateInterval);
+    }, [symbol, coins, symbolInfo, setSymbolInfo]);
+
     useEffect(() => {
         if (!info) return;
         setFetchedChannels(new Set());
         fetchedChannelsRef.current = new Set();
         setUserOrders([]);
         setUserSymbolOrders([]);
-        setPositions([]);
+        // Positions are now managed by PositionsStore, not webData2
+        setUserBalances([]);
         positionsRef.current = [];
         openOrdersRef.current = [];
         userFundingsRef.current = [];
         activeTwapsRef.current = [];
         setUserNonFundingLedgerUpdates([]);
         userNonFundingLedgerUpdatesRef.current = [];
+        resetRefs();
 
         // Subscribe to webData2 on user socket for user-specific data
         const { unsubscribe } = info.subscribe(
-            { type: WsChannels.WEB_DATA2, user: debugWallet.address },
+            { type: WsChannels.WEB_DATA2, user: userAddress },
             postWebData2,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
+            },
         );
 
         // Also subscribe to webData2 on market socket for market data
@@ -115,7 +153,7 @@ export default function WebDataConsumer() {
                     postWebData2MarketOnly(msg);
                 };
                 const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: debugWallet.address },
+                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
                     marketDataCallback,
                 );
                 unsubscribeMarketData = result.unsubscribe;
@@ -125,43 +163,62 @@ export default function WebDataConsumer() {
         const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
             {
                 type: WsChannels.USER_HISTORICAL_ORDERS,
-                user: debugWallet.address,
+                user: userAddress,
             },
-            postUserHistoricalOrders,
+            (payload: any) => {
+                postUserHistoricalOrders(payload);
+            },
         );
 
         const { unsubscribe: unsubscribeUserFills } = info.subscribe(
-            { type: WsChannels.USER_FILLS, user: debugWallet.address },
+            { type: WsChannels.USER_FILLS, user: userAddress },
             postUserFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapSliceFills } = info.subscribe(
-            { type: WsChannels.TWAP_SLICE_FILLS, user: debugWallet.address },
+            { type: WsChannels.TWAP_SLICE_FILLS, user: userAddress },
             postUserTwapSliceFills,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserTwapHistory } = info.subscribe(
-            { type: WsChannels.TWAP_HISTORY, user: debugWallet.address },
+            { type: WsChannels.TWAP_HISTORY, user: userAddress },
             postUserTwapHistory,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
+            },
         );
 
         const { unsubscribe: unsubscribeUserFundings } = info.subscribe(
-            { type: WsChannels.USER_FUNDINGS, user: debugWallet.address },
+            { type: WsChannels.USER_FUNDINGS, user: userAddress },
             postUserFundings,
+            () => {
+                fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+            },
         );
 
         const { unsubscribe: unsubscribeUserNonFundingLedgerUpdates } =
             info.subscribe(
                 {
                     type: WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
-                    user: debugWallet.address,
+                    user: userAddress,
                 },
                 postUserNonFundingLedgerUpdates,
+                () => {
+                    fetchedChannelsRef.current.add(
+                        WsChannels.USER_NON_FUNDING_LEDGER_UPDATES,
+                    );
+                },
             );
 
         const userDataInterval = setInterval(() => {
             setUserOrders(openOrdersRef.current);
-            setPositions(positionsRef.current);
+            // Positions now come from RPC polling, not webData2
             setUserBalances(userBalancesRef.current);
             setUserFills(userFillsRef.current);
             setOrderHistory(userOrderHistoryRef.current);
@@ -189,6 +246,7 @@ export default function WebDataConsumer() {
 
         return () => {
             clearInterval(userDataInterval);
+            // clearInterval(monitorInterval);
             unsubscribe();
             unsubscribeMarketData?.();
             unsubscribeOrderHistory();
@@ -198,14 +256,19 @@ export default function WebDataConsumer() {
             unsubscribeUserFundings();
             unsubscribeUserNonFundingLedgerUpdates();
         };
-    }, [debugWallet.address, info]);
+    }, [userAddress, info]);
 
     useEffect(() => {
         acccountOverviewPrevRef.current = accountOverview;
     }, [accountOverview]);
 
+    const lastDataTimestampRef = useRef<number>(Date.now());
+
     const handleWebData2WorkerResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
+            // Update last data timestamp
+            lastDataTimestampRef.current = Date.now();
+
             // When using multi-socket mode, market data comes from market socket
             // So we only process user data from the user socket's webData2
             if (!info?.multiSocketInfo) {
@@ -214,16 +277,26 @@ export default function WebDataConsumer() {
                 setCoinPriceMap(data.data.coinPriceMap);
             }
 
-            if (data.data.user?.toLowerCase() === addressRef.current) {
-                openOrdersRef.current = data.data.userOpenOrders;
-                positionsRef.current = data.data.positions;
+            if (
+                isEstablished(sessionState) &&
+                data.data.user?.toLowerCase() === addressRef.current
+            ) {
+                // Open orders now come from order history subscription
+                // Positions now come from RPC polling
                 userBalancesRef.current = data.data.userBalances;
                 accountOverviewRef.current = data.data.accountOverview;
                 activeTwapsRef.current = data.data.activeTwaps;
             }
             fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
+            setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         },
-        [setCoins, setCoinPriceMap, info?.multiSocketInfo],
+        [
+            setCoins,
+            setCoinPriceMap,
+            info?.multiSocketInfo,
+            sessionState,
+            setFetchedChannels,
+        ],
     );
 
     const postWebData2 = useWorker<WebData2Output>(
@@ -234,6 +307,9 @@ export default function WebDataConsumer() {
     // Handler for market-only data from market socket
     const handleWebData2MarketOnlyResult = useCallback(
         ({ data }: { data: WebData2Output }) => {
+            // Update last data timestamp
+            lastDataTimestampRef.current = Date.now();
+
             // Only update market data (coins and price map)
             // This ensures market data always comes from the market endpoint
             setCoins(data.data.coins);
@@ -247,65 +323,232 @@ export default function WebDataConsumer() {
         handleWebData2MarketOnlyResult,
     );
 
-    const postUserHistoricalOrders = useCallback((payload: any) => {
-        const data = payload.data;
-        if (
-            data &&
-            data.orderHistory &&
-            data.orderHistory.length > 0 &&
-            data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
-        ) {
-            const orders: OrderDataIF[] = [];
-            data.orderHistory.forEach((order: any) => {
-                const processedOrder = processUserOrder(
-                    order.order,
-                    order.status,
-                );
-                if (processedOrder) {
-                    orders.push(processedOrder);
-                }
-            });
-            if (data.isSnapshot) {
-                orders.sort((a, b) => b.timestamp - a.timestamp);
-                userOrderHistoryRef.current = orders;
-            } else {
-                userOrderHistoryRef.current = [
-                    ...orders.sort((a, b) => b.timestamp - a.timestamp),
-                    ...userOrderHistoryRef.current,
-                ];
-                userOrderHistoryRef.current.sort(
-                    (a, b) => b.timestamp - a.timestamp,
-                );
-            }
-            fetchedChannelsRef.current.add(WsChannels.USER_HISTORICAL_ORDERS);
-        }
-    }, []);
+    const postUserHistoricalOrders = useCallback(
+        (payload: any) => {
+            const data = payload.data;
 
-    const postUserFills = useCallback((payload: any) => {
-        const data = payload.data;
-        if (
-            data &&
-            data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
-        ) {
-            const fills = processUserFills(data);
-            fills.sort((a, b) => b.time - a.time);
-            if (data.isSnapshot) {
-                userFillsRef.current = fills;
-            } else {
-                userFillsRef.current = [...fills, ...userFillsRef.current];
+            if (!data) {
+                console.warn('[ORDER HISTORY] No data in payload');
+                return;
             }
-            fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
-        }
-    }, []);
+
+            console.log('[ORDER HISTORY] Received subscription data:', {
+                isSnapshot: data.isSnapshot,
+                orderCount: data.orderHistory?.length,
+                user: data.user,
+            });
+
+            if (
+                data &&
+                data.orderHistory &&
+                data.user &&
+                data.user?.toLowerCase() === addressRef.current?.toLowerCase()
+            ) {
+                const orders: OrderDataIF[] = [];
+                data.orderHistory.forEach((order: any) => {
+                    console.log('[ORDER HISTORY] Processing order:', {
+                        oid: order.order?.oid,
+                        status: order.status,
+                        coin: order.order?.coin,
+                        side: order.order?.side,
+                        sz: order.order?.sz,
+                        limitPx: order.order?.limitPx,
+                    });
+                    const processedOrder = processUserOrder(
+                        order.order,
+                        order.status,
+                    );
+                    console.log(processedOrder);
+                    if (processedOrder) {
+                        orders.push(processedOrder);
+                    }
+                });
+
+                const previousOpenOrders = [...openOrdersRef.current];
+
+                if (data.isSnapshot) {
+                    orders.sort((a, b) => b.timestamp - a.timestamp);
+                    userOrderHistoryRef.current = orders;
+                    // Extract open orders for the open orders table
+                    const openOrders = orders.filter(
+                        (order) => order.status === 'open',
+                    );
+                    openOrdersRef.current = openOrders;
+
+                    console.log(
+                        '[OPEN ORDERS] Snapshot - Setting open orders:',
+                        {
+                            totalOrders: orders.length,
+                            openOrdersCount: openOrders.length,
+                            openOrderOids: openOrders.map((o) => ({
+                                oid: o.oid,
+                                coin: o.coin,
+                                status: o.status,
+                            })),
+                        },
+                    );
+                } else {
+                    // For updates, merge new/updated orders with existing ones
+                    // Create a map to track the latest status of each order by oid
+                    const orderMap = new Map<number, OrderDataIF>();
+
+                    // First, add all existing orders to the map
+                    userOrderHistoryRef.current.forEach((order) => {
+                        orderMap.set(order.oid, order);
+                    });
+
+                    // Then, update or add new orders (this will overwrite with latest status)
+                    orders.forEach((order) => {
+                        const existingOrder = orderMap.get(order.oid);
+                        console.log(
+                            '[ORDER HISTORY] Update - Order status change:',
+                            {
+                                oid: order.oid,
+                                coin: order.coin,
+                                oldStatus: existingOrder?.status,
+                                newStatus: order.status,
+                                isNewOrder: !existingOrder,
+                            },
+                        );
+                        orderMap.set(order.oid, order);
+                    });
+
+                    // Convert back to array and sort
+                    userOrderHistoryRef.current = Array.from(
+                        orderMap.values(),
+                    ).sort((a, b) => b.timestamp - a.timestamp);
+
+                    // Update open orders - filter only orders with status 'open'
+                    const allOpenOrders = userOrderHistoryRef.current.filter(
+                        (order) => order.status === 'open',
+                    );
+                    openOrdersRef.current = allOpenOrders;
+
+                    // Log changes to open orders
+                    const removedOrders = previousOpenOrders.filter(
+                        (prevOrder) =>
+                            !allOpenOrders.find(
+                                (order) => order.oid === prevOrder.oid,
+                            ),
+                    );
+                    const addedOrders = allOpenOrders.filter(
+                        (order) =>
+                            !previousOpenOrders.find(
+                                (prevOrder) => prevOrder.oid === order.oid,
+                            ),
+                    );
+
+                    if (removedOrders.length > 0 || addedOrders.length > 0) {
+                        console.log(
+                            '[OPEN ORDERS] Update - Changes detected:',
+                            {
+                                previousCount: previousOpenOrders.length,
+                                newCount: allOpenOrders.length,
+                                removed: removedOrders.map((o) => ({
+                                    oid: o.oid,
+                                    coin: o.coin,
+                                    status: o.status,
+                                })),
+                                added: addedOrders.map((o) => ({
+                                    oid: o.oid,
+                                    coin: o.coin,
+                                    status: o.status,
+                                })),
+                            },
+                        );
+                    }
+                }
+                fetchedChannelsRef.current.add(
+                    WsChannels.USER_HISTORICAL_ORDERS,
+                );
+                // Update store immediately for both snapshot and updates
+                setOrderHistory(userOrderHistoryRef.current);
+                setUserOrders(openOrdersRef.current);
+                setFetchedChannels(new Set([...fetchedChannelsRef.current]));
+            } else {
+                console.warn(
+                    '[ORDER HISTORY] Skipping - user mismatch or missing data',
+                );
+            }
+        },
+        [setFetchedChannels],
+    );
+
+    const postUserFills = useCallback(
+        (payload: any) => {
+            const data = payload.data;
+
+            console.log('[USER FILLS] Received subscription data:', {
+                isSnapshot: data?.isSnapshot,
+                fillsCount: data?.fills?.length,
+                user: data?.user,
+            });
+
+            if (
+                data &&
+                data.user &&
+                data.user?.toLowerCase() === addressRef.current?.toLowerCase()
+            ) {
+                console.log('[USER FILLS] Processing fills:', {
+                    rawFills: data.fills?.slice(0, 3).map((fill: any) => ({
+                        coin: fill.coin,
+                        side: fill.side,
+                        px: fill.px,
+                        sz: fill.sz,
+                        oid: fill.oid,
+                        tid: fill.tid,
+                        time: fill.time,
+                    })),
+                });
+
+                const fills = processUserFills(data);
+                fills.sort((a, b) => b.time - a.time);
+
+                console.log('[USER FILLS] Processed fills:', {
+                    processedCount: fills.length,
+                    firstFewFills: fills.slice(0, 3).map((fill) => ({
+                        coin: fill.coin,
+                        side: fill.side,
+                        px: fill.px,
+                        sz: fill.sz,
+                        oid: fill.oid,
+                        tid: fill.tid,
+                        time: fill.time,
+                    })),
+                });
+
+                if (data.isSnapshot) {
+                    userFillsRef.current = fills;
+                    console.log(
+                        '[USER FILLS] Set snapshot fills:',
+                        fills.length,
+                    );
+                } else {
+                    const previousCount = userFillsRef.current.length;
+                    userFillsRef.current = [...fills, ...userFillsRef.current];
+                    console.log('[USER FILLS] Added update fills:', {
+                        newFillsCount: fills.length,
+                        previousTotal: previousCount,
+                        newTotal: userFillsRef.current.length,
+                    });
+                }
+                fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
+                setFetchedChannels(new Set([...fetchedChannelsRef.current]));
+            } else {
+                console.warn(
+                    '[USER FILLS] Skipping - user mismatch or missing data',
+                );
+            }
+        },
+        [setFetchedChannels],
+    );
 
     const postUserTwapSliceFills = useCallback((payload: any) => {
         const data = payload.data;
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const fills = processUserTwapSliceFills(data);
             if (data.isSnapshot) {
@@ -325,7 +568,7 @@ export default function WebDataConsumer() {
         if (
             data &&
             data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
+            data.user?.toLowerCase() === addressRef.current?.toLowerCase()
         ) {
             const history = processUserTwapHistory(data);
             if (data.isSnapshot) {
@@ -340,26 +583,30 @@ export default function WebDataConsumer() {
         }
     }, []);
 
-    const postUserFundings = useCallback((payload: any) => {
-        const data = payload.data;
-        if (
-            data &&
-            data.user &&
-            data.user?.toLowerCase() === addressRef.current?.toLocaleLowerCase()
-        ) {
-            const fundings = processUserFundings(data.fundings);
-            fundings.sort((a, b) => b.time - a.time);
-            if (data.isSnapshot) {
-                userFundingsRef.current = fundings;
-            } else {
-                userFundingsRef.current = [
-                    ...fundings,
-                    ...userFundingsRef.current,
-                ];
+    const postUserFundings = useCallback(
+        (payload: any) => {
+            const data = payload.data;
+            if (
+                data &&
+                data.user &&
+                data.user?.toLowerCase() === addressRef.current?.toLowerCase()
+            ) {
+                const fundings = processUserFundings(data.fundings);
+                fundings.sort((a, b) => b.time - a.time);
+                if (data.isSnapshot) {
+                    userFundingsRef.current = fundings;
+                } else {
+                    userFundingsRef.current = [
+                        ...fundings,
+                        ...userFundingsRef.current,
+                    ];
+                }
+                fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
+                setFetchedChannels(new Set([...fetchedChannelsRef.current]));
             }
-            fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
-        }
-    }, []);
+        },
+        [setFetchedChannels],
+    );
 
     const postUserNonFundingLedgerUpdates = useCallback(
         (payload: any) => {
@@ -399,6 +646,32 @@ export default function WebDataConsumer() {
             setFavCoins(favs);
         }
     }, [favKeys, coins]);
+
+    const resetRefs = useCallback(() => {
+        openOrdersRef.current = [];
+        positionsRef.current = [];
+        userBalancesRef.current = [];
+        userOrderHistoryRef.current = [];
+        userFillsRef.current = [];
+        twapHistoryRef.current = [];
+        twapSliceFillsRef.current = [];
+        userFundingsRef.current = [];
+        activeTwapsRef.current = [];
+        userNonFundingLedgerUpdatesRef.current = [];
+    }, []);
+
+    useEffect(() => {
+        if (!isEstablished(sessionState)) {
+            resetRefs();
+        }
+    }, [isEstablished(sessionState)]);
+
+    // Update positions in TradeDataStore when unified data changes
+    useEffect(() => {
+        if (unifiedPositions) {
+            setPositions(unifiedPositions);
+        }
+    }, [unifiedPositions, setPositions]);
 
     return <></>;
 }

@@ -1,12 +1,19 @@
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { buyColor, sellColor, type LineLabel } from './customOrderLineUtils';
 import type { LineData } from './component/LineComponent';
+import { type LineLabel } from './customOrderLineUtils';
+import { LIQ_PRICE_LINE_COLOR } from './orderLineUtils';
 
 export const usePositionOrderLines = (): LineData[] => {
     const { chart } = useTradingView();
     const { positions, symbol } = useTradeDataStore();
+    const { bsColor, getBsColor } = useAppSettings();
+
+    const sessionState = useSession();
+    const isSessionEstablished = isEstablished(sessionState);
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -22,7 +29,7 @@ export const usePositionOrderLines = (): LineData[] => {
     }, [JSON.stringify(positions), symbol]);
 
     useEffect(() => {
-        if (!chart || !positions?.length) {
+        if (!isSessionEstablished || !chart || !positions?.length) {
             setLines([]);
             return;
         }
@@ -37,8 +44,10 @@ export const usePositionOrderLines = (): LineData[] => {
                     yPrice: order.price,
                     textValue: { type: 'PNL', pnl } as LineLabel,
                     quantityTextValue: order.szi,
-                    color: pnl > 0 ? buyColor : sellColor,
+                    color: pnl > 0 ? getBsColor().buy : getBsColor().sell,
                     type: 'PNL',
+                    lineStyle: 3,
+                    lineWidth: 1,
                 });
             }
 
@@ -51,8 +60,10 @@ export const usePositionOrderLines = (): LineData[] => {
                         text: ' Liq. Price',
                     } as LineLabel,
                     quantityTextValue: undefined,
-                    color: sellColor,
+                    color: LIQ_PRICE_LINE_COLOR,
                     type: 'LIQ',
+                    lineStyle: 3,
+                    lineWidth: 2,
                 });
             }
 
@@ -60,7 +71,13 @@ export const usePositionOrderLines = (): LineData[] => {
         });
 
         setLines(newLines);
-    }, [chart, JSON.stringify(filteredPositions), symbol]);
+    }, [
+        isSessionEstablished,
+        chart,
+        JSON.stringify(filteredPositions),
+        symbol,
+        bsColor,
+    ]);
 
     return lines;
 };

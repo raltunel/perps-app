@@ -1,8 +1,6 @@
+import { buildWithdrawMarginTx } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
-import {
-    buildWithdrawMarginTx,
-    getUserMarginBucket,
-} from '@crocswap-libs/ambient-ember';
+import { getUnifiedMarginData } from '~/utils/getUnifiedMarginData';
 
 export interface WithdrawServiceResult {
     success: boolean;
@@ -29,110 +27,45 @@ export class WithdrawService {
     /**
      * Get available balance to withdraw from margin bucket
      * @param userPublicKey - User's public key
+     * @param marketId - Market ID (defaults to BTC market)
      * @returns Promise<AvailableWithdrawBalance | null>
      */
     async getAvailableWithdrawBalance(
         userPublicKey: PublicKey,
+        marketId: bigint = BigInt(64),
     ): Promise<AvailableWithdrawBalance | null> {
         try {
-            console.log(
-                '🔍 Fetching available withdraw balance for:',
-                userPublicKey.toString(),
-            );
-            console.log('📡 Connection endpoint:', this.connection.rpcEndpoint);
-
-            let marginBucket;
-            try {
-                // Add timeout to prevent hanging
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(
-                        () =>
-                            reject(
-                                new Error(
-                                    'getUserMarginBucket timeout after 10 seconds',
-                                ),
+            // Add timeout to prevent hanging
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                setTimeout(
+                    () =>
+                        reject(
+                            new Error(
+                                'getUnifiedMarginData timeout after 10 seconds',
                             ),
-                        10000,
-                    );
-                });
-
-                marginBucket = await Promise.race([
-                    getUserMarginBucket(this.connection, userPublicKey),
-                    timeoutPromise,
-                ]);
-                console.log('✅ getUserMarginBucket call completed');
-            } catch (marginError) {
-                console.error(
-                    '❌ Error calling getUserMarginBucket:',
-                    marginError,
+                        ),
+                    10000,
                 );
-                // Don't throw, just return 0 balance
+            });
+
+            const result = await Promise.race([
+                getUnifiedMarginData({
+                    connection: this.connection,
+                    walletPublicKey: userPublicKey,
+                    forceRefresh: true, // Always get fresh data for withdrawals
+                    marketId,
+                }),
+                timeoutPromise,
+            ]);
+
+            if (!result.marginBucket) {
+                console.warn('⚠️ No margin bucket found for user');
                 return { balance: 0, decimalized: 0 };
             }
-
-            if (!marginBucket) {
-                console.log('⚠️ No margin bucket found for user');
-                return { balance: 0, decimalized: 0 };
-            }
-
-            // Don't use JSON.stringify with BigInt values
-            console.log('📊 Margin bucket data:', marginBucket);
-            console.log('📊 Calculations:', marginBucket.calculations);
-            console.log(
-                '📊 All margin bucket keys:',
-                Object.keys(marginBucket),
-            );
-
-            // If calculations exist, log its keys
-            if (marginBucket.calculations) {
-                console.log(
-                    '📊 Calculations keys:',
-                    Object.keys(marginBucket.calculations),
-                );
-                // Log each calculation value separately to handle BigInts
-                for (const [key, value] of Object.entries(
-                    marginBucket.calculations,
-                )) {
-                    console.log(
-                        `  - ${key}:`,
-                        value?.toString ? value.toString() : value,
-                    );
-                }
-            }
-
-            // Get available to withdraw from calculations
-            // Try different possible field names
-            let availableToWithdraw =
-                marginBucket.calculations?.collateralAvailableToWithdraw ||
-                marginBucket.collateralAvailableToWithdraw ||
-                marginBucket.availableToWithdraw ||
-                marginBucket.calculations?.availableToWithdraw ||
-                marginBucket.calculations?.available_to_withdraw ||
-                0;
-
-            console.log('💰 Raw available to withdraw:', availableToWithdraw);
-            console.log(
-                '💰 Type of available to withdraw:',
-                typeof availableToWithdraw,
-            );
-
-            // Convert BigInt to number if necessary
-            if (typeof availableToWithdraw === 'bigint') {
-                availableToWithdraw = Number(availableToWithdraw);
-                console.log(
-                    '💰 Converted from BigInt to number:',
-                    availableToWithdraw,
-                );
-            }
-
-            // Convert to decimalized value (assuming 6 decimals for USD)
-            const decimalized = availableToWithdraw / Math.pow(10, 6);
-
-            console.log('💵 Decimalized available to withdraw:', decimalized);
 
             return {
-                balance: availableToWithdraw,
-                decimalized,
+                balance: Number(result.availableToWithdraw),
+                decimalized: result.decimalized,
             };
         } catch (error) {
             console.error(
@@ -154,15 +87,15 @@ export class WithdrawService {
      * @param amount - Amount to withdraw (in decimalized form)
      * @returns Validation result
      */
-    validateWithdrawAmount(amount: number): {
+    validateWithdrawAmount(amount: number | undefined): {
         isValid: boolean;
         message?: string;
     } {
-        if (!amount || amount <= 0) {
+        if (amount && amount < 1) {
             return { isValid: false, message: 'Invalid withdraw amount' };
         }
 
-        // No minimum for withdrawals
+        // $1 minimum for withdrawals
         return { isValid: true };
     }
 
@@ -174,7 +107,7 @@ export class WithdrawService {
      * @returns Promise<Transaction>
      */
     private async buildWithdrawTransaction(
-        amount: number,
+        amount: number | undefined,
         user: PublicKey,
         actor?: PublicKey,
         target?: PublicKey,
@@ -215,26 +148,17 @@ export class WithdrawService {
 
             // Convert decimalized amount to non-decimalized (multiply by 10^6)
             // Use BigInt to match what the SDK expects
-            const nonDecimalizedAmount = BigInt(
-                Math.floor(amount * Math.pow(10, 6)),
-            );
-            console.log(
-                '💰 Non-decimalized amount:',
-                nonDecimalizedAmount.toString(),
-            );
-            console.log(
-                '💰 Non-decimalized amount type:',
-                typeof nonDecimalizedAmount,
-            );
+            const nonDecimalizedAmount = amount
+                ? BigInt(Math.floor(amount * Math.pow(10, 6)))
+                : undefined;
 
             // Build the transaction using the SDK
             const transaction = await buildWithdrawMarginTx(
                 this.connection,
-                nonDecimalizedAmount,
                 user,
                 {
+                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: actor || user,
-                    target: target, // User's wallet for PDA construction
                 },
             );
 
@@ -275,7 +199,7 @@ export class WithdrawService {
      * @returns Promise<WithdrawServiceResult>
      */
     async executeWithdraw(
-        amount: number,
+        amount: number | undefined,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         sendTransaction: (instructions: any[]) => Promise<any>,
@@ -299,31 +223,14 @@ export class WithdrawService {
                 amount,
                 userWalletKey, // user (wallet key)
                 sessionPublicKey, // actor (session key for signing)
-                undefined, // target (not needed for withdraw?)
+                undefined, // target (not needed for withdraw)
+                undefined, // rent payer (not needed for withdraw)
             );
 
             // Extract instructions from the transaction
             const instructions = transaction.instructions;
 
             console.log('📤 Sending withdraw transaction:');
-            console.log('  - Instructions to send:', instructions.length);
-            console.log(
-                '  - Instruction details:',
-                instructions.map((ix, index) => ({
-                    index,
-                    programId: ix.programId.toString(),
-                    keysCount: ix.keys.length,
-                    dataLength: ix.data.length,
-                    firstFewDataBytes: Array.from(ix.data.slice(0, 8)),
-                })),
-            );
-
-            // Send the transaction using Fogo session (pass raw instructions like deposit does)
-            console.log('  - Calling sendTransaction with instructions...');
-            console.log(
-                '  - sendTransaction function type:',
-                typeof sendTransaction,
-            );
             console.log('  - Instructions array:', instructions);
             const result = await sendTransaction(instructions);
 
@@ -355,16 +262,9 @@ export class WithdrawService {
 
             // Track transaction confirmation
             if (signature) {
-                console.log(
-                    '🔍 Starting transaction tracking for signature:',
-                    signature,
-                );
-
                 // Wait for confirmation
-                const isConfirmed = await this.trackTransactionConfirmation(
-                    signature,
-                    amount,
-                );
+                const isConfirmed =
+                    await this.trackTransactionConfirmation(signature);
 
                 if (isConfirmed) {
                     // Note: Success notification should be handled by the component
@@ -423,12 +323,10 @@ export class WithdrawService {
     /**
      * Track transaction confirmation on-chain
      * @param signature - Transaction signature
-     * @param amount - Amount being withdrawn
      * @returns Promise<boolean> - true if confirmed, false if failed or timed out
      */
     private async trackTransactionConfirmation(
         signature: string,
-        amount: number,
     ): Promise<boolean> {
         return new Promise((resolve) => {
             const maxRetries = 30; // 60 seconds total (2 seconds per check)

@@ -1,15 +1,20 @@
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
+import { useIsClient } from '~/hooks/useIsClient';
 import {
     TableState,
     type HeaderCell,
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import { useIsClient } from '~/hooks/useIsClient';
 
 interface GenericTableProps<
     T,
@@ -17,6 +22,7 @@ interface GenericTableProps<
     F extends (...args: Parameters<F>) => Promise<T[]>,
 > {
     data: T[];
+    noDataMessage?: string;
     renderHeader: (
         sortDirection: TableSortDirection,
         sortClickHandler: (key: S) => void,
@@ -52,8 +58,11 @@ export default function GenericTable<
     const id = useId();
     const navigate = useNavigate();
 
+    const sessionState = useSession();
+
     const {
         data,
+        noDataMessage,
         renderHeader,
         renderRow,
         sorterMethod,
@@ -132,6 +141,8 @@ export default function GenericTable<
     const isClient = useIsClient();
 
     const [rowLimit, setRowLimit] = useState(slicedLimit);
+
+    const isHttpInfoCallsDisabled = true;
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -246,7 +257,7 @@ export default function GenericTable<
         } else {
             setTableState(TableState.FILLED);
         }
-    }, [isFetched, dataToShow]);
+    }, [isFetched, dataToShow, storageKey]);
 
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
@@ -369,6 +380,10 @@ export default function GenericTable<
         };
     }, [tableState, checkShadow, id]);
 
+    const isSessionEstablished = useMemo(() => {
+        return isEstablished(sessionState);
+    }, [sessionState]);
+
     return (
         <div
             className={styles.tableWrapper}
@@ -376,74 +391,81 @@ export default function GenericTable<
                 height: heightOverride,
             }}
         >
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={skeletonRows}
-                    colRatios={skeletonColRatios}
-                />
-            ) : (
-                <>
-                    <span
-                        id={`${id}-headerContainer`}
-                        className={styles.headerContainer}
-                    >
-                        {renderHeader(sortDirection, handleSort, sortBy)}
-                    </span>
-                    <div
-                        id={`${id}-tableBody`}
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : styles.notPage
-                        }`}
-                    >
-                        {tableState === TableState.FILLED &&
-                            dataToShow.map(renderRow)}
-                        {tableState === TableState.EMPTY && <NoDataRow />}
-
-                        {sortedData.length > 0 && (
-                            <div
-                                id={`${id}-actionsContainer`}
-                                className={styles.actionsContainer}
-                            >
-                                {sortedData.length > slicedLimit &&
-                                    !pageMode &&
-                                    viewAllLink &&
-                                    viewAllLink.length > 0 && (
-                                        <a
-                                            href='#'
-                                            className={styles.viewAllLink}
-                                            onClick={handleViewAll}
-                                        >
-                                            View All
-                                        </a>
-                                    )}
-                                {tableModel &&
-                                    (pageMode || csvDataFetcher) &&
-                                    tableModel.some(
-                                        (header) => header.exportable,
-                                    ) && (
-                                        <a
-                                            href='#'
-                                            className={styles.exportLink}
-                                            onClick={handleExportCsv}
-                                        >
-                                            Export as CSV
-                                        </a>
-                                    )}
-                            </div>
-                        )}
-
-                        {pageMode && (
-                            <GenericTablePagination
-                                totalCount={sortedData.length}
-                                page={page}
-                                setPage={setPage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={setRowsPerPage}
-                            />
-                        )}
+            <span
+                id={`${id}-headerContainer`}
+                className={styles.headerContainer}
+            >
+                {tableState === TableState.LOADING ? (
+                    <div /> // for header during loading
+                ) : (
+                    renderHeader(sortDirection, handleSort, sortBy)
+                )}
+            </span>
+            <div
+                id={`${id}-tableBody`}
+                className={`${styles.tableBody} ${
+                    pageMode ? styles.pageMode : styles.notPage
+                }`}
+            >
+                {isSessionEstablished && tableState === TableState.LOADING && (
+                    <SkeletonTable
+                        rows={skeletonRows}
+                        colRatios={skeletonColRatios}
+                    />
+                )}
+                {isSessionEstablished &&
+                    tableState === TableState.FILLED &&
+                    dataToShow.map(renderRow)}
+                {isSessionEstablished && tableState === TableState.EMPTY && (
+                    <NoDataRow text={noDataMessage} />
+                )}
+                {!isSessionEstablished && (
+                    <div className={styles.sessionButtonContainer}>
+                        <SessionButton />
                     </div>
-                </>
-            )}
+                )}
+
+                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={styles.actionsContainer}
+                    >
+                        {sortedData.length > slicedLimit &&
+                            !pageMode &&
+                            viewAllLink &&
+                            viewAllLink.length > 0 && (
+                                <a
+                                    href='#'
+                                    className={styles.viewAllLink}
+                                    onClick={handleViewAll}
+                                >
+                                    View All
+                                </a>
+                            )}
+                        {tableModel &&
+                            (pageMode || csvDataFetcher) &&
+                            tableModel.some((header) => header.exportable) && (
+                                <a
+                                    href='#'
+                                    className={styles.exportLink}
+                                    onClick={handleExportCsv}
+                                >
+                                    Export as CSV
+                                </a>
+                            )}
+                    </div>
+                )}
+
+                {pageMode && (
+                    <GenericTablePagination
+                        totalCount={sortedData.length}
+                        page={page}
+                        setPage={setPage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={setRowsPerPage}
+                    />
+                )}
+            </div>
         </div>
     );
 }

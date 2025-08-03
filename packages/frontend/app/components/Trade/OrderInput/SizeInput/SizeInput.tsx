@@ -51,6 +51,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         <div className={styles.sizeInputContainer}>
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
+                id='trade-module-size-input'
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}

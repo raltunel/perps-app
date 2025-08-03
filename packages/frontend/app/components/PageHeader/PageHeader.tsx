@@ -16,17 +16,17 @@ import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
-import DepositDropdown from './DepositDropdown/DepositDropdown';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
 import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
-// import WalletDropdown from './WalletDropdown/WalletDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
@@ -45,7 +45,10 @@ export default function PageHeader() {
     const location = useLocation();
 
     // symbol for active market
-    const { symbol, marginBucket, setMarginBucket } = useTradeDataStore();
+    const { symbol, setMarginBucket } = useTradeDataStore();
+
+    // Use unified margin data
+    const { marginBucket } = useUnifiedMarginData();
 
     // data to generate nav links in page header
     const navLinks = [
@@ -101,40 +104,12 @@ export default function PageHeader() {
         [],
     );
 
+    const { openDepositModal, PortfolioModalsRenderer } = usePortfolioModals();
+
+    // Update TradeDataStore when unified margin data changes
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-
-        const fetchMarginBucket = async () => {
-            if (isEstablished(sessionState)) {
-                const marginBucket = await getUserMarginBucket(
-                    sessionState.connection,
-                    // new PublicKey(
-                    //     'EBuzZzbTgcbjRz2TBygGgf2T7nmqzSjQG5vGmEiCvUzu',
-                    // ),
-                    sessionState.walletPublicKey,
-                    BigInt(DFLT_EMBER_MARKET.mktId),
-                    USD_MINT,
-                    {},
-                );
-                // console.log({ marginBucket });
-                setMarginBucket(marginBucket);
-            }
-        };
-
-        fetchMarginBucket(); // Initial fetch on mount
-
-        if (isEstablished(sessionState)) {
-            intervalId = setInterval(() => {
-                fetchMarginBucket();
-            }, 2000); // Refresh every 2 seconds
-        }
-
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-        };
-    }, [sessionState]);
+        setMarginBucket(marginBucket);
+    }, [marginBucket, setMarginBucket]);
 
     return (
         <>
@@ -145,6 +120,7 @@ export default function PageHeader() {
                         alt='Perps Logo'
                         width='70px'
                         height='70px'
+                        loading='eager'
                     />
                 </Link>
                 <nav
@@ -222,21 +198,10 @@ export default function PageHeader() {
                         >
                             <button
                                 className={styles.depositButton}
-                                onClick={() =>
-                                    setIsDepositDropdownOpen(
-                                        !isDepositDropdownOpen,
-                                    )
-                                }
+                                onClick={() => openDepositModal()}
                             >
                                 Deposit
                             </button>
-
-                            {isDepositDropdownOpen && (
-                                <DepositDropdown
-                                    isDropdown
-                                    marginBucket={marginBucket}
-                                />
-                            )}
                         </section>
                     )}
 
@@ -314,7 +279,7 @@ export default function PageHeader() {
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
                             }
                         >
-                            <AiOutlineQuestionCircle
+                            <LuCircleHelp
                                 size={18}
                                 color='var(--text2)'
                             />
@@ -363,6 +328,7 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
+            {PortfolioModalsRenderer}
         </>
     );
 }

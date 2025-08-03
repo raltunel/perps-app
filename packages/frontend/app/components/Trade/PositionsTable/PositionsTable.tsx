@@ -1,12 +1,13 @@
 import { useMemo, useRef } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useModal } from '~/hooks/useModal';
-import { useDebugStore } from '~/stores/DebugStore';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
+import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
-import { EXTERNAL_PAGE_URL_PREFIX, WsChannels } from '~/utils/Constants';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
 
@@ -18,13 +19,14 @@ interface PositionsTableProps {
 
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
-    const { coinPriceMap, positions, symbol } = useTradeDataStore();
+    const { coinPriceMap, symbol } = useTradeDataStore();
+    const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
 
-    const { debugWallet } = useDebugStore();
+    const { userAddress } = useUserDataStore();
 
     const currentUserRef = useRef<string>('');
-    currentUserRef.current = debugWallet.address;
+    currentUserRef.current = userAddress;
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
@@ -45,6 +47,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     return (
         <>
             <GenericTable
+                noDataMessage='No open positions'
                 storageKey={`PositionsTable_${currentUserRef.current}`}
                 data={filteredData as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

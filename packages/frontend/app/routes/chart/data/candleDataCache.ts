@@ -120,11 +120,44 @@ export async function getMarkFillData(coin: string, user?: string) {
                 };
 
                 dataCacheWithUser.set(cacheKey, fetchedDataWithUser);
+
+                return fetchedDataWithUser;
             }
         });
+    } else {
+        return [];
     }
+}
 
-    return [];
+export function updateMarkDataWithSubscription(
+    coin: string,
+    newMarks: any[],
+    user: string,
+) {
+    const cacheKey = `${coin}-fillData`;
+
+    const cachedData = dataCacheWithUser.get(cacheKey);
+
+    if (cachedData) {
+        const existingMarks = cachedData.dataCache;
+
+        newMarks.forEach((newMark) => {
+            const exists = existingMarks.some(
+                (oldMark) => oldMark.oid === newMark.oid,
+            );
+
+            if (!exists) {
+                existingMarks.push(newMark);
+            }
+        });
+
+        const fetchedDataWithUser = {
+            user: user,
+            dataCache: existingMarks,
+        };
+
+        dataCacheWithUser.set(cacheKey, fetchedDataWithUser);
+    }
 }
 
 export function getMarkColorData() {

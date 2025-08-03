@@ -1,6 +1,9 @@
 import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useCancelOrderService } from '~/hooks/useCancelOrderService';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import type { IPaneApi } from '~/tv/charting_library';
 import {
     findLimitLabelAtPosition,
     getXandYLocationForChartDrag,
@@ -11,9 +14,8 @@ import {
     getPricetoPixel,
     quantityTextFormatWithComma,
 } from '../customOrderLineUtils';
-import { drawLabel, type LabelType } from '../orderLineUtils';
+import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
-import type { IPaneApi } from '~/tv/charting_library';
 
 interface LabelProps {
     lines: LineData[];
@@ -49,11 +51,15 @@ const LabelComponent = ({
 }: LabelProps) => {
     const { chart, isChartReady } = useTradingView();
 
+    const notifications = useNotificationStore();
+
+    const { executeCancelOrder } = useCancelOrderService();
+
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
     useEffect(() => {
-        if (!chart || !isChartReady || !ctx) return;
+        if (!chart || !isChartReady || !ctx || !canvasSize) return;
 
         let animationFrameId: number | null = null;
 
@@ -102,6 +108,7 @@ const LabelComponent = ({
                 const yPricePixel = getPricetoPixel(
                     chart,
                     line.yPrice,
+                    line.type,
                     heightAttr,
                     scaleData,
                 ).pixel;
@@ -142,11 +149,25 @@ const LabelComponent = ({
                         : []),
                 ];
 
-                const labelLocations = drawLabel(ctx, {
-                    x: xPixel,
-                    y: yPricePixel,
-                    labelOptions,
-                });
+                let labelLocations = [];
+
+                if (line.type !== 'LIQ') {
+                    labelLocations = drawLabel(ctx, {
+                        x: xPixel,
+                        y: yPricePixel,
+                        labelOptions,
+                    });
+                } else {
+                    labelLocations = drawLiqLabel(
+                        ctx,
+                        {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                        },
+                        canvasSize.width,
+                    );
+                }
 
                 return {
                     ...line,
@@ -271,6 +292,57 @@ const LabelComponent = ({
         }
     }, [chart, drawnLabelsRef.current, isDrag]);
 
+    const handleCancel = async (orderId: number) => {
+        if (!orderId) {
+            notifications.add({
+                title: 'Cancel Failed',
+                message: 'Order ID not found',
+                icon: 'error',
+            });
+            return;
+        }
+
+        try {
+            // Show pending notification
+            notifications.add({
+                title: 'Cancel Order Pending',
+                message: `Cancelling order`,
+                icon: 'spinner',
+            });
+
+            // Execute the cancel order
+            const result = await executeCancelOrder({
+                orderId,
+            });
+
+            if (result.success) {
+                // Show success notification
+                notifications.add({
+                    title: 'Order Cancelled',
+                    message: `Successfully cancelled order`,
+                    icon: 'check',
+                });
+            } else {
+                // Show error notification
+                notifications.add({
+                    title: 'Cancel Failed',
+                    message: String(result.error || 'Failed to cancel order'),
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error cancelling order:', error);
+            notifications.add({
+                title: 'Cancel Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+            });
+        }
+    };
+
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleMouseDown = (params: any) => {
@@ -307,6 +379,9 @@ const LabelComponent = ({
                         );
 
                         if (found) {
+                            console.log({ found });
+                            if (found.parentLine.oid)
+                                handleCancel(found.parentLine.oid);
                             console.log(found.parentLine.textValue);
                         }
                     }

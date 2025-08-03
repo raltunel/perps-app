@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
@@ -28,6 +30,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { coinPriceMap } = useTradeDataStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
+        const notifications = useNotificationStore();
+        const { executeMarketOrder } = useMarketOrderService();
+        const [isClosing, setIsClosing] = useState(false);
 
         const showTpSl = false;
 
@@ -106,8 +111,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 return (
                     <LeverageSliderModal
                         currentLeverage={position.leverage.value}
-                        maxLeverage={position.maxLeverage}
+                        // maxLeverage={position.maxLeverage}
                         onClose={modalCtrl.close}
+                        onConfirm={(value) => {
+                            console.log({ value });
+                        }}
                     />
                 );
             } else if (modalContent === 'tpsl') {
@@ -128,6 +136,58 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
 
+        // Handle market close
+        const handleMarketClose = useCallback(async () => {
+            if (isClosing || !position.szi) return;
+
+            setIsClosing(true);
+
+            try {
+                // Show pending notification
+                notifications.add({
+                    title: 'Closing Position',
+                    message: `Market closing ${Math.abs(position.szi)} ${position.coin}`,
+                    icon: 'spinner',
+                });
+
+                // Execute market order in opposite direction
+                const result = await executeMarketOrder({
+                    quantity: Math.abs(position.szi), // Use absolute value of position size
+                    side: position.szi > 0 ? 'sell' : 'buy', // Opposite side to close
+                    leverage: position.leverage?.value,
+                });
+
+                if (result.success) {
+                    notifications.add({
+                        title: 'Position Closed',
+                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                        icon: 'check',
+                    });
+                } else {
+                    notifications.add({
+                        title: 'Close Failed',
+                        message: String(
+                            result.error || 'Failed to close position',
+                        ),
+                        icon: 'error',
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error closing position:', error);
+                notifications.add({
+                    title: 'Close Failed',
+                    message: String(
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error occurred',
+                    ),
+                    icon: 'error',
+                });
+            } finally {
+                setIsClosing(false);
+            }
+        }, [position, executeMarketOrder, notifications, isClosing]);
+
         // Memoize funding values and tooltip
         const fundingToShow = useMemo(
             () => position.cumFunding.sinceOpen * -1,
@@ -143,6 +203,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             ],
         );
 
+        const isLinkDisabled = position.coin.toLowerCase() !== 'btc';
+
+        const liquidationDisp = useMemo(() => {
+            if (position.liquidationPx === null) return '-';
+            if (position.liquidationPx <= 0) {
+                return '0';
+            }
+            if (position.liquidationPx > 1_000_000) {
+                return '>' + formatNum(1_000_000);
+            }
+            return formatNum(position.liquidationPx);
+        }, [position.liquidationPx, formatNum]);
+
         return (
             <div
                 className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
@@ -154,24 +227,25 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <span
                         style={{
                             color: baseColor,
-                            cursor: 'pointer',
+                            cursor: isLinkDisabled ? 'default' : 'pointer',
                         }}
-                        onClick={handleCoinClick}
+                        onClick={isLinkDisabled ? undefined : handleCoinClick}
                     >
                         {position.coin}
                     </span>
-                    {position.leverage.value && (
-                        <span
-                            className={styles.badge}
-                            onClick={openLeverageModal}
-                            style={{
-                                color: baseColor,
-                                backgroundColor: hexToRgba(baseColor, 0.15),
-                            }}
-                        >
-                            {position.leverage.value}x
-                        </span>
-                    )}
+                    {position.leverage.value &&
+                        position.coin.toLowerCase() === 'btc' && (
+                            <span
+                                className={styles.badge}
+                                onClick={openLeverageModal}
+                                style={{
+                                    color: baseColor,
+                                    backgroundColor: hexToRgba(baseColor, 0.15),
+                                }}
+                            >
+                                {Math.floor(position.leverage.value)}x
+                            </span>
+                        )}
                 </div>
                 <div
                     className={`${styles.cell} ${styles.sizeCell}`}
@@ -214,7 +288,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <RiExternalLinkLine color='var(--text2)' />
                 </div>
                 <div className={`${styles.cell} ${styles.liqPriceCell}`}>
-                    {formatNum(position.liquidationPx)}
+                    {liquidationDisp}
                 </div>
                 <div className={`${styles.cell} ${styles.marginCell}`}>
                     {formatNum(position.marginUsed, 2)}
@@ -245,7 +319,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
                         {/* <button className={styles.actionButton}>Limit</button> */}
-                        <button className={styles.actionButton}>Market</button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={handleMarketClose}
+                            disabled={isClosing}
+                        >
+                            {isClosing ? 'Closing...' : 'Market'}
+                        </button>
                     </div>
                 </div>
                 {modalCtrl.isOpen && renderModalContent()}

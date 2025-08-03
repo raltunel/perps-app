@@ -3,6 +3,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import styles from './NumFormattedInput.module.css';
 
 interface NumFormattedInputProps {
+    id?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onFocus?: () => void;
@@ -11,9 +12,12 @@ interface NumFormattedInputProps {
     className?: string;
     ariaLabel?: string;
     placeholder?: string;
+    inputRegexOverride?: RegExp;
+    autoFocus?: boolean;
 }
 
 const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
+    id,
     value,
     onChange,
     onFocus,
@@ -22,6 +26,8 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     className,
     ariaLabel,
     placeholder,
+    inputRegexOverride,
+    autoFocus,
 }) => {
     const {
         inputRegex,
@@ -43,12 +49,20 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     const handleChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value;
-            if (inputRegex.test(newValue) && newValue.length <= 12) {
+            if (
+                (inputRegexOverride || inputRegex).test(newValue) &&
+                newValue.length <= 12
+            ) {
                 onChange(event);
                 valueNum.current = parseFormattedWithOnlyDecimals(newValue);
             }
         },
-        [inputRegex, onChange, parseFormattedWithOnlyDecimals],
+        [
+            inputRegex,
+            onChange,
+            parseFormattedWithOnlyDecimals,
+            inputRegexOverride,
+        ],
     );
 
     useEffect(() => {
@@ -62,6 +76,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
     return (
         <>
             <input
+                {...(id && { id })}
                 type='text'
                 value={value}
                 onChange={handleChange}
@@ -73,6 +88,7 @@ const NumFormattedInput: React.FC<NumFormattedInputProps> = ({
                 inputMode='numeric'
                 pattern='[0-9]*'
                 placeholder={placeholder}
+                autoFocus={autoFocus}
             />
         </>
     );

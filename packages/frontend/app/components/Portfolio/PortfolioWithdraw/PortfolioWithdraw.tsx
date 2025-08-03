@@ -1,11 +1,14 @@
 import { memo, useCallback, useMemo, useState } from 'react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
-import Tooltip from '~/components/Tooltip/Tooltip';
-import { useDebouncedCallback } from '~/hooks/useDebounce';
-import styles from './PortfolioWithdraw.module.css';
+import { LuCircleHelp } from 'react-icons/lu';
+import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import useDebounce from '~/hooks/useDebounce';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
+import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import styles from './PortfolioWithdraw.module.css';
 
 interface propsIF {
     portfolio: {
@@ -14,7 +17,7 @@ interface propsIF {
         availableBalance: number;
         unit?: string;
     };
-    onWithdraw: (amount: number) => void;
+    onWithdraw: (amount?: number | undefined) => void;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -26,98 +29,77 @@ function PortfolioWithdraw({
     isProcessing = false,
 }: propsIF) {
     const notificationStore = useNotificationStore();
-    const [amount, setAmount] = useState<string>('');
+    const [rawInputString, setRawInputString] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
 
-    const unitValue = portfolio.unit || 'fUSD';
+    const {
+        formatNum,
+        parseFormattedWithOnlyDecimals,
+        formatNumWithOnlyDecimals,
+        activeDecimalSeparator,
+    } = useNumFormatter();
 
-    // const isValidNumberInput = useCallback(() => {
-    //     return true
-    // }, []);
+    const withdrawInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
-    const USD_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }),
-        [],
-    );
+    const isSizeInvalid: boolean =
+        !isNaN(withdrawInputNum) &&
+        withdrawInputNum > 0 &&
+        withdrawInputNum < 1;
 
-    const OTHER_FORMATTER = useMemo(
-        () =>
-            new Intl.NumberFormat('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 8,
-            }),
-        [],
-    );
+    // debounced invalid state
+    const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
 
-    const formatCurrency = useCallback(
-        (value: number, unit: string) => {
-            if (unit === 'USD') {
-                return USD_FORMATTER.format(value);
+    const showInvalidSizeWarning = isSizeInvalid
+        ? isSizeInvalidDebounced
+        : false;
+
+    const [maxActive, setMaxActive] = useState(false);
+
+    const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
+
+    const validateAmount = useCallback(
+        (amount: number, maxAmount: number) => {
+            if (!amount || isNaN(amount)) {
+                return {
+                    isValid: false,
+                    message: 'Please enter a valid amount',
+                };
             }
-            return `${OTHER_FORMATTER.format(value)} ${unit}`;
+
+            if (amount <= 0) {
+                return {
+                    isValid: false,
+                    message: 'Amount must be greater than 0',
+                };
+            }
+
+            if (amount > maxAmount && !maxActive) {
+                return {
+                    isValid: false,
+                    message: `Amount exceeds available balance of ${maxAmount}`,
+                };
+            }
+
+            return {
+                isValid: true,
+                message: null,
+            };
         },
-        [USD_FORMATTER, OTHER_FORMATTER],
-    );
-
-    const validateAmount = useCallback((amount: number, maxAmount: number) => {
-        if (!amount || isNaN(amount)) {
-            return {
-                isValid: false,
-                message: 'Please enter a valid amount',
-            };
-        }
-
-        if (amount <= 0) {
-            return {
-                isValid: false,
-                message: 'Amount must be greater than 0',
-            };
-        }
-
-        if (amount > maxAmount) {
-            return {
-                isValid: false,
-                message: `Amount exceeds available balance of ${maxAmount}`,
-            };
-        }
-
-        return {
-            isValid: true,
-            message: null,
-        };
-    }, []);
-
-    const debouncedHandleChange = useDebouncedCallback((newValue: string) => {
-        setAmount(newValue);
-        setError(null);
-    }, 20);
-
-    const handleInputChange = useCallback(
-        (event: React.ChangeEvent<HTMLInputElement>) => {
-            const newValue = event.target.value;
-            debouncedHandleChange(newValue);
-            // Clear transaction status when user starts typing
-            setTransactionStatus('idle');
-        },
-        [debouncedHandleChange],
+        [maxActive],
     );
 
     const handleMaxClick = useCallback(() => {
-        setAmount(portfolio.availableBalance.toString());
-        setError(null);
+        setRawInputString(
+            '$' +
+                formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
+        );
+        setMaxActive(true);
     }, [portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
-        const withdrawAmount = parseFloat(amount);
         setError(null);
         setTransactionStatus('pending');
 
@@ -146,7 +128,7 @@ function PortfolioWithdraw({
 
             // Race between the withdraw and the timeout
             const result = await Promise.race([
-                onWithdraw(withdrawAmount),
+                maxActive ? onWithdraw() : onWithdraw(withdrawAmount),
                 timeoutPromise,
             ]);
 
@@ -154,15 +136,27 @@ function PortfolioWithdraw({
             if (result && result.success === false) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
+                notificationStore.add({
+                    title: 'Withdrawal Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
             } else {
                 setTransactionStatus('success');
-                setAmount(''); // Clear form on success
 
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
-                    message: `Successfully withdrew $${withdrawAmount.toFixed(2)} USD`,
+                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} fUSD`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 10000,
                 });
 
                 // Close modal on success - notification will show after modal closes
@@ -177,7 +171,7 @@ function PortfolioWithdraw({
             );
         }
     }, [
-        amount,
+        withdrawAmount,
         portfolio.availableBalance,
         onWithdraw,
         validateAmount,
@@ -190,28 +184,25 @@ function PortfolioWithdraw({
         () => [
             {
                 label: 'Available to withdraw',
-                value: formatCurrency(portfolio.availableBalance, unitValue),
+                value: !isNaN(portfolio.availableBalance)
+                    ? formatNum(portfolio.availableBalance, 2, true, true)
+                    : '-',
                 tooltip:
                     'The total amount you have available to withdraw from your portfolio',
             },
-            {
-                label: 'Network Fee',
-                value: unitValue === 'USD' ? '$0.001' : '0.0001 BTC',
-                tooltip:
-                    'Fee charged for processing the withdrawal transaction',
-            },
         ],
-        [portfolio.availableBalance, unitValue, formatCurrency],
+        [portfolio.availableBalance, formatNum],
     );
 
     // Memoize button disabled state calculation
     const isButtonDisabled = useMemo(
         () =>
             isProcessing ||
-            !amount ||
-            parseFloat(amount) <= 0 ||
-            parseFloat(amount) > portfolio.availableBalance,
-        [isProcessing, amount, portfolio.availableBalance],
+            !rawInputString ||
+            isNaN(withdrawInputNum) ||
+            withdrawInputNum <= 0 ||
+            (!maxActive && withdrawInputNum > portfolio.availableBalance),
+        [isProcessing, rawInputString, portfolio.availableBalance, maxActive],
     );
 
     return (
@@ -222,27 +213,40 @@ function PortfolioWithdraw({
                 <h4>Withdraw fUSD to Fogo</h4>
                 <div>
                     <p>fUSD will be sent to your address.</p>
-                    <p>
-                        A {unitValue === 'USD' ? '$0.001' : '0.0001 BTC'} fee
-                        will be deducted from the fUSD withdrawn.
-                    </p>
-                    <p>Withdrawals should arrive within 5 minutes.</p>
                 </div>
             </div>
 
             <div className={styles.inputContainer}>
-                <h6>Amount</h6>
-                <input
-                    type='text'
-                    value={amount}
-                    onChange={handleInputChange}
+                <h6>
+                    Amount{' '}
+                    {showInvalidSizeWarning && (
+                        <span className={styles.minWarning}>(Min: $1)</span>
+                    )}
+                </h6>
+                <NumFormattedInput
+                    placeholder='Enter amount (min $1)'
+                    value={rawInputString}
+                    onChange={(
+                        event: string | React.ChangeEvent<HTMLInputElement>,
+                    ) => {
+                        if (typeof event === 'string') {
+                            setRawInputString(event);
+                            setMaxActive(false);
+                        } else {
+                            setRawInputString(event.target.value);
+                            setMaxActive(false);
+                        }
+                    }}
+                    autoFocus
                     aria-label='withdraw input'
-                    inputMode='numeric'
-                    pattern='[0-9]*'
-                    placeholder='Enter amount'
-                    min='0'
-                    step='any'
-                    disabled={isProcessing}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (e.key === 'Enter' && !isButtonDisabled) {
+                            handleWithdraw();
+                        }
+                    }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
@@ -265,7 +269,7 @@ function PortfolioWithdraw({
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>
@@ -277,7 +281,7 @@ function PortfolioWithdraw({
             <SimpleButton
                 bg='accent1'
                 onClick={handleWithdraw}
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

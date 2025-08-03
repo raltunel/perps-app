@@ -1,6 +1,6 @@
 {
     "name": "@perps-app/frontend",
-    "version": "0.0.10",
+    "version": "0.1.0",
     "private": true,
     "type": "module",
     "scripts": {
@@ -18,10 +18,10 @@
         "generate-pwa-assets": "pwa-assets-generator"
     },
     "dependencies": {
-        "@crocswap-libs/ambient-ember": "^0.1.19",
+        "@crocswap-libs/ambient-ember": "^0.1.37",
         "@fogo/sessions-idls": "^0.0.3",
-        "@fogo/sessions-sdk": "^0.0.7",
-        "@fogo/sessions-sdk-react": "^0.0.9",
+        "@fogo/sessions-sdk": "^0.0.9",
+        "@fogo/sessions-sdk-react": "^0.0.13",
         "@netlify/functions": "3.0.4",
         "@perps-app/sdk": "workspace:*",
         "@react-router/node": "^7.6.0",

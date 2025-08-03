@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useAppStateStore } from '~/stores/AppStateStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
 import SymbolInfoField from './symbolinfofield/symbolinfofield';
 import SymbolSearch from './symbolsearch/symbolsearch';
-import { useAppStateStore } from '~/stores/AppStateStore';
 
 const SymbolInfo: React.FC = React.memo(() => {
     const { symbol, symbolInfo } = useTradeDataStore();
@@ -16,6 +16,20 @@ const SymbolInfo: React.FC = React.memo(() => {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const { titleOverride } = useAppStateStore();
+
+    // State for funding countdown
+    const [fundingCountdown, setFundingCountdown] = useState(
+        getTimeUntilNextHour(),
+    );
+
+    // Update funding countdown every second
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setFundingCountdown(getTimeUntilNextHour());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     // Memoize 24h change string and usdChange
     const changeData = useMemo(() => {
@@ -72,20 +86,20 @@ const SymbolInfo: React.FC = React.memo(() => {
                                 id='tutorial-pool-info'
                             >
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Estimated fair value, calculated to prevent unfair liquidations'
                                     label='Mark'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.markPx)}
                                     lastWsChange={symbolInfo?.lastPriceChange}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='An external, aggregated market value sourced from multiple reputable exchanges'
                                     label='Oracle'
                                     valueClass={'w4'}
                                     value={formatNum(symbolInfo?.oraclePx)}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Change in price over the last 24 hours'
                                     label='24h Change'
                                     valueClass={'w7'}
                                     value={changeData.str}
@@ -98,7 +112,7 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Total volume of the market over the last 24 hours'
                                     label='24h Volume'
                                     valueClass={'w7'}
                                     value={
@@ -107,7 +121,7 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Total open interest of the market'
                                     label='Open Interest'
                                     valueClass={'w7'}
                                     value={
@@ -120,7 +134,7 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Periodic fee aligning perpetual futures price with spot price'
                                     label='Funding Rate'
                                     valueClass={'w7'}
                                     value={
@@ -131,10 +145,10 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     type={'positive'}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='tooltip content'
+                                    tooltipContent='Time until the next funding'
                                     label='Funding Countdown'
                                     valueClass={'w7'}
-                                    value={getTimeUntilNextHour()}
+                                    value={fundingCountdown}
                                 />
                             </div>
                         </HorizontalScrollable>

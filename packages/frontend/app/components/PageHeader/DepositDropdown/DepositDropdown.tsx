@@ -1,4 +1,4 @@
-import type { MarginBucketInfo } from '@crocswap-libs/ambient-ember';
+import type { MarginBucketAvail } from '@crocswap-libs/ambient-ember';
 import {
     isEstablished,
     SessionButton,
@@ -21,7 +21,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
 
 interface propsIF {
-    marginBucket: MarginBucketInfo | null;
+    marginBucket: MarginBucketAvail | null;
     isDropdown?: boolean;
 }
 
@@ -57,10 +57,10 @@ function DepositDropdown(props: propsIF) {
 
     useEffect(() => {
         if (marginBucket) {
-            const equityBigNum = marginBucket.calculations.equity;
+            const equityBigNum = marginBucket.equity;
             const normalizedEquity = Number(equityBigNum) / 1e6;
             setBalanceNum(normalizedEquity);
-            const unrealizedPnlBigNum = marginBucket.calculations.unrealizedPnl;
+            const unrealizedPnlBigNum = marginBucket.unrealizedPnl;
             const normalizedUnrealizedPnl = Number(unrealizedPnlBigNum) / 1e6;
             setUnrealizedPnlNum(normalizedUnrealizedPnl);
         }
@@ -68,32 +68,6 @@ function DepositDropdown(props: propsIF) {
 
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
-
-    // Debug SessionState
-    useEffect(() => {
-        console.log(
-            '🔍 [DepositDropdown] Full SessionState object:',
-            sessionState,
-        );
-        console.log('🔍 [DepositDropdown] SessionState exploration:', {
-            isEstablished: isEstablished(sessionState),
-            hasSession: !!sessionState,
-            sessionKeys: Object.keys(sessionState || {}),
-            sessionDetails: sessionState
-                ? Object.entries(sessionState).map(([key, value]) => ({
-                      key,
-                      type: typeof value,
-                      isFunction: typeof value === 'function',
-                      value:
-                          typeof value === 'function'
-                              ? 'function'
-                              : value?.toString
-                                ? value.toString().substring(0, 100)
-                                : JSON.stringify(value),
-                  }))
-                : 'No session state',
-        });
-    }, [sessionState]);
 
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();

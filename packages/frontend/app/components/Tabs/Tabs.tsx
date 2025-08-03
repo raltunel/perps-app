@@ -1,14 +1,8 @@
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
-import React, {
-    useCallback,
-    useEffect,
-    useId,
-    useMemo,
-    useRef,
-    useState,
-} from 'react';
+import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { WsChannels } from '~/utils/Constants';
 import styles from './Tabs.module.css';
 
 interface TabProps {
@@ -79,22 +73,38 @@ export default function Tabs(props: TabsProps) {
         staticHeight = 'auto',
     } = props;
 
-    const {
-        fetchedChannels,
-        userBalances: { length: balancesCount },
-        positions: { length: positionsCount },
-        userOrders: { length: openOrdersCount },
-        activeTwaps: { length: activeTwapsCount },
-    } = useTradeDataStore();
+    const { positions, balance } = useUnifiedMarginData();
 
-    const webDataFetched = useMemo(() => {
-        return fetchedChannels.has(WsChannels.WEB_DATA2);
-    }, [fetchedChannels]);
+    const { orderHistory, userFills, userFundings, userOrders } =
+        useTradeDataStore();
+
+    const sessionState = useSession();
+    const isSessionEstablished = isEstablished(sessionState);
+
+    const positionsCount = isSessionEstablished ? positions.length : 0;
+
+    const openOrdersCount = userOrders.filter(
+        (order) => order.status === 'open',
+    ).length;
+
+    // Using a local state for web data fetched since we don't have this in unified margin data yet
+    const [webDataFetched, setWebDataFetched] = useState(false);
+
+    // Set webDataFetched to true after initial render to show counts
+    useEffect(() => {
+        setWebDataFetched(true);
+    }, []);
 
     // Function to get tab ID (either the string itself or the id property)
     const getTabId = (tab: string | { id: string; label: string }): string => {
         return typeof tab === 'string' ? tab : tab.id;
     };
+
+    const balancesCount = isSessionEstablished
+        ? balance !== null && balance.total > 0
+            ? 1
+            : 0
+        : 0;
 
     // Function to get tab label (either the string itself or the label property)
     const getTabLabel = (
@@ -115,8 +125,24 @@ export default function Tabs(props: TabsProps) {
             openOrdersCount > 0
         ) {
             label = `Open Orders (${openOrdersCount})`;
-        } else if (label === 'TWAP' && webDataFetched && activeTwapsCount > 0) {
-            label = `TWAP (${activeTwapsCount})`;
+        } else if (
+            label === 'Trade History' &&
+            webDataFetched &&
+            userFills.length > 0
+        ) {
+            label = `Trade History (${userFills.length})`;
+        } else if (
+            label === 'Funding' &&
+            webDataFetched &&
+            userFundings.length > 0
+        ) {
+            label = `Funding (${userFundings.length})`;
+        } else if (
+            label === 'Order History' &&
+            webDataFetched &&
+            orderHistory.length > 0
+        ) {
+            label = `Order History (${orderHistory.length})`;
         }
         return label;
     };

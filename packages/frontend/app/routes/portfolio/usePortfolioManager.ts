@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useDepositService } from '~/hooks/useDepositService';
 import { useWithdrawService } from '~/hooks/useWithdrawService';
-import { useSession, isEstablished } from '@fogo/sessions-sdk-react';
 
 interface PortfolioDataIF {
     id: string;
@@ -119,87 +118,21 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 });
 
 export function usePortfolioManager() {
-    const sessionState = useSession();
-
-    // One-time comprehensive SessionState debug
-    useEffect(() => {
-        console.log(
-            '🎯 [usePortfolioManager] COMPREHENSIVE SessionState Debug:',
-        );
-        console.log('================================');
-        console.log('Full object:', sessionState);
-        console.log('Is Established:', isEstablished(sessionState));
-        console.log('Type:', typeof sessionState);
-        console.log('Constructor:', sessionState?.constructor?.name);
-        console.log('================================');
-
-        if (sessionState) {
-            console.log('🔑 All Properties:');
-            for (const [key, value] of Object.entries(sessionState)) {
-                const type = typeof value;
-                let displayValue = '';
-
-                if (type === 'function') {
-                    displayValue = `[Function: ${value.name || 'anonymous'}]`;
-                } else if (value === null) {
-                    displayValue = 'null';
-                } else if (value === undefined) {
-                    displayValue = 'undefined';
-                } else if (type === 'object') {
-                    if (
-                        value.toString &&
-                        value.toString !== Object.prototype.toString
-                    ) {
-                        displayValue = value.toString();
-                    } else {
-                        try {
-                            displayValue = JSON.stringify(value, null, 2);
-                        } catch {
-                            displayValue = '[Complex Object]';
-                        }
-                    }
-                } else {
-                    displayValue = String(value);
-                }
-
-                console.log(`  ${key}: (${type}) ${displayValue}`);
-            }
-
-            console.log('================================');
-            console.log(
-                '🔧 Methods available:',
-                Object.entries(sessionState)
-                    .filter(([_, v]) => typeof v === 'function')
-                    .map(([k]) => k),
-            );
-            console.log(
-                '🔑 PublicKey fields:',
-                Object.entries(sessionState)
-                    .filter(
-                        ([k]) =>
-                            k.toLowerCase().includes('key') ||
-                            k.toLowerCase().includes('public'),
-                    )
-                    .map(([k, v]) => `${k}: ${v?.toString ? v.toString() : v}`),
-            );
-        }
-        console.log('================================');
-    }, [sessionState]);
-
     const {
         balance: walletBalance,
-        isLoading: isBalanceLoading,
         error: balanceError,
         executeDeposit,
         validateAmount,
+        startAutoRefresh: startDepositAutoRefresh,
+        stopAutoRefresh: stopDepositAutoRefresh,
     } = useDepositService();
 
     const {
         availableBalance: withdrawableBalance,
-        isLoading: isWithdrawLoading,
         error: withdrawError,
         executeWithdraw,
-        validateAmount: validateWithdrawAmount,
+        startAutoRefresh: startWithdrawAutoRefresh,
+        stopAutoRefresh: stopWithdrawAutoRefresh,
     } = useWithdrawService();
 
     // Create initial portfolio data with real wallet balance and withdrawable balance
@@ -231,18 +164,11 @@ export function usePortfolioManager() {
 
     // Update portfolio contract balance when withdrawable balance changes
     useEffect(() => {
-        console.log('💰 Withdrawable balance update:', withdrawableBalance);
         if (withdrawableBalance?.decimalized !== undefined) {
-            console.log(
-                '📊 Updating contract balance to:',
-                withdrawableBalance.decimalized,
-            );
             dispatch({
                 type: 'UPDATE_CONTRACT_BALANCE',
                 balance: withdrawableBalance.decimalized,
             });
-        } else {
-            console.log('⚠️ No withdrawable balance to update');
         }
     }, [withdrawableBalance]);
 
@@ -270,7 +196,7 @@ export function usePortfolioManager() {
     const selectedPortfolio = useMemo(() => portfolio, [portfolio]);
 
     const processDeposit = useCallback(
-        async (amount: number) => {
+        async (amount?: number) => {
             // Set processing state to true
             setIsProcessing(true);
             setStatus({ isLoading: true, error: null });
@@ -304,7 +230,7 @@ export function usePortfolioManager() {
     );
 
     const processWithdraw = useCallback(
-        async (amount: number) => {
+        async (amount?: number) => {
             // Set processing state to true
             setIsProcessing(true);
             setStatus({ isLoading: true, error: null });
@@ -373,7 +299,8 @@ export function usePortfolioManager() {
     return {
         portfolio,
         selectedPortfolio,
-        isProcessing: isProcessing || isBalanceLoading || isWithdrawLoading,
+        isProcessing: isProcessing,
+        setIsProcessing,
         status: balanceError
             ? { isLoading: false, error: balanceError }
             : withdrawError
@@ -384,5 +311,10 @@ export function usePortfolioManager() {
         processWithdraw,
         processSend,
         validateAmount,
+        // Expose auto refresh functions
+        startDepositAutoRefresh,
+        stopDepositAutoRefresh,
+        startWithdrawAutoRefresh,
+        stopWithdrawAutoRefresh,
     };
 }

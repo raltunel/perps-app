@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DepositService } from '~/services/depositService';
 
 interface DepositServiceResult {
@@ -18,9 +17,11 @@ export interface UseDepositServiceReturn {
     balance: UserBalance | null;
     isLoading: boolean;
     error: string | null;
-    executeDeposit: (amount: number) => Promise<DepositServiceResult>;
+    executeDeposit: (amount?: number) => Promise<DepositServiceResult>;
     refreshBalance: () => Promise<void>;
     validateAmount: (amount: number) => { isValid: boolean; message?: string };
+    startAutoRefresh: () => void;
+    stopAutoRefresh: () => void;
 }
 
 /**
@@ -34,41 +35,10 @@ export function useDepositService(): UseDepositServiceReturn {
     const [depositService, setDepositService] = useState<DepositService | null>(
         null,
     );
+    const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize deposit service when session is established
     useEffect(() => {
-        console.log(
-            '🔍 [useDepositService] Full SessionState object:',
-            sessionState,
-        );
-        console.log(
-            '🔍 [useDepositService] SessionState keys:',
-            Object.keys(sessionState),
-        );
-        console.log('🔍 [useDepositService] SessionState details:', {
-            isEstablished: isEstablished(sessionState),
-            hasConnection: !!sessionState.connection,
-            connectionEndpoint: sessionState.connection?.rpcEndpoint,
-            sessionPublicKey: sessionState.sessionPublicKey?.toString(),
-            userPublicKey: sessionState.userPublicKey?.toString(),
-            walletPublicKey: sessionState.walletPublicKey?.toString(),
-            sessionToken: sessionState.sessionToken,
-            sendTransactionType: typeof sessionState.sendTransaction,
-            availableMethods: Object.keys(sessionState).filter(
-                (key) => typeof sessionState[key] === 'function',
-            ),
-            allProperties: Object.entries(sessionState).map(([key, value]) => ({
-                key,
-                type: typeof value,
-                value:
-                    typeof value === 'function'
-                        ? 'function'
-                        : value?.toString
-                          ? value.toString()
-                          : JSON.stringify(value),
-            })),
-        });
-
         if (isEstablished(sessionState)) {
             const service = new DepositService(sessionState.connection);
             setDepositService(service);
@@ -88,24 +58,9 @@ export function useDepositService(): UseDepositServiceReturn {
         setError(null);
 
         try {
-            console.log('🔍 Session state debug:', {
-                sessionPublicKey: sessionState.sessionPublicKey?.toString(),
-                userPublicKey: sessionState.userPublicKey?.toString(),
-                walletPublicKey: sessionState.walletPublicKey?.toString(),
-                allKeys: Object.keys(sessionState).filter(
-                    (key) =>
-                        key.toLowerCase().includes('public') ||
-                        key.toLowerCase().includes('key'),
-                ),
-            });
-
             // Try to find the correct user wallet public key
             const userWalletKey =
-                sessionState.userPublicKey ||
-                sessionState.walletPublicKey ||
-                sessionState.sessionPublicKey;
-
-            console.log('🔑 Using wallet key:', userWalletKey?.toString());
+                sessionState.walletPublicKey || sessionState.sessionPublicKey;
 
             const userBalance =
                 await depositService.getUserBalance(userWalletKey);
@@ -127,9 +82,48 @@ export function useDepositService(): UseDepositServiceReturn {
         }
     }, [depositService, refreshBalance]);
 
+    // Start auto refresh function
+    const startAutoRefresh = useCallback(() => {
+        if (!depositService) return;
+
+        // Clear any existing interval
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+
+        // Refresh immediately
+        refreshBalance();
+
+        // Set up new interval
+        const intervalId = setInterval(() => {
+            refreshBalance();
+        }, 2000);
+
+        autoRefreshIntervalRef.current = intervalId;
+    }, [depositService, refreshBalance]);
+
+    // Stop auto refresh function
+    const stopAutoRefresh = useCallback(() => {
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+    }, []);
+
+    // Clean up interval on unmount
+    useEffect(() => {
+        return () => {
+            if (autoRefreshIntervalRef.current) {
+                clearInterval(autoRefreshIntervalRef.current);
+                autoRefreshIntervalRef.current = null;
+            }
+        };
+    }, []);
+
     // Execute deposit transaction
     const executeDeposit = useCallback(
-        async (amount: number): Promise<DepositServiceResult> => {
+        async (amount?: number): Promise<DepositServiceResult> => {
             if (!depositService || !isEstablished(sessionState)) {
                 return {
                     success: false,
@@ -141,26 +135,8 @@ export function useDepositService(): UseDepositServiceReturn {
             setError(null);
 
             try {
-                // Debug session state to find correct method name
-                console.log('🔍 Session state debug for sendTransaction:');
-                console.log(
-                    '  - sessionState keys:',
-                    Object.keys(sessionState),
-                );
-                console.log(
-                    '  - sendTransaction type:',
-                    typeof sessionState.sendTransaction,
-                );
-                console.log(
-                    '  - Available methods:',
-                    Object.keys(sessionState).filter(
-                        (key) => typeof sessionState[key] === 'function',
-                    ),
-                );
-
                 // Get both keys: session key for transaction building, user wallet key for PDAs
                 const userWalletKey =
-                    sessionState.userPublicKey ||
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
@@ -181,11 +157,7 @@ export function useDepositService(): UseDepositServiceReturn {
                 // Get payer from SessionState if available
                 const payerPublicKey = sessionState.payer || undefined;
 
-                console.log(
-                    '  - Using payer from SessionState:',
-                    payerPublicKey?.toString() ||
-                        'Not available, will use fallback',
-                );
+                // Using payer from SessionState if available
 
                 const result = await depositService.executeDeposit(
                     amount,
@@ -236,5 +208,7 @@ export function useDepositService(): UseDepositServiceReturn {
         executeDeposit,
         refreshBalance,
         validateAmount,
+        startAutoRefresh,
+        stopAutoRefresh,
     };
 }

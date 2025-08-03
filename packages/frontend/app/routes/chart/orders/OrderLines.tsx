@@ -119,7 +119,9 @@ export default function OrderLines({
     }, [chart, scaleData]);
 
     useEffect(() => {
-        if (!scaleData || !lines.length || !chart || !canvasSize) return;
+        if (!scaleData || !chart || !canvasSize) return;
+
+        if (!lines.length) setVisibleLines([]);
 
         const [minY, maxY] = scaleData.yScale.domain();
 
@@ -129,6 +131,7 @@ export default function OrderLines({
             const labelInformation = getPricetoPixel(
                 chart,
                 line.yPrice,
+                line.type,
                 height,
                 scaleData,
             );

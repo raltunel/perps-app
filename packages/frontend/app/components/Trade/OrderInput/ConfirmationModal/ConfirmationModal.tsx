@@ -1,9 +1,10 @@
-import styles from './ConfirmationModal.module.css';
+import { useEffect } from 'react';
+import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import type { modalContentT } from '../OrderInput';
+import styles from './ConfirmationModal.module.css';
 
 interface propsIF {
     tx: modalContentT;
@@ -15,27 +16,58 @@ interface propsIF {
     limitPrice?: string;
     isEnabled: boolean;
     toggleEnabled: () => void;
+    isProcessing?: boolean;
+    setIsProcessingOrder?: (value: boolean) => void;
 }
 type InfoItem = {
     label: string;
     value: string;
     tooltip?: string;
     className?: string;
+    valueStyle?: React.CSSProperties;
 };
 
 export default function ConfirmationModal(props: propsIF) {
-    const { submitFn, tx, isEnabled, toggleEnabled, size, limitPrice } = props;
+    const {
+        submitFn,
+        tx,
+        isEnabled,
+        toggleEnabled,
+        size,
+        limitPrice,
+        isProcessing,
+        setIsProcessingOrder,
+    } = props;
+
+    const { getBsColor } = useAppSettings();
+
+    const buyColor = getBsColor().buy;
+    const sellColor = getBsColor().sell;
+
+    useEffect(() => {
+        if (isProcessing) {
+            setIsProcessingOrder?.(false);
+        }
+    }, []);
 
     const dataInfo: InfoItem[] = [
         {
             label: 'Action',
             value: tx.includes('buy') ? 'Buy' : 'Sell',
-            className: styles[tx.includes('buy') ? 'green' : 'red'],
+            valueStyle: {
+                color: tx.includes('buy')
+                    ? getBsColor().buy
+                    : getBsColor().sell,
+            },
         },
         {
             label: 'Size',
             value: `${size.qty || '--'} ${size.denom}`,
-            className: styles[tx.includes('buy') ? 'green' : 'red'],
+            valueStyle: {
+                color: tx.includes('buy')
+                    ? getBsColor().buy
+                    : getBsColor().sell,
+            },
         },
         {
             label: 'Price',
@@ -69,7 +101,7 @@ export default function ConfirmationModal(props: propsIF) {
                                     content={info?.tooltip}
                                     position='right'
                                 >
-                                    <AiOutlineQuestionCircle size={13} />
+                                    <LuCircleHelp size={12} />
                                 </Tooltip>
                             )}
                         </div>
@@ -77,6 +109,9 @@ export default function ConfirmationModal(props: propsIF) {
                             className={`${styles.infoValue} ${
                                 info?.className && info.className
                             }`}
+                            style={{
+                                ...info?.valueStyle,
+                            }}
                         >
                             {info.value}
                         </div>
@@ -91,13 +126,22 @@ export default function ConfirmationModal(props: propsIF) {
                     // reverse
                 />
             </div>
-            <SimpleButton
-                bg='accent1'
-                onClick={submitFn}
-                style={{ height: '47px' }}
+            <button
+                className={styles.confirmButton}
+                onClick={isProcessing ? undefined : submitFn}
+                style={{
+                    height: '47px',
+                    cursor: isProcessing ? 'not-allowed' : 'pointer',
+                    backgroundColor: tx.includes('buy') ? buyColor : sellColor,
+                }}
+                disabled={isProcessing}
             >
-                {tx.includes('buy') ? 'Buy / Long' : 'Sell / Short'}
-            </SimpleButton>
+                {isProcessing
+                    ? 'Confirming Transaction...'
+                    : tx.includes('buy')
+                      ? 'Buy / Long'
+                      : 'Sell / Short'}
+            </button>
         </div>
     );
 }

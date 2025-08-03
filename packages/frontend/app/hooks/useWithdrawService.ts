@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { PublicKey } from '@solana/web3.js';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { WithdrawService } from '~/services/withdrawService';
 
 interface WithdrawServiceResult {
@@ -18,9 +17,13 @@ export interface UseWithdrawServiceReturn {
     availableBalance: AvailableWithdrawBalance | null;
     isLoading: boolean;
     error: string | null;
-    executeWithdraw: (amount: number) => Promise<WithdrawServiceResult>;
+    executeWithdraw: (
+        amount: number | undefined,
+    ) => Promise<WithdrawServiceResult>;
     refreshBalance: () => Promise<void>;
     validateAmount: (amount: number) => { isValid: boolean; message?: string };
+    startAutoRefresh: () => void;
+    stopAutoRefresh: () => void;
 }
 
 /**
@@ -34,70 +37,21 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
     const [error, setError] = useState<string | null>(null);
     const [withdrawService, setWithdrawService] =
         useState<WithdrawService | null>(null);
+    const autoRefreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Initialize withdraw service when session is established
     useEffect(() => {
-        console.log('🔄 Withdraw service initialization check');
-        console.log('  - Session established:', isEstablished(sessionState));
-        console.log('  - Session state:', sessionState);
-
-        console.log(
-            '🔍 [useWithdrawService] Full SessionState object:',
-            sessionState,
-        );
-        console.log(
-            '🔍 [useWithdrawService] SessionState keys:',
-            Object.keys(sessionState),
-        );
-        console.log('🔍 [useWithdrawService] SessionState details:', {
-            isEstablished: isEstablished(sessionState),
-            hasConnection: !!sessionState.connection,
-            connectionEndpoint: sessionState.connection?.rpcEndpoint,
-            sessionPublicKey: sessionState.sessionPublicKey?.toString(),
-            userPublicKey: sessionState.userPublicKey?.toString(),
-            walletPublicKey: sessionState.walletPublicKey?.toString(),
-            sessionToken: sessionState.sessionToken,
-            sendTransactionType: typeof sessionState.sendTransaction,
-            availableMethods: Object.keys(sessionState).filter(
-                (key) => typeof sessionState[key] === 'function',
-            ),
-            allProperties: Object.entries(sessionState).map(([key, value]) => ({
-                key,
-                type: typeof value,
-                value:
-                    typeof value === 'function'
-                        ? 'function'
-                        : value?.toString
-                          ? value.toString()
-                          : JSON.stringify(value),
-            })),
-        });
-
         if (isEstablished(sessionState)) {
-            console.log(
-                '✅ Creating withdraw service with connection:',
-                sessionState.connection,
-            );
             const service = new WithdrawService(sessionState.connection);
             setWithdrawService(service);
         } else {
-            console.log(
-                '⚠️ Session not established, withdraw service not created',
-            );
             setWithdrawService(null);
         }
     }, [sessionState]);
 
     // Fetch available withdraw balance
     const refreshBalance = useCallback(async () => {
-        console.log('🔄 Attempting to refresh withdraw balance');
-        console.log('  - Withdraw service exists:', !!withdrawService);
-        console.log('  - Session established:', isEstablished(sessionState));
-
         if (!withdrawService || !isEstablished(sessionState)) {
-            console.log(
-                '⚠️ Cannot refresh balance - service or session not ready',
-            );
             return;
         }
 
@@ -107,43 +61,29 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
         try {
             // Get user's wallet public key
             const userWalletKey =
-                sessionState.userPublicKey ||
-                sessionState.walletPublicKey ||
-                sessionState.sessionPublicKey;
+                sessionState.walletPublicKey || sessionState.sessionPublicKey;
 
-            console.log('🔑 Available keys in session:', {
-                userPublicKey: sessionState.userPublicKey?.toString(),
-                walletPublicKey: sessionState.walletPublicKey?.toString(),
-                sessionPublicKey: sessionState.sessionPublicKey?.toString(),
-            });
+            // Get marketId from TradeDataStore (default to BTC market if not available)
+            const marketId = BigInt(64); // TODO: Get from TradeDataStore when available
 
             // Try session key first (as that's what's used for transactions)
-            console.log(
-                '🔑 Trying session key first:',
-                sessionState.sessionPublicKey.toString(),
-            );
             let balance = await withdrawService.getAvailableWithdrawBalance(
                 sessionState.sessionPublicKey,
+                marketId,
             );
 
             // If no balance with session key, try wallet key
             if (!balance || balance.decimalized === 0) {
-                console.log(
-                    '🔑 No balance with session key, trying wallet key:',
-                    userWalletKey.toString(),
+                balance = await withdrawService.getAvailableWithdrawBalance(
+                    userWalletKey,
+                    marketId,
                 );
-                balance =
-                    await withdrawService.getAvailableWithdrawBalance(
-                        userWalletKey,
-                    );
             }
 
             if (balance) {
                 setAvailableBalance(balance);
-                console.log('✅ Available withdraw balance fetched:', balance);
             } else {
                 setAvailableBalance({ balance: 0, decimalized: 0 });
-                console.log('⚠️ No available balance to withdraw');
             }
         } catch (err) {
             const errorMessage =
@@ -151,7 +91,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
                     ? err.message
                     : 'Failed to fetch available balance';
             setError(errorMessage);
-            console.error('❌ Error fetching available balance:', err);
+            // Error already captured in error state
         } finally {
             setIsLoading(false);
         }
@@ -159,19 +99,53 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
 
     // Fetch balance on mount and when service is available
     useEffect(() => {
-        console.log(
-            '🔄 Withdraw service availability changed:',
-            !!withdrawService,
-        );
         if (withdrawService) {
-            console.log('✅ Withdraw service ready, refreshing balance...');
             refreshBalance();
         }
     }, [withdrawService, refreshBalance]);
 
+    // Start auto refresh function
+    const startAutoRefresh = useCallback(() => {
+        if (!withdrawService) return;
+
+        // Clear any existing interval
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+
+        // Refresh immediately
+        refreshBalance();
+
+        // Set up new interval
+        const intervalId = setInterval(() => {
+            refreshBalance();
+        }, 2000);
+
+        autoRefreshIntervalRef.current = intervalId;
+    }, [withdrawService, refreshBalance]);
+
+    // Stop auto refresh function
+    const stopAutoRefresh = useCallback(() => {
+        if (autoRefreshIntervalRef.current) {
+            clearInterval(autoRefreshIntervalRef.current);
+            autoRefreshIntervalRef.current = null;
+        }
+    }, []);
+
+    // Clean up interval on unmount
+    useEffect(() => {
+        return () => {
+            if (autoRefreshIntervalRef.current) {
+                clearInterval(autoRefreshIntervalRef.current);
+                autoRefreshIntervalRef.current = null;
+            }
+        };
+    }, []);
+
     // Execute withdraw transaction
     const executeWithdraw = useCallback(
-        async (amount: number): Promise<WithdrawServiceResult> => {
+        async (amount: number | undefined): Promise<WithdrawServiceResult> => {
             if (!withdrawService || !isEstablished(sessionState)) {
                 return {
                     success: false,
@@ -183,26 +157,8 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
             setError(null);
 
             try {
-                // Debug session state to find correct method name
-                console.log('🔍 Session state debug for sendTransaction:');
-                console.log(
-                    '  - sessionState keys:',
-                    Object.keys(sessionState),
-                );
-                console.log(
-                    '  - sendTransaction type:',
-                    typeof sessionState.sendTransaction,
-                );
-                console.log(
-                    '  - Available methods:',
-                    Object.keys(sessionState).filter(
-                        (key) => typeof sessionState[key] === 'function',
-                    ),
-                );
-
                 // Get both keys: session key for transaction building, user wallet key for PDAs
                 const userWalletKey =
-                    sessionState.userPublicKey ||
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
@@ -277,5 +233,7 @@ export function useWithdrawService(): UseWithdrawServiceReturn {
         executeWithdraw,
         refreshBalance,
         validateAmount,
+        startAutoRefresh,
+        stopAutoRefresh,
     };
 }

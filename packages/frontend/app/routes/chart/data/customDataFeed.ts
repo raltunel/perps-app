@@ -3,6 +3,7 @@ import type {
     IDatafeedChartApi,
     LibrarySymbolInfo,
     Mark,
+    OnReadyCallback,
 } from '~/tv/charting_library/charting_library';
 import { WsChannels } from '~/utils/Constants';
 import {
@@ -10,6 +11,7 @@ import {
     getMarkColorData,
     getMarkFillData,
     updateCandleCache,
+    updateMarkDataWithSubscription,
 } from './candleDataCache';
 import { processWSCandleMessage } from './processChartData';
 import {
@@ -23,8 +25,21 @@ const subscriptions = new Map<
     { subId: number; unsubscribe: () => void }
 >();
 
-export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
-    ({
+export type CustomDataFeedType = IDatafeedChartApi & {
+    updateUserAddress: (address: string) => void;
+} & { onReady(callback: OnReadyCallback): void };
+
+export const createDataFeed = (
+    info: Info | null,
+    addToFetchedChannels: (channel: string) => void,
+): CustomDataFeedType => {
+    let currentUserAddress = '';
+    const updateUserAddress = (newAddress: string) => {
+        currentUserAddress = newAddress;
+    };
+    const datafeed: IDatafeedChartApi & {
+        updateUserAddress: (address: string) => void;
+    } = {
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
         },
@@ -136,8 +151,10 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
 
             const markRes = (await getMarkFillData(
                 symbolInfo.name,
-                // debugWallet.address,
+                currentUserAddress,
             )) as any;
+
+            if (!markRes) return;
 
             const fillHistory = markRes.dataCache;
             const userWallet = markRes.user;
@@ -159,39 +176,48 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
             }
 
             if (!info) return console.log('SDK is not ready');
-            info.subscribe(
-                {
-                    type: WsChannels.USER_FILLS,
-                    user: userWallet,
-                },
-                (payload: any) => {
-                    if (!payload || !payload.data) return;
+            setTimeout(() => {
+                info.subscribe(
+                    {
+                        type: WsChannels.USER_FILLS,
+                        user: userWallet,
+                    },
+                    (payload: any) => {
+                        addToFetchedChannels(WsChannels.USER_FILLS);
+                        if (!payload || !payload.data) return;
 
-                    const fills = payload.data.fills;
-                    if (!fills || fills.length === 0) return;
+                        const fills = payload.data.fills;
+                        if (!fills || fills.length === 0) return;
 
-                    const poolFills = fills.filter(
-                        (fill: any) => fill.coin === symbolInfo.name,
-                    );
+                        const poolFills = fills.filter(
+                            (fill: any) => fill.coin === symbolInfo.name,
+                        );
 
-                    if (poolFills.length === 0) return;
+                        if (poolFills.length === 0) return;
 
-                    poolFills.sort((a: any, b: any) => b.time - a.time);
+                        poolFills.sort((a: any, b: any) => b.time - a.time);
 
-                    fillMarks(poolFills);
+                        fillMarks(poolFills);
 
-                    const markArray = [
-                        ...bSideOrderHistoryMarks.values(),
-                        ...aSideOrderHistoryMarks.values(),
-                    ];
+                        updateMarkDataWithSubscription(
+                            symbolInfo.name,
+                            poolFills,
+                            userWallet,
+                        );
 
-                    if (markArray.length > 0) {
-                        markArray.sort((a: any, b: any) => b.px - a.px);
+                        const markArray = [
+                            ...bSideOrderHistoryMarks.values(),
+                            ...aSideOrderHistoryMarks.values(),
+                        ];
 
-                        onDataCallback(markArray);
-                    }
-                },
-            );
+                        if (markArray.length > 0) {
+                            markArray.sort((a: any, b: any) => b.px - a.px);
+
+                            onDataCallback(markArray);
+                        }
+                    },
+                );
+            }, 500);
         },
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
@@ -239,4 +265,9 @@ export const createDataFeed = (info: Info | null): IDatafeedChartApi =>
                 );
             }
         },
-    }) as IDatafeedChartApi;
+
+        updateUserAddress,
+    } as CustomDataFeedType;
+
+    return datafeed as CustomDataFeedType;
+};

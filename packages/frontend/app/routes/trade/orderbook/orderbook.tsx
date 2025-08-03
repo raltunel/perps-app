@@ -58,6 +58,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
 }) => {
     const { info } = useSdk();
 
+    const orderClickDisabled = false;
+
     const orderRowHeight = useMemo(() => {
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         return dummyOrderRow?.getBoundingClientRect()?.height || 16;
@@ -242,6 +244,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
+            if (orderClickDisabled) return;
+
             if (rowLockTimeoutRef.current) {
                 clearTimeout(rowLockTimeoutRef.current);
             }
