@@ -16,7 +16,7 @@ interface propsIF {
         availableBalance: number;
         unit?: string;
     };
-    onWithdraw: (amount: number) => void;
+    onWithdraw: (amount?: number | undefined) => void;
     onClose: () => void;
     isProcessing?: boolean;
 }

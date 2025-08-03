@@ -120,7 +120,6 @@ const OTHER_FORMATTER = new Intl.NumberFormat('en-US', {
 export function usePortfolioManager() {
     const {
         balance: walletBalance,
-        isLoading: isBalanceLoading,
         error: balanceError,
         executeDeposit,
         validateAmount,
@@ -130,10 +129,8 @@ export function usePortfolioManager() {
 
     const {
         availableBalance: withdrawableBalance,
-        isLoading: isWithdrawLoading,
         error: withdrawError,
         executeWithdraw,
-        validateAmount: validateWithdrawAmount,
         startAutoRefresh: startWithdrawAutoRefresh,
         stopAutoRefresh: stopWithdrawAutoRefresh,
     } = useWithdrawService();
@@ -233,7 +230,7 @@ export function usePortfolioManager() {
     );
 
     const processWithdraw = useCallback(
-        async (amount: number) => {
+        async (amount: number | undefined) => {
             // Set processing state to true
             setIsProcessing(true);
             setStatus({ isLoading: true, error: null });
