@@ -1200,12 +1200,17 @@ function OrderInput({
                     message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1277,12 +1282,17 @@ function OrderInput({
                     message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
