@@ -10,7 +10,7 @@
 }
 
 .rowContainer.noSendButton {
-    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1.5fr;
+    grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
 }
 
 .headerContainer {
@@ -30,7 +30,7 @@
 }
 
 .headerContainer.noSendButton {
-    grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 1.5fr;
+    grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
 }
 
 .cell {
@@ -102,15 +102,26 @@
 
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1.5fr;
+        grid-template-columns: 1fr 1.5fr 1.5fr 1.5fr 1.5fr 1.5fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .rowContainer,
+    .headerContainer {
+        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1fr 0.5fr;
     }
 
+    .rowContainer.noSendButton,
+    .headerContainer.noSendButton {
+        grid-template-columns: 1fr 1.5fr 1.5fr 1fr 1.5fr;
+    }
     .buyingPowerCell {
         display: none;
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 700px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 1.5fr 1fr 1fr 0.5fr;
@@ -120,13 +131,12 @@
     .headerContainer.noSendButton {
         grid-template-columns: 1fr 1.5fr 1fr 1.5fr;
     }
-
     .availableBalanceCell {
         display: none;
     }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 480px) {
     .rowContainer,
     .headerContainer {
         grid-template-columns: 1fr 1.5fr 1fr 0.5fr;
@@ -135,22 +145,6 @@
     .rowContainer.noSendButton,
     .headerContainer.noSendButton {
         grid-template-columns: 1fr 1.5fr 1.5fr;
-    }
-
-    .pnlCell {
-        display: none;
-    }
-}
-
-@media (max-width: 480px) {
-    .rowContainer,
-    .headerContainer {
-        grid-template-columns: 1fr 1fr 1fr 0.5fr;
-    }
-
-    .rowContainer.noSendButton,
-    .headerContainer.noSendButton {
-        grid-template-columns: 1fr 1fr 1fr;
     }
 
     .totalBalanceCell {
@@ -164,6 +158,9 @@
     .sendButton {
         font-size: 0.75rem;
         padding: 0.2rem 0.4rem;
+    }
+    .pnlCell {
+        display: none;
     }
 }
 
