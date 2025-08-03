@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
-import styles from './DepositModal.module.css';
-import Tooltip from '~/components/Tooltip/Tooltip';
+import { useCallback, useMemo, useState } from 'react';
 import { LuChevronDown, LuCircleHelp } from 'react-icons/lu';
-import { useVaultManager } from '~/routes/vaults/useVaultManager';
+import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDepositService } from '~/hooks/useDepositService';
+import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import styles from './DepositModal.module.css';
 
 interface DepositModalProps {
     vault: {
@@ -127,7 +127,7 @@ export default function DepositModal({
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited $${depositAmount.toFixed(2)} USD`,
+                    message: `Successfully deposited $${depositAmount.toFixed(2)} fUSD`,
                     icon: 'check',
                 });
 

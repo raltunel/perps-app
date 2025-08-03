@@ -91,7 +91,7 @@ export class WithdrawService {
         isValid: boolean;
         message?: string;
     } {
-        if (amount && amount <= 1) {
+        if (amount && amount < 1) {
             return { isValid: false, message: 'Invalid withdraw amount' };
         }
 

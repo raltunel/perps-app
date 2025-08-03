@@ -29,6 +29,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
     const {
         selectedPortfolio,
         isProcessing,
+        setIsProcessing,
         processDeposit: originalProcessDeposit,
         processWithdraw: originalProcessWithdraw,
         processSend: originalProcessSend,
@@ -91,6 +92,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
 
     const openDepositModal = () => {
         closeAllPortfolioModals();
+        setIsProcessing(false);
         depositModal.open();
         // Start auto refresh when opening deposit modal
         startDepositAutoRefresh();
@@ -98,6 +100,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
 
     const openWithdrawModal = () => {
         closeAllPortfolioModals();
+        setIsProcessing(false);
         withdrawModal.open();
         // Start auto refresh when opening withdraw modal
         startWithdrawAutoRefresh();

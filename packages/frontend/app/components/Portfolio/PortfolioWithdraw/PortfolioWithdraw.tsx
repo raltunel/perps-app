@@ -3,6 +3,7 @@ import { LuCircleHelp } from 'react-icons/lu';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
@@ -34,14 +35,28 @@ function PortfolioWithdraw({
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
 
-    const [maxActive, setMaxActive] = useState(false);
-
     const {
         formatNum,
         parseFormattedWithOnlyDecimals,
         formatNumWithOnlyDecimals,
         activeDecimalSeparator,
     } = useNumFormatter();
+
+    const withdrawInputNum = parseFormattedWithOnlyDecimals(rawInputString);
+
+    const isSizeInvalid: boolean =
+        !isNaN(withdrawInputNum) &&
+        withdrawInputNum > 0 &&
+        withdrawInputNum < 1;
+
+    // debounced invalid state
+    const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
+
+    const showInvalidSizeWarning = isSizeInvalid
+        ? isSizeInvalidDebounced
+        : false;
+
+    const [maxActive, setMaxActive] = useState(false);
 
     const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
 
@@ -136,7 +151,7 @@ function PortfolioWithdraw({
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} USD`,
+                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} fUSD`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -184,10 +199,9 @@ function PortfolioWithdraw({
         () =>
             isProcessing ||
             !rawInputString ||
-            parseFormattedWithOnlyDecimals(rawInputString) <= 0 ||
-            (!maxActive &&
-                parseFormattedWithOnlyDecimals(rawInputString) >
-                    portfolio.availableBalance),
+            isNaN(withdrawInputNum) ||
+            withdrawInputNum <= 0 ||
+            (!maxActive && withdrawInputNum > portfolio.availableBalance),
         [isProcessing, rawInputString, portfolio.availableBalance, maxActive],
     );
 
@@ -203,9 +217,14 @@ function PortfolioWithdraw({
             </div>
 
             <div className={styles.inputContainer}>
-                <h6>Amount</h6>
+                <h6>
+                    Amount{' '}
+                    {showInvalidSizeWarning && (
+                        <span className={styles.minWarning}>(Min: $1)</span>
+                    )}
+                </h6>
                 <NumFormattedInput
-                    placeholder='Enter amount'
+                    placeholder='Enter amount (min $1)'
                     value={rawInputString}
                     onChange={(
                         event: string | React.ChangeEvent<HTMLInputElement>,
@@ -262,7 +281,7 @@ function PortfolioWithdraw({
             <SimpleButton
                 bg='accent1'
                 onClick={handleWithdraw}
-                disabled={isButtonDisabled}
+                disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

@@ -300,6 +300,7 @@ export function usePortfolioManager() {
         portfolio,
         selectedPortfolio,
         isProcessing: isProcessing,
+        setIsProcessing,
         status: balanceError
             ? { isLoading: false, error: balanceError }
             : withdrawError
