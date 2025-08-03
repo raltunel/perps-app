@@ -195,8 +195,6 @@ function PortfolioDeposit(props: propsIF) {
         [isProcessing, depositInputNum, availableBalance, maxActive],
     );
 
-    console.log({ isButtonDisabled, depositInputNum, availableBalance });
-
     const handleDepositChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
