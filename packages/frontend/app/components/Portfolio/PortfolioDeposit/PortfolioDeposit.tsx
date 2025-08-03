@@ -23,7 +23,7 @@ interface propsIF {
         unit?: string;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onDeposit: (amount: number) => void | Promise<any>;
+    onDeposit: (amount?: number) => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -65,9 +65,12 @@ function PortfolioDeposit(props: propsIF) {
         ? isSizeInvalidDebounced
         : false;
 
+    const [maxActive, setMaxActive] = useState(false);
+
     const handleMaxClick = useCallback(() => {
         setRawInputString('$' + formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
+        setMaxActive(true);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
@@ -93,7 +96,7 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        if (depositInputNum > availableBalance) {
+        if (!maxActive && depositInputNum > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             setTransactionStatus('idle');
             return;
@@ -113,7 +116,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                onDeposit(depositInputNum),
+                maxActive ? onDeposit() : onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
@@ -153,7 +156,7 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [availableBalance, onDeposit, formatNum, depositInputNum]);
+    }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
@@ -171,12 +174,14 @@ function PortfolioDeposit(props: propsIF) {
         return [
             {
                 label: 'Available to deposit',
-                value: formatNum(
-                    availableBalance,
-                    isUSDToken ? 2 : 8,
-                    true,
-                    isUSDToken,
-                ),
+                value: !isNaN(availableBalance)
+                    ? formatNum(
+                          availableBalance,
+                          isUSDToken ? 2 : 8,
+                          true,
+                          isUSDToken,
+                      )
+                    : '-',
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
@@ -188,16 +193,18 @@ function PortfolioDeposit(props: propsIF) {
             isProcessing ||
             !depositInputNum ||
             depositInputNum <= 0 ||
-            depositInputNum > availableBalance,
-        [isProcessing, depositInputNum, availableBalance],
+            (!maxActive && depositInputNum > availableBalance),
+        [isProcessing, depositInputNum, availableBalance, maxActive],
     );
 
     const handleDepositChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
                 setRawInputString(event);
+                setMaxActive(false);
             } else {
                 setRawInputString(event.target.value);
+                setMaxActive(false);
             }
         },
         [],

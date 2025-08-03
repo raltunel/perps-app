@@ -16,7 +16,7 @@ interface propsIF {
         availableBalance: number;
         unit?: string;
     };
-    onWithdraw: (amount: number) => void;
+    onWithdraw: (amount?: number | undefined) => void;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -34,6 +34,8 @@ function PortfolioWithdraw({
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
 
+    const [maxActive, setMaxActive] = useState(false);
+
     const {
         formatNum,
         parseFormattedWithOnlyDecimals,
@@ -43,39 +45,43 @@ function PortfolioWithdraw({
 
     const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
 
-    const validateAmount = useCallback((amount: number, maxAmount: number) => {
-        if (!amount || isNaN(amount)) {
-            return {
-                isValid: false,
-                message: 'Please enter a valid amount',
-            };
-        }
+    const validateAmount = useCallback(
+        (amount: number, maxAmount: number) => {
+            if (!amount || isNaN(amount)) {
+                return {
+                    isValid: false,
+                    message: 'Please enter a valid amount',
+                };
+            }
 
-        if (amount <= 0) {
-            return {
-                isValid: false,
-                message: 'Amount must be greater than 0',
-            };
-        }
+            if (amount <= 0) {
+                return {
+                    isValid: false,
+                    message: 'Amount must be greater than 0',
+                };
+            }
 
-        if (amount > maxAmount) {
-            return {
-                isValid: false,
-                message: `Amount exceeds available balance of ${maxAmount}`,
-            };
-        }
+            if (amount > maxAmount && !maxActive) {
+                return {
+                    isValid: false,
+                    message: `Amount exceeds available balance of ${maxAmount}`,
+                };
+            }
 
-        return {
-            isValid: true,
-            message: null,
-        };
-    }, []);
+            return {
+                isValid: true,
+                message: null,
+            };
+        },
+        [maxActive],
+    );
 
     const handleMaxClick = useCallback(() => {
         setRawInputString(
             '$' +
                 formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
         );
+        setMaxActive(true);
     }, [portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
@@ -107,7 +113,7 @@ function PortfolioWithdraw({
 
             // Race between the withdraw and the timeout
             const result = await Promise.race([
-                onWithdraw(withdrawAmount),
+                maxActive ? onWithdraw() : onWithdraw(withdrawAmount),
                 timeoutPromise,
             ]);
 
@@ -163,7 +169,9 @@ function PortfolioWithdraw({
         () => [
             {
                 label: 'Available to withdraw',
-                value: formatNum(portfolio.availableBalance, 2, true, true),
+                value: !isNaN(portfolio.availableBalance)
+                    ? formatNum(portfolio.availableBalance, 2, true, true)
+                    : '-',
                 tooltip:
                     'The total amount you have available to withdraw from your portfolio',
             },
@@ -177,9 +185,10 @@ function PortfolioWithdraw({
             isProcessing ||
             !rawInputString ||
             parseFormattedWithOnlyDecimals(rawInputString) <= 0 ||
-            parseFormattedWithOnlyDecimals(rawInputString) >
-                portfolio.availableBalance,
-        [isProcessing, rawInputString, portfolio.availableBalance],
+            (!maxActive &&
+                parseFormattedWithOnlyDecimals(rawInputString) >
+                    portfolio.availableBalance),
+        [isProcessing, rawInputString, portfolio.availableBalance, maxActive],
     );
 
     return (
@@ -203,8 +212,10 @@ function PortfolioWithdraw({
                     ) => {
                         if (typeof event === 'string') {
                             setRawInputString(event);
+                            setMaxActive(false);
                         } else {
                             setRawInputString(event.target.value);
+                            setMaxActive(false);
                         }
                     }}
                     autoFocus
