@@ -65,9 +65,12 @@ function PortfolioDeposit(props: propsIF) {
         ? isSizeInvalidDebounced
         : false;
 
+    const [maxActive, setMaxActive] = useState(false);
+
     const handleMaxClick = useCallback(() => {
         setRawInputString('$' + formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
+        setMaxActive(true);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
@@ -113,7 +116,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                onDeposit(depositInputNum),
+                maxActive ? onDeposit() : onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
@@ -196,8 +199,10 @@ function PortfolioDeposit(props: propsIF) {
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
                 setRawInputString(event);
+                setMaxActive(false);
             } else {
                 setRawInputString(event.target.value);
+                setMaxActive(false);
             }
         },
         [],
