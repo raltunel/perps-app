@@ -321,10 +321,20 @@ function OrderInput({
 
     useEffect(() => {
         if (!marginBucket) return;
-        const leverageFloor = calcLeverageFloor(marginBucket);
-        const leverageFloorNum = Number(leverageFloor);
-        if (!leverageFloorNum) return;
-        setLeverageFloor(10_000 / leverageFloorNum);
+
+        try {
+            const leverageFloor = calcLeverageFloor(marginBucket);
+            const leverageFloorNum = Number(leverageFloor);
+
+            if (!Number.isFinite(leverageFloorNum) || leverageFloorNum === 0) {
+                setLeverageFloor(0);
+                return;
+            }
+            setLeverageFloor(10_000 / leverageFloorNum);
+        } catch (err) {
+            console.log('error in calcLeverageFloor:', err);
+            setLeverageFloor(0);
+        }
     }, [marginBucket]);
 
     useEffect(() => {
