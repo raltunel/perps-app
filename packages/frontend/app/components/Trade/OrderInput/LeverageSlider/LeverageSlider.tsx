@@ -14,6 +14,7 @@ import styles from './LeverageSlider.module.css';
 interface LeverageSliderProps {
     value: number;
     onChange: (value: number) => void;
+    onClick?: (newLeverage: number) => void;
     className?: string;
     minimumInputValue?: number;
     generateRandomMaximumInput?: () => void;
@@ -76,12 +77,12 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
-    // generateRandomMaximumInput,
     // NEW: Modal mode props with defaults
     modalMode = false,
     maxLeverage,
     hideTitle = false,
     minimumValue,
+    onClick,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -267,7 +268,6 @@ export default function LeverageSlider({
 
     const handleLeverageChange = (newLeverage: number) => {
         // Update the preferred leverage in store with the exact value (no rounding)
-        console.log({ newLeverage });
         setPreferredLeverage(newLeverage);
 
         // Always call the parent onChange with the exact value
@@ -577,7 +577,11 @@ export default function LeverageSlider({
     // Handle track click to set value
     const handleTrackClick = (e: React.MouseEvent) => {
         const boundedValue = calculateValueFromPosition(e.clientX);
-        handleLeverageChange(boundedValue);
+        if (onClick) {
+            onClick(boundedValue);
+        } else {
+            handleLeverageChange(boundedValue);
+        }
     };
 
     const handleTrackTouchStart = (e: React.TouchEvent) => {
@@ -998,7 +1002,12 @@ export default function LeverageSlider({
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleLeverageChange(tickValue);
+                                        console.log({ onClick });
+                                        if (onClick) {
+                                            onClick(tickValue);
+                                        } else {
+                                            handleLeverageChange(tickValue);
+                                        }
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
