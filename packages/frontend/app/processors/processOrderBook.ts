@@ -80,7 +80,7 @@ export function processUserOrder(
             oid: parseNum(data.oid),
             // side: e.side,
             side:
-                data.side === 'A'
+                data.side === 'A' || data.side === 'S'
                     ? 'sell'
                     : data.side === 'B'
                       ? 'buy'
