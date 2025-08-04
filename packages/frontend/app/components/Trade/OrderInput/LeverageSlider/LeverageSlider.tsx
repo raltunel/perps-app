@@ -162,24 +162,28 @@ export default function LeverageSlider({
         null,
     );
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
-
-    // Check conditions for showing minimum warning
     const shouldShowInteractiveWarning = useMemo(() => {
         if (minimumValue === undefined) return false;
 
-        // Show if user is dragging AND current value is below minimum
         const isDraggingBelowMinimum =
             isDragging && currentValue <= minimumValue + 0.01;
 
-        // Show if user is hovering below minimum (but not dragging)
         const isHoveringBelowMinimum =
             !isDragging &&
+            hoveredTickIndex === null &&
             isHovering &&
             hoverValue !== null &&
-            hoverValue <= minimumValue + 0.01;
+            hoverValue < minimumValue * 0.95;
 
         return isDraggingBelowMinimum || isHoveringBelowMinimum;
-    }, [minimumValue, currentValue, isDragging, isHovering, hoverValue]);
+    }, [
+        minimumValue,
+        currentValue,
+        isDragging,
+        isHovering,
+        hoverValue,
+        hoveredTickIndex,
+    ]);
 
     // Effect to handle warning display logic
     useEffect(() => {
@@ -511,7 +515,6 @@ export default function LeverageSlider({
             Math.min(e.clientX - rect.left, rect.width),
         );
 
-        // Account for knob margins when calculating percentage
         const knobRadius = SLIDER_CONFIG.KNOB_RADIUS;
         const adjustedOffsetX = Math.max(
             knobRadius,
@@ -521,15 +524,10 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value (no rounding for smooth preview)
         const newValue = percentageToValue(percentage);
 
-        // Ensure value is within min/max bounds
-        const boundedValue = constrainValue(newValue);
-
-        setHoverValue(boundedValue);
+        setHoverValue(newValue);
         setIsHovering(true);
-        // Clear any tick-specific hover when hovering over track
         setHoveredTickIndex(null);
     };
 
@@ -1029,6 +1027,26 @@ export default function LeverageSlider({
                     )}
                 </div>
             )}
+            <div
+                style={{
+                    marginTop: '10px',
+                    padding: '8px 12px',
+                    backgroundColor: '#111',
+                    color: '#0f0',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    border: '1px solid #333',
+                    borderRadius: '4px',
+                    maxWidth: '300px',
+                }}
+            >
+                <div>Hover Value: {hoverValue?.toFixed(3) ?? 'null'}</div>
+                <div>Minimum Value: {minimumValue}</div>
+                <div>
+                    Trigger Warning?:{' '}
+                    {shouldShowInteractiveWarning ? ' YES' : 'NO'}
+                </div>
+            </div>
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
