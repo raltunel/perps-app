@@ -108,10 +108,6 @@ export const SdkProvider: React.FC<{
 
     const stashSubscriptions = useCallback(() => {
         if (info?.multiSocketInfo) {
-            // For multi-socket mode, we don't need to stash subscriptions
-            // as they're managed internally by each socket
-            // stashedSubs.current = {};
-
             const activeSubs =
                 info?.multiSocketInfo?.getActiveSubscriptions() || {};
 
@@ -119,7 +115,6 @@ export const SdkProvider: React.FC<{
                 // reset stashed subs if we can access active subs from ws object
                 stashedSubs.current = {};
             }
-
             Object.keys(activeSubs).forEach((key) => {
                 const subs = activeSubs[key];
                 stashedSubs.current[key] = subs;
@@ -138,7 +133,7 @@ export const SdkProvider: React.FC<{
             });
         }
         console.log(
-            '>>> stashed subscriptions',
+            '>>> stashed subscriptions (market only)',
             stashedSubs.current,
             new Date().toISOString(),
         );
@@ -156,12 +151,7 @@ export const SdkProvider: React.FC<{
         if (!isClient) return;
 
         if (info?.multiSocketInfo) {
-            // For multi-socket, just reconnect
-
-            // [22-07-2025] disabled to activate reInit mechanism for multisocketinfo
-            // info.multiSocketInfo.reconnect();
-
-            // [22-07-2025] call to reInit
+            // re-init subs
             info.multiSocketInfo?.getPool().reInit(stashedSubs.current);
         } else {
             info?.wsManager?.reInit(stashedSubs.current);

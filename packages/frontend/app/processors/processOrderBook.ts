@@ -58,7 +58,12 @@ export function processTrades(data: any): OrderBookTradeIF[] {
     return data.map((e: any) => {
         return {
             coin: e.coin,
-            side: e.side === 'A' ? 'sell' : e.side === 'B' ? 'buy' : e.side,
+            side:
+                e.side === 'A' || e.side === 'S'
+                    ? 'sell'
+                    : e.side === 'B'
+                      ? 'buy'
+                      : e.side,
             px: parseNum(e.px),
             sz: parseNum(e.sz),
             hash: e.hash,
@@ -80,7 +85,7 @@ export function processUserOrder(
             oid: parseNum(data.oid),
             // side: e.side,
             side:
-                data.side === 'A'
+                data.side === 'A' || data.side === 'S'
                     ? 'sell'
                     : data.side === 'B'
                       ? 'buy'
@@ -91,6 +96,7 @@ export function processUserOrder(
             status: status,
             limitPx: parseNum(data.limitPx),
             origSz: parseNum(data.origSz),
+            filledSz: parseNum(data.origSz - data.sz),
             reduceOnly: data.reduceOnly,
             isPositionTpsl: data.isPositionTpsl,
             isTrigger: data.isTrigger,

@@ -22,6 +22,7 @@ interface GenericTableProps<
     F extends (...args: Parameters<F>) => Promise<T[]>,
 > {
     data: T[];
+    noDataMessage?: string;
     renderHeader: (
         sortDirection: TableSortDirection,
         sortClickHandler: (key: S) => void,
@@ -61,6 +62,7 @@ export default function GenericTable<
 
     const {
         data,
+        noDataMessage,
         renderHeader,
         renderRow,
         sorterMethod,
@@ -139,6 +141,8 @@ export default function GenericTable<
     const isClient = useIsClient();
 
     const [rowLimit, setRowLimit] = useState(slicedLimit);
+
+    const isHttpInfoCallsDisabled = true;
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -253,7 +257,7 @@ export default function GenericTable<
         } else {
             setTableState(TableState.FILLED);
         }
-    }, [isFetched, dataToShow]);
+    }, [isFetched, dataToShow, storageKey]);
 
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
@@ -403,15 +407,17 @@ export default function GenericTable<
                     pageMode ? styles.pageMode : styles.notPage
                 }`}
             >
-                {tableState === TableState.LOADING && (
+                {isSessionEstablished && tableState === TableState.LOADING && (
                     <SkeletonTable
                         rows={skeletonRows}
                         colRatios={skeletonColRatios}
                     />
                 )}
-                {tableState === TableState.FILLED && dataToShow.map(renderRow)}
-                {tableState === TableState.EMPTY && isSessionEstablished && (
-                    <NoDataRow />
+                {isSessionEstablished &&
+                    tableState === TableState.FILLED &&
+                    dataToShow.map(renderRow)}
+                {isSessionEstablished && tableState === TableState.EMPTY && (
+                    <NoDataRow text={noDataMessage} />
                 )}
                 {!isSessionEstablished && (
                     <div className={styles.sessionButtonContainer}>
@@ -419,7 +425,7 @@ export default function GenericTable<
                     </div>
                 )}
 
-                {sortedData.length > 0 && (
+                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
                     <div
                         id={`${id}-actionsContainer`}
                         className={styles.actionsContainer}

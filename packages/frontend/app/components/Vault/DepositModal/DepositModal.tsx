@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
-import styles from './DepositModal.module.css';
-import Tooltip from '~/components/Tooltip/Tooltip';
+import { useCallback, useMemo, useState } from 'react';
 import { LuChevronDown, LuCircleHelp } from 'react-icons/lu';
-import { useVaultManager } from '~/routes/vaults/useVaultManager';
+import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDepositService } from '~/hooks/useDepositService';
+import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import styles from './DepositModal.module.css';
 
 interface DepositModalProps {
     vault: {
@@ -127,7 +127,7 @@ export default function DepositModal({
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited $${depositAmount.toFixed(2)} USD`,
+                    message: `Successfully deposited $${depositAmount.toFixed(2)} fUSD`,
                     icon: 'check',
                 });
 
@@ -166,11 +166,6 @@ export default function DepositModal({
             value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
             tooltip: 'Your current wallet balance',
         },
-        {
-            label: 'Network Fee',
-            value: 'Sponsored by Fogo',
-            tooltip: 'Transaction fees are sponsored by Fogo',
-        },
     ];
 
     // Check if amount is below minimum
@@ -178,7 +173,7 @@ export default function DepositModal({
         if (!amount) return false;
         const depositAmount = parseFloat(amount);
         const result =
-            !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 10;
+            !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 5;
         console.log(
             'isBelowMinimum check - amount:',
             amount,
@@ -321,7 +316,7 @@ export default function DepositModal({
                 onClick={(e) => {
                     if (isBelowMinimum) {
                         e.preventDefault();
-                        setError('Minimum deposit amount is $10.00');
+                        setError('Minimum deposit amount is $5.00');
                         // Clear error after 3 seconds
                         setTimeout(() => setError(null), 3000);
                         return;

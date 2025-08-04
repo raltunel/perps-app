@@ -1,8 +1,8 @@
-import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 import {
-    getUserTokenBalance,
     buildDepositMarginTx,
+    getUserTokenBalance,
 } from '@crocswap-libs/ambient-ember';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
 // Removed notificationService - notifications handled by components
 
 // USD token mint address from root.tsx configuration
@@ -42,10 +42,6 @@ export class DepositService {
     ): Promise<UserBalance> {
         try {
             const mintToUse = mint || USD_MINT;
-            console.log('🔍 Debugging getUserBalance call:');
-            console.log('  - Connection:', this.connection);
-            console.log('  - User wallet pubkey:', userWallet.toString());
-            console.log('  - Mint address:', mintToUse.toString());
 
             const balance = await getUserTokenBalance(
                 this.connection,
@@ -53,20 +49,13 @@ export class DepositService {
                 mintToUse,
             );
 
-            console.log('  - Raw balance from SDK:', balance);
-            console.log('  - Balance type:', typeof balance);
-
             // Convert from non-decimalized to decimalized (divide by 10^6)
             const decimalized = Number(balance) / Math.pow(10, 6);
-
-            console.log('  - Decimalized balance:', decimalized);
 
             const result = {
                 balance: Number(balance),
                 decimalized,
             };
-
-            console.log('  - Final result:', result);
 
             return result;
         } catch (error) {
@@ -87,14 +76,14 @@ export class DepositService {
      * @param amount - Deposit amount in decimalized form
      * @returns validation result
      */
-    validateDepositAmount(amount: number): {
+    validateDepositAmount(amount: number | undefined): {
         isValid: boolean;
         message?: string;
     } {
-        if (amount < 10) {
+        if (amount && amount < 5) {
             return {
                 isValid: false,
-                message: 'Minimum deposit value is $10',
+                message: 'Minimum deposit value is $5',
             };
         }
         return { isValid: true };
@@ -109,7 +98,7 @@ export class DepositService {
      * @returns Promise<Transaction>
      */
     async buildDepositTransaction(
-        amount: number,
+        amount: number | undefined,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         payerPublicKey?: PublicKey,
@@ -119,9 +108,9 @@ export class DepositService {
             console.log('  - Decimalized amount:', amount);
 
             // Convert decimalized amount to non-decimalized (multiply by 10^6)
-            const nonDecimalizedAmount = BigInt(
-                Math.floor(amount * Math.pow(10, 6)),
-            );
+            const nonDecimalizedAmount = amount
+                ? BigInt(Math.floor(amount * Math.pow(10, 6)))
+                : undefined;
             console.log(
                 '  - Non-decimalized amount (bigint):',
                 nonDecimalizedAmount,
@@ -146,9 +135,9 @@ export class DepositService {
 
             const transaction = await buildDepositMarginTx(
                 this.connection,
-                nonDecimalizedAmount,
                 userWalletKey,
                 {
+                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: sessionPublicKey, // sessionPublicKey as actor
                     rentPayer: rentPayer, // payer from SessionState or fallback
                 },
@@ -197,7 +186,7 @@ export class DepositService {
      * @returns Promise<DepositServiceResult>
      */
     async executeDeposit(
-        amount: number,
+        amount: number | undefined,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         sendTransaction: (instructions: any[]) => Promise<any>,

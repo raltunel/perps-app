@@ -24,7 +24,11 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
-import { MARKET_WS_ENDPOINT, USER_WS_ENDPOINT } from './utils/Constants';
+import {
+    MARKET_WS_ENDPOINT,
+    RPC_ENDPOINT,
+    USER_WS_ENDPOINT,
+} from './utils/Constants';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -161,7 +165,7 @@ export default function App() {
         <>
             <Layout>
                 <FogoSessionProvider
-                    endpoint='https://testnet.fogo.io/'
+                    endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
                     tokens={[
                         // NATIVE_MINT.toBase58(),

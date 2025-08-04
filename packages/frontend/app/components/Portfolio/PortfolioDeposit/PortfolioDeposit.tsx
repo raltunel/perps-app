@@ -12,6 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -22,7 +23,7 @@ interface propsIF {
         unit?: string;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onDeposit: (amount: number) => void | Promise<any>;
+    onDeposit: (amount?: number) => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -55,7 +56,7 @@ function PortfolioDeposit(props: propsIF) {
     const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
     const isSizeInvalid: boolean =
-        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 10;
+        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 5;
 
     // debounced invalid state
     const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
@@ -64,9 +65,12 @@ function PortfolioDeposit(props: propsIF) {
         ? isSizeInvalidDebounced
         : false;
 
+    const [maxActive, setMaxActive] = useState(false);
+
     const handleMaxClick = useCallback(() => {
         setRawInputString('$' + formatNumWithOnlyDecimals(availableBalance, 2));
         setError(null);
+        setMaxActive(true);
     }, [availableBalance]);
 
     const handleDeposit = useCallback(async () => {
@@ -85,14 +89,14 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        // Check minimum deposit of $10
-        if (depositInputNum < 10) {
-            setError('Minimum deposit amount is $10.00');
+        // Check minimum deposit of $5
+        if (depositInputNum < 5) {
+            setError('Minimum deposit amount is $5.00');
             setTransactionStatus('idle');
             return;
         }
 
-        if (depositInputNum > availableBalance) {
+        if (!maxActive && depositInputNum > availableBalance) {
             setError(`Amount exceeds available balance of ${availableBalance}`);
             setTransactionStatus('idle');
             return;
@@ -112,7 +116,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                onDeposit(depositInputNum),
+                maxActive ? onDeposit() : onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
@@ -120,14 +124,27 @@ function PortfolioDeposit(props: propsIF) {
             if (result && result.success === false) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
+                notificationStore.add({
+                    title: 'Deposit Failed',
+                    message: result.error || 'Transaction failed',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
             } else {
                 setTransactionStatus('success');
 
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} USD`,
+                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} fUSD`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 10000,
                 });
 
                 // Close modal on success - notification will show after modal closes
@@ -139,7 +156,7 @@ function PortfolioDeposit(props: propsIF) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
         }
-    }, [availableBalance, onDeposit, formatNum, depositInputNum]);
+    }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 
     const handleTokenSelect = useCallback((token: Token) => {
         setSelectedToken(token);
@@ -157,12 +174,14 @@ function PortfolioDeposit(props: propsIF) {
         return [
             {
                 label: 'Available to deposit',
-                value: formatNum(
-                    availableBalance,
-                    isUSDToken ? 2 : 8,
-                    true,
-                    isUSDToken,
-                ),
+                value: !isNaN(availableBalance)
+                    ? formatNum(
+                          availableBalance,
+                          isUSDToken ? 2 : 8,
+                          true,
+                          isUSDToken,
+                      )
+                    : '-',
                 tooltip:
                     'The maximum amount you can deposit based on your balance',
             },
@@ -174,16 +193,18 @@ function PortfolioDeposit(props: propsIF) {
             isProcessing ||
             !depositInputNum ||
             depositInputNum <= 0 ||
-            depositInputNum > availableBalance,
-        [isProcessing, depositInputNum, availableBalance],
+            (!maxActive && depositInputNum > availableBalance),
+        [isProcessing, depositInputNum, availableBalance, maxActive],
     );
 
     const handleDepositChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             if (typeof event === 'string') {
                 setRawInputString(event);
+                setMaxActive(false);
             } else {
                 setRawInputString(event.target.value);
+                setMaxActive(false);
             }
         },
         [],
@@ -207,11 +228,11 @@ function PortfolioDeposit(props: propsIF) {
                 <h6>
                     Amount{' '}
                     {showInvalidSizeWarning && (
-                        <span className={styles.minWarning}>(Min: $10)</span>
+                        <span className={styles.minWarning}>(Min: $5)</span>
                     )}
                 </h6>
                 <NumFormattedInput
-                    placeholder='Enter amount (min $10)'
+                    placeholder='Enter amount (min $5)'
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label='deposit input'

@@ -5,6 +5,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import useDebounce from '~/hooks/useDebounce';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
@@ -13,6 +14,7 @@ import styles from './LeverageSlider.module.css';
 interface LeverageSliderProps {
     value: number;
     onChange: (value: number) => void;
+    onClick?: (newLeverage: number) => void;
     className?: string;
     minimumInputValue?: number;
     generateRandomMaximumInput?: () => void;
@@ -34,7 +36,7 @@ const LEVERAGE_CONFIG = {
     DECIMAL_INCREMENT: 0.1,
 
     // Default fallback max leverage when symbolInfo is not available
-    DEFAULT_MAX_LEVERAGE: 1,
+    DEFAULT_MAX_LEVERAGE: 100,
 
     // Number of tick marks to show on slider
     TICK_COUNT_HIGH_LEVERAGE: 7,
@@ -75,12 +77,12 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
-    generateRandomMaximumInput,
     // NEW: Modal mode props with defaults
     modalMode = false,
     maxLeverage,
     hideTitle = false,
     minimumValue,
+    onClick,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -112,6 +114,8 @@ export default function LeverageSlider({
     const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
         null,
     );
+    const [unconstrainedSliderValue, setUnconstrainedSliderValue] =
+        useState<number>(0);
     const [hasInitializedLeverage, setHasInitializedLeverage] =
         useState<boolean>(false);
     const [announceText, setAnnounceText] = useState<string>('');
@@ -124,15 +128,15 @@ export default function LeverageSlider({
     }, [currentValue]);
 
     // Helper function to get the actual rounded value (what user sees)
-    const getRoundedDisplayValue = (val: number): number => {
-        if (val < 3) {
-            // Round DOWN to nearest tenth
-            return Math.floor(val * 10) / 10;
-        } else {
-            // Round DOWN to nearest whole number
-            return Math.floor(val);
-        }
-    };
+    // const getRoundedDisplayValue = (val: number): number => {
+    //     if (val < 3) {
+    //         // Round DOWN to nearest tenth
+    //         return Math.floor(val * 10) / 10;
+    //     } else {
+    //         // Round DOWN to nearest whole number
+    //         return Math.floor(val);
+    //     }
+    // };
 
     // Helper function to format values for input display (shows decimals below 3)
     const formatValue = (val: number): string => {
@@ -157,32 +161,42 @@ export default function LeverageSlider({
         return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
 
-    const [showMinimumWarning, setShowMinimumWarning] = useState(false);
+    const [sliderBelowMinimumLeverage, setSliderBelowMinimumLeverage] =
+        useState(false);
     const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
         null,
     );
+
+    const sliderBelowMinimumLeverageDebounced = useDebounce(
+        sliderBelowMinimumLeverage,
+        500,
+    );
+
+    const showMinimumWarning = sliderBelowMinimumLeverage
+        ? sliderBelowMinimumLeverageDebounced
+        : false;
+
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
     const shouldShowInteractiveWarning = useMemo(() => {
         if (minimumValue === undefined) return false;
 
         const isDraggingBelowMinimum =
-            isDragging && currentValue <= minimumValue + 0.01;
+            isDragging && unconstrainedSliderValue <= minimumValue * 0.95;
 
         const isHoveringBelowMinimum =
             !isDragging &&
             hoveredTickIndex === null &&
             isHovering &&
             hoverValue !== null &&
-            hoverValue < minimumValue * 0.95;
+            hoverValue <= minimumValue * 0.95;
 
         return isDraggingBelowMinimum || isHoveringBelowMinimum;
     }, [
         minimumValue,
-        currentValue,
+        unconstrainedSliderValue,
         isDragging,
         isHovering,
         hoverValue,
-        hoveredTickIndex,
     ]);
 
     // Effect to handle warning display logic
@@ -193,18 +207,18 @@ export default function LeverageSlider({
 
         if (shouldShowInteractiveWarning) {
             // Show immediately for interactive conditions and stop any auto-hide
-            setShowMinimumWarning(true);
+            setSliderBelowMinimumLeverage(true);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
             }
         } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
             // Show warning when reaching minimum for the first time, then auto-hide after 3 seconds
-            setShowMinimumWarning(true);
+            setSliderBelowMinimumLeverage(true);
             setHasShownMinimumWarning(true);
 
             const timeout = setTimeout(() => {
-                setShowMinimumWarning(false);
+                setSliderBelowMinimumLeverage(false);
                 setWarningTimeout(null);
             }, 3000);
 
@@ -212,14 +226,14 @@ export default function LeverageSlider({
         } else if (!isCurrentAtMinimum) {
             // Reset the "has shown" flag and hide warning when user moves above minimum
             setHasShownMinimumWarning(false);
-            setShowMinimumWarning(false);
+            setSliderBelowMinimumLeverage(false);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
             }
         } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
             // Hide warning when interactive conditions stop and we've already shown the minimum warning
-            setShowMinimumWarning(false);
+            setSliderBelowMinimumLeverage(false);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
@@ -250,11 +264,8 @@ export default function LeverageSlider({
     };
 
     const handleLeverageChange = (newLeverage: number) => {
-        // In modal mode, skip store updates
-        if (!modalMode) {
-            // Update the preferred leverage in store with the exact value (no rounding)
-            setPreferredLeverage(newLeverage);
-        }
+        // Update the preferred leverage in store with the exact value (no rounding)
+        setPreferredLeverage(newLeverage);
 
         // Always call the parent onChange with the exact value
         onChange(newLeverage);
@@ -262,9 +273,6 @@ export default function LeverageSlider({
     };
 
     const handleMarketChange = useCallback(() => {
-        // Skip market change logic in modal mode
-        if (modalMode) return;
-
         const effectiveSymbol = symbolInfo?.coin;
         const currentMaxLeverage =
             effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
@@ -320,15 +328,12 @@ export default function LeverageSlider({
         currentMarket,
         minimumInputValue,
         hasInitializedLeverage,
-        modalMode, // Add modalMode to dependencies
     ]);
 
-    // Market change detection and leverage validation (skip in modal mode)
+    // Market change detection and leverage validation
     useEffect(() => {
-        if (!modalMode) {
-            handleMarketChange();
-        }
-    }, [handleMarketChange, modalMode]);
+        handleMarketChange();
+    }, [handleMarketChange]);
 
     // Handle smooth leverage changes during dragging (no rounding)
     const handleSmoothLeverageChange = (newLeverage: number) => {
@@ -343,14 +348,14 @@ export default function LeverageSlider({
 
     // Initialize input value on first render and notify parent if no value was provided
     useEffect(() => {
-        if (inputValue === '' && !modalMode) {
+        if (inputValue === '') {
             setInputValue(formatValue(currentValue));
             // If no value was provided, set it to 1x
             if (value === undefined || value === null) {
                 handleLeverageChange(1);
             }
         }
-    }, [maximumInputValue, modalMode]);
+    }, [maximumInputValue]);
 
     // Generate tick marks using centralized logic
     useEffect(() => {
@@ -526,6 +531,9 @@ export default function LeverageSlider({
 
         const newValue = percentageToValue(percentage);
 
+        // Ensure value is within min/max bounds
+        // const boundedValue = constrainValue(newValue);
+
         setHoverValue(newValue);
         setIsHovering(true);
         setHoveredTickIndex(null);
@@ -563,7 +571,11 @@ export default function LeverageSlider({
     // Handle track click to set value
     const handleTrackClick = (e: React.MouseEvent) => {
         const boundedValue = calculateValueFromPosition(e.clientX);
-        handleLeverageChange(boundedValue);
+        if (onClick) {
+            onClick(boundedValue);
+        } else {
+            handleLeverageChange(boundedValue);
+        }
     };
 
     const handleTrackTouchStart = (e: React.TouchEvent) => {
@@ -659,6 +671,7 @@ export default function LeverageSlider({
             // Convert percentage to value (no rounding for smooth movement)
             const newValue = percentageToValue(percentage);
 
+            setUnconstrainedSliderValue(newValue);
             // Ensure value is within min/max bounds
             const boundedValue = constrainValue(newValue);
 
@@ -983,7 +996,12 @@ export default function LeverageSlider({
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleLeverageChange(tickValue);
+                                        console.log({ onClick });
+                                        if (onClick) {
+                                            onClick(tickValue);
+                                        } else {
+                                            handleLeverageChange(tickValue);
+                                        }
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
