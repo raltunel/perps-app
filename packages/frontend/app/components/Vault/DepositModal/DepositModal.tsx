@@ -178,7 +178,7 @@ export default function DepositModal({
         if (!amount) return false;
         const depositAmount = parseFloat(amount);
         const result =
-            !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 10;
+            !isNaN(depositAmount) && depositAmount > 0 && depositAmount < 5;
         console.log(
             'isBelowMinimum check - amount:',
             amount,
@@ -321,7 +321,7 @@ export default function DepositModal({
                 onClick={(e) => {
                     if (isBelowMinimum) {
                         e.preventDefault();
-                        setError('Minimum deposit amount is $10.00');
+                        setError('Minimum deposit amount is $5.00');
                         // Clear error after 3 seconds
                         setTimeout(() => setError(null), 3000);
                         return;

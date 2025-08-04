@@ -80,10 +80,10 @@ export class DepositService {
         isValid: boolean;
         message?: string;
     } {
-        if (amount && amount < 10) {
+        if (amount && amount < 5) {
             return {
                 isValid: false,
-                message: 'Minimum deposit value is $10',
+                message: 'Minimum deposit value is $5',
             };
         }
         return { isValid: true };
