@@ -429,6 +429,9 @@ function OrderInput({
     function roundDownToHundredth(value: number) {
         return Math.floor(value * 100) / 100;
     }
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
+    }
 
     const notionalUsdOrderSizeNum =
         Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
@@ -1210,7 +1213,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
             });
@@ -1292,7 +1295,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
             });
