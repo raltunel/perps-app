@@ -422,8 +422,15 @@ function OrderInput({
         markPx,
     ]);
 
-    function roundDownToMillionth(value: number) {
-        return Math.floor(value * 1_000_000) / 1_000_000;
+    // function roundDownToMillionth(value: number) {
+    //     return Math.floor(value * 1_000_000) / 1_000_000;
+    // }
+
+    function roundDownToHundredth(value: number) {
+        return Math.floor(value * 100) / 100;
+    }
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
     }
 
     const notionalUsdOrderSizeNum =
@@ -436,7 +443,10 @@ function OrderInput({
             !isEditingSizeInput &&
             !userExceededAvailableMargin
         ) {
-            setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
+            const maxNotionalSize =
+                ((usdAvailableToTrade * 0.999) / markPx) * leverage;
+
+            setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
         positionSliderPercentageValue,
@@ -509,8 +519,8 @@ function OrderInput({
     }, [usdOrderValue, leverage]);
 
     const collateralInsufficient =
-        roundDownToMillionth(usdAvailableToTrade) <
-        roundDownToMillionth(marginRequired);
+        roundDownToHundredth(usdAvailableToTrade) <
+        roundDownToHundredth(marginRequired);
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -777,7 +787,8 @@ function OrderInput({
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
         if (marketOrderType === 'market') {
             const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                (((value / 100) * usdAvailableToTrade * 0.999) /
+                    (markPx || 1)) *
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
@@ -1210,7 +1221,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
             });
@@ -1292,7 +1303,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
             });
@@ -1697,6 +1708,7 @@ function OrderInput({
                             submitFn={submitMarketBuy}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'market_sell' && (
@@ -1716,6 +1728,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_buy' && (
@@ -1736,6 +1749,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_sell' && (
@@ -1756,6 +1770,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                 </Modal>
