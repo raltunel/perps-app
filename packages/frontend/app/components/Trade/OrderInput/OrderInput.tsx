@@ -1733,9 +1733,9 @@ function OrderInput({
                                 : confirmOrderModal.content === 'market_sell'
                                   ? 'Confirm Sell Order'
                                   : confirmOrderModal.content === 'limit_buy'
-                                    ? 'Confirm Limit Buy'
+                                    ? 'Confirm Limit Buy Order'
                                     : confirmOrderModal.content === 'limit_sell'
-                                      ? 'Confirm Limit Sale'
+                                      ? 'Confirm Limit Sell Order'
                                       : ''
                     }
                 >
