@@ -288,9 +288,11 @@ function PortfolioDeposit(props: propsIF) {
                 <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
                 </button>
-                {error && <div>{error}</div>}
+                {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
-                    <div>Transaction failed. Please try again.</div>
+                    <div className={styles.error}>
+                        Transaction failed. Please try again.
+                    </div>
                 )}
             </div>
 
