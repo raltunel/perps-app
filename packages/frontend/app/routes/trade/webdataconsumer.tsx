@@ -499,6 +499,8 @@ export default function WebDataConsumer() {
                         oid: fill.oid,
                         tid: fill.tid,
                         time: fill.time,
+                        startPosition: fill.startPosition,
+                        hasStartPosition: 'startPosition' in fill,
                     })),
                 });
 
@@ -525,13 +527,45 @@ export default function WebDataConsumer() {
                         fills.length,
                     );
                 } else {
+                    // Merge fills with deduplication
                     const previousCount = userFillsRef.current.length;
-                    userFillsRef.current = [...fills, ...userFillsRef.current];
-                    console.log('[USER FILLS] Added update fills:', {
-                        newFillsCount: fills.length,
-                        previousTotal: previousCount,
-                        newTotal: userFillsRef.current.length,
+
+                    // Create a map for efficient deduplication
+                    const fillMap = new Map<string, UserFillIF>();
+
+                    // Add existing fills to map
+                    userFillsRef.current.forEach((fill) => {
+                        const dedupeKey = fill.startPositionRaw
+                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
+                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
+                        fillMap.set(dedupeKey, fill);
                     });
+
+                    // Add new fills, which will overwrite duplicates
+                    fills.forEach((fill) => {
+                        const dedupeKey = fill.startPositionRaw
+                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
+                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
+                        fillMap.set(dedupeKey, fill);
+                    });
+
+                    // Convert back to array and sort by time
+                    userFillsRef.current = Array.from(fillMap.values()).sort(
+                        (a, b) => b.time - a.time,
+                    );
+
+                    console.log(
+                        '[USER FILLS] Added update fills with deduplication:',
+                        {
+                            newFillsCount: fills.length,
+                            previousTotal: previousCount,
+                            newTotal: userFillsRef.current.length,
+                            duplicatesRemoved:
+                                previousCount +
+                                fills.length -
+                                userFillsRef.current.length,
+                        },
+                    );
                 }
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));
