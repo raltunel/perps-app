@@ -118,7 +118,16 @@ export default function WebDataConsumer() {
     }, [symbol, coins, symbolInfo, setSymbolInfo]);
 
     useEffect(() => {
+        console.log('[WebDataConsumer] Subscription setup effect triggered:', {
+            hasInfo: !!info,
+            userAddress,
+            timestamp: new Date().toISOString(),
+        });
         if (!info) return;
+
+        console.log(
+            '[WebDataConsumer] CLEARING and re-establishing all subscriptions!',
+        );
         setFetchedChannels(new Set());
         fetchedChannelsRef.current = new Set();
         setUserOrders([]);
@@ -134,10 +143,15 @@ export default function WebDataConsumer() {
         resetRefs();
 
         // Subscribe to webData2 on user socket for user-specific data
+        console.log(
+            '[WEB_DATA2] Setting up subscription with user:',
+            userAddress,
+        );
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: userAddress },
             postWebData2,
             () => {
+                console.log('[WEB_DATA2] Subscription snapshot complete');
                 fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             },
         );
@@ -160,20 +174,38 @@ export default function WebDataConsumer() {
             }
         }
 
+        console.log('[ORDER HISTORY] Setting up subscription:', {
+            user: userAddress,
+            hasMultiSocket: !!info.multiSocketInfo,
+            channel: WsChannels.USER_HISTORICAL_ORDERS,
+        });
         const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
             {
                 type: WsChannels.USER_HISTORICAL_ORDERS,
                 user: userAddress,
             },
             (payload: any) => {
+                console.log(
+                    '[ORDER HISTORY] Message received via subscription callback',
+                );
                 postUserHistoricalOrders(payload);
             },
         );
 
+        console.log(
+            '[USER FILLS] Setting up subscription with user:',
+            userAddress,
+        );
         const { unsubscribe: unsubscribeUserFills } = info.subscribe(
             { type: WsChannels.USER_FILLS, user: userAddress },
-            postUserFills,
+            (payload: any) => {
+                console.log(
+                    '[USER FILLS] Message received via subscription callback',
+                );
+                postUserFills(payload);
+            },
             () => {
+                console.log('[USER FILLS] Subscription snapshot complete');
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
             },
         );
@@ -246,6 +278,13 @@ export default function WebDataConsumer() {
         }, 1000);
 
         return () => {
+            console.log(
+                '[WebDataConsumer] CLEANUP - Tearing down all subscriptions!',
+                {
+                    userAddress,
+                    timestamp: new Date().toISOString(),
+                },
+            );
             clearInterval(userDataInterval);
             // clearInterval(monitorInterval);
             unsubscribe();
