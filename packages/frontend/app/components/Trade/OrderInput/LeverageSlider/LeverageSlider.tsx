@@ -1035,7 +1035,7 @@ export default function LeverageSlider({
                     )}
                 </div>
             )}
-            <div
+            {/* <div
                 style={{
                     marginTop: '10px',
                     padding: '8px 12px',
@@ -1054,7 +1054,7 @@ export default function LeverageSlider({
                     Trigger Warning?:{' '}
                     {shouldShowInteractiveWarning ? ' YES' : 'NO'}
                 </div>
-            </div>
+            </div> */}
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
