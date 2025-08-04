@@ -107,14 +107,6 @@ export const SdkProvider: React.FC<{
     }, [internetConnected]);
 
     const stashSubscriptions = useCallback(() => {
-        // Market data channels that can be stashed
-        const MARKET_CHANNELS = new Set([
-            'l2Book',
-            'trades',
-            'candle',
-            'allMids',
-        ]);
-
         if (info?.multiSocketInfo) {
             const activeSubs =
                 info?.multiSocketInfo?.getActiveSubscriptions() || {};
@@ -123,17 +115,9 @@ export const SdkProvider: React.FC<{
                 // reset stashed subs if we can access active subs from ws object
                 stashedSubs.current = {};
             }
-
             Object.keys(activeSubs).forEach((key) => {
-                const channelType = key.split(':')[0];
-                // Only stash market data subscriptions
-                if (MARKET_CHANNELS.has(channelType)) {
-                    const subs = activeSubs[key];
-                    stashedSubs.current[key] = subs;
-                    console.log(`>>> stashing market subscription: ${key}`);
-                } else {
-                    console.log(`>>> keeping active user subscription: ${key}`);
-                }
+                const subs = activeSubs[key];
+                stashedSubs.current[key] = subs;
             });
         } else {
             const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
@@ -144,15 +128,8 @@ export const SdkProvider: React.FC<{
             }
 
             Object.keys(activeSubs).forEach((key) => {
-                const channelType = key.split(':')[0];
-                // Only stash market data subscriptions
-                if (MARKET_CHANNELS.has(channelType)) {
-                    const subs = activeSubs[key];
-                    stashedSubs.current[key] = subs;
-                    console.log(`>>> stashing market subscription: ${key}`);
-                } else {
-                    console.log(`>>> keeping active user subscription: ${key}`);
-                }
+                const subs = activeSubs[key];
+                stashedSubs.current[key] = subs;
             });
         }
         console.log(
