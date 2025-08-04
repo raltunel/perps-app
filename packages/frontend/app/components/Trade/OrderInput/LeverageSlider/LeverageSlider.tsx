@@ -820,14 +820,7 @@ export default function LeverageSlider({
                 className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
             >
                 {!hideTitle && (
-                    <div className={styles.titleWithWarning}>
-                        <h3 className={styles.containerTitle}>Leverage</h3>
-                        {showMinimumWarning && (
-                            <div className={styles.minimumWarning}>
-                                Minimum leverage reached
-                            </div>
-                        )}
-                    </div>
+                    <h3 className={styles.containerTitle}>Leverage</h3>
                 )}
 
                 {/* Input at top for modal mode */}
@@ -849,8 +842,13 @@ export default function LeverageSlider({
                     />
                 </div>
 
-                {/* Slider container for modal mode */}
                 <div className={styles.modalSliderContainer}>
+                    {showMinimumWarning && (
+                        <div className={styles.modalSliderWarning}>
+                            Minimum leverage reached
+                        </div>
+                    )}
+
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
@@ -867,10 +865,7 @@ export default function LeverageSlider({
                         onMouseMove={handleTrackMouseMove}
                         onMouseLeave={handleTrackMouseLeave}
                     >
-                        {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
-
-                        {/* Active colored portion - using fixed position gradient */}
                         <div
                             className={styles.sliderActive}
                             style={{
@@ -891,7 +886,6 @@ export default function LeverageSlider({
                             const isCurrent =
                                 Math.abs(tickValue - value) <
                                 SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
@@ -952,7 +946,6 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
-                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -960,7 +953,6 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
@@ -985,7 +977,6 @@ export default function LeverageSlider({
                                                 : UI_CONFIG.INACTIVE_LABEL_COLOR,
                                     }}
                                     onKeyDown={(e) => {
-                                        // ADD THIS
                                         if (
                                             e.key === 'Enter' ||
                                             e.key === ' '
@@ -996,7 +987,6 @@ export default function LeverageSlider({
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        console.log({ onClick });
                                         if (onClick) {
                                             onClick(tickValue);
                                         } else {
@@ -1012,6 +1002,7 @@ export default function LeverageSlider({
                         })}
                     </div>
                 </div>
+
                 <div
                     aria-live='assertive'
                     aria-atomic='true'
@@ -1029,7 +1020,6 @@ export default function LeverageSlider({
             </div>
         );
     }
-
     // Regular layout: Slider and input side by side
     return (
         <div

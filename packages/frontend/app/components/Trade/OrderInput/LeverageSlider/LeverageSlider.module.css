@@ -195,6 +195,24 @@
     border-radius: var(--radius-s);
     margin-bottom: var(--gap-m);
 }
+.modalSliderWarning {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--red);
+    padding: 0 var(--padding-s);
+    font-size: var(--font-size-s, 12px);
+    white-space: nowrap;
+    z-index: 10;
+
+    border-radius: var(--radius-xs);
+}
+
+.modalSliderContainer {
+    position: relative;
+    width: 100%;
+}
 
 .modalValueInput {
     background-color: transparent;

@@ -321,19 +321,13 @@ function OrderInput({
 
     useEffect(() => {
         if (!marginBucket) return;
-
         try {
             const leverageFloor = calcLeverageFloor(marginBucket);
             const leverageFloorNum = Number(leverageFloor);
-
-            if (!Number.isFinite(leverageFloorNum) || leverageFloorNum === 0) {
-                setLeverageFloor(0);
-                return;
-            }
+            if (!leverageFloorNum) return;
             setLeverageFloor(10_000 / leverageFloorNum);
-        } catch (err) {
-            console.log('error in calcLeverageFloor:', err);
-            setLeverageFloor(0);
+        } catch {
+            setLeverageFloor(100);
         }
     }, [marginBucket]);
 
