@@ -139,7 +139,7 @@ export const WS_SLEEP_MODE = 5 * SECONDS;
 export const WS_SLEEP_MODE_PRICE_CHECK = 20 * SECONDS;
 // Increased from 2 minutes to 30 minutes to prevent losing limit order fills
 // This gives more time for limit orders to fill before websocket connections are stashed
-export const WS_SLEEP_MODE_STASH_CONNECTION = 30 * MINUTES;
+export const WS_SLEEP_MODE_STASH_CONNECTION = 2 * MINUTES;
 
 export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
 
