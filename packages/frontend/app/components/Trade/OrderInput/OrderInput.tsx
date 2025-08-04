@@ -422,8 +422,12 @@ function OrderInput({
         markPx,
     ]);
 
-    function roundDownToMillionth(value: number) {
-        return Math.floor(value * 1_000_000) / 1_000_000;
+    // function roundDownToMillionth(value: number) {
+    //     return Math.floor(value * 1_000_000) / 1_000_000;
+    // }
+
+    function roundDownToHundredth(value: number) {
+        return Math.floor(value * 100) / 100;
     }
 
     const notionalUsdOrderSizeNum =
@@ -436,7 +440,15 @@ function OrderInput({
             !isEditingSizeInput &&
             !userExceededAvailableMargin
         ) {
-            setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
+            const maxNotionalSize =
+                ((usdAvailableToTrade * 0.999) / markPx) * leverage;
+            console.log({
+                maxNotionalSize,
+                usdAvailableToTrade,
+                markPx,
+                leverage,
+            });
+            setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
         positionSliderPercentageValue,
@@ -509,8 +521,8 @@ function OrderInput({
     }, [usdOrderValue, leverage]);
 
     const collateralInsufficient =
-        roundDownToMillionth(usdAvailableToTrade) <
-        roundDownToMillionth(marginRequired);
+        roundDownToHundredth(usdAvailableToTrade) <
+        roundDownToHundredth(marginRequired);
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -777,7 +789,8 @@ function OrderInput({
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
         if (marketOrderType === 'market') {
             const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                (((value / 100) * usdAvailableToTrade * 0.999) /
+                    (markPx || 1)) *
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
