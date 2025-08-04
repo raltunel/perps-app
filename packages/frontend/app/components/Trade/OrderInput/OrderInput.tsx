@@ -443,7 +443,8 @@ function OrderInput({
             positionSliderPercentageValue === 100 &&
             markPx &&
             !isEditingSizeInput &&
-            !userExceededAvailableMargin
+            !userExceededAvailableMargin &&
+            !isReduceOnlyEnabled
         ) {
             const maxNotionalSize =
                 ((usdAvailableToTrade * 0.999) / markPx) * leverage;
@@ -456,6 +457,7 @@ function OrderInput({
         markPx,
         isEditingSizeInput,
         userExceededAvailableMargin,
+        isReduceOnlyEnabled,
     ]);
 
     const sizeLessThanMinimum =
