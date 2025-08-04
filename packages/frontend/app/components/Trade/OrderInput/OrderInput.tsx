@@ -1043,11 +1043,15 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             }
+            // Get best ask price for buy order
+            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+
             // Execute the market buy order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'buy',
                 leverage: leverage,
+                bestAskPrice: bestAskPrice,
             });
 
             if (result.success) {
@@ -1114,11 +1118,15 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             }
+            // Get best bid price for sell order
+            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+
             // Execute the market sell order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'sell',
                 leverage: leverage,
+                bestBidPrice: bestBidPrice,
             });
 
             if (result.success) {

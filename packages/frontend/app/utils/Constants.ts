@@ -153,3 +153,12 @@ export const blockExplorer =
 
 export const RPC_ENDPOINT =
     import.meta.env.VITE_RPC_ENDPOINT || 'https://testnet.fogo.io';
+
+// Market Order Constants
+/**
+ * Price offset for market orders in USD.
+ * Buy orders will be filled at best ask + this offset.
+ * Sell orders will be filled at best bid - this offset.
+ * This ensures market orders are filled even with slight price movements.
+ */
+export const MARKET_ORDER_PRICE_OFFSET_USD = 50;
