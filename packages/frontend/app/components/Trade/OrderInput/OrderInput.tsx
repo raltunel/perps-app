@@ -830,6 +830,13 @@ function OrderInput({
         }
     };
 
+    useEffect(() => {
+        if (!isReduceOnlyEnabled && !notionalSymbolQtyNum)
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(
+                positionSliderPercentageValue,
+            );
+    }, [isReduceOnlyEnabled]);
+
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
     // const handleChaseOptionChange = (value: string) => {
