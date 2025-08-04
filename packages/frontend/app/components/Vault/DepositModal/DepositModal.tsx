@@ -166,11 +166,6 @@ export default function DepositModal({
             value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
             tooltip: 'Your current wallet balance',
         },
-        {
-            label: 'Network Fee',
-            value: 'Sponsored by Fogo',
-            tooltip: 'Transaction fees are sponsored by Fogo',
-        },
     ];
 
     // Check if amount is below minimum

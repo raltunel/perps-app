@@ -101,12 +101,6 @@ export default function ConfirmationModal(props: propsIF) {
                 'Estimated price at which your position will be liquidated',
             className: styles.white,
         },
-        {
-            label: 'Network Fee',
-            value: '0.000001 FOGO',
-            tooltip: 'Fee required to execute this trade on the network',
-            className: styles.white,
-        },
     ];
 
     return (

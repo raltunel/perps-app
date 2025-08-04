@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { LuCircleHelp } from 'react-icons/lu';
+import { useEffect, useState } from 'react';
+// import { LuCircleHelp } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import Tooltip from '~/components/Tooltip/Tooltip';
+// import Tooltip from '~/components/Tooltip/Tooltip';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
@@ -24,7 +24,7 @@ export default function LeverageSliderModal({
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
-    const currentMarket = useLeverageStore((state) => state.currentMarket);
+    // const currentMarket = useLeverageStore((state) => state.currentMarket);
 
     // Update local state if currentLeverage prop changes
     useEffect(() => {
@@ -33,12 +33,16 @@ export default function LeverageSliderModal({
 
     const handleSliderChange = (newValue: number) => {
         // Update the leverage in the store immediately as the slider changes
-        setPreferredLeverage(newValue);
         setValue(newValue);
+    };
+
+    const handleSliderClick = (newLeverage: number) => {
+        setValue(newLeverage);
     };
 
     const handleConfirm = () => {
         if (onConfirm) {
+            setPreferredLeverage(value);
             onConfirm(value);
         }
         onClose();
@@ -52,6 +56,7 @@ export default function LeverageSliderModal({
                     <LeverageSlider
                         value={value}
                         onChange={handleSliderChange}
+                        onClick={handleSliderClick}
                         modalMode={true}
                         maxLeverage={maxLeverage}
                         hideTitle={true}
@@ -59,7 +64,7 @@ export default function LeverageSliderModal({
                     />
                 </div>
 
-                <div className={styles.maxPositionContainer}>
+                {/* <div className={styles.maxPositionContainer}>
                     <p>
                         Max position at Current Leverage
                         <Tooltip
@@ -70,7 +75,7 @@ export default function LeverageSliderModal({
                         </Tooltip>
                     </p>
                     <span>100,000 USD</span>
-                </div>
+                </div> */}
 
                 {/* Action buttons */}
                 <div className={styles.buttonContainer}>
