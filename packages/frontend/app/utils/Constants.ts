@@ -115,6 +115,11 @@ export const TWITTER_CHARACTER_LIMIT = 240;
 export const PERPS_TWITTER = '@ambient_finance';
 export const FOGO_TWITTER = '@FogoChain';
 
+export const externalURLs = {
+    discord: 'https://discord.gg/ambient-finance',
+    twitter: 'https://x.com/ambient_finance',
+};
+
 export enum WsChannels {
     ORDERBOOK = 'l2Book',
     ORDERBOOK_TRADES = 'trades',
