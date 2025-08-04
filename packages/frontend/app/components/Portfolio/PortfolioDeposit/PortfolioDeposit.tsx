@@ -224,13 +224,11 @@ function PortfolioDeposit(props: propsIF) {
                 className={styles.tokenDropdown}
             />
 
-            <div className={styles.inputContainer}>
-                <h6>
-                    Amount{' '}
-                    {showInvalidSizeWarning && (
-                        <span className={styles.minWarning}>(Min: $5)</span>
-                    )}
-                </h6>
+            {/* <div className={styles.inputContainer}>
+                <h6>Amount</h6>
+                {showInvalidSizeWarning && (
+                    <span className={styles.minWarning}>(Min: $5)</span>
+                )}
                 <NumFormattedInput
                     placeholder='Enter amount (min $5)'
                     value={rawInputString}
@@ -262,6 +260,37 @@ function PortfolioDeposit(props: propsIF) {
                     <div className={styles.error}>
                         Transaction failed. Please try again.
                     </div>
+                )}
+            </div> */}
+
+            <div className={styles.input_container}>
+                <h6>Amount</h6>
+                {showInvalidSizeWarning && <span>Min: $5</span>}
+                <NumFormattedInput
+                    placeholder='Enter amount (min $5)'
+                    value={rawInputString}
+                    onChange={handleDepositChange}
+                    aria-label='deposit input'
+                    autoFocus
+                    onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (
+                            e.key === 'Enter' &&
+                            !isButtonDisabled &&
+                            !isSizeInvalid
+                        ) {
+                            handleDeposit();
+                        }
+                    }}
+                    inputRegexOverride={RegExp(
+                        `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
+                    )}
+                />
+                <button onClick={handleMaxClick} disabled={isProcessing}>
+                    Max
+                </button>
+                {error && <div>{error}</div>}
+                {transactionStatus === 'failed' && !error && (
+                    <div>Transaction failed. Please try again.</div>
                 )}
             </div>
 
