@@ -306,6 +306,9 @@ function OrderInput({
 
     const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
+    const [maximumLeverageBelowMinimum, setMaximumLeverageBelowMinimum] =
+        useState<number>();
+
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
         useState(0);
 
@@ -314,6 +317,16 @@ function OrderInput({
     const [liquidationPrice, setLiquidationPrice] = useState<number | null>(
         null,
     );
+
+    // reset maximumLeverageBelowMinimum when marginBucket changes
+    const rawAvailableToTrade =
+        tradeDirection === 'buy'
+            ? marginBucket?.availToBuy
+            : marginBucket?.availToSell;
+
+    useEffect(() => {
+        setMaximumLeverageBelowMinimum(undefined);
+    }, [rawAvailableToTrade]);
 
     useEffect(() => {
         if (!marginBucket) {
@@ -338,6 +351,16 @@ function OrderInput({
             Number(usdAvailableToTrade) / 1_000_000;
 
         setUsdAvailableToTrade(normalizedAvailableToTrade);
+
+        // set maximumLeverageBelowMinimum to leverage if leverage is larger than maximumLeverageBelowMinimum
+        if (normalizedAvailableToTrade === 0) {
+            if (
+                !maximumLeverageBelowMinimum ||
+                leverage > maximumLeverageBelowMinimum
+            ) {
+                setMaximumLeverageBelowMinimum(leverage);
+            }
+        }
 
         const currentPositionNotionalSize = marginBucket?.netPosition || 0;
         const normalizedCurrentPosition =
@@ -932,9 +955,9 @@ function OrderInput({
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
-            minimumValue: 5,
+            minimumValue: maximumLeverageBelowMinimum,
         }),
-        [leverage, handleLeverageChange],
+        [leverage, handleLeverageChange, maximumLeverageBelowMinimum],
     );
 
     // const chasePriceProps = useMemo(
