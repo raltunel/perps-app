@@ -206,6 +206,7 @@ function OrderInput({
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minNotionalUsdOrderSize = 0.99;
+    const maxNotionalUsdOrderSize = 100_000;
     // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
@@ -459,6 +460,10 @@ function OrderInput({
     const sizeLessThanMinimum =
         !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
+
+    const sizeMoreThanMaximum =
+        !notionalUsdOrderSizeNum ||
+        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
         return formatNum(usdAvailableToTrade, 2);
@@ -1395,12 +1400,14 @@ function OrderInput({
     const getDisabledReason = (
         collateralInsufficient: boolean,
         sizeLessThanMinimum: boolean,
+        sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
         isMarketOrderLoading: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
         if (collateralInsufficient) return 'Insufficient collateral';
         if (sizeLessThanMinimum) return 'Order size below minimum';
+        if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
@@ -1420,12 +1427,14 @@ function OrderInput({
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
+        sizeMoreThanMaximum ||
         isPriceInvalid ||
         submitButtonRecentlyClicked;
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
         sizeLessThanMinimum,
+        sizeMoreThanMaximum,
         isPriceInvalid,
         isMarketOrderLoading,
     );
