@@ -58,7 +58,12 @@ export function processTrades(data: any): OrderBookTradeIF[] {
     return data.map((e: any) => {
         return {
             coin: e.coin,
-            side: e.side === 'A' ? 'sell' : e.side === 'B' ? 'buy' : e.side,
+            side:
+                e.side === 'A' || e.side === 'S'
+                    ? 'sell'
+                    : e.side === 'B'
+                      ? 'buy'
+                      : e.side,
             px: parseNum(e.px),
             sz: parseNum(e.sz),
             hash: e.hash,
