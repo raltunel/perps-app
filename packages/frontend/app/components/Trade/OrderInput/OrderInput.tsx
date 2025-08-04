@@ -321,10 +321,14 @@ function OrderInput({
 
     useEffect(() => {
         if (!marginBucket) return;
-        const leverageFloor = calcLeverageFloor(marginBucket);
-        const leverageFloorNum = Number(leverageFloor);
-        if (!leverageFloorNum) return;
-        setLeverageFloor(10_000 / leverageFloorNum);
+        try {
+            const leverageFloor = calcLeverageFloor(marginBucket);
+            const leverageFloorNum = Number(leverageFloor);
+            if (!leverageFloorNum) return;
+            setLeverageFloor(10_000 / leverageFloorNum);
+        } catch {
+            setLeverageFloor(100);
+        }
     }, [marginBucket]);
 
     useEffect(() => {
