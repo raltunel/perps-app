@@ -133,9 +133,13 @@ export enum WsChannels {
 const SECONDS = 1000;
 const MINUTES = SECONDS * 60;
 
-export const WS_SLEEP_MODE = 0 * SECONDS;
+// Delay before entering sleep mode when tab becomes hidden
+// Set to 5 seconds to avoid triggering on brief tab switches
+export const WS_SLEEP_MODE = 5 * SECONDS;
 export const WS_SLEEP_MODE_PRICE_CHECK = 20 * SECONDS;
-export const WS_SLEEP_MODE_STASH_CONNECTION = 2 * MINUTES;
+// Increased from 2 minutes to 30 minutes to prevent losing limit order fills
+// This gives more time for limit orders to fill before websocket connections are stashed
+export const WS_SLEEP_MODE_STASH_CONNECTION = 30 * MINUTES;
 
 export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
 
