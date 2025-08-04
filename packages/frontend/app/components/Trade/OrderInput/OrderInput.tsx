@@ -590,23 +590,15 @@ function OrderInput({
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
-        const midPrice = getMidPrice();
-        if (!midPrice) return;
-        if (obChosenPrice > midPrice) {
-            setTradeDirection('sell');
-        } else {
-            setTradeDirection('buy');
-        }
-        // uncomment once markPx more in line with orderbook
-        // if (markPx && obChosenPrice) {
-        //     console.log({ markPx, obChosenPrice });
-        //     if (obChosenPrice > markPx) {
-        //         setTradeDirection('sell');
-        //     } else {
-        //         setTradeDirection('buy');
-        //     }
+        // commented out to match HL functionality and not assume trade direction
+        // const midPrice = getMidPrice();
+        // if (!midPrice) return;
+        // if (obChosenPrice > midPrice) {
+        //     setTradeDirection('sell');
+        // } else {
+        //     setTradeDirection('buy');
         // }
-    }, [obChosenAmount, obChosenPrice]);
+    }, [obChosenPrice]);
 
     const activeOptions: useAppOptionsIF = useAppOptions();
 
