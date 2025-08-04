@@ -107,11 +107,15 @@ export const SdkProvider: React.FC<{
     }, [internetConnected]);
 
     const stashSubscriptions = useCallback(() => {
-        if (info?.multiSocketInfo) {
-            // For multi-socket mode, we don't need to stash subscriptions
-            // as they're managed internally by each socket
-            // stashedSubs.current = {};
+        // Market data channels that can be stashed
+        const MARKET_CHANNELS = new Set([
+            'l2Book',
+            'trades',
+            'candle',
+            'allMids',
+        ]);
 
+        if (info?.multiSocketInfo) {
             const activeSubs =
                 info?.multiSocketInfo?.getActiveSubscriptions() || {};
 
@@ -121,8 +125,15 @@ export const SdkProvider: React.FC<{
             }
 
             Object.keys(activeSubs).forEach((key) => {
-                const subs = activeSubs[key];
-                stashedSubs.current[key] = subs;
+                const channelType = key.split(':')[0];
+                // Only stash market data subscriptions
+                if (MARKET_CHANNELS.has(channelType)) {
+                    const subs = activeSubs[key];
+                    stashedSubs.current[key] = subs;
+                    console.log(`>>> stashing market subscription: ${key}`);
+                } else {
+                    console.log(`>>> keeping active user subscription: ${key}`);
+                }
             });
         } else {
             const activeSubs = info?.wsManager?.getActiveSubscriptions() || {};
@@ -133,12 +144,19 @@ export const SdkProvider: React.FC<{
             }
 
             Object.keys(activeSubs).forEach((key) => {
-                const subs = activeSubs[key];
-                stashedSubs.current[key] = subs;
+                const channelType = key.split(':')[0];
+                // Only stash market data subscriptions
+                if (MARKET_CHANNELS.has(channelType)) {
+                    const subs = activeSubs[key];
+                    stashedSubs.current[key] = subs;
+                    console.log(`>>> stashing market subscription: ${key}`);
+                } else {
+                    console.log(`>>> keeping active user subscription: ${key}`);
+                }
             });
         }
         console.log(
-            '>>> stashed subscriptions',
+            '>>> stashed subscriptions (market only)',
             stashedSubs.current,
             new Date().toISOString(),
         );
@@ -146,7 +164,13 @@ export const SdkProvider: React.FC<{
 
     const stashWebsocket = useCallback(() => {
         if (info?.multiSocketInfo) {
-            info.multiSocketInfo.stop();
+            // Only stop market socket, keep user socket alive for orders/fills
+            const pool = info.multiSocketInfo.getPool();
+            console.log(
+                '>>> Stopping only market socket, keeping user socket active',
+            );
+            pool.stopSocket('market');
+            // Note: We're NOT stopping the user socket to maintain order/fill subscriptions
         } else {
             info?.wsManager?.stop();
         }
@@ -156,13 +180,25 @@ export const SdkProvider: React.FC<{
         if (!isClient) return;
 
         if (info?.multiSocketInfo) {
-            // For multi-socket, just reconnect
+            // For multi-socket, only reinit market socket since user socket stayed active
+            const pool = info.multiSocketInfo.getPool();
+            console.log('>>> Reinitializing market socket only');
 
-            // [22-07-2025] disabled to activate reInit mechanism for multisocketinfo
-            // info.multiSocketInfo.reconnect();
+            // Filter stashed subs to only include market-related subscriptions
+            const marketSubs: Record<string, any> = {};
+            Object.entries(stashedSubs.current).forEach(([key, value]) => {
+                const channelType = key.split(':')[0];
+                // Only restore market data subscriptions
+                if (
+                    ['l2Book', 'trades', 'candle', 'allMids'].includes(
+                        channelType,
+                    )
+                ) {
+                    marketSubs[key] = value;
+                }
+            });
 
-            // [22-07-2025] call to reInit
-            info.multiSocketInfo?.getPool().reInit(stashedSubs.current);
+            pool.reInit(marketSubs);
         } else {
             info?.wsManager?.reInit(stashedSubs.current);
         }
