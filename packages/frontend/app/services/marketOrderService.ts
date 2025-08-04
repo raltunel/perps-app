@@ -6,6 +6,7 @@ import {
     buildOrderEntryWithFillTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
+import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -18,6 +19,8 @@ export interface MarketOrderParams {
     quantity: number; // User input quantity (will be multiplied by 100_000_000)
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
+    bestBidPrice?: number; // Best bid price from order book (for sell orders)
+    bestAskPrice?: number; // Best ask price from order book (for buy orders)
 }
 
 /**
@@ -73,6 +76,46 @@ export class MarketOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
+            // Calculate fill prices based on order book
+            let fillPrice: bigint;
+            if (params.side === 'buy') {
+                // For buy orders: use best ask + offset
+                if (!params.bestAskPrice) {
+                    throw new Error(
+                        'Cannot execute market buy order: No ask prices available in order book',
+                    );
+                }
+                const fillPriceUsd =
+                    params.bestAskPrice + MARKET_ORDER_PRICE_OFFSET_USD;
+                fillPrice = BigInt(Math.floor(fillPriceUsd * 1_000_000)); // Convert to 6 decimal places
+                console.log('  - Buy order fill price calculation:');
+                console.log('    - Best ask price:', params.bestAskPrice);
+                console.log('    - Offset:', MARKET_ORDER_PRICE_OFFSET_USD);
+                console.log('    - Fill price USD:', fillPriceUsd);
+                console.log(
+                    '    - Fill price (on-chain):',
+                    fillPrice.toString(),
+                );
+            } else {
+                // For sell orders: use best bid - offset
+                if (!params.bestBidPrice) {
+                    throw new Error(
+                        'Cannot execute market sell order: No bid prices available in order book',
+                    );
+                }
+                const fillPriceUsd =
+                    params.bestBidPrice - MARKET_ORDER_PRICE_OFFSET_USD;
+                fillPrice = BigInt(Math.floor(fillPriceUsd * 1_000_000)); // Convert to 6 decimal places
+                console.log('  - Sell order fill price calculation:');
+                console.log('    - Best bid price:', params.bestBidPrice);
+                console.log('    - Offset:', MARKET_ORDER_PRICE_OFFSET_USD);
+                console.log('    - Fill price USD:', fillPriceUsd);
+                console.log(
+                    '    - Fill price (on-chain):',
+                    fillPrice.toString(),
+                );
+            }
+
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
@@ -82,7 +125,7 @@ export class MarketOrderService {
                     side: OrderSide.Bid,
                     qty: onChainQuantity,
                     orderPrice: BigInt('0'), // market order convention is to use 0
-                    fillPrice: BigInt('120000000000'),
+                    fillPrice: fillPrice,
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
@@ -111,7 +154,7 @@ export class MarketOrderService {
                     side: OrderSide.Ask,
                     qty: onChainQuantity,
                     orderPrice: BigInt('0'), // market order convention is to use 0
-                    fillPrice: BigInt('110000000000'),
+                    fillPrice: fillPrice,
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,

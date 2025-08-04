@@ -54,6 +54,8 @@ export interface UserFillIF {
     tid: number;
     value: number;
     closedPnl: number;
+    startPositionRaw?: string; // Raw string value from server for deduplication
+    startPosition?: number; // Parsed float value for display
 }
 
 export interface DepositAndWithDrawalIF {

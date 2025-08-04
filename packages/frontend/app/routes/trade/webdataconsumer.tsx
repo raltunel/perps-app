@@ -118,7 +118,16 @@ export default function WebDataConsumer() {
     }, [symbol, coins, symbolInfo, setSymbolInfo]);
 
     useEffect(() => {
+        console.log('[WebDataConsumer] Subscription setup effect triggered:', {
+            hasInfo: !!info,
+            userAddress,
+            timestamp: new Date().toISOString(),
+        });
         if (!info) return;
+
+        console.log(
+            '[WebDataConsumer] CLEARING and re-establishing all subscriptions!',
+        );
         setFetchedChannels(new Set());
         fetchedChannelsRef.current = new Set();
         setUserOrders([]);
@@ -134,10 +143,15 @@ export default function WebDataConsumer() {
         resetRefs();
 
         // Subscribe to webData2 on user socket for user-specific data
+        console.log(
+            '[WEB_DATA2] Setting up subscription with user:',
+            userAddress,
+        );
         const { unsubscribe } = info.subscribe(
             { type: WsChannels.WEB_DATA2, user: userAddress },
             postWebData2,
             () => {
+                console.log('[WEB_DATA2] Subscription snapshot complete');
                 fetchedChannelsRef.current.add(WsChannels.WEB_DATA2);
             },
         );
@@ -160,20 +174,38 @@ export default function WebDataConsumer() {
             }
         }
 
+        console.log('[ORDER HISTORY] Setting up subscription:', {
+            user: userAddress,
+            hasMultiSocket: !!info.multiSocketInfo,
+            channel: WsChannels.USER_HISTORICAL_ORDERS,
+        });
         const { unsubscribe: unsubscribeOrderHistory } = info.subscribe(
             {
                 type: WsChannels.USER_HISTORICAL_ORDERS,
                 user: userAddress,
             },
             (payload: any) => {
+                console.log(
+                    '[ORDER HISTORY] Message received via subscription callback',
+                );
                 postUserHistoricalOrders(payload);
             },
         );
 
+        console.log(
+            '[USER FILLS] Setting up subscription with user:',
+            userAddress,
+        );
         const { unsubscribe: unsubscribeUserFills } = info.subscribe(
             { type: WsChannels.USER_FILLS, user: userAddress },
-            postUserFills,
+            (payload: any) => {
+                console.log(
+                    '[USER FILLS] Message received via subscription callback',
+                );
+                postUserFills(payload);
+            },
             () => {
+                console.log('[USER FILLS] Subscription snapshot complete');
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
             },
         );
@@ -217,11 +249,12 @@ export default function WebDataConsumer() {
             );
 
         const userDataInterval = setInterval(() => {
-            setUserOrders(openOrdersRef.current);
+            // NOTE: setUserOrders and setOrderHistory removed from here
+            // They are updated immediately in postUserHistoricalOrders to avoid race conditions
+
             // Positions now come from RPC polling, not webData2
             setUserBalances(userBalancesRef.current);
             setUserFills(userFillsRef.current);
-            setOrderHistory(userOrderHistoryRef.current);
             setTwapHistory(twapHistoryRef.current);
             setTwapSliceFills(twapSliceFillsRef.current);
             setUserFundings(userFundingsRef.current);
@@ -245,6 +278,13 @@ export default function WebDataConsumer() {
         }, 1000);
 
         return () => {
+            console.log(
+                '[WebDataConsumer] CLEANUP - Tearing down all subscriptions!',
+                {
+                    userAddress,
+                    timestamp: new Date().toISOString(),
+                },
+            );
             clearInterval(userDataInterval);
             // clearInterval(monitorInterval);
             unsubscribe();
@@ -498,6 +538,8 @@ export default function WebDataConsumer() {
                         oid: fill.oid,
                         tid: fill.tid,
                         time: fill.time,
+                        startPosition: fill.startPosition,
+                        hasStartPosition: 'startPosition' in fill,
                     })),
                 });
 
@@ -524,13 +566,45 @@ export default function WebDataConsumer() {
                         fills.length,
                     );
                 } else {
+                    // Merge fills with deduplication
                     const previousCount = userFillsRef.current.length;
-                    userFillsRef.current = [...fills, ...userFillsRef.current];
-                    console.log('[USER FILLS] Added update fills:', {
-                        newFillsCount: fills.length,
-                        previousTotal: previousCount,
-                        newTotal: userFillsRef.current.length,
+
+                    // Create a map for efficient deduplication
+                    const fillMap = new Map<string, UserFillIF>();
+
+                    // Add existing fills to map
+                    userFillsRef.current.forEach((fill) => {
+                        const dedupeKey = fill.startPositionRaw
+                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
+                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
+                        fillMap.set(dedupeKey, fill);
                     });
+
+                    // Add new fills, which will overwrite duplicates
+                    fills.forEach((fill) => {
+                        const dedupeKey = fill.startPositionRaw
+                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
+                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
+                        fillMap.set(dedupeKey, fill);
+                    });
+
+                    // Convert back to array and sort by time
+                    userFillsRef.current = Array.from(fillMap.values()).sort(
+                        (a, b) => b.time - a.time,
+                    );
+
+                    console.log(
+                        '[USER FILLS] Added update fills with deduplication:',
+                        {
+                            newFillsCount: fills.length,
+                            previousTotal: previousCount,
+                            newTotal: userFillsRef.current.length,
+                            duplicatesRemoved:
+                                previousCount +
+                                fills.length -
+                                userFillsRef.current.length,
+                        },
+                    );
                 }
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));

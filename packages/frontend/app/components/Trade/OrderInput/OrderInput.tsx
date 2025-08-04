@@ -164,11 +164,8 @@ function OrderInput({
     }, [sessionState]);
 
     // Market order service hook
-    const {
-        executeMarketOrder,
-        isLoading: isMarketOrderLoading,
-        signature,
-    } = useMarketOrderService();
+    const { executeMarketOrder, isLoading: isMarketOrderLoading } =
+        useMarketOrderService();
 
     const { executeLimitOrder } = useLimitOrderService();
 
@@ -209,6 +206,7 @@ function OrderInput({
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minNotionalUsdOrderSize = 0.99;
+    const maxNotionalUsdOrderSize = 100_000;
     // eslint-disable-next-line
     const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
         useState<number>(100);
@@ -425,8 +423,15 @@ function OrderInput({
         markPx,
     ]);
 
-    function roundDownToMillionth(value: number) {
-        return Math.floor(value * 1_000_000) / 1_000_000;
+    // function roundDownToMillionth(value: number) {
+    //     return Math.floor(value * 1_000_000) / 1_000_000;
+    // }
+
+    function roundDownToHundredth(value: number) {
+        return Math.floor(value * 100) / 100;
+    }
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
     }
 
     const notionalUsdOrderSizeNum =
@@ -439,7 +444,10 @@ function OrderInput({
             !isEditingSizeInput &&
             !userExceededAvailableMargin
         ) {
-            setNotionalSymbolQtyNum((usdAvailableToTrade / markPx) * leverage);
+            const maxNotionalSize =
+                ((usdAvailableToTrade * 0.999) / markPx) * leverage;
+
+            setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
         positionSliderPercentageValue,
@@ -452,6 +460,10 @@ function OrderInput({
     const sizeLessThanMinimum =
         !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
+
+    const sizeMoreThanMaximum =
+        !notionalUsdOrderSizeNum ||
+        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
         return formatNum(usdAvailableToTrade, 2);
@@ -512,8 +524,8 @@ function OrderInput({
     }, [usdOrderValue, leverage]);
 
     const collateralInsufficient =
-        roundDownToMillionth(usdAvailableToTrade) <
-        roundDownToMillionth(marginRequired);
+        roundDownToHundredth(usdAvailableToTrade) <
+        roundDownToHundredth(marginRequired);
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -578,6 +590,22 @@ function OrderInput({
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
+        const midPrice = getMidPrice();
+        if (!midPrice) return;
+        if (obChosenPrice > midPrice) {
+            setTradeDirection('sell');
+        } else {
+            setTradeDirection('buy');
+        }
+        // uncomment once markPx more in line with orderbook
+        // if (markPx && obChosenPrice) {
+        //     console.log({ markPx, obChosenPrice });
+        //     if (obChosenPrice > markPx) {
+        //         setTradeDirection('sell');
+        //     } else {
+        //         setTradeDirection('buy');
+        //     }
+        // }
     }, [obChosenAmount, obChosenPrice]);
 
     const activeOptions: useAppOptionsIF = useAppOptions();
@@ -764,7 +792,8 @@ function OrderInput({
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
         if (marketOrderType === 'market') {
             const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                (((value / 100) * usdAvailableToTrade * 0.999) /
+                    (markPx || 1)) *
                 leverage;
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         } else if (marketOrderType === 'limit') {
@@ -1031,11 +1060,15 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             }
+            // Get best ask price for buy order
+            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+
             // Execute the market buy order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'buy',
                 leverage: leverage,
+                bestAskPrice: bestAskPrice,
             });
 
             if (result.success) {
@@ -1102,11 +1135,15 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             }
+            // Get best bid price for sell order
+            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+
             // Execute the market sell order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
                 side: 'sell',
                 leverage: leverage,
+                bestBidPrice: bestBidPrice,
             });
 
             if (result.success) {
@@ -1190,7 +1227,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
             });
@@ -1201,12 +1238,17 @@ function OrderInput({
                     message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1267,7 +1309,7 @@ function OrderInput({
             // Execute limit order
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
-                price: limitPrice,
+                price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
             });
@@ -1278,12 +1320,17 @@ function OrderInput({
                     message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                 });
             }
         } catch (error) {
@@ -1354,12 +1401,14 @@ function OrderInput({
     const getDisabledReason = (
         collateralInsufficient: boolean,
         sizeLessThanMinimum: boolean,
+        sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
         isMarketOrderLoading: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
         if (collateralInsufficient) return 'Insufficient collateral';
         if (sizeLessThanMinimum) return 'Order size below minimum';
+        if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
@@ -1379,54 +1428,56 @@ function OrderInput({
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
+        sizeMoreThanMaximum ||
         isPriceInvalid ||
         submitButtonRecentlyClicked;
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
         sizeLessThanMinimum,
+        sizeMoreThanMaximum,
         isPriceInvalid,
         isMarketOrderLoading,
     );
 
-    const launchPadContent = (
-        <div className={styles.launchpad}>
-            <header>
-                <div
-                    className={styles.exit_launchpad}
-                    onClick={() => setShowLaunchpad(false)}
-                >
-                    <MdKeyboardArrowLeft />
-                </div>
-                <h3>Order Types</h3>
-                <button
-                    className={styles.trade_type_toggle}
-                    onClick={() => setShowLaunchpad(false)}
-                >
-                    <PiSquaresFour />
-                </button>
-            </header>
-            <ul className={styles.launchpad_clickables}>
-                {marketOrderTypes.map((mo: OrderTypeOption) => (
-                    <li
-                        key={JSON.stringify(mo)}
-                        onClick={() => {
-                            handleMarketOrderTypeChange(mo.value);
-                            setShowLaunchpad(false);
-                        }}
-                    >
-                        <div className={styles.name_and_icon}>
-                            {mo.icon}
-                            <h4>{mo.label}</h4>
-                        </div>
-                        <div>
-                            <p>{mo.blurb}</p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
+    // const launchPadContent = (
+    //     <div className={styles.launchpad}>
+    //         <header>
+    //             <div
+    //                 className={styles.exit_launchpad}
+    //                 onClick={() => setShowLaunchpad(false)}
+    //             >
+    //                 <MdKeyboardArrowLeft />
+    //             </div>
+    //             <h3>Order Types</h3>
+    //             <button
+    //                 className={styles.trade_type_toggle}
+    //                 onClick={() => setShowLaunchpad(false)}
+    //             >
+    //                 <PiSquaresFour />
+    //             </button>
+    //         </header>
+    //         <ul className={styles.launchpad_clickables}>
+    //             {marketOrderTypes.map((mo: OrderTypeOption) => (
+    //                 <li
+    //                     key={JSON.stringify(mo)}
+    //                     onClick={() => {
+    //                         handleMarketOrderTypeChange(mo.value);
+    //                         setShowLaunchpad(false);
+    //                     }}
+    //                 >
+    //                     <div className={styles.name_and_icon}>
+    //                         {mo.icon}
+    //                         <h4>{mo.label}</h4>
+    //                     </div>
+    //                     <div>
+    //                         <p>{mo.blurb}</p>
+    //                     </div>
+    //                 </li>
+    //             ))}
+    //         </ul>
+    //     </div>
+    // );
 
     return (
         <div className={styles.mainContainer}>
@@ -1667,6 +1718,7 @@ function OrderInput({
                             submitFn={submitMarketBuy}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'market_sell' && (
@@ -1686,6 +1738,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_buy' && (
@@ -1706,6 +1759,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_sell' && (
@@ -1726,6 +1780,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                 </Modal>

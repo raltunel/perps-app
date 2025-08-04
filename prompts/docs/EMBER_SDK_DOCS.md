@@ -548,8 +548,7 @@ async function manageMargin(
         }
 
         // Withdraw
-        const tx = await ember.buildWithdrawMarginTx(connection, {
-            user: user.publicKey,
+        const tx = await ember.buildWithdrawMarginTx(connection, user, {
             mint: ember.USD_MINT,
             amount: scaledAmount,
             marketId: 64n,

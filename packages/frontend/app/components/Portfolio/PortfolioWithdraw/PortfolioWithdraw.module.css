@@ -84,6 +84,12 @@
     font-size: var(--font-size-xs, 10px);
 }
 
+.minWarning {
+    color: #ff4d4f;
+    font-size: var(--font-size-xs, 10px);
+    margin-left: 4px;
+}
+
 .contentContainer {
     width: 100%;
     display: flex;
