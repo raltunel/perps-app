@@ -1,0 +1,17 @@
+.container {
+    --container-width: 439px;
+    --input-height: 33px;
+    --sliderknob-width: 16px;
+    --button-height: 47px;
+    width: var(--container-width);
+    padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+}
+.content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-m);
+    /* background: var(--bg-dark3)  */
+}
