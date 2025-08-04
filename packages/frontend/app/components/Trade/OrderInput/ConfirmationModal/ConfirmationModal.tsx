@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import type { modalContentT } from '../OrderInput';
@@ -18,6 +19,7 @@ interface propsIF {
     toggleEnabled: () => void;
     isProcessing?: boolean;
     setIsProcessingOrder?: (value: boolean) => void;
+    liquidationPrice?: number | null;
 }
 type InfoItem = {
     label: string;
@@ -37,9 +39,12 @@ export default function ConfirmationModal(props: propsIF) {
         limitPrice,
         isProcessing,
         setIsProcessingOrder,
+        liquidationPrice,
     } = props;
 
     const { getBsColor } = useAppSettings();
+
+    const { formatNum } = useNumFormatter();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
@@ -49,6 +54,21 @@ export default function ConfirmationModal(props: propsIF) {
             setIsProcessingOrder?.(false);
         }
     }, []);
+
+    const liquidationPriceDisplay = useMemo(() => {
+        if (liquidationPrice === null || liquidationPrice === undefined) {
+            return '-';
+        }
+
+        const humanReadablePrice = liquidationPrice / 1e6; // Convert from 10^8 to human readable
+
+        // Display '-' if price is below 0 or above 100 million
+        if (humanReadablePrice <= 0 || humanReadablePrice > 100_000_000) {
+            return '-';
+        }
+
+        return formatNum(humanReadablePrice);
+    }, [liquidationPrice, formatNum]);
 
     const dataInfo: InfoItem[] = [
         {
@@ -76,7 +96,7 @@ export default function ConfirmationModal(props: propsIF) {
         },
         {
             label: 'Est. Liquidation Price',
-            value: 'N/A',
+            value: liquidationPriceDisplay,
             tooltip:
                 'Estimated price at which your position will be liquidated',
             className: styles.white,

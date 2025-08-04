@@ -1697,6 +1697,7 @@ function OrderInput({
                             submitFn={submitMarketBuy}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'market_sell' && (
@@ -1716,6 +1717,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_buy' && (
@@ -1736,6 +1738,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                     {confirmOrderModal.content === 'limit_sell' && (
@@ -1756,6 +1759,7 @@ function OrderInput({
                             isEnabled={!activeOptions.skipOpenOrderConfirm}
                             isProcessing={isProcessingOrder}
                             setIsProcessingOrder={setIsProcessingOrder}
+                            liquidationPrice={liquidationPrice}
                         />
                     )}
                 </Modal>
