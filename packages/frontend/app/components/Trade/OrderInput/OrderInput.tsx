@@ -322,7 +322,9 @@ function OrderInput({
     useEffect(() => {
         if (!marginBucket) return;
         const leverageFloor = calcLeverageFloor(marginBucket);
-        setLeverageFloor(10_000 / Number(leverageFloor));
+        const leverageFloorNum = Number(leverageFloor);
+        if (!leverageFloorNum) return;
+        setLeverageFloor(10_000 / leverageFloorNum);
     }, [marginBucket]);
 
     useEffect(() => {
