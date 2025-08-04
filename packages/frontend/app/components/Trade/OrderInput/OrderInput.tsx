@@ -442,12 +442,7 @@ function OrderInput({
         ) {
             const maxNotionalSize =
                 ((usdAvailableToTrade * 0.999) / markPx) * leverage;
-            console.log({
-                maxNotionalSize,
-                usdAvailableToTrade,
-                markPx,
-                leverage,
-            });
+
             setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
