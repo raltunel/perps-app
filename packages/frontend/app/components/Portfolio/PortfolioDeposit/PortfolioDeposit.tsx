@@ -56,7 +56,7 @@ function PortfolioDeposit(props: propsIF) {
     const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
     const isSizeInvalid: boolean =
-        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 10;
+        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 5;
 
     // debounced invalid state
     const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
@@ -89,9 +89,9 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        // Check minimum deposit of $10
-        if (depositInputNum < 10) {
-            setError('Minimum deposit amount is $10.00');
+        // Check minimum deposit of $5
+        if (depositInputNum < 5) {
+            setError('Minimum deposit amount is $5.00');
             setTransactionStatus('idle');
             return;
         }
@@ -228,11 +228,11 @@ function PortfolioDeposit(props: propsIF) {
                 <h6>
                     Amount{' '}
                     {showInvalidSizeWarning && (
-                        <span className={styles.minWarning}>(Min: $10)</span>
+                        <span className={styles.minWarning}>(Min: $5)</span>
                     )}
                 </h6>
                 <NumFormattedInput
-                    placeholder='Enter amount (min $10)'
+                    placeholder='Enter amount (min $5)'
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label='deposit input'
