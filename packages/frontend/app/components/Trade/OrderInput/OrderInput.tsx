@@ -799,12 +799,33 @@ function OrderInput({
         }
     };
 
+    const setNotationalSymbolQtyFromPositionSize = (value: number) => {
+        if (isReduceOnlyEnabled && !!marginBucket) {
+            // divide bigint by 1e8 to unscale
+            const unscaledPositionSize =
+                Math.abs(Number(marginBucket.netPosition)) / 1e8;
+            const notionalSymbolQtyNum =
+                (value / 100) * Number(unscaledPositionSize);
+
+            // console.log({
+            //     netPosition: marginBucket.netPosition,
+            //     unscaledPositionSize,
+            //     notionalSymbolQtyNum,
+            // });
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+        }
+    };
+
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
 
         setPositionSliderPercentageValue(value);
-        setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        if (isReduceOnlyEnabled) {
+            setNotationalSymbolQtyFromPositionSize(value);
+        } else {
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        }
     };
 
     // CHASE OPTION---------------------------------------------------
@@ -1400,13 +1421,13 @@ function OrderInput({
         isReduceOnlyExceedingPositionSize: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
+        if (isReduceInWrongDirection) return 'Switch direction to reduce';
         if (collateralInsufficient) return 'Insufficient collateral';
+        if (isReduceOnlyExceedingPositionSize)
+            return 'Reduce only exceeds position size';
         if (sizeLessThanMinimum) return 'Order size below minimum';
         if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
-        if (isReduceInWrongDirection) return 'Switch direction to reduce';
-        if (isReduceOnlyExceedingPositionSize)
-            return 'Reduce only exceeds position size';
         return null;
     };
 
