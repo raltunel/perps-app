@@ -2,8 +2,11 @@ import * as d3 from 'd3';
 import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
+import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import type { LimitOrderParams } from '~/services/limitOrderService';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import type { IPaneApi } from '~/tv/charting_library';
+import { blockExplorer } from '~/utils/Constants';
 import {
     findLimitLabelAtPosition,
     getXandYLocationForChartDrag,
@@ -54,7 +57,8 @@ const LabelComponent = ({
     const notifications = useNotificationStore();
 
     const { executeCancelOrder } = useCancelOrderService();
-
+    const { executeLimitOrder } = useLimitOrderService();
+    const { add } = useNotificationStore();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
@@ -404,6 +408,10 @@ const LabelComponent = ({
         };
     }, [chart, JSON.stringify(drawnLabelsRef.current)]);
 
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
+    }
+
     useEffect(() => {
         if (!overlayCanvasRef.current) return;
         let tempSelectedLine: LabelLocationData | undefined = undefined;
@@ -467,12 +475,105 @@ const LabelComponent = ({
             setSelectedLine(tempSelectedLine);
         };
 
-        const handleDragEnd = () => {
-            console.log('dragend', {
-                orderId: tempSelectedLine?.parentLine.oid,
-                originalPrice: originalPrice,
-                draggedPrice: tempSelectedLine?.parentLine.yPrice,
-            });
+        const handleDragEnd = async () => {
+            if (
+                !tempSelectedLine ||
+                originalPrice === undefined ||
+                tempSelectedLine.parentLine.oid === undefined
+            ) {
+                return;
+            }
+
+            const orderId = tempSelectedLine.parentLine.oid;
+            const newPrice = tempSelectedLine.parentLine.yPrice;
+            const quantity = tempSelectedLine.parentLine.quantityTextValue;
+            const side =
+                tempSelectedLine.parentLine.color === '#EF5350'
+                    ? 'sell'
+                    : 'buy';
+
+            try {
+                // First cancel the existing order
+                const cancelResult = await executeCancelOrder({
+                    orderId: orderId, // Keep as number if that's what the API expects
+                    // Add any other required parameters for cancel order
+                });
+
+                if (cancelResult.success) {
+                    // If cancel was successful, create a new order with the updated price
+                    // Note: You'll need to provide the correct order parameters based on your application's needs
+                    const newOrderParams: LimitOrderParams = {
+                        // Example parameters - replace with actual parameters from your order
+                        price: roundDownToTenth(newPrice),
+                        // Add other required parameters for the limit order
+                        // For example:
+                        // symbol: 'BTC/USD',
+                        side,
+                        quantity: quantity,
+                        // ... other required parameters
+                    } as LimitOrderParams; // Cast to the correct type
+
+                    const limitOrderResult =
+                        await executeLimitOrder(newOrderParams);
+
+                    if (!limitOrderResult.success) {
+                        console.error(
+                            'Failed to create new order:',
+                            limitOrderResult.error,
+                        );
+                        // Show error notification to user
+                        add({
+                            title: 'Failed to update order',
+                            message:
+                                limitOrderResult.error ||
+                                'Unknown error occurred',
+                            icon: 'error',
+                            removeAfter: 15000,
+                            txLink: limitOrderResult.signature
+                                ? `${blockExplorer}/tx/${limitOrderResult.signature}`
+                                : undefined,
+                        });
+                    } else {
+                        // Show success notification
+                        add({
+                            title: 'Order updated',
+                            message:
+                                'The order has been successfully updated with the new price.',
+                            icon: 'check',
+                            removeAfter: 15000,
+                            txLink: limitOrderResult.signature
+                                ? `${blockExplorer}/tx/${limitOrderResult.signature}`
+                                : undefined,
+                        });
+                    }
+                } else {
+                    console.error(
+                        'Failed to cancel order:',
+                        cancelResult.error,
+                    );
+                    // Show error notification to user
+                    add({
+                        title: 'Failed to cancel order',
+                        message: cancelResult.error || 'Unknown error occurred',
+                        icon: 'error',
+                        removeAfter: 15000,
+                        txLink: cancelResult.signature
+                            ? `${blockExplorer}/tx/${cancelResult.signature}`
+                            : undefined,
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating order:', error);
+                add({
+                    title: 'Error updating order',
+                    message:
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error occurred',
+                    icon: 'error',
+                });
+            }
+
             tempSelectedLine = undefined;
             setSelectedLine(undefined);
             setIsDrag(false);
