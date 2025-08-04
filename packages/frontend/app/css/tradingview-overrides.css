@@ -13,3 +13,7 @@
 [data-outside-boundary-for='symbol-search-items-dialog'] {
     display: none !important;
 }
+
+[data-name='legend-source-title'] {
+    pointer-events: none !important;
+}
