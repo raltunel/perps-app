@@ -1455,10 +1455,11 @@ function OrderInput({
         return (
             isReduceOnlyEnabled &&
             !!marginBucket &&
-            ((marginBucket.netPosition > 0n &&
-                tradeDirection === 'sell' &&
-                BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
-                    marginBucket.netPosition) ||
+            (!marginBucket.netPosition ||
+                (marginBucket.netPosition > 0n &&
+                    tradeDirection === 'sell' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        marginBucket.netPosition) ||
                 (marginBucket.netPosition < 0n &&
                     tradeDirection === 'buy' &&
                     BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
