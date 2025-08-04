@@ -224,13 +224,9 @@ function PortfolioDeposit(props: propsIF) {
                 className={styles.tokenDropdown}
             />
 
-            <div className={styles.inputContainer}>
-                <h6>
-                    Amount{' '}
-                    {showInvalidSizeWarning && (
-                        <span className={styles.minWarning}>(Min: $5)</span>
-                    )}
-                </h6>
+            <div className={styles.input_container}>
+                <h6>Amount</h6>
+                {showInvalidSizeWarning && <span>Min: $5</span>}
                 <NumFormattedInput
                     placeholder='Enter amount (min $5)'
                     value={rawInputString}
@@ -250,11 +246,7 @@ function PortfolioDeposit(props: propsIF) {
                         `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
                     )}
                 />
-                <button
-                    onClick={handleMaxClick}
-                    disabled={isProcessing}
-                    className={styles.maxButton}
-                >
+                <button onClick={handleMaxClick} disabled={isProcessing}>
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
