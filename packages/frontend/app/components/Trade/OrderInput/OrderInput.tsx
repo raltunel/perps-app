@@ -465,7 +465,6 @@ function OrderInput({
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const sizeMoreThanMaximum =
-        !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
@@ -785,20 +784,35 @@ function OrderInput({
     };
 
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
+        const userBuyingPowerExceedsMaxOrderSize =
+            usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
+
+        let notionalSymbolQtyNum;
         if (marketOrderType === 'market') {
-            const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade * 0.999) /
-                    (markPx || 1)) *
-                leverage;
-            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize * 0.999) /
+                    (markPx || 1);
+            } else {
+                notionalSymbolQtyNum =
+                    (((value / 100) * usdAvailableToTrade * 0.999) /
+                        (markPx || 1)) *
+                    leverage;
+            }
         } else if (marketOrderType === 'limit') {
             if (!price || !usdAvailableToTrade) return;
-            const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) /
-                    (parseFormattedNum(price) || 1)) *
-                leverage;
-            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize * 0.999) /
+                    (parseFormattedNum(price) || 1);
+            } else {
+                notionalSymbolQtyNum =
+                    (((value / 100) * usdAvailableToTrade * 0.999) /
+                        (parseFormattedNum(price) || 1)) *
+                    leverage;
+            }
         }
+        if (notionalSymbolQtyNum) setNotionalSymbolQtyNum(notionalSymbolQtyNum);
     };
 
     const setNotationalSymbolQtyFromPositionSize = (value: number) => {
