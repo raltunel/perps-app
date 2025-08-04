@@ -10,6 +10,7 @@ import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
@@ -28,6 +29,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         const { position } = props;
         const { coinPriceMap } = useTradeDataStore();
+        const { buys, sells } = useOrderBookStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
         const notifications = useNotificationStore();
@@ -150,11 +152,20 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     icon: 'spinner',
                 });
 
+                // Get order book prices for the closing order
+                const closingSide = position.szi > 0 ? 'sell' : 'buy';
+                const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+                const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
-                    side: position.szi > 0 ? 'sell' : 'buy', // Opposite side to close
+                    side: closingSide, // Opposite side to close
                     leverage: position.leverage?.value,
+                    bestBidPrice:
+                        closingSide === 'sell' ? bestBidPrice : undefined,
+                    bestAskPrice:
+                        closingSide === 'buy' ? bestAskPrice : undefined,
                 });
 
                 if (result.success) {
@@ -186,7 +197,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             } finally {
                 setIsClosing(false);
             }
-        }, [position, executeMarketOrder, notifications, isClosing]);
+        }, [
+            position,
+            executeMarketOrder,
+            notifications,
+            isClosing,
+            buys,
+            sells,
+        ]);
 
         // Memoize funding values and tooltip
         const fundingToShow = useMemo(
