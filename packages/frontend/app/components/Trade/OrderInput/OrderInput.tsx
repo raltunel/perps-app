@@ -1,4 +1,5 @@
 import {
+    calcLeverageFloor,
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
     type MarginBucketAvail,
@@ -307,8 +308,7 @@ function OrderInput({
 
     const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
-    const [maximumLeverageBelowMinimum, setMaximumLeverageBelowMinimum] =
-        useState<number>();
+    const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
         useState(0);
@@ -319,15 +319,11 @@ function OrderInput({
         null,
     );
 
-    // reset maximumLeverageBelowMinimum when marginBucket changes
-    const rawAvailableToTrade =
-        tradeDirection === 'buy'
-            ? marginBucket?.availToBuy
-            : marginBucket?.availToSell;
-
     useEffect(() => {
-        setMaximumLeverageBelowMinimum(undefined);
-    }, [rawAvailableToTrade]);
+        if (!marginBucket) return;
+        const leverageFloor = calcLeverageFloor(marginBucket);
+        setLeverageFloor(10_000 / Number(leverageFloor));
+    }, [marginBucket]);
 
     useEffect(() => {
         if (!marginBucket) {
@@ -352,16 +348,6 @@ function OrderInput({
             Number(usdAvailableToTrade) / 1_000_000;
 
         setUsdAvailableToTrade(normalizedAvailableToTrade);
-
-        // set maximumLeverageBelowMinimum to leverage if leverage is larger than maximumLeverageBelowMinimum
-        if (normalizedAvailableToTrade === 0) {
-            if (
-                !maximumLeverageBelowMinimum ||
-                leverage > maximumLeverageBelowMinimum
-            ) {
-                setMaximumLeverageBelowMinimum(leverage);
-            }
-        }
 
         const currentPositionNotionalSize = marginBucket?.netPosition || 0;
         const normalizedCurrentPosition =
@@ -471,8 +457,7 @@ function OrderInput({
         ) {
             const maxNotionalSize =
                 ((usdAvailableToTrade * 0.999) / markPx) * leverage;
-
-            setNotionalSymbolQtyNum(maxNotionalSize);
+            if (maxNotionalSize > 0) setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
         positionSliderPercentageValue,
@@ -978,9 +963,9 @@ function OrderInput({
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
-            minimumValue: maximumLeverageBelowMinimum,
+            minimumValue: leverageFloor,
         }),
-        [leverage, handleLeverageChange, maximumLeverageBelowMinimum],
+        [leverage, handleLeverageChange, leverageFloor],
     );
 
     // const chasePriceProps = useMemo(
