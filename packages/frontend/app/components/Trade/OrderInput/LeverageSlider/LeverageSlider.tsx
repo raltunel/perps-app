@@ -5,6 +5,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import useDebounce from '~/hooks/useDebounce';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
@@ -75,7 +76,7 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
-    generateRandomMaximumInput,
+    // generateRandomMaximumInput,
     // NEW: Modal mode props with defaults
     modalMode = false,
     maxLeverage,
@@ -112,6 +113,8 @@ export default function LeverageSlider({
     const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
         null,
     );
+    const [unconstrainedSliderValue, setUnconstrainedSliderValue] =
+        useState<number>(0);
     const [hasInitializedLeverage, setHasInitializedLeverage] =
         useState<boolean>(false);
     const [announceText, setAnnounceText] = useState<string>('');
@@ -124,15 +127,15 @@ export default function LeverageSlider({
     }, [currentValue]);
 
     // Helper function to get the actual rounded value (what user sees)
-    const getRoundedDisplayValue = (val: number): number => {
-        if (val < 3) {
-            // Round DOWN to nearest tenth
-            return Math.floor(val * 10) / 10;
-        } else {
-            // Round DOWN to nearest whole number
-            return Math.floor(val);
-        }
-    };
+    // const getRoundedDisplayValue = (val: number): number => {
+    //     if (val < 3) {
+    //         // Round DOWN to nearest tenth
+    //         return Math.floor(val * 10) / 10;
+    //     } else {
+    //         // Round DOWN to nearest whole number
+    //         return Math.floor(val);
+    //     }
+    // };
 
     // Helper function to format values for input display (shows decimals below 3)
     const formatValue = (val: number): string => {
@@ -157,10 +160,21 @@ export default function LeverageSlider({
         return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
 
-    const [showMinimumWarning, setShowMinimumWarning] = useState(false);
+    const [sliderBelowMinimumLeverage, setSliderBelowMinimumLeverage] =
+        useState(false);
     const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
         null,
     );
+
+    const sliderBelowMinimumLeverageDebounced = useDebounce(
+        sliderBelowMinimumLeverage,
+        500,
+    );
+
+    const showMinimumWarning = sliderBelowMinimumLeverage
+        ? sliderBelowMinimumLeverageDebounced
+        : false;
+
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
 
     // Check conditions for showing minimum warning
@@ -169,17 +183,23 @@ export default function LeverageSlider({
 
         // Show if user is dragging AND current value is below minimum
         const isDraggingBelowMinimum =
-            isDragging && currentValue <= minimumValue + 0.01;
+            isDragging && unconstrainedSliderValue <= minimumValue * 0.95;
 
         // Show if user is hovering below minimum (but not dragging)
         const isHoveringBelowMinimum =
             !isDragging &&
             isHovering &&
             hoverValue !== null &&
-            hoverValue <= minimumValue + 0.01;
+            hoverValue <= minimumValue * 0.95;
 
         return isDraggingBelowMinimum || isHoveringBelowMinimum;
-    }, [minimumValue, currentValue, isDragging, isHovering, hoverValue]);
+    }, [
+        minimumValue,
+        unconstrainedSliderValue,
+        isDragging,
+        isHovering,
+        hoverValue,
+    ]);
 
     // Effect to handle warning display logic
     useEffect(() => {
@@ -189,18 +209,18 @@ export default function LeverageSlider({
 
         if (shouldShowInteractiveWarning) {
             // Show immediately for interactive conditions and stop any auto-hide
-            setShowMinimumWarning(true);
+            setSliderBelowMinimumLeverage(true);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
             }
         } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
             // Show warning when reaching minimum for the first time, then auto-hide after 3 seconds
-            setShowMinimumWarning(true);
+            setSliderBelowMinimumLeverage(true);
             setHasShownMinimumWarning(true);
 
             const timeout = setTimeout(() => {
-                setShowMinimumWarning(false);
+                setSliderBelowMinimumLeverage(false);
                 setWarningTimeout(null);
             }, 3000);
 
@@ -208,14 +228,14 @@ export default function LeverageSlider({
         } else if (!isCurrentAtMinimum) {
             // Reset the "has shown" flag and hide warning when user moves above minimum
             setHasShownMinimumWarning(false);
-            setShowMinimumWarning(false);
+            setSliderBelowMinimumLeverage(false);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
             }
         } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
             // Hide warning when interactive conditions stop and we've already shown the minimum warning
-            setShowMinimumWarning(false);
+            setSliderBelowMinimumLeverage(false);
             if (warningTimeout) {
                 clearTimeout(warningTimeout);
                 setWarningTimeout(null);
@@ -517,9 +537,9 @@ export default function LeverageSlider({
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = constrainValue(newValue);
+        // const boundedValue = constrainValue(newValue);
 
-        setHoverValue(boundedValue);
+        setHoverValue(newValue);
         setIsHovering(true);
         // Clear any tick-specific hover when hovering over track
         setHoveredTickIndex(null);
@@ -653,6 +673,7 @@ export default function LeverageSlider({
             // Convert percentage to value (no rounding for smooth movement)
             const newValue = percentageToValue(percentage);
 
+            setUnconstrainedSliderValue(newValue);
             // Ensure value is within min/max bounds
             const boundedValue = constrainValue(newValue);
 
