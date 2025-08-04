@@ -61,6 +61,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     return (
         <>
             <GenericTable
+                noDataMessage='No open orders'
                 storageKey={`OpenOrdersTable_${currentUserRef.current}`}
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

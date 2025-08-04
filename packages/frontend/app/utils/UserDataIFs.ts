@@ -18,6 +18,7 @@ export interface UserBalanceIF {
     available: number;
     metaIndex: number;
     buyingPower: number;
+    contractAddress?: string;
 }
 
 export interface AccountOverviewIF {
@@ -53,6 +54,8 @@ export interface UserFillIF {
     tid: number;
     value: number;
     closedPnl: number;
+    startPositionRaw?: string; // Raw string value from server for deduplication
+    startPosition?: number; // Parsed float value for display
 }
 
 export interface DepositAndWithDrawalIF {

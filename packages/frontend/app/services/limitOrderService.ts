@@ -3,30 +3,27 @@ import {
     OrderSide,
     TimeInForce,
     buildOrderEntryTransaction,
-    buildOrderEntryWithFillTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
 
-export interface MarketOrderResult {
+export interface LimitOrderResult {
     success: boolean;
     error?: string;
     signature?: string;
     confirmed?: boolean;
 }
 
-export interface MarketOrderParams {
+export interface LimitOrderParams {
     quantity: number; // User input quantity (will be multiplied by 100_000_000)
+    price: number; // User input price (will be multiplied by 1_000_000)
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
-    bestBidPrice?: number; // Best bid price from order book (for sell orders)
-    bestAskPrice?: number; // Best ask price from order book (for buy orders)
 }
 
 /**
- * Service for handling Solana market order transactions
+ * Service for handling Solana limit order transactions
  */
-export class MarketOrderService {
+export class LimitOrderService {
     private connection: Connection;
 
     constructor(connection: Connection) {
@@ -34,22 +31,23 @@ export class MarketOrderService {
     }
 
     /**
-     * Build a market order transaction
+     * Build a limit order transaction
      * @param params - Order parameters
      * @param userPublicKey - User's public key
      * @param rentPayer - Optional rent payer public key
      * @returns Promise<Transaction>
      */
-    private async buildMarketOrderTransaction(
-        params: MarketOrderParams,
+    private async buildLimitOrderTransaction(
+        params: LimitOrderParams,
         userPublicKey: PublicKey,
         sessionPublicKey?: PublicKey,
         rentPayer?: PublicKey,
     ) {
         try {
-            console.log('🔨 Building market order transaction:', {
+            console.log('🔨 Building limit order transaction:', {
                 side: params.side,
                 quantity: params.quantity,
+                price: params.price,
                 userPublicKey: userPublicKey.toString(),
             });
 
@@ -68,6 +66,11 @@ export class MarketOrderService {
             console.log('  - Display quantity:', params.quantity);
             console.log('  - On-chain quantity:', onChainQuantity.toString());
 
+            // Convert displayed price to on-chain price (6 decimal places)
+            const onChainPrice = BigInt(Math.floor(params.price * 1_000_000));
+            console.log('  - Display price:', params.price);
+            console.log('  - On-chain price:', onChainPrice.toString());
+
             // Calculate userSetImBps from leverage if provided
             let userSetImBps: number | undefined;
             if (params.leverage && params.leverage > 0) {
@@ -76,61 +79,19 @@ export class MarketOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
-            // Calculate fill prices based on order book
-            let fillPrice: bigint;
-            if (params.side === 'buy') {
-                // For buy orders: use best ask + offset
-                if (!params.bestAskPrice) {
-                    throw new Error(
-                        'Cannot execute market buy order: No ask prices available in order book',
-                    );
-                }
-                const fillPriceUsd =
-                    params.bestAskPrice + MARKET_ORDER_PRICE_OFFSET_USD;
-                fillPrice = BigInt(Math.floor(fillPriceUsd * 1_000_000)); // Convert to 6 decimal places
-                console.log('  - Buy order fill price calculation:');
-                console.log('    - Best ask price:', params.bestAskPrice);
-                console.log('    - Offset:', MARKET_ORDER_PRICE_OFFSET_USD);
-                console.log('    - Fill price USD:', fillPriceUsd);
-                console.log(
-                    '    - Fill price (on-chain):',
-                    fillPrice.toString(),
-                );
-            } else {
-                // For sell orders: use best bid - offset
-                if (!params.bestBidPrice) {
-                    throw new Error(
-                        'Cannot execute market sell order: No bid prices available in order book',
-                    );
-                }
-                const fillPriceUsd =
-                    params.bestBidPrice - MARKET_ORDER_PRICE_OFFSET_USD;
-                fillPrice = BigInt(Math.floor(fillPriceUsd * 1_000_000)); // Convert to 6 decimal places
-                console.log('  - Sell order fill price calculation:');
-                console.log('    - Best bid price:', params.bestBidPrice);
-                console.log('    - Offset:', MARKET_ORDER_PRICE_OFFSET_USD);
-                console.log('    - Fill price USD:', fillPriceUsd);
-                console.log(
-                    '    - Fill price (on-chain):',
-                    fillPrice.toString(),
-                );
-            }
-
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
-                console.log('  - Building market BUY order...');
+                console.log('  - Building limit BUY order...');
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
                     side: OrderSide.Bid,
                     qty: onChainQuantity,
-                    orderPrice: BigInt('0'), // market order convention is to use 0
-                    fillPrice: fillPrice,
-                    tif: { type: TimeInForce.IOC },
+                    price: onChainPrice,
+                    tif: { type: TimeInForce.GTC }, // Good Till Cancelled for limit orders
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
-                    keeper: sessionPublicKey,
                 };
 
                 // Only add userSetImBps if it's defined
@@ -138,28 +99,25 @@ export class MarketOrderService {
                     orderParams.userSetImBps = userSetImBps;
                 }
 
-                const transaction = buildOrderEntryWithFillTransaction(
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',
                 );
-                console.log('✅ Market buy order built successfully');
-                console.log('  - Transaction details:', transaction);
+                console.log('✅ Limit buy order built successfully');
                 return transaction;
             } else {
-                console.log('  - Building market SELL order...');
+                console.log('  - Building limit SELL order...');
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
                     side: OrderSide.Ask,
                     qty: onChainQuantity,
-                    orderPrice: BigInt('0'), // market order convention is to use 0
-                    fillPrice: fillPrice,
-                    tif: { type: TimeInForce.IOC },
+                    price: onChainPrice,
+                    tif: { type: TimeInForce.GTC }, // Good Till Cancelled for limit orders
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
-                    keeper: sessionPublicKey,
                 };
 
                 // Only add userSetImBps if it's defined
@@ -167,16 +125,18 @@ export class MarketOrderService {
                     orderParams.userSetImBps = userSetImBps;
                 }
 
-                const transaction = buildOrderEntryWithFillTransaction(
+                console.log('  - Order parameters:', orderParams);
+
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',
                 );
-                console.log('✅ Market sell order built successfully');
+                console.log('✅ Limit sell order built successfully');
                 return transaction;
             }
         } catch (error) {
-            console.error('❌ Error building market order transaction:', error);
+            console.error('❌ Error building limit order transaction:', error);
             console.error('Build transaction error details:', {
                 message:
                     error instanceof Error ? error.message : 'Unknown error',
@@ -184,38 +144,39 @@ export class MarketOrderService {
                 params,
                 userPublicKey: userPublicKey.toString(),
             });
-            throw new Error(`Failed to build market order: ${error}`);
+            throw new Error(`Failed to build limit order: ${error}`);
         }
     }
 
     /**
-     * Execute a market order by building and sending the transaction
+     * Execute a limit order by building and sending the transaction
      * @param params - Order parameters
      * @param sessionPublicKey - Session public key (for transaction building)
      * @param userWalletKey - User's actual wallet public key (for order owner)
      * @param sendTransaction - Function to send the transaction (from Fogo session)
      * @param rentPayer - Optional rent payer public key
-     * @returns Promise<MarketOrderResult>
+     * @returns Promise<LimitOrderResult>
      */
-    async executeMarketOrder(
-        params: MarketOrderParams,
+    async executeLimitOrder(
+        params: LimitOrderParams,
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         sendTransaction: (instructions: any[]) => Promise<any>,
         rentPayer?: PublicKey,
-    ): Promise<MarketOrderResult> {
+    ): Promise<LimitOrderResult> {
         try {
-            console.log('📈 Executing market order:', {
+            console.log('📈 Executing limit order:', {
                 side: params.side,
                 quantity: params.quantity,
+                price: params.price,
                 sessionKey: sessionPublicKey.toString(),
                 walletKey: userWalletKey.toString(),
             });
 
             // Build the transaction
             // Use wallet key as the order owner
-            const transaction = await this.buildMarketOrderTransaction(
+            const transaction = await this.buildLimitOrderTransaction(
                 params,
                 userWalletKey,
                 sessionPublicKey,
@@ -225,7 +186,7 @@ export class MarketOrderService {
             // Extract instructions from the transaction
             const instructions = transaction.instructions;
 
-            console.log('📤 Sending market order transaction:');
+            console.log('📤 Sending limit order transaction:');
             console.log('  - Instructions to send:', instructions.length);
             console.log(
                 '  - Instruction details:',
@@ -281,7 +242,7 @@ export class MarketOrderService {
                 );
 
                 if (isConfirmed) {
-                    console.log('✅ Market order confirmed on-chain');
+                    console.log('✅ Limit order confirmed on-chain');
                     return {
                         success: true,
                         signature,
@@ -303,7 +264,7 @@ export class MarketOrderService {
                 };
             }
         } catch (error) {
-            console.error('❌ Error executing market order:', error);
+            console.error('❌ Error executing limit order:', error);
             console.error('Execute order error details:', {
                 message:
                     error instanceof Error ? error.message : 'Unknown error',
@@ -333,7 +294,7 @@ export class MarketOrderService {
      */
     private async trackTransactionConfirmation(
         signature: string,
-        params: MarketOrderParams,
+        params: LimitOrderParams,
     ): Promise<boolean> {
         return new Promise((resolve) => {
             const maxRetries = 30; // 60 seconds total (2 seconds per check)
@@ -370,7 +331,7 @@ export class MarketOrderService {
                         ) {
                             console.log('✅ Transaction confirmed on-chain!');
                             console.log(
-                                `✅ Market ${params.side} order for ${params.quantity} units confirmed`,
+                                `✅ Limit ${params.side} order for ${params.quantity} units at ${params.price} confirmed`,
                             );
                             resolve(true);
                             return;

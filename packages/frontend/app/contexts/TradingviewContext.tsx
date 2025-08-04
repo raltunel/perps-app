@@ -73,10 +73,9 @@ export interface ChartContainerProps {
     container: string;
 }
 
-export const TradingViewProvider: React.FC<{
-    children: React.ReactNode;
-    setIsChartReadyForFirstOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ children, setIsChartReadyForFirstOpen }) => {
+export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
+    children,
+}) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
@@ -337,8 +336,6 @@ export const TradingViewProvider: React.FC<{
         // });
 
         tvWidget.onChartReady(() => {
-            setIsChartReadyForFirstOpen(true);
-
             /**
              * 0 -> main chart pane
              * 1 -> volume chart pane

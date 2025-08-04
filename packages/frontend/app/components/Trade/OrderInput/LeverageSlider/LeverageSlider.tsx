@@ -27,7 +27,7 @@ const LEVERAGE_CONFIG = {
     DECIMAL_INCREMENT: 0.1,
 
     // Default fallback max leverage when symbolInfo is not available
-    DEFAULT_MAX_LEVERAGE: 1,
+    DEFAULT_MAX_LEVERAGE: 100,
 
     // Number of tick marks to show on slider
     TICK_COUNT_HIGH_LEVERAGE: 7,
@@ -156,11 +156,9 @@ export default function LeverageSlider({
     };
 
     const handleLeverageChange = (newLeverage: number) => {
-        // In modal mode, skip store updates
-        if (!modalMode) {
-            // Update the preferred leverage in store with the exact value (no rounding)
-            setPreferredLeverage(newLeverage);
-        }
+        // Update the preferred leverage in store with the exact value (no rounding)
+        console.log({ newLeverage });
+        setPreferredLeverage(newLeverage);
 
         // Always call the parent onChange with the exact value
         onChange(newLeverage);
@@ -168,9 +166,6 @@ export default function LeverageSlider({
     };
 
     const handleMarketChange = useCallback(() => {
-        // Skip market change logic in modal mode
-        if (modalMode) return;
-
         const effectiveSymbol = symbolInfo?.coin;
         const currentMaxLeverage =
             effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
@@ -226,15 +221,12 @@ export default function LeverageSlider({
         currentMarket,
         minimumInputValue,
         hasInitializedLeverage,
-        modalMode, // Add modalMode to dependencies
     ]);
 
-    // Market change detection and leverage validation (skip in modal mode)
+    // Market change detection and leverage validation
     useEffect(() => {
-        if (!modalMode) {
-            handleMarketChange();
-        }
-    }, [handleMarketChange, modalMode]);
+        handleMarketChange();
+    }, [handleMarketChange]);
 
     // Handle smooth leverage changes during dragging (no rounding)
     const handleSmoothLeverageChange = (newLeverage: number) => {
@@ -249,14 +241,14 @@ export default function LeverageSlider({
 
     // Initialize input value on first render and notify parent if no value was provided
     useEffect(() => {
-        if (inputValue === '' && !modalMode) {
+        if (inputValue === '') {
             setInputValue(formatValue(currentValue));
             // If no value was provided, set it to 1x
             if (value === undefined || value === null) {
                 handleLeverageChange(1);
             }
         }
-    }, [maximumInputValue, modalMode]);
+    }, [maximumInputValue]);
 
     // Generate tick marks using centralized logic
     useEffect(() => {

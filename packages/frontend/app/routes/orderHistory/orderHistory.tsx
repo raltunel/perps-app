@@ -6,6 +6,7 @@ import { useInfoApi } from '~/hooks/useInfoApi';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
+import { useDebugStore } from '~/stores/DebugStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 
 function OrderHistory() {
@@ -17,6 +18,8 @@ function OrderHistory() {
 
     const { orderHistory, fetchedChannels } = useTradeDataStore();
 
+    const { debugWallet } = useDebugStore();
+
     const orderHistoryFetched = useMemo(() => {
         return fetchedChannels.has(WsChannels.USER_HISTORICAL_ORDERS);
     }, [fetchedChannels]);
@@ -27,18 +30,13 @@ function OrderHistory() {
 
     const { fetchOrderHistory } = useInfoApi();
 
-    // TODO: live update is disabled for now, because websocket snapshots were sending limited data
     const isCurrentUser = useMemo(() => {
-        return false;
-        // if (address) {
-        //     return (
-        //         address.toLocaleLowerCase() ===
-        //         userAddress.toLocaleLowerCase()
-        //     );
-        // } else {
-        //     return true;
-        // }
-    }, [address, userAddress]);
+        if (address) {
+            return address.toLowerCase() === debugWallet.address.toLowerCase();
+        } else {
+            return true;
+        }
+    }, [address, debugWallet.address, userAddress]);
 
     useEffect(() => {
         if (!isCurrentUser && address) {
@@ -57,7 +55,15 @@ function OrderHistory() {
         } else {
             return fetchedHistoryData;
         }
-    }, [isCurrentUser, orderHistory, fetchedHistoryData]);
+    }, [
+        isCurrentUser,
+        orderHistory,
+        fetchedHistoryData,
+        orderHistoryFetched,
+        isFetched,
+        address,
+        debugWallet.address,
+    ]);
 
     return (
         <ExternalPage title='Order History'>

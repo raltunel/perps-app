@@ -92,6 +92,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 defaultSortBy={'time'}
                 defaultSortDirection={'desc'}
                 tableModel={TradeHistoryTableModel}
+                noDataMessage='No trade history'
                 csvDataFetcher={fetchUserFills}
                 csvDataFetcherArgs={[userAddress, true]}
             />

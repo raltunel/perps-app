@@ -1,48 +1,46 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useState } from 'react';
 import {
-    MarketOrderService,
-    type MarketOrderParams,
-    type MarketOrderResult,
-} from '~/services/marketOrderService';
+    CancelOrderService,
+    type CancelOrderParams,
+    type CancelOrderResult,
+} from '~/services/cancelOrderService';
 
-export interface UseMarketOrderServiceReturn {
+export interface UseCancelOrderServiceReturn {
     isLoading: boolean;
     error: string | null;
-    signature?: string;
-    executeMarketOrder: (
-        params: MarketOrderParams,
-    ) => Promise<MarketOrderResult>;
+    executeCancelOrder: (
+        params: CancelOrderParams,
+    ) => Promise<CancelOrderResult>;
 }
 
 /**
- * Hook for managing market order functionality with Solana transactions
+ * Hook for managing cancel order functionality with Solana transactions
  */
-export function useMarketOrderService(): UseMarketOrderServiceReturn {
+export function useCancelOrderService(): UseCancelOrderServiceReturn {
     const sessionState = useSession();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [signature, setSignature] = useState<string | undefined>(undefined);
-    const [marketOrderService, setMarketOrderService] =
-        useState<MarketOrderService | null>(null);
+    const [cancelOrderService, setCancelOrderService] =
+        useState<CancelOrderService | null>(null);
 
-    // Initialize market order service when session is established
+    // Initialize cancel order service when session is established
     useEffect(() => {
         if (isEstablished(sessionState)) {
-            const service = new MarketOrderService(sessionState.connection);
-            setMarketOrderService(service);
+            const service = new CancelOrderService(sessionState.connection);
+            setCancelOrderService(service);
         } else {
             console.log(
-                '⚠️ Session not established, market order service not created',
+                '⚠️ Session not established, cancel order service not created',
             );
-            setMarketOrderService(null);
+            setCancelOrderService(null);
         }
     }, [sessionState]);
 
-    // Execute market order transaction
-    const executeMarketOrder = useCallback(
-        async (params: MarketOrderParams): Promise<MarketOrderResult> => {
-            if (!marketOrderService || !isEstablished(sessionState)) {
+    // Execute cancel order transaction
+    const executeCancelOrder = useCallback(
+        async (params: CancelOrderParams): Promise<CancelOrderResult> => {
+            if (!cancelOrderService || !isEstablished(sessionState)) {
                 return {
                     success: false,
                     error: 'Session not established',
@@ -53,7 +51,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
             setError(null);
 
             try {
-                console.log('🚀 Executing market order:', params);
+                console.log('🚀 Executing cancel order:', params);
 
                 // Get user's wallet public key
                 const userWalletKey =
@@ -80,7 +78,7 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                 // Get paymaster from SessionState if available
                 const paymaster = sessionState.payer || undefined;
 
-                const result = await marketOrderService.executeMarketOrder(
+                const result = await cancelOrderService.executeCancelOrder(
                     params,
                     sessionState.sessionPublicKey, // For transaction building/signing
                     userWalletKey, // For order owner
@@ -88,19 +86,14 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                     paymaster, // Pass paymaster as rent payer
                 );
 
-                // Update the signature state if available
-                if (result.signature) {
-                    setSignature(result.signature);
-                }
-
                 if (!result.success) {
-                    setError(result.error || 'Market order failed');
+                    setError(result.error || 'Cancel order failed');
                 }
 
                 return result;
             } catch (err) {
                 const errorMessage =
-                    err instanceof Error ? err.message : 'Market order failed';
+                    err instanceof Error ? err.message : 'Cancel order failed';
                 setError(errorMessage);
                 return {
                     success: false,
@@ -110,13 +103,12 @@ export function useMarketOrderService(): UseMarketOrderServiceReturn {
                 setIsLoading(false);
             }
         },
-        [marketOrderService, sessionState],
+        [cancelOrderService, sessionState],
     );
 
     return {
         isLoading,
         error,
-        executeMarketOrder,
-        signature,
+        executeCancelOrder,
     };
 }

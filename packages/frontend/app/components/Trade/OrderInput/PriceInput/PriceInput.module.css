@@ -33,10 +33,19 @@
     outline: none;
     border: none;
     color: var(--accent1, #7371fc);
+    border-radius: var(--radius-s);
+    padding: var(--padding-xs) var(--padding-s);
+    margin: 0 var(--margin-xs);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
 
     display: flex;
-    justify-content: flex-end;
-    flex-direction: row;
+    justify-content: center;
     align-items: center;
-    gap: var(--gap-s);
+    min-width: 40px;
+}
+
+.midButtonActive {
+    background-color: rgba(115, 113, 252, 0.15);
+    color: var(--accent1, #7371fc);
 }

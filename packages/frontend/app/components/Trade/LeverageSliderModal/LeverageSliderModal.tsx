@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import styles from './LeverageSliderModal.module.css';
-import Modal from '~/components/Modal/Modal';
-import Tooltip from '~/components/Tooltip/Tooltip';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
+import { useState, useEffect } from 'react';
 import { LuCircleHelp } from 'react-icons/lu';
+import Modal from '~/components/Modal/Modal';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import Tooltip from '~/components/Tooltip/Tooltip';
+import { useLeverageStore } from '~/stores/LeverageStore';
+import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
+import styles from './LeverageSliderModal.module.css';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
-    maxLeverage: number;
     onClose: () => void;
+    maxLeverage?: number;
     onConfirm?: (newLeverage: number) => void;
 }
 
@@ -20,6 +21,21 @@ export default function LeverageSliderModal({
     onConfirm,
 }: LeverageSliderModalProps) {
     const [value, setValue] = useState<number>(currentLeverage);
+    const setPreferredLeverage = useLeverageStore(
+        (state) => state.setPreferredLeverage,
+    );
+    const currentMarket = useLeverageStore((state) => state.currentMarket);
+
+    // Update local state if currentLeverage prop changes
+    useEffect(() => {
+        setValue(currentLeverage);
+    }, [currentLeverage]);
+
+    const handleSliderChange = (newValue: number) => {
+        // Update the leverage in the store immediately as the slider changes
+        setPreferredLeverage(newValue);
+        setValue(newValue);
+    };
 
     const handleConfirm = () => {
         if (onConfirm) {
@@ -35,7 +51,7 @@ export default function LeverageSliderModal({
                 <div className={styles.sliderSection}>
                     <LeverageSlider
                         value={value}
-                        onChange={setValue}
+                        onChange={handleSliderChange}
                         modalMode={true}
                         maxLeverage={maxLeverage}
                         hideTitle={true}
