@@ -134,7 +134,21 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='The hourly rate at which longs pay shorts (if negative, shorts pay longs). There are no fees associated with funding, which is a peer-to-peer transfer between users to push prices towards the spot price.'
+                                    tooltipContent={
+                                        <div
+                                            className={
+                                                styles.fundingTooltipContent
+                                            }
+                                        >
+                                            The hourly rate at which longs pay
+                                            shorts (if negative, shorts pay
+                                            longs). There are no fees associated
+                                            with funding, which is a
+                                            peer-to-peer transfer between users
+                                            to push prices towards the spot
+                                            price.
+                                        </div>
+                                    }
                                     label='Funding Rate'
                                     valueClass={'w7'}
                                     value={
