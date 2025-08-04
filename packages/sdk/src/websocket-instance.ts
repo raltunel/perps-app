@@ -28,6 +28,14 @@ export interface WebSocketInstanceConfig {
     autoConnect?: boolean; // defaults to true
 }
 
+export const WsBackdoorChannelsForSleepMode = new Set([
+    'userFills',
+    'userHistoricalOrders',
+    'userTwapSliceFills',
+    'userTwapHistory',
+    'webData2',
+]);
+
 function subscriptionToIdentifier(subscription: Subscription): string {
     switch (subscription.type) {
         case 'allMids':
@@ -336,11 +344,20 @@ export class WebSocketInstance {
         }
     };
 
+    private extractChannelFromMessage(message: string) {
+        const match = message.match(/"channel"\s*:\s*"([^"]+)"/);
+        return match && match.length > 1 ? match[1] : '';
+    }
+
     private onMessage = (event: MessageEvent) => {
-        if (this.sleepMode) {
-            return;
-        }
         const message = event.data;
+
+        if (this.sleepMode) {
+            const chnl = this.extractChannelFromMessage(message);
+            if (!WsBackdoorChannelsForSleepMode.has(chnl)) {
+                return;
+            }
+        }
 
         // Log first message to debug connection issues
         if (!this.firstMessageLogged) {
