@@ -217,11 +217,12 @@ export default function WebDataConsumer() {
             );
 
         const userDataInterval = setInterval(() => {
-            setUserOrders(openOrdersRef.current);
+            // NOTE: setUserOrders and setOrderHistory removed from here
+            // They are updated immediately in postUserHistoricalOrders to avoid race conditions
+
             // Positions now come from RPC polling, not webData2
             setUserBalances(userBalancesRef.current);
             setUserFills(userFillsRef.current);
-            setOrderHistory(userOrderHistoryRef.current);
             setTwapHistory(twapHistoryRef.current);
             setTwapSliceFills(twapSliceFillsRef.current);
             setUserFundings(userFundingsRef.current);
