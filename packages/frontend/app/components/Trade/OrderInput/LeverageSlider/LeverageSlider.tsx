@@ -180,15 +180,16 @@ export default function LeverageSlider({
     const shouldShowInteractiveWarning = useMemo(() => {
         if (minimumValue === undefined) return false;
 
+        const minWithBuffer = minimumValue * 10 ** -0.1;
         const isDraggingBelowMinimum =
-            isDragging && unconstrainedSliderValue <= minimumValue * 0.95;
+            isDragging && unconstrainedSliderValue <= minWithBuffer;
 
         const isHoveringBelowMinimum =
             !isDragging &&
             hoveredTickIndex === null &&
             isHovering &&
             hoverValue !== null &&
-            hoverValue <= minimumValue * 0.95;
+            hoverValue <= minWithBuffer;
 
         return isDraggingBelowMinimum || isHoveringBelowMinimum;
     }, [
