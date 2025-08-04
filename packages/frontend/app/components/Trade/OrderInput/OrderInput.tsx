@@ -47,6 +47,7 @@ import styles from './OrderInput.module.css';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
+import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -196,11 +197,11 @@ function OrderInput({
 
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
-    // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
-    // const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
-    // const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
-    // const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
-    //     useState(false);
+    const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
+    const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
+    const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
+    const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
+        useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
@@ -223,7 +224,7 @@ function OrderInput({
 
     const {
         obChosenPrice,
-        obChosenAmount,
+        // obChosenAmount,
         symbol,
         symbolInfo,
         marginMode,
@@ -465,7 +466,8 @@ function OrderInput({
             positionSliderPercentageValue === 100 &&
             markPx &&
             !isEditingSizeInput &&
-            !userExceededAvailableMargin
+            !userExceededAvailableMargin &&
+            !isReduceOnlyEnabled
         ) {
             const maxNotionalSize =
                 ((usdAvailableToTrade * 0.999) / markPx) * leverage;
@@ -478,6 +480,7 @@ function OrderInput({
         markPx,
         isEditingSizeInput,
         userExceededAvailableMargin,
+        isReduceOnlyEnabled,
     ]);
 
     const sizeLessThanMinimum =
@@ -821,13 +824,41 @@ function OrderInput({
         }
     };
 
+    const setNotationalSymbolQtyFromPositionSize = (value: number) => {
+        if (isReduceOnlyEnabled && !!marginBucket) {
+            // divide bigint by 1e8 to unscale
+            const unscaledPositionSize =
+                Math.abs(Number(marginBucket.netPosition)) / 1e8;
+            const notionalSymbolQtyNum =
+                (value / 100) * Number(unscaledPositionSize);
+
+            // console.log({
+            //     netPosition: marginBucket.netPosition,
+            //     unscaledPositionSize,
+            //     notionalSymbolQtyNum,
+            // });
+            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+        }
+    };
+
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
 
         setPositionSliderPercentageValue(value);
-        setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        if (isReduceOnlyEnabled) {
+            setNotationalSymbolQtyFromPositionSize(value);
+        } else {
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        }
     };
+
+    useEffect(() => {
+        if (!isReduceOnlyEnabled && !notionalSymbolQtyNum)
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(
+                positionSliderPercentageValue,
+            );
+    }, [isReduceOnlyEnabled]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -838,26 +869,26 @@ function OrderInput({
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
-    // const handleToggleReduceOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isReduceOnlyEnabled;
-    //     setIsReduceOnlyEnabled(newValue);
-    // };
-    // const handleToggleProfitOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isTakeProfitEnabled;
-    //     setIsTakeProfitEnabled(newValue);
-    // };
-    // const handleToggleRandomize = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isRandomizeEnabled;
-    //     setIsRandomizeEnabled(newValue);
-    // };
-    // const handleToggleChasingInterval = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isChasingIntervalEnabled;
-    //     setIsChasingIntervalEnabled(newValue);
-    // };
+    const handleToggleReduceOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isReduceOnlyEnabled;
+        setIsReduceOnlyEnabled(newValue);
+    };
+    const handleToggleProfitOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isTakeProfitEnabled;
+        setIsTakeProfitEnabled(newValue);
+    };
+    const handleToggleRandomize = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isRandomizeEnabled;
+        setIsRandomizeEnabled(newValue);
+    };
+    const handleToggleChasingInterval = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isChasingIntervalEnabled;
+        setIsChasingIntervalEnabled(newValue);
+    };
 
     // PRICE RANGE AND TOTAL ORDERS -----------------------------------------
     const handleMinPriceRange = (
@@ -916,30 +947,30 @@ function OrderInput({
     );
 
     // -----------------------------PROPS----------------------------------------
-    // const reduceAndProfitToggleProps = useMemo(
-    //     () => ({
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleIsChasingInterval: handleToggleChasingInterval,
-    //     }),
-    //     [
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleChasingInterval,
-    //     ],
-    // );
+    const reduceAndProfitToggleProps = useMemo(
+        () => ({
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleIsChasingInterval: handleToggleChasingInterval,
+        }),
+        [
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleChasingInterval,
+        ],
+    );
 
     const leverageSliderProps = useMemo(
         () => ({
@@ -1419,9 +1450,14 @@ function OrderInput({
         sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
         isMarketOrderLoading: boolean,
+        isReduceInWrongDirection: boolean,
+        isReduceOnlyExceedingPositionSize: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
+        if (isReduceInWrongDirection) return 'Switch direction to reduce';
         if (collateralInsufficient) return 'Insufficient collateral';
+        if (isReduceOnlyExceedingPositionSize)
+            return 'Reduce only exceeds position size';
         if (sizeLessThanMinimum) return 'Order size below minimum';
         if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
@@ -1440,12 +1476,41 @@ function OrderInput({
         }
     }, [submitButtonRecentlyClicked]);
 
+    const isReduceInWrongDirection =
+        isReduceOnlyEnabled &&
+        !!marginBucket &&
+        ((marginBucket.netPosition > 0n && tradeDirection === 'buy') ||
+            (marginBucket.netPosition < 0n && tradeDirection === 'sell'));
+
+    const isReduceOnlyExceedingPositionSize = useMemo(() => {
+        return (
+            isReduceOnlyEnabled &&
+            !!marginBucket &&
+            (!marginBucket.netPosition ||
+                (marginBucket.netPosition > 0n &&
+                    tradeDirection === 'sell' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        marginBucket.netPosition) ||
+                (marginBucket.netPosition < 0n &&
+                    tradeDirection === 'buy' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        -1n * marginBucket.netPosition))
+        );
+    }, [
+        isReduceOnlyEnabled,
+        marginBucket,
+        tradeDirection,
+        notionalSymbolQtyNum,
+    ]);
+
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
-        submitButtonRecentlyClicked;
+        submitButtonRecentlyClicked ||
+        isReduceInWrongDirection ||
+        isReduceOnlyExceedingPositionSize;
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
@@ -1453,6 +1518,8 @@ function OrderInput({
         sizeMoreThanMaximum,
         isPriceInvalid,
         isMarketOrderLoading,
+        isReduceInWrongDirection || false,
+        isReduceOnlyExceedingPositionSize || false,
     );
 
     // const launchPadContent = (
@@ -1634,9 +1701,9 @@ function OrderInput({
                                 priceDistributionButtons}
                             {marketOrderType === 'twap' && <RunningTime />}
 
-                            {/* <ReduceAndProfitToggle
+                            <ReduceAndProfitToggle
                                 {...reduceAndProfitToggleProps}
-                            /> */}
+                            />
                         </motion.div>
                         <motion.div
                             key='buttondetails'
