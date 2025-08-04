@@ -134,7 +134,7 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     }
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='Periodic fee aligning perpetual futures price with spot price'
+                                    tooltipContent='The hourly rate at which longs pay shorts (if negative, shorts pay longs). There are no fees associated with funding, which is a peer-to-peer transfer between users to push prices towards the spot price.'
                                     label='Funding Rate'
                                     valueClass={'w7'}
                                     value={
