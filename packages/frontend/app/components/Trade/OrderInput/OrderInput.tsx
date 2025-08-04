@@ -1396,12 +1396,17 @@ function OrderInput({
         sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
         isMarketOrderLoading: boolean,
+        isReduceInWrongDirection: boolean,
+        isReduceOnlyExceedingPositionSize: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
         if (collateralInsufficient) return 'Insufficient collateral';
         if (sizeLessThanMinimum) return 'Order size below minimum';
         if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
+        if (isReduceInWrongDirection) return 'Switch direction to reduce';
+        if (isReduceOnlyExceedingPositionSize)
+            return 'Reduce only exceeds position size';
         return null;
     };
 
@@ -1417,12 +1422,40 @@ function OrderInput({
         }
     }, [submitButtonRecentlyClicked]);
 
+    const isReduceInWrongDirection =
+        isReduceOnlyEnabled &&
+        !!marginBucket &&
+        ((marginBucket.netPosition > 0n && tradeDirection === 'buy') ||
+            (marginBucket.netPosition < 0n && tradeDirection === 'sell'));
+
+    const isReduceOnlyExceedingPositionSize = useMemo(() => {
+        return (
+            isReduceOnlyEnabled &&
+            !!marginBucket &&
+            ((marginBucket.netPosition > 0n &&
+                tradeDirection === 'sell' &&
+                BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                    marginBucket.netPosition) ||
+                (marginBucket.netPosition < 0n &&
+                    tradeDirection === 'buy' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        -1n * marginBucket.netPosition))
+        );
+    }, [
+        isReduceOnlyEnabled,
+        marginBucket,
+        tradeDirection,
+        notionalSymbolQtyNum,
+    ]);
+
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
-        submitButtonRecentlyClicked;
+        submitButtonRecentlyClicked ||
+        isReduceInWrongDirection ||
+        isReduceOnlyExceedingPositionSize;
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
@@ -1430,6 +1463,8 @@ function OrderInput({
         sizeMoreThanMaximum,
         isPriceInvalid,
         isMarketOrderLoading,
+        isReduceInWrongDirection || false,
+        isReduceOnlyExceedingPositionSize || false,
     );
 
     // const launchPadContent = (
