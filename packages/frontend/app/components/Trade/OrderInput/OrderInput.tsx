@@ -47,6 +47,7 @@ import styles from './OrderInput.module.css';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
+import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -196,11 +197,11 @@ function OrderInput({
 
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
-    // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
-    // const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
-    // const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
-    // const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
-    //     useState(false);
+    const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
+    const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
+    const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
+    const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
+        useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
@@ -223,7 +224,7 @@ function OrderInput({
 
     const {
         obChosenPrice,
-        obChosenAmount,
+        // obChosenAmount,
         symbol,
         symbolInfo,
         marginMode,
@@ -815,26 +816,26 @@ function OrderInput({
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
-    // const handleToggleReduceOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isReduceOnlyEnabled;
-    //     setIsReduceOnlyEnabled(newValue);
-    // };
-    // const handleToggleProfitOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isTakeProfitEnabled;
-    //     setIsTakeProfitEnabled(newValue);
-    // };
-    // const handleToggleRandomize = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isRandomizeEnabled;
-    //     setIsRandomizeEnabled(newValue);
-    // };
-    // const handleToggleChasingInterval = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isChasingIntervalEnabled;
-    //     setIsChasingIntervalEnabled(newValue);
-    // };
+    const handleToggleReduceOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isReduceOnlyEnabled;
+        setIsReduceOnlyEnabled(newValue);
+    };
+    const handleToggleProfitOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isTakeProfitEnabled;
+        setIsTakeProfitEnabled(newValue);
+    };
+    const handleToggleRandomize = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isRandomizeEnabled;
+        setIsRandomizeEnabled(newValue);
+    };
+    const handleToggleChasingInterval = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isChasingIntervalEnabled;
+        setIsChasingIntervalEnabled(newValue);
+    };
 
     // PRICE RANGE AND TOTAL ORDERS -----------------------------------------
     const handleMinPriceRange = (
@@ -893,30 +894,30 @@ function OrderInput({
     );
 
     // -----------------------------PROPS----------------------------------------
-    // const reduceAndProfitToggleProps = useMemo(
-    //     () => ({
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleIsChasingInterval: handleToggleChasingInterval,
-    //     }),
-    //     [
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleChasingInterval,
-    //     ],
-    // );
+    const reduceAndProfitToggleProps = useMemo(
+        () => ({
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleIsChasingInterval: handleToggleChasingInterval,
+        }),
+        [
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleChasingInterval,
+        ],
+    );
 
     const leverageSliderProps = useMemo(
         () => ({
@@ -1610,9 +1611,9 @@ function OrderInput({
                                 priceDistributionButtons}
                             {marketOrderType === 'twap' && <RunningTime />}
 
-                            {/* <ReduceAndProfitToggle
+                            <ReduceAndProfitToggle
                                 {...reduceAndProfitToggleProps}
-                            /> */}
+                            />
                         </motion.div>
                         <motion.div
                             key='buttondetails'
