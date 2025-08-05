@@ -3,6 +3,7 @@ import {
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
     type MarginBucketAvail,
+    type MarginBucketPriced,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -209,17 +210,6 @@ function OrderInput({
 
     const minNotionalUsdOrderSize = 0.99;
     const maxNotionalUsdOrderSize = 100_000;
-    // eslint-disable-next-line
-    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
-        useState<number>(100);
-    const generateRandomMaximumInput = () => {
-        // Generate a random maximum between minNotionalUsdOrderSize and 100
-        const newMaximumInputValue =
-            Math.floor(Math.random() * (100 - minNotionalUsdOrderSize + 1)) +
-            minNotionalUsdOrderSize;
-
-        setTempMaximumLeverageInput(newMaximumInputValue);
-    };
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
@@ -453,25 +443,56 @@ function OrderInput({
     const notionalUsdOrderSizeNum =
         Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
+    const userBuyingPowerExceedsMaxOrderSize =
+        usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
+
+    const getAvailableToTradeFromMarginBucket = (
+        marginBucket: MarginBucketPriced,
+    ) => {
+        if (!marginBucket) return 0;
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+
+        // Generate new MarginBucketAvail with leverage-adjusted values
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+
+        // Use the appropriate availToBuy or availToSell based on order side
+        const usdAvailableToTrade =
+            tradeDirection === 'buy'
+                ? releveragedBucket?.availToBuy || 0
+                : releveragedBucket?.availToSell || 0;
+
+        const normalizedAvailableToTrade =
+            Number(usdAvailableToTrade) / 1_000_000;
+        return normalizedAvailableToTrade;
+    };
+
     useEffect(() => {
         if (
+            marginBucket &&
             positionSliderPercentageValue === 100 &&
             markPx &&
             !isEditingSizeInput &&
             !userExceededAvailableMargin &&
-            !isReduceOnlyEnabled
+            !isReduceOnlyEnabled &&
+            !userBuyingPowerExceedsMaxOrderSize
         ) {
+            const normalizedAvailableToTrade =
+                getAvailableToTradeFromMarginBucket(marginBucket);
             const maxNotionalSize =
-                ((usdAvailableToTrade * 0.999) / markPx) * leverage;
+                (normalizedAvailableToTrade / markPx) * leverage;
+
             if (maxNotionalSize > 0) setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
+        marginBucket,
         positionSliderPercentageValue,
         leverage,
         markPx,
         isEditingSizeInput,
         userExceededAvailableMargin,
         isReduceOnlyEnabled,
+        userBuyingPowerExceedsMaxOrderSize,
     ]);
 
     const sizeLessThanMinimum =
@@ -479,7 +500,6 @@ function OrderInput({
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const sizeMoreThanMaximum =
-        !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
@@ -521,20 +541,12 @@ function OrderInput({
             orderValue = notionalSymbolQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
-            price &&
-            price.length > 0 &&
             notionalSymbolQtyNum
         ) {
-            orderValue = notionalSymbolQtyNum * parseFormattedNum(price);
+            orderValue = notionalSymbolQtyNum * (markPx || 1);
         }
         return orderValue;
-    }, [
-        notionalSymbolQtyNum,
-        price,
-        marketOrderType,
-        markPx,
-        parseFormattedNum,
-    ]);
+    }, [notionalSymbolQtyNum, marketOrderType, markPx]);
 
     const marginRequired = useMemo(() => {
         return usdOrderValue / leverage;
@@ -728,8 +740,10 @@ function OrderInput({
             setNotionalSymbolQtyNum(adjusted);
             if (isUserLoggedIn) {
                 const usdValue = adjusted * (markPx || 1);
-                const percent =
-                    (usdValue / leverage / usdAvailableToTrade) * 100;
+                const percent = userBuyingPowerExceedsMaxOrderSize
+                    ? (usdValue / maxNotionalUsdOrderSize) * 100
+                    : (usdValue / leverage / usdAvailableToTrade) * 100;
+
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
@@ -799,20 +813,37 @@ function OrderInput({
     };
 
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
+        let notionalSymbolQtyNum;
         if (marketOrderType === 'market') {
-            const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade * 0.999) /
-                    (markPx || 1)) *
-                leverage;
-            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
+                notionalSymbolQtyNum =
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
+                    leverage;
+            }
         } else if (marketOrderType === 'limit') {
-            if (!price || !usdAvailableToTrade) return;
-            const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) /
-                    (parseFormattedNum(price) || 1)) *
-                leverage;
-            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+            if (!markPx) return;
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
+                if (!normalizedAvailableToTrade) return;
+                notionalSymbolQtyNum =
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
+                    leverage;
+            }
         }
+        if (notionalSymbolQtyNum) setNotionalSymbolQtyNum(notionalSymbolQtyNum);
     };
 
     const setNotationalSymbolQtyFromPositionSize = (value: number) => {
@@ -968,7 +999,6 @@ function OrderInput({
             value: leverage,
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
-            generateRandomMaximumInput: generateRandomMaximumInput,
             minimumValue: leverageFloor,
         }),
         [leverage, handleLeverageChange, leverageFloor],
