@@ -780,7 +780,6 @@ function OrderInput({
                         ? (usdValue / maxNotionalUsdOrderSize) * 100
                         : (usdValue / leverage / usdAvailableToTrade) * 100;
                 }
-                console.log({ percent, maxCollateralModeEnabled });
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
@@ -814,14 +813,12 @@ function OrderInput({
     ]);
 
     useEffect(() => {
-        console.log({ userExceededAvailableMargin });
         if (!userExceededAvailableMargin) handleSizeInputUpdate();
     }, [tradeDirection]);
 
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
         if (isEditingSizeInput) {
-            console.log({ sizeDisplay });
             if (sizeDisplay === '') {
                 handleSizeInputUpdate();
             } else {
@@ -834,7 +831,6 @@ function OrderInput({
     }, [sizeDisplay, isEditingSizeInput]);
 
     const handleSizeInputBlur = useCallback(() => {
-        console.log('on blur');
         handleSizeInputUpdate();
         setIsEditingSizeInput(false);
     }, [handleSizeInputUpdate]);
