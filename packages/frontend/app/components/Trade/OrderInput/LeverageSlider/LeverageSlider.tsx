@@ -17,7 +17,6 @@ interface LeverageSliderProps {
     onClick?: (newLeverage: number) => void;
     className?: string;
     minimumInputValue?: number;
-    generateRandomMaximumInput?: () => void;
     // NEW: Modal mode props
     modalMode?: boolean;
     maxLeverage?: number;
