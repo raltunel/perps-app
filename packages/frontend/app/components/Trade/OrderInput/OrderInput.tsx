@@ -733,8 +733,7 @@ function OrderInput({
         [],
     );
 
-    const handleSizeInputBlur = useCallback(() => {
-        setIsEditingSizeInput(false);
+    const handleSizeInputUpdate = useCallback(() => {
         const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
@@ -757,13 +756,20 @@ function OrderInput({
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
         }
-    }, [
-        usdAvailableToTrade,
-        markPx,
-        sizeDisplay,
-        selectedMode,
-        isUserLoggedIn,
-    ]);
+    }, [sizeDisplay, selectedMode, markPx, leverage, isUserLoggedIn]);
+
+    // update slider on debounce after user has paused typing and updating sizeDisplay
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            handleSizeInputUpdate();
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [sizeDisplay]);
+
+    const handleSizeInputBlur = useCallback(() => {
+        setIsEditingSizeInput(false);
+        handleSizeInputUpdate();
+    }, [handleSizeInputUpdate]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
