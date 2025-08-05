@@ -16,10 +16,14 @@
     /* background: var(--bg-dark3)  */
 }
 
-.description {
+.description,
+.estimatedPnl {
     color: var(--text2);
     font-size: var(--font-size-s);
     text-align: center;
+}
+.estimatedPnl span {
+    color: var(--green);
 }
 .position_size_container {
     position: relative;

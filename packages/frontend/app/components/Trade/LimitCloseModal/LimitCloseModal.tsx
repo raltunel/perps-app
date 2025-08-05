@@ -374,7 +374,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         <PositionSize
                             value={positionSize}
                             onChange={handlePositionSizeChange}
-                            hideValueDisplay
+                            isModal
                         />
                         {isOverLimit && (
                             <div className={styles.warning_message}>
@@ -383,6 +383,9 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         )}
                     </div>
 
+                    <p className={styles.estimatedPnl}>
+                        Estimated closed PNL (without fees): <span>$0.17</span>
+                    </p>
                     <SimpleButton
                         onClick={() => {
                             console.log('confirm');
