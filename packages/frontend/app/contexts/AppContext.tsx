@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
+import { initializePythPriceService } from '~/stores/PythPriceStore';
 import { debugWallets } from '~/utils/Constants';
 
 interface AppContextType {
@@ -41,6 +42,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
     const sessionState = useSession();
     const [fogoAddress, setFogoAddress] = useState('');
+
+    // Initialize Pyth price service on mount
+    useEffect(() => {
+        initializePythPriceService();
+    }, []);
 
     const bindEmptyAddress = () => {
         setUserAddress(debugWallets[2].address);

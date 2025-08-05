@@ -24,6 +24,7 @@
         "@fogo/sessions-sdk-react": "^0.0.13",
         "@netlify/functions": "3.0.4",
         "@perps-app/sdk": "workspace:*",
+        "@pythnetwork/hermes-client": "^2.0.0",
         "@react-router/node": "^7.6.0",
         "@solana/compat": "^2.3.0",
         "@solana/kit": "^2.3.0",

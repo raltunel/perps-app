@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { usePythPrice } from '~/hooks/usePythPrice';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -16,6 +17,13 @@ const SymbolInfo: React.FC = React.memo(() => {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const { titleOverride } = useAppStateStore();
+
+    // Get Pyth price for the current symbol
+    const {
+        price: pythPrice,
+        isStale: isPythStale,
+        isConnected: isPythConnected,
+    } = usePythPrice(symbol);
 
     // State for funding countdown
     const [fundingCountdown, setFundingCountdown] = useState(
@@ -93,10 +101,20 @@ const SymbolInfo: React.FC = React.memo(() => {
                                     lastWsChange={symbolInfo?.lastPriceChange}
                                 />
                                 <SymbolInfoField
-                                    tooltipContent='An external, aggregated market value sourced from multiple reputable exchanges'
-                                    label='Oracle'
+                                    tooltipContent={
+                                        pythPrice && isPythConnected
+                                            ? isPythStale
+                                                ? 'Pyth Network oracle (price may be stale)'
+                                                : 'Real-time price from Pyth Network oracle'
+                                            : 'An external, aggregated market value sourced from multiple reputable exchanges'
+                                    }
+                                    label={`Oracle${isPythStale ? ' ⚠' : ''}`}
                                     valueClass={'w4'}
-                                    value={formatNum(symbolInfo?.oraclePx)}
+                                    value={formatNum(
+                                        pythPrice && isPythConnected
+                                            ? pythPrice
+                                            : symbolInfo?.oraclePx,
+                                    )}
                                 />
                                 <SymbolInfoField
                                     tooltipContent='Change in price over the last 24 hours'
