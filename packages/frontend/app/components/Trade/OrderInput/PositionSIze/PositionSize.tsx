@@ -383,7 +383,9 @@ export default function PositionSize({
 
                 {/* Current value display with input  */}
                 {!hideValueDisplay && (
-                    <div className={styles.valueDisplay}>
+                    <div
+                        className={`${styles.valueDisplay} ${isModal && styles.modalValueDisplay}`}
+                    >
                         <input
                             type='text'
                             inputMode='numeric'
