@@ -133,7 +133,7 @@
 }
 
 .valueDisplay {
-    width: 50px;
+    width: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -141,6 +141,9 @@
     background-color: var(--bg-dark3);
     border-radius: var(--radius-s);
     padding: 0 var(--padding-s);
+}
+.modalValueDisplay {
+    border: 1px solid var(--bg-dark4);
 }
 
 .valueInput {
