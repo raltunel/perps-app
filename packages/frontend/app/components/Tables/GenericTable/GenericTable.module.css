@@ -29,6 +29,10 @@
     flex-direction: column;
 }
 
+.tableWrapper.showingPagination {
+    position: relative;
+}
+
 .tableBody {
     height: 100%;
     overflow-y: auto;
@@ -37,6 +41,10 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
+}
+
+.showingPagination .tableBody {
+    height: calc(100% - 2.6rem);
 }
 
 .tableBody::-webkit-scrollbar {

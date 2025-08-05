@@ -45,6 +45,8 @@ interface GenericTableProps<
     defaultSortDirection?: TableSortDirection;
     heightOverride?: string;
     storageKey: string;
+    perPageOverride?: number;
+    inTradePage?: boolean;
     tableModel?: HeaderCell[];
     csvDataFetcher?: (...args: Parameters<F>) => Promise<T[]>;
     csvDataFetcherArgs?: Parameters<F>;
@@ -79,6 +81,8 @@ export default function GenericTable<
         tableModel,
         csvDataFetcher,
         csvDataFetcherArgs,
+        perPageOverride,
+        inTradePage,
     } = props;
 
     function safeParse<T>(value: string | null, fallback: T): T {
@@ -92,6 +96,15 @@ export default function GenericTable<
 
     const sortByKey = `GenericTable:${storageKey}:sortBy`;
     const sortDirKey = `GenericTable:${storageKey}:sortDir`;
+
+    const showPaginationInTradePage = useMemo(() => {
+        return (
+            inTradePage &&
+            data &&
+            perPageOverride &&
+            data.length > perPageOverride
+        );
+    }, [inTradePage, perPageOverride, data]);
 
     const [sortBy, setSortBy] = useState<S>(() => {
         const stored = localStorage.getItem(sortByKey);
@@ -225,7 +238,9 @@ export default function GenericTable<
     }, [isClient]);
 
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(20);
+    const [rowsPerPage, setRowsPerPage] = useState(perPageOverride ?? 20);
+
+    console.log('>>> rowsPerPage', rowsPerPage, perPageOverride, pageMode);
 
     useEffect(() => {
         setPage(0);
@@ -386,7 +401,9 @@ export default function GenericTable<
 
     return (
         <div
-            className={styles.tableWrapper}
+            className={`${styles.tableWrapper} ${
+                showPaginationInTradePage ? styles.showingPagination : ''
+            }`}
             style={{
                 height: heightOverride,
             }}
@@ -456,7 +473,7 @@ export default function GenericTable<
                     </div>
                 )}
 
-                {pageMode && (
+                {pageMode && !inTradePage && (
                     <GenericTablePagination
                         totalCount={sortedData.length}
                         page={page}
@@ -466,6 +483,17 @@ export default function GenericTable<
                     />
                 )}
             </div>
+            {showPaginationInTradePage && (
+                <GenericTablePagination
+                    totalCount={sortedData.length}
+                    page={page}
+                    setPage={setPage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={setRowsPerPage}
+                    absolute={true}
+                    noChangeRowsPerPage={true}
+                />
+            )}
         </div>
     );
 }

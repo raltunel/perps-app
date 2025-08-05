@@ -19,10 +19,19 @@ interface OrderHistoryTableProps {
     pageMode?: boolean;
     data: OrderDataIF[];
     isFetched: boolean;
+    perPageOverride?: number;
+    inTradePage?: boolean;
 }
 
 export default function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { selectedFilter, pageMode, data, isFetched } = props;
+    const {
+        selectedFilter,
+        pageMode,
+        data,
+        isFetched,
+        perPageOverride,
+        inTradePage,
+    } = props;
 
     const { symbol, filterOrderHistory } = useTradeDataStore();
 
@@ -75,6 +84,8 @@ export default function OrderHistoryTable(props: OrderHistoryTableProps) {
                 noDataMessage='No order history'
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
+                perPageOverride={perPageOverride}
+                inTradePage={inTradePage}
             />
         </>
     );

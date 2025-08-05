@@ -9,6 +9,8 @@ interface GenericTablePaginationProps {
     rowsPerPage: number;
     onRowsPerPageChange: (rowsPerPage: number) => void;
     rowsOptions?: number[];
+    absolute?: boolean;
+    noChangeRowsPerPage?: boolean;
 }
 
 const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
@@ -18,6 +20,8 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
     rowsPerPage,
     rowsOptions = [10, 20, 50, 100],
     onRowsPerPageChange,
+    absolute = false,
+    noChangeRowsPerPage = false,
 }) => {
     const [rowsPerPageState, setRowsPerPageState] = useState(rowsPerPage);
     const [isRowsDropdownOpen, setIsRowsDropdownOpen] = useState(false);
@@ -41,24 +45,30 @@ const GenericTablePagination: React.FC<GenericTablePaginationProps> = ({
 
     return (
         <>
-            <div className={styles.paginationContainer}>
-                <div className={styles.rowsPerPage}>
-                    Rows per page:
-                    <div
-                        className={styles.rowSelector}
-                        onClick={() =>
-                            setIsRowsDropdownOpen(!isRowsDropdownOpen)
-                        }
-                    >
-                        {rowsPerPageState}
-                        <FaChevronUp className={styles.chvrUp} />
-                        {isRowsDropdownOpen && (
-                            <div className={` ${styles.dropupMenu}`}>
-                                {rowsItems()}
-                            </div>
-                        )}
+            <div
+                className={`${styles.paginationContainer} ${
+                    absolute ? styles.absolute : ''
+                }`}
+            >
+                {!noChangeRowsPerPage && (
+                    <div className={styles.rowsPerPage}>
+                        Rows per page:
+                        <div
+                            className={styles.rowSelector}
+                            onClick={() =>
+                                setIsRowsDropdownOpen(!isRowsDropdownOpen)
+                            }
+                        >
+                            {rowsPerPageState}
+                            <FaChevronUp className={styles.chvrUp} />
+                            {isRowsDropdownOpen && (
+                                <div className={` ${styles.dropupMenu}`}>
+                                    {rowsItems()}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <div className={styles.pageInfo}>
                     {page * rowsPerPageState + 1}-

@@ -201,6 +201,9 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         data={orderHistory}
                         isFetched={orderHistoryFetched}
+                        pageMode={true}
+                        perPageOverride={10}
+                        inTradePage={true}
                     />
                 );
             case 'Deposits and Withdrawals':

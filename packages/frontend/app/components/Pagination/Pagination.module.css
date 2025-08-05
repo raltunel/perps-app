@@ -36,6 +36,12 @@
     user-select: none;
 }
 
+.paginationContainer.absolute {
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+}
+
 .rowsPerPage {
     display: flex;
     align-items: center;
