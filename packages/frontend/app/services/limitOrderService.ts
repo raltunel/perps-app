@@ -103,7 +103,7 @@ export class LimitOrderService {
                     rentPayer: rentPayer,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
-                    cancelOrderIx: params.replaceOrderId,
+                    cancelOrderId: params.replaceOrderId,
                 };
 
                 const transaction = buildOrderEntryTransaction(
