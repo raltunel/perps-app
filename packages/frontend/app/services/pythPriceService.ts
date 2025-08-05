@@ -1,4 +1,4 @@
-import { HermesClient, type PriceUpdate } from '@pythnetwork/hermes-client';
+import { HermesClient } from '@pythnetwork/hermes-client';
 import {
     PYTH_ENDPOINT,
     PYTH_PRICE_FEEDS,
@@ -34,6 +34,7 @@ export class PythPriceService {
     private isConnected = false;
     private priceCache: Map<string, PythPriceData> = new Map();
     private latencyStats: Map<string, number[]> = new Map();
+    private pollingIntervals: Map<string, NodeJS.Timeout> = new Map();
 
     private constructor() {
         this.client = new HermesClient(PYTH_ENDPOINT);
@@ -62,16 +63,25 @@ export class PythPriceService {
      * Monitor connection status and attempt reconnection if needed
      */
     private monitorConnection(): void {
+        // Set initial connection status to true since HTTP API doesn't need persistent connection
+        this.setConnectionStatus(true);
+
         // Check connection every 5 seconds
         setInterval(async () => {
             try {
                 // Try to fetch a price to check if connection is alive
                 const testFeedId = PYTH_PRICE_FEEDS.BTC.id;
-                await this.client.getLatestPriceUpdates([testFeedId]);
+                const result = await this.client.getLatestPriceUpdates([
+                    testFeedId,
+                ]);
 
-                if (!this.isConnected) {
-                    this.setConnectionStatus(true);
-                    console.log('🟢 Pyth connection established');
+                if (result && result.parsed && result.parsed.length > 0) {
+                    if (!this.isConnected) {
+                        this.setConnectionStatus(true);
+                        console.log('🟢 Pyth connection established');
+                    }
+                } else {
+                    throw new Error('No data received');
                 }
             } catch (error) {
                 if (this.isConnected) {
@@ -86,6 +96,10 @@ export class PythPriceService {
      * Subscribe to price updates for a symbol
      */
     public async subscribeToSymbol(symbol: string): Promise<void> {
+        console.log(
+            `[PythPriceService] subscribeToSymbol called for: ${symbol}`,
+        );
+
         const priceFeedId = getPriceFeedId(symbol);
         if (!priceFeedId) {
             console.warn(`No Pyth price feed found for symbol: ${symbol}`);
@@ -93,30 +107,74 @@ export class PythPriceService {
         }
 
         if (this.activeSubscriptions.has(symbol)) {
+            console.log(`[PythPriceService] Already subscribed to ${symbol}`);
             return; // Already subscribed
         }
 
         this.activeSubscriptions.add(symbol);
-        console.log(`📊 Subscribing to Pyth price feed for ${symbol}`);
+        console.log(
+            `📊 Subscribing to Pyth price feed for ${symbol}, feedId: ${priceFeedId}`,
+        );
+
+        // Test immediate fetch
+        this.testFetchPrice(symbol, priceFeedId);
 
         // Start polling for this symbol
         this.startPollingForSymbol(symbol, priceFeedId);
     }
 
     /**
+     * Test immediate price fetch
+     */
+    private async testFetchPrice(
+        symbol: string,
+        priceFeedId: string,
+    ): Promise<void> {
+        try {
+            console.log(
+                `[PythPriceService] Testing immediate fetch for ${symbol}...`,
+            );
+            const result = await this.client.getLatestPriceUpdates([
+                priceFeedId,
+            ]);
+            console.log(`[PythPriceService] Test fetch result:`, result);
+
+            if (result && result.parsed && result.parsed.length > 0) {
+                this.handlePriceUpdate(symbol, result.parsed[0]);
+            }
+        } catch (error) {
+            console.error(`[PythPriceService] Test fetch error:`, error);
+        }
+    }
+
+    /**
      * Start polling for price updates for a specific symbol
      */
     private startPollingForSymbol(symbol: string, priceFeedId: string): void {
+        console.log(`[PythPriceService] Starting polling for ${symbol}`);
+
+        // Clear any existing interval for this symbol
+        const existingInterval = this.pollingIntervals.get(symbol);
+        if (existingInterval) {
+            clearInterval(existingInterval);
+        }
+
         // Poll every second for real-time updates
         const pollInterval = setInterval(async () => {
             if (!this.activeSubscriptions.has(symbol)) {
                 clearInterval(pollInterval);
+                this.pollingIntervals.delete(symbol);
                 return;
             }
 
             try {
                 const startTime = Date.now();
-                const priceUpdates = await this.client.getLatestPriceUpdates([
+                console.log(
+                    `[PythPriceService] Fetching price for ${symbol}...`,
+                );
+
+                // getLatestPriceUpdates returns an object with parsed property
+                const result = await this.client.getLatestPriceUpdates([
                     priceFeedId,
                 ]);
                 const latency = Date.now() - startTime;
@@ -124,14 +182,25 @@ export class PythPriceService {
                 // Track latency stats
                 this.updateLatencyStats(symbol, latency);
 
-                if (priceUpdates && priceUpdates.length > 0) {
-                    const update = priceUpdates[0];
+                if (result && result.parsed && result.parsed.length > 0) {
+                    const update = result.parsed[0];
+                    console.log(
+                        `[PythPriceService] Raw price update for ${symbol}:`,
+                        update,
+                    );
                     this.handlePriceUpdate(symbol, update);
+                } else {
+                    console.warn(
+                        `[PythPriceService] No price updates received for ${symbol}`,
+                    );
                 }
             } catch (error) {
                 console.error(`Error fetching price for ${symbol}:`, error);
             }
         }, 1000);
+
+        // Store the interval
+        this.pollingIntervals.set(symbol, pollInterval);
     }
 
     /**
@@ -157,7 +226,7 @@ export class PythPriceService {
     /**
      * Handle incoming price update
      */
-    private handlePriceUpdate(symbol: string, update: PriceUpdate): void {
+    private handlePriceUpdate(symbol: string, update: any): void {
         const priceData = this.parsePriceUpdate(symbol, update);
 
         // Update cache
@@ -194,17 +263,38 @@ export class PythPriceService {
     /**
      * Parse Pyth price update into our format
      */
-    private parsePriceUpdate(
-        symbol: string,
-        update: PriceUpdate,
-    ): PythPriceData {
-        const price =
-            parseFloat(update.price.price) * Math.pow(10, update.price.expo);
-        const confidence =
-            parseFloat(update.price.conf) * Math.pow(10, update.price.expo);
-        const publishTime = update.price.publishTime;
+    private parsePriceUpdate(symbol: string, update: any): PythPriceData {
+        console.log(
+            `[PythPriceService] Parsing price update:`,
+            JSON.stringify(update, null, 2),
+        );
+
+        // Check if we have the price data structure
+        if (!update || !update.price) {
+            console.error(
+                `[PythPriceService] Invalid price update structure:`,
+                update,
+            );
+            throw new Error('Invalid price update structure');
+        }
+
+        // Parse price and confidence - price values are stored as strings with exponent
+        const priceValue = parseFloat(update.price.price);
+        const exponent = parseInt(update.price.expo);
+        const price = priceValue * Math.pow(10, exponent);
+
+        const confidenceValue = parseFloat(update.price.conf);
+        const confidence = confidenceValue * Math.pow(10, exponent);
+
+        // Parse publish time - it's in seconds
+        const publishTime = parseInt(update.price.publish_time);
         const currentTime = Math.floor(Date.now() / 1000);
-        const isStale = currentTime - publishTime > PRICE_STALENESS_THRESHOLD;
+        const age = currentTime - publishTime;
+        const isStale = age > PRICE_STALENESS_THRESHOLD;
+
+        console.log(
+            `[PythPriceService] Parsed price for ${symbol}: $${price.toFixed(2)}, confidence: ±$${confidence.toFixed(2)}, age: ${age}s, stale: ${isStale}`,
+        );
 
         return {
             price,
@@ -221,6 +311,14 @@ export class PythPriceService {
     public unsubscribeFromSymbol(symbol: string): void {
         this.activeSubscriptions.delete(symbol);
         this.priceCache.delete(symbol);
+
+        // Clear polling interval
+        const interval = this.pollingIntervals.get(symbol);
+        if (interval) {
+            clearInterval(interval);
+            this.pollingIntervals.delete(symbol);
+        }
+
         console.log(`📊 Unsubscribed from Pyth price feed for ${symbol}`);
     }
 

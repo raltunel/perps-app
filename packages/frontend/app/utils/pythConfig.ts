@@ -125,7 +125,14 @@ export const PRICE_STALENESS_THRESHOLD = 30;
 
 // Helper function to get price feed ID for a symbol
 export function getPriceFeedId(symbol: string): string | undefined {
-    return PYTH_PRICE_FEEDS[symbol]?.id;
+    const feedId = PYTH_PRICE_FEEDS[symbol]?.id;
+    if (!feedId) {
+        console.log(
+            `[pythConfig] No feed found for symbol: ${symbol}. Available symbols:`,
+            Object.keys(PYTH_PRICE_FEEDS),
+        );
+    }
+    return feedId;
 }
 
 // Helper function to check if a symbol has a Pyth price feed
