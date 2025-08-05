@@ -814,12 +814,14 @@ function OrderInput({
     ]);
 
     useEffect(() => {
+        console.log({ userExceededAvailableMargin });
         if (!userExceededAvailableMargin) handleSizeInputUpdate();
-    }, [tradeDirection, userExceededAvailableMargin]);
+    }, [tradeDirection]);
 
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
         if (isEditingSizeInput) {
+            console.log({ sizeDisplay });
             if (sizeDisplay === '') {
                 handleSizeInputUpdate();
             } else {
@@ -832,6 +834,7 @@ function OrderInput({
     }, [sizeDisplay, isEditingSizeInput]);
 
     const handleSizeInputBlur = useCallback(() => {
+        console.log('on blur');
         handleSizeInputUpdate();
         setIsEditingSizeInput(false);
     }, [handleSizeInputUpdate]);
