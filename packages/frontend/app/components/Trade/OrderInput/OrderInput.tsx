@@ -1185,12 +1185,12 @@ function OrderInput({
             setIsProcessingOrder(true);
             if (activeOptions.skipOpenOrderConfirm) {
                 confirmOrderModal.close();
-                notifications.add({
-                    title: 'Order Submitted',
-                    message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
-                    icon: 'spinner',
-                    removeAfter: 5000,
-                });
+                // notifications.add({
+                //     title: 'Order Submitted',
+                //     message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                //     icon: 'spinner',
+                //     removeAfter: 5000,
+                // });
             }
             // Get best ask price for buy order
             const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
@@ -1260,12 +1260,12 @@ function OrderInput({
             setIsProcessingOrder(true);
             if (activeOptions.skipOpenOrderConfirm) {
                 confirmOrderModal.close();
-                notifications.add({
-                    title: 'Order Submitted',
-                    message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
-                    icon: 'spinner',
-                    removeAfter: 5000,
-                });
+                // notifications.add({
+                //     title: 'Order Submitted',
+                //     message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                //     icon: 'spinner',
+                //     removeAfter: 5000,
+                // });
             }
             // Get best bid price for sell order
             const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
@@ -1348,11 +1348,11 @@ function OrderInput({
         if (activeOptions.skipOpenOrderConfirm) {
             confirmOrderModal.close();
             // Show pending notification
-            notifications.add({
-                title: 'Buy / Long Limit Order Pending',
-                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
+            // notifications.add({
+            //     title: 'Buy / Long Limit Order Pending',
+            //     message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+            //     icon: 'spinner',
+            // });
         }
 
         try {
@@ -1430,11 +1430,11 @@ function OrderInput({
         if (activeOptions.skipOpenOrderConfirm) {
             confirmOrderModal.close();
             // Show pending notification
-            notifications.add({
-                title: 'Sell / Short Limit Order Pending',
-                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
+            // notifications.add({
+            //     title: 'Sell / Short Limit Order Pending',
+            //     message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+            //     icon: 'spinner',
+            // });
         }
 
         try {
