@@ -685,9 +685,10 @@ function OrderInput({
 
     useEffect(() => {
         let percent = 0;
-
         if (isReduceOnlyEnabled) {
-            if (marginBucket?.netPosition) {
+            if (maxCollateralModeEnabled) {
+                percent = 100;
+            } else if (marginBucket?.netPosition) {
                 const unscaledPositionSize =
                     Math.abs(Number(marginBucket?.netPosition)) / 1e8;
                 percent = Math.min(
@@ -706,9 +707,10 @@ function OrderInput({
         } else {
             setMaxCollateralModeEnabled(false);
         }
-    }, [!!usdAvailableToTrade, isReduceOnlyEnabled]);
+    }, [!!usdAvailableToTrade, isReduceOnlyEnabled, maxCollateralModeEnabled]);
 
     useEffect(() => {
+        setMaxCollateralModeEnabled(false);
         let percent = 0;
 
         if (isReduceOnlyEnabled) {
