@@ -55,6 +55,20 @@ export default function ConfirmationModal(props: propsIF) {
         }
     }, []);
 
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                submitFn();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [submitFn]);
+
     const liquidationPriceDisplay = useMemo(() => {
         if (liquidationPrice === null || liquidationPrice === undefined) {
             return '-';
