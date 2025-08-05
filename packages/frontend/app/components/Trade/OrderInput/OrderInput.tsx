@@ -1,4 +1,5 @@
 import {
+    calcLeverageFloor,
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
     type MarginBucketAvail,
@@ -307,6 +308,8 @@ function OrderInput({
 
     const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
+    const [leverageFloor, setLeverageFloor] = useState<number>();
+
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
         useState(0);
 
@@ -315,6 +318,18 @@ function OrderInput({
     const [liquidationPrice, setLiquidationPrice] = useState<number | null>(
         null,
     );
+
+    useEffect(() => {
+        if (!marginBucket) return;
+        try {
+            const leverageFloor = calcLeverageFloor(marginBucket);
+            const leverageFloorNum = Number(leverageFloor);
+            if (!leverageFloorNum) return;
+            setLeverageFloor(10_000 / leverageFloorNum);
+        } catch {
+            setLeverageFloor(100);
+        }
+    }, [marginBucket]);
 
     useEffect(() => {
         if (!marginBucket) {
@@ -448,8 +463,7 @@ function OrderInput({
         ) {
             const maxNotionalSize =
                 ((usdAvailableToTrade * 0.999) / markPx) * leverage;
-
-            setNotionalSymbolQtyNum(maxNotionalSize);
+            if (maxNotionalSize > 0) setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
         positionSliderPercentageValue,
@@ -969,8 +983,9 @@ function OrderInput({
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
             generateRandomMaximumInput: generateRandomMaximumInput,
+            minimumValue: leverageFloor,
         }),
-        [leverage, handleLeverageChange],
+        [leverage, handleLeverageChange, leverageFloor],
     );
 
     // const chasePriceProps = useMemo(
