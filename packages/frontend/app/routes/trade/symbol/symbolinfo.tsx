@@ -5,6 +5,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { usePythPrice } from '~/hooks/usePythPrice';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getTimeUntilNextHour } from '~/utils/orderbook/OrderBookUtils';
 import styles from './symbolinfo.module.css';
@@ -17,6 +18,7 @@ const SymbolInfo: React.FC = React.memo(() => {
     const { orderBookMode } = useAppSettings();
     const { marketId } = useParams<{ marketId: string }>();
     const { titleOverride } = useAppStateStore();
+    const { usePythOracle } = useDebugStore();
 
     // Get Pyth price for the current symbol
     const {
@@ -102,16 +104,20 @@ const SymbolInfo: React.FC = React.memo(() => {
                                 />
                                 <SymbolInfoField
                                     tooltipContent={
-                                        pythPrice && isPythConnected
+                                        usePythOracle &&
+                                        pythPrice &&
+                                        isPythConnected
                                             ? isPythStale
                                                 ? 'Pyth Network oracle (price may be stale)'
                                                 : 'Real-time price from Pyth Network oracle'
                                             : 'An external, aggregated market value sourced from multiple reputable exchanges'
                                     }
-                                    label={`Oracle${isPythStale ? ' ⚠' : ''}`}
+                                    label={`Oracle${usePythOracle && isPythStale ? ' ⚠' : ''}`}
                                     valueClass={'w4'}
                                     value={formatNum(
-                                        pythPrice && isPythConnected
+                                        usePythOracle &&
+                                            pythPrice &&
+                                            isPythConnected
                                             ? pythPrice
                                             : symbolInfo?.oraclePx,
                                     )}
