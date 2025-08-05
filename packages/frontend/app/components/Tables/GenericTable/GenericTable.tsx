@@ -143,6 +143,7 @@ export default function GenericTable<
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
     const isHttpInfoCallsDisabled = true;
+    const isShowAllEnabled = true;
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -178,7 +179,9 @@ export default function GenericTable<
 
         const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
 
-        if (rowCount > slicedLimit) {
+        if (isShowAllEnabled) {
+            setRowLimit(Infinity);
+        } else if (rowCount > slicedLimit) {
             setRowLimit(rowCount);
         } else {
             setRowLimit(slicedLimit);
@@ -386,7 +389,9 @@ export default function GenericTable<
 
     return (
         <div
-            className={styles.tableWrapper}
+            className={`${styles.tableWrapper} ${
+                isShowAllEnabled ? styles.showAllWrapper : ''
+            }`}
             style={{
                 height: heightOverride,
             }}
@@ -405,7 +410,7 @@ export default function GenericTable<
                 id={`${id}-tableBody`}
                 className={`${styles.tableBody} ${
                     pageMode ? styles.pageMode : styles.notPage
-                }`}
+                } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
             >
                 {isSessionEstablished && tableState === TableState.LOADING && (
                     <SkeletonTable
@@ -454,6 +459,15 @@ export default function GenericTable<
                                 </a>
                             )}
                     </div>
+                )}
+
+                {isHttpInfoCallsDisabled && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={
+                            styles.actionsContainer + ' ' + styles.showAllMode
+                        }
+                    ></div>
                 )}
 
                 {pageMode && (

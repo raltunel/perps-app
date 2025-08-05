@@ -68,6 +68,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     // the useeffect was updating and reformatting user input so I added this to track it to differentiate between the input and the slider
     const lastChangedBySlider = useRef(true);
 
+    const estimatedPNL = isPositionLong
+        ? sizeNum * (parseFormattedNum(price) - position.entryPx)
+        : sizeNum * (position.entryPx - parseFormattedNum(price));
+
     useEffect(() => {
         if (isMidModeActive) {
             setMidPriceAsPriceInput();
@@ -542,10 +546,21 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             </div>
                         )}
                     </div>
+                    {price && (
+                        <p
+                            className={
+                                estimatedPNL >= 0
+                                    ? styles.estimatedPnlPositive
+                                    : styles.estimatedPnlNegative
+                            }
+                        >
+                            Estimated closed PNL (without fees):{' '}
+                            <span>
+                                {formatNum(estimatedPNL, 2, true, true)}
+                            </span>
+                        </p>
+                    )}
 
-                    <p className={styles.estimatedPnl}>
-                        Estimated closed PNL (without fees): <span>$0.17</span>
-                    </p>
                     <SimpleButton
                         onClick={handleConfirm}
                         bg='accent1'
