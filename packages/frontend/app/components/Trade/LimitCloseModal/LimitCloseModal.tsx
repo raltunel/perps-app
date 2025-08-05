@@ -326,6 +326,69 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             close();
         }
     }
+    const handleConfirm = () => {
+        if (isProcessingOrder || isOverLimit) return;
+
+        console.log('confirm');
+        if (isPositionLong) {
+            submitLimitSell();
+        } else {
+            submitLimitBuy();
+        }
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const activeElement = document.activeElement;
+            const isInputActive =
+                activeElement?.tagName === 'INPUT' ||
+                activeElement?.tagName === 'TEXTAREA';
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleConfirm();
+                return;
+            }
+
+            if (isInputActive) return;
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                close();
+                return;
+            }
+
+            // Left and right arrow keys
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                const step = 5;
+                const newValue =
+                    e.key === 'ArrowRight'
+                        ? Math.min(100, positionSize + step)
+                        : Math.max(0, positionSize - step);
+
+                handlePositionSizeChange(newValue);
+                return;
+            }
+
+            if (e.key === 'Home') {
+                e.preventDefault();
+                handlePositionSizeChange(0);
+                return;
+            }
+
+            if (e.key === 'End') {
+                e.preventDefault();
+                handlePositionSizeChange(100);
+                return;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [positionSize, isProcessingOrder, isOverLimit, close]);
 
     return (
         <Modal title='Limit Close' close={close}>
@@ -387,14 +450,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         Estimated closed PNL (without fees): <span>$0.17</span>
                     </p>
                     <SimpleButton
-                        onClick={() => {
-                            console.log('confirm');
-                            if (isPositionLong) {
-                                submitLimitSell();
-                            } else {
-                                submitLimitBuy();
-                            }
-                        }}
+                        onClick={handleConfirm}
                         bg='accent1'
                         disabled={isProcessingOrder || isOverLimit}
                     >
