@@ -240,8 +240,6 @@ export default function GenericTable<
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(perPageOverride ?? 20);
 
-    console.log('>>> rowsPerPage', rowsPerPage, perPageOverride, pageMode);
-
     useEffect(() => {
         setPage(0);
     }, [sortBy, sortDirection]);

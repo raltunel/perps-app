@@ -168,6 +168,7 @@ export default function TradeTable(props: TradeTableProps) {
                     <PositionsTable
                         isFetched={!positionsLoading || lastUpdateTime > 0}
                         selectedFilter={selectedFilter}
+                        pageMode={true}
                         perPageOverride={10}
                         inTradePage={true}
                     />
@@ -178,6 +179,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         isFetched={orderHistoryFetched}
                         data={userOrders}
+                        pageMode={true}
                         perPageOverride={10}
                         inTradePage={true}
                     />
@@ -189,6 +191,7 @@ export default function TradeTable(props: TradeTableProps) {
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
+                        pageMode={true}
                         perPageOverride={10}
                         inTradePage={true}
                     />
