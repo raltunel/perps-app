@@ -26,6 +26,7 @@ import { useKeydown } from '~/hooks/useKeydown';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
+import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -1486,17 +1487,30 @@ function OrderInput({
         submitLimitSell,
     ]);
 
+    // Get portfolio modals state
+    const { isAnyPortfolioModalOpen } = usePortfolioModals();
+
     // hook to handle Enter key press for order submission
     useEffect(() => {
         const handleEnter = () => {
             console.log('Enter pressed', tradeDirection, marketOrderType);
-            if (!activeOptions.skipOpenOrderConfirm) {
+            // Don't submit if any modal is open (including portfolio modals) or if we should skip confirmation
+            if (
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !activeOptions.skipOpenOrderConfirm
+            ) {
                 handleSubmitOrder();
             }
         };
 
         const keydownHandler = (e: KeyboardEvent) => {
-            if (e.key === 'Enter') {
+            // Only handle Enter key when no modal is open (including portfolio modals)
+            if (
+                e.key === 'Enter' &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen
+            ) {
                 e.preventDefault();
                 e.stopPropagation();
                 handleEnter();
