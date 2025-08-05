@@ -81,10 +81,6 @@ export default function GenericTable<
         csvDataFetcherArgs,
     } = props;
 
-    useEffect(() => {
-        console.log('>>> data.length', data.length);
-    }, [data]);
-
     function safeParse<T>(value: string | null, fallback: T): T {
         if (!value || value === 'undefined') return fallback;
         try {
@@ -191,10 +187,6 @@ export default function GenericTable<
             setRowLimit(slicedLimit);
         }
     };
-
-    useEffect(() => {
-        console.log('>>> rowLimit', rowLimit);
-    }, [rowLimit]);
 
     useEffect(() => {
         checkShadow();
