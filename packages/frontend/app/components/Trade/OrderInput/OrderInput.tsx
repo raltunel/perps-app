@@ -303,6 +303,7 @@ function OrderInput({
     const [userExceededAvailableMargin, setUserExceededAvailableMargin] =
         useState(false);
 
+    console.log({ userExceededAvailableMargin });
     const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
@@ -780,7 +781,7 @@ function OrderInput({
                         ? (usdValue / maxNotionalUsdOrderSize) * 100
                         : (usdValue / leverage / usdAvailableToTrade) * 100;
                 }
-
+                console.log({ percent });
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
@@ -926,6 +927,7 @@ function OrderInput({
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
         setUserExceededAvailableMargin(false);
+        console.log({ value });
         setPositionSliderPercentageValue(value);
         if (value === 100) {
             setMaxCollateralModeEnabled(true);
