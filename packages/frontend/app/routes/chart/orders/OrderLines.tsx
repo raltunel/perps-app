@@ -48,11 +48,20 @@ export default function OrderLines({
     >(undefined);
 
     useEffect(() => {
-        const updatedLines = openLines.map((line) =>
-            selectedLine && line.oid === selectedLine.parentLine.oid
-                ? selectedLine.parentLine
-                : line,
-        );
+        let matchFound = false;
+
+        const updatedLines = openLines.map((line) => {
+            if (selectedLine && line.oid === selectedLine.parentLine.oid) {
+                matchFound = true;
+                return selectedLine.parentLine;
+            }
+            return line;
+        });
+
+        if (selectedLine && !matchFound) {
+            setSelectedLine(undefined);
+        }
+
         setLines([...updatedLines, ...positionLines]);
     }, [openLines, positionLines, selectedLine]);
 
