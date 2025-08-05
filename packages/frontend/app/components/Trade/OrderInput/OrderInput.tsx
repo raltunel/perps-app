@@ -12,6 +12,7 @@ import React, {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState,
     type JSX,
 } from 'react';
@@ -155,6 +156,9 @@ function OrderInput({
     marginBucket: MarginBucketAvail | null;
     isAnyPortfolioModalOpen: boolean;
 }) {
+    // Track if the OrderInput component is focused
+    const [isFocused, setIsFocused] = useState(false);
+    const orderInputRef = useRef<HTMLDivElement>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
@@ -776,7 +780,7 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', sizeDisplay);
+            handleSubmitOrder();
         }
     };
     // PRICE INPUT----------------------------------
@@ -1490,11 +1494,53 @@ function OrderInput({
 
     // Get portfolio modals state
 
+    // Set up focus/blur handlers for the component
+    useEffect(() => {
+        const handleFocusIn = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                orderInputRef.current.contains(e.target as Node)
+            ) {
+                setIsFocused(true);
+            }
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                !orderInputRef.current.contains(e.relatedTarget as Node)
+            ) {
+                setIsFocused(false);
+            }
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+        document.addEventListener('focusout', handleFocusOut);
+
+        // Set initial focus state
+        if (
+            orderInputRef.current &&
+            orderInputRef.current.contains(document.activeElement)
+        ) {
+            setIsFocused(true);
+        }
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            document.removeEventListener('focusout', handleFocusOut);
+        };
+    }, []);
+
     // hook to handle Enter key press for order submission
     useEffect(() => {
         const handleEnter = () => {
-            // Don't submit if any modal is open (including portfolio modals) or if we should skip confirmation
+            // Only submit if:
+            // 1. The component is focused
+            // 2. There's a valid notional/symbol quantity
+            // 3. No modals are open
+            // 4. Skip confirmation is not enabled
             if (
+                isFocused &&
                 notionalSymbolQtyNum &&
                 !confirmOrderModal.isOpen &&
                 !isAnyPortfolioModalOpen &&
@@ -1505,11 +1551,20 @@ function OrderInput({
         };
 
         const keydownHandler = (e: KeyboardEvent) => {
-            // Only handle Enter key when no modal is open (including portfolio modals)
+            // Only handle Enter key when:
+            // 1. The component is focused
+            // 2. No modals are open
+            // 3. The event target is not a textarea or input (to allow normal Enter behavior in form fields)
+            const target = e.target as HTMLElement;
+            const isFormElement =
+                target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+
             if (
                 e.key === 'Enter' &&
+                isFocused &&
                 !confirmOrderModal.isOpen &&
-                !isAnyPortfolioModalOpen
+                !isAnyPortfolioModalOpen &&
+                !isFormElement
             ) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1517,14 +1572,16 @@ function OrderInput({
             }
         };
 
-        document.addEventListener('keydown', keydownHandler);
-        return () => document.removeEventListener('keydown', keydownHandler);
+        document.addEventListener('keydown', keydownHandler, true); // Use capture phase to ensure we catch the event
+        return () =>
+            document.removeEventListener('keydown', keydownHandler, true);
     }, [
         tradeDirection,
         marketOrderType,
         activeOptions.skipOpenOrderConfirm,
         handleSubmitOrder,
         notionalSymbolQtyNum,
+        isFocused,
     ]);
 
     const getDisabledReason = (
@@ -1642,7 +1699,7 @@ function OrderInput({
     // );
 
     return (
-        <div className={styles.mainContainer}>
+        <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div
