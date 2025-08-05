@@ -931,7 +931,6 @@ function OrderInput({
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
-        console.log({ value });
 
         setPositionSliderPercentageValue(value);
         if (isReduceOnlyEnabled) {
