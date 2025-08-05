@@ -190,7 +190,6 @@ function OrderInput({
         useState(0);
 
     const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] = useState(0);
-
     // Track if we're processing an order
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
@@ -304,8 +303,6 @@ function OrderInput({
     const [userExceededAvailableMargin, setUserExceededAvailableMargin] =
         useState(false);
 
-    const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
-
     const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
@@ -331,27 +328,9 @@ function OrderInput({
 
     useEffect(() => {
         if (!marginBucket) {
-            setUsdAvailableToTrade(0);
             setCurrentPositionNotionalSize(0);
             return;
         }
-
-        // Calculate implied maintenance margin from leverage
-        const mmBps = Math.floor(10000 / leverage);
-
-        // Generate new MarginBucketAvail with leverage-adjusted values
-        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
-
-        // Use the appropriate availToBuy or availToSell based on order side
-        const usdAvailableToTrade =
-            tradeDirection === 'buy'
-                ? releveragedBucket?.availToBuy || 0
-                : releveragedBucket?.availToSell || 0;
-
-        const normalizedAvailableToTrade =
-            Number(usdAvailableToTrade) / 1_000_000;
-
-        setUsdAvailableToTrade(normalizedAvailableToTrade);
 
         const currentPositionNotionalSize = marginBucket?.netPosition || 0;
         const normalizedCurrentPosition =
@@ -451,34 +430,32 @@ function OrderInput({
     const notionalUsdOrderSizeNum =
         Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
-    const userBuyingPowerExceedsMaxOrderSize =
-        usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
-
-    const getAvailableToTradeFromMarginBucket = useCallback(() => {
+    const usdAvailableToTrade = useMemo(() => {
         if (!marginBucket) return 0;
         // Calculate implied maintenance margin from leverage
         const mmBps = Math.floor(10000 / leverage);
-
-        // Generate new MarginBucketAvail with leverage-adjusted values
         const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
-
-        // Use the appropriate availToBuy or availToSell based on order side
-        const usdAvailableToTrade =
-            tradeDirection === 'buy'
-                ? releveragedBucket?.availToBuy || 0
-                : releveragedBucket?.availToSell || 0;
-
         const normalizedAvailableToTrade =
-            Number(usdAvailableToTrade) / 1_000_000;
-        return normalizedAvailableToTrade - 0.03;
+            Number(
+                tradeDirection === 'buy'
+                    ? releveragedBucket?.availToBuy || 0
+                    : releveragedBucket?.availToSell || 0,
+            ) / 1_000_000;
+        return normalizedAvailableToTrade;
     }, [marginBucket, leverage, tradeDirection]);
+
+    const userBuyingPowerExceedsMaxOrderSize =
+        usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
+
+    const [maxCollateralModeEnabled, setMaxCollateralModeEnabled] =
+        useState(false);
 
     useEffect(() => {
         if (
-            positionSliderPercentageValue === 100 &&
+            !userExceededAvailableMargin &&
+            maxCollateralModeEnabled &&
             markPx &&
             !isEditingSizeInput &&
-            !userExceededAvailableMargin &&
             !userBuyingPowerExceedsMaxOrderSize
         ) {
             if (isReduceOnlyEnabled) {
@@ -487,17 +464,17 @@ function OrderInput({
                     Math.abs(Number(marginBucket.netPosition)) / 1e8;
                 setNotionalSymbolQtyNum(unscaledPositionSize);
             } else {
-                const normalizedAvailableToTrade =
-                    getAvailableToTradeFromMarginBucket();
                 const maxNotionalSize =
-                    (normalizedAvailableToTrade / markPx) * leverage;
+                    (usdAvailableToTrade / markPx) * leverage;
 
-                if (maxNotionalSize > 0)
+                if (maxNotionalSize > 0) {
                     setNotionalSymbolQtyNum(maxNotionalSize);
+                }
             }
         }
     }, [
-        positionSliderPercentageValue,
+        maxCollateralModeEnabled,
+        usdAvailableToTrade,
         leverage,
         markPx,
         isEditingSizeInput,
@@ -649,22 +626,6 @@ function OrderInput({
         setLeverage(value);
     };
 
-    // 1. Keep sizeDisplay constant and update notionalSymbolQtyNum when markPx changes (and not in 'symbol' mode)
-    useEffect(() => {
-        if (
-            !isEditingSizeInput &&
-            selectedMode !== 'symbol' &&
-            sizeDisplay &&
-            markPx
-        ) {
-            const parsedQty = parseFormattedNum(sizeDisplay);
-            if (!isNaN(parsedQty) && markPx !== 0) {
-                setNotionalSymbolQtyNum(parsedQty / markPx);
-            }
-        }
-        // Only depend on markPx here
-    }, [markPx]);
-
     useEffect(() => {
         if (
             !isEditingSizeInput &&
@@ -684,7 +645,7 @@ function OrderInput({
 
     // 2. Update sizeDisplay when notionalSymbolQtyNum or selectedMode changes
     useEffect(() => {
-        if (!isEditingSizeInput) {
+        if (!isEditingSizeInput && !userExceededAvailableMargin) {
             if (selectedMode === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
@@ -696,15 +657,14 @@ function OrderInput({
                         : '',
                 );
             } else if (markPx) {
-                setSizeDisplay(
-                    notionalSymbolQtyNum
-                        ? formatNumWithOnlyDecimals(
-                              notionalSymbolQtyNum * markPx,
-                              2,
-                              false,
-                          )
-                        : '',
-                );
+                const newSizeString = notionalSymbolQtyNum
+                    ? formatNumWithOnlyDecimals(
+                          notionalSymbolQtyNum * markPx,
+                          2,
+                          false,
+                      )
+                    : '';
+                setSizeDisplay(newSizeString);
             }
         }
     }, [
@@ -713,6 +673,7 @@ function OrderInput({
         isEditingSizeInput,
         markPx,
         leverage,
+        userExceededAvailableMargin,
     ]);
 
     const getPercentFromAvailableToTrade = useCallback(() => {
@@ -739,13 +700,14 @@ function OrderInput({
             if (!usdAvailableToTrade) return;
             percent = Math.min(getPercentFromAvailableToTrade(), 100);
         }
+        setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
-    }, [
-        leverage,
-        !!usdAvailableToTrade,
-        isReduceOnlyEnabled,
-        getPercentFromAvailableToTrade,
-    ]);
+        if (percent === 100) {
+            setMaxCollateralModeEnabled(true);
+        } else {
+            setMaxCollateralModeEnabled(false);
+        }
+    }, [leverage, !!usdAvailableToTrade, isReduceOnlyEnabled]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
@@ -794,13 +756,15 @@ function OrderInput({
                     if (percent > 100) {
                         setUserExceededAvailableMargin(true);
                         setPositionSliderPercentageValue(100);
+                        setMaxCollateralModeEnabled(true);
                     } else {
                         setUserExceededAvailableMargin(false);
                         if (percent > 99.5) {
                             setPositionSliderPercentageValue(100);
+                            setMaxCollateralModeEnabled(true);
                         } else {
-                            console.log({ percent });
                             setPositionSliderPercentageValue(percent);
+                            setMaxCollateralModeEnabled(false);
                         }
                     }
                 }
@@ -837,7 +801,9 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            handleSubmitOrder();
+            if (!activeOptions.skipOpenOrderConfirm) {
+                handleSubmitOrder();
+            }
         }
     };
     // PRICE INPUT----------------------------------
@@ -889,12 +855,8 @@ function OrderInput({
                 notionalSymbolQtyNum =
                     ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
             } else {
-                const normalizedAvailableToTrade =
-                    getAvailableToTradeFromMarginBucket();
-
                 notionalSymbolQtyNum =
-                    (((value / 100) * normalizedAvailableToTrade) /
-                        (markPx || 1)) *
+                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
                     leverage;
             }
         } else if (marketOrderType === 'limit') {
@@ -903,13 +865,8 @@ function OrderInput({
                 notionalSymbolQtyNum =
                     ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
             } else {
-                const normalizedAvailableToTrade =
-                    getAvailableToTradeFromMarginBucket();
-
-                if (!normalizedAvailableToTrade) return;
                 notionalSymbolQtyNum =
-                    (((value / 100) * normalizedAvailableToTrade) /
-                        (markPx || 1)) *
+                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
                     leverage;
             }
         }
@@ -931,8 +888,13 @@ function OrderInput({
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
-
+        setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(value);
+        if (value === 100) {
+            setMaxCollateralModeEnabled(true);
+        } else {
+            setMaxCollateralModeEnabled(false);
+        }
         if (isReduceOnlyEnabled) {
             setNotationalSymbolQtyFromPositionSize(value);
         } else {
@@ -1591,12 +1553,20 @@ function OrderInput({
             // 2. There's a valid notional/symbol quantity
             // 3. No modals are open
             // 4. Skip confirmation is not enabled
+            const submitButton = document.querySelector(
+                '[data-testid="submit-order-button"]',
+            );
+            const isSubmitButtonFocused =
+                document.activeElement === submitButton;
+            // Submit if either:
+            // 1. The submit button is focused, or
+            // 2. Skip confirmation is not enabled
             if (
-                isFocused &&
+                (isSubmitButtonFocused ||
+                    (!activeOptions.skipOpenOrderConfirm && isFocused)) &&
                 notionalSymbolQtyNum &&
                 !confirmOrderModal.isOpen &&
-                !isAnyPortfolioModalOpen &&
-                !activeOptions.skipOpenOrderConfirm
+                !isAnyPortfolioModalOpen
             ) {
                 handleSubmitOrder();
             }
@@ -1909,6 +1879,7 @@ function OrderInput({
                                     disabled={!isDisabled}
                                 >
                                     <button
+                                        data-testid='submit-order-button'
                                         className={styles.submit_button}
                                         style={{
                                             backgroundColor:
