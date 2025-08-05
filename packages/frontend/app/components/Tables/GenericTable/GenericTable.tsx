@@ -81,6 +81,10 @@ export default function GenericTable<
         csvDataFetcherArgs,
     } = props;
 
+    useEffect(() => {
+        console.log('>>> data.length', data.length);
+    }, [data]);
+
     function safeParse<T>(value: string | null, fallback: T): T {
         if (!value || value === 'undefined') return fallback;
         try {
@@ -143,6 +147,7 @@ export default function GenericTable<
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
     const isHttpInfoCallsDisabled = true;
+    const isShowAllEnabled = true;
 
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
@@ -178,12 +183,18 @@ export default function GenericTable<
 
         const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
 
-        if (rowCount > slicedLimit) {
+        if (isShowAllEnabled) {
+            setRowLimit(Infinity);
+        } else if (rowCount > slicedLimit) {
             setRowLimit(rowCount);
         } else {
             setRowLimit(slicedLimit);
         }
     };
+
+    useEffect(() => {
+        console.log('>>> rowLimit', rowLimit);
+    }, [rowLimit]);
 
     useEffect(() => {
         checkShadow();
@@ -405,7 +416,7 @@ export default function GenericTable<
                 id={`${id}-tableBody`}
                 className={`${styles.tableBody} ${
                     pageMode ? styles.pageMode : styles.notPage
-                }`}
+                } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
             >
                 {isSessionEstablished && tableState === TableState.LOADING && (
                     <SkeletonTable
