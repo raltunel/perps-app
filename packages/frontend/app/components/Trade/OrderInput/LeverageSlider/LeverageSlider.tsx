@@ -1,4 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+import useDebounce from '~/hooks/useDebounce';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
@@ -7,13 +14,14 @@ import styles from './LeverageSlider.module.css';
 interface LeverageSliderProps {
     value: number;
     onChange: (value: number) => void;
+    onClick?: (newLeverage: number) => void;
     className?: string;
     minimumInputValue?: number;
-    generateRandomMaximumInput?: () => void;
     // NEW: Modal mode props
     modalMode?: boolean;
     maxLeverage?: number;
     hideTitle?: boolean;
+    minimumValue?: number;
 }
 
 const LEVERAGE_CONFIG = {
@@ -68,11 +76,12 @@ export default function LeverageSlider({
     onChange,
     className = '',
     minimumInputValue = 1,
-    generateRandomMaximumInput,
     // NEW: Modal mode props with defaults
     modalMode = false,
     maxLeverage,
     hideTitle = false,
+    minimumValue,
+    onClick,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -89,6 +98,9 @@ export default function LeverageSlider({
           ? 100
           : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
+    const effectiveMinimum =
+        minimumValue !== undefined ? minimumValue : minimumInputValue;
+
     // Always default to 1x leverage if no value provided
     const currentValue = value ?? 1;
     const [inputValue, setInputValue] = useState<string>(
@@ -101,6 +113,8 @@ export default function LeverageSlider({
     const [hoveredTickIndex, setHoveredTickIndex] = useState<number | null>(
         null,
     );
+    const [unconstrainedSliderValue, setUnconstrainedSliderValue] =
+        useState<number>(0);
     const [hasInitializedLeverage, setHasInitializedLeverage] =
         useState<boolean>(false);
     const [announceText, setAnnounceText] = useState<string>('');
@@ -113,15 +127,15 @@ export default function LeverageSlider({
     }, [currentValue]);
 
     // Helper function to get the actual rounded value (what user sees)
-    const getRoundedDisplayValue = (val: number): number => {
-        if (val < 3) {
-            // Round DOWN to nearest tenth
-            return Math.floor(val * 10) / 10;
-        } else {
-            // Round DOWN to nearest whole number
-            return Math.floor(val);
-        }
-    };
+    // const getRoundedDisplayValue = (val: number): number => {
+    //     if (val < 3) {
+    //         // Round DOWN to nearest tenth
+    //         return Math.floor(val * 10) / 10;
+    //     } else {
+    //         // Round DOWN to nearest whole number
+    //         return Math.floor(val);
+    //     }
+    // };
 
     // Helper function to format values for input display (shows decimals below 3)
     const formatValue = (val: number): string => {
@@ -143,8 +157,102 @@ export default function LeverageSlider({
     };
 
     const constrainValue = (val: number): number => {
-        return Math.max(minimumInputValue, Math.min(maximumInputValue, val));
+        return Math.max(effectiveMinimum, Math.min(maximumInputValue, val));
     };
+
+    const [sliderBelowMinimumLeverage, setSliderBelowMinimumLeverage] =
+        useState(false);
+    const [warningTimeout, setWarningTimeout] = useState<NodeJS.Timeout | null>(
+        null,
+    );
+
+    const sliderBelowMinimumLeverageDebounced = useDebounce(
+        sliderBelowMinimumLeverage,
+        500,
+    );
+
+    const showMinimumWarning = sliderBelowMinimumLeverage
+        ? sliderBelowMinimumLeverageDebounced
+        : false;
+
+    const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
+    const shouldShowInteractiveWarning = useMemo(() => {
+        if (minimumValue === undefined) return false;
+
+        const minWithBuffer = minimumValue * 10 ** -0.1;
+        const isDraggingBelowMinimum =
+            isDragging && unconstrainedSliderValue <= minWithBuffer;
+
+        const isHoveringBelowMinimum =
+            !isDragging &&
+            hoveredTickIndex === null &&
+            isHovering &&
+            hoverValue !== null &&
+            hoverValue <= minWithBuffer;
+
+        return isDraggingBelowMinimum || isHoveringBelowMinimum;
+    }, [
+        minimumValue,
+        unconstrainedSliderValue,
+        isDragging,
+        isHovering,
+        hoverValue,
+    ]);
+
+    // Effect to handle warning display logic
+    useEffect(() => {
+        if (minimumValue === undefined) return;
+
+        const isCurrentAtMinimum = Math.abs(currentValue - minimumValue) < 0.01;
+
+        if (shouldShowInteractiveWarning) {
+            // Show immediately for interactive conditions and stop any auto-hide
+            setSliderBelowMinimumLeverage(true);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (isCurrentAtMinimum && !hasShownMinimumWarning) {
+            // Show warning when reaching minimum for the first time, then auto-hide after 3 seconds
+            setSliderBelowMinimumLeverage(true);
+            setHasShownMinimumWarning(true);
+
+            const timeout = setTimeout(() => {
+                setSliderBelowMinimumLeverage(false);
+                setWarningTimeout(null);
+            }, 3000);
+
+            setWarningTimeout(timeout);
+        } else if (!isCurrentAtMinimum) {
+            // Reset the "has shown" flag and hide warning when user moves above minimum
+            setHasShownMinimumWarning(false);
+            setSliderBelowMinimumLeverage(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        } else if (!shouldShowInteractiveWarning && hasShownMinimumWarning) {
+            // Hide warning when interactive conditions stop and we've already shown the minimum warning
+            setSliderBelowMinimumLeverage(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+        }
+
+        return () => {
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+            }
+        };
+    }, [
+        currentValue,
+        minimumValue,
+        shouldShowInteractiveWarning,
+        hasShownMinimumWarning,
+        warningTimeout,
+    ]);
+
     const announceValueChange = (value: number) => {
         const formattedValue = formatValue(value);
         setAnnounceText('');
@@ -157,7 +265,6 @@ export default function LeverageSlider({
 
     const handleLeverageChange = (newLeverage: number) => {
         // Update the preferred leverage in store with the exact value (no rounding)
-        console.log({ newLeverage });
         setPreferredLeverage(newLeverage);
 
         // Always call the parent onChange with the exact value
@@ -413,7 +520,6 @@ export default function LeverageSlider({
             Math.min(e.clientX - rect.left, rect.width),
         );
 
-        // Account for knob margins when calculating percentage
         const knobRadius = SLIDER_CONFIG.KNOB_RADIUS;
         const adjustedOffsetX = Math.max(
             knobRadius,
@@ -423,15 +529,13 @@ export default function LeverageSlider({
             ((adjustedOffsetX - knobRadius) / (rect.width - 2 * knobRadius)) *
             100;
 
-        // Convert percentage to value (no rounding for smooth preview)
         const newValue = percentageToValue(percentage);
 
         // Ensure value is within min/max bounds
-        const boundedValue = constrainValue(newValue);
+        // const boundedValue = constrainValue(newValue);
 
-        setHoverValue(boundedValue);
+        setHoverValue(newValue);
         setIsHovering(true);
-        // Clear any tick-specific hover when hovering over track
         setHoveredTickIndex(null);
     };
 
@@ -467,7 +571,11 @@ export default function LeverageSlider({
     // Handle track click to set value
     const handleTrackClick = (e: React.MouseEvent) => {
         const boundedValue = calculateValueFromPosition(e.clientX);
-        handleLeverageChange(boundedValue);
+        if (onClick) {
+            onClick(boundedValue);
+        } else {
+            handleLeverageChange(boundedValue);
+        }
     };
 
     const handleTrackTouchStart = (e: React.TouchEvent) => {
@@ -563,6 +671,7 @@ export default function LeverageSlider({
             // Convert percentage to value (no rounding for smooth movement)
             const newValue = percentageToValue(percentage);
 
+            setUnconstrainedSliderValue(newValue);
             // Ensure value is within min/max bounds
             const boundedValue = constrainValue(newValue);
 
@@ -733,8 +842,13 @@ export default function LeverageSlider({
                     />
                 </div>
 
-                {/* Slider container for modal mode */}
                 <div className={styles.modalSliderContainer}>
+                    {showMinimumWarning && (
+                        <div className={styles.modalSliderWarning}>
+                            Minimum leverage reached
+                        </div>
+                    )}
+
                     <div
                         ref={sliderRef}
                         className={styles.sliderTrack}
@@ -751,10 +865,7 @@ export default function LeverageSlider({
                         onMouseMove={handleTrackMouseMove}
                         onMouseLeave={handleTrackMouseLeave}
                     >
-                        {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
-
-                        {/* Active colored portion - using fixed position gradient */}
                         <div
                             className={styles.sliderActive}
                             style={{
@@ -775,7 +886,6 @@ export default function LeverageSlider({
                             const isCurrent =
                                 Math.abs(tickValue - value) <
                                 SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
@@ -836,7 +946,6 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
-                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -844,7 +953,6 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
@@ -869,7 +977,6 @@ export default function LeverageSlider({
                                                 : UI_CONFIG.INACTIVE_LABEL_COLOR,
                                     }}
                                     onKeyDown={(e) => {
-                                        // ADD THIS
                                         if (
                                             e.key === 'Enter' ||
                                             e.key === ' '
@@ -880,7 +987,11 @@ export default function LeverageSlider({
                                     }}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handleLeverageChange(tickValue);
+                                        if (onClick) {
+                                            onClick(tickValue);
+                                        } else {
+                                            handleLeverageChange(tickValue);
+                                        }
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
@@ -891,6 +1002,7 @@ export default function LeverageSlider({
                         })}
                     </div>
                 </div>
+
                 <div
                     aria-live='assertive'
                     aria-atomic='true'
@@ -908,14 +1020,41 @@ export default function LeverageSlider({
             </div>
         );
     }
-
     // Regular layout: Slider and input side by side
     return (
         <div
             className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
         >
-            {!hideTitle && <h3 className={styles.containerTitle}>Leverage</h3>}
-
+            {!hideTitle && (
+                <div className={styles.titleWithWarning}>
+                    <h3 className={styles.containerTitle}>Leverage</h3>
+                    {showMinimumWarning && (
+                        <div className={styles.minimumWarning}>
+                            Minimum leverage reached
+                        </div>
+                    )}
+                </div>
+            )}
+            {/* <div
+                style={{
+                    marginTop: '10px',
+                    padding: '8px 12px',
+                    backgroundColor: '#111',
+                    color: '#0f0',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    border: '1px solid #333',
+                    borderRadius: '4px',
+                    maxWidth: '300px',
+                }}
+            >
+                <div>Hover Value: {hoverValue?.toFixed(3) ?? 'null'}</div>
+                <div>Minimum Value: {minimumValue}</div>
+                <div>
+                    Trigger Warning?:{' '}
+                    {shouldShowInteractiveWarning ? ' YES' : 'NO'}
+                </div>
+            </div> */}
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -1098,6 +1237,7 @@ export default function LeverageSlider({
                     <span className={styles.valueSuffix}>x</span>
                 </div>
             </div>
+
             <div
                 aria-live='assertive'
                 aria-atomic='true'

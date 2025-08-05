@@ -55,6 +55,20 @@ export default function ConfirmationModal(props: propsIF) {
         }
     }, []);
 
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                submitFn();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [submitFn]);
+
     const liquidationPriceDisplay = useMemo(() => {
         if (liquidationPrice === null || liquidationPrice === undefined) {
             return '-';
@@ -99,12 +113,6 @@ export default function ConfirmationModal(props: propsIF) {
             value: liquidationPriceDisplay,
             tooltip:
                 'Estimated price at which your position will be liquidated',
-            className: styles.white,
-        },
-        {
-            label: 'Network Fee',
-            value: '0.000001 FOGO',
-            tooltip: 'Fee required to execute this trade on the network',
             className: styles.white,
         },
     ];

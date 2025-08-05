@@ -1,7 +1,9 @@
 import {
+    calcLeverageFloor,
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
     type MarginBucketAvail,
+    type MarginBucketPriced,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -10,6 +12,7 @@ import React, {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState,
     type JSX,
 } from 'react';
@@ -47,6 +50,7 @@ import styles from './OrderInput.module.css';
 import PositionSize from './PositionSIze/PositionSize';
 import PriceInput from './PriceInput/PriceInput';
 import PriceRange from './PriceRange/PriceRange';
+import ReduceAndProfitToggle from './ReduceAndProfitToggle/ReduceAndProfitToggle';
 import RunningTime from './RunningTime/RunningTime';
 import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
@@ -147,12 +151,18 @@ export type modalContentT =
 
 function OrderInput({
     marginBucket,
+    isAnyPortfolioModalOpen,
 }: {
     marginBucket: MarginBucketAvail | null;
+    isAnyPortfolioModalOpen: boolean;
 }) {
+    // Track if the OrderInput component is focused
+    const [isFocused, setIsFocused] = useState(false);
+    const orderInputRef = useRef<HTMLDivElement>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
@@ -196,34 +206,23 @@ function OrderInput({
 
     // disabled 07 Jul 25
     // const [chaseOption, setChaseOption] = useState<string>('bid1ask1');
-    // const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
-    // const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
-    // const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
-    // const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
-    //     useState(false);
+    const [isReduceOnlyEnabled, setIsReduceOnlyEnabled] = useState(false);
+    const [isTakeProfitEnabled, setIsTakeProfitEnabled] = useState(false);
+    const [isRandomizeEnabled, setIsRandomizeEnabled] = useState(false);
+    const [isChasingIntervalEnabled, setIsChasingIntervalEnabled] =
+        useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState('86437.7');
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minNotionalUsdOrderSize = 0.99;
     const maxNotionalUsdOrderSize = 100_000;
-    // eslint-disable-next-line
-    const [tempMaximumLeverageInput, setTempMaximumLeverageInput] =
-        useState<number>(100);
-    const generateRandomMaximumInput = () => {
-        // Generate a random maximum between minNotionalUsdOrderSize and 100
-        const newMaximumInputValue =
-            Math.floor(Math.random() * (100 - minNotionalUsdOrderSize + 1)) +
-            minNotionalUsdOrderSize;
-
-        setTempMaximumLeverageInput(newMaximumInputValue);
-    };
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
     const {
         obChosenPrice,
-        obChosenAmount,
+        // obChosenAmount,
         symbol,
         symbolInfo,
         marginMode,
@@ -253,10 +252,11 @@ function OrderInput({
             buys.length > 0 &&
             sells.length > 0
         ) {
-            const midPrice = getMidPrice();
-            if (!midPrice) return;
+            const resolution = buys[0].px - buys[1].px;
+            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
+            if (!midOrMarkPrice) return;
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midPrice,
+                midOrMarkPrice,
                 6,
                 true,
             );
@@ -283,6 +283,7 @@ function OrderInput({
         !sells.length,
         buys?.[0]?.px,
         sells?.[0]?.px,
+        markPx,
     ]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -306,6 +307,8 @@ function OrderInput({
 
     const [usdAvailableToTrade, setUsdAvailableToTrade] = useState(0);
 
+    const [leverageFloor, setLeverageFloor] = useState<number>();
+
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
         useState(0);
 
@@ -314,6 +317,18 @@ function OrderInput({
     const [liquidationPrice, setLiquidationPrice] = useState<number | null>(
         null,
     );
+
+    useEffect(() => {
+        if (!marginBucket) return;
+        try {
+            const leverageFloor = calcLeverageFloor(marginBucket);
+            const leverageFloorNum = Number(leverageFloor);
+            if (!leverageFloorNum) return;
+            setLeverageFloor(10_000 / leverageFloorNum);
+        } catch {
+            setLeverageFloor(100);
+        }
+    }, [marginBucket]);
 
     useEffect(() => {
         if (!marginBucket) {
@@ -437,24 +452,56 @@ function OrderInput({
     const notionalUsdOrderSizeNum =
         Math.floor(notionalSymbolQtyNum * (markPx || 1) * 100) / 100;
 
+    const userBuyingPowerExceedsMaxOrderSize =
+        usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
+
+    const getAvailableToTradeFromMarginBucket = (
+        marginBucket: MarginBucketPriced,
+    ) => {
+        if (!marginBucket) return 0;
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+
+        // Generate new MarginBucketAvail with leverage-adjusted values
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+
+        // Use the appropriate availToBuy or availToSell based on order side
+        const usdAvailableToTrade =
+            tradeDirection === 'buy'
+                ? releveragedBucket?.availToBuy || 0
+                : releveragedBucket?.availToSell || 0;
+
+        const normalizedAvailableToTrade =
+            Number(usdAvailableToTrade) / 1_000_000;
+        return normalizedAvailableToTrade;
+    };
+
     useEffect(() => {
         if (
+            marginBucket &&
             positionSliderPercentageValue === 100 &&
             markPx &&
             !isEditingSizeInput &&
-            !userExceededAvailableMargin
+            !userExceededAvailableMargin &&
+            !isReduceOnlyEnabled &&
+            !userBuyingPowerExceedsMaxOrderSize
         ) {
+            const normalizedAvailableToTrade =
+                getAvailableToTradeFromMarginBucket(marginBucket);
             const maxNotionalSize =
-                ((usdAvailableToTrade * 0.999) / markPx) * leverage;
+                (normalizedAvailableToTrade / markPx) * leverage;
 
-            setNotionalSymbolQtyNum(maxNotionalSize);
+            if (maxNotionalSize > 0) setNotionalSymbolQtyNum(maxNotionalSize);
         }
     }, [
+        marginBucket,
         positionSliderPercentageValue,
         leverage,
         markPx,
         isEditingSizeInput,
         userExceededAvailableMargin,
+        isReduceOnlyEnabled,
+        userBuyingPowerExceedsMaxOrderSize,
     ]);
 
     const sizeLessThanMinimum =
@@ -462,7 +509,6 @@ function OrderInput({
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const sizeMoreThanMaximum =
-        !notionalUsdOrderSizeNum ||
         notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
     const displayNumAvailableToTrade = useMemo(() => {
@@ -504,20 +550,12 @@ function OrderInput({
             orderValue = notionalSymbolQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
-            price &&
-            price.length > 0 &&
             notionalSymbolQtyNum
         ) {
-            orderValue = notionalSymbolQtyNum * parseFormattedNum(price);
+            orderValue = notionalSymbolQtyNum * (markPx || 1);
         }
         return orderValue;
-    }, [
-        notionalSymbolQtyNum,
-        price,
-        marketOrderType,
-        markPx,
-        parseFormattedNum,
-    ]);
+    }, [notionalSymbolQtyNum, marketOrderType, markPx]);
 
     const marginRequired = useMemo(() => {
         return usdOrderValue / leverage;
@@ -590,25 +628,15 @@ function OrderInput({
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
-        const midPrice = getMidPrice();
-        if (!midPrice) return;
-        if (obChosenPrice > midPrice) {
-            setTradeDirection('sell');
-        } else {
-            setTradeDirection('buy');
-        }
-        // uncomment once markPx more in line with orderbook
-        // if (markPx && obChosenPrice) {
-        //     console.log({ markPx, obChosenPrice });
-        //     if (obChosenPrice > markPx) {
-        //         setTradeDirection('sell');
-        //     } else {
-        //         setTradeDirection('buy');
-        //     }
+        // commented out to match HL functionality and not assume trade direction
+        // const midPrice = getMidPrice();
+        // if (!midPrice) return;
+        // if (obChosenPrice > midPrice) {
+        //     setTradeDirection('sell');
+        // } else {
+        //     setTradeDirection('buy');
         // }
-    }, [obChosenAmount, obChosenPrice]);
-
-    const activeOptions: useAppOptionsIF = useAppOptions();
+    }, [obChosenPrice]);
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
@@ -710,8 +738,7 @@ function OrderInput({
         [],
     );
 
-    const handleSizeInputBlur = useCallback(() => {
-        setIsEditingSizeInput(false);
+    const handleSizeInputUpdate = useCallback(() => {
         const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
@@ -719,8 +746,10 @@ function OrderInput({
             setNotionalSymbolQtyNum(adjusted);
             if (isUserLoggedIn) {
                 const usdValue = adjusted * (markPx || 1);
-                const percent =
-                    (usdValue / leverage / usdAvailableToTrade) * 100;
+                const percent = userBuyingPowerExceedsMaxOrderSize
+                    ? (usdValue / maxNotionalUsdOrderSize) * 100
+                    : (usdValue / leverage / usdAvailableToTrade) * 100;
+
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
@@ -732,19 +761,26 @@ function OrderInput({
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
         }
-    }, [
-        usdAvailableToTrade,
-        markPx,
-        sizeDisplay,
-        selectedMode,
-        isUserLoggedIn,
-    ]);
+    }, [sizeDisplay, selectedMode, markPx, leverage, isUserLoggedIn]);
+
+    // update slider on debounce after user has paused typing and updating sizeDisplay
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            handleSizeInputUpdate();
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [sizeDisplay]);
+
+    const handleSizeInputBlur = useCallback(() => {
+        setIsEditingSizeInput(false);
+        handleSizeInputUpdate();
+    }, [handleSizeInputUpdate]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', sizeDisplay);
+            handleSubmitOrder();
         }
     };
     // PRICE INPUT----------------------------------
@@ -790,18 +826,52 @@ function OrderInput({
     };
 
     const setNotionalSymbolQtyNumFromUsdAvailableToTrade = (value: number) => {
+        let notionalSymbolQtyNum;
         if (marketOrderType === 'market') {
-            const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade * 0.999) /
-                    (markPx || 1)) *
-                leverage;
-            setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
+                notionalSymbolQtyNum =
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
+                    leverage;
+            }
         } else if (marketOrderType === 'limit') {
-            if (!price || !usdAvailableToTrade) return;
+            if (!markPx) return;
+            if (userBuyingPowerExceedsMaxOrderSize) {
+                notionalSymbolQtyNum =
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
+                if (!normalizedAvailableToTrade) return;
+                notionalSymbolQtyNum =
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
+                    leverage;
+            }
+        }
+        if (notionalSymbolQtyNum) setNotionalSymbolQtyNum(notionalSymbolQtyNum);
+    };
+
+    const setNotationalSymbolQtyFromPositionSize = (value: number) => {
+        if (isReduceOnlyEnabled && !!marginBucket) {
+            // divide bigint by 1e8 to unscale
+            const unscaledPositionSize =
+                Math.abs(Number(marginBucket.netPosition)) / 1e8;
             const notionalSymbolQtyNum =
-                (((value / 100) * usdAvailableToTrade) /
-                    (parseFormattedNum(price) || 1)) *
-                leverage;
+                (value / 100) * Number(unscaledPositionSize);
+
+            // console.log({
+            //     netPosition: marginBucket.netPosition,
+            //     unscaledPositionSize,
+            //     notionalSymbolQtyNum,
+            // });
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
@@ -811,8 +881,19 @@ function OrderInput({
         setIsEditingSizeInput(false);
 
         setPositionSliderPercentageValue(value);
-        setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        if (isReduceOnlyEnabled) {
+            setNotationalSymbolQtyFromPositionSize(value);
+        } else {
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(value);
+        }
     };
+
+    useEffect(() => {
+        if (!isReduceOnlyEnabled && !notionalSymbolQtyNum)
+            setNotionalSymbolQtyNumFromUsdAvailableToTrade(
+                positionSliderPercentageValue,
+            );
+    }, [isReduceOnlyEnabled]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -823,26 +904,26 @@ function OrderInput({
 
     // REDUCE AND PROFIT STOP LOSS -----------------------------------------------------
 
-    // const handleToggleReduceOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isReduceOnlyEnabled;
-    //     setIsReduceOnlyEnabled(newValue);
-    // };
-    // const handleToggleProfitOnly = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isTakeProfitEnabled;
-    //     setIsTakeProfitEnabled(newValue);
-    // };
-    // const handleToggleRandomize = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isRandomizeEnabled;
-    //     setIsRandomizeEnabled(newValue);
-    // };
-    // const handleToggleChasingInterval = (newState?: boolean) => {
-    //     const newValue =
-    //         newState !== undefined ? newState : !isChasingIntervalEnabled;
-    //     setIsChasingIntervalEnabled(newValue);
-    // };
+    const handleToggleReduceOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isReduceOnlyEnabled;
+        setIsReduceOnlyEnabled(newValue);
+    };
+    const handleToggleProfitOnly = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isTakeProfitEnabled;
+        setIsTakeProfitEnabled(newValue);
+    };
+    const handleToggleRandomize = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isRandomizeEnabled;
+        setIsRandomizeEnabled(newValue);
+    };
+    const handleToggleChasingInterval = (newState?: boolean) => {
+        const newValue =
+            newState !== undefined ? newState : !isChasingIntervalEnabled;
+        setIsChasingIntervalEnabled(newValue);
+    };
 
     // PRICE RANGE AND TOTAL ORDERS -----------------------------------------
     const handleMinPriceRange = (
@@ -901,39 +982,39 @@ function OrderInput({
     );
 
     // -----------------------------PROPS----------------------------------------
-    // const reduceAndProfitToggleProps = useMemo(
-    //     () => ({
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleIsChasingInterval: handleToggleChasingInterval,
-    //     }),
-    //     [
-    //         isReduceOnlyEnabled,
-    //         isTakeProfitEnabled,
-    //         handleToggleProfitOnly,
-    //         handleToggleReduceOnly,
-    //         marketOrderType,
-    //         isRandomizeEnabled,
-    //         handleToggleRandomize,
-    //         isChasingIntervalEnabled,
-    //         handleToggleChasingInterval,
-    //     ],
-    // );
+    const reduceAndProfitToggleProps = useMemo(
+        () => ({
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleIsChasingInterval: handleToggleChasingInterval,
+        }),
+        [
+            isReduceOnlyEnabled,
+            isTakeProfitEnabled,
+            handleToggleProfitOnly,
+            handleToggleReduceOnly,
+            marketOrderType,
+            isRandomizeEnabled,
+            handleToggleRandomize,
+            isChasingIntervalEnabled,
+            handleToggleChasingInterval,
+        ],
+    );
 
     const leverageSliderProps = useMemo(
         () => ({
             value: leverage,
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
-            generateRandomMaximumInput: generateRandomMaximumInput,
+            minimumValue: leverageFloor,
         }),
-        [leverage, handleLeverageChange],
+        [leverage, handleLeverageChange, leverageFloor],
     );
 
     // const chasePriceProps = useMemo(
@@ -1363,7 +1444,10 @@ function OrderInput({
         selectedMode === 'symbol' ? 6 : 2,
     );
 
-    const handleSubmitOrder = () => {
+    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
+        useState(false);
+
+    const handleSubmitOrder = useCallback(() => {
         if (submitButtonRecentlyClicked) return;
         if (activeOptions.skipOpenOrderConfirm)
             setSubmitButtonRecentlyClicked(true);
@@ -1396,24 +1480,129 @@ function OrderInput({
                 }
             }
         }
-    };
+    }, [
+        submitButtonRecentlyClicked,
+        activeOptions.skipOpenOrderConfirm,
+        tradeDirection,
+        marketOrderType,
+        confirmOrderModal,
+        submitMarketBuy,
+        submitLimitBuy,
+        submitMarketSell,
+        submitLimitSell,
+    ]);
+
+    // Get portfolio modals state
+
+    // Set up focus/blur handlers for the component
+    useEffect(() => {
+        const handleFocusIn = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                orderInputRef.current.contains(e.target as Node)
+            ) {
+                setIsFocused(true);
+            }
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                !orderInputRef.current.contains(e.relatedTarget as Node)
+            ) {
+                setIsFocused(false);
+            }
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+        document.addEventListener('focusout', handleFocusOut);
+
+        // Set initial focus state
+        if (
+            orderInputRef.current &&
+            orderInputRef.current.contains(document.activeElement)
+        ) {
+            setIsFocused(true);
+        }
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            document.removeEventListener('focusout', handleFocusOut);
+        };
+    }, []);
+
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleEnter = () => {
+            // Only submit if:
+            // 1. The component is focused
+            // 2. There's a valid notional/symbol quantity
+            // 3. No modals are open
+            // 4. Skip confirmation is not enabled
+            if (
+                isFocused &&
+                notionalSymbolQtyNum &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !activeOptions.skipOpenOrderConfirm
+            ) {
+                handleSubmitOrder();
+            }
+        };
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            // Only handle Enter key when:
+            // 1. The component is focused
+            // 2. No modals are open
+            // 3. The event target is not a textarea or input (to allow normal Enter behavior in form fields)
+            const target = e.target as HTMLElement;
+            const isFormElement =
+                target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+
+            if (
+                e.key === 'Enter' &&
+                isFocused &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !isFormElement
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEnter();
+            }
+        };
+
+        document.addEventListener('keydown', keydownHandler, true); // Use capture phase to ensure we catch the event
+        return () =>
+            document.removeEventListener('keydown', keydownHandler, true);
+    }, [
+        tradeDirection,
+        marketOrderType,
+        activeOptions.skipOpenOrderConfirm,
+        handleSubmitOrder,
+        notionalSymbolQtyNum,
+        isFocused,
+    ]);
+
     const getDisabledReason = (
         collateralInsufficient: boolean,
         sizeLessThanMinimum: boolean,
         sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
         isMarketOrderLoading: boolean,
+        isReduceInWrongDirection: boolean,
+        isReduceOnlyExceedingPositionSize: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
+        if (isReduceInWrongDirection) return 'Switch direction to reduce';
         if (collateralInsufficient) return 'Insufficient collateral';
+        if (isReduceOnlyExceedingPositionSize)
+            return 'Reduce only exceeds position size';
         if (sizeLessThanMinimum) return 'Order size below minimum';
         if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
-
-    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
-        useState(false);
 
     useEffect(() => {
         if (submitButtonRecentlyClicked) {
@@ -1424,12 +1613,41 @@ function OrderInput({
         }
     }, [submitButtonRecentlyClicked]);
 
+    const isReduceInWrongDirection =
+        isReduceOnlyEnabled &&
+        !!marginBucket &&
+        ((marginBucket.netPosition > 0n && tradeDirection === 'buy') ||
+            (marginBucket.netPosition < 0n && tradeDirection === 'sell'));
+
+    const isReduceOnlyExceedingPositionSize = useMemo(() => {
+        return (
+            isReduceOnlyEnabled &&
+            !!marginBucket &&
+            (!marginBucket.netPosition ||
+                (marginBucket.netPosition > 0n &&
+                    tradeDirection === 'sell' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        marginBucket.netPosition) ||
+                (marginBucket.netPosition < 0n &&
+                    tradeDirection === 'buy' &&
+                    BigInt(Math.floor(notionalSymbolQtyNum * 1e8)) >
+                        -1n * marginBucket.netPosition))
+        );
+    }, [
+        isReduceOnlyEnabled,
+        marginBucket,
+        tradeDirection,
+        notionalSymbolQtyNum,
+    ]);
+
     const isDisabled =
         collateralInsufficient ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
-        submitButtonRecentlyClicked;
+        submitButtonRecentlyClicked ||
+        isReduceInWrongDirection ||
+        isReduceOnlyExceedingPositionSize;
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
@@ -1437,6 +1655,8 @@ function OrderInput({
         sizeMoreThanMaximum,
         isPriceInvalid,
         isMarketOrderLoading,
+        isReduceInWrongDirection || false,
+        isReduceOnlyExceedingPositionSize || false,
     );
 
     // const launchPadContent = (
@@ -1479,7 +1699,7 @@ function OrderInput({
     // );
 
     return (
-        <div className={styles.mainContainer}>
+        <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div
@@ -1618,9 +1838,9 @@ function OrderInput({
                                 priceDistributionButtons}
                             {marketOrderType === 'twap' && <RunningTime />}
 
-                            {/* <ReduceAndProfitToggle
+                            <ReduceAndProfitToggle
                                 {...reduceAndProfitToggleProps}
-                            /> */}
+                            />
                         </motion.div>
                         <motion.div
                             key='buttondetails'
@@ -1674,9 +1894,9 @@ function OrderInput({
                                 : confirmOrderModal.content === 'market_sell'
                                   ? 'Confirm Sell Order'
                                   : confirmOrderModal.content === 'limit_buy'
-                                    ? 'Confirm Limit Buy'
+                                    ? 'Confirm Limit Buy Order'
                                     : confirmOrderModal.content === 'limit_sell'
-                                      ? 'Confirm Limit Sale'
+                                      ? 'Confirm Limit Sell Order'
                                       : ''
                     }
                 >

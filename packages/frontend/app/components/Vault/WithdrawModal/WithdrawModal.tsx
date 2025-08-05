@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
-import styles from './WithdrawModal.module.css';
+import { useCallback, useState } from 'react';
+import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
-import { LuCircleHelp } from 'react-icons/lu';
+import styles from './WithdrawModal.module.css';
 
 interface WithdrawModalProps {
     vault: {
@@ -63,11 +63,6 @@ export default function WithdrawModal({
             value: formatCurrency(vault.yourDeposit, unitValue),
             tooltip:
                 'The total amount you have available to withdraw from this vault',
-        },
-        {
-            label: 'Network Fee',
-            value: unitValue === 'USD' ? '$1.00' : '0.0001 BTC',
-            tooltip: 'Fee charged for processing the withdrawal transaction',
         },
     ];
 
