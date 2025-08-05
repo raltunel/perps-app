@@ -493,72 +493,49 @@ const LabelComponent = ({
                     : 'buy';
 
             try {
-                // First cancel the existing order
-                const cancelResult = await executeCancelOrder({
-                    orderId: orderId, // Keep as number if that's what the API expects
-                    // Add any other required parameters for cancel order
-                });
+                // If cancel was successful, create a new order with the updated price
+                // Note: You'll need to provide the correct order parameters based on your application's needs
+                const newOrderParams: LimitOrderParams = {
+                    // Example parameters - replace with actual parameters from your order
+                    price: roundDownToTenth(newPrice),
+                    // Add other required parameters for the limit order
+                    // For example:
+                    // symbol: 'BTC/USD',
+                    side,
+                    quantity: quantity,
+                    replaceOrderId: BigInt(orderId),
+                    // ... other required parameters
+                } as LimitOrderParams; // Cast to the correct type
 
-                if (cancelResult.success) {
-                    // If cancel was successful, create a new order with the updated price
-                    // Note: You'll need to provide the correct order parameters based on your application's needs
-                    const newOrderParams: LimitOrderParams = {
-                        // Example parameters - replace with actual parameters from your order
-                        price: roundDownToTenth(newPrice),
-                        // Add other required parameters for the limit order
-                        // For example:
-                        // symbol: 'BTC/USD',
-                        side,
-                        quantity: quantity,
-                        // ... other required parameters
-                    } as LimitOrderParams; // Cast to the correct type
+                const limitOrderResult =
+                    await executeLimitOrder(newOrderParams);
 
-                    const limitOrderResult =
-                        await executeLimitOrder(newOrderParams);
-
-                    if (!limitOrderResult.success) {
-                        console.error(
-                            'Failed to create new order:',
-                            limitOrderResult.error,
-                        );
-                        // Show error notification to user
-                        add({
-                            title: 'Failed to update order',
-                            message:
-                                limitOrderResult.error ||
-                                'Unknown error occurred',
-                            icon: 'error',
-                            removeAfter: 15000,
-                            txLink: limitOrderResult.signature
-                                ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                                : undefined,
-                        });
-                    } else {
-                        // Show success notification
-                        add({
-                            title: 'Order updated',
-                            message:
-                                'The order has been successfully updated with the new price.',
-                            icon: 'check',
-                            removeAfter: 15000,
-                            txLink: limitOrderResult.signature
-                                ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                                : undefined,
-                        });
-                    }
-                } else {
+                if (!limitOrderResult.success) {
                     console.error(
-                        'Failed to cancel order:',
-                        cancelResult.error,
+                        'Failed to create new order:',
+                        limitOrderResult.error,
                     );
                     // Show error notification to user
                     add({
-                        title: 'Failed to cancel order',
-                        message: cancelResult.error || 'Unknown error occurred',
+                        title: 'Failed to update order',
+                        message:
+                            limitOrderResult.error || 'Unknown error occurred',
                         icon: 'error',
                         removeAfter: 15000,
-                        txLink: cancelResult.signature
-                            ? `${blockExplorer}/tx/${cancelResult.signature}`
+                        txLink: limitOrderResult.signature
+                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
+                            : undefined,
+                    });
+                } else {
+                    // Show success notification
+                    add({
+                        title: 'Order updated',
+                        message:
+                            'The order has been successfully updated with the new price.',
+                        icon: 'check',
+                        removeAfter: 15000,
+                        txLink: limitOrderResult.signature
+                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
                             : undefined,
                     });
                 }
