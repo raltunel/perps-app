@@ -1,3 +1,4 @@
+import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
 import styles from './testpage.module.css';
 
 export default function testpage() {
