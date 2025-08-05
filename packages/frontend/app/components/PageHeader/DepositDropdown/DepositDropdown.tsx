@@ -15,7 +15,6 @@ import React, {
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './DepositDropdown.module.css';
@@ -23,6 +22,9 @@ import styles from './DepositDropdown.module.css';
 interface propsIF {
     marginBucket: MarginBucketAvail | null;
     isDropdown?: boolean;
+    openDepositModal: () => void;
+    openWithdrawModal: () => void;
+    PortfolioModalsRenderer: React.ReactNode;
 }
 
 const tooltipSvg = (
@@ -50,7 +52,13 @@ const tooltipSvg = (
 );
 
 function DepositDropdown(props: propsIF) {
-    const { isDropdown, marginBucket } = props;
+    const {
+        isDropdown,
+        marginBucket,
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+    } = props;
 
     const [balanceNum, setBalanceNum] = useState<number>(0);
     const [unrealizedPnlNum, setUnrealizedPnlNum] = useState<number>(0);
@@ -69,8 +77,6 @@ function DepositDropdown(props: propsIF) {
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
 
-    const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
-        usePortfolioModals();
     const {
         //   accountOverview,
         selectedCurrency,
