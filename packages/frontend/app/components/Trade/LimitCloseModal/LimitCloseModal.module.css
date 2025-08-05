@@ -22,5 +22,19 @@
     text-align: center;
 }
 .position_size_container {
+    position: relative;
     padding: var(--padding-m) 0;
+    padding-top: var(--padding-l);
+}
+
+.warning_message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: var(--font-size-s);
+    color: var(--red);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
 }
