@@ -3,6 +3,7 @@ import {
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
     type MarginBucketAvail,
+    type MarginBucketPriced,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -445,6 +446,27 @@ function OrderInput({
     const userBuyingPowerExceedsMaxOrderSize =
         usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
 
+    const getAvailableToTradeFromMarginBucket = (
+        marginBucket: MarginBucketPriced,
+    ) => {
+        if (!marginBucket) return 0;
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+
+        // Generate new MarginBucketAvail with leverage-adjusted values
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+
+        // Use the appropriate availToBuy or availToSell based on order side
+        const usdAvailableToTrade =
+            tradeDirection === 'buy'
+                ? releveragedBucket?.availToBuy || 0
+                : releveragedBucket?.availToSell || 0;
+
+        const normalizedAvailableToTrade =
+            Number(usdAvailableToTrade) / 1_000_000;
+        return normalizedAvailableToTrade;
+    };
+
     useEffect(() => {
         if (
             marginBucket &&
@@ -455,20 +477,8 @@ function OrderInput({
             !isReduceOnlyEnabled &&
             !userBuyingPowerExceedsMaxOrderSize
         ) {
-            // Calculate implied maintenance margin from leverage
-            const mmBps = Math.floor(10000 / leverage);
-
-            // Generate new MarginBucketAvail with leverage-adjusted values
-            const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
-
-            // Use the appropriate availToBuy or availToSell based on order side
-            const usdAvailableToTrade =
-                tradeDirection === 'buy'
-                    ? releveragedBucket?.availToBuy || 0
-                    : releveragedBucket?.availToSell || 0;
-
             const normalizedAvailableToTrade =
-                Number(usdAvailableToTrade) / 1_000_000;
+                getAvailableToTradeFromMarginBucket(marginBucket);
             const maxNotionalSize =
                 (normalizedAvailableToTrade / markPx) * leverage;
 
@@ -531,20 +541,12 @@ function OrderInput({
             orderValue = notionalSymbolQtyNum * (markPx || 1);
         } else if (
             (marketOrderType === 'limit' || marketOrderType === 'stop_limit') &&
-            price &&
-            price.length > 0 &&
             notionalSymbolQtyNum
         ) {
-            orderValue = notionalSymbolQtyNum * parseFormattedNum(price);
+            orderValue = notionalSymbolQtyNum * (markPx || 1);
         }
         return orderValue;
-    }, [
-        notionalSymbolQtyNum,
-        price,
-        marketOrderType,
-        markPx,
-        parseFormattedNum,
-    ]);
+    }, [notionalSymbolQtyNum, marketOrderType, markPx]);
 
     const marginRequired = useMemo(() => {
         return usdOrderValue / leverage;
@@ -816,21 +818,28 @@ function OrderInput({
             if (userBuyingPowerExceedsMaxOrderSize) {
                 notionalSymbolQtyNum =
                     ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
-            } else {
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
                 notionalSymbolQtyNum =
-                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
                     leverage;
             }
         } else if (marketOrderType === 'limit') {
-            if (!price || !usdAvailableToTrade) return;
+            if (!markPx) return;
             if (userBuyingPowerExceedsMaxOrderSize) {
                 notionalSymbolQtyNum =
-                    ((value / 100) * maxNotionalUsdOrderSize) /
-                    (parseFormattedNum(price) || 1);
-            } else {
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
+            } else if (marginBucket) {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket(marginBucket);
+
+                if (!normalizedAvailableToTrade) return;
                 notionalSymbolQtyNum =
-                    (((value / 100) * usdAvailableToTrade) /
-                        (parseFormattedNum(price) || 1)) *
+                    (((value / 100) * normalizedAvailableToTrade) /
+                        (markPx || 1)) *
                     leverage;
             }
         }
