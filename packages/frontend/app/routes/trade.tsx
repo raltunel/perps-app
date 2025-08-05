@@ -18,6 +18,7 @@ import ComboBoxContainer from '~/components/Inputs/ComboBox/ComboBoxContainer';
 import AdvancedTutorialController from '~/components/Tutorial/AdvancedTutorialController';
 import { useTutorial } from '~/hooks/useTutorial';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import { usePortfolioModals } from './portfolio/usePortfolioModals';
 
 // Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
@@ -200,6 +201,13 @@ export default function Trade() {
         [symbol, activeTab],
     );
 
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+        isAnyPortfolioModalOpen,
+    } = usePortfolioModals();
+
     // Mobile view
     if (isMobile && symbol) {
         return (
@@ -218,7 +226,10 @@ export default function Trade() {
                 >
                     {(activeTab === 'order' ||
                         visibilityRefs.current.order) && (
-                        <OrderInput marginBucket={marginBucket} />
+                        <OrderInput
+                            marginBucket={marginBucket}
+                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
+                        />
                     )}
                 </div>
                 <div
@@ -308,7 +319,12 @@ export default function Trade() {
                             id='tradeModulesSection'
                             className={styles.tradeModules}
                         >
-                            <OrderInput marginBucket={marginBucket} />
+                            <OrderInput
+                                marginBucket={marginBucket}
+                                isAnyPortfolioModalOpen={
+                                    isAnyPortfolioModalOpen
+                                }
+                            />
                         </div>
                     </section>
                     <section
@@ -319,7 +335,14 @@ export default function Trade() {
                             <MemoizedTradeTable />
                         </div>
                         <div className={styles.wallet}>
-                            <DepositDropdown marginBucket={marginBucket} />
+                            <DepositDropdown
+                                marginBucket={marginBucket}
+                                openDepositModal={openDepositModal}
+                                openWithdrawModal={openWithdrawModal}
+                                PortfolioModalsRenderer={
+                                    PortfolioModalsRenderer
+                                }
+                            />
                         </div>
                     </section>
                 </div>

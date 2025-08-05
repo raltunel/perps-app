@@ -10,6 +10,8 @@ interface PositionSizeProps {
     value: number;
     onChange: (value: number) => void;
     className?: string;
+    hideValueDisplay?: boolean;
+    isModal?: boolean;
 }
 
 const POSITION_SIZE_CONFIG = {
@@ -45,6 +47,8 @@ export default function PositionSize({
     value = 0,
     onChange,
     className = '',
+    hideValueDisplay = false,
+    isModal = false,
 }: PositionSizeProps) {
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [showLabels] = useState(POSITION_SIZE_UI_CONFIG.DEFAULT_SHOW_LABELS);
@@ -284,7 +288,9 @@ export default function PositionSize({
     };
 
     return (
-        <div className={`${styles.positionSliderContainer} ${className} `}>
+        <div
+            className={`${styles.positionSliderContainer} ${className} ${isModal && styles.modalContainer} `}
+        >
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -376,30 +382,34 @@ export default function PositionSize({
                 </div>
 
                 {/* Current value display with input  */}
-                <div className={styles.valueDisplay}>
-                    <input
-                        type='text'
-                        inputMode='numeric'
-                        pattern='[0-9]*'
-                        value={Number.isNaN(currentValue) ? '' : currentValue}
-                        onChange={handleInputChange}
-                        onBlur={handleInputBlur}
-                        onKeyDown={handleInputKeyDown}
-                        className={styles.valueInput}
-                        aria-label='Position size value'
-                        style={{
-                            color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
-                        }}
-                    />
-                    <span
-                        className={styles.valueSuffix}
-                        style={{
-                            color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
-                        }}
-                    >
-                        %
-                    </span>
-                </div>
+                {!hideValueDisplay && (
+                    <div className={styles.valueDisplay}>
+                        <input
+                            type='text'
+                            inputMode='numeric'
+                            pattern='[0-9]*'
+                            value={
+                                Number.isNaN(currentValue) ? '' : currentValue
+                            }
+                            onChange={handleInputChange}
+                            onBlur={handleInputBlur}
+                            onKeyDown={handleInputKeyDown}
+                            className={styles.valueInput}
+                            aria-label='Position size value'
+                            style={{
+                                color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
+                            }}
+                        />
+                        <span
+                            className={styles.valueSuffix}
+                            style={{
+                                color: POSITION_SIZE_UI_CONFIG.TEXT_COLOR,
+                            }}
+                        >
+                            %
+                        </span>
+                    </div>
+                )}
             </div>
         </div>
     );

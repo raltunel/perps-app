@@ -12,6 +12,7 @@ interface PropsIF {
     setMidPriceAsPriceInput: () => void;
     isMidModeActive: boolean;
     setIsMidModeActive: (value: boolean) => void;
+    isModal?: boolean;
 }
 export default function PriceInput(props: PropsIF) {
     const {
@@ -25,11 +26,16 @@ export default function PriceInput(props: PropsIF) {
         setMidPriceAsPriceInput,
         isMidModeActive,
         setIsMidModeActive,
+        isModal = false,
     } = props;
 
     return (
         <div
-            className={`${styles.priceInputContainer} ${showMidButton ? styles.chaseLimit : ''}`}
+            className={`${styles.priceInputContainer}
+             ${showMidButton ? styles.chaseLimit : ''}
+             ${isModal ? styles.modalContainer : ''}
+
+              `}
         >
             <span>Price</span>
             <NumFormattedInput

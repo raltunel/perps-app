@@ -1,5 +1,6 @@
 .priceInputContainer {
     width: 100%;
+
     padding: var(--padding-xs) var(--padding-s);
     align-items: center;
     align-self: stretch;
@@ -12,6 +13,9 @@
     display: grid;
     gap: var(--gap-xs);
     color: var(--text2);
+}
+.modalContainer {
+    border: 1px solid var(--bg-dark4);
 }
 
 .chaseLimit {

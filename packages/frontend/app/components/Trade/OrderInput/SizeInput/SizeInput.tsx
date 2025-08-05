@@ -16,6 +16,7 @@ interface PropsIF {
     selectedMode: OrderBookMode;
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
+    isModal?: boolean;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -31,12 +32,15 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         selectedMode,
         setSelectedMode,
         onFocus,
+        isModal = false,
     } = props;
 
+    // temporarily only show BTC in the limit close modal
     // Memoized ComboBox options
     const comboBoxOptions = useMemo(
-        () => ['USD', symbol.toUpperCase()],
-        [symbol],
+        () =>
+            isModal ? [symbol.toUpperCase()] : [symbol.toUpperCase(), 'USD'],
+        [symbol, isModal],
     );
 
     // Memoized ComboBox onChange handler
@@ -48,7 +52,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     );
 
     return (
-        <div className={styles.sizeInputContainer}>
+        <div
+            className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
+        >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
                 id='trade-module-size-input'

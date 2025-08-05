@@ -12,6 +12,7 @@ import React, {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState,
     type JSX,
 } from 'react';
@@ -150,12 +151,18 @@ export type modalContentT =
 
 function OrderInput({
     marginBucket,
+    isAnyPortfolioModalOpen,
 }: {
     marginBucket: MarginBucketAvail | null;
+    isAnyPortfolioModalOpen: boolean;
 }) {
+    // Track if the OrderInput component is focused
+    const [isFocused, setIsFocused] = useState(false);
+    const orderInputRef = useRef<HTMLDivElement>(null);
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
@@ -631,8 +638,6 @@ function OrderInput({
         // }
     }, [obChosenPrice]);
 
-    const activeOptions: useAppOptionsIF = useAppOptions();
-
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
     }, []);
@@ -733,8 +738,7 @@ function OrderInput({
         [],
     );
 
-    const handleSizeInputBlur = useCallback(() => {
-        setIsEditingSizeInput(false);
+    const handleSizeInputUpdate = useCallback(() => {
         const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
@@ -757,19 +761,26 @@ function OrderInput({
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
         }
-    }, [
-        usdAvailableToTrade,
-        markPx,
-        sizeDisplay,
-        selectedMode,
-        isUserLoggedIn,
-    ]);
+    }, [sizeDisplay, selectedMode, markPx, leverage, isUserLoggedIn]);
+
+    // update slider on debounce after user has paused typing and updating sizeDisplay
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            handleSizeInputUpdate();
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [sizeDisplay]);
+
+    const handleSizeInputBlur = useCallback(() => {
+        setIsEditingSizeInput(false);
+        handleSizeInputUpdate();
+    }, [handleSizeInputUpdate]);
 
     const handleSizeKeyDown = (
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', sizeDisplay);
+            handleSubmitOrder();
         }
     };
     // PRICE INPUT----------------------------------
@@ -1433,7 +1444,10 @@ function OrderInput({
         selectedMode === 'symbol' ? 6 : 2,
     );
 
-    const handleSubmitOrder = () => {
+    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
+        useState(false);
+
+    const handleSubmitOrder = useCallback(() => {
         if (submitButtonRecentlyClicked) return;
         if (activeOptions.skipOpenOrderConfirm)
             setSubmitButtonRecentlyClicked(true);
@@ -1466,7 +1480,110 @@ function OrderInput({
                 }
             }
         }
-    };
+    }, [
+        submitButtonRecentlyClicked,
+        activeOptions.skipOpenOrderConfirm,
+        tradeDirection,
+        marketOrderType,
+        confirmOrderModal,
+        submitMarketBuy,
+        submitLimitBuy,
+        submitMarketSell,
+        submitLimitSell,
+    ]);
+
+    // Get portfolio modals state
+
+    // Set up focus/blur handlers for the component
+    useEffect(() => {
+        const handleFocusIn = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                orderInputRef.current.contains(e.target as Node)
+            ) {
+                setIsFocused(true);
+            }
+        };
+
+        const handleFocusOut = (e: FocusEvent) => {
+            if (
+                orderInputRef.current &&
+                !orderInputRef.current.contains(e.relatedTarget as Node)
+            ) {
+                setIsFocused(false);
+            }
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+        document.addEventListener('focusout', handleFocusOut);
+
+        // Set initial focus state
+        if (
+            orderInputRef.current &&
+            orderInputRef.current.contains(document.activeElement)
+        ) {
+            setIsFocused(true);
+        }
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+            document.removeEventListener('focusout', handleFocusOut);
+        };
+    }, []);
+
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleEnter = () => {
+            // Only submit if:
+            // 1. The component is focused
+            // 2. There's a valid notional/symbol quantity
+            // 3. No modals are open
+            // 4. Skip confirmation is not enabled
+            if (
+                isFocused &&
+                notionalSymbolQtyNum &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !activeOptions.skipOpenOrderConfirm
+            ) {
+                handleSubmitOrder();
+            }
+        };
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            // Only handle Enter key when:
+            // 1. The component is focused
+            // 2. No modals are open
+            // 3. The event target is not a textarea or input (to allow normal Enter behavior in form fields)
+            const target = e.target as HTMLElement;
+            const isFormElement =
+                target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+
+            if (
+                e.key === 'Enter' &&
+                isFocused &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !isFormElement
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEnter();
+            }
+        };
+
+        document.addEventListener('keydown', keydownHandler, true); // Use capture phase to ensure we catch the event
+        return () =>
+            document.removeEventListener('keydown', keydownHandler, true);
+    }, [
+        tradeDirection,
+        marketOrderType,
+        activeOptions.skipOpenOrderConfirm,
+        handleSubmitOrder,
+        notionalSymbolQtyNum,
+        isFocused,
+    ]);
+
     const getDisabledReason = (
         collateralInsufficient: boolean,
         sizeLessThanMinimum: boolean,
@@ -1486,9 +1603,6 @@ function OrderInput({
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
-
-    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
-        useState(false);
 
     useEffect(() => {
         if (submitButtonRecentlyClicked) {
@@ -1585,7 +1699,7 @@ function OrderInput({
     // );
 
     return (
-        <div className={styles.mainContainer}>
+        <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div

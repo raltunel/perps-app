@@ -16,6 +16,7 @@ import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
+import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -113,7 +114,6 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 return (
                     <LeverageSliderModal
                         currentLeverage={position.leverage.value}
-                        // maxLeverage={position.maxLeverage}
                         onClose={modalCtrl.close}
                         onConfirm={(value) => {
                             console.log({ value });
@@ -128,6 +128,13 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             position={position}
                         />
                     </Modal>
+                );
+            } else if (modalContent === 'limitChase') {
+                return (
+                    <LimitCloseModal
+                        position={position}
+                        close={modalCtrl.close}
+                    />
                 );
             }
             return null;
@@ -343,6 +350,15 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             disabled={isClosing}
                         >
                             {isClosing ? 'Closing...' : 'Market'}
+                        </button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={() => {
+                                setModalContent('limitChase');
+                                modalCtrl.open();
+                            }}
+                        >
+                            Limit
                         </button>
                     </div>
                 </div>
