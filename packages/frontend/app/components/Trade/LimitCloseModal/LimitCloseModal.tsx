@@ -69,8 +69,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const lastChangedBySlider = useRef(true);
 
     const estimatedPNL = isPositionLong
-        ? sizeNum * (parseFormattedNum(price) - position.entryPx)
-        : sizeNum * (position.entryPx - parseFormattedNum(price));
+        ? notionalSymbolQtyNum * (parseFormattedNum(price) - position.entryPx)
+        : notionalSymbolQtyNum * (position.entryPx - parseFormattedNum(price));
 
     useEffect(() => {
         if (isMidModeActive) {
