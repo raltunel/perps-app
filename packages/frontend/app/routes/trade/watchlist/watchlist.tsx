@@ -10,7 +10,7 @@ const WatchList: React.FC = () => {
     const { favCoins, favKeys, symbol, addToFavKeys, removeFromFavKeys } =
         useTradeDataStore();
 
-    const whiteListedCoins = new Set(['BTC']);
+    const whiteListedCoins = new Set(['BTC', 'ETH', 'SOL']);
 
     const [watchListMode, setWatchListMode] = useState<'dollar' | 'percent'>(
         'dollar',

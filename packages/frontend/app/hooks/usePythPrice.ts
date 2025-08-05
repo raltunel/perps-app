@@ -37,23 +37,14 @@ export function usePythPrice(symbol: string | null): UsePythPriceResult {
 
     // Subscribe to price updates when component mounts or symbol changes
     useEffect(() => {
-        console.log(
-            `[usePythPrice] Effect triggered for symbol: ${symbol}, hasFeed: ${hasFeed}`,
-        );
-
         if (!symbol || !hasFeed) {
-            console.log(
-                `[usePythPrice] Skipping subscription - symbol: ${symbol}, hasFeed: ${hasFeed}`,
-            );
             return;
         }
 
-        console.log(`[usePythPrice] Subscribing to ${symbol}`);
         subscribeToSymbol(symbol);
 
         // Cleanup: unsubscribe when component unmounts or symbol changes
         return () => {
-            console.log(`[usePythPrice] Unsubscribing from ${symbol}`);
             unsubscribeFromSymbol(symbol);
         };
     }, [symbol, hasFeed, subscribeToSymbol, unsubscribeFromSymbol]);

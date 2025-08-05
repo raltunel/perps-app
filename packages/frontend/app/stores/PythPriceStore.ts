@@ -43,14 +43,8 @@ export const usePythPriceStore = create<PythPriceStore>()(
         },
 
         subscribeToSymbol: async (symbol: string) => {
-            console.log(
-                `[PythPriceStore] subscribeToSymbol called for: ${symbol}`,
-            );
             const state = get();
             if (state.activeSubscriptions.has(symbol)) {
-                console.log(
-                    `[PythPriceStore] Already subscribed to: ${symbol}`,
-                );
                 return; // Already subscribed
             }
 
@@ -111,10 +105,6 @@ export function initializePythPriceService(): void {
 
     // Subscribe to price updates
     service.onPriceUpdate((symbol, priceData) => {
-        console.log(
-            `[PythPriceStore] Price update received for ${symbol}:`,
-            priceData,
-        );
         store.setPrice(symbol, priceData);
     });
 

@@ -27,27 +27,6 @@ const SymbolInfo: React.FC = React.memo(() => {
         isConnected: isPythConnected,
     } = usePythPrice(symbol);
 
-    // Debug logging
-    useEffect(() => {
-        console.log('[Oracle Debug]', {
-            symbol,
-            usePythOracle,
-            pythPrice,
-            isPythConnected,
-            hlPrice: symbolInfo?.oraclePx,
-            finalPrice:
-                usePythOracle && pythPrice && isPythConnected
-                    ? pythPrice
-                    : symbolInfo?.oraclePx,
-        });
-    }, [
-        symbol,
-        usePythOracle,
-        pythPrice,
-        isPythConnected,
-        symbolInfo?.oraclePx,
-    ]);
-
     // State for funding countdown
     const [fundingCountdown, setFundingCountdown] = useState(
         getTimeUntilNextHour(),
