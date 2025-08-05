@@ -15,10 +15,18 @@ interface PositionsTableProps {
     pageMode?: boolean;
     isFetched: boolean;
     selectedFilter?: string;
+    perPageOverride?: number;
+    inTradePage?: boolean;
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
-    const { pageMode, isFetched, selectedFilter } = props;
+    const {
+        pageMode,
+        isFetched,
+        selectedFilter,
+        perPageOverride,
+        inTradePage,
+    } = props;
     const { coinPriceMap, symbol } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
@@ -85,6 +93,8 @@ export default function PositionsTable(props: PositionsTableProps) {
                 viewAllLink={viewAllLink}
                 skeletonRows={7}
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
+                perPageOverride={perPageOverride}
+                inTradePage={inTradePage}
             />
         </>
     );

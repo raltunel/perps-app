@@ -168,6 +168,8 @@ export default function TradeTable(props: TradeTableProps) {
                     <PositionsTable
                         isFetched={!positionsLoading || lastUpdateTime > 0}
                         selectedFilter={selectedFilter}
+                        perPageOverride={10}
+                        inTradePage={true}
                     />
                 );
             case 'Open Orders':
@@ -176,6 +178,8 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         isFetched={orderHistoryFetched}
                         data={userOrders}
+                        perPageOverride={10}
+                        inTradePage={true}
                     />
                 );
             // case 'TWAP':
@@ -185,6 +189,8 @@ export default function TradeTable(props: TradeTableProps) {
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
+                        perPageOverride={10}
+                        inTradePage={true}
                     />
                 );
             case 'Funding History':

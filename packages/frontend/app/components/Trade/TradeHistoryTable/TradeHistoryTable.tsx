@@ -17,11 +17,20 @@ interface TradeHistoryTableProps {
     onViewOrderDetails?: (time: string, coin: string) => void;
     onViewAll?: () => void;
     pageMode?: boolean;
+    perPageOverride?: number;
+    inTradePage?: boolean;
 }
 
 export default function TradeHistoryTable(props: TradeHistoryTableProps) {
-    const { data, isFetched, selectedFilter, onViewOrderDetails, pageMode } =
-        props;
+    const {
+        data,
+        isFetched,
+        selectedFilter,
+        onViewOrderDetails,
+        pageMode,
+        perPageOverride,
+        inTradePage,
+    } = props;
 
     const { symbol } = useTradeDataStore();
 
@@ -95,6 +104,8 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 noDataMessage='No trade history'
                 csvDataFetcher={fetchUserFills}
                 csvDataFetcherArgs={[userAddress, true]}
+                perPageOverride={perPageOverride}
+                inTradePage={inTradePage}
             />
         </>
     );

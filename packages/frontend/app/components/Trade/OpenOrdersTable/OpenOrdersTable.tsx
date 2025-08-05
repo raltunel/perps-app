@@ -17,10 +17,20 @@ interface OpenOrdersTableProps {
     selectedFilter?: string;
     isFetched: boolean;
     pageMode?: boolean;
+    perPageOverride?: number;
+    inTradePage?: boolean;
 }
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
-    const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
+    const {
+        onCancel,
+        selectedFilter,
+        isFetched,
+        pageMode,
+        data,
+        perPageOverride,
+        inTradePage,
+    } = props;
 
     const handleCancel = (time: number, coin: string) => {
         if (onCancel) {
@@ -86,6 +96,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
+                perPageOverride={perPageOverride}
+                inTradePage={inTradePage}
             />
         </>
     );
