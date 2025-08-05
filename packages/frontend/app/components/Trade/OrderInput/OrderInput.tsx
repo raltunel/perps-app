@@ -736,6 +736,7 @@ function OrderInput({
 
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
+            setIsEditingSizeInput(true);
             if (typeof event === 'string') {
                 setSizeDisplay(event);
             } else {
@@ -808,10 +809,14 @@ function OrderInput({
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
         if (isEditingSizeInput) {
-            const timeout = setTimeout(() => {
+            if (sizeDisplay === '') {
                 handleSizeInputUpdate();
-            }, 500);
-            return () => clearTimeout(timeout);
+            } else {
+                const timeout = setTimeout(() => {
+                    handleSizeInputUpdate();
+                }, 500);
+                return () => clearTimeout(timeout);
+            }
         }
     }, [sizeDisplay, isEditingSizeInput]);
 
