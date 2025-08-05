@@ -34,8 +34,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
-    const { parseFormattedNum, formatNum, parseFormattedWithOnlyDecimals } =
-        useNumFormatter();
+    const {
+        parseFormattedNum,
+        formatNum,
+        // parseFormattedWithOnlyDecimals
+    } = useNumFormatter();
 
     const isPositionLong = position.szi > 0;
 
@@ -56,10 +59,12 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const originalSize = Math.abs(position.szi);
 
     const [positionSize, setPositionSize] = useState(100);
-    const [size, setSize] = useState(String(originalSize));
+    const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] =
+        useState(originalSize);
+    const [sizeDisplay, setSizeDisplay] = useState('');
     const [isOverLimit, setIsOverLimit] = useState(false);
+    const [isEditingSizeInput, setIsEditingSizeInput] = useState(false);
 
-    const sizeNum = parseFormattedWithOnlyDecimals(size);
     // the useeffect was updating and reformatting user input so I added this to track it to differentiate between the input and the slider
     const lastChangedBySlider = useRef(true);
 
@@ -76,26 +81,90 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         markPx,
     ]);
 
+    // Initialize sizeDisplay based on selectedMode
+    useEffect(() => {
+        if (!isEditingSizeInput) {
+            if (selectedMode === 'symbol') {
+                setSizeDisplay(
+                    notionalSymbolQtyNum
+                        ? formatNumWithOnlyDecimals(
+                              notionalSymbolQtyNum,
+                              6,
+                              true,
+                          )
+                        : '',
+                );
+            } else if (markPx) {
+                setSizeDisplay(
+                    notionalSymbolQtyNum
+                        ? formatNumWithOnlyDecimals(
+                              notionalSymbolQtyNum * markPx,
+                              2,
+                              false,
+                          )
+                        : '',
+                );
+            }
+        }
+    }, [notionalSymbolQtyNum, selectedMode, isEditingSizeInput, markPx]);
+
+    // Update sizeDisplay when markPx changes
+    useEffect(() => {
+        if (
+            !isEditingSizeInput &&
+            selectedMode !== 'symbol' &&
+            sizeDisplay &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(sizeDisplay);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setNotionalSymbolQtyNum(parsedQty / markPx);
+            }
+        }
+    }, [markPx]);
+
+    // Update sizeDisplay format when selectedMode changes
+    useEffect(() => {
+        if (
+            !isEditingSizeInput &&
+            selectedMode === 'usd' &&
+            sizeDisplay &&
+            markPx
+        ) {
+            const parsedQty = parseFormattedNum(sizeDisplay);
+            if (!isNaN(parsedQty) && markPx !== 0) {
+                setSizeDisplay(
+                    formatNumWithOnlyDecimals(parsedQty * markPx, 2),
+                );
+            }
+        }
+    }, [selectedMode]);
+
     useEffect(() => {
         if (!lastChangedBySlider.current) return;
 
         const calculatedSize = (originalSize * positionSize) / 100;
-        const formattedSize = formatNumWithOnlyDecimals(
-            calculatedSize,
-            8,
-            true,
-        );
-        setSize(formattedSize);
+        setNotionalSymbolQtyNum(calculatedSize);
 
         if (Math.abs(calculatedSize) < 1e-8) {
             setIsOverLimit(true);
         } else if (positionSize > 0) {
-            const numVal = parseFloat(formattedSize);
-            if (numVal <= originalSize && numVal > 0) {
+            if (calculatedSize <= originalSize && calculatedSize > 0) {
                 setIsOverLimit(false);
             }
         }
-    }, [positionSize, originalSize, formatNumWithOnlyDecimals]);
+    }, [positionSize, originalSize]);
+
+    useEffect(() => {
+        console.log(
+            'Mode switched to:',
+            selectedMode,
+            'sizeDisplay:',
+            sizeDisplay,
+            'markPx:',
+            markPx,
+        );
+    }, [selectedMode]);
 
     const handleSizeChange = (
         val: string | React.ChangeEvent<HTMLInputElement>,
@@ -107,45 +176,73 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         } else if (val?.target?.value !== undefined) {
             inputValue = val.target.value;
         } else return;
+
         lastChangedBySlider.current = false;
-        setSize(inputValue);
+        setSizeDisplay(inputValue);
+    };
 
-        const numVal = parseFloat(inputValue);
-        if (!isNaN(numVal) && originalSize > 0) {
-            const percentage = (numVal / originalSize) * 100;
+    const handleSizeInputUpdate = () => {
+        const parsed = parseFormattedNum(sizeDisplay.trim());
+        if (!isNaN(parsed)) {
+            const adjusted =
+                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+            setNotionalSymbolQtyNum(adjusted);
 
-            if (numVal > originalSize) {
+            if (adjusted > originalSize) {
                 setPositionSize(100);
                 setIsOverLimit(true);
-            } else if (Math.abs(numVal) < 1e-8) {
+            } else if (Math.abs(adjusted) < 1e-8) {
                 setPositionSize(0);
                 setIsOverLimit(true);
             } else {
+                const percentage = (adjusted / originalSize) * 100;
                 setPositionSize(Math.round(Math.max(0, percentage)));
                 setIsOverLimit(false);
             }
+        } else if (sizeDisplay.trim() === '') {
+            setNotionalSymbolQtyNum(0);
+            setPositionSize(0);
+            setIsOverLimit(true);
         } else {
             setIsOverLimit(true);
         }
     };
+
+    const handleSizeInputBlur = () => {
+        setIsEditingSizeInput(false);
+        handleSizeInputUpdate();
+    };
+
+    const handleOnFocus = () => {
+        setIsEditingSizeInput(true);
+    };
+
+    // Update sizeDisplay on debounce after user has paused typing
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (isEditingSizeInput) {
+                handleSizeInputUpdate();
+            }
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [sizeDisplay, isEditingSizeInput]);
 
     function roundDownToTenth(value: number) {
         return Math.floor(value * 10) / 10;
     }
 
     const handlePositionSizeChange = (val: number) => {
-        // for input
+        // for slider input
         lastChangedBySlider.current = true;
         setPositionSize(val);
         setIsOverLimit(val === 0);
     };
 
     const getWarningMessage = () => {
-        const numVal = parseFloat(size);
-        if (isNaN(numVal) || numVal < 0) return 'Please enter a valid size';
-        if (Math.abs(numVal) < 1e-8) return 'Size cannot be zero';
-        if (numVal > originalSize)
+        if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
+        if (notionalSymbolQtyNum > originalSize)
             return 'Size cannot exceed your position size';
+        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
         return '';
     };
 
@@ -168,7 +265,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     // fn to submit a 'Buy' limit order
     async function submitLimitBuy(): Promise<void> {
         // Validate position size
-        if (!sizeNum || sizeNum <= 0) {
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
                 title: 'Invalid Order Size',
                 message: 'Please enter a valid order size',
@@ -197,7 +294,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             // Show pending notification
             notifications.add({
                 title: 'Buy / Long Limit Order Pending',
-                message: `Buying ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
             });
         }
@@ -205,7 +302,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         try {
             // Execute limit order
             const result = await executeLimitOrder({
-                quantity: sizeNum,
+                quantity: notionalSymbolQtyNum,
                 price: roundDownToTenth(limitPrice),
                 side: 'buy',
             });
@@ -213,7 +310,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
                     removeAfter: 10000,
@@ -249,7 +346,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     // fn to submit a 'Sell' limit order
     async function submitLimitSell(): Promise<void> {
         // Validate position size
-        if (!sizeNum || sizeNum <= 0) {
+        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
                 title: 'Invalid Order Size',
                 message: 'Please enter a valid order size',
@@ -278,7 +375,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             // Show pending notification
             notifications.add({
                 title: 'Sell / Short Limit Order Pending',
-                message: `Selling ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
             });
         }
@@ -286,7 +383,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         try {
             // Execute limit order
             const result = await executeLimitOrder({
-                quantity: sizeNum,
+                quantity: notionalSymbolQtyNum,
                 price: roundDownToTenth(limitPrice),
                 side: 'sell',
             });
@@ -294,7 +391,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
                     removeAfter: 10000,
@@ -420,11 +517,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     />
 
                     <SizeInput
-                        value={size}
+                        value={sizeDisplay}
                         onChange={handleSizeChange}
-                        onBlur={(e) => console.log('Size blur', e)}
+                        onFocus={handleOnFocus}
+                        onBlur={handleSizeInputBlur}
                         onKeyDown={(e) => console.log('Size keydown', e.key)}
-                        onFocus={() => console.log('Size input focused')}
                         className=''
                         ariaLabel='size-input'
                         useTotalSize={false}
