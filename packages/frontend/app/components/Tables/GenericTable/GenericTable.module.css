@@ -125,6 +125,9 @@
     box-shadow: 0px 0px 20px 20px var(--bg-dark2);
     z-index: var(--z-index-generic-table-actions);
 }
+.actionsContainer.lessShadow {
+    box-shadow: 0px 0px 20px 10px var(--bg-dark2);
+}
 
 .sessionButtonContainer {
     display: flex;

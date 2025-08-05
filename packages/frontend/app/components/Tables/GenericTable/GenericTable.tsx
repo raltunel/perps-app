@@ -459,6 +459,15 @@ export default function GenericTable<
                     </div>
                 )}
 
+                {isHttpInfoCallsDisabled && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={
+                            styles.actionsContainer + ' ' + styles.lessShadow
+                        }
+                    ></div>
+                )}
+
                 {pageMode && (
                     <GenericTablePagination
                         totalCount={sortedData.length}
