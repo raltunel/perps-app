@@ -1,9 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { type useAppOptionsIF, useAppOptions } from '~/stores/AppOptionsStore';
+import {
+    type NotificationStoreIF,
+    useNotificationStore,
+} from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -20,6 +27,17 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const { symbolInfo } = useTradeDataStore();
+
+    const activeOptions: useAppOptionsIF = useAppOptions();
+
+    const { executeLimitOrder } = useLimitOrderService();
+
+    const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+
+    const { parseFormattedNum, formatNum, parseFormattedWithOnlyDecimals } =
+        useNumFormatter();
+
+    const isPositionLong = position.szi > 0;
 
     const { buys, sells } = useOrderBookStore();
 
@@ -41,6 +59,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const [size, setSize] = useState(String(originalSize));
     const [isOverLimit, setIsOverLimit] = useState(false);
 
+    const sizeNum = parseFormattedWithOnlyDecimals(size);
     // the useeffect was updating and reformatting user input so I added this to track it to differentiate between the input and the slider
     const lastChangedBySlider = useRef(true);
 
@@ -110,6 +129,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         }
     };
 
+    function roundDownToTenth(value: number) {
+        return Math.floor(value * 10) / 10;
+    }
+
     const handlePositionSizeChange = (val: number) => {
         // for input
         lastChangedBySlider.current = true;
@@ -140,6 +163,169 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             setIsMidModeActive(true);
         }
     };
+    const notifications: NotificationStoreIF = useNotificationStore();
+
+    // fn to submit a 'Buy' limit order
+    async function submitLimitBuy(): Promise<void> {
+        // Validate position size
+        if (!sizeNum || sizeNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        if (activeOptions.skipOpenOrderConfirm) {
+            close();
+            // Show pending notification
+            notifications.add({
+                title: 'Buy / Long Limit Order Pending',
+                message: `Buying ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+        }
+
+        try {
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: sizeNum,
+                price: roundDownToTenth(limitPrice),
+                side: 'buy',
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed buy order for ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit buy order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            close();
+        }
+    }
+
+    // fn to submit a 'Sell' limit order
+    async function submitLimitSell(): Promise<void> {
+        // Validate position size
+        if (!sizeNum || sizeNum <= 0) {
+            notifications.add({
+                title: 'Invalid Order Size',
+                message: 'Please enter a valid order size',
+                icon: 'error',
+            });
+            close();
+            return;
+        }
+
+        // Validate price
+        const limitPrice = parseFormattedNum(price);
+        if (!limitPrice || limitPrice <= 0) {
+            notifications.add({
+                title: 'Invalid Price',
+                message: 'Please enter a valid limit price',
+                icon: 'error',
+            });
+            close();
+            return;
+        }
+
+        setIsProcessingOrder(true);
+
+        if (activeOptions.skipOpenOrderConfirm) {
+            close();
+            // Show pending notification
+            notifications.add({
+                title: 'Sell / Short Limit Order Pending',
+                message: `Selling ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+            });
+        }
+
+        try {
+            // Execute limit order
+            const result = await executeLimitOrder({
+                quantity: sizeNum,
+                price: roundDownToTenth(limitPrice),
+                side: 'sell',
+            });
+
+            if (result.success) {
+                notifications.add({
+                    title: 'Limit Order Placed',
+                    message: `Successfully placed sell order for ${formatNum(sizeNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    icon: 'check',
+                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    removeAfter: 10000,
+                });
+            } else {
+                notifications.add({
+                    title: 'Limit Order Failed',
+                    message: result.error || 'Failed to place limit order',
+                    icon: 'error',
+                    removeAfter: 15000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error submitting limit sell order:', error);
+            notifications.add({
+                title: 'Limit Order Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 15000,
+            });
+        } finally {
+            setIsProcessingOrder(false);
+            close();
+        }
+    }
 
     return (
         <Modal title='Limit Close' close={close}>
@@ -200,11 +386,16 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     <SimpleButton
                         onClick={() => {
                             console.log('confirm');
+                            if (isPositionLong) {
+                                submitLimitSell();
+                            } else {
+                                submitLimitBuy();
+                            }
                         }}
                         bg='accent1'
-                        disabled={isOverLimit}
+                        disabled={isProcessingOrder || isOverLimit}
                     >
-                        Confirm
+                        {isProcessingOrder ? 'Processing...' : 'Confirm'}
                     </SimpleButton>
                 </div>
             </div>
