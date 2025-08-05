@@ -1434,6 +1434,13 @@ function OrderInput({
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
+    // hook to handle Enter key press for order submission
+    useKeydown('Enter', () => {
+        if (!activeOptions.skipOpenOrderConfirm) {
+            handleSubmitOrder();
+        }
+    });
+
     const formattedSizeDisplay = formatNum(
         parseFormattedNum(sizeDisplay),
         selectedMode === 'symbol' ? 6 : 2,

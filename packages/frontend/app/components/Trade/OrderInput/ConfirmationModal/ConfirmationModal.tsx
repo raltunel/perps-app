@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useKeydown } from '~/hooks/useKeydown';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
@@ -54,6 +55,11 @@ export default function ConfirmationModal(props: propsIF) {
             setIsProcessingOrder?.(false);
         }
     }, []);
+
+    // hook to handle Enter key press for order submission
+    useKeydown('Enter', () => {
+        submitFn();
+    });
 
     const liquidationPriceDisplay = useMemo(() => {
         if (liquidationPrice === null || liquidationPrice === undefined) {
