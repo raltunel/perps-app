@@ -386,17 +386,21 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             </div>
                         )}
                     </div>
+                    {price && (
+                        <p
+                            className={
+                                estimatedPNL >= 0
+                                    ? styles.estimatedPnlPositive
+                                    : styles.estimatedPnlNegative
+                            }
+                        >
+                            Estimated closed PNL (without fees):{' '}
+                            <span>
+                                {formatNum(estimatedPNL, 2, true, true)}
+                            </span>
+                        </p>
+                    )}
 
-                    <p
-                        className={
-                            estimatedPNL >= 0
-                                ? styles.estimatedPnlPositive
-                                : styles.estimatedPnlNegative
-                        }
-                    >
-                        Estimated closed PNL (without fees):{' '}
-                        <span>{formatNum(estimatedPNL, 2, true, true)}</span>
-                    </p>
                     <SimpleButton
                         onClick={() => {
                             console.log('confirm');
