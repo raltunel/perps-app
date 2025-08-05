@@ -39,7 +39,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         const showTpSl = false;
 
-        const modalCtrl = useModal('open');
+        const modalCtrl = useModal('closed');
         const [modalContent, setModalContent] = useState<string>('share');
 
         const baseColor =
