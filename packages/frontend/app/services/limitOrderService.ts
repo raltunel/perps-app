@@ -3,6 +3,7 @@ import {
     OrderSide,
     TimeInForce,
     buildOrderEntryTransaction,
+    cancelOrderIx,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 
@@ -18,6 +19,7 @@ export interface LimitOrderParams {
     price: number; // User input price (will be multiplied by 1_000_000)
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
+    replaceOrderId?: bigint; // Optional order ID to replace an existing order
 }
 
 /**
@@ -79,6 +81,13 @@ export class LimitOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
+            if (params.replaceOrderId) {
+                console.log(
+                    '  - This order will replace existing order ID:',
+                    params.replaceOrderId.toString(),
+                );
+            }
+
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building limit BUY order...');
@@ -118,6 +127,7 @@ export class LimitOrderService {
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    cancelOrderId: params.replaceOrderId,
                 };
 
                 // Only add userSetImBps if it's defined
