@@ -708,15 +708,28 @@ function OrderInput({
     ]);
 
     useEffect(() => {
-        if (!usdAvailableToTrade) return;
-        const percent = Math.min(
-            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
-                usdAvailableToTrade) *
+        let percent = 0;
+
+        if (isReduceOnlyEnabled) {
+            if (marginBucket?.netPosition) {
+                const unscaledPositionSize =
+                    Math.abs(Number(marginBucket?.netPosition)) / 1e8;
+                percent = Math.min(
+                    (notionalSymbolQtyNum / unscaledPositionSize) * 100,
+                    100,
+                );
+            }
+        } else {
+            if (!usdAvailableToTrade) return;
+            percent = Math.min(
+                (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
+                    usdAvailableToTrade) *
+                    100,
                 100,
-            100,
-        );
+            );
+        }
         setPositionSliderPercentageValue(percent);
-    }, [leverage, !!usdAvailableToTrade]);
+    }, [leverage, !!usdAvailableToTrade, isReduceOnlyEnabled]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
@@ -741,12 +754,16 @@ function OrderInput({
                     selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
                 setNotionalSymbolQtyNum(adjusted);
                 if (isUserLoggedIn) {
-                    const usdValue = adjusted * (markPx || 1);
+                    const usdValue =
+                        selectedMode === 'symbol'
+                            ? adjusted * (markPx || 1)
+                            : parsed;
                     let percent = 0;
-                    const unscaledPositionSize =
-                        Math.abs(Number(marginBucket?.netPosition)) / 1e8;
                     if (isReduceOnlyEnabled) {
                         if (marginBucket?.netPosition) {
+                            const unscaledPositionSize =
+                                Math.abs(Number(marginBucket?.netPosition)) /
+                                1e8;
                             percent =
                                 (usdValue /
                                     (unscaledPositionSize * (markPx || 1))) *
