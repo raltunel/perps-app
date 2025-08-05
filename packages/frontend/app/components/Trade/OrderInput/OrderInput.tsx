@@ -751,12 +751,17 @@ function OrderInput({
         if (!isNaN(parsed)) {
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-            setNotionalSymbolQtyNum(adjusted);
+            setNotionalSymbolQtyNum(
+                maxCollateralModeEnabled
+                    ? (usdAvailableToTrade * leverage) / (markPx || 1)
+                    : adjusted,
+            );
             if (isUserLoggedIn) {
-                const usdValue =
-                    selectedMode === 'symbol'
-                        ? adjusted * (markPx || 1)
-                        : parsed;
+                const usdValue = maxCollateralModeEnabled
+                    ? usdAvailableToTrade * leverage
+                    : selectedMode === 'symbol'
+                      ? adjusted * (markPx || 1)
+                      : parsed;
                 let percent = 0;
                 if (isReduceOnlyEnabled) {
                     if (marginBucket?.netPosition) {
@@ -779,7 +784,7 @@ function OrderInput({
                     setMaxCollateralModeEnabled(true);
                 } else {
                     setUserExceededAvailableMargin(false);
-                    if (percent > 99.5) {
+                    if (percent > 99) {
                         setPositionSliderPercentageValue(100);
                         setMaxCollateralModeEnabled(true);
                     } else {
@@ -797,9 +802,10 @@ function OrderInput({
         markPx,
         leverage,
         isUserLoggedIn,
-        usdAvailableToTrade,
         isReduceOnlyEnabled,
-        marginBucket,
+        usdAvailableToTrade,
+        marginBucket?.netPosition,
+        maxNotionalUsdOrderSize,
     ]);
 
     useEffect(() => {
