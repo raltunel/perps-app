@@ -15,3 +15,12 @@
     gap: var(--gap-m);
     /* background: var(--bg-dark3)  */
 }
+
+.description {
+    color: var(--text2);
+    font-size: var(--font-size-s);
+    text-align: center;
+}
+.position_size_container {
+    padding: var(--padding-m) 0;
+}

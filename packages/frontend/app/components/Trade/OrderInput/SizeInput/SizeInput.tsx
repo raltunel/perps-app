@@ -16,6 +16,7 @@ interface PropsIF {
     selectedMode: OrderBookMode;
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
+    isModal?: boolean;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -31,6 +32,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         selectedMode,
         setSelectedMode,
         onFocus,
+        isModal = false,
     } = props;
 
     // Memoized ComboBox options
@@ -48,7 +50,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     );
 
     return (
-        <div className={styles.sizeInputContainer}>
+        <div
+            className={`${styles.sizeInputContainer} ${isModal && styles.modalContainer}`}
+        >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
                 id='trade-module-size-input'
