@@ -3,7 +3,6 @@ import {
     OrderSide,
     TimeInForce,
     buildOrderEntryTransaction,
-    buildOrderEntryWithFillTransaction,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
@@ -124,21 +123,18 @@ export class MarketOrderService {
                     orderId: orderId,
                     side: OrderSide.Bid,
                     qty: onChainQuantity,
-                    orderPrice: BigInt('0'), // market order convention is to use 0
+                    price: BigInt('0'), // market order convention is to use 0
                     fillPrice: fillPrice,
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
                     keeper: sessionPublicKey,
+                    userSetImBps: userSetImBps,
+                    includesFillAtMarket: true,
                 };
 
-                // Only add userSetImBps if it's defined
-                if (userSetImBps !== undefined) {
-                    orderParams.userSetImBps = userSetImBps;
-                }
-
-                const transaction = buildOrderEntryWithFillTransaction(
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',
@@ -153,21 +149,18 @@ export class MarketOrderService {
                     orderId: orderId,
                     side: OrderSide.Ask,
                     qty: onChainQuantity,
-                    orderPrice: BigInt('0'), // market order convention is to use 0
+                    price: BigInt('0'), // market order convention is to use 0
                     fillPrice: fillPrice,
                     tif: { type: TimeInForce.IOC },
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
                     keeper: sessionPublicKey,
+                    userSetImBps: userSetImBps,
+                    includesFillAtMarket: true, // Ensure fill at market is included
                 };
 
-                // Only add userSetImBps if it's defined
-                if (userSetImBps !== undefined) {
-                    orderParams.userSetImBps = userSetImBps;
-                }
-
-                const transaction = buildOrderEntryWithFillTransaction(
+                const transaction = buildOrderEntryTransaction(
                     this.connection,
                     orderParams,
                     'confirmed',

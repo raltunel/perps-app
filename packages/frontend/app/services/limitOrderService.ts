@@ -101,12 +101,10 @@ export class LimitOrderService {
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    userSetImBps: userSetImBps,
+                    includesFillAtMarket: true,
+                    cancelOrderIx: params.replaceOrderId,
                 };
-
-                // Only add userSetImBps if it's defined
-                if (userSetImBps !== undefined) {
-                    orderParams.userSetImBps = userSetImBps;
-                }
 
                 const transaction = buildOrderEntryTransaction(
                     this.connection,
@@ -127,13 +125,10 @@ export class LimitOrderService {
                     user: userPublicKey,
                     actor: sessionPublicKey,
                     rentPayer: rentPayer,
+                    userSetImBps: userSetImBps,
+                    includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
                 };
-
-                // Only add userSetImBps if it's defined
-                if (userSetImBps !== undefined) {
-                    orderParams.userSetImBps = userSetImBps;
-                }
 
                 console.log('  - Order parameters:', orderParams);
 
