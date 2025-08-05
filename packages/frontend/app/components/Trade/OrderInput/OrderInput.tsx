@@ -479,15 +479,22 @@ function OrderInput({
             markPx &&
             !isEditingSizeInput &&
             !userExceededAvailableMargin &&
-            !isReduceOnlyEnabled &&
             !userBuyingPowerExceedsMaxOrderSize
         ) {
-            const normalizedAvailableToTrade =
-                getAvailableToTradeFromMarginBucket();
-            const maxNotionalSize =
-                (normalizedAvailableToTrade / markPx) * leverage;
+            if (isReduceOnlyEnabled) {
+                if (!marginBucket?.netPosition) return;
+                const unscaledPositionSize =
+                    Math.abs(Number(marginBucket.netPosition)) / 1e8;
+                setNotionalSymbolQtyNum(unscaledPositionSize);
+            } else {
+                const normalizedAvailableToTrade =
+                    getAvailableToTradeFromMarginBucket();
+                const maxNotionalSize =
+                    (normalizedAvailableToTrade / markPx) * leverage;
 
-            if (maxNotionalSize > 0) setNotionalSymbolQtyNum(maxNotionalSize);
+                if (maxNotionalSize > 0)
+                    setNotionalSymbolQtyNum(maxNotionalSize);
+            }
         }
     }, [
         positionSliderPercentageValue,
@@ -497,6 +504,7 @@ function OrderInput({
         userExceededAvailableMargin,
         isReduceOnlyEnabled,
         userBuyingPowerExceedsMaxOrderSize,
+        marginBucket?.netPosition,
     ]);
 
     const sizeLessThanMinimum =
