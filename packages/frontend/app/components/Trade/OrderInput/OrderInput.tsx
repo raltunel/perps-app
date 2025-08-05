@@ -671,7 +671,6 @@ function OrderInput({
         notionalSymbolQtyNum,
         selectedMode,
         isEditingSizeInput,
-        markPx,
         leverage,
         userExceededAvailableMargin,
     ]);
@@ -725,55 +724,51 @@ function OrderInput({
     );
 
     const handleSizeInputUpdate = useCallback(() => {
-        if (isEditingSizeInput) {
-            const parsed = parseFormattedNum(sizeDisplay.trim());
-            if (!isNaN(parsed)) {
-                const adjusted =
-                    selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-                setNotionalSymbolQtyNum(adjusted);
-                if (isUserLoggedIn) {
-                    const usdValue =
-                        selectedMode === 'symbol'
-                            ? adjusted * (markPx || 1)
-                            : parsed;
-                    let percent = 0;
-                    if (isReduceOnlyEnabled) {
-                        if (marginBucket?.netPosition) {
-                            const unscaledPositionSize =
-                                Math.abs(Number(marginBucket?.netPosition)) /
-                                1e8;
-                            percent =
-                                (usdValue /
-                                    (unscaledPositionSize * (markPx || 1))) *
-                                100;
-                        }
-                    } else {
-                        percent = userBuyingPowerExceedsMaxOrderSize
-                            ? (usdValue / maxNotionalUsdOrderSize) * 100
-                            : (usdValue / leverage / usdAvailableToTrade) * 100;
+        const parsed = parseFormattedNum(sizeDisplay.trim());
+        if (!isNaN(parsed)) {
+            const adjusted =
+                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+            setNotionalSymbolQtyNum(adjusted);
+            if (isUserLoggedIn) {
+                const usdValue =
+                    selectedMode === 'symbol'
+                        ? adjusted * (markPx || 1)
+                        : parsed;
+                let percent = 0;
+                if (isReduceOnlyEnabled) {
+                    if (marginBucket?.netPosition) {
+                        const unscaledPositionSize =
+                            Math.abs(Number(marginBucket?.netPosition)) / 1e8;
+                        percent =
+                            (usdValue /
+                                (unscaledPositionSize * (markPx || 1))) *
+                            100;
                     }
+                } else {
+                    percent = userBuyingPowerExceedsMaxOrderSize
+                        ? (usdValue / maxNotionalUsdOrderSize) * 100
+                        : (usdValue / leverage / usdAvailableToTrade) * 100;
+                }
 
-                    if (percent > 100) {
-                        setUserExceededAvailableMargin(true);
+                if (percent > 100) {
+                    setUserExceededAvailableMargin(true);
+                    setPositionSliderPercentageValue(100);
+                    setMaxCollateralModeEnabled(true);
+                } else {
+                    setUserExceededAvailableMargin(false);
+                    if (percent > 99.5) {
                         setPositionSliderPercentageValue(100);
                         setMaxCollateralModeEnabled(true);
                     } else {
-                        setUserExceededAvailableMargin(false);
-                        if (percent > 99.5) {
-                            setPositionSliderPercentageValue(100);
-                            setMaxCollateralModeEnabled(true);
-                        } else {
-                            setPositionSliderPercentageValue(percent);
-                            setMaxCollateralModeEnabled(false);
-                        }
+                        setPositionSliderPercentageValue(percent);
+                        setMaxCollateralModeEnabled(false);
                     }
                 }
-            } else if (sizeDisplay.trim() === '') {
-                setNotionalSymbolQtyNum(0);
             }
+        } else if (sizeDisplay.trim() === '') {
+            setNotionalSymbolQtyNum(0);
         }
     }, [
-        isEditingSizeInput,
         sizeDisplay,
         selectedMode,
         markPx,
@@ -784,13 +779,19 @@ function OrderInput({
         marginBucket,
     ]);
 
+    useEffect(() => {
+        handleSizeInputUpdate();
+    }, [tradeDirection]);
+
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            handleSizeInputUpdate();
-        }, 500);
-        return () => clearTimeout(timeout);
-    }, [sizeDisplay]);
+        if (isEditingSizeInput) {
+            const timeout = setTimeout(() => {
+                handleSizeInputUpdate();
+            }, 500);
+            return () => clearTimeout(timeout);
+        }
+    }, [sizeDisplay, isEditingSizeInput]);
 
     const handleSizeInputBlur = useCallback(() => {
         handleSizeInputUpdate();
