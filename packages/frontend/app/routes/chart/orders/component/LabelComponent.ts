@@ -552,7 +552,6 @@ const LabelComponent = ({
             }
 
             tempSelectedLine = undefined;
-            setSelectedLine(undefined);
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
