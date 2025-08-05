@@ -29,6 +29,10 @@
     flex-direction: column;
 }
 
+.tableWrapper.showAllWrapper {
+    padding-bottom: 0;
+}
+
 .tableBody {
     height: 100%;
     overflow-y: auto;
@@ -125,8 +129,8 @@
     box-shadow: 0px 0px 20px 20px var(--bg-dark2);
     z-index: var(--z-index-generic-table-actions);
 }
-.actionsContainer.lessShadow {
-    box-shadow: 0px 0px 20px 10px var(--bg-dark2);
+.actionsContainer.showAllMode {
+    padding-bottom: 0;
 }
 
 .sessionButtonContainer {

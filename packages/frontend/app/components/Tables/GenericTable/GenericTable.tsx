@@ -389,7 +389,9 @@ export default function GenericTable<
 
     return (
         <div
-            className={styles.tableWrapper}
+            className={`${styles.tableWrapper} ${
+                isShowAllEnabled ? styles.showAllWrapper : ''
+            }`}
             style={{
                 height: heightOverride,
             }}
@@ -463,7 +465,7 @@ export default function GenericTable<
                     <div
                         id={`${id}-actionsContainer`}
                         className={
-                            styles.actionsContainer + ' ' + styles.lessShadow
+                            styles.actionsContainer + ' ' + styles.showAllMode
                         }
                     ></div>
                 )}
