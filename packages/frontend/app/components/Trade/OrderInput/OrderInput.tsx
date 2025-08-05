@@ -737,6 +737,7 @@ function OrderInput({
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             setIsEditingSizeInput(true);
+            setMaxCollateralModeEnabled(false);
             if (typeof event === 'string') {
                 setSizeDisplay(event);
             } else {
@@ -753,7 +754,9 @@ function OrderInput({
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(
                 maxCollateralModeEnabled
-                    ? (usdAvailableToTrade * leverage) / (markPx || 1)
+                    ? isReduceOnlyEnabled
+                        ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
+                        : (usdAvailableToTrade * leverage) / (markPx || 1)
                     : adjusted,
             );
             if (isUserLoggedIn) {
@@ -809,8 +812,8 @@ function OrderInput({
     ]);
 
     useEffect(() => {
-        handleSizeInputUpdate();
-    }, [tradeDirection]);
+        if (!userExceededAvailableMargin) handleSizeInputUpdate();
+    }, [tradeDirection, userExceededAvailableMargin]);
 
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
