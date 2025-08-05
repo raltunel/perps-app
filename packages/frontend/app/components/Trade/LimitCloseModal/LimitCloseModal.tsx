@@ -18,7 +18,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const [price, setPrice] = useState(String(position.entryPx));
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const [isMidModeActive, setIsMidModeActive] = useState(false);
 
     const originalSize = Math.abs(position.szi);
