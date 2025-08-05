@@ -17,13 +17,17 @@
 }
 
 .description,
-.estimatedPnl {
+.estimatedPnlPositive,
+.estimatedPnlNegative {
     color: var(--text2);
     font-size: var(--font-size-s);
     text-align: center;
 }
-.estimatedPnl span {
+.estimatedPnlPositive span {
     color: var(--green);
+}
+.estimatedPnlNegative span {
+    color: var(--red);
 }
 .position_size_container {
     position: relative;
