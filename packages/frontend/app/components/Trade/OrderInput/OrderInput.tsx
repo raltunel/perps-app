@@ -815,23 +815,21 @@ function OrderInput({
         if (marketOrderType === 'market') {
             if (userBuyingPowerExceedsMaxOrderSize) {
                 notionalSymbolQtyNum =
-                    ((value / 100) * maxNotionalUsdOrderSize * 0.999) /
-                    (markPx || 1);
+                    ((value / 100) * maxNotionalUsdOrderSize) / (markPx || 1);
             } else {
                 notionalSymbolQtyNum =
-                    (((value / 100) * usdAvailableToTrade * 0.999) /
-                        (markPx || 1)) *
+                    (((value / 100) * usdAvailableToTrade) / (markPx || 1)) *
                     leverage;
             }
         } else if (marketOrderType === 'limit') {
             if (!price || !usdAvailableToTrade) return;
             if (userBuyingPowerExceedsMaxOrderSize) {
                 notionalSymbolQtyNum =
-                    ((value / 100) * maxNotionalUsdOrderSize * 0.999) /
+                    ((value / 100) * maxNotionalUsdOrderSize) /
                     (parseFormattedNum(price) || 1);
             } else {
                 notionalSymbolQtyNum =
-                    (((value / 100) * usdAvailableToTrade * 0.999) /
+                    (((value / 100) * usdAvailableToTrade) /
                         (parseFormattedNum(price) || 1)) *
                     leverage;
             }
