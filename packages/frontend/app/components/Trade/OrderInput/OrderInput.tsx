@@ -706,7 +706,27 @@ function OrderInput({
         } else {
             setMaxCollateralModeEnabled(false);
         }
-    }, [leverage, !!usdAvailableToTrade, isReduceOnlyEnabled]);
+    }, [!!usdAvailableToTrade, isReduceOnlyEnabled]);
+
+    useEffect(() => {
+        let percent = 0;
+
+        if (isReduceOnlyEnabled) {
+            if (marginBucket?.netPosition) {
+                const unscaledPositionSize =
+                    Math.abs(Number(marginBucket?.netPosition)) / 1e8;
+                percent = Math.min(
+                    (notionalSymbolQtyNum / unscaledPositionSize) * 100,
+                    100,
+                );
+            }
+        } else {
+            if (!usdAvailableToTrade) return;
+            percent = Math.min(getPercentFromAvailableToTrade(), 100);
+        }
+        setUserExceededAvailableMargin(false);
+        setPositionSliderPercentageValue(percent);
+    }, [leverage]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
