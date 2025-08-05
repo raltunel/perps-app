@@ -303,7 +303,6 @@ function OrderInput({
     const [userExceededAvailableMargin, setUserExceededAvailableMargin] =
         useState(false);
 
-    console.log({ userExceededAvailableMargin });
     const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const [currentPositionNotionalSize, setCurrentPositionNotionalSize] =
@@ -810,6 +809,8 @@ function OrderInput({
         usdAvailableToTrade,
         marginBucket?.netPosition,
         maxNotionalUsdOrderSize,
+        userBuyingPowerExceedsMaxOrderSize,
+        maxCollateralModeEnabled,
     ]);
 
     useEffect(() => {
@@ -927,7 +928,6 @@ function OrderInput({
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
         setUserExceededAvailableMargin(false);
-        console.log({ value });
         setPositionSliderPercentageValue(value);
         if (value === 100) {
             setMaxCollateralModeEnabled(true);
