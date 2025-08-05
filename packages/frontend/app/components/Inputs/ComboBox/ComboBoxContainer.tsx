@@ -28,6 +28,8 @@ export default function ComboBoxContainer() {
         setIsWsSleepMode,
         isDebugWalletActive,
         setIsDebugWalletActive,
+        usePythOracle,
+        setUsePythOracle,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -88,6 +90,14 @@ export default function ComboBoxContainer() {
             >
                 <div className={styles.sdkToggleButton}>
                     {sdkEnabled ? 'SDK' : 'SDK'}
+                </div>
+            </div>
+            <div
+                className={`${styles.sdkToggle} ${usePythOracle ? styles.active : styles.disabled}`}
+                onClick={() => setUsePythOracle(!usePythOracle)}
+            >
+                <div className={styles.sdkToggleButton}>
+                    {usePythOracle ? 'Pyth' : 'HL'} Oracle
                 </div>
             </div>
 

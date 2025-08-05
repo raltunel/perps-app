@@ -24,6 +24,8 @@ interface DebugStore {
     setIsWsSleepMode: (isWsSleepMode: boolean) => void;
     isDebugWalletActive: boolean;
     setIsDebugWalletActive: (isDebugWalletActive: boolean) => void;
+    usePythOracle: boolean;
+    setUsePythOracle: (usePythOracle: boolean) => void;
 }
 
 export const useDebugStore = create<DebugStore>((set) => ({
@@ -55,4 +57,6 @@ export const useDebugStore = create<DebugStore>((set) => ({
     isDebugWalletActive: false,
     setIsDebugWalletActive: (isDebugWalletActive: boolean) =>
         set({ isDebugWalletActive }),
+    usePythOracle: true, // Default to Pyth as requested
+    setUsePythOracle: (usePythOracle: boolean) => set({ usePythOracle }),
 }));
