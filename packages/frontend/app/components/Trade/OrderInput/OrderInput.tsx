@@ -747,13 +747,6 @@ function OrderInput({
                         Math.abs(Number(marginBucket?.netPosition)) / 1e8;
                     if (isReduceOnlyEnabled) {
                         if (marginBucket?.netPosition) {
-                            console.log({
-                                usdValue,
-                                leverage,
-                                netPosition: marginBucket.netPosition,
-                                markPx,
-                                unscaledPositionSize,
-                            });
                             percent =
                                 (usdValue /
                                     (unscaledPositionSize * (markPx || 1))) *
@@ -897,11 +890,6 @@ function OrderInput({
             const notionalSymbolQtyNum =
                 (value / 100) * Number(unscaledPositionSize);
 
-            // console.log({
-            //     netPosition: marginBucket.netPosition,
-            //     unscaledPositionSize,
-            //     notionalSymbolQtyNum,
-            // });
             setNotionalSymbolQtyNum(notionalSymbolQtyNum);
         }
     };
