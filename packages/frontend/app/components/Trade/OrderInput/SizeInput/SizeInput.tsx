@@ -38,9 +38,8 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     // temporarily only show BTC in the limit close modal
     // Memoized ComboBox options
     const comboBoxOptions = useMemo(
-        () =>
-            isModal ? [symbol.toUpperCase()] : [symbol.toUpperCase(), 'USD'],
-        [symbol, isModal],
+        () => [symbol.toUpperCase(), 'USD'],
+        [symbol],
     );
 
     // Memoized ComboBox onChange handler

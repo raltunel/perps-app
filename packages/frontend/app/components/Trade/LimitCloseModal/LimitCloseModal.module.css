@@ -16,10 +16,18 @@
     /* background: var(--bg-dark3)  */
 }
 
-.description {
+.description,
+.estimatedPnlPositive,
+.estimatedPnlNegative {
     color: var(--text2);
     font-size: var(--font-size-s);
     text-align: center;
+}
+.estimatedPnlPositive span {
+    color: var(--green);
+}
+.estimatedPnlNegative span {
+    color: var(--red);
 }
 .position_size_container {
     position: relative;

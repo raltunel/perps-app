@@ -1,7 +1,7 @@
-import { LuPen } from 'react-icons/lu';
 import { useState } from 'react';
-import useNumFormatter from '~/hooks/useNumFormatter';
+import { LuPen } from 'react-icons/lu';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -52,11 +52,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
 
         try {
             // Show pending notification
-            notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling order for ${order.sz} ${order.coin}`,
-                icon: 'spinner',
-            });
+            // notifications.add({
+            //     title: 'Cancel Order Pending',
+            //     message: `Cancelling order for ${order.sz} ${order.coin}`,
+            //     icon: 'spinner',
+            // });
 
             // Execute the cancel order
             const result = await executeCancelOrder({
