@@ -231,59 +231,34 @@ export class DepositService {
 
             // Send the transaction
             console.log('  - Calling sendTransaction with instructions...');
-            console.log(
-                '  - sendTransaction function type:',
-                typeof sendTransaction,
-            );
             console.log('  - Instructions array:', instructions);
-            const result = await sendTransaction(instructions);
+            const transactionResult = await sendTransaction(instructions);
 
-            console.log('  - sendTransaction result:', result);
-            console.log('  - Result type:', typeof result);
-            console.log(
-                '  - Result keys:',
-                result ? Object.keys(result) : 'null',
-            );
+            console.log('📥 Transaction result:', transactionResult);
 
-            const signature = result?.signature || result;
-            console.log('  - Extracted signature:', signature);
-
-            // Track transaction confirmation
-            if (signature) {
+            if (
+                transactionResult &&
+                transactionResult.signature &&
+                !('error' in transactionResult)
+            ) {
                 console.log(
-                    '🔍 Starting transaction tracking for signature:',
-                    signature,
-                );
-
-                // Wait for confirmation
-                const isConfirmed = await this.trackTransactionConfirmation(
-                    signature,
-                    amount,
-                );
-
-                if (isConfirmed) {
-                    // Note: Success notification should be handled by the component
-
-                    return {
-                        success: true,
-                        signature,
-                        confirmed: true,
-                    };
-                } else {
-                    return {
-                        success: false,
-                        error: 'Transaction failed or timed out',
-                        signature,
-                        confirmed: false,
-                    };
-                }
-            } else {
-                console.warn(
-                    '⚠️ No signature returned from sendTransaction - cannot track confirmation',
+                    '✅ Order transaction successful:',
+                    transactionResult.signature,
                 );
                 return {
+                    success: true,
+                    signature: transactionResult.signature,
+                    confirmed: transactionResult.confirmed,
+                };
+            } else {
+                const errorMessage =
+                    typeof transactionResult?.error === 'string'
+                        ? transactionResult.error
+                        : 'Order transaction failed';
+                console.error('❌ Deposit order failed:', errorMessage);
+                return {
                     success: false,
-                    error: 'No transaction signature received',
+                    error: errorMessage,
                 };
             }
         } catch (error) {

@@ -205,67 +205,32 @@ export class LimitOrderService {
 
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
-            const result = await sendTransaction(instructions);
+            const transactionResult = await sendTransaction(instructions);
 
-            console.log('📥 Transaction result:', result);
+            console.log('📥 Transaction result:', transactionResult);
 
-            // Extract signature from result
-            let signature: string | undefined;
-
-            if (typeof result === 'string') {
-                signature = result;
-            } else if (result && typeof result === 'object') {
-                // Check various possible signature locations
-                signature =
-                    result.signature ||
-                    result.txid ||
-                    result.hash ||
-                    result.transactionSignature;
-
-                // If still not found, check for a nested result object
-                if (!signature && result.result) {
-                    signature =
-                        result.result.signature ||
-                        result.result.txid ||
-                        result.result;
-                }
-            }
-
-            console.log('🔑 Extracted signature:', signature);
-
-            // Track transaction confirmation
-            if (signature) {
+            if (
+                transactionResult &&
+                transactionResult.signature &&
+                !('error' in transactionResult)
+            ) {
                 console.log(
-                    '🔍 Starting transaction tracking for signature:',
-                    signature,
+                    '✅ Order transaction successful:',
+                    transactionResult.signature,
                 );
-
-                // Wait for confirmation
-                const isConfirmed = await this.trackTransactionConfirmation(
-                    signature,
-                    params,
-                );
-
-                if (isConfirmed) {
-                    console.log('✅ Limit order confirmed on-chain');
-                    return {
-                        success: true,
-                        signature,
-                        confirmed: true,
-                    };
-                } else {
-                    return {
-                        success: false,
-                        error: 'Transaction failed or timed out',
-                        signature,
-                        confirmed: false,
-                    };
-                }
+                return {
+                    success: true,
+                    signature: transactionResult.signature,
+                    confirmed: transactionResult.confirmed,
+                };
             } else {
-                console.warn('⚠️ No signature returned from sendTransaction');
+                const errorMessage =
+                    typeof transactionResult?.error === 'string'
+                        ? transactionResult.error
+                        : 'Order transaction failed';
                 return {
                     success: false,
-                    error: 'No transaction signature received',
+                    error: errorMessage,
                 };
             }
         } catch (error) {
@@ -289,85 +254,5 @@ export class LimitOrderService {
                 error: errorMessage,
             };
         }
-    }
-
-    /**
-     * Track transaction confirmation on-chain
-     * @param signature - Transaction signature
-     * @param params - Order parameters for logging
-     * @returns Promise<boolean> - true if confirmed, false if failed or timed out
-     */
-    private async trackTransactionConfirmation(
-        signature: string,
-        params: LimitOrderParams,
-    ): Promise<boolean> {
-        return new Promise((resolve) => {
-            const maxRetries = 30; // 60 seconds total (2 seconds per check)
-            let retryCount = 0;
-
-            const checkConfirmation = async () => {
-                try {
-                    retryCount++;
-                    console.log(
-                        `🔍 Checking transaction status (attempt ${retryCount}/${maxRetries})...`,
-                    );
-
-                    const status =
-                        await this.connection.getSignatureStatus(signature);
-
-                    if (status && status.value) {
-                        console.log(
-                            '📊 Transaction status:',
-                            status.value.confirmationStatus,
-                        );
-
-                        if (status.value.err) {
-                            console.error(
-                                '❌ Transaction failed on-chain:',
-                                status.value.err,
-                            );
-                            resolve(false);
-                            return;
-                        }
-
-                        if (
-                            status.value.confirmationStatus === 'confirmed' ||
-                            status.value.confirmationStatus === 'finalized'
-                        ) {
-                            console.log('✅ Transaction confirmed on-chain!');
-                            console.log(
-                                `✅ Limit ${params.side} order for ${params.quantity} units at ${params.price} confirmed`,
-                            );
-                            resolve(true);
-                            return;
-                        }
-                    }
-
-                    // Continue checking if not confirmed yet
-                    if (retryCount < maxRetries) {
-                        setTimeout(checkConfirmation, 2000); // Check every 2 seconds
-                    } else {
-                        console.warn(
-                            '⏱️ Transaction confirmation timeout for signature:',
-                            signature,
-                        );
-                        resolve(false);
-                    }
-                } catch (error) {
-                    console.error(
-                        '❌ Error checking transaction status:',
-                        error,
-                    );
-                    if (retryCount < maxRetries) {
-                        setTimeout(checkConfirmation, 2000); // Retry on error
-                    } else {
-                        resolve(false);
-                    }
-                }
-            };
-
-            // Start checking immediately
-            checkConfirmation();
-        });
     }
 }
