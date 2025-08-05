@@ -780,7 +780,7 @@ function OrderInput({
                         ? (usdValue / maxNotionalUsdOrderSize) * 100
                         : (usdValue / leverage / usdAvailableToTrade) * 100;
                 }
-                console.log({ percent });
+                console.log({ percent, maxCollateralModeEnabled });
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
