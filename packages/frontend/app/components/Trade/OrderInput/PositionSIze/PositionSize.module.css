@@ -6,7 +6,8 @@
 
     padding-left: var(--padding-xs);
 }
-
+.modalContainer {
+}
 .containerTitle {
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
