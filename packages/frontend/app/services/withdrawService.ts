@@ -232,63 +232,33 @@ export class WithdrawService {
 
             console.log('📤 Sending withdraw transaction:');
             console.log('  - Instructions array:', instructions);
-            const result = await sendTransaction(instructions);
+            const transactionResult = await sendTransaction(instructions);
 
-            console.log('📥 Transaction result:', result);
+            console.log('📥 Transaction result:', transactionResult);
 
-            // Extract signature from result
-            let signature: string | undefined;
-
-            if (typeof result === 'string') {
-                signature = result;
-            } else if (result && typeof result === 'object') {
-                // Check various possible signature locations
-                signature =
-                    result.signature ||
-                    result.txid ||
-                    result.hash ||
-                    result.transactionSignature;
-
-                // If still not found, check for a nested result object
-                if (!signature && result.result) {
-                    signature =
-                        result.result.signature ||
-                        result.result.txid ||
-                        result.result;
-                }
-            }
-
-            console.log('🔑 Extracted signature:', signature);
-
-            // Track transaction confirmation
-            if (signature) {
-                // Wait for confirmation
-                const isConfirmed =
-                    await this.trackTransactionConfirmation(signature);
-
-                if (isConfirmed) {
-                    // Note: Success notification should be handled by the component
-
-                    return {
-                        success: true,
-                        signature,
-                        confirmed: true,
-                    };
-                } else {
-                    return {
-                        success: false,
-                        error: 'Transaction failed or timed out',
-                        signature,
-                        confirmed: false,
-                    };
-                }
-            } else {
-                console.warn(
-                    '⚠️ No signature returned from sendTransaction - cannot track confirmation',
+            if (
+                transactionResult &&
+                transactionResult.signature &&
+                !('error' in transactionResult)
+            ) {
+                console.log(
+                    '✅ Withdraw transaction successful:',
+                    transactionResult.signature,
                 );
                 return {
+                    success: true,
+                    signature: transactionResult.signature,
+                    confirmed: transactionResult.confirmed,
+                };
+            } else {
+                const errorMessage =
+                    typeof transactionResult?.error === 'string'
+                        ? transactionResult.error
+                        : 'Withdraw transaction failed';
+                console.error('❌ Withdraw order failed:', errorMessage);
+                return {
                     success: false,
-                    error: 'No transaction signature received',
+                    error: errorMessage,
                 };
             }
         } catch (error) {

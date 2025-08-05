@@ -232,67 +232,32 @@ export class MarketOrderService {
 
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
-            const result = await sendTransaction(instructions);
+            const transactionResult = await sendTransaction(instructions);
 
-            console.log('📥 Transaction result:', result);
+            console.log('📥 Transaction result:', transactionResult);
 
-            // Extract signature from result
-            let signature: string | undefined;
-
-            if (typeof result === 'string') {
-                signature = result;
-            } else if (result && typeof result === 'object') {
-                // Check various possible signature locations
-                signature =
-                    result.signature ||
-                    result.txid ||
-                    result.hash ||
-                    result.transactionSignature;
-
-                // If still not found, check for a nested result object
-                if (!signature && result.result) {
-                    signature =
-                        result.result.signature ||
-                        result.result.txid ||
-                        result.result;
-                }
-            }
-
-            console.log('🔑 Extracted signature:', signature);
-
-            // Track transaction confirmation
-            if (signature) {
+            if (
+                transactionResult &&
+                transactionResult.signature &&
+                !('error' in transactionResult)
+            ) {
                 console.log(
-                    '🔍 Starting transaction tracking for signature:',
-                    signature,
+                    '✅ Order transaction successful:',
+                    transactionResult.signature,
                 );
-
-                // Wait for confirmation
-                const isConfirmed = await this.trackTransactionConfirmation(
-                    signature,
-                    params,
-                );
-
-                if (isConfirmed) {
-                    console.log('✅ Market order confirmed on-chain');
-                    return {
-                        success: true,
-                        signature,
-                        confirmed: true,
-                    };
-                } else {
-                    return {
-                        success: false,
-                        error: 'Transaction failed or timed out',
-                        signature,
-                        confirmed: false,
-                    };
-                }
+                return {
+                    success: true,
+                    signature: transactionResult.signature,
+                    confirmed: transactionResult.confirmed,
+                };
             } else {
-                console.warn('⚠️ No signature returned from sendTransaction');
+                const errorMessage =
+                    typeof transactionResult?.error === 'string'
+                        ? transactionResult.error
+                        : 'Order transaction failed';
                 return {
                     success: false,
-                    error: 'No transaction signature received',
+                    error: errorMessage,
                 };
             }
         } catch (error) {

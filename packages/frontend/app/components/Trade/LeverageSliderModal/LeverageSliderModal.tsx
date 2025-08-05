@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 // import { LuCircleHelp } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 // import Tooltip from '~/components/Tooltip/Tooltip';
 import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
+import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useLeverageStore } from '~/stores/LeverageStore';
+import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
+import { blockExplorer } from '~/utils/Constants';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;
@@ -23,11 +26,20 @@ export default function LeverageSliderModal({
     onConfirm,
 }: LeverageSliderModalProps) {
     const [value, setValue] = useState<number>(currentLeverage);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [transactionStatus, setTransactionStatus] = useState<
+        'idle' | 'pending' | 'success' | 'failed'
+    >('idle');
+
+    const notificationStore = useNotificationStore();
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
     const { marginBucket } = useTradeDataStore();
     const [leverageFloor, setLeverageFloor] = useState<number>();
+
+    const { isLoading, error, executeSetUserMargin } =
+        useSetUserMarginService();
 
     useEffect(() => {
         if (!marginBucket) return;
@@ -51,13 +63,99 @@ export default function LeverageSliderModal({
         setValue(newLeverage);
     };
 
-    const handleConfirm = () => {
-        if (onConfirm) {
-            setPreferredLeverage(value);
-            onConfirm(value);
+    const handleConfirm = useCallback(async () => {
+        setIsProcessing(true);
+        setTransactionStatus('pending');
+
+        try {
+            // Calculate userImBps from leverage value
+            const userImBps = Math.floor(10000 / value);
+
+            console.log(
+                '🚀 Setting user margin with leverage:',
+                value,
+                'userImBps:',
+                userImBps,
+            );
+
+            // Create a timeout promise
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(
+                    () =>
+                        reject(
+                            new Error('Transaction timed out after 15 seconds'),
+                        ),
+                    15000,
+                );
+            });
+
+            // Race between the transaction and the timeout
+            const result = await Promise.race([
+                executeSetUserMargin({ userSetImBps: userImBps }),
+                timeoutPromise,
+            ]);
+
+            console.log('✅ Transaction result:', result);
+
+            if (result.success) {
+                setTransactionStatus('success');
+
+                // Update local state
+                setPreferredLeverage(value);
+                if (onConfirm) {
+                    onConfirm(value);
+                }
+
+                // Show success notification
+                notificationStore.add({
+                    title: 'Leverage Updated',
+                    message: `Successfully set leverage to ${value.toFixed(1)}x`,
+                    icon: 'check',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
+
+                // Close modal on success
+                onClose();
+            } else {
+                setTransactionStatus('failed');
+
+                // Show error notification and close modal
+                notificationStore.add({
+                    title: 'Transaction Failed',
+                    message: result.error || 'Failed to update leverage',
+                    icon: 'xmark',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                });
+                onClose();
+            }
+        } catch (error) {
+            setTransactionStatus('failed');
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to update leverage';
+
+            // Show error notification
+            notificationStore.add({
+                title: 'Transaction Error',
+                message: errorMessage,
+                icon: 'xmark',
+            });
+        } finally {
+            setIsProcessing(false);
         }
-        onClose();
-    };
+    }, [
+        value,
+        executeSetUserMargin,
+        setPreferredLeverage,
+        onConfirm,
+        onClose,
+        notificationStore,
+    ]);
 
     return (
         <Modal title='Adjust Leverage' close={onClose}>
@@ -89,13 +187,30 @@ export default function LeverageSliderModal({
                     <span>100,000 USD</span>
                 </div> */}
 
+                {/* Error display */}
+                {error && <div className={styles.error}>{error}</div>}
+
                 {/* Action buttons */}
                 <div className={styles.buttonContainer}>
-                    <SimpleButton onClick={onClose} bg='dark4'>
+                    <SimpleButton
+                        onClick={onClose}
+                        bg='dark4'
+                        disabled={isProcessing}
+                    >
                         Cancel
                     </SimpleButton>
-                    <SimpleButton onClick={handleConfirm} bg='accent1'>
-                        Confirm
+                    <SimpleButton
+                        onClick={handleConfirm}
+                        bg='accent1'
+                        disabled={isProcessing || isLoading}
+                    >
+                        {transactionStatus === 'pending'
+                            ? 'Confirming...'
+                            : isProcessing
+                              ? 'Processing...'
+                              : isLoading
+                                ? 'Loading...'
+                                : 'Confirm'}
                     </SimpleButton>
                 </div>
             </div>
