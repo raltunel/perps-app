@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import Modal from '~/components/Modal/Modal';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
+import type { PositionIF } from '~/utils/UserDataIFs';
+import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import PriceInput from '../OrderInput/PriceInput/PriceInput';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
-import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './LimitCloseModal.module.css';
-import Modal from '~/components/Modal/Modal';
-import PositionSize from '../OrderInput/PositionSIze/PositionSize';
-import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import type { PositionIF } from '~/utils/UserDataIFs';
-import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface PropsIF {
     close: () => void;
@@ -17,7 +19,19 @@ interface PropsIF {
 export default function LimitCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const [price, setPrice] = useState(String(position.entryPx));
+    const { symbolInfo } = useTradeDataStore();
+
+    const { buys, sells } = useOrderBookStore();
+
+    const markPx = symbolInfo?.markPx;
+
+    const getMidPrice = () => {
+        if (!buys.length || !sells.length) return null;
+        const midPrice = (buys[0].px + sells[0].px) / 2;
+        return midPrice;
+    };
+
+    const [price, setPrice] = useState(String(getMidPrice()));
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const [isMidModeActive, setIsMidModeActive] = useState(false);
 
@@ -29,6 +43,19 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     // the useeffect was updating and reformatting user input so I added this to track it to differentiate between the input and the slider
     const lastChangedBySlider = useRef(true);
+
+    useEffect(() => {
+        if (isMidModeActive) {
+            setMidPriceAsPriceInput();
+        }
+    }, [
+        isMidModeActive,
+        !buys.length,
+        !sells.length,
+        buys?.[0]?.px,
+        sells?.[0]?.px,
+        markPx,
+    ]);
 
     useEffect(() => {
         if (!lastChangedBySlider.current) return;
@@ -99,6 +126,21 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         return '';
     };
 
+    const setMidPriceAsPriceInput = () => {
+        if (buys.length > 0 && sells.length > 0) {
+            const resolution = buys[0].px - buys[1].px;
+            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
+            if (!midOrMarkPrice) return;
+            const formattedMidPrice = formatNumWithOnlyDecimals(
+                midOrMarkPrice,
+                6,
+                true,
+            );
+            setPrice(formattedMidPrice);
+            setIsMidModeActive(true);
+        }
+    };
+
     return (
         <Modal title='Limit Close' close={close}>
             <div className={styles.container}>
@@ -110,6 +152,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     <PriceInput
                         value={price}
                         onChange={(val) => {
+                            setIsMidModeActive(false);
                             if (typeof val === 'string') {
                                 setPrice(val);
                             } else if (val?.target?.value !== undefined) {
@@ -121,10 +164,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         className=''
                         ariaLabel='price-input'
                         showMidButton={true}
-                        setMidPriceAsPriceInput={() => {
-                            setPrice(String(position.entryPx));
-                            setIsMidModeActive(true);
-                        }}
+                        setMidPriceAsPriceInput={setMidPriceAsPriceInput}
                         isMidModeActive={isMidModeActive}
                         setIsMidModeActive={setIsMidModeActive}
                         isModal
