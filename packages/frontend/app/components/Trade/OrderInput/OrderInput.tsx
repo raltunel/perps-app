@@ -26,7 +26,6 @@ import { useKeydown } from '~/hooks/useKeydown';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
-import { usePortfolioModals } from '~/routes/portfolio/usePortfolioModals';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -151,8 +150,10 @@ export type modalContentT =
 
 function OrderInput({
     marginBucket,
+    isAnyPortfolioModalOpen,
 }: {
     marginBucket: MarginBucketAvail | null;
+    isAnyPortfolioModalOpen: boolean;
 }) {
     const { getBsColor } = useAppSettings();
 
@@ -1488,14 +1489,13 @@ function OrderInput({
     ]);
 
     // Get portfolio modals state
-    const { isAnyPortfolioModalOpen } = usePortfolioModals();
 
     // hook to handle Enter key press for order submission
     useEffect(() => {
         const handleEnter = () => {
-            console.log('Enter pressed', tradeDirection, marketOrderType);
             // Don't submit if any modal is open (including portfolio modals) or if we should skip confirmation
             if (
+                notionalSymbolQtyNum &&
                 !confirmOrderModal.isOpen &&
                 !isAnyPortfolioModalOpen &&
                 !activeOptions.skipOpenOrderConfirm
@@ -1524,6 +1524,7 @@ function OrderInput({
         marketOrderType,
         activeOptions.skipOpenOrderConfirm,
         handleSubmitOrder,
+        notionalSymbolQtyNum,
     ]);
 
     const getDisabledReason = (
