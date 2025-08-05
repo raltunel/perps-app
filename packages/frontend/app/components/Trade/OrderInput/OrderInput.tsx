@@ -156,6 +156,7 @@ function OrderInput({
     const { getBsColor } = useAppSettings();
 
     const sessionState = useSession();
+    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
@@ -630,8 +631,6 @@ function OrderInput({
         //     setTradeDirection('buy');
         // }
     }, [obChosenPrice]);
-
-    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const handleMarketOrderTypeChange = useCallback((value: string) => {
         setMarketOrderType(value);
@@ -1434,19 +1433,15 @@ function OrderInput({
     // hook to bind action to close launchpad to the DOM
     useKeydown('Escape', () => setShowLaunchpad(false));
 
-    // hook to handle Enter key press for order submission
-    useKeydown('Enter', () => {
-        if (!activeOptions.skipOpenOrderConfirm) {
-            handleSubmitOrder();
-        }
-    });
-
     const formattedSizeDisplay = formatNum(
         parseFormattedNum(sizeDisplay),
         selectedMode === 'symbol' ? 6 : 2,
     );
 
-    const handleSubmitOrder = () => {
+    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
+        useState(false);
+
+    const handleSubmitOrder = useCallback(() => {
         if (submitButtonRecentlyClicked) return;
         if (activeOptions.skipOpenOrderConfirm)
             setSubmitButtonRecentlyClicked(true);
@@ -1479,7 +1474,44 @@ function OrderInput({
                 }
             }
         }
-    };
+    }, [
+        submitButtonRecentlyClicked,
+        activeOptions.skipOpenOrderConfirm,
+        tradeDirection,
+        marketOrderType,
+        confirmOrderModal,
+        submitMarketBuy,
+        submitLimitBuy,
+        submitMarketSell,
+        submitLimitSell,
+    ]);
+
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleEnter = () => {
+            console.log('Enter pressed', tradeDirection, marketOrderType);
+            if (!activeOptions.skipOpenOrderConfirm) {
+                handleSubmitOrder();
+            }
+        };
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEnter();
+            }
+        };
+
+        document.addEventListener('keydown', keydownHandler);
+        return () => document.removeEventListener('keydown', keydownHandler);
+    }, [
+        tradeDirection,
+        marketOrderType,
+        activeOptions.skipOpenOrderConfirm,
+        handleSubmitOrder,
+    ]);
+
     const getDisabledReason = (
         collateralInsufficient: boolean,
         sizeLessThanMinimum: boolean,
@@ -1499,9 +1531,6 @@ function OrderInput({
         if (isPriceInvalid) return 'Invalid price';
         return null;
     };
-
-    const [submitButtonRecentlyClicked, setSubmitButtonRecentlyClicked] =
-        useState(false);
 
     useEffect(() => {
         if (submitButtonRecentlyClicked) {
