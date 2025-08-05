@@ -715,6 +715,14 @@ function OrderInput({
         leverage,
     ]);
 
+    const getPercentFromAvailableToTrade = useCallback(() => {
+        return (
+            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
+                usdAvailableToTrade) *
+            100
+        );
+    }, [notionalSymbolQtyNum, leverage, markPx, usdAvailableToTrade]);
+
     useEffect(() => {
         let percent = 0;
 
@@ -729,15 +737,15 @@ function OrderInput({
             }
         } else {
             if (!usdAvailableToTrade) return;
-            percent = Math.min(
-                (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
-                    usdAvailableToTrade) *
-                    100,
-                100,
-            );
+            percent = Math.min(getPercentFromAvailableToTrade(), 100);
         }
         setPositionSliderPercentageValue(percent);
-    }, [leverage, !!usdAvailableToTrade, isReduceOnlyEnabled]);
+    }, [
+        leverage,
+        !!usdAvailableToTrade,
+        isReduceOnlyEnabled,
+        getPercentFromAvailableToTrade,
+    ]);
 
     const handleOnFocus = () => {
         setIsEditingSizeInput(true);
@@ -791,6 +799,7 @@ function OrderInput({
                         if (percent > 99.5) {
                             setPositionSliderPercentageValue(100);
                         } else {
+                            console.log({ percent });
                             setPositionSliderPercentageValue(percent);
                         }
                     }
@@ -922,6 +931,7 @@ function OrderInput({
     // POSITION SIZE------------------------------
     const handleSizeSliderChange = (value: number) => {
         setIsEditingSizeInput(false);
+        console.log({ value });
 
         setPositionSliderPercentageValue(value);
         if (isReduceOnlyEnabled) {
