@@ -216,13 +216,9 @@ function PortfolioWithdraw({
                 </div>
             </div>
 
-            <div className={styles.inputContainer}>
-                <h6>
-                    Amount{' '}
-                    {showInvalidSizeWarning && (
-                        <span className={styles.minWarning}>(Min: $1)</span>
-                    )}
-                </h6>
+            <div className={styles.input_container}>
+                <h6>Amount</h6>
+                {showInvalidSizeWarning && <span>Min: $1</span>}
                 <NumFormattedInput
                     placeholder='Enter amount (min $1)'
                     value={rawInputString}

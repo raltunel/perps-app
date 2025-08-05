@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 // import Tooltip from '~/components/Tooltip/Tooltip';
+import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
 import { useLeverageStore } from '~/stores/LeverageStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
 
@@ -24,6 +26,15 @@ export default function LeverageSliderModal({
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
+    const { marginBucket } = useTradeDataStore();
+    const [leverageFloor, setLeverageFloor] = useState<number>();
+
+    useEffect(() => {
+        if (!marginBucket) return;
+        const leverageFloor = calcLeverageFloor(marginBucket);
+        setLeverageFloor(10_000 / Number(leverageFloor));
+    }, [marginBucket]);
+
     // const currentMarket = useLeverageStore((state) => state.currentMarket);
 
     // Update local state if currentLeverage prop changes
@@ -61,6 +72,7 @@ export default function LeverageSliderModal({
                         maxLeverage={maxLeverage}
                         hideTitle={true}
                         className={styles.modalSlider}
+                        minimumValue={leverageFloor}
                     />
                 </div>
 
