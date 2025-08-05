@@ -245,10 +245,11 @@ function OrderInput({
             buys.length > 0 &&
             sells.length > 0
         ) {
-            const midPrice = getMidPrice();
-            if (!midPrice) return;
+            const resolution = buys[0].px - buys[1].px;
+            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
+            if (!midOrMarkPrice) return;
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midPrice,
+                midOrMarkPrice,
                 6,
                 true,
             );
@@ -275,6 +276,7 @@ function OrderInput({
         !sells.length,
         buys?.[0]?.px,
         sells?.[0]?.px,
+        markPx,
     ]);
 
     const confirmOrderModal = useModal<modalContentT>('closed');
