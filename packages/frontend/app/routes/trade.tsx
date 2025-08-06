@@ -276,7 +276,7 @@ export default function Trade() {
         <>
             <TradeRouteHandler />
             <WebDataConsumer />
-            {symbol && (
+            {/*symbol && (
                 <div className={styles.container}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
@@ -344,6 +344,47 @@ export default function Trade() {
                                 }
                             />
                         </div>
+                    </section>
+                </div>
+            )*/}
+            {symbol && (
+                <div className={styles.containerNew}>
+                    <section className={styles.market_data}>
+                        <div id='watchlistSection' className={styles.watchlist}>
+                            <WatchList />
+                        </div>
+                        <div
+                            id='symbolInfoSection'
+                            className={styles.symbolInfo}
+                        >
+                            <MemoizedSymbolInfo />
+                        </div>
+                        <div id='chartSection' className={styles.chart}>
+                            <MemoizedTradingViewWrapper />
+                        </div>
+                        <div
+                            id='orderBookSection'
+                            className={styles.order_book}
+                        >
+                            <MemoizedOrderBookSection symbol={symbol} />
+                        </div>
+                    </section>
+                    <section className={styles.table} id='tutorial-trade-table'>
+                        <MemoizedTradeTable />
+                    </section>
+                    <section className={styles.order_input}>
+                        <OrderInput
+                            marginBucket={marginBucket}
+                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
+                        />
+                    </section>
+                    <section className={styles.wallet}>
+                        <DepositDropdown
+                            marginBucket={marginBucket}
+                            openDepositModal={openDepositModal}
+                            openWithdrawModal={openWithdrawModal}
+                            PortfolioModalsRenderer={PortfolioModalsRenderer}
+                        />
                     </section>
                 </div>
             )}
