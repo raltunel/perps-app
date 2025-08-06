@@ -312,7 +312,9 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     title: 'Limit Order Placed',
                     message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
             } else {
@@ -390,7 +392,9 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     title: 'Limit Order Placed',
                     message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
             } else {

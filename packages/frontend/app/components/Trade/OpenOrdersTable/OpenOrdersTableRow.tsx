@@ -77,7 +77,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     title: 'Order Cancelled',
                     message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
 
@@ -91,7 +93,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     title: 'Cancel Failed',
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
             }

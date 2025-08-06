@@ -1413,7 +1413,9 @@ function OrderInput({
                     title: 'Limit Order Placed',
                     message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
             } else {
@@ -1502,7 +1504,9 @@ function OrderInput({
                     title: 'Limit Order Placed',
                     message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
                     removeAfter: 5000,
                 });
             } else {
