@@ -269,9 +269,11 @@ function OrderInput({
     }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
 
     const [isMidModeActive, setIsMidModeActive] = useState(false);
+    const confirmOrderModal = useModal<modalContentT>('closed');
 
     useEffect(() => {
-        if (isMidModeActive) {
+        // Don't update price if confirm modal is open
+        if (isMidModeActive && !confirmOrderModal.isOpen) {
             setMidPriceAsPriceInput();
         }
     }, [
@@ -282,9 +284,8 @@ function OrderInput({
         buys?.[0]?.px,
         sells?.[0]?.px,
         markPx,
+        confirmOrderModal.isOpen, // Add dependency to re-run when modal state changes
     ]);
-
-    const confirmOrderModal = useModal<modalContentT>('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
