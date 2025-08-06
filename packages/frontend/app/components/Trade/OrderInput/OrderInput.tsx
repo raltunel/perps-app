@@ -1146,6 +1146,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
+            autoFocus: true,
         }),
         [
             handleSizeChange,
