@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import type { WsMsg } from '@perps-app/sdk/src/utils/types';
+import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
-import { useApp } from '~/contexts/AppContext';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { processUserOrder } from '~/processors/processOrderBook';
@@ -14,8 +15,8 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -30,8 +31,6 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
-import { useNotificationStore } from '~/stores/NotificationStore';
-import useNumFormatter from '~/hooks/useNumFormatter';
 
 export default function WebDataConsumer() {
     const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -72,7 +71,7 @@ export default function WebDataConsumer() {
     addressRef.current = userAddress?.toLowerCase();
 
     // Use unified margin data for both balance and positions
-    const { balance, positions: unifiedPositions } = useUnifiedMarginData();
+    const { positions: unifiedPositions } = useUnifiedMarginData();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -522,7 +521,7 @@ export default function WebDataConsumer() {
 
     const postUserFills = useCallback(
         (payload: any) => {
-            const data = payload.data;
+            const data = payload.data as UserFillsData;
 
             console.log('[USER FILLS] Received subscription data:', {
                 isSnapshot: data?.isSnapshot,
@@ -549,12 +548,15 @@ export default function WebDataConsumer() {
                     })),
                 });
 
-                const fills = processUserFills(data);
-                fills.sort((a, b) => b.time - a.time);
+                const fills = data.fills.length ? processUserFills(data) : [];
+                const filteredFills = fills.filter(
+                    (fill) => fill.crossed === true,
+                );
+                filteredFills.sort((a, b) => b.time - a.time);
 
                 console.log('[USER FILLS] Processed fills:', {
-                    processedCount: fills.length,
-                    firstFewFills: fills.slice(0, 3).map((fill) => ({
+                    processedCount: filteredFills.length,
+                    firstFewFills: filteredFills.slice(0, 3).map((fill) => ({
                         coin: fill.coin,
                         side: fill.side,
                         px: fill.px,
@@ -566,10 +568,10 @@ export default function WebDataConsumer() {
                 });
 
                 if (data.isSnapshot) {
-                    userFillsRef.current = fills;
+                    userFillsRef.current = filteredFills;
                     console.log(
                         '[USER FILLS] Set snapshot fills:',
-                        fills.length,
+                        filteredFills.length,
                     );
                 } else {
                     // Merge fills with deduplication
@@ -587,7 +589,7 @@ export default function WebDataConsumer() {
                     });
 
                     // Add new fills, which will overwrite duplicates
-                    fills.forEach((fill) => {
+                    filteredFills.forEach((fill) => {
                         const dedupeKey = fill.startPositionRaw
                             ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
                             : `${fill.coin}-${fill.oid}-${fill.tid}`;
@@ -607,12 +609,20 @@ export default function WebDataConsumer() {
                             );
                         }
 
+                        const usdValueOfFillStr = formatNum(
+                            fill.sz * fill.px,
+                            2,
+                            true,
+                            true,
+                        );
+
                         // notify user
                         notifiedOrdersRef.current.add(fill.oid);
                         notificationStore.add({
                             title: 'Limit Order Filled',
-                            message: `Successfully filled ${fill.side} order for ${fill.sz} ${fill.coin} at ${formatNum(fill.px)}`,
+                            message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
                             icon: 'check',
+                            removeAfter: 5000,
                         });
                     });
 
@@ -624,12 +634,12 @@ export default function WebDataConsumer() {
                     console.log(
                         '[USER FILLS] Added update fills with deduplication:',
                         {
-                            newFillsCount: fills.length,
+                            newFillsCount: filteredFills.length,
                             previousTotal: previousCount,
                             newTotal: userFillsRef.current.length,
                             duplicatesRemoved:
                                 previousCount +
-                                fills.length -
+                                filteredFills.length -
                                 userFillsRef.current.length,
                         },
                     );

@@ -311,13 +311,19 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 side: 'buy',
             });
 
+            const usdValueOfOrderStr = formatNum(
+                notionalSymbolQtyNum * limitPrice,
+                2,
+                true,
+                true,
+            );
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
@@ -374,12 +380,19 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
+        const usdValueOfOrderStr = formatNum(
+            notionalSymbolQtyNum * limitPrice,
+            2,
+            true,
+            true,
+        );
+
         if (activeOptions.skipOpenOrderConfirm) {
             close();
             // Show pending notification
             notifications.add({
                 title: 'Sell / Short Limit Order Pending',
-                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                message: `Selling ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
             });
         }
@@ -395,10 +408,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
