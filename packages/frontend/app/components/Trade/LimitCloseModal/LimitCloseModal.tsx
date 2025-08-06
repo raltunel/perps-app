@@ -293,16 +293,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
-        if (activeOptions.skipOpenOrderConfirm) {
-            close();
-            // Show pending notification
-            notifications.add({
-                title: 'Buy / Long Limit Order Pending',
-                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
-        }
-
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -386,16 +376,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             true,
             true,
         );
-
-        if (activeOptions.skipOpenOrderConfirm) {
-            close();
-            // Show pending notification
-            notifications.add({
-                title: 'Sell / Short Limit Order Pending',
-                message: `Selling ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
-        }
 
         try {
             // Execute limit order

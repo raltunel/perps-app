@@ -619,7 +619,7 @@ export default function WebDataConsumer() {
                         // notify user
                         notifiedOrdersRef.current.add(fill.oid);
                         notificationStore.add({
-                            title: 'Limit Order Filled',
+                            title: 'Order Filled',
                             message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
                             icon: 'check',
                             removeAfter: 5000,
