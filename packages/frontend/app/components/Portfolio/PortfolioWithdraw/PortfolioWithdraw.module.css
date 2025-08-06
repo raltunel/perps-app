@@ -51,15 +51,24 @@
     height: 32px;
     border-radius: var(--radius-s, 8px);
     background-color: var(--bg-dark4, #27272c);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* label text for the input field */
 .input_container > h6 {
+    flex-shrink: 0;
     font-size: var(--font-size-s, 12px);
     color: var(--text2);
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+}
+
+.input_container > input {
+    flex: 1;
+    min-width: 0;
 }
 
 /* warning displayed to user when below the minimum tx threshold */

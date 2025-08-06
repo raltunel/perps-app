@@ -51,6 +51,8 @@ function PortfolioDeposit(props: propsIF) {
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
+    const MIN_DEPOSIT_AMOUNT = 5;
+
     const [rawInputString, setRawInputString] = useState('');
 
     const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
@@ -139,7 +141,7 @@ function PortfolioDeposit(props: propsIF) {
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, true)} fUSD`,
+                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -226,7 +228,9 @@ function PortfolioDeposit(props: propsIF) {
 
             <div className={styles.input_container}>
                 <h6>Amount</h6>
-                {showInvalidSizeWarning && <span>Min: $5</span>}
+                {showInvalidSizeWarning && (
+                    <span>{`Min: ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`}</span>
+                )}
                 <NumFormattedInput
                     placeholder='Enter amount (min $5)'
                     value={rawInputString}
