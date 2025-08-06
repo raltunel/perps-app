@@ -855,7 +855,7 @@ function OrderInput({
     ) => {
         if (event.key === 'Enter') {
             if (activeOptions.skipOpenOrderConfirm) {
-                (submitButton as HTMLElement).focus();
+                (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
             } else {
                 handleSubmitOrder();
