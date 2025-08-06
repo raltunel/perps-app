@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LuPen } from 'react-icons/lu';
 import { RiExternalLinkLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
@@ -9,14 +9,15 @@ import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
+import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
-import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -61,6 +62,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             }
             return ret;
         }, [position.tp, position.sl, formatNum]);
+
+        const setLeverage = useLeverageStore(
+            (state) => state.setPreferredLeverage,
+        );
+
+        const { symbol } = useTradeDataStore();
+        useEffect(() => {
+            if (symbol.toLowerCase() === position.coin.toLowerCase()) {
+                setLeverage(position.leverage.value);
+            }
+        }, [symbol]);
 
         // Memoize hexToRgba
         const hexToRgba = useCallback((hex: string, alpha: number): string => {
