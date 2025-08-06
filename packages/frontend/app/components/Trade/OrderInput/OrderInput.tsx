@@ -676,12 +676,22 @@ function OrderInput({
     ]);
 
     const getPercentFromAvailableToTrade = useCallback(() => {
-        return (
-            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
-                usdAvailableToTrade) *
-            100
+        const minAvailableOrMaxOI = Math.min(
+            usdAvailableToTrade * leverage,
+            maxNotionalUsdOrderSize,
         );
-    }, [notionalSymbolQtyNum, leverage, markPx, usdAvailableToTrade]);
+
+        return (
+            ((notionalSymbolQtyNum * (markPx || 1)) / minAvailableOrMaxOI) * 100
+        );
+    }, [
+        notionalSymbolQtyNum,
+        leverage,
+        markPx,
+        usdAvailableToTrade,
+        userBuyingPowerExceedsMaxOrderSize,
+        maxNotionalUsdOrderSize,
+    ]);
 
     useEffect(() => {
         let percent = 0;
@@ -753,15 +763,19 @@ function OrderInput({
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(
-                maxCollateralModeEnabled
+                maxCollateralModeEnabled || parsed === maxNotionalUsdOrderSize
                     ? isReduceOnlyEnabled
                         ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
-                        : (usdAvailableToTrade * leverage) / (markPx || 1)
+                        : userBuyingPowerExceedsMaxOrderSize
+                          ? maxNotionalUsdOrderSize / (markPx || 1)
+                          : (usdAvailableToTrade * leverage) / (markPx || 1)
                     : adjusted,
             );
             if (isUserLoggedIn) {
                 const usdValue = maxCollateralModeEnabled
-                    ? usdAvailableToTrade * leverage
+                    ? userBuyingPowerExceedsMaxOrderSize
+                        ? maxNotionalUsdOrderSize
+                        : usdAvailableToTrade * leverage
                     : selectedMode === 'symbol'
                       ? adjusted * (markPx || 1)
                       : parsed;
@@ -810,6 +824,7 @@ function OrderInput({
         maxNotionalUsdOrderSize,
         userBuyingPowerExceedsMaxOrderSize,
         maxCollateralModeEnabled,
+        userExceededAvailableMargin,
     ]);
 
     useEffect(() => {
