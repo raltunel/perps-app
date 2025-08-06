@@ -172,14 +172,16 @@ export default function LeverageSlider({
     );
 
     const showMinimumWarning = sliderBelowMinimumLeverage
-        ? sliderBelowMinimumLeverageDebounced
+        ? isDragging
+            ? true
+            : sliderBelowMinimumLeverageDebounced
         : false;
 
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
     const shouldShowInteractiveWarning = useMemo(() => {
         if (minimumValue === undefined) return false;
 
-        const minWithBuffer = minimumValue * 10 ** -0.1;
+        const minWithBuffer = minimumValue * 10 ** -0.08;
         const isDraggingBelowMinimum =
             isDragging && unconstrainedSliderValue <= minWithBuffer;
 
@@ -264,12 +266,17 @@ export default function LeverageSlider({
     };
 
     const handleLeverageChange = (newLeverage: number) => {
+        const newLeverageOrMinAllowedForUser = Math.max(
+            newLeverage,
+            minimumValue || 1,
+        );
+
         // Update the preferred leverage in store with the exact value (no rounding)
-        setPreferredLeverage(newLeverage);
+        setPreferredLeverage(newLeverageOrMinAllowedForUser);
 
         // Always call the parent onChange with the exact value
-        onChange(newLeverage);
-        announceValueChange(newLeverage);
+        onChange(newLeverageOrMinAllowedForUser);
+        announceValueChange(newLeverageOrMinAllowedForUser);
     };
 
     const handleMarketChange = useCallback(() => {
@@ -572,7 +579,7 @@ export default function LeverageSlider({
     const handleTrackClick = (e: React.MouseEvent) => {
         const boundedValue = calculateValueFromPosition(e.clientX);
         if (onClick) {
-            onClick(boundedValue);
+            onClick(Math.max(boundedValue, minimumValue || 1));
         } else {
             handleLeverageChange(boundedValue);
         }
@@ -988,7 +995,12 @@ export default function LeverageSlider({
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         if (onClick) {
-                                            onClick(tickValue);
+                                            onClick(
+                                                Math.max(
+                                                    tickValue,
+                                                    minimumValue || 1,
+                                                ),
+                                            );
                                         } else {
                                             handleLeverageChange(tickValue);
                                         }
