@@ -854,7 +854,10 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            if (!activeOptions.skipOpenOrderConfirm) {
+            if (activeOptions.skipOpenOrderConfirm) {
+                (submitButton as HTMLElement).focus();
+                event.preventDefault();
+            } else {
                 handleSubmitOrder();
             }
         }
@@ -1143,6 +1146,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
+            autoFocus: true,
         }),
         [
             handleSizeChange,
@@ -1606,9 +1610,7 @@ function OrderInput({
             // 2. There's a valid notional/symbol quantity
             // 3. No modals are open
             // 4. Skip confirmation is not enabled
-            const submitButton = document.querySelector(
-                '[data-testid="submit-order-button"]',
-            );
+
             const isSubmitButtonFocused =
                 document.activeElement === submitButton;
             // Submit if either:
@@ -1622,6 +1624,13 @@ function OrderInput({
                 !isAnyPortfolioModalOpen
             ) {
                 handleSubmitOrder();
+            } else if (
+                activeOptions.skipOpenOrderConfirm &&
+                isFocused &&
+                submitButton
+            ) {
+                // focus the submit button
+                (submitButton as HTMLElement).focus();
             }
         };
 
@@ -1772,6 +1781,10 @@ function OrderInput({
     //         </ul>
     //     </div>
     // );
+
+    const submitButton = document.querySelector(
+        '[data-testid="submit-order-button"]',
+    );
 
     return (
         <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
