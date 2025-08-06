@@ -206,7 +206,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
             {showReduceToggle && (
                 <div
                     className={styles.reduceToggleContent}
-                    onClick={() => handleToggleReduceOnly()}
+                    // onClick={() => handleToggleReduceOnly()}
                 >
                     <ToggleSwitch
                         isOn={isReduceOnlyEnabled}

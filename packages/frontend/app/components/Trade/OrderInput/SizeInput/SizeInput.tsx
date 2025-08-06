@@ -17,6 +17,7 @@ interface PropsIF {
     setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
     isModal?: boolean;
+    autoFocus?: boolean;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -65,6 +66,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 aria-label={ariaLabel}
                 placeholder='Enter Size'
                 onFocus={onFocus}
+                autoFocus={props.autoFocus}
             />
             <button className={styles.tokenButton}>
                 <ComboBox

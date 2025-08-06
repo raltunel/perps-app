@@ -676,12 +676,22 @@ function OrderInput({
     ]);
 
     const getPercentFromAvailableToTrade = useCallback(() => {
-        return (
-            (((notionalSymbolQtyNum / leverage) * (markPx || 1)) /
-                usdAvailableToTrade) *
-            100
+        const minAvailableOrMaxOI = Math.min(
+            usdAvailableToTrade * leverage,
+            maxNotionalUsdOrderSize,
         );
-    }, [notionalSymbolQtyNum, leverage, markPx, usdAvailableToTrade]);
+
+        return (
+            ((notionalSymbolQtyNum * (markPx || 1)) / minAvailableOrMaxOI) * 100
+        );
+    }, [
+        notionalSymbolQtyNum,
+        leverage,
+        markPx,
+        usdAvailableToTrade,
+        userBuyingPowerExceedsMaxOrderSize,
+        maxNotionalUsdOrderSize,
+    ]);
 
     useEffect(() => {
         let percent = 0;
@@ -753,15 +763,19 @@ function OrderInput({
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(
-                maxCollateralModeEnabled
+                maxCollateralModeEnabled || parsed === maxNotionalUsdOrderSize
                     ? isReduceOnlyEnabled
                         ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
-                        : (usdAvailableToTrade * leverage) / (markPx || 1)
+                        : userBuyingPowerExceedsMaxOrderSize
+                          ? maxNotionalUsdOrderSize / (markPx || 1)
+                          : (usdAvailableToTrade * leverage) / (markPx || 1)
                     : adjusted,
             );
             if (isUserLoggedIn) {
                 const usdValue = maxCollateralModeEnabled
-                    ? usdAvailableToTrade * leverage
+                    ? userBuyingPowerExceedsMaxOrderSize
+                        ? maxNotionalUsdOrderSize
+                        : usdAvailableToTrade * leverage
                     : selectedMode === 'symbol'
                       ? adjusted * (markPx || 1)
                       : parsed;
@@ -810,6 +824,7 @@ function OrderInput({
         maxNotionalUsdOrderSize,
         userBuyingPowerExceedsMaxOrderSize,
         maxCollateralModeEnabled,
+        userExceededAvailableMargin,
     ]);
 
     useEffect(() => {
@@ -839,7 +854,10 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            if (!activeOptions.skipOpenOrderConfirm) {
+            if (activeOptions.skipOpenOrderConfirm) {
+                (submitButton as HTMLElement).focus();
+                event.preventDefault();
+            } else {
                 handleSubmitOrder();
             }
         }
@@ -1128,6 +1146,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
+            autoFocus: true,
         }),
         [
             handleSizeChange,
@@ -1591,9 +1610,7 @@ function OrderInput({
             // 2. There's a valid notional/symbol quantity
             // 3. No modals are open
             // 4. Skip confirmation is not enabled
-            const submitButton = document.querySelector(
-                '[data-testid="submit-order-button"]',
-            );
+
             const isSubmitButtonFocused =
                 document.activeElement === submitButton;
             // Submit if either:
@@ -1607,6 +1624,13 @@ function OrderInput({
                 !isAnyPortfolioModalOpen
             ) {
                 handleSubmitOrder();
+            } else if (
+                activeOptions.skipOpenOrderConfirm &&
+                isFocused &&
+                submitButton
+            ) {
+                // focus the submit button
+                (submitButton as HTMLElement).focus();
             }
         };
 
@@ -1757,6 +1781,10 @@ function OrderInput({
     //         </ul>
     //     </div>
     // );
+
+    const submitButton = document.querySelector(
+        '[data-testid="submit-order-button"]',
+    );
 
     return (
         <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
