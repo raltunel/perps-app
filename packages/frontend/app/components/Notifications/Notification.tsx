@@ -37,12 +37,40 @@ export default function Notification(props: propsIF) {
     const [isHovered, setIsHovered] = useState(false);
     const timeoutRef = useRef<NodeJS.Timeout>(null);
 
+    // Track if we're in the middle of a debounce
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [isDebouncedHovered, setIsDebouncedHovered] = useState(false);
+
+    // Debounce hover state changes
+    useEffect(() => {
+        if (isHovered || shouldPauseDismissal) {
+            // Clear any pending debounce timer when hovering starts
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = null;
+            }
+            setIsDebouncedHovered(true);
+        } else {
+            // Set a timer to update hover state after debounce period
+            debounceTimerRef.current = setTimeout(() => {
+                setIsDebouncedHovered(false);
+                debounceTimerRef.current = null;
+            }, 500); // 500ms debounce
+        }
+
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [isHovered, shouldPauseDismissal]);
+
     // Setup auto-dismiss timer, but only when not hovered and not in group hover state
     useEffect(() => {
-        if (!isHovered && !shouldPauseDismissal) {
+        if (!isDebouncedHovered) {
             timeoutRef.current = setTimeout(
                 () => dismiss(data.slug),
-                DISMISS_AFTER - (Date.now() - createdAt.current),
+                Math.max(0, DISMISS_AFTER - (Date.now() - createdAt.current)),
             );
         } else if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
@@ -53,7 +81,7 @@ export default function Notification(props: propsIF) {
                 clearTimeout(timeoutRef.current);
             }
         };
-    }, [dismiss, isHovered, shouldPauseDismissal]);
+    }, [dismiss, isDebouncedHovered, data.slug]);
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
