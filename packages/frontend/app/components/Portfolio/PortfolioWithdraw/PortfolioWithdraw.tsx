@@ -135,7 +135,6 @@ function PortfolioWithdraw({
     }, [portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
-        console.log('clicked');
         setError(null);
         setTransactionStatus('pending');
 
@@ -143,8 +142,6 @@ function PortfolioWithdraw({
             withdrawInputNum,
             portfolio.availableBalance,
         );
-
-        console.log({ validation });
 
         if (!validation.isValid) {
             setError(validation.message);
