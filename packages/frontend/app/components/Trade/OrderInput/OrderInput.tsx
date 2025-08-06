@@ -1787,7 +1787,7 @@ function OrderInput({
     );
 
     return (
-        <div ref={orderInputRef} className={styles.mainContainer} tabIndex={-1}>
+        <div ref={orderInputRef} className={styles.mainContainer}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div
