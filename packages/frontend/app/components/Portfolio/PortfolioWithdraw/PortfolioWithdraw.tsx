@@ -79,6 +79,7 @@ function PortfolioWithdraw({
     // Memoize button disabled state calculation
     const isButtonDisabled = useMemo(
         () =>
+            isNaN(withdrawInputNum) ||
             isProcessing ||
             !rawInputString ||
             withdrawInputNum <= 0 ||
