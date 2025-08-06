@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 // import { LuCircleHelp } from 'react-icons/lu';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -8,9 +8,9 @@ import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { blockExplorer } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
-import { blockExplorer } from '~/utils/Constants';
 
 interface LeverageSliderModalProps {
     currentLeverage: number;

@@ -308,6 +308,7 @@ export default function LeverageSlider({
             onChange(validatedLeverage);
             setHasInitializedLeverage(true);
         } else {
+            if (modalMode) return;
             // Even if no market change, ensure we have the right leverage for the current maxLeverage
             const currentPreference = getPreferredLeverage();
             const shouldUpdate =
