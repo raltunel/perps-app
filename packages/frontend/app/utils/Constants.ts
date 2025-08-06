@@ -52,12 +52,6 @@ export const Langs: LangType[] = [
     },
 ];
 
-export const wsUrls = [
-    'wss://api.hyperliquid.xyz/ws',
-    'wss://pulse-api-mock.liquidity.tools/ws',
-    'wss://api-ui.hyperliquid.xyz/ws',
-];
-
 export const wsEnvironments = [
     {
         label: 'Mock',
@@ -150,6 +144,13 @@ export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
 
 export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 
+export const MARKET_API_URL =
+    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+
+export const MARKET_INFO_ENDPOINT =
+    import.meta.env.VITE_MARKET_INFO_ENDPOINT ||
+    'https://api.hyperliquid.xyz/info';
+
 export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
 
@@ -171,3 +172,26 @@ export const RPC_ENDPOINT =
  * This ensures market orders are filled even with slight price movements.
  */
 export const MARKET_ORDER_PRICE_OFFSET_USD = 50;
+
+console.log('Market Info Endpoint:', MARKET_INFO_ENDPOINT);
+console.log('Market WS Endpoint:', MARKET_WS_ENDPOINT);
+console.log('User WS Endpoint:', USER_WS_ENDPOINT);
+
+export const wsUrls = [
+    MARKET_WS_ENDPOINT + '/ws',
+    'wss://pulse-api-mock.liquidity.tools/ws',
+    'wss://api-ui.hyperliquid.xyz/ws',
+];
+
+export const API_URLS = {
+    mainnet: 'https://pulse-api-mock.liquidity.tools',
+    testnet: 'https://pulse-api-mock.liquidity.tools',
+    mock: 'https://pulse-api-mock.liquidity.tools',
+
+    local: 'http://localhost:9153',
+
+    hl: MARKET_API_URL,
+};
+
+export type Environment = keyof typeof API_URLS;
+export const DEFAULT_API_ENVIRONMENT: Environment = 'mock';
