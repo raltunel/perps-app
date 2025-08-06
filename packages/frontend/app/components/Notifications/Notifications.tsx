@@ -34,6 +34,21 @@ export default function Notifications() {
     const { info } = useSdk();
 
     const { showReload, setShowReload } = useVersionCheck();
+    const [hoveredNotifications, setHoveredNotifications] = useState<
+        Set<number>
+    >(new Set());
+
+    const handleMouseEnter = useCallback((slug: number) => {
+        setHoveredNotifications((prev) => new Set(prev).add(slug));
+    }, []);
+
+    const handleMouseLeave = useCallback((slug: number) => {
+        setHoveredNotifications((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(slug);
+            return newSet;
+        });
+    }, []);
 
     useEffect(() => {
         if (!info) return;
@@ -148,7 +163,16 @@ export default function Notifications() {
                             }}
                             layout // Optional: enables smooth stacking animations
                         >
-                            <Notification data={n} dismiss={data.remove} />
+                            <Notification
+                                data={n}
+                                dismiss={data.remove}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                                shouldPauseDismissal={
+                                    data.notifications.length <= 3 &&
+                                    hoveredNotifications.size > 0
+                                }
+                            />
                         </motion.div>
                     ))}
             </AnimatePresence>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import {
     IoAlertCircleOutline,
@@ -12,10 +12,19 @@ import styles from './Notification.module.css';
 interface propsIF {
     data: notificationIF;
     dismiss: (id: number) => void;
+    onMouseEnter?: (slug: number) => void;
+    onMouseLeave?: (slug: number) => void;
+    shouldPauseDismissal?: boolean;
 }
 
 export default function Notification(props: propsIF) {
-    const { data, dismiss } = props;
+    const {
+        data,
+        dismiss,
+        onMouseEnter,
+        onMouseLeave,
+        shouldPauseDismissal = false,
+    } = props;
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
 
@@ -25,16 +34,26 @@ export default function Notification(props: propsIF) {
     const DISMISS_AFTER = data.removeAfter || 5000;
 
     // logic to remove this elem from the DOM after a timeout, yes the
-    // ... logic shown is convoluted, any changes will result in all
-    // ... notifications being dismissed together or the timer being
-    // ... reset any time a notification disappears
+    const [isHovered, setIsHovered] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout>(null);
+
+    // Setup auto-dismiss timer, but only when not hovered and not in group hover state
     useEffect(() => {
-        const autoDismiss: NodeJS.Timeout = setTimeout(
-            () => dismiss(data.slug),
-            DISMISS_AFTER - (Date.now() - createdAt.current),
-        );
-        return () => clearTimeout(autoDismiss);
-    }, [dismiss]);
+        if (!isHovered && !shouldPauseDismissal) {
+            timeoutRef.current = setTimeout(
+                () => dismiss(data.slug),
+                DISMISS_AFTER - (Date.now() - createdAt.current),
+            );
+        } else if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [dismiss, isHovered, shouldPauseDismissal]);
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
@@ -84,7 +103,17 @@ export default function Notification(props: propsIF) {
     }
 
     return (
-        <section className={styles.notification}>
+        <section
+            className={styles.notification}
+            onMouseEnter={() => {
+                setIsHovered(true);
+                onMouseEnter?.(data.slug);
+            }}
+            onMouseLeave={() => {
+                setIsHovered(false);
+                onMouseLeave?.(data.slug);
+            }}
+        >
             <header>
                 <div className={styles.header_content}>
                     {data.icon === 'spinner' && (

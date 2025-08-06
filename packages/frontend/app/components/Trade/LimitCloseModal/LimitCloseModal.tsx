@@ -330,7 +330,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -345,7 +345,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -418,7 +418,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -433,7 +433,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);

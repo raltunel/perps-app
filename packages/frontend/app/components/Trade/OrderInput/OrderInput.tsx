@@ -1248,7 +1248,7 @@ function OrderInput({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1263,7 +1263,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1332,7 +1332,7 @@ function OrderInput({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1347,7 +1347,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1421,7 +1421,7 @@ function OrderInput({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1436,7 +1436,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1510,7 +1510,7 @@ function OrderInput({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1525,7 +1525,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
