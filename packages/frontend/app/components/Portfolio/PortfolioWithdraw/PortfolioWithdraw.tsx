@@ -44,21 +44,30 @@ function PortfolioWithdraw({
 
     const withdrawInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
+    const MIN_WITHDRAW_AMOUNT = 1;
+
     const isSizeInvalid: boolean =
         !isNaN(withdrawInputNum) &&
         withdrawInputNum > 0 &&
-        withdrawInputNum < 1;
+        withdrawInputNum < MIN_WITHDRAW_AMOUNT;
 
+    const [maxActive, setMaxActive] = useState(false);
     // debounced invalid state
     const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
 
-    const showInvalidSizeWarning = isSizeInvalid
-        ? isSizeInvalidDebounced
-        : false;
-
-    const [maxActive, setMaxActive] = useState(false);
+    const userBalanceLessThanMinimum =
+        portfolio.availableBalance < MIN_WITHDRAW_AMOUNT;
 
     const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
+
+    const userAtMax = withdrawAmount === portfolio.availableBalance;
+
+    const showInvalidSizeWarning =
+        isSizeInvalid && !userAtMax
+            ? userBalanceLessThanMinimum && maxActive
+                ? false
+                : isSizeInvalidDebounced
+            : false;
 
     const validateAmount = useCallback(
         (amount: number, maxAmount: number) => {
@@ -79,7 +88,7 @@ function PortfolioWithdraw({
             if (amount > maxAmount && !maxActive) {
                 return {
                     isValid: false,
-                    message: `Amount exceeds available balance of ${maxAmount}`,
+                    message: `Amount exceeds available balance of ${formatNum(maxAmount, 2, true, true)}`,
                 };
             }
 
@@ -94,7 +103,12 @@ function PortfolioWithdraw({
     const handleMaxClick = useCallback(() => {
         setRawInputString(
             '$' +
-                formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
+                formatNumWithOnlyDecimals(
+                    portfolio.availableBalance,
+                    2,
+                    true,
+                    false,
+                ),
         );
         setMaxActive(true);
     }, [portfolio.availableBalance]);
@@ -151,7 +165,7 @@ function PortfolioWithdraw({
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} fUSD`,
+                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, false)} fUSD`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -201,9 +215,12 @@ function PortfolioWithdraw({
             !rawInputString ||
             isNaN(withdrawInputNum) ||
             withdrawInputNum <= 0 ||
-            (!maxActive && withdrawInputNum > portfolio.availableBalance),
+            (!maxActive && withdrawInputNum > portfolio.availableBalance) ||
+            (isSizeInvalid && !maxActive),
         [isProcessing, rawInputString, portfolio.availableBalance, maxActive],
     );
+
+    console.log({ isButtonDisabled });
 
     return (
         <div className={styles.container}>
@@ -218,7 +235,17 @@ function PortfolioWithdraw({
 
             <div className={styles.input_container}>
                 <h6>Amount</h6>
-                {showInvalidSizeWarning && <span>Min: $1</span>}
+                {showInvalidSizeWarning ? (
+                    userBalanceLessThanMinimum ? (
+                        <span>
+                            {`Min: ${formatNum(MIN_WITHDRAW_AMOUNT, 2, true, true)} or Max`}
+                        </span>
+                    ) : (
+                        <span>
+                            Min: {formatNum(MIN_WITHDRAW_AMOUNT, 2, true, true)}
+                        </span>
+                    )
+                ) : null}
                 <NumFormattedInput
                     placeholder='Enter amount (min $1)'
                     value={rawInputString}
@@ -277,7 +304,7 @@ function PortfolioWithdraw({
             <SimpleButton
                 bg='accent1'
                 onClick={handleWithdraw}
-                disabled={isButtonDisabled || isSizeInvalid}
+                disabled={isButtonDisabled}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'
