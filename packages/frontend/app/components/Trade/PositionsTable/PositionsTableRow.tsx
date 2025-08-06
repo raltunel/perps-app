@@ -165,11 +165,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
             try {
                 // Show pending notification
-                notifications.add({
-                    title: 'Closing Position',
-                    message: `Market closing ${Math.abs(position.szi)} ${position.coin}`,
-                    icon: 'spinner',
-                });
+                // notifications.add({
+                //     title: 'Closing Position',
+                //     message: `Market closing ${Math.abs(position.szi)} ${position.coin}`,
+                //     icon: 'spinner',
+                // });
 
                 // Get order book prices for the closing order
                 const closingSide = position.szi > 0 ? 'sell' : 'buy';

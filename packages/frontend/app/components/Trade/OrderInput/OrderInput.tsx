@@ -269,9 +269,11 @@ function OrderInput({
     }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
 
     const [isMidModeActive, setIsMidModeActive] = useState(false);
+    const confirmOrderModal = useModal<modalContentT>('closed');
 
     useEffect(() => {
-        if (isMidModeActive) {
+        // Don't update price if confirm modal is open
+        if (isMidModeActive && !confirmOrderModal.isOpen) {
             setMidPriceAsPriceInput();
         }
     }, [
@@ -282,9 +284,8 @@ function OrderInput({
         buys?.[0]?.px,
         sells?.[0]?.px,
         markPx,
+        confirmOrderModal.isOpen, // Add dependency to re-run when modal state changes
     ]);
-
-    const confirmOrderModal = useModal<modalContentT>('closed');
 
     const showPriceInputComponent = ['limit', 'stop_limit'].includes(
         marketOrderType,
@@ -855,7 +856,7 @@ function OrderInput({
     ) => {
         if (event.key === 'Enter') {
             if (activeOptions.skipOpenOrderConfirm) {
-                (submitButton as HTMLElement).focus();
+                (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
             } else {
                 handleSubmitOrder();
@@ -1222,13 +1223,22 @@ function OrderInput({
                 bestAskPrice: bestAskPrice,
             });
 
+            const usdValueOfOrderStr = formatNum(
+                roundDownToHundredth(
+                    notionalSymbolQtyNum * (bestAskPrice || 1),
+                ),
+                2,
+                true,
+                true,
+            );
+
             if (result.success) {
                 // Show success notification
                 notifications.add({
                     title: 'Buy Order Successful',
-                    message: `Successfully bought ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    message: `Successfully bought ${usdValueOfOrderStr} of ${symbol}`,
                     icon: 'check',
-                    removeAfter: 10000,
+                    removeAfter: 5000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1239,7 +1249,7 @@ function OrderInput({
                     title: 'Buy Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1254,7 +1264,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1297,13 +1307,22 @@ function OrderInput({
                 bestBidPrice: bestBidPrice,
             });
 
+            const usdValueOfOrderStr = formatNum(
+                roundDownToHundredth(
+                    notionalSymbolQtyNum * (bestBidPrice || 1),
+                ),
+                2,
+                true,
+                true,
+            );
+
             if (result.success) {
                 // Show success notification
                 notifications.add({
                     title: 'Sell Order Successful',
-                    message: `Successfully sold ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
+                    message: `Successfully sold ${usdValueOfOrderStr} of ${symbol}`,
                     icon: 'check',
-                    removeAfter: 10000,
+                    removeAfter: 5000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1314,7 +1333,7 @@ function OrderInput({
                     title: 'Sell Order Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1329,7 +1348,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1383,20 +1402,29 @@ function OrderInput({
                 leverage: leverage,
             });
 
+            const usdValueOfOrderStr = formatNum(
+                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                2,
+                true,
+                true,
+            );
+
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1411,7 +1439,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -1465,20 +1493,29 @@ function OrderInput({
                 leverage: leverage,
             });
 
+            const usdValueOfOrderStr = formatNum(
+                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                2,
+                true,
+                true,
+            );
+
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -1493,7 +1530,7 @@ function OrderInput({
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);

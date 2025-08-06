@@ -396,22 +396,22 @@ export default function GenericTable<
                 height: heightOverride,
             }}
         >
-            <span
-                id={`${id}-headerContainer`}
-                className={styles.headerContainer}
-            >
-                {tableState === TableState.LOADING ? (
-                    <div /> // for header during loading
-                ) : (
-                    renderHeader(sortDirection, handleSort, sortBy)
-                )}
-            </span>
             <div
                 id={`${id}-tableBody`}
                 className={`${styles.tableBody} ${
                     pageMode ? styles.pageMode : styles.notPage
                 } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
             >
+                <span
+                    id={`${id}-headerContainer`}
+                    className={styles.headerContainer}
+                >
+                    {tableState === TableState.LOADING ? (
+                        <div /> // for header during loading
+                    ) : (
+                        renderHeader(sortDirection, handleSort, sortBy)
+                    )}
+                </span>
                 {isSessionEstablished && tableState === TableState.LOADING && (
                     <SkeletonTable
                         rows={skeletonRows}
