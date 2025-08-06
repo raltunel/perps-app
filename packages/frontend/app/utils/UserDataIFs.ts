@@ -49,7 +49,7 @@ export interface UserFillIF {
     hash: string;
     oid: number;
     px: number;
-    side: 'buy' | 'sell';
+    side: 'buy' | 'sell' | 'B' | 'S';
     sz: number;
     tid: number;
     value: number;
