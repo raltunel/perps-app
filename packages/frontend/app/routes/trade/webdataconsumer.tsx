@@ -30,6 +30,8 @@ import type {
     UserFillIF,
     UserFundingIF,
 } from '~/utils/UserDataIFs';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 export default function WebDataConsumer() {
     const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -82,12 +84,16 @@ export default function WebDataConsumer() {
     const userFundingsRef = useRef<UserFundingIF[]>([]);
     const activeTwapsRef = useRef<ActiveTwapIF[]>([]);
     const userNonFundingLedgerUpdatesRef = useRef<TransactionData[]>([]);
+    const notificationStore = useNotificationStore();
+    const { formatNum } = useNumFormatter();
 
     const { info } = useSdk();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
 
     const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
     const fetchedChannelsRef = useRef<Set<string>>(new Set());
+
+    const notifiedOrdersRef = useRef<Set<number>>(new Set());
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -586,6 +592,28 @@ export default function WebDataConsumer() {
                             ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
                             : `${fill.coin}-${fill.oid}-${fill.tid}`;
                         fillMap.set(dedupeKey, fill);
+
+                        // prevent duplicate notifications
+                        if (notifiedOrdersRef.current.has(fill.oid)) {
+                            return;
+                        }
+
+                        // manage max length for notified orders
+                        if (
+                            Array.from(notifiedOrdersRef.current).length >= 10
+                        ) {
+                            notifiedOrdersRef.current.delete(
+                                Array.from(notifiedOrdersRef.current)[0],
+                            );
+                        }
+
+                        // notify user
+                        notifiedOrdersRef.current.add(fill.oid);
+                        notificationStore.add({
+                            title: 'Limit Order Filled',
+                            message: `Successfully filled ${fill.side} order for ${fill.sz} ${fill.coin} at ${formatNum(fill.px)}`,
+                            icon: 'check',
+                        });
                     });
 
                     // Convert back to array and sort by time
@@ -732,6 +760,7 @@ export default function WebDataConsumer() {
         userFundingsRef.current = [];
         activeTwapsRef.current = [];
         userNonFundingLedgerUpdatesRef.current = [];
+        notifiedOrdersRef.current = new Set();
     }, []);
 
     useEffect(() => {
