@@ -34,6 +34,35 @@ export default function Notifications() {
     const { info } = useSdk();
 
     const { showReload, setShowReload } = useVersionCheck();
+    const [hoveredNotifications, setHoveredNotifications] = useState<
+        Set<number>
+    >(new Set());
+
+    const handleMouseEnter = useCallback((slug: number) => {
+        setHoveredNotifications((prev) => new Set(prev).add(slug));
+    }, []);
+
+    const handleMouseLeave = useCallback((slug: number) => {
+        setHoveredNotifications((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(slug);
+            return newSet;
+        });
+    }, []);
+
+    const handleDismiss = useCallback(
+        (slug: number) => {
+            // Remove the notification from hoveredNotifications when dismissed
+            setHoveredNotifications((prev) => {
+                const newSet = new Set(prev);
+                newSet.delete(slug);
+                return newSet;
+            });
+            // Call the original remove function
+            data.remove(slug);
+        },
+        [data.remove],
+    );
 
     useEffect(() => {
         if (!info) return;
@@ -148,7 +177,17 @@ export default function Notifications() {
                             }}
                             layout // Optional: enables smooth stacking animations
                         >
-                            <Notification data={n} dismiss={data.remove} />
+                            <Notification
+                                key={n.slug}
+                                data={n}
+                                dismiss={handleDismiss}
+                                onMouseEnter={handleMouseEnter}
+                                onMouseLeave={handleMouseLeave}
+                                shouldPauseDismissal={
+                                    data.notifications.length <= 3 &&
+                                    hoveredNotifications.size > 0
+                                }
+                            />
                         </motion.div>
                     ))}
             </AnimatePresence>

@@ -128,7 +128,7 @@ function PortfolioDeposit(props: propsIF) {
                     title: 'Deposit Failed',
                     message: result.error || 'Transaction failed',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -144,7 +144,7 @@ function PortfolioDeposit(props: propsIF) {
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
-                    removeAfter: 10000,
+                    removeAfter: 5000,
                 });
 
                 // Close modal on success - notification will show after modal closes

@@ -4,6 +4,7 @@ import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
+import { blockExplorer } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
@@ -63,12 +64,23 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 orderId: order.oid,
             });
 
+            const usdValueOfOrderStr = formatNum(
+                order.sz * order.limitPx,
+                2,
+                true,
+                true,
+            );
+
             if (result.success) {
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
-                    message: `Successfully cancelled order for ${order.sz} ${order.coin}`,
+                    message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
 
                 // Call the original onCancel callback if provided
@@ -81,6 +93,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                     title: 'Cancel Failed',
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
             }
         } catch (error) {

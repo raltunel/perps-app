@@ -293,16 +293,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
-        if (activeOptions.skipOpenOrderConfirm) {
-            close();
-            // Show pending notification
-            notifications.add({
-                title: 'Buy / Long Limit Order Pending',
-                message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
-        }
-
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -311,20 +301,28 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 side: 'buy',
             });
 
+            const usdValueOfOrderStr = formatNum(
+                notionalSymbolQtyNum * limitPrice,
+                2,
+                true,
+                true,
+            );
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -339,7 +337,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);
@@ -374,15 +372,12 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
-        if (activeOptions.skipOpenOrderConfirm) {
-            close();
-            // Show pending notification
-            notifications.add({
-                title: 'Sell / Short Limit Order Pending',
-                message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                icon: 'spinner',
-            });
-        }
+        const usdValueOfOrderStr = formatNum(
+            notionalSymbolQtyNum * limitPrice,
+            2,
+            true,
+            true,
+        );
 
         try {
             // Execute limit order
@@ -395,17 +390,19 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${formatNum(notionalSymbolQtyNum)} ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
-                    txLink: `${blockExplorer}/tx/${result.signature}`,
-                    removeAfter: 10000,
+                    txLink: result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
+                        : undefined,
+                    removeAfter: 5000,
                 });
             } else {
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
                     icon: 'error',
-                    removeAfter: 15000,
+                    removeAfter: 10000,
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -420,7 +417,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ? error.message
                         : 'Unknown error occurred',
                 icon: 'error',
-                removeAfter: 15000,
+                removeAfter: 10000,
             });
         } finally {
             setIsProcessingOrder(false);

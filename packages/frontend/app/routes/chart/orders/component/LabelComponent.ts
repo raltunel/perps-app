@@ -521,7 +521,7 @@ const LabelComponent = ({
                         message:
                             limitOrderResult.error || 'Unknown error occurred',
                         icon: 'error',
-                        removeAfter: 15000,
+                        removeAfter: 10000,
                         txLink: limitOrderResult.signature
                             ? `${blockExplorer}/tx/${limitOrderResult.signature}`
                             : undefined,
@@ -533,7 +533,7 @@ const LabelComponent = ({
                         message:
                             'The order has been successfully updated with the new price.',
                         icon: 'check',
-                        removeAfter: 15000,
+                        removeAfter: 10000,
                         txLink: limitOrderResult.signature
                             ? `${blockExplorer}/tx/${limitOrderResult.signature}`
                             : undefined,
