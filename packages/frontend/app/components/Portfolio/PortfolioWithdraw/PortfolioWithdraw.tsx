@@ -44,21 +44,56 @@ function PortfolioWithdraw({
 
     const withdrawInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
-    const isSizeInvalid: boolean =
-        !isNaN(withdrawInputNum) &&
-        withdrawInputNum > 0 &&
-        withdrawInputNum < 1;
+    const MIN_WITHDRAW_AMOUNT = 1;
 
+    const [maxModeActive, setMaxModeActive] = useState(false);
     // debounced invalid state
+
+    // withdrawal amount within 0.005 of available balance
+    const userAtTheirMax =
+        withdrawInputNum >= portfolio.availableBalance - 0.005 &&
+        withdrawInputNum <= portfolio.availableBalance + 0.005;
+
+    const isSizeLessThanMinimum =
+        !userAtTheirMax &&
+        !maxModeActive &&
+        !!withdrawInputNum &&
+        withdrawInputNum < MIN_WITHDRAW_AMOUNT;
+
+    const isSizeInvalid: boolean =
+        !!withdrawInputNum &&
+        (isNaN(withdrawInputNum) || isSizeLessThanMinimum);
+
     const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
 
     const showInvalidSizeWarning = isSizeInvalid
         ? isSizeInvalidDebounced
         : false;
 
-    const [maxActive, setMaxActive] = useState(false);
+    const userBalanceLessThanMinimum =
+        portfolio.availableBalance < MIN_WITHDRAW_AMOUNT;
 
-    const withdrawAmount = parseFormattedWithOnlyDecimals(rawInputString);
+    const amountExceedsUserBalance =
+        withdrawInputNum > portfolio.availableBalance;
+
+    // Memoize button disabled state calculation
+    const isButtonDisabled = useMemo(
+        () =>
+            isNaN(withdrawInputNum) ||
+            isProcessing ||
+            !rawInputString ||
+            withdrawInputNum <= 0 ||
+            isSizeInvalid ||
+            (amountExceedsUserBalance && !userAtTheirMax),
+        [
+            isProcessing,
+            rawInputString,
+            showInvalidSizeWarning,
+            amountExceedsUserBalance,
+            withdrawInputNum,
+            userAtTheirMax,
+        ],
+    );
 
     const validateAmount = useCallback(
         (amount: number, maxAmount: number) => {
@@ -76,10 +111,10 @@ function PortfolioWithdraw({
                 };
             }
 
-            if (amount > maxAmount && !maxActive) {
+            if (amount > maxAmount && !maxModeActive && !userAtTheirMax) {
                 return {
                     isValid: false,
-                    message: `Amount exceeds available balance of ${maxAmount}`,
+                    message: `Amount exceeds available balance of ${formatNum(maxAmount, 2, true, true)}`,
                 };
             }
 
@@ -88,7 +123,7 @@ function PortfolioWithdraw({
                 message: null,
             };
         },
-        [maxActive],
+        [maxModeActive, userAtTheirMax],
     );
 
     const handleMaxClick = useCallback(() => {
@@ -96,7 +131,7 @@ function PortfolioWithdraw({
             '$' +
                 formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
         );
-        setMaxActive(true);
+        setMaxModeActive(true);
     }, [portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
@@ -104,7 +139,7 @@ function PortfolioWithdraw({
         setTransactionStatus('pending');
 
         const validation = validateAmount(
-            withdrawAmount,
+            withdrawInputNum,
             portfolio.availableBalance,
         );
 
@@ -128,7 +163,9 @@ function PortfolioWithdraw({
 
             // Race between the withdraw and the timeout
             const result = await Promise.race([
-                maxActive ? onWithdraw() : onWithdraw(withdrawAmount),
+                maxModeActive || userAtTheirMax
+                    ? onWithdraw()
+                    : onWithdraw(withdrawInputNum),
                 timeoutPromise,
             ]);
 
@@ -151,7 +188,7 @@ function PortfolioWithdraw({
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawAmount, 2, true, true)} fUSD`,
+                    message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -171,7 +208,7 @@ function PortfolioWithdraw({
             );
         }
     }, [
-        withdrawAmount,
+        withdrawInputNum,
         portfolio.availableBalance,
         onWithdraw,
         validateAmount,
@@ -194,17 +231,6 @@ function PortfolioWithdraw({
         [portfolio.availableBalance, formatNum],
     );
 
-    // Memoize button disabled state calculation
-    const isButtonDisabled = useMemo(
-        () =>
-            isProcessing ||
-            !rawInputString ||
-            isNaN(withdrawInputNum) ||
-            withdrawInputNum <= 0 ||
-            (!maxActive && withdrawInputNum > portfolio.availableBalance),
-        [isProcessing, rawInputString, portfolio.availableBalance, maxActive],
-    );
-
     return (
         <div className={styles.container}>
             <div className={styles.textContent}>
@@ -218,7 +244,17 @@ function PortfolioWithdraw({
 
             <div className={styles.input_container}>
                 <h6>Amount</h6>
-                {showInvalidSizeWarning && <span>Min: $1</span>}
+                {showInvalidSizeWarning ? (
+                    userBalanceLessThanMinimum ? (
+                        <span>
+                            {`Min: ${formatNum(MIN_WITHDRAW_AMOUNT, 2, true, true)} or Max`}
+                        </span>
+                    ) : (
+                        <span>
+                            Min: {formatNum(MIN_WITHDRAW_AMOUNT, 2, true, true)}
+                        </span>
+                    )
+                ) : null}
                 <NumFormattedInput
                     placeholder='Enter amount (min $1)'
                     value={rawInputString}
@@ -227,10 +263,10 @@ function PortfolioWithdraw({
                     ) => {
                         if (typeof event === 'string') {
                             setRawInputString(event);
-                            setMaxActive(false);
+                            setMaxModeActive(false);
                         } else {
                             setRawInputString(event.target.value);
-                            setMaxActive(false);
+                            setMaxModeActive(false);
                         }
                     }}
                     autoFocus
@@ -277,7 +313,7 @@ function PortfolioWithdraw({
             <SimpleButton
                 bg='accent1'
                 onClick={handleWithdraw}
-                disabled={isButtonDisabled || isSizeInvalid}
+                disabled={isButtonDisabled}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'

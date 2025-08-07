@@ -3,7 +3,6 @@ import {
     OrderSide,
     TimeInForce,
     buildOrderEntryTransaction,
-    cancelOrderIx,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 
@@ -231,6 +230,7 @@ export class LimitOrderService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature,
                 };
             }
         } catch (error) {

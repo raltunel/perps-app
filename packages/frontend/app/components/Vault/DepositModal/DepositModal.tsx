@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { LuChevronDown, LuCircleHelp } from 'react-icons/lu';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { useDepositService } from '~/hooks/useDepositService';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import styles from './DepositModal.module.css';
@@ -45,6 +46,8 @@ export default function DepositModal({
         executeDeposit,
         isLoading: isDepositLoading,
     } = useDepositService();
+
+    const { formatNum } = useNumFormatter();
 
     // Use the unit from the vault or default to USD
     const unitValue = vault.unit || 'USD';
@@ -127,7 +130,7 @@ export default function DepositModal({
                 // Show success notification
                 notificationStore.add({
                     title: 'Deposit Successful',
-                    message: `Successfully deposited $${depositAmount.toFixed(2)} fUSD`,
+                    message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
                     icon: 'check',
                 });
 
