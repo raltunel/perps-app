@@ -35,6 +35,7 @@ export class PythPriceService {
     private priceCache: Map<string, PythPriceData> = new Map();
     private latencyStats: Map<string, number[]> = new Map();
     private pollingIntervals: Map<string, NodeJS.Timeout> = new Map();
+    private isInternetConnected: boolean = true;
 
     private constructor() {
         this.client = new HermesClient(PYTH_ENDPOINT);
@@ -57,6 +58,15 @@ export class PythPriceService {
     private setupEventHandlers(): void {
         // Start connection monitoring
         this.monitorConnection();
+
+        if (window) {
+            // setup internet connection listeners
+            window.addEventListener('online', this.internetConnectedListener);
+            window.addEventListener(
+                'offline',
+                this.internetDisconnectedListener,
+            );
+        }
     }
 
     /**
@@ -69,6 +79,10 @@ export class PythPriceService {
         // Check connection every 5 seconds
         setInterval(async () => {
             try {
+                if (!this.isInternetConnected) {
+                    return;
+                }
+
                 // Try to fetch a price to check if connection is alive
                 const testFeedId = PYTH_PRICE_FEEDS.BTC.id;
                 const result = await this.client.getLatestPriceUpdates([
@@ -154,6 +168,10 @@ export class PythPriceService {
             }
 
             try {
+                if (!this.isInternetConnected) {
+                    return;
+                }
+
                 const startTime = Date.now();
 
                 // getLatestPriceUpdates returns an object with parsed property
@@ -367,6 +385,13 @@ export class PythPriceService {
         return metrics;
     }
 
+    private internetConnectedListener = () => {
+        this.isInternetConnected = true;
+    };
+    private internetDisconnectedListener = () => {
+        this.isInternetConnected = false;
+    };
+
     /**
      * Cleanup resources
      */
@@ -379,5 +404,15 @@ export class PythPriceService {
         this.connectionStatusCallbacks.clear();
         this.priceCache.clear();
         PythPriceService.instance = null;
+        if (window) {
+            window.removeEventListener(
+                'online',
+                this.internetConnectedListener,
+            );
+            window.removeEventListener(
+                'offline',
+                this.internetDisconnectedListener,
+            );
+        }
     }
 }

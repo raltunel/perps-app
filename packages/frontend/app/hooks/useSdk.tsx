@@ -101,6 +101,9 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!internetConnected) {
+            console.log('>>> internet disconnected', new Date().toISOString());
+            stashSubscriptions();
+            stashWebsocket();
             setShouldReconnect(true);
         }
     }, [internetConnected]);
@@ -132,7 +135,7 @@ export const SdkProvider: React.FC<{
             });
         }
         console.log(
-            '>>> stashed subscriptions (market only)',
+            '>>> stashed subscriptions',
             stashedSubs.current,
             new Date().toISOString(),
         );
@@ -151,6 +154,7 @@ export const SdkProvider: React.FC<{
 
         if (info?.multiSocketInfo) {
             // re-init subs
+            console.log('>>> reinit subs', stashedSubs.current);
             info.multiSocketInfo?.getPool().reInit(stashedSubs.current);
         } else {
             info?.wsManager?.reInit(stashedSubs.current);
@@ -160,6 +164,13 @@ export const SdkProvider: React.FC<{
     useEffect(() => {
         if (!isClient) return;
         if (!isTabActive) return;
+
+        console.log(
+            '>>> internetConnected',
+            internetConnected,
+            'shouldReconnect',
+            shouldReconnect,
+        );
 
         if (internetConnected && shouldReconnect) {
             // Check if already connected before reconnecting
@@ -174,6 +185,10 @@ export const SdkProvider: React.FC<{
                 needsReconnect = !info.wsManager.isWsReady();
             }
 
+            console.log('>>> needs reconnect', needsReconnect);
+            console.log('>>> stashed subs', stashedSubs.current);
+            console.log('>>> ---------------------------------');
+
             if (needsReconnect) {
                 console.log(
                     '>>> alternate reconnect',
@@ -185,11 +200,42 @@ export const SdkProvider: React.FC<{
                     new Date().toISOString(),
                 );
                 if (info?.multiSocketInfo) {
+                    console.log('>>> reconnecting ', stashedSubs.current);
+                    const activeSubs =
+                        info.multiSocketInfo.getActiveSubscriptions();
+
+                    console.log('>>> active subsssssssssss', activeSubs);
+                    // info.multiSocketInfo.getPool().reInit(stashedSubs.current);
                     info.multiSocketInfo.reconnect();
+
+                    setTimeout(() => {
+                        if (
+                            Object.keys(activeSubs).length === 0 &&
+                            stashedSubs.current
+                        ) {
+                            console.log('>>> sub again');
+                            Object.values(stashedSubs.current).forEach(
+                                (subs) => {
+                                    subs.forEach((sub) => {
+                                        info.multiSocketInfo?.subscribe(
+                                            sub.subscription,
+                                            sub.callback,
+                                            undefined,
+                                        );
+                                    });
+                                },
+                            );
+                        }
+                    }, 4000);
                 } else {
                     info?.wsManager?.reconnect(stashedSubs.current);
                 }
                 setWsReconnecting(true);
+            } else {
+                const activeSubs =
+                    info?.multiSocketInfo?.getActiveSubscriptions() || {};
+                console.log('>>> active subs', activeSubs);
+                console.log('>>> ---------------------------------');
             }
             setShouldReconnect(false);
         }

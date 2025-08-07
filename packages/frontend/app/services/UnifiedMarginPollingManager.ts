@@ -23,6 +23,7 @@ class UnifiedMarginPollingManager {
     private lastFetchTime = 0;
     private minFetchInterval = 900; // Minimum time between fetches in ms
     private pollingInterval = 1000; // Poll every 1 second
+    private isInternetConnected: boolean = true;
 
     private constructor() {}
 
@@ -88,6 +89,15 @@ class UnifiedMarginPollingManager {
         this.intervalId = setInterval(() => {
             this.fetchData();
         }, this.pollingInterval);
+
+        if (window) {
+            // setup internet connection listeners
+            window.addEventListener('online', this.internetConnectedListener);
+            window.addEventListener(
+                'offline',
+                this.internetDisconnectedListener,
+            );
+        }
     }
 
     private stop(): void {
@@ -107,6 +117,17 @@ class UnifiedMarginPollingManager {
             store.setError(null);
             store.setIsLoading(true);
             store.setLastUpdateTime(0);
+
+            // if (window) {
+            //     window.removeEventListener(
+            //         'online',
+            //         this.internetConnectedListener,
+            //     );
+            //     window.removeEventListener(
+            //         'offline',
+            //         this.internetDisconnectedListener,
+            //     );
+            // }
         }, 0);
     }
 
@@ -123,6 +144,10 @@ class UnifiedMarginPollingManager {
         this.lastFetchTime = now;
 
         try {
+            if (!this.isInternetConnected) {
+                return;
+            }
+
             const marginBucket = await getUserMarginBucket(
                 this.connection,
                 this.walletPublicKey,
@@ -212,6 +237,13 @@ class UnifiedMarginPollingManager {
         this.lastFetchTime = 0;
         return this.fetchData();
     }
+
+    private internetConnectedListener = () => {
+        this.isInternetConnected = true;
+    };
+    private internetDisconnectedListener = () => {
+        this.isInternetConnected = false;
+    };
 }
 
 export const unifiedMarginPollingManager =

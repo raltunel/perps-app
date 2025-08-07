@@ -306,6 +306,7 @@ export class WebSocketPool {
 
     // [22-07-2025] reInit action, passes stashed subs to related socket instance to re-activate sub after new connection
     public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
+        console.log('>>> reInit', stashedSubs);
         Object.values(stashedSubs).forEach((subs) => {
             subs.forEach((sub) => {
                 const socket = this.getSocketForSubscription(sub.subscription);
@@ -318,7 +319,7 @@ export class WebSocketPool {
         setTimeout(() => {
             this.sockets.forEach((socket) => {
                 socket.connect();
-            }, 200);
+            }, 400);
         });
     }
 }
