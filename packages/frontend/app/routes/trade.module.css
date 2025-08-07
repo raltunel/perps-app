@@ -4,11 +4,6 @@ body {
     overscroll-behavior-x: none;
     touch-action: pan-y;
 }
-/* .mainContainer {
-    height: 100%;
-    display: grid;
-    grid-template-rows: 10px minmax(0, 1fr);
-} */
 
 .container {
     height: 100%;
@@ -47,7 +42,7 @@ body {
     overflow: hidden;
 }
 
-.watchlist {
+/* .watchlist {
     grid-area: watchlist;
 }
 
@@ -57,7 +52,7 @@ body {
 
 .chart {
     grid-area: chart;
-}
+} */
 
 .order_book {
     grid-area: order_book;
@@ -83,7 +78,7 @@ body {
     overflow: hidden;
 }
 
-@media (max-height: 600px) {
+@media (max-height: 700px) {
     /* expand the order input to the full right col on short screens */
     .containerNew {
         grid-template-areas:
@@ -105,17 +100,15 @@ body {
 }
 
 .containerTop {
+    width: 100%;
     transition: all 0.2s ease;
-    grid-template-columns: 1fr var(--order-book-width-desktop-small) var(
-            --trade-module-width-desktop-small
-        );
+    grid-template-columns: 1fr var(--order-book-width-desktop-small);
     gap: var(--gap-s);
 }
 
 .containerTop.orderBookLarge {
     grid-template-columns:
-        1fr var(--order-book-width-desktop-large-doubled)
-        var(--trade-module-width-desktop-large);
+        1fr var(--order-book-width-desktop-large-doubled);
 }
 
 .containerBottom {

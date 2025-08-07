@@ -276,8 +276,8 @@ export default function Trade() {
         <>
             <TradeRouteHandler />
             <WebDataConsumer />
-            {/*symbol && (
-                <div className={styles.container}>
+            {symbol && (
+                <div className={styles.containerNew}>
                     <section
                         className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                     >
@@ -313,59 +313,6 @@ export default function Trade() {
                             </div>
                         </div>
                         <div id='orderBookSection' className={styles.orderBook}>
-                            <MemoizedOrderBookSection symbol={symbol} />
-                        </div>
-                        <div
-                            id='tradeModulesSection'
-                            className={styles.tradeModules}
-                        >
-                            <OrderInput
-                                marginBucket={marginBucket}
-                                isAnyPortfolioModalOpen={
-                                    isAnyPortfolioModalOpen
-                                }
-                            />
-                        </div>
-                    </section>
-                    <section
-                        id={'bottomSection'}
-                        className={styles.containerBottom}
-                    >
-                        <div className={styles.table} id='tutorial-trade-table'>
-                            <MemoizedTradeTable />
-                        </div>
-                        <div className={styles.wallet}>
-                            <DepositDropdown
-                                marginBucket={marginBucket}
-                                openDepositModal={openDepositModal}
-                                openWithdrawModal={openWithdrawModal}
-                                PortfolioModalsRenderer={
-                                    PortfolioModalsRenderer
-                                }
-                            />
-                        </div>
-                    </section>
-                </div>
-            )*/}
-            {symbol && (
-                <div className={styles.containerNew}>
-                    <section className={styles.market_data}>
-                        <div id='watchlistSection' className={styles.watchlist}>
-                            <WatchList />
-                        </div>
-                        <div
-                            id='symbolInfoSection'
-                            className={styles.symbolInfo}
-                        >
-                            <MemoizedSymbolInfo />
-                        </div>
-                        <div id='chartSection' className={styles.chart}>
-                            <MemoizedTradingViewWrapper />
-                        </div>
-                        <div
-                            id='orderBookSection'
-                            className={styles.order_book}
-                        >
                             <MemoizedOrderBookSection symbol={symbol} />
                         </div>
                     </section>
