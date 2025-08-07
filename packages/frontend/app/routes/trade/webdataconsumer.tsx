@@ -551,6 +551,10 @@ export default function WebDataConsumer() {
                 const fills = processUserFills(data);
                 fills.sort((a, b) => b.time - a.time);
 
+                const limitFills = fills.filter(
+                    (fill) => fill.crossed === true,
+                );
+
                 console.log('[USER FILLS] Processed fills:', {
                     processedCount: fills.length,
                     firstFewFills: fills.slice(0, 3).map((fill) => ({
@@ -565,7 +569,7 @@ export default function WebDataConsumer() {
                 });
 
                 if (!data.isSnapshot) {
-                    fills.forEach((fill) => {
+                    limitFills.forEach((fill) => {
                         // manage max length for notified orders
                         if (
                             Array.from(notifiedOrdersRef.current).length >= 10
