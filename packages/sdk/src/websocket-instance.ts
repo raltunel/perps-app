@@ -129,6 +129,14 @@ export class WebSocketInstance {
             errorCallback?: ErrCallback;
         }
     > = {};
+    private backupSubscriptions: Record<
+        number,
+        {
+            subscription: Subscription;
+            callback: Callback;
+            errorCallback?: ErrCallback;
+        }
+    > = {};
     private pingInterval: number | null = null;
     private stopped: boolean = false;
     private isDebug: boolean;
@@ -312,6 +320,12 @@ export class WebSocketInstance {
                     `>>> [${this.socketName}] pong reconnect`,
                     new Date().toISOString(),
                 );
+
+                for (const subId of Object.keys(this.allSubscriptions)) {
+                    const sub = this.allSubscriptions[Number(subId)];
+                    this.backupSubscriptions[Number(subId)] = sub;
+                }
+
                 this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
@@ -451,6 +465,30 @@ export class WebSocketInstance {
                             this.allSubscriptions,
                         )) {
                             const sub = this.allSubscriptions[Number(subId)];
+                            this.queuedSubscriptions.push({
+                                subscription: sub.subscription,
+                                active: {
+                                    callback: sub.callback,
+                                    subscriptionId: Number(subId),
+                                    subscription: sub.subscription,
+                                    errorCallback: sub.errorCallback,
+                                },
+                            });
+                        }
+                    }
+
+                    if (this.queuedSubscriptions.length === 0) {
+                        console.log(
+                            '>>>> ??????????????????????????????????????',
+                        );
+                        console.log('>>>> backup subs will be used');
+                        console.log(
+                            '>>>> ??????????????????????????????????????',
+                        );
+                        for (const subId of Object.keys(
+                            this.backupSubscriptions,
+                        )) {
+                            const sub = this.backupSubscriptions[Number(subId)];
                             this.queuedSubscriptions.push({
                                 subscription: sub.subscription,
                                 active: {
