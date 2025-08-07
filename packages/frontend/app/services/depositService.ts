@@ -3,6 +3,7 @@ import {
     getUserTokenBalance,
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import { MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 // Removed notificationService - notifications handled by components
 
 // USD token mint address from root.tsx configuration
@@ -80,10 +81,10 @@ export class DepositService {
         isValid: boolean;
         message?: string;
     } {
-        if (amount && amount < 5) {
+        if (amount && amount < MIN_DEPOSIT_AMOUNT) {
             return {
                 isValid: false,
-                message: 'Minimum deposit value is $5',
+                message: `Minimum deposit value is $${MIN_DEPOSIT_AMOUNT}`,
             };
         }
         return { isValid: true };
@@ -110,7 +111,7 @@ export class DepositService {
             // Convert decimalized amount to non-decimalized (multiply by 10^6)
             const nonDecimalizedAmount = amount
                 ? BigInt(Math.floor(amount * Math.pow(10, 6)))
-                : undefined;
+                : BigInt(0);
             console.log(
                 '  - Non-decimalized amount (bigint):',
                 nonDecimalizedAmount,
@@ -136,8 +137,8 @@ export class DepositService {
             const transaction = await buildDepositMarginTx(
                 this.connection,
                 userWalletKey,
+                nonDecimalizedAmount,
                 {
-                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: sessionPublicKey, // sessionPublicKey as actor
                     rentPayer: rentPayer, // payer from SessionState or fallback
                 },

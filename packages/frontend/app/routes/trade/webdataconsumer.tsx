@@ -548,15 +548,16 @@ export default function WebDataConsumer() {
                     })),
                 });
 
-                const fills = data.fills.length ? processUserFills(data) : [];
-                const filteredFills = fills.filter(
+                const fills = processUserFills(data);
+                fills.sort((a, b) => b.time - a.time);
+
+                const limitFills = fills.filter(
                     (fill) => fill.crossed === true,
                 );
-                filteredFills.sort((a, b) => b.time - a.time);
 
                 console.log('[USER FILLS] Processed fills:', {
-                    processedCount: filteredFills.length,
-                    firstFewFills: filteredFills.slice(0, 3).map((fill) => ({
+                    processedCount: fills.length,
+                    firstFewFills: fills.slice(0, 3).map((fill) => ({
                         coin: fill.coin,
                         side: fill.side,
                         px: fill.px,
@@ -567,39 +568,8 @@ export default function WebDataConsumer() {
                     })),
                 });
 
-                if (data.isSnapshot) {
-                    userFillsRef.current = filteredFills;
-                    console.log(
-                        '[USER FILLS] Set snapshot fills:',
-                        filteredFills.length,
-                    );
-                } else {
-                    // Merge fills with deduplication
-                    const previousCount = userFillsRef.current.length;
-
-                    // Create a map for efficient deduplication
-                    const fillMap = new Map<string, UserFillIF>();
-
-                    // Add existing fills to map
-                    userFillsRef.current.forEach((fill) => {
-                        const dedupeKey = fill.startPositionRaw
-                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
-                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
-                        fillMap.set(dedupeKey, fill);
-                    });
-
-                    // Add new fills, which will overwrite duplicates
-                    filteredFills.forEach((fill) => {
-                        const dedupeKey = fill.startPositionRaw
-                            ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
-                            : `${fill.coin}-${fill.oid}-${fill.tid}`;
-                        fillMap.set(dedupeKey, fill);
-
-                        // prevent duplicate notifications
-                        if (notifiedOrdersRef.current.has(fill.oid)) {
-                            return;
-                        }
-
+                if (!data.isSnapshot) {
+                    limitFills.forEach((fill) => {
                         // manage max length for notified orders
                         if (
                             Array.from(notifiedOrdersRef.current).length >= 10
@@ -625,25 +595,43 @@ export default function WebDataConsumer() {
                             removeAfter: 5000,
                         });
                     });
-
-                    // Convert back to array and sort by time
-                    userFillsRef.current = Array.from(fillMap.values()).sort(
-                        (a, b) => b.time - a.time,
-                    );
-
-                    console.log(
-                        '[USER FILLS] Added update fills with deduplication:',
-                        {
-                            newFillsCount: filteredFills.length,
-                            previousTotal: previousCount,
-                            newTotal: userFillsRef.current.length,
-                            duplicatesRemoved:
-                                previousCount +
-                                filteredFills.length -
-                                userFillsRef.current.length,
-                        },
-                    );
                 }
+
+                // Merge fills with deduplication
+                const previousCount = userFillsRef.current.length;
+                const joinedFills = userFillsRef.current.concat(fills);
+                joinedFills.sort((a, b) => a.time - b.time);
+
+                // Set of deduplication keys
+                const dedupKeySet = new Set<string>();
+
+                const deFupKeyFn = (fill: UserFillIF) => {
+                    return fill.startPositionRaw
+                        ? `${fill.coin}-${fill.oid}-${fill.startPositionRaw}`
+                        : `${fill.coin}-${fill.oid}-${fill.tid}`;
+                };
+
+                const filteredFills = joinedFills.filter((fill) => {
+                    const dedupeKey = deFupKeyFn(fill);
+                    if (dedupKeySet.has(dedupeKey)) {
+                        return false; // Duplicate found, skip this fill
+                    }
+                    dedupKeySet.add(dedupeKey);
+                    return true; // Unique fill, keep it
+                });
+
+                console.log(
+                    '[USER FILLS] Added update fills with deduplication:',
+                    {
+                        newFillsCount: filteredFills.length,
+                        previousTotal: previousCount,
+                        newTotal: userFillsRef.current.length,
+                    },
+                );
+
+                userFillsRef.current = filteredFills;
+                setUserFills(userFillsRef.current);
+
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));
             } else {
