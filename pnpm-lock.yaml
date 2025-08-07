@@ -21,8 +21,8 @@ importers:
   packages/frontend:
     dependencies:
       '@crocswap-libs/ambient-ember':
-        specifier: ^0.1.51
-        version: 0.1.51(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ^0.1.52
+        version: 0.1.52(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
         specifier: ^0.0.3
         version: 0.0.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -30,8 +30,8 @@ importers:
         specifier: ^0.0.9
         version: 0.0.9(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@fogo/sessions-sdk-react':
-        specifier: ^0.0.13
-        version: 0.0.13(@babel/runtime@7.28.2)(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10)))(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3))(@types/react@19.1.9)(bs58@6.0.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.1(react@19.1.1))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(tslib@2.8.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: ^0.0.14
+        version: 0.0.14(@babel/runtime@7.28.2)(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10)))(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3))(@types/react@19.1.9)(bs58@6.0.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.1(react@19.1.1))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(tslib@2.8.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@netlify/functions':
         specifier: 3.0.4
         version: 3.0.4
@@ -811,8 +811,8 @@ packages:
     peerDependencies:
       '@solana/web3.js': ^1.69.0
 
-  '@crocswap-libs/ambient-ember@0.1.51':
-    resolution: {integrity: sha512-sN2J9jRS0yc9z7yYCRBj6/JkIOQozZsth/Ja0vrC5fbjdWXt9+b2IcIGzfJmMo/axuAfUyc20v7XfDb5fab56w==}
+  '@crocswap-libs/ambient-ember@0.1.52':
+    resolution: {integrity: sha512-b2fnNNHeKA5NnYpBhx1J/OW0jK3RiPcQWYp4zpBRh93DONfaEujzoV1bpMPdNzFymR9CwpbvyiytD381eT6lpw==}
 
   '@d3fc/d3fc-annotation@3.0.16':
     resolution: {integrity: sha512-4tA7RHLUbj/i3KqWRqCVDOHi435qBRXbAFrAajVYM2juNzFdX5RCoF3opyXKOFncs339caxgeySGStTVfulO9w==}
@@ -1161,8 +1161,8 @@ packages:
   '@fogo/sessions-idls@0.0.3':
     resolution: {integrity: sha512-Q21eZ8OepO0xIu8JVkoeQuxvPhzlyyuKLrCeA6ScNXbP+irV1pP/64oDkX+r8jRyV/vxtmtLppGdPtHaHg5mSw==}
 
-  '@fogo/sessions-sdk-react@0.0.13':
-    resolution: {integrity: sha512-t1qterhPUsn+xgJ1qHQYq/nQ9jc7jPzc7VwwvxVL5+Am9hmmX+OmiOe90/x4WFC1ieD5/0eGnAtc34UuIcnkWA==}
+  '@fogo/sessions-sdk-react@0.0.14':
+    resolution: {integrity: sha512-UAN9siUYzHVHv/kJpF9wpKTkvG3nh2B7FfQnDVBYA/nOANCHA6CP7T6CKUGjmzqfGOjo+xa1yUi1oZTfcbU5WQ==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^19
@@ -8801,7 +8801,7 @@ snapshots:
       bn.js: 5.2.2
       buffer-layout: 1.2.2
 
-  '@crocswap-libs/ambient-ember@0.1.51(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@crocswap-libs/ambient-ember@0.1.52(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/borsh': 0.31.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
       '@noble/ed25519': 2.3.0
@@ -9118,7 +9118,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@fogo/sessions-sdk-react@0.0.13(@babel/runtime@7.28.2)(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10)))(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3))(@types/react@19.1.9)(bs58@6.0.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.1(react@19.1.1))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(tslib@2.8.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@fogo/sessions-sdk-react@0.0.14(@babel/runtime@7.28.2)(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10)))(@solana/sysvars@2.3.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3))(@types/react@19.1.9)(bs58@6.0.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@19.1.1(react@19.1.1))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.9)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(tslib@2.8.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(ws@7.5.10(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls': 0.0.3(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)

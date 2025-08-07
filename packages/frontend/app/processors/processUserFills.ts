@@ -1,4 +1,5 @@
 import type {
+    Fill,
     UserActiveTwap,
     UserFillsData,
     UserFunding,
@@ -22,7 +23,7 @@ import { parseNum } from '../utils/orderbook/OrderBookUtils';
 export function processUserFills(data: UserFillsData): UserFillIF[] {
     const fillMap = new Map<string, UserFillIF>();
 
-    data.fills.forEach((fill: any) => {
+    data.fills.forEach((fill: Fill) => {
         // Create a unique key for deduplication based on coin, oid, and startPosition string
         const startPosRaw = fill.startPosition
             ? String(fill.startPosition)

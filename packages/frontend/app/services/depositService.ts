@@ -110,7 +110,7 @@ export class DepositService {
             // Convert decimalized amount to non-decimalized (multiply by 10^6)
             const nonDecimalizedAmount = amount
                 ? BigInt(Math.floor(amount * Math.pow(10, 6)))
-                : undefined;
+                : BigInt(0);
             console.log(
                 '  - Non-decimalized amount (bigint):',
                 nonDecimalizedAmount,
@@ -136,8 +136,8 @@ export class DepositService {
             const transaction = await buildDepositMarginTx(
                 this.connection,
                 userWalletKey,
+                nonDecimalizedAmount,
                 {
-                    amount: nonDecimalizedAmount, // non-decimalized amount
                     actor: sessionPublicKey, // sessionPublicKey as actor
                     rentPayer: rentPayer, // payer from SessionState or fallback
                 },

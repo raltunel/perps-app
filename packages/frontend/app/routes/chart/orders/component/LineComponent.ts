@@ -16,6 +16,7 @@ export type LineData = {
     oid?: number;
     lineStyle: number;
     lineWidth: number;
+    side?: 'buy' | 'sell';
 };
 
 interface LineProps {

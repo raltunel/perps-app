@@ -258,6 +258,7 @@ export class MarketOrderService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature,
                 };
             }
         } catch (error) {
