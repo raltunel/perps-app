@@ -134,6 +134,7 @@ export class WebsocketManager {
         this.numWorkers = numWorkers;
 
         this.initializeWorkers();
+        console.log('>>> initializeWorkers');
         this.connect();
     }
 
@@ -409,6 +410,7 @@ export class WebsocketManager {
 
         this.baseUrl = newBaseUrl;
 
+        console.log('>>> setBaseUrl', newBaseUrl);
         this.connect();
     }
 
@@ -619,12 +621,14 @@ export class WebsocketManager {
 
         this.pongCheckDelay();
         setTimeout(() => {
+            console.log('>>> reconnect timeout ms');
             this.connect();
         }, RECONNECT_TIMEOUT_MS);
     }
 
     public reInit(stashedSubs: Record<string, ActiveSubscription[]>) {
         this.processStashedSubs(stashedSubs);
+        console.log('>>> reInit');
         this.connect();
     }
 

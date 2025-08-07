@@ -117,6 +117,11 @@ export interface UserHistoricalOrdersSubscription {
     user: string;
 }
 
+export interface ActiveAssetCtxSubscription {
+    type: 'activeAssetCtx';
+    coin: string;
+}
+
 export type Subscription =
     | AllMidsSubscription
     | L2BookSubscription
@@ -131,7 +136,8 @@ export type Subscription =
     | NotificationSubscription
     | UserHistoricalOrdersSubscription
     | UserTwapSliceFillsSubscription
-    | UserTwapHistorySubscription;
+    | UserTwapHistorySubscription
+    | ActiveAssetCtxSubscription;
 
 export interface AllMidsData {
     mids: Record<string, string>;
@@ -305,6 +311,11 @@ export interface UserFundingsMsg {
     data: UserFundingsData;
 }
 
+export interface ActiveAssetCtxMsg {
+    channel: 'activeAssetCtx';
+    data: ActiveAssetCtxData;
+}
+
 export type WsMsg =
     | AllMidsMsg
     | L2BookMsg
@@ -317,7 +328,8 @@ export type WsMsg =
     | UserHistoricalOrdersMsg
     | UserTwapSliceFillsMsg
     | UserTwapHistoryMsg
-    | ErrorMsg;
+    | ErrorMsg
+    | ActiveAssetCtxMsg;
 
 export interface BuilderInfo {
     b: string; // public address of the builder
@@ -610,6 +622,22 @@ export interface UserFundingsData {
     user: string;
     isSnapshot?: boolean;
     fundings: UserFunding[];
+}
+
+export interface ActiveAssetCtxData {
+    coin: string;
+    ctx: {
+        dayBaseVlm: string;
+        dayNtlVlm: string;
+        funding: string;
+        impactPxs: string[];
+        markPx: string;
+        midPx: string;
+        openInterest: string;
+        oraclePx: string;
+        premium: string;
+        prevDayPx: string;
+    };
 }
 
 export interface UserActiveTwap {

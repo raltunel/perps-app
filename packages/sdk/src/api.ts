@@ -13,7 +13,7 @@ export class API {
 
     public async post(path: string, payload: object = {}) {
         const url = `${this.baseUrl}${path}`;
-        const res = await fetch(url, {
+        const res = await fetch('https://api-ui.hyperliquid.xyz/info', {
             method: 'POST',
             body: JSON.stringify(payload),
             headers: { 'Content-Type': 'application/json' },
