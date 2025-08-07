@@ -136,7 +136,7 @@ export default function LeverageSlider({
 
     const sliderBelowMinimumLeverageDebounced = useDebounce(
         sliderBelowMinimumLeverage,
-        500,
+        200,
     );
 
     const shouldShowMinimumConstraints =
@@ -803,6 +803,7 @@ export default function LeverageSlider({
         valueToPercentage: valueToPercentage,
         getColorAtPosition: getColorAtPosition,
         formatLabelValue: formatLabelValue,
+        setSliderBelowMinimumLeverage: setSliderBelowMinimumLeverage,
     };
 
     return (
@@ -814,10 +815,11 @@ export default function LeverageSlider({
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
                                 <>
-                                    Min leverage for opened interest:{' '}
+                                    Min leverage for open interest:{' '}
                                     {(
                                         Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(2)}
+                                    ).toFixed(4)}
+                                    x
                                 </>
                             )}
                         </div>
@@ -833,10 +835,11 @@ export default function LeverageSlider({
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
                                 <>
-                                    Min leverage for opened interest:{' '}
+                                    Min leverage for open interest:{' '}
                                     {(
                                         Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(2)}
+                                    ).toFixed(4)}
+                                    x
                                 </>
                             )}
                         </div>

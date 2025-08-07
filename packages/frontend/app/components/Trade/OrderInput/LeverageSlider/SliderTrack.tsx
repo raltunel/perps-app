@@ -31,6 +31,9 @@ interface SliderTrackProps {
     getColorAtPosition: (position: number) => string;
     formatLabelValue: (val: number) => string;
     shouldShowMinimumConstraints: boolean;
+    onMinimumLabelEnter?: () => void;
+    onMinimumLabelLeave?: () => void;
+    setSliderBelowMinimumLeverage?: (value: boolean) => void;
 }
 
 const SLIDER_CONFIG = {
@@ -71,6 +74,7 @@ export default function SliderTrack({
     getColorAtPosition,
     formatLabelValue,
     shouldShowMinimumConstraints,
+    setSliderBelowMinimumLeverage,
 }: SliderTrackProps) {
     const isTickInGreyedArea = (tickValue: number): boolean => {
         return shouldShowMinimumConstraints && tickValue < minimumValue!;
@@ -103,6 +107,12 @@ export default function SliderTrack({
                             style={{
                                 width: `${minimumPercentage}%`,
                             }}
+                            onMouseEnter={() =>
+                                setSliderBelowMinimumLeverage?.(true)
+                            }
+                            onMouseLeave={() =>
+                                setSliderBelowMinimumLeverage?.(false)
+                            }
                         ></div>
 
                         <div
@@ -110,16 +120,30 @@ export default function SliderTrack({
                             style={{
                                 left: `${minimumPercentage}%`,
                             }}
+                            onMouseEnter={() =>
+                                setSliderBelowMinimumLeverage?.(true)
+                            }
+                            onMouseLeave={() =>
+                                setSliderBelowMinimumLeverage?.(false)
+                            }
                         ></div>
 
-                        <div
-                            className={styles.minimumLabel}
-                            style={{
-                                left: `${minimumPercentage}%`,
-                            }}
-                        >
-                            Min
-                        </div>
+                        {minimumValue && (
+                            <div
+                                className={styles.minimumLabel}
+                                style={{
+                                    left: `${minimumPercentage}%`,
+                                }}
+                                onMouseEnter={() =>
+                                    setSliderBelowMinimumLeverage?.(true)
+                                }
+                                onMouseLeave={() =>
+                                    setSliderBelowMinimumLeverage?.(false)
+                                }
+                            >
+                                Min: {Math.trunc(minimumValue)}x
+                            </div>
+                        )}
                     </>
                 )}
 
@@ -256,8 +280,24 @@ export default function SliderTrack({
                                     onLeverageChange(tickValue);
                                 }
                             }}
-                            onMouseEnter={() => onTickHover(index)}
-                            onMouseLeave={onTickLeave}
+                            onMouseEnter={() => {
+                                if (isInGreyedArea) {
+                                    // Show warning for greyed out labels
+                                    setSliderBelowMinimumLeverage?.(true);
+                                } else {
+                                    // Normal hover behavior for non-greyed labels
+                                    onTickHover(index);
+                                }
+                            }}
+                            onMouseLeave={() => {
+                                if (isInGreyedArea) {
+                                    // Hide warning for greyed out labels
+                                    setSliderBelowMinimumLeverage?.(false);
+                                } else {
+                                    // Normal leave behavior for non-greyed labels
+                                    onTickLeave();
+                                }
+                            }}
                         >
                             {formatLabelValue(tickValue)}x
                         </div>
