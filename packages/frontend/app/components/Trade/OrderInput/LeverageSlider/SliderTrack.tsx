@@ -30,6 +30,7 @@ interface SliderTrackProps {
     valueToPercentage: (val: number) => number;
     getColorAtPosition: (position: number) => string;
     formatLabelValue: (val: number) => string;
+    shouldShowMinimumConstraints: boolean;
 }
 
 const SLIDER_CONFIG = {
@@ -69,7 +70,11 @@ export default function SliderTrack({
     valueToPercentage,
     getColorAtPosition,
     formatLabelValue,
+    shouldShowMinimumConstraints,
 }: SliderTrackProps) {
+    const isTickInGreyedArea = (tickValue: number): boolean => {
+        return shouldShowMinimumConstraints && tickValue < minimumValue!;
+    };
     return (
         <>
             <div
@@ -91,7 +96,7 @@ export default function SliderTrack({
                 <div className={styles.sliderBackground}></div>
 
                 {/* Greyed out minimum section */}
-                {minimumValue !== undefined && (
+                {shouldShowMinimumConstraints && (
                     <>
                         <div
                             className={styles.sliderGreyedOut}
@@ -143,8 +148,7 @@ export default function SliderTrack({
                         (hoverValue === tickValue && isHovering);
                     const tickColor = getColorAtPosition(position);
 
-                    const isInGreyedArea =
-                        minimumValue !== undefined && tickValue < minimumValue;
+                    const isInGreyedArea = isTickInGreyedArea(tickValue);
 
                     return (
                         <div
@@ -217,8 +221,7 @@ export default function SliderTrack({
                         (hoverValue === tickValue && isHovering);
                     const tickColor = getColorAtPosition(position);
 
-                    const isInGreyedArea =
-                        minimumValue !== undefined && tickValue < minimumValue;
+                    const isInGreyedArea = isTickInGreyedArea(tickValue);
 
                     return (
                         <div

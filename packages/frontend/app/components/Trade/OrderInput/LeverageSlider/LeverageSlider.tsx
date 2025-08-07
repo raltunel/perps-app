@@ -138,16 +138,22 @@ export default function LeverageSlider({
         500,
     );
 
-    const showMinimumWarning = sliderBelowMinimumLeverage
-        ? isDragging
-            ? true
-            : sliderBelowMinimumLeverageDebounced
-        : false;
+    const shouldShowMinimumConstraints =
+        minimumValue !== undefined && minimumValue > 1;
+
+    const showMinimumWarning =
+        shouldShowMinimumConstraints &&
+        (sliderBelowMinimumLeverage
+            ? isDragging
+                ? true
+                : sliderBelowMinimumLeverageDebounced
+            : false);
 
     const [hasShownMinimumWarning, setHasShownMinimumWarning] = useState(false);
 
     const shouldShowInteractiveWarning = useMemo(() => {
-        if (minimumValue === undefined) return false;
+        // Don't show warnings if minimumValue is undefined or equals 1
+        if (!shouldShowMinimumConstraints) return false;
 
         const minWithBuffer = minimumValue * 10 ** -0.08;
         const isDraggingBelowMinimum =
@@ -162,6 +168,7 @@ export default function LeverageSlider({
 
         return isDraggingBelowMinimum || isHoveringBelowMinimum;
     }, [
+        shouldShowMinimumConstraints,
         minimumValue,
         unconstrainedSliderValue,
         isDragging,
@@ -240,7 +247,7 @@ export default function LeverageSlider({
     };
 
     const getMinimumPercentage = (): number => {
-        if (minimumValue === undefined) return 0;
+        if (!shouldShowMinimumConstraints) return 0;
         return valueToPercentage(minimumValue);
     };
 
@@ -502,8 +509,14 @@ export default function LeverageSlider({
 
     // Effects
     useEffect(() => {
-        if (minimumValue === undefined) return;
-
+        if (!shouldShowMinimumConstraints) {
+            setSliderBelowMinimumLeverage(false);
+            if (warningTimeout) {
+                clearTimeout(warningTimeout);
+                setWarningTimeout(null);
+            }
+            return;
+        }
         const isCurrentAtMinimum = Math.abs(currentValue - minimumValue) < 0.01;
 
         if (shouldShowInteractiveWarning) {
@@ -548,6 +561,7 @@ export default function LeverageSlider({
         shouldShowInteractiveWarning,
         hasShownMinimumWarning,
         warningTimeout,
+        shouldShowMinimumConstraints,
     ]);
 
     const handleMarketChange = useCallback(() => {
@@ -766,6 +780,9 @@ export default function LeverageSlider({
                         minimumInputValue={minimumInputValue}
                         maximumInputValue={maximumInputValue}
                         minimumValue={minimumValue}
+                        shouldShowMinimumConstraints={
+                            shouldShowMinimumConstraints
+                        }
                         tickMarks={tickMarks}
                         hoveredTickIndex={hoveredTickIndex}
                         hoverValue={hoverValue}
@@ -835,6 +852,9 @@ export default function LeverageSlider({
                     <SliderTrack
                         sliderRef={sliderRef}
                         knobRef={knobRef}
+                        shouldShowMinimumConstraints={
+                            shouldShowMinimumConstraints
+                        }
                         currentValue={currentValue}
                         value={value}
                         minimumInputValue={minimumInputValue}
