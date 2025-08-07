@@ -55,7 +55,7 @@ export default function WsConnectionChecker() {
                 sleepModeTimeout.current = setTimeout(() => {
                     if (isTabPassive.current) {
                         console.log('>>> sleep mode', new Date().toISOString());
-                        setIsWsSleepMode(true);
+                        // setIsWsSleepMode(true);
                         setIsTabActive(false);
                     }
                 }, WS_SLEEP_MODE);
@@ -65,7 +65,7 @@ export default function WsConnectionChecker() {
                 if (sleepModeTimeout.current) {
                     clearTimeout(sleepModeTimeout.current);
                 }
-                setIsWsSleepMode(false);
+                // setIsWsSleepMode(false);
                 setIsTabActive(true);
             }
         };
