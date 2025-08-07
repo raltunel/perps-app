@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
+import type {
+    ActiveAssetCtxData,
+    ActiveAssetCtxMsg,
+    UserFillsData,
+} from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -9,6 +13,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
 import { processUserOrder } from '~/processors/processOrderBook';
+import { processActiveAssetCtx } from '~/processors/processSymbolInfo';
 import {
     processUserFills,
     processUserFundings,
@@ -56,6 +61,8 @@ export default function WebDataConsumer() {
         setTwapSliceFills,
         setUserFundings,
         setActiveTwaps,
+        addToCoins,
+        addToCoinPriceMap,
         setUserNonFundingLedgerUpdates,
     } = useTradeDataStore();
     const symbolRef = useRef<string>(symbol);
@@ -167,13 +174,40 @@ export default function WebDataConsumer() {
         if (info.multiSocketInfo) {
             const marketSocket = info.multiSocketInfo.getMarketSocket();
             if (marketSocket) {
-                const marketDataCallback = (msg: any) => {
-                    // Only process market data from this subscription
-                    postWebData2MarketOnly(msg);
+                // prev expensive webdata2 subscription
+                // const marketDataCallback = (msg: any) => {
+                //     // Only process market data from this subscription
+                //     postWebData2MarketOnly(msg);
+                // };
+                // const result = marketSocket.subscribe(
+                //     { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
+                //     marketDataCallback,
+                // );
+                // unsubscribeMarketData = result.unsubscribe;
+
+                const cheapMarketDataCallback = (msg: any) => {
+                    handleActiveAssetCtxResult({ msg });
                 };
                 const result = marketSocket.subscribe(
-                    { type: WsChannels.WEB_DATA2, user: DUMMY_ADDRESS },
-                    marketDataCallback,
+                    {
+                        type: WsChannels.ACTIVE_ASSET_CTX,
+                        coin: symbolRef.current,
+                    },
+                    cheapMarketDataCallback,
+                );
+                const result2 = marketSocket.subscribe(
+                    {
+                        type: WsChannels.ACTIVE_ASSET_CTX,
+                        coin: 'ETH',
+                    },
+                    cheapMarketDataCallback,
+                );
+                const result3 = marketSocket.subscribe(
+                    {
+                        type: WsChannels.ACTIVE_ASSET_CTX,
+                        coin: 'SOL',
+                    },
+                    cheapMarketDataCallback,
                 );
                 unsubscribeMarketData = result.unsubscribe;
             }
@@ -361,6 +395,16 @@ export default function WebDataConsumer() {
             setCoinPriceMap(data.data.coinPriceMap);
         },
         [setCoins, setCoinPriceMap],
+    );
+
+    const handleActiveAssetCtxResult = useCallback(
+        ({ msg }: { msg: ActiveAssetCtxMsg }) => {
+            const processedData = processActiveAssetCtx(msg.data);
+
+            addToCoins(processedData);
+            addToCoinPriceMap(processedData);
+        },
+        [addToCoins, addToCoinPriceMap],
     );
 
     const postWebData2MarketOnly = useWorker<WebData2Output>(

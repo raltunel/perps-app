@@ -127,6 +127,7 @@ export enum WsChannels {
     TWAP_SLICE_FILLS = 'userTwapSliceFills',
     USER_FUNDINGS = 'userFundings',
     USER_NON_FUNDING_LEDGER_UPDATES = 'userNonFundingLedgerUpdates',
+    ACTIVE_ASSET_CTX = 'activeAssetCtx',
 }
 
 const SECONDS = 1000;
@@ -149,7 +150,8 @@ export const MARKET_API_URL =
     'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_INFO_ENDPOINT =
-    import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
+    // import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
+    'https://api-ui.hyperliquid.xyz/info';
 
 export const MARKET_WS_ENDPOINT =
     import.meta.env.VITE_MARKET_WS_ENDPOINT ||

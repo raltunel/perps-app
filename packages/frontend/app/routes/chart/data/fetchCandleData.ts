@@ -44,22 +44,22 @@ export const fetchUserFillsHistory = async (user: string) => {
         user: user,
     };
 
-    try {
-        const response = await fetch(MARKET_INFO_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
-        });
+    // try {
+    //     const response = await fetch(MARKET_INFO_ENDPOINT, {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json' },
+    //         body: JSON.stringify(requestBody),
+    //     });
 
-        const json = await response.json();
+    //     const json = await response.json();
 
-        if (!json) {
-            return undefined;
-        }
+    //     if (!json) {
+    //         return undefined;
+    //     }
 
-        return json;
-    } catch (error) {
-        console.error(error);
-        return undefined;
-    }
+    //     return json;
+    // } catch (error) {
+    //     console.error(error);
+    //     return undefined;
+    // }
 };

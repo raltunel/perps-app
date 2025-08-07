@@ -47,6 +47,8 @@ type TradeDataStore = UserTradeDataStore & {
     setIsTradeInfoExpanded: (shouldExpand: boolean) => void;
     updateSymbolInfo: (symbolInfo: TokenDetailsIF) => void; // used for updating symbol info from REST API while ws is sleeping
     addToFetchedChannels: (channel: string) => void;
+    addToCoins: (coin: SymbolInfoIF) => void;
+    addToCoinPriceMap: (symbolInfo: SymbolInfoIF) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -147,6 +149,18 @@ const useTradeDataStore = create<TradeDataStore>()(
             },
             addToFetchedChannels: (channel: string) => {
                 get().fetchedChannels.add(channel);
+            },
+            addToCoins: (coin: SymbolInfoIF) => {
+                const newConins = [
+                    ...get().coins.filter((c) => c.coin !== coin.coin),
+                    coin,
+                ];
+                set({ coins: newConins });
+            },
+            addToCoinPriceMap: (symbolInfo: SymbolInfoIF) => {
+                const newCoinPriceMap = new Map(get().coinPriceMap);
+                newCoinPriceMap.set(symbolInfo.coin, symbolInfo.oraclePx);
+                set({ coinPriceMap: newCoinPriceMap });
             },
         }),
         {
