@@ -126,17 +126,6 @@ export default function LeverageSlider({
         currentValueRef.current = currentValue;
     }, [currentValue]);
 
-    // Helper function to get the actual rounded value (what user sees)
-    // const getRoundedDisplayValue = (val: number): number => {
-    //     if (val < 3) {
-    //         // Round DOWN to nearest tenth
-    //         return Math.floor(val * 10) / 10;
-    //     } else {
-    //         // Round DOWN to nearest whole number
-    //         return Math.floor(val);
-    //     }
-    // };
-
     // Helper function to format values for input display (shows decimals below 3)
     const formatValue = (val: number): string => {
         if (val < 3) {
@@ -453,6 +442,12 @@ export default function LeverageSlider({
         return valueToPercentage(currentValue);
     };
 
+    // Get the percentage position where the minimum value restriction begins
+    const getMinimumPercentage = (): number => {
+        if (minimumValue === undefined) return 0;
+        return valueToPercentage(minimumValue);
+    };
+
     // Get color based on position
     const getColorAtPosition = (position: number): string => {
         const colorStops = SLIDER_CONFIG.COLOR_STOPS;
@@ -539,9 +534,6 @@ export default function LeverageSlider({
 
         const newValue = percentageToValue(percentage);
 
-        // Ensure value is within min/max bounds
-        // const boundedValue = constrainValue(newValue);
-
         setHoverValue(newValue);
         setIsHovering(true);
         setHoveredTickIndex(null);
@@ -553,6 +545,7 @@ export default function LeverageSlider({
         setHoverValue(null);
         setHoveredTickIndex(null);
     };
+
     const calculateValueFromPosition = (clientX: number): number => {
         if (!sliderRef.current) return currentValue;
 
@@ -654,6 +647,7 @@ export default function LeverageSlider({
         e.preventDefault();
         handleLeverageChange(newValue);
     };
+
     // Handle dragging functionality
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
@@ -758,13 +752,7 @@ export default function LeverageSlider({
             document.removeEventListener('touchend', handleTouchEnd);
             document.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [
-        isDragging,
-        minimumInputValue,
-        maximumInputValue,
-        // currentValue,
-        modalMode,
-    ]);
+    }, [isDragging, minimumInputValue, maximumInputValue, modalMode]);
 
     const handleKnobMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
         (e.target as HTMLElement).focus();
@@ -874,6 +862,36 @@ export default function LeverageSlider({
                         onMouseLeave={handleTrackMouseLeave}
                     >
                         <div className={styles.sliderBackground}></div>
+
+                        {/* Greyed out minimum section - shows before user interaction */}
+                        {minimumValue !== undefined && (
+                            <>
+                                <div
+                                    className={styles.sliderGreyedOut}
+                                    style={{
+                                        width: `${getMinimumPercentage()}%`,
+                                    }}
+                                ></div>
+
+                                {/* Minimum value indicator line and label */}
+                                <div
+                                    className={styles.minimumIndicator}
+                                    style={{
+                                        left: `${getMinimumPercentage()}%`,
+                                    }}
+                                ></div>
+
+                                <div
+                                    className={styles.minimumLabel}
+                                    style={{
+                                        left: `${getMinimumPercentage()}%`,
+                                    }}
+                                >
+                                    Min
+                                </div>
+                            </>
+                        )}
+
                         <div
                             className={styles.sliderActive}
                             style={{
@@ -899,6 +917,11 @@ export default function LeverageSlider({
                                 (hoverValue === tickValue && isHovering);
                             const tickColor = getColorAtPosition(position);
 
+                            // Check if this tick is in the greyed-out area
+                            const isInGreyedArea =
+                                minimumValue !== undefined &&
+                                tickValue < minimumValue;
+
                             return (
                                 <div
                                     key={index}
@@ -918,14 +941,16 @@ export default function LeverageSlider({
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        backgroundColor:
-                                            isActive || isHovered
-                                                ? tickColor
-                                                : 'transparent',
-                                        borderColor:
-                                            isActive || isHovered
-                                                ? 'transparent'
-                                                : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
+                                        backgroundColor: isInGreyedArea
+                                            ? '#2b2a2f'
+                                            : isActive || isHovered
+                                              ? tickColor
+                                              : 'transparent',
+                                        borderColor: isInGreyedArea
+                                            ? '#2b2a2f'
+                                            : isActive || isHovered
+                                              ? 'transparent'
+                                              : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
                                     }}
                                     onKeyDown={(e) => {
                                         if (
@@ -966,6 +991,11 @@ export default function LeverageSlider({
                                 (hoverValue === tickValue && isHovering);
                             const tickColor = getColorAtPosition(position);
 
+                            // Check if this tick is in the greyed-out area
+                            const isInGreyedArea =
+                                minimumValue !== undefined &&
+                                tickValue < minimumValue;
+
                             return (
                                 <div
                                     key={index}
@@ -979,10 +1009,11 @@ export default function LeverageSlider({
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        color:
-                                            isActive || isHovered
-                                                ? tickColor
-                                                : UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                        color: isInGreyedArea
+                                            ? 'rgba(128, 128, 128, 0.6)' // Dimmed for greyed area
+                                            : isActive || isHovered
+                                              ? tickColor
+                                              : 'var(--text1)', // Bright white for non-greyed labels
                                     }}
                                     onKeyDown={(e) => {
                                         if (
@@ -1033,6 +1064,7 @@ export default function LeverageSlider({
             </div>
         );
     }
+
     // Regular layout: Slider and input side by side
     return (
         <div
@@ -1048,26 +1080,7 @@ export default function LeverageSlider({
                     )}
                 </div>
             )}
-            {/* <div
-                style={{
-                    marginTop: '10px',
-                    padding: '8px 12px',
-                    backgroundColor: '#111',
-                    color: '#0f0',
-                    fontFamily: 'monospace',
-                    fontSize: '13px',
-                    border: '1px solid #333',
-                    borderRadius: '4px',
-                    maxWidth: '300px',
-                }}
-            >
-                <div>Hover Value: {hoverValue?.toFixed(3) ?? 'null'}</div>
-                <div>Minimum Value: {minimumValue}</div>
-                <div>
-                    Trigger Warning?:{' '}
-                    {shouldShowInteractiveWarning ? ' YES' : 'NO'}
-                </div>
-            </div> */}
+
             <div className={styles.sliderWithValue}>
                 <div className={styles.sliderContainer}>
                     <div
@@ -1089,6 +1102,35 @@ export default function LeverageSlider({
                         {/* Dark background track */}
                         <div className={styles.sliderBackground}></div>
 
+                        {/* Greyed out minimum section - shows before user interaction */}
+                        {minimumValue !== undefined && (
+                            <>
+                                <div
+                                    className={styles.sliderGreyedOut}
+                                    style={{
+                                        width: `${getMinimumPercentage()}%`,
+                                    }}
+                                ></div>
+
+                                {/* Minimum value indicator line and label */}
+                                <div
+                                    className={styles.minimumIndicator}
+                                    style={{
+                                        left: `${getMinimumPercentage()}%`,
+                                    }}
+                                ></div>
+
+                                <div
+                                    className={styles.minimumLabel}
+                                    style={{
+                                        left: `${getMinimumPercentage()}%`,
+                                    }}
+                                >
+                                    Min
+                                </div>
+                            </>
+                        )}
+
                         {/* Active colored portion - using fixed position gradient */}
                         <div
                             className={styles.sliderActive}
@@ -1099,7 +1141,6 @@ export default function LeverageSlider({
                                     getKnobPosition() > 0
                                         ? `${100 / (getKnobPosition() / 100)}% 100%`
                                         : '100% 100%',
-
                                 backgroundPosition: 'left center',
                             }}
                         ></div>
@@ -1111,11 +1152,15 @@ export default function LeverageSlider({
                             const isCurrent =
                                 Math.abs(tickValue - value) <
                                 SLIDER_CONFIG.CURRENT_VALUE_THRESHOLD;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
                             const tickColor = getColorAtPosition(position);
+
+                            // Check if this tick is in the greyed-out area
+                            const isInGreyedArea =
+                                minimumValue !== undefined &&
+                                tickValue < minimumValue;
 
                             return (
                                 <div
@@ -1136,14 +1181,16 @@ export default function LeverageSlider({
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        backgroundColor:
-                                            isActive || isHovered
-                                                ? tickColor
-                                                : 'transparent',
-                                        borderColor:
-                                            isActive || isHovered
-                                                ? 'transparent'
-                                                : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
+                                        backgroundColor: isInGreyedArea
+                                            ? '#2b2a2f'
+                                            : isActive || isHovered
+                                              ? tickColor
+                                              : 'transparent',
+                                        borderColor: isInGreyedArea
+                                            ? '#2b2a2f'
+                                            : isActive || isHovered
+                                              ? 'transparent'
+                                              : `rgba(255, 255, 255, ${UI_CONFIG.INACTIVE_TICK_OPACITY})`,
                                     }}
                                     onMouseEnter={() => handleTickHover(index)}
                                     onMouseLeave={handleTickLeave}
@@ -1176,7 +1223,6 @@ export default function LeverageSlider({
                             }}
                             onMouseDown={handleKnobMouseDown}
                             onTouchStart={handleKnobMouseDown}
-                            // tabIndex={-1}
                         ></div>
                     </div>
 
@@ -1184,11 +1230,15 @@ export default function LeverageSlider({
                         {tickMarks.map((tickValue, index) => {
                             const position = valueToPercentage(tickValue);
                             const isActive = tickValue <= value;
-                            // Only highlight if this specific tick is hovered OR if the hover value exactly matches this tick
                             const isHovered =
                                 hoveredTickIndex === index ||
                                 (hoverValue === tickValue && isHovering);
                             const tickColor = getColorAtPosition(position);
+
+                            // Check if this tick is in the greyed-out area
+                            const isInGreyedArea =
+                                minimumValue !== undefined &&
+                                tickValue < minimumValue;
 
                             return (
                                 <div
@@ -1203,10 +1253,11 @@ export default function LeverageSlider({
                                     }`}
                                     style={{
                                         left: `${position}%`,
-                                        color:
-                                            isActive || isHovered
-                                                ? tickColor
-                                                : UI_CONFIG.INACTIVE_LABEL_COLOR,
+                                        color: isInGreyedArea
+                                            ? 'rgba(128, 128, 128, 0.6)' // Dimmed for greyed area
+                                            : isActive || isHovered
+                                              ? tickColor
+                                              : 'var(--text1)', // Bright white for non-greyed labels
                                     }}
                                     onClick={() =>
                                         handleLeverageChange(tickValue)
