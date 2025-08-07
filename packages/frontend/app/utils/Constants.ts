@@ -145,14 +145,15 @@ export const EXTERNAL_PAGE_URL_PREFIX = '/v2';
 export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_API_URL ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_INFO_ENDPOINT =
-    import.meta.env.VITE_MARKET_INFO_ENDPOINT ||
-    'https://api.hyperliquid.xyz/info';
+    import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
 
 export const MARKET_WS_ENDPOINT =
-    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_WS_ENDPOINT ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const USER_WS_ENDPOINT =
     import.meta.env.VITE_USER_WS_ENDPOINT ||

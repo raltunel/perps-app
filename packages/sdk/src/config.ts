@@ -16,18 +16,12 @@ export const RECONNECT_TIMEOUT_MS = 500; // timeout to trigger connect method wh
 export const DEMO_USER = '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00';
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
-
-export const MARKET_INFO_ENDPOINT =
-    import.meta.env.VITE_MARKET_INFO_ENDPOINT ||
-    'https://api.hyperliquid.xyz/info';
+    import.meta.env.VITE_MARKET_API_URL ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_WS_ENDPOINT =
-    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
-
-export const USER_WS_ENDPOINT =
-    import.meta.env.VITE_USER_WS_ENDPOINT ||
-    'https://embindexer.net/ember/tradesocket';
+    import.meta.env.VITE_MARKET_WS_ENDPOINT ||
+    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const blockExplorer =
     import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';
@@ -42,11 +36,7 @@ export const RPC_ENDPOINT =
  * Sell orders will be filled at best bid - this offset.
  * This ensures market orders are filled even with slight price movements.
  */
-export const MARKET_ORDER_PRICE_OFFSET_USD = 50;
-
-console.log('Market Info Endpoint:', MARKET_INFO_ENDPOINT);
-console.log('Market WS Endpoint:', MARKET_WS_ENDPOINT);
-console.log('User WS Endpoint:', USER_WS_ENDPOINT);
+export const MARKET_ORDER_PRICE_OFFSET_USD = 10;
 
 export const wsUrls = [
     MARKET_WS_ENDPOINT + '/ws',
