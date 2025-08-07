@@ -462,7 +462,10 @@ export class WebSocketInstance {
                             });
                         }
                     }
+
                     setTimeout(() => {
+                        this.activeSubscriptions = {};
+                        this.allSubscriptions = {};
                         this.connect(); // Call connect directly instead of reconnect
                     }, 200);
                 }
