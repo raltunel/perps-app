@@ -511,6 +511,7 @@ const LabelComponent = ({
                     await executeLimitOrder(newOrderParams);
 
                 if (!limitOrderResult.success) {
+                    setSelectedLine(undefined);
                     console.error(
                         'Failed to create new order:',
                         limitOrderResult.error,
@@ -540,6 +541,7 @@ const LabelComponent = ({
                     });
                 }
             } catch (error) {
+                setSelectedLine(undefined);
                 console.error('Error updating order:', error);
                 add({
                     title: 'Error updating order',
