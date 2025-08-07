@@ -320,11 +320,18 @@ export class WebSocketInstance {
                     `>>> [${this.socketName}] pong reconnect`,
                     new Date().toISOString(),
                 );
-
                 for (const subId of Object.keys(this.allSubscriptions)) {
                     const sub = this.allSubscriptions[Number(subId)];
                     this.backupSubscriptions[Number(subId)] = sub;
                 }
+
+                console.log('>>> all subs', this.allSubscriptions);
+                console.log('>>> backup subs', this.backupSubscriptions);
+                console.log('>>> active subs', this.activeSubscriptions);
+                console.log('>>> queued subs', this.queuedSubscriptions);
+                console.log(
+                    '>>> .............. . .- .- . -. -. - .- .- . ........ ',
+                );
 
                 this.reconnect();
             }
