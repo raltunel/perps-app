@@ -5,6 +5,10 @@
     gap: var(--gap-s);
 }
 
+/* Modal-specific container styles */
+.leverageSliderContainer.modalContainer {
+}
+
 .containerTitle {
     color: var(--text2, #bcbcc4);
     font-size: var(--font-size-s, 12px);
@@ -12,6 +16,10 @@
 
 .titleWithWarning {
     position: relative;
+}
+
+/* Modal-specific title styles */
+.titleWithWarning.modalTitle {
 }
 
 .minimumWarning {
@@ -24,6 +32,19 @@
     white-space: nowrap;
     z-index: 10;
     animation: fadeIn 0.2s ease-in-out;
+}
+
+.modalSliderWarning {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--red);
+    padding: 0 var(--padding-s);
+    font-size: var(--font-size-s, 12px);
+    white-space: nowrap;
+    z-index: 10;
+    border-radius: var(--radius-xs);
 }
 
 @keyframes fadeIn {
@@ -43,6 +64,14 @@
     justify-content: space-between;
     width: 100%;
     gap: var(--gap-m);
+}
+
+.modalSliderContainer {
+    position: relative;
+    width: 100%;
+    padding-bottom: var(--padding-m);
+    padding-left: var(--padding-m);
+    padding-right: var(--padding-m);
 }
 
 .sliderContainer {
@@ -222,6 +251,27 @@
     font-size: var(--font-size-s, 12px);
 }
 
+.modalInputContainer {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-dark4) !important;
+    border-radius: var(--radius-s);
+    margin-bottom: var(--gap-m);
+}
+
+.modalValueInput {
+    background-color: transparent;
+    width: 100%;
+    height: 33px;
+    border: none;
+    border-radius: var(--radius-s);
+    color: var(--text1);
+    font-size: var(--font-size-s);
+    text-align: center;
+    outline: none;
+    padding: 0 var(--padding-s);
+}
+
 /* remove afterwards */
 .randomMaxContainer {
     display: flex;
@@ -237,46 +287,4 @@
     background: var(--accent1);
     color: var(--text1);
     padding: var(--padding-xs);
-}
-
-.modalInputContainer {
-    display: flex;
-    align-items: center;
-    background-color: var(--bg-dark4) !important;
-    border-radius: var(--radius-s);
-    margin-bottom: var(--gap-m);
-}
-
-.modalSliderWarning {
-    position: absolute;
-    bottom: 0px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--red);
-    padding: 0 var(--padding-s);
-    font-size: var(--font-size-s, 12px);
-    white-space: nowrap;
-    z-index: 10;
-    border-radius: var(--radius-xs);
-}
-
-.modalSliderContainer {
-    position: relative;
-    width: 100%;
-    padding-bottom: var(--padding-m);
-    padding-left: var(--padding-m);
-    padding-right: var(--padding-m);
-}
-
-.modalValueInput {
-    background-color: transparent;
-    width: 100%;
-    height: 33px;
-    border: none;
-    border-radius: var(--radius-s);
-    color: var(--text1);
-    font-size: var(--font-size-s);
-    text-align: center;
-    outline: none;
-    padding: 0 var(--padding-s);
 }

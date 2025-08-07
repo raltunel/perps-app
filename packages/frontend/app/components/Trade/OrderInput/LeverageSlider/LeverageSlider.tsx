@@ -12,6 +12,7 @@ import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
 import InputField from './InputField';
 import SliderTrack from './SliderTrack';
 import styles from './LeverageSlider.module.css';
+import ScreenReaderAnnouncer from '~/components/ScreenReaderAnnouncer/ScreenReaderAnnouncer';
 
 interface LeverageSliderProps {
     value: number;
@@ -737,109 +738,86 @@ export default function LeverageSlider({
         };
     }, [isDragging, minimumInputValue, maximumInputValue, modalMode]);
 
-    if (modalMode) {
-        return (
-            <div
-                className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
-            >
-                {!hideTitle && (
-                    <h3 className={styles.containerTitle}>Leverage</h3>
-                )}
+    const containerClasses = [
+        styles.leverageSliderContainer,
+        className,
+        modalMode && styles.modalContainer,
+        currentValue !== 1 && styles.sliderContainerNotAtFirst,
+    ]
+        .filter(Boolean)
+        .join(' ');
 
-                <InputField
-                    value={inputValue}
-                    currentValue={currentValue}
-                    isDragging={isDragging}
-                    modalMode={modalMode}
-                    knobColor={getKnobColor()}
-                    onChange={handleInputChange}
-                    onBlur={handleInputBlur}
-                    onKeyDown={handleInputKeyDown}
-                    formatValue={formatValue}
-                />
+    const titleClasses = [
+        styles.titleWithWarning,
+        modalMode && styles.modalTitle,
+    ]
+        .filter(Boolean)
+        .join(' ');
 
-                <div className={styles.modalSliderContainer}>
-                    {showMinimumWarning && (
-                        <div className={styles.modalSliderWarning}>
-                            {minimumValue !== undefined && (
-                                <>
-                                    Min leverage for opened interest:{' '}
-                                    {(
-                                        Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(4)}
-                                </>
-                            )}
-                        </div>
-                    )}
+    const warningClasses = [
+        modalMode ? styles.modalSliderWarning : styles.minimumWarning,
+    ].join(' ');
 
-                    <SliderTrack
-                        sliderRef={sliderRef}
-                        knobRef={knobRef}
-                        currentValue={currentValue}
-                        value={value}
-                        minimumInputValue={minimumInputValue}
-                        maximumInputValue={maximumInputValue}
-                        minimumValue={minimumValue}
-                        shouldShowMinimumConstraints={
-                            shouldShowMinimumConstraints
-                        }
-                        tickMarks={tickMarks}
-                        hoveredTickIndex={hoveredTickIndex}
-                        hoverValue={hoverValue}
-                        isHovering={isHovering}
-                        knobPosition={getKnobPosition()}
-                        minimumPercentage={getMinimumPercentage()}
-                        gradientString={createGradientString()}
-                        knobColor={getKnobColor()}
-                        onClick={onClick}
-                        onKeyDown={handleKeyDown}
-                        onTrackMouseDown={handleTrackMouseDown}
-                        onTrackTouchStart={handleTrackTouchStart}
-                        onTrackMouseMove={handleTrackMouseMove}
-                        onTrackMouseLeave={handleTrackMouseLeave}
-                        onKnobMouseDown={handleKnobMouseDown}
-                        onTickHover={handleTickHover}
-                        onTickLeave={handleTickLeave}
-                        onLeverageChange={handleLeverageChange}
-                        valueToPercentage={valueToPercentage}
-                        getColorAtPosition={getColorAtPosition}
-                        formatLabelValue={formatLabelValue}
-                    />
-                </div>
+    const sliderContainerClasses = [
+        modalMode ? styles.modalSliderContainer : styles.sliderWithValue,
+    ].join(' ');
 
-                <div
-                    aria-live='assertive'
-                    aria-atomic='true'
-                    className='sr-only'
-                    style={{
-                        position: 'absolute',
-                        left: '-10000px',
-                        width: '1px',
-                        height: '1px',
-                        overflow: 'hidden',
-                    }}
-                >
-                    {announceText}
-                </div>
-            </div>
-        );
-    }
+    const inputFieldProps = {
+        value: inputValue,
+        currentValue: currentValue,
+        isDragging: isDragging,
+        modalMode: modalMode,
+        knobColor: getKnobColor(),
+        onChange: handleInputChange,
+        onBlur: handleInputBlur,
+        onKeyDown: handleInputKeyDown,
+        formatValue: formatValue,
+    };
+    const sliderTrackProps = {
+        sliderRef: sliderRef,
+        knobRef: knobRef,
+        currentValue: currentValue,
+        value: value,
+        minimumInputValue: minimumInputValue,
+        maximumInputValue: maximumInputValue,
+        minimumValue: minimumValue,
+        shouldShowMinimumConstraints: shouldShowMinimumConstraints,
+        tickMarks: tickMarks,
+        hoveredTickIndex: hoveredTickIndex,
+        hoverValue: hoverValue,
+        isHovering: isHovering,
+        knobPosition: getKnobPosition(),
+        minimumPercentage: getMinimumPercentage(),
+        gradientString: createGradientString(),
+        knobColor: getKnobColor(),
+        onClick: onClick,
+        onKeyDown: handleKeyDown,
+        onTrackMouseDown: handleTrackMouseDown,
+        onTrackTouchStart: handleTrackTouchStart,
+        onTrackMouseMove: handleTrackMouseMove,
+        onTrackMouseLeave: handleTrackMouseLeave,
+        onKnobMouseDown: handleKnobMouseDown,
+        onTickHover: handleTickHover,
+        onTickLeave: handleTickLeave,
+        onLeverageChange: handleLeverageChange,
+        valueToPercentage: valueToPercentage,
+        getColorAtPosition: getColorAtPosition,
+        formatLabelValue: formatLabelValue,
+    };
 
     return (
-        <div
-            className={`${styles.leverageSliderContainer} ${className} ${currentValue !== 1 ? styles.sliderContainerNotAtFirst : ''}`}
-        >
+        <div className={containerClasses}>
             {!hideTitle && (
-                <div className={styles.titleWithWarning}>
+                <div className={titleClasses}>
                     <h3 className={styles.containerTitle}>Leverage</h3>
-                    {showMinimumWarning && (
-                        <div className={styles.minimumWarning}>
+                    {!modalMode && showMinimumWarning && (
+                        <div className={warningClasses}>
                             {minimumValue !== undefined && (
                                 <>
                                     Min leverage for opened interest:{' '}
                                     {(
                                         Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(4)}
+                                    ).toFixed(2)}
                                 </>
                             )}
                         </div>
@@ -847,70 +825,30 @@ export default function LeverageSlider({
                 </div>
             )}
 
-            <div className={styles.sliderWithValue}>
-                <div className={styles.sliderContainer}>
-                    <SliderTrack
-                        sliderRef={sliderRef}
-                        knobRef={knobRef}
-                        shouldShowMinimumConstraints={
-                            shouldShowMinimumConstraints
-                        }
-                        currentValue={currentValue}
-                        value={value}
-                        minimumInputValue={minimumInputValue}
-                        maximumInputValue={maximumInputValue}
-                        minimumValue={minimumValue}
-                        tickMarks={tickMarks}
-                        hoveredTickIndex={hoveredTickIndex}
-                        hoverValue={hoverValue}
-                        isHovering={isHovering}
-                        knobPosition={getKnobPosition()}
-                        minimumPercentage={getMinimumPercentage()}
-                        gradientString={createGradientString()}
-                        knobColor={getKnobColor()}
-                        onClick={onClick}
-                        onKeyDown={handleKeyDown}
-                        onTrackMouseDown={handleTrackMouseDown}
-                        onTrackTouchStart={handleTrackTouchStart}
-                        onTrackMouseMove={handleTrackMouseMove}
-                        onTrackMouseLeave={handleTrackMouseLeave}
-                        onKnobMouseDown={handleKnobMouseDown}
-                        onTickHover={handleTickHover}
-                        onTickLeave={handleTickLeave}
-                        onLeverageChange={handleLeverageChange}
-                        valueToPercentage={valueToPercentage}
-                        getColorAtPosition={getColorAtPosition}
-                        formatLabelValue={formatLabelValue}
-                    />
+            <div className={sliderContainerClasses}>
+                {modalMode && <InputField {...inputFieldProps} />}
+
+                <div className={modalMode ? undefined : styles.sliderContainer}>
+                    {modalMode && showMinimumWarning && (
+                        <div className={warningClasses}>
+                            {minimumValue !== undefined && (
+                                <>
+                                    Min leverage for opened interest:{' '}
+                                    {(
+                                        Math.trunc(minimumValue * 10000) / 10000
+                                    ).toFixed(2)}
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    <SliderTrack {...sliderTrackProps} />
                 </div>
 
-                <InputField
-                    value={inputValue}
-                    currentValue={currentValue}
-                    isDragging={isDragging}
-                    modalMode={modalMode}
-                    knobColor={getKnobColor()}
-                    onChange={handleInputChange}
-                    onBlur={handleInputBlur}
-                    onKeyDown={handleInputKeyDown}
-                    formatValue={formatValue}
-                />
+                {!modalMode && <InputField {...inputFieldProps} />}
             </div>
 
-            <div
-                aria-live='assertive'
-                aria-atomic='true'
-                className='sr-only'
-                style={{
-                    position: 'absolute',
-                    left: '-10000px',
-                    width: '1px',
-                    height: '1px',
-                    overflow: 'hidden',
-                }}
-            >
-                {announceText}
-            </div>
+            <ScreenReaderAnnouncer text={announceText} />
         </div>
     );
 }
