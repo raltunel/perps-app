@@ -1083,7 +1083,7 @@ function OrderInput({
             value: leverage,
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
-            // minimumValue: 30,
+            // minimumValue: 95,
             minimumValue: leverageFloor,
         }),
         [leverage, handleLeverageChange, leverageFloor],
