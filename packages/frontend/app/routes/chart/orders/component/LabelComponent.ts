@@ -479,7 +479,8 @@ const LabelComponent = ({
             if (
                 !tempSelectedLine ||
                 originalPrice === undefined ||
-                tempSelectedLine.parentLine.oid === undefined
+                tempSelectedLine.parentLine.oid === undefined ||
+                tempSelectedLine.parentLine.side === undefined
             ) {
                 return;
             }
@@ -487,10 +488,7 @@ const LabelComponent = ({
             const orderId = tempSelectedLine.parentLine.oid;
             const newPrice = tempSelectedLine.parentLine.yPrice;
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
-            const side =
-                tempSelectedLine.parentLine.color === '#EF5350'
-                    ? 'sell'
-                    : 'buy';
+            const side = tempSelectedLine.parentLine.side;
 
             try {
                 // If cancel was successful, create a new order with the updated price
@@ -511,6 +509,7 @@ const LabelComponent = ({
                     await executeLimitOrder(newOrderParams);
 
                 if (!limitOrderResult.success) {
+                    setSelectedLine(undefined);
                     console.error(
                         'Failed to create new order:',
                         limitOrderResult.error,
@@ -521,7 +520,7 @@ const LabelComponent = ({
                         message:
                             limitOrderResult.error || 'Unknown error occurred',
                         icon: 'error',
-                        removeAfter: 15000,
+                        removeAfter: 10000,
                         txLink: limitOrderResult.signature
                             ? `${blockExplorer}/tx/${limitOrderResult.signature}`
                             : undefined,
@@ -533,13 +532,14 @@ const LabelComponent = ({
                         message:
                             'The order has been successfully updated with the new price.',
                         icon: 'check',
-                        removeAfter: 15000,
+                        removeAfter: 10000,
                         txLink: limitOrderResult.signature
                             ? `${blockExplorer}/tx/${limitOrderResult.signature}`
                             : undefined,
                     });
                 }
             } catch (error) {
+                setSelectedLine(undefined);
                 console.error('Error updating order:', error);
                 add({
                     title: 'Error updating order',

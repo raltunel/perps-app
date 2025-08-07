@@ -20,9 +20,8 @@ import type {
 
 type Callback = (msg: any) => void;
 
-import type { Environment } from './config';
-import { API_URLS } from './config';
 import type { ErrCallback } from './websocket-instance';
+import { API_URLS, type Environment } from './config';
 
 interface InfoOptions {
     environment: Environment;

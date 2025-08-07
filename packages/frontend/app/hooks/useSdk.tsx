@@ -4,7 +4,6 @@ import {
     Exchange,
     Info,
     type ActiveSubscription,
-    type Environment,
 } from '@perps-app/sdk';
 import React, {
     createContext,

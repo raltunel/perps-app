@@ -42,7 +42,11 @@ export default function ShareModal(props: propsIF) {
         tokenBackgroundMap[memPosition.coin.toUpperCase()] || 'light';
 
     const referralLink = 'https://perps.ambient.finance';
-    // const referralLink = `https://ambient.finance/v2/join/` + REFERRAL_CODE;
+    // const referralLink = `https://perps.ambient.finance/v2/join/` + REFERRAL_CODE;
+
+    const returnOnEquity = useMemo(() => {
+        return memPosition.returnOnEquity;
+    }, [memPosition]);
 
     return (
         <Modal title='' close={close}>
@@ -97,11 +101,11 @@ export default function ShareModal(props: propsIF) {
                         <div
                             className={styles.market_pct}
                             style={{
-                                color: `var(--${memPosition.returnOnEquity > 0 ? 'green' : 'red'})`,
+                                color: `var(--${returnOnEquity > 0 ? 'green' : 'red'})`,
                             }}
                         >
-                            {memPosition.returnOnEquity > 0 && '+'}
-                            {formatNum(memPosition.returnOnEquity * 100, 1)}%
+                            {returnOnEquity > 0 && '+'}
+                            {formatNum(returnOnEquity * 100, 1)}%
                         </div>
                     </div>
                     <div className={styles.prices}>
