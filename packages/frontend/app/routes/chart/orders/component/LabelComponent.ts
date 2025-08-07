@@ -479,7 +479,8 @@ const LabelComponent = ({
             if (
                 !tempSelectedLine ||
                 originalPrice === undefined ||
-                tempSelectedLine.parentLine.oid === undefined
+                tempSelectedLine.parentLine.oid === undefined ||
+                tempSelectedLine.parentLine.side === undefined
             ) {
                 return;
             }
@@ -487,10 +488,7 @@ const LabelComponent = ({
             const orderId = tempSelectedLine.parentLine.oid;
             const newPrice = tempSelectedLine.parentLine.yPrice;
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
-            const side =
-                tempSelectedLine.parentLine.color === '#EF5350'
-                    ? 'sell'
-                    : 'buy';
+            const side = tempSelectedLine.parentLine.side;
 
             try {
                 // If cancel was successful, create a new order with the updated price
