@@ -320,7 +320,12 @@ export class WebSocketInstance {
     };
 
     private onOpen = () => {
-        console.log(`[${this.socketName}] onOpen`);
+        console.log(`>>> [${this.socketName}] onOpen`);
+        console.log(
+            `>>> [${this.socketName}] queuedSubscriptions`,
+            this.queuedSubscriptions,
+        );
+        console.log(`>>> [${this.socketName}] ..................... `);
         this.wsReady = true;
         this.isConnecting = false;
         this.firstMessageLogged = false;
@@ -429,6 +434,9 @@ export class WebSocketInstance {
                 console.log('>>> reconnecting isStopped?', this.stopped);
                 if (!this.stopped) {
                     console.log('>>> active subs', this.activeSubscriptions);
+                    console.log('>>> queued subs', this.queuedSubscriptions);
+                    console.log('>>> all subs', this.allSubscriptions);
+                    console.log('>>> ..................... ');
                     this.queuedSubscriptions = [];
                     for (const sub of Object.values(this.activeSubscriptions)) {
                         for (const activeSub of sub) {
@@ -438,8 +446,25 @@ export class WebSocketInstance {
                             });
                         }
                     }
-                    this.activeSubscriptions = {};
-                    this.connect(); // Call connect directly instead of reconnect
+                    if (this.queuedSubscriptions.length === 0) {
+                        for (const subId of Object.keys(
+                            this.allSubscriptions,
+                        )) {
+                            const sub = this.allSubscriptions[Number(subId)];
+                            this.queuedSubscriptions.push({
+                                subscription: sub.subscription,
+                                active: {
+                                    callback: sub.callback,
+                                    subscriptionId: Number(subId),
+                                    subscription: sub.subscription,
+                                    errorCallback: sub.errorCallback,
+                                },
+                            });
+                        }
+                    }
+                    setTimeout(() => {
+                        this.connect(); // Call connect directly instead of reconnect
+                    }, 200);
                 }
             }, RECONNECT_TIMEOUT_MS);
         }
@@ -560,6 +585,10 @@ export class WebSocketInstance {
         errorCallback?: ErrCallback,
     ) => {
         const identifier = subscriptionToIdentifier(subscription);
+
+        if (this.socketName === 'market') {
+            console.log('>>> subscribe', subscription, callback, existingId);
+        }
 
         const existingSubs = this.activeSubscriptions[identifier] || [];
         if (existingSubs.length > 0) {
