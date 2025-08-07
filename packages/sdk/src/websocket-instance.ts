@@ -454,59 +454,78 @@ export class WebSocketInstance {
             this.reconnectTimeout = setTimeout(() => {
                 console.log('>>> reconnecting isStopped?', this.stopped);
                 if (!this.stopped) {
-                    console.log('>>> active subs', this.activeSubscriptions);
-                    console.log('>>> queued subs', this.queuedSubscriptions);
-                    console.log('>>> all subs', this.allSubscriptions);
-                    console.log('>>> ..................... ');
-                    this.queuedSubscriptions = [];
                     for (const sub of Object.values(this.activeSubscriptions)) {
                         for (const activeSub of sub) {
+                            if (
+                                this.queuedSubscriptions.some(
+                                    (q) =>
+                                        subscriptionToIdentifier(
+                                            q.subscription,
+                                        ) ===
+                                        subscriptionToIdentifier(
+                                            activeSub.subscription,
+                                        ),
+                                )
+                            ) {
+                                continue;
+                            }
                             this.queuedSubscriptions.push({
                                 subscription: activeSub.subscription,
                                 active: activeSub,
                             });
                         }
                     }
-                    if (this.queuedSubscriptions.length === 0) {
-                        for (const subId of Object.keys(
-                            this.allSubscriptions,
-                        )) {
-                            const sub = this.allSubscriptions[Number(subId)];
-                            this.queuedSubscriptions.push({
-                                subscription: sub.subscription,
-                                active: {
-                                    callback: sub.callback,
-                                    subscriptionId: Number(subId),
-                                    subscription: sub.subscription,
-                                    errorCallback: sub.errorCallback,
-                                },
-                            });
+                    for (const subId of Object.keys(this.allSubscriptions)) {
+                        const sub = this.allSubscriptions[Number(subId)];
+                        if (
+                            this.queuedSubscriptions.some(
+                                (q) =>
+                                    subscriptionToIdentifier(q.subscription) ===
+                                    subscriptionToIdentifier(sub.subscription),
+                            )
+                        ) {
+                            continue;
                         }
+                        this.queuedSubscriptions.push({
+                            subscription: sub.subscription,
+                            active: {
+                                callback: sub.callback,
+                                subscriptionId: Number(subId),
+                                subscription: sub.subscription,
+                                errorCallback: sub.errorCallback,
+                            },
+                        });
                     }
 
-                    if (this.queuedSubscriptions.length === 0) {
-                        console.log(
-                            '>>>> ??????????????????????????????????????',
-                        );
-                        console.log('>>>> backup subs will be used');
-                        console.log(
-                            '>>>> ??????????????????????????????????????',
-                        );
-                        for (const subId of Object.keys(
-                            this.backupSubscriptions,
-                        )) {
-                            const sub = this.backupSubscriptions[Number(subId)];
-                            this.queuedSubscriptions.push({
-                                subscription: sub.subscription,
-                                active: {
-                                    callback: sub.callback,
-                                    subscriptionId: Number(subId),
-                                    subscription: sub.subscription,
-                                    errorCallback: sub.errorCallback,
-                                },
-                            });
+                    for (const subId of Object.keys(this.backupSubscriptions)) {
+                        const sub = this.backupSubscriptions[Number(subId)];
+                        if (
+                            this.queuedSubscriptions.some(
+                                (q) =>
+                                    subscriptionToIdentifier(q.subscription) ===
+                                    subscriptionToIdentifier(sub.subscription),
+                            )
+                        ) {
+                            continue;
                         }
+                        this.queuedSubscriptions.push({
+                            subscription: sub.subscription,
+                            active: {
+                                callback: sub.callback,
+                                subscriptionId: Number(subId),
+                                subscription: sub.subscription,
+                                errorCallback: sub.errorCallback,
+                            },
+                        });
                     }
+
+                    console.log(
+                        '>>> -------------BEFORE RECONNECT------------------------------- ',
+                    );
+                    console.log('>>> queued subs', this.queuedSubscriptions);
+                    console.log(
+                        '>>> -------------------------------------------- ',
+                    );
 
                     setTimeout(() => {
                         this.activeSubscriptions = {};
