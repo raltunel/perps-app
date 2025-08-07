@@ -403,7 +403,7 @@ export class WebSocketInstance {
 
     private onClose = (event: CloseEvent) => {
         console.log(
-            `[${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
+            `>>> [${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
         );
         this.wsReady = false;
         this.isConnecting = false;
@@ -426,7 +426,19 @@ export class WebSocketInstance {
                 new Date().toISOString(),
             );
             this.reconnectTimeout = setTimeout(() => {
+                console.log('>>> reconnecting isStopped?', this.stopped);
                 if (!this.stopped) {
+                    console.log('>>> active subs', this.activeSubscriptions);
+                    this.queuedSubscriptions = [];
+                    for (const sub of Object.values(this.activeSubscriptions)) {
+                        for (const activeSub of sub) {
+                            this.queuedSubscriptions.push({
+                                subscription: activeSub.subscription,
+                                active: activeSub,
+                            });
+                        }
+                    }
+                    this.activeSubscriptions = {};
                     this.connect(); // Call connect directly instead of reconnect
                 }
             }, RECONNECT_TIMEOUT_MS);
