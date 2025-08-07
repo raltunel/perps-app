@@ -70,6 +70,7 @@ export class WebSocketPool {
                 numWorkers: this.config.numWorkers,
                 pingInterval: this.config.pingInterval,
                 autoConnect: false, // Don't connect immediately
+                sendTimeout: 1000,
             };
             socketsToCreate.push(['market', marketConfig]);
         }
@@ -112,7 +113,14 @@ export class WebSocketPool {
         // Connect all sockets in parallel
         console.log('Connecting all WebSocket instances in parallel...');
         this.sockets.forEach((socket) => {
-            socket.connect();
+            if (socket.getSocketName() === 'market') {
+                setTimeout(() => {
+                    console.log('>>> connecting market socket');
+                    socket.connect();
+                }, 200);
+            } else {
+                socket.connect();
+            }
         });
     }
 
@@ -228,6 +236,7 @@ export class WebSocketPool {
      * Stop all sockets
      */
     public stopAll() {
+        console.log('>>> stopping all sockets');
         this.sockets.forEach((socket) => socket.stop());
         // [22-07-2025] clear is commented out to make reInit action working
         // this.sockets.clear();
@@ -239,6 +248,7 @@ export class WebSocketPool {
     public stopSocket(name: string) {
         const socket = this.sockets.get(name);
         if (socket) {
+            console.log('>>> stopping socket', name);
             socket.stop();
             this.sockets.delete(name);
         }
@@ -369,6 +379,7 @@ export class MultiSocketInfo {
     }
 
     public stop() {
+        console.log('>>> stopping multi socket');
         this.pool.stopAll();
     }
 

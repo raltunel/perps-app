@@ -26,6 +26,7 @@ export interface WebSocketInstanceConfig {
     numWorkers?: number;
     pingInterval?: number;
     autoConnect?: boolean; // defaults to true
+    sendTimeout?: number; // defaults to 0
 }
 
 export const WsBackdoorChannelsForSleepMode = new Set([
@@ -66,6 +67,8 @@ function subscriptionToIdentifier(subscription: Subscription): string {
             return `userTwapSliceFills:${subscription.user?.toLowerCase()}`;
         case 'userTwapHistory':
             return `userTwapHistory:${subscription.user?.toLowerCase()}`;
+        case 'activeAssetCtx':
+            return `activeAssetCtx:${subscription.coin?.toLowerCase()}`;
         default:
             throw new Error('Unknown subscription type');
     }
@@ -105,6 +108,8 @@ function wsMsgToIdentifier(wsMsg: WsMsg): string | undefined {
             return `userTwapSliceFills:${wsMsg.data.user?.toLowerCase()}`;
         case 'userTwapHistory':
             return `userTwapHistory:${wsMsg.data.user.toLowerCase()}`;
+        case 'activeAssetCtx':
+            return `activeAssetCtx:${wsMsg.data.coin?.toLowerCase()}`;
         case 'error':
             return 'error';
         default:
@@ -150,6 +155,8 @@ export class WebSocketInstance {
     private readonly socketType: SocketType;
     private readonly socketName: string;
     private onConnectionChange?: (connected: boolean) => void;
+    private firstPongReceived: boolean = false;
+    private sendTimeout: number;
 
     constructor(config: WebSocketInstanceConfig) {
         this.isDebug = config.isDebug ?? false;
@@ -158,6 +165,9 @@ export class WebSocketInstance {
         this.socketType = config.socketType;
         this.socketName = config.socketName ?? config.socketType;
         this.pingIntervalMs = config.pingInterval ?? DEFAULT_PING_INTERVAL_MS;
+        this.sendTimeout = config.sendTimeout ?? 0;
+
+        console.log('>>> config constructor', config);
 
         // Bind methods to ensure proper context
         this.onOpen = this.onOpen.bind(this);
@@ -174,6 +184,7 @@ export class WebSocketInstance {
 
         // Auto-connect unless explicitly disabled
         if (config.autoConnect !== false) {
+            console.log('>>> autoConnect', config.autoConnect);
             this.connect();
         }
     }
@@ -298,21 +309,30 @@ export class WebSocketInstance {
             this.sleepMode
         )
             return;
+
+        console.log('>>> sending ping', this.socketName);
         this.log('sending ping');
         if (this.pongTimeout) {
             clearTimeout(this.pongTimeout);
             this.pongTimeout = null;
         }
 
-        this.ws.send(JSON.stringify({ method: 'ping' }));
+        if (this.sendTimeout > 0) {
+            setTimeout(() => {
+                this.ws.send(JSON.stringify({ method: 'ping' }));
+            }, this.sendTimeout);
+        } else {
+            this.ws.send(JSON.stringify({ method: 'ping' }));
+        }
 
         this.pongTimeout = setTimeout(() => {
             if (!this.pongReceived && !this.pongCheckLock && !this.sleepMode) {
-                console.log(
-                    `>>> [${this.socketName}] pong reconnect`,
-                    new Date().toISOString(),
-                );
-                this.reconnect();
+                // console.log(
+                //     `>>> [${this.socketName}] pong reconnect`,
+                //     new Date().toISOString(),
+                // );
+                // console.log('>>> pong reconnect');
+                // this.reconnect();
             }
         }, PONG_CHECK_TIMEOUT_MS);
 
@@ -337,6 +357,7 @@ export class WebSocketInstance {
         this.queuedSubscriptions = [];
 
         if (!this.stopped && this.pingInterval === null) {
+            console.log('??? ping interval', this.pingIntervalMs);
             // @ts-ignore
             this.pingInterval = setInterval(this.sendPing, this.pingIntervalMs);
             // send initial ping
@@ -403,8 +424,9 @@ export class WebSocketInstance {
 
     private onClose = (event: CloseEvent) => {
         console.log(
-            `[${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
+            `>>> [${this.socketName}] onClose - Code: ${event.code}, Reason: ${event.reason}, Clean: ${event.wasClean}`,
         );
+        console.log('>>> active subs', this.activeSubscriptions);
         this.wsReady = false;
         this.isConnecting = false;
         this.onConnectionChange?.(false);
@@ -420,20 +442,22 @@ export class WebSocketInstance {
             this.reconnectTimeout = null;
         }
 
-        if (!this.stopped) {
-            console.log(
-                `>>> [${this.socketName}] close reconnect`,
-                new Date().toISOString(),
-            );
-            this.reconnectTimeout = setTimeout(() => {
-                if (!this.stopped) {
-                    this.connect(); // Call connect directly instead of reconnect
-                }
-            }, RECONNECT_TIMEOUT_MS);
-        }
+        // if (!this.stopped) {
+        //     console.log(
+        //         `>>> [${this.socketName}] close reconnect`,
+        //         new Date().toISOString(),
+        //     );
+        //     this.reconnectTimeout = setTimeout(() => {
+        //         if (!this.stopped) {
+        //             console.log('>>> close reconnect timeout');
+        //             this.connect(); // Call connect directly instead of reconnect
+        //         }
+        //     }, RECONNECT_TIMEOUT_MS);
+        // }
     };
 
     private onError = (event: Event) => {
+        console.log('>>> onError', this.socketName, event);
         const wsEvent = event as ErrorEvent;
         console.error(`[${this.socketName}] WebSocket error:`, {
             message: wsEvent.message,
@@ -489,6 +513,7 @@ export class WebSocketInstance {
         if (msg.channel === 'pong') {
             this.log('pong received');
             this.pongReceived = true;
+            this.firstPongReceived = true;
             return;
         }
         if (msg.channel === 'error') {
@@ -548,6 +573,13 @@ export class WebSocketInstance {
         errorCallback?: ErrCallback,
     ) => {
         const identifier = subscriptionToIdentifier(subscription);
+
+        // console.log(
+        //     '>>> subscribe',
+        //     identifier,
+        //     this.wsReady,
+        //     this.firstPongReceived,
+        // );
 
         const existingSubs = this.activeSubscriptions[identifier] || [];
         if (existingSubs.length > 0) {
@@ -617,8 +649,17 @@ export class WebSocketInstance {
             errorCallback,
         };
 
-        if (!this.wsReady || this.ws.readyState !== WebSocket.OPEN) {
+        if (
+            !this.wsReady ||
+            this.ws.readyState !== WebSocket.OPEN
+            // || !this.firstPongReceived
+        ) {
             this.log('enqueueing subscription', subscription, subscriptionId);
+            // console.log(
+            //     '>>> enqueueing subscription',
+            //     subscription,
+            //     subscriptionId,
+            // );
             if (
                 !this.queuedSubscriptions.some(
                     (q) => q.active.subscriptionId === subscriptionId,
@@ -666,9 +707,31 @@ export class WebSocketInstance {
                     subscription,
                     errorCallback,
                 });
-                this.ws.send(
-                    JSON.stringify({ method: 'subscribe', subscription }),
-                );
+                if (this.socketName === 'market') {
+                    console.log('>>> subscribing', subscription);
+                }
+                if (this.sendTimeout > 0) {
+                    setTimeout(() => {
+                        if (this.ws.readyState === WebSocket.OPEN) {
+                            this.ws.send(
+                                JSON.stringify({
+                                    method: 'subscribe',
+                                    subscription,
+                                }),
+                            );
+                        } else {
+                            console.log(
+                                '>>> ws not open, reconnecting',
+                                subscription,
+                            );
+                            this.connect();
+                        }
+                    }, this.sendTimeout);
+                } else {
+                    this.ws.send(
+                        JSON.stringify({ method: 'subscribe', subscription }),
+                    );
+                }
             }
         }
 
@@ -741,6 +804,7 @@ export class WebSocketInstance {
     };
 
     public reconnect = () => {
+        console.log('>>> reconnect', this.socketName);
         this.log('reconnect');
 
         // Clear any pending reconnect timeout
@@ -759,6 +823,7 @@ export class WebSocketInstance {
             // The onClose handler will trigger the reconnection
         } else {
             // No active connection, connect directly
+            console.log('>>> no active connection, connect directly');
             this.connect();
         }
     };

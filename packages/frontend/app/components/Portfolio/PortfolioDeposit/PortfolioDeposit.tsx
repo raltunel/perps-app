@@ -12,7 +12,7 @@ import TokenDropdown, {
 import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -51,14 +51,14 @@ function PortfolioDeposit(props: propsIF) {
     // Available balance for this portfolio
     const availableBalance = portfolio.availableBalance;
 
-    const MIN_DEPOSIT_AMOUNT = 5;
-
     const [rawInputString, setRawInputString] = useState('');
 
     const depositInputNum = parseFormattedWithOnlyDecimals(rawInputString);
 
     const isSizeInvalid: boolean =
-        !isNaN(depositInputNum) && depositInputNum > 0 && depositInputNum < 5;
+        !isNaN(depositInputNum) &&
+        depositInputNum > 0 &&
+        depositInputNum < MIN_DEPOSIT_AMOUNT;
 
     // debounced invalid state
     const isSizeInvalidDebounced = useDebounce<boolean>(isSizeInvalid, 500);
@@ -91,9 +91,11 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        // Check minimum deposit of $5
-        if (depositInputNum < 5) {
-            setError('Minimum deposit amount is $5.00');
+        // Check minimum deposit amount
+        if (depositInputNum < MIN_DEPOSIT_AMOUNT) {
+            setError(
+                `Minimum deposit amount is ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`,
+            );
             setTransactionStatus('idle');
             return;
         }
@@ -232,7 +234,7 @@ function PortfolioDeposit(props: propsIF) {
                     <span>{`Min: ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`}</span>
                 )}
                 <NumFormattedInput
-                    placeholder='Enter amount (min $5)'
+                    placeholder={`Enter amount (min $${MIN_DEPOSIT_AMOUNT})`}
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label='deposit input'
