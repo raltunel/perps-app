@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { type useAppOptionsIF, useAppOptions } from '~/stores/AppOptionsStore';
 import {
     type NotificationStoreIF,
     useNotificationStore,
@@ -24,21 +23,16 @@ interface PropsIF {
 }
 
 export default function LimitCloseModal({ close, position }: PropsIF) {
-    const { formatNumWithOnlyDecimals } = useNumFormatter();
+    const { parseFormattedNum, formatNumWithOnlyDecimals, formatNum } =
+        useNumFormatter();
 
     const { symbolInfo } = useTradeDataStore();
 
-    const activeOptions: useAppOptionsIF = useAppOptions();
+    const MIN_ORDER_VALUE = 1;
 
     const { executeLimitOrder } = useLimitOrderService();
 
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
-
-    const {
-        parseFormattedNum,
-        formatNum,
-        // parseFormattedWithOnlyDecimals
-    } = useNumFormatter();
 
     const isPositionLong = position.szi > 0;
 
@@ -53,7 +47,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
 
     const [price, setPrice] = useState(String(getMidPrice()));
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
     const [isMidModeActive, setIsMidModeActive] = useState(false);
 
     const originalSize = Math.abs(position.szi);
@@ -240,6 +234,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         lastChangedBySlider.current = true;
         setPositionSize(val);
         setIsOverLimit(val === 0);
+        setIsEditingSizeInput(false);
     };
 
     const getWarningMessage = () => {
@@ -266,6 +261,12 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
     const notifications: NotificationStoreIF = useNotificationStore();
 
+    const limitPrice = parseFormattedNum(price);
+
+    const isLessThanMinValue = useMemo(() => {
+        return notionalSymbolQtyNum * limitPrice < MIN_ORDER_VALUE;
+    }, [limitPrice, notionalSymbolQtyNum]);
+
     async function submitLimitOrder(side: 'buy' | 'sell'): Promise<void> {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
@@ -279,7 +280,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         }
 
         // Validate price
-        const limitPrice = parseFormattedNum(price);
         if (!limitPrice || limitPrice <= 0) {
             notifications.add({
                 title: 'Invalid Price',
@@ -298,6 +298,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             true,
             true,
         );
+
+        console.log({ usdValueOfOrderStr });
 
         try {
             // Execute limit order
@@ -482,9 +484,17 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     <SimpleButton
                         onClick={handleConfirm}
                         bg='accent1'
-                        disabled={isProcessingOrder || isOverLimit}
+                        disabled={
+                            isProcessingOrder ||
+                            isOverLimit ||
+                            isLessThanMinValue
+                        }
                     >
-                        {isProcessingOrder ? 'Processing...' : 'Confirm'}
+                        {isLessThanMinValue
+                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                            : isProcessingOrder
+                              ? 'Processing...'
+                              : 'Confirm'}
                     </SimpleButton>
                 </div>
             </div>

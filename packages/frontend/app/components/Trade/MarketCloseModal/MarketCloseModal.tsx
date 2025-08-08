@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
@@ -7,6 +7,7 @@ import {
     type NotificationStoreIF,
     useNotificationStore,
 } from '~/stores/NotificationStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
@@ -14,7 +15,6 @@ import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './MarketCloseModal.module.css';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
 
 interface PropsIF {
     close: () => void;
@@ -33,11 +33,13 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
     const { parseFormattedNum, formatNum } = useNumFormatter();
 
+    const MIN_ORDER_VALUE = 1;
+
     const isPositionLong = position.szi > 0;
 
     const markPx = symbolInfo?.markPx;
 
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
+    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
     const originalSize = Math.abs(position.szi);
 
@@ -56,6 +58,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         : isPositionLong
           ? notionalSymbolQtyNum * (markPx - position.entryPx)
           : notionalSymbolQtyNum * (position.entryPx - markPx);
+
+    const isLessThanMinValue = useMemo(() => {
+        return notionalSymbolQtyNum * (markPx || 1) < MIN_ORDER_VALUE;
+    }, [markPx, notionalSymbolQtyNum]);
 
     // Initialize sizeDisplay based on selectedMode
     useEffect(() => {
@@ -196,6 +202,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         lastChangedBySlider.current = true;
         setPositionSize(val);
         setIsOverLimit(val === 0);
+        setIsEditingSizeInput(false);
     };
 
     const getWarningMessage = () => {
@@ -395,9 +402,17 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     <SimpleButton
                         onClick={handleConfirm}
                         bg='accent1'
-                        disabled={isProcessingOrder || isOverLimit}
+                        disabled={
+                            isProcessingOrder ||
+                            isOverLimit ||
+                            isLessThanMinValue
+                        }
                     >
-                        {isProcessingOrder ? 'Processing...' : 'Confirm'}
+                        {isLessThanMinValue
+                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                            : isProcessingOrder
+                              ? 'Processing...'
+                              : 'Confirm'}
                     </SimpleButton>
                 </div>
             </div>
