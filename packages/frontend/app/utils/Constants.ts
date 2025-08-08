@@ -132,6 +132,8 @@ export enum WsChannels {
 const SECONDS = 1000;
 const MINUTES = SECONDS * 60;
 
+export const MIN_DEPOSIT_AMOUNT = 1;
+
 // Delay before entering sleep mode when tab becomes hidden
 // Set to 5 seconds to avoid triggering on brief tab switches
 export const WS_SLEEP_MODE = 5 * SECONDS;
