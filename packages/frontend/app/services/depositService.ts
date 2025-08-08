@@ -260,6 +260,7 @@ export class DepositService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature,
                 };
             }
         } catch (error) {
