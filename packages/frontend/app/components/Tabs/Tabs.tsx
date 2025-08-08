@@ -1,6 +1,13 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { motion } from 'framer-motion';
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './Tabs.module.css';
@@ -81,11 +88,21 @@ export default function Tabs(props: TabsProps) {
     const sessionState = useSession();
     const isSessionEstablished = isEstablished(sessionState);
 
-    const positionsCount = isSessionEstablished ? positions.length : 0;
+    const MIN_POSITION_USD_SIZE = 0.01;
 
-    const openOrdersCount = userOrders.filter(
-        (order) => order.status === 'open',
-    ).length;
+    const positionsCount = useMemo(() => {
+        return isSessionEstablished
+            ? positions.filter(
+                  (position) =>
+                      Math.abs(position.szi) * position.entryPx >
+                      MIN_POSITION_USD_SIZE,
+              ).length
+            : 0;
+    }, [positions, isSessionEstablished]);
+
+    const openOrdersCount = useMemo(() => {
+        return userOrders.filter((order) => order.status === 'open').length;
+    }, [userOrders]);
 
     // Using a local state for web data fetched since we don't have this in unified margin data yet
     const [webDataFetched, setWebDataFetched] = useState(false);

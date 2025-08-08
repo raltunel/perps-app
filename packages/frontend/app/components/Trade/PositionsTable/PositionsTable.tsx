@@ -19,7 +19,7 @@ interface PositionsTableProps {
 
 export default function PositionsTable(props: PositionsTableProps) {
     const { pageMode, isFetched, selectedFilter } = props;
-    const { coinPriceMap, symbol } = useTradeDataStore();
+    const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
 
@@ -30,26 +30,39 @@ export default function PositionsTable(props: PositionsTableProps) {
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
 
-    const filteredData = useMemo(() => {
+    const MIN_POSITION_USD_SIZE = 0.01;
+
+    const dataFilteredBySize = useMemo(() => {
+        return positions.filter(
+            (position) =>
+                Math.abs(position.szi) *
+                    (symbolInfo?.markPx || position.entryPx) >
+                MIN_POSITION_USD_SIZE,
+        );
+    }, [positions, symbolInfo]);
+
+    const dataFilteredByType = useMemo(() => {
         switch (selectedFilter) {
             case 'all':
-                return positions;
+                return dataFilteredBySize;
             case 'active':
-                return positions.filter((fill) => fill.coin === symbol);
+                return dataFilteredBySize.filter(
+                    (fill) => fill.coin === symbol,
+                );
             case 'long':
-                return positions.filter((fill) => fill.szi > 0);
+                return dataFilteredBySize.filter((fill) => fill.szi > 0);
             case 'short':
-                return positions.filter((fill) => fill.szi < 0);
+                return dataFilteredBySize.filter((fill) => fill.szi < 0);
         }
 
-        return positions;
-    }, [positions, selectedFilter]);
+        return dataFilteredBySize;
+    }, [selectedFilter, dataFilteredBySize]);
     return (
         <>
             <GenericTable
                 noDataMessage='No open positions'
                 storageKey={`PositionsTable_${currentUserRef.current}`}
-                data={filteredData as PositionIF[]}
+                data={dataFilteredByType as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <>
                         <PositionsTableHeader
