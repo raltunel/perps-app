@@ -3,7 +3,6 @@ import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { type useAppOptionsIF, useAppOptions } from '~/stores/AppOptionsStore';
 import {
     type NotificationStoreIF,
     useNotificationStore,
@@ -26,8 +25,6 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
     const { symbolInfo } = useTradeDataStore();
-
-    const activeOptions: useAppOptionsIF = useAppOptions();
 
     const { executeMarketOrder } = useMarketOrderService();
     const { buys, sells } = useOrderBookStore();
@@ -54,9 +51,11 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     // Track if the last change was from the slider
     const lastChangedBySlider = useRef(true);
 
-    const estimatedPNL = isPositionLong
-        ? notionalSymbolQtyNum * (markPx - position.entryPx)
-        : notionalSymbolQtyNum * (position.entryPx - markPx);
+    const estimatedPNL = !markPx
+        ? 0
+        : isPositionLong
+          ? notionalSymbolQtyNum * (markPx - position.entryPx)
+          : notionalSymbolQtyNum * (position.entryPx - markPx);
 
     // Initialize sizeDisplay based on selectedMode
     useEffect(() => {
@@ -194,7 +193,6 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     }, [sizeDisplay, isEditingSizeInput]);
 
     const handlePositionSizeChange = (val: number) => {
-        // for slider input
         lastChangedBySlider.current = true;
         setPositionSize(val);
         setIsOverLimit(val === 0);

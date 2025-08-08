@@ -378,7 +378,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                 modalCtrl.open();
                             }}
                         >
-                            Mark modal
+                            Market
                         </button>
                         <button
                             className={styles.actionButton}
