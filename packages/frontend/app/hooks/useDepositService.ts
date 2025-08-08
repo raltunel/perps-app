@@ -17,7 +17,7 @@ export interface UseDepositServiceReturn {
     balance: UserBalance | null;
     isLoading: boolean;
     error: string | null;
-    executeDeposit: (amount?: number) => Promise<DepositServiceResult>;
+    executeDeposit: (amount: number | 'max') => Promise<DepositServiceResult>;
     refreshBalance: () => Promise<void>;
     validateAmount: (amount: number) => { isValid: boolean; message?: string };
     startAutoRefresh: () => void;
@@ -123,7 +123,7 @@ export function useDepositService(): UseDepositServiceReturn {
 
     // Execute deposit transaction
     const executeDeposit = useCallback(
-        async (amount?: number): Promise<DepositServiceResult> => {
+        async (amount: number | 'max'): Promise<DepositServiceResult> => {
             if (!depositService || !isEstablished(sessionState)) {
                 return {
                     success: false,

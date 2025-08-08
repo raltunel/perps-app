@@ -77,10 +77,13 @@ export class DepositService {
      * @param amount - Deposit amount in decimalized form
      * @returns validation result
      */
-    validateDepositAmount(amount: number | undefined): {
+    validateDepositAmount(amount: number | 'max'): {
         isValid: boolean;
         message?: string;
     } {
+        if (amount === 'max') {
+            return { isValid: true };
+        }
         if (amount && amount < MIN_DEPOSIT_AMOUNT) {
             return {
                 isValid: false,
@@ -99,7 +102,7 @@ export class DepositService {
      * @returns Promise<Transaction>
      */
     async buildDepositTransaction(
-        amount: number | undefined,
+        amount: number | 'max',
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         payerPublicKey?: PublicKey,
@@ -109,9 +112,10 @@ export class DepositService {
             console.log('  - Decimalized amount:', amount);
 
             // Convert decimalized amount to non-decimalized (multiply by 10^6)
-            const nonDecimalizedAmount = amount
-                ? BigInt(Math.floor(amount * Math.pow(10, 6)))
-                : BigInt(0);
+            const nonDecimalizedAmount =
+                amount === 'max'
+                    ? 'max'
+                    : BigInt(Math.floor(amount * Math.pow(10, 6)));
             console.log(
                 '  - Non-decimalized amount (bigint):',
                 nonDecimalizedAmount,
@@ -187,7 +191,7 @@ export class DepositService {
      * @returns Promise<DepositServiceResult>
      */
     async executeDeposit(
-        amount: number | undefined,
+        amount: number | 'max',
         sessionPublicKey: PublicKey,
         userWalletKey: PublicKey,
         sendTransaction: (instructions: any[]) => Promise<any>,
@@ -260,6 +264,7 @@ export class DepositService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature,
                 };
             }
         } catch (error) {
