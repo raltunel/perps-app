@@ -23,7 +23,7 @@ interface propsIF {
         unit?: string;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onDeposit: (amount?: number) => void | Promise<any>;
+    onDeposit: (amount: number | 'max') => void | Promise<any>;
     onClose: () => void;
     isProcessing?: boolean;
 }
@@ -120,7 +120,7 @@ function PortfolioDeposit(props: propsIF) {
 
             // Race between the deposit and the timeout
             const result = await Promise.race([
-                maxActive ? onDeposit() : onDeposit(depositInputNum),
+                maxActive ? onDeposit('max') : onDeposit(depositInputNum),
                 timeoutPromise,
             ]);
 
