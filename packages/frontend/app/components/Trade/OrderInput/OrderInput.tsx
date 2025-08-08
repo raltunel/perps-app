@@ -855,6 +855,7 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
+            if (!isUserLoggedIn) return;
             if (activeOptions.skipOpenOrderConfirm) {
                 (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
@@ -883,7 +884,13 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', price);
+            if (!isUserLoggedIn) return;
+            if (activeOptions.skipOpenOrderConfirm) {
+                (submitButton as HTMLElement)?.focus();
+                event.preventDefault();
+            } else {
+                handleSubmitOrder();
+            }
         }
     };
     // STOP PRICE----------------------------------------------------------
@@ -901,7 +908,13 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            console.log('Enter pressed:', price);
+            if (!isUserLoggedIn) return;
+            if (activeOptions.skipOpenOrderConfirm) {
+                (submitButton as HTMLElement)?.focus();
+                event.preventDefault();
+            } else {
+                handleSubmitOrder();
+            }
         }
     };
 
@@ -1682,6 +1695,7 @@ function OrderInput({
 
             if (
                 e.key === 'Enter' &&
+                isUserLoggedIn &&
                 isFocused &&
                 !confirmOrderModal.isOpen &&
                 !isAnyPortfolioModalOpen &&
