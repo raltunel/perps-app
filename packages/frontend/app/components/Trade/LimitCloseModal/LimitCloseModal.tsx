@@ -266,87 +266,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
     const notifications: NotificationStoreIF = useNotificationStore();
 
-    // fn to submit a 'Buy' limit order
-    async function submitLimitBuy(): Promise<void> {
-        // Validate position size
-        if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
-            notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
-                icon: 'error',
-            });
-            close();
-            return;
-        }
-
-        // Validate price
-        const limitPrice = parseFormattedNum(price);
-        if (!limitPrice || limitPrice <= 0) {
-            notifications.add({
-                title: 'Invalid Price',
-                message: 'Please enter a valid limit price',
-                icon: 'error',
-            });
-            close();
-            return;
-        }
-
-        setIsProcessingOrder(true);
-
-        try {
-            // Execute limit order
-            const result = await executeLimitOrder({
-                quantity: notionalSymbolQtyNum,
-                price: roundDownToTenth(limitPrice),
-                side: 'buy',
-            });
-
-            const usdValueOfOrderStr = formatNum(
-                notionalSymbolQtyNum * limitPrice,
-                2,
-                true,
-                true,
-            );
-            if (result.success) {
-                notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
-                    icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                    removeAfter: 5000,
-                });
-            } else {
-                notifications.add({
-                    title: 'Limit Order Failed',
-                    message: result.error || 'Failed to place limit order',
-                    icon: 'error',
-                    removeAfter: 10000,
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
-                });
-            }
-        } catch (error) {
-            console.error('❌ Error submitting limit buy order:', error);
-            notifications.add({
-                title: 'Limit Order Failed',
-                message:
-                    error instanceof Error
-                        ? error.message
-                        : 'Unknown error occurred',
-                icon: 'error',
-                removeAfter: 10000,
-            });
-        } finally {
-            setIsProcessingOrder(false);
-            close();
-        }
-    }
-
-    // fn to submit a 'Sell' limit order
-    async function submitLimitSell(): Promise<void> {
+    async function submitLimitOrder(side: 'buy' | 'sell'): Promise<void> {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
@@ -384,13 +304,13 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             const result = await executeLimitOrder({
                 quantity: notionalSymbolQtyNum,
                 price: roundDownToTenth(limitPrice),
-                side: 'sell',
+                side,
             });
 
             if (result.success) {
                 notifications.add({
                     title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -409,7 +329,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             }
         } catch (error) {
-            console.error('❌ Error submitting limit sell order:', error);
+            console.error(`❌ Error submitting limit ${side} order:`, error);
             notifications.add({
                 title: 'Limit Order Failed',
                 message:
@@ -424,14 +344,15 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             close();
         }
     }
+
     const handleConfirm = () => {
         if (isProcessingOrder || isOverLimit) return;
 
         console.log('confirm');
         if (isPositionLong) {
-            submitLimitSell();
+            submitLimitOrder('sell');
         } else {
-            submitLimitBuy();
+            submitLimitOrder('buy');
         }
     };
 
