@@ -153,6 +153,10 @@ export class WebSocketInstance {
     private firstMessageLogged: boolean = false;
     private isConnecting: boolean = false;
     private reconnectTimeout: NodeJS.Timeout | null = null;
+    private reconnectAttempts: number = 0;
+    private readonly maxReconnectAttempts = 20; // Maximum number of reconnection attempts before giving up
+    private readonly initialReconnectDelay = 1000; // Start with 1 second
+    private readonly maxReconnectDelay = 30000; // Max 30 seconds between attempts
 
     // New properties for multi-socket support
     private readonly socketType: SocketType;
@@ -412,6 +416,7 @@ export class WebSocketInstance {
         this.wsReady = true;
         this.isConnecting = false;
         this.firstMessageLogged = false;
+        this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
         this.onConnectionChange?.(true);
 
         // send queued subs
@@ -513,9 +518,23 @@ export class WebSocketInstance {
                 `>>> [${this.socketName}] close reconnect`,
                 new Date().toISOString(),
             );
+            // Calculate delay with exponential backoff and jitter
+            const baseDelay = Math.min(
+                this.initialReconnectDelay *
+                    Math.pow(2, this.reconnectAttempts),
+                this.maxReconnectDelay,
+            );
+            const jitter = Math.random() * 1000; // Add up to 1s of jitter
+            const delay = Math.min(baseDelay + jitter, this.maxReconnectDelay);
+
+            console.log(
+                `>>> [${this.socketName}] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`,
+            );
+
             this.reconnectTimeout = setTimeout(() => {
                 console.log('>>> reconnecting isStopped?', this.stopped);
                 if (!this.stopped) {
+                    this.reconnectAttempts++;
                     this.fillQueuedSubs();
 
                     console.log(
@@ -532,7 +551,7 @@ export class WebSocketInstance {
                         this.connect(); // Call connect directly instead of reconnect
                     }, 200);
                 }
-            }, RECONNECT_TIMEOUT_MS);
+            }, delay);
         }
     };
 
