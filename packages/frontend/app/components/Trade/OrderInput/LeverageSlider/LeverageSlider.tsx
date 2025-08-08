@@ -5,14 +5,14 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import ScreenReaderAnnouncer from '~/components/ScreenReaderAnnouncer/ScreenReaderAnnouncer';
 import useDebounce from '~/hooks/useDebounce';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
 import InputField from './InputField';
-import SliderTrack from './SliderTrack';
 import styles from './LeverageSlider.module.css';
-import ScreenReaderAnnouncer from '~/components/ScreenReaderAnnouncer/ScreenReaderAnnouncer';
+import SliderTrack from './SliderTrack';
 
 interface LeverageSliderProps {
     value: number;
@@ -817,13 +817,7 @@ export default function LeverageSlider({
                     {!modalMode && showMinimumWarning && (
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
-                                <>
-                                    Min leverage for open interest:{' '}
-                                    {(
-                                        Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(2)}
-                                    x
-                                </>
+                                <>Close position to reduce minimum leverage</>
                             )}
                         </div>
                     )}
@@ -837,13 +831,7 @@ export default function LeverageSlider({
                     {modalMode && showMinimumWarning && (
                         <div className={warningClasses}>
                             {minimumValue !== undefined && (
-                                <>
-                                    Min leverage for open interest:{' '}
-                                    {(
-                                        Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(4)}
-                                    x
-                                </>
+                                <>Close position to reduce minimum leverage</>
                             )}
                         </div>
                     )}
