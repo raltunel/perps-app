@@ -381,6 +381,9 @@ export default function LeverageSlider({
             100;
 
         const newValue = percentageToValue(percentage);
+        if (shouldShowMinimumConstraints && newValue < minimumValue!) {
+            return;
+        }
 
         setHoverValue(newValue);
         setIsHovering(true);
@@ -818,7 +821,7 @@ export default function LeverageSlider({
                                     Min leverage for open interest:{' '}
                                     {(
                                         Math.trunc(minimumValue * 10000) / 10000
-                                    ).toFixed(4)}
+                                    ).toFixed(2)}
                                     x
                                 </>
                             )}

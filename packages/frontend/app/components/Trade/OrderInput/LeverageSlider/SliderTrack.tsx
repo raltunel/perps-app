@@ -107,12 +107,12 @@ export default function SliderTrack({
                             style={{
                                 width: `${minimumPercentage}%`,
                             }}
-                            onMouseEnter={() =>
-                                setSliderBelowMinimumLeverage?.(true)
-                            }
-                            onMouseLeave={() =>
-                                setSliderBelowMinimumLeverage?.(false)
-                            }
+                            // onMouseEnter={() =>
+                            //     setSliderBelowMinimumLeverage?.(true)
+                            // }
+                            // onMouseLeave={() =>
+                            //     setSliderBelowMinimumLeverage?.(false)
+                            // }
                         ></div>
 
                         <div
@@ -120,12 +120,12 @@ export default function SliderTrack({
                             style={{
                                 left: `${minimumPercentage}%`,
                             }}
-                            onMouseEnter={() =>
-                                setSliderBelowMinimumLeverage?.(true)
-                            }
-                            onMouseLeave={() =>
-                                setSliderBelowMinimumLeverage?.(false)
-                            }
+                            // onMouseEnter={() =>
+                            //     setSliderBelowMinimumLeverage?.(true)
+                            // }
+                            // onMouseLeave={() =>
+                            //     setSliderBelowMinimumLeverage?.(false)
+                            // }
                         ></div>
 
                         {minimumValue && (
@@ -282,8 +282,9 @@ export default function SliderTrack({
                             }}
                             onMouseEnter={() => {
                                 if (isInGreyedArea) {
+                                    return;
                                     // Show warning for greyed out labels
-                                    setSliderBelowMinimumLeverage?.(true);
+                                    // setSliderBelowMinimumLeverage?.(true);
                                 } else {
                                     // Normal hover behavior for non-greyed labels
                                     onTickHover(index);
@@ -291,8 +292,9 @@ export default function SliderTrack({
                             }}
                             onMouseLeave={() => {
                                 if (isInGreyedArea) {
+                                    return;
                                     // Hide warning for greyed out labels
-                                    setSliderBelowMinimumLeverage?.(false);
+                                    // setSliderBelowMinimumLeverage?.(false);
                                 } else {
                                     // Normal leave behavior for non-greyed labels
                                     onTickLeave();
