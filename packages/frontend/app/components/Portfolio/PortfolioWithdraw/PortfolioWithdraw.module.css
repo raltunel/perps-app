@@ -95,6 +95,13 @@
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.input_container > button.active {
+    background-color: var(--accent1, #7371fc);
+    color: var(--text1, #f0f0f8);
+    border-radius: var(--radius-s, 4px);
 }
 
 .error {
