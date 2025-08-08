@@ -580,21 +580,25 @@ export default function WebDataConsumer() {
                             );
                         }
 
-                        const usdValueOfFillStr = formatNum(
-                            fill.sz * fill.px,
-                            2,
-                            true,
-                            true,
-                        );
+                        // Only show notification if we haven't notified for this order ID yet
+                        if (!notifiedOrdersRef.current.has(fill.oid)) {
+                            const usdValueOfFillStr = formatNum(
+                                fill.sz * fill.px,
+                                2,
+                                true,
+                                true,
+                            );
 
-                        // notify user
-                        notifiedOrdersRef.current.add(fill.oid);
-                        notificationStore.add({
-                            title: 'Order Filled',
-                            message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
-                            icon: 'check',
-                            removeAfter: 5000,
-                        });
+                            // Add to notified orders before showing notification
+                            notifiedOrdersRef.current.add(fill.oid);
+
+                            notificationStore.add({
+                                title: 'Order Filled',
+                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
+                                icon: 'check',
+                                removeAfter: 5000,
+                            });
+                        }
                     });
                 }
 
