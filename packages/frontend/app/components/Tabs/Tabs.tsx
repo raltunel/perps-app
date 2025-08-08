@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './Tabs.module.css';
 
 interface TabProps {
@@ -87,8 +88,6 @@ export default function Tabs(props: TabsProps) {
 
     const sessionState = useSession();
     const isSessionEstablished = isEstablished(sessionState);
-
-    const MIN_POSITION_USD_SIZE = 0.01;
 
     const positionsCount = useMemo(() => {
         return isSessionEstablished

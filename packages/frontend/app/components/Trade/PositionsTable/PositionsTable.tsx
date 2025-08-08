@@ -5,7 +5,10 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import type { TableSortDirection } from '~/utils/CommonIFs';
-import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import {
+    EXTERNAL_PAGE_URL_PREFIX,
+    MIN_POSITION_USD_SIZE,
+} from '~/utils/Constants';
 import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
 import PositionsTableHeader from './PositionsTableHeader';
@@ -29,8 +32,6 @@ export default function PositionsTable(props: PositionsTableProps) {
     currentUserRef.current = userAddress;
 
     const viewAllLink = `${EXTERNAL_PAGE_URL_PREFIX}/positions`;
-
-    const MIN_POSITION_USD_SIZE = 0.01;
 
     const dataFilteredBySize = useMemo(() => {
         return positions.filter(
