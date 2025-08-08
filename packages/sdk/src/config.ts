@@ -16,12 +16,12 @@ export const RECONNECT_TIMEOUT_MS = 500; // timeout to trigger connect method wh
 export const DEMO_USER = '0xECB63caA47c7c4E77F60f1cE858Cf28dC2B82b00';
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL ||
-    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+// 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_WS_ENDPOINT =
-    import.meta.env.VITE_MARKET_WS_ENDPOINT ||
-    'https://throbbing-disk-07bc.doug-fa5.workers.dev';
+    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+// 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const blockExplorer =
     import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
+import { filter } from 'd3';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -600,7 +601,7 @@ export default function WebDataConsumer() {
                 // Merge fills with deduplication
                 const previousCount = userFillsRef.current.length;
                 const joinedFills = userFillsRef.current.concat(fills);
-                joinedFills.sort((a, b) => a.time - b.time);
+                joinedFills.sort((a, b) => b.time - a.time);
 
                 // Set of deduplication keys
                 const dedupKeySet = new Set<string>();
