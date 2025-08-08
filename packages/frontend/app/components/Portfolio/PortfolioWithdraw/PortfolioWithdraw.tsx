@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { LuCircleHelp } from 'react-icons/lu';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -127,12 +127,29 @@ function PortfolioWithdraw({
     );
 
     const handleMaxClick = useCallback(() => {
+        if (maxModeActive) {
+            setMaxModeActive(false);
+            return;
+        }
         setRawInputString(
             '$' +
                 formatNumWithOnlyDecimals(portfolio.availableBalance, 2, false),
         );
         setMaxModeActive(true);
-    }, [portfolio.availableBalance]);
+    }, [portfolio.availableBalance, maxModeActive]);
+
+    useEffect(() => {
+        if (maxModeActive) {
+            setRawInputString(
+                '$' +
+                    formatNumWithOnlyDecimals(
+                        portfolio.availableBalance,
+                        2,
+                        false,
+                    ),
+            );
+        }
+    }, [maxModeActive, portfolio.availableBalance]);
 
     const handleWithdraw = useCallback(async () => {
         setError(null);
@@ -280,7 +297,11 @@ function PortfolioWithdraw({
                         `^\\$?\\d*(?:\\${activeDecimalSeparator}\\d*)?$`,
                     )}
                 />
-                <button onClick={handleMaxClick} disabled={isProcessing}>
+                <button
+                    onClick={handleMaxClick}
+                    disabled={isProcessing}
+                    className={maxModeActive ? styles.active : ''}
+                >
                     Max
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
