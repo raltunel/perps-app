@@ -262,6 +262,11 @@ function OrderInput({
         }
     };
 
+    const normalizedEquity = useMemo(() => {
+        if (!marginBucket) return 0;
+        return Number(marginBucket?.equity) / 1e6;
+    }, [marginBucket]);
+
     useEffect(() => {
         // set mid price input as default price when market changes
         setMidPriceAsPriceInput();
@@ -436,25 +441,29 @@ function OrderInput({
         // Calculate implied maintenance margin from leverage
         const mmBps = Math.floor(10000 / leverage);
         const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
-        const normalizedAvailableToTrade =
+        const normalizedAvailableToTrade = Math.floor(
             Number(
                 tradeDirection === 'buy'
                     ? releveragedBucket?.availToBuy || 0
                     : releveragedBucket?.availToSell || 0,
-            ) / 1_000_000;
-        return normalizedAvailableToTrade;
+            ) / 1_000_000,
+        );
+        const roundedAvailableToTrade =
+            normalizedAvailableToTrade < MIN_POSITION_USD_SIZE
+                ? 0
+                : Math.floor(normalizedAvailableToTrade);
+        return roundedAvailableToTrade;
     }, [marginBucket, leverage, tradeDirection]);
 
     const userBuyingPowerExceedsMaxOrderSize =
         usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
 
-    const [maxCollateralModeEnabled, setMaxCollateralModeEnabled] =
-        useState(false);
+    const [isMaxModeEnabled, setIsMaxModeEnabled] = useState(false);
 
     useEffect(() => {
         if (
             !userExceededAvailableMargin &&
-            maxCollateralModeEnabled &&
+            isMaxModeEnabled &&
             markPx &&
             !isEditingSizeInput &&
             !userBuyingPowerExceedsMaxOrderSize
@@ -474,7 +483,7 @@ function OrderInput({
             }
         }
     }, [
-        maxCollateralModeEnabled,
+        isMaxModeEnabled,
         usdAvailableToTrade,
         leverage,
         markPx,
@@ -553,9 +562,11 @@ function OrderInput({
         return usdOrderValue / leverage;
     }, [usdOrderValue, leverage]);
 
-    const collateralInsufficient =
-        roundDownToHundredth(usdAvailableToTrade) <
-        roundDownToHundredth(marginRequired);
+    const collateralInsufficient = useMemo(() => {
+        return (
+            !usdAvailableToTrade || usdAvailableToTrade < marginRequired - 0.01
+        );
+    }, [usdAvailableToTrade, marginRequired]);
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -708,7 +719,7 @@ function OrderInput({
     useEffect(() => {
         let percent = 0;
         if (isReduceOnlyEnabled) {
-            if (maxCollateralModeEnabled) {
+            if (isMaxModeEnabled) {
                 percent = 100;
             } else if (marginBucket?.netPosition) {
                 const unscaledPositionSize =
@@ -725,14 +736,14 @@ function OrderInput({
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
         if (percent === 100) {
-            setMaxCollateralModeEnabled(true);
+            setIsMaxModeEnabled(true);
         } else {
-            setMaxCollateralModeEnabled(false);
+            setIsMaxModeEnabled(false);
         }
-    }, [!!usdAvailableToTrade, isReduceOnlyEnabled, maxCollateralModeEnabled]);
+    }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
     useEffect(() => {
-        setMaxCollateralModeEnabled(false);
+        setIsMaxModeEnabled(false);
         let percent = 0;
 
         if (isReduceOnlyEnabled) {
@@ -759,7 +770,7 @@ function OrderInput({
     const handleSizeChange = useCallback(
         (event: React.ChangeEvent<HTMLInputElement> | string) => {
             setIsEditingSizeInput(true);
-            setMaxCollateralModeEnabled(false);
+            setIsMaxModeEnabled(false);
             if (typeof event === 'string') {
                 setSizeDisplay(event);
             } else {
@@ -775,7 +786,7 @@ function OrderInput({
             const adjusted =
                 selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(
-                maxCollateralModeEnabled || parsed === maxNotionalUsdOrderSize
+                isMaxModeEnabled || parsed === maxNotionalUsdOrderSize
                     ? isReduceOnlyEnabled
                         ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
                         : userBuyingPowerExceedsMaxOrderSize
@@ -784,7 +795,7 @@ function OrderInput({
                     : adjusted,
             );
             if (isUserLoggedIn) {
-                const usdValue = maxCollateralModeEnabled
+                const usdValue = isMaxModeEnabled
                     ? userBuyingPowerExceedsMaxOrderSize
                         ? maxNotionalUsdOrderSize
                         : usdAvailableToTrade * leverage
@@ -806,18 +817,19 @@ function OrderInput({
                         ? (usdValue / maxNotionalUsdOrderSize) * 100
                         : (usdValue / leverage / usdAvailableToTrade) * 100;
                 }
+                if (isNaN(percent) || percent === Infinity) return;
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
-                    setMaxCollateralModeEnabled(true);
+                    setIsMaxModeEnabled(true);
                 } else {
                     setUserExceededAvailableMargin(false);
                     if (percent > 99) {
                         setPositionSliderPercentageValue(100);
-                        setMaxCollateralModeEnabled(true);
+                        setIsMaxModeEnabled(true);
                     } else {
                         setPositionSliderPercentageValue(percent);
-                        setMaxCollateralModeEnabled(false);
+                        setIsMaxModeEnabled(false);
                     }
                 }
             }
@@ -835,7 +847,7 @@ function OrderInput({
         marginBucket?.netPosition,
         maxNotionalUsdOrderSize,
         userBuyingPowerExceedsMaxOrderSize,
-        maxCollateralModeEnabled,
+        isMaxModeEnabled,
         userExceededAvailableMargin,
     ]);
 
@@ -972,9 +984,9 @@ function OrderInput({
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(value);
         if (value === 100) {
-            setMaxCollateralModeEnabled(true);
+            setIsMaxModeEnabled(true);
         } else {
-            setMaxCollateralModeEnabled(false);
+            setIsMaxModeEnabled(false);
         }
         if (isReduceOnlyEnabled) {
             setNotationalSymbolQtyFromPositionSize(value);
@@ -1855,6 +1867,15 @@ function OrderInput({
         '[data-testid="submit-order-button"]',
     );
 
+    const submitButtonText =
+        normalizedEquity < MIN_POSITION_USD_SIZE
+            ? 'Deposit to Trade'
+            : collateralInsufficient
+              ? tradeDirection === 'buy'
+                  ? 'Max Long - Deposit to Trade'
+                  : 'Max Short - Deposit to Trade'
+              : 'Submit';
+
     return (
         <div ref={orderInputRef} className={styles.mainContainer}>
             <AnimatePresence mode='wait'>
@@ -2025,7 +2046,7 @@ function OrderInput({
                                         onClick={handleSubmitOrder}
                                         disabled={isDisabled}
                                     >
-                                        Submit
+                                        {submitButtonText}
                                     </button>
                                 </Tooltip>
                             )}
