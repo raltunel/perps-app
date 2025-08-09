@@ -441,17 +441,17 @@ function OrderInput({
         // Calculate implied maintenance margin from leverage
         const mmBps = Math.floor(10000 / leverage);
         const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
-        const normalizedAvailableToTrade = Math.floor(
+        const normalizedAvailableToTrade =
             Number(
                 tradeDirection === 'buy'
                     ? releveragedBucket?.availToBuy || 0
                     : releveragedBucket?.availToSell || 0,
-            ) / 1_000_000,
-        );
+            ) / 1_000_000;
+
         const roundedAvailableToTrade =
             normalizedAvailableToTrade < MIN_POSITION_USD_SIZE
                 ? 0
-                : Math.floor(normalizedAvailableToTrade);
+                : normalizedAvailableToTrade;
         return roundedAvailableToTrade;
     }, [marginBucket, leverage, tradeDirection]);
 
