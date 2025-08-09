@@ -492,13 +492,18 @@ function OrderInput({
     const sizeMoreThanMaximum =
         notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
 
-    const displayNumAvailableToTrade = useMemo(() => {
-        return formatNum(usdAvailableToTrade, 2);
-    }, [usdAvailableToTrade, activeGroupSeparator]);
-
     const currentPositionLessThanMinPositionSize =
         Math.abs(currentPositionNotionalSize) * (markPx || 1) <
         MIN_POSITION_USD_SIZE;
+
+    const displayNumAvailableToTradeLessThanMinPositionSize =
+        Math.abs(usdAvailableToTrade) < MIN_POSITION_USD_SIZE;
+
+    const displayNumAvailableToTrade = useMemo(() => {
+        return displayNumAvailableToTradeLessThanMinPositionSize
+            ? formatNum(0, 2, false, true)
+            : formatNum(usdAvailableToTrade, 2, false, true);
+    }, [usdAvailableToTrade, activeGroupSeparator]);
 
     const displayNumCurrentPosition = useMemo(() => {
         return currentPositionLessThanMinPositionSize
@@ -861,7 +866,7 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            if (!isUserLoggedIn) return;
+            if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
                 (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
@@ -890,7 +895,7 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            if (!isUserLoggedIn) return;
+            if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
                 (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
@@ -914,7 +919,7 @@ function OrderInput({
         event: React.KeyboardEvent<HTMLInputElement>,
     ) => {
         if (event.key === 'Enter') {
-            if (!isUserLoggedIn) return;
+            if (!isUserLoggedIn || isDisabled) return;
             if (activeOptions.skipOpenOrderConfirm) {
                 (submitButton as HTMLElement)?.focus();
                 event.preventDefault();
@@ -1659,107 +1664,14 @@ function OrderInput({
         };
     }, []);
 
-    // hook to handle Enter key press for order submission
-    useEffect(() => {
-        const handleEnter = () => {
-            // Only submit if:
-            // 1. The component is focused
-            // 2. There's a valid notional/symbol quantity
-            // 3. No modals are open
-            // 4. Skip confirmation is not enabled
-
-            const isSubmitButtonFocused =
-                document.activeElement === submitButton;
-            // Submit if either:
-            // 1. The submit button is focused, or
-            // 2. Skip confirmation is not enabled
-            if (
-                (isSubmitButtonFocused ||
-                    (!activeOptions.skipOpenOrderConfirm && isFocused)) &&
-                notionalSymbolQtyNum &&
-                !confirmOrderModal.isOpen &&
-                !isAnyPortfolioModalOpen
-            ) {
-                handleSubmitOrder();
-            } else if (
-                activeOptions.skipOpenOrderConfirm &&
-                isFocused &&
-                submitButton
-            ) {
-                // focus the submit button
-                (submitButton as HTMLElement).focus();
-            }
-        };
-
-        const keydownHandler = (e: KeyboardEvent) => {
-            // Only handle Enter key when:
-            // 1. The component is focused
-            // 2. No modals are open
-            // 3. The event target is not a textarea or input (to allow normal Enter behavior in form fields)
-            const target = e.target as HTMLElement;
-            const isFormElement =
-                target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
-
-            if (
-                e.key === 'Enter' &&
-                isUserLoggedIn &&
-                isFocused &&
-                !confirmOrderModal.isOpen &&
-                !isAnyPortfolioModalOpen &&
-                !isFormElement
-            ) {
-                e.preventDefault();
-                e.stopPropagation();
-                handleEnter();
-            }
-        };
-
-        document.addEventListener('keydown', keydownHandler, true); // Use capture phase to ensure we catch the event
-        return () =>
-            document.removeEventListener('keydown', keydownHandler, true);
-    }, [
-        tradeDirection,
-        marketOrderType,
-        activeOptions.skipOpenOrderConfirm,
-        handleSubmitOrder,
-        notionalSymbolQtyNum,
-        isFocused,
-    ]);
-
-    const getDisabledReason = (
-        collateralInsufficient: boolean,
-        sizeLessThanMinimum: boolean,
-        sizeMoreThanMaximum: boolean,
-        isPriceInvalid: boolean,
-        isMarketOrderLoading: boolean,
-        isReduceInWrongDirection: boolean,
-        isReduceOnlyExceedingPositionSize: boolean,
-    ) => {
-        if (isMarketOrderLoading) return 'Processing order...';
-        if (isReduceInWrongDirection) return 'Switch direction to reduce';
-        if (collateralInsufficient) return 'Insufficient collateral';
-        if (isReduceOnlyExceedingPositionSize)
-            return 'Reduce only exceeds position size';
-        if (sizeLessThanMinimum) return 'Order size below minimum';
-        if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
-        if (isPriceInvalid) return 'Invalid price';
-        return null;
-    };
-
-    useEffect(() => {
-        if (submitButtonRecentlyClicked) {
-            const timeout = setTimeout(() => {
-                setSubmitButtonRecentlyClicked(false);
-            }, 1000);
-            return () => clearTimeout(timeout);
-        }
-    }, [submitButtonRecentlyClicked]);
-
-    const isReduceInWrongDirection =
-        isReduceOnlyEnabled &&
-        !!marginBucket &&
-        ((marginBucket.netPosition > 0n && tradeDirection === 'buy') ||
-            (marginBucket.netPosition < 0n && tradeDirection === 'sell'));
+    const isReduceInWrongDirection = useMemo(() => {
+        return (
+            isReduceOnlyEnabled &&
+            !!marginBucket &&
+            ((marginBucket.netPosition > 0n && tradeDirection === 'buy') ||
+                (marginBucket.netPosition < 0n && tradeDirection === 'sell'))
+        );
+    }, [isReduceOnlyEnabled, marginBucket, tradeDirection]);
 
     const isReduceOnlyExceedingPositionSize = useMemo(() => {
         return (
@@ -1790,6 +1702,105 @@ function OrderInput({
         submitButtonRecentlyClicked ||
         isReduceInWrongDirection ||
         isReduceOnlyExceedingPositionSize;
+
+    // hook to handle Enter key press for order submission
+    useEffect(() => {
+        const handleEnter = () => {
+            // Only submit if:
+            // 1. The component is focused
+            // 2. There's a valid notional/symbol quantity
+            // 3. No modals are open
+            // 4. Skip confirmation is not enabled
+
+            const isSubmitButtonFocused =
+                document.activeElement === submitButton;
+            // Submit if either:
+            // 1. The submit button is focused, or
+            // 2. Skip confirmation is not enabled
+            if (
+                (isSubmitButtonFocused ||
+                    (!activeOptions.skipOpenOrderConfirm && isFocused)) &&
+                notionalSymbolQtyNum &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !isDisabled
+            ) {
+                handleSubmitOrder();
+            } else if (
+                activeOptions.skipOpenOrderConfirm &&
+                isFocused &&
+                submitButton
+            ) {
+                // focus the submit button
+                (submitButton as HTMLElement).focus();
+            }
+        };
+
+        const keydownHandler = (e: KeyboardEvent) => {
+            // Only handle Enter key when:
+            // 1. The component is focused
+            // 2. No modals are open
+            // 3. The event target is not a textarea or input (to allow normal Enter behavior in form fields)
+            const target = e.target as HTMLElement;
+            const isFormElement =
+                target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+
+            if (
+                e.key === 'Enter' &&
+                isUserLoggedIn &&
+                isFocused &&
+                !confirmOrderModal.isOpen &&
+                !isAnyPortfolioModalOpen &&
+                !isFormElement &&
+                !isDisabled
+            ) {
+                e.preventDefault();
+                e.stopPropagation();
+                handleEnter();
+            }
+        };
+
+        document.addEventListener('keydown', keydownHandler, true); // Use capture phase to ensure we catch the event
+        return () =>
+            document.removeEventListener('keydown', keydownHandler, true);
+    }, [
+        tradeDirection,
+        marketOrderType,
+        activeOptions.skipOpenOrderConfirm,
+        handleSubmitOrder,
+        notionalSymbolQtyNum,
+        isFocused,
+        isDisabled,
+    ]);
+
+    const getDisabledReason = (
+        collateralInsufficient: boolean,
+        sizeLessThanMinimum: boolean,
+        sizeMoreThanMaximum: boolean,
+        isPriceInvalid: boolean,
+        isMarketOrderLoading: boolean,
+        isReduceInWrongDirection: boolean,
+        isReduceOnlyExceedingPositionSize: boolean,
+    ) => {
+        if (isMarketOrderLoading) return 'Processing order...';
+        if (isReduceInWrongDirection) return 'Switch direction to reduce';
+        if (collateralInsufficient) return 'Insufficient collateral';
+        if (isReduceOnlyExceedingPositionSize)
+            return 'Reduce only exceeds position size';
+        if (sizeLessThanMinimum) return 'Order size below minimum';
+        if (sizeMoreThanMaximum) return 'Order size exceeds position limits';
+        if (isPriceInvalid) return 'Invalid price';
+        return null;
+    };
+
+    useEffect(() => {
+        if (submitButtonRecentlyClicked) {
+            const timeout = setTimeout(() => {
+                setSubmitButtonRecentlyClicked(false);
+            }, 1000);
+            return () => clearTimeout(timeout);
+        }
+    }, [submitButtonRecentlyClicked]);
 
     const disabledReason = getDisabledReason(
         collateralInsufficient,
