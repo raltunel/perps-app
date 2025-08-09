@@ -116,13 +116,18 @@ function DepositDropdown(props: propsIF) {
     const unrealizedPnlLessThanMinPositionSize =
         Math.abs(unrealizedPnlNum) < MIN_POSITION_USD_SIZE;
 
+    const balanceLessThanMinPositionSize =
+        Math.abs(balanceNum) < MIN_POSITION_USD_SIZE;
+
     // Memoize overview data
     const overviewData = useMemo(
         () => [
             {
                 label: 'Balance',
                 tooltipContent: 'total account equity',
-                value: formatNum(balanceNum, 2, true, true),
+                value: balanceLessThanMinPositionSize
+                    ? formatNum(0, 2, true, true)
+                    : formatNum(balanceNum, 2, true, true),
                 change: 0,
             },
             {
