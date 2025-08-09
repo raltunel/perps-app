@@ -30,6 +30,15 @@ export function useUnifiedMarginData() {
             // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
+                // Clear the store first
+                const store = useUnifiedMarginStore.getState();
+                store.setMarginBucket(null);
+                store.setBalance(null);
+                store.setPositions([]);
+                store.setError(null);
+                store.setIsLoading(true);
+                store.setLastUpdateTime(0);
+                // Then unsubscribe
                 unifiedMarginPollingManager.unsubscribe();
             }
             return;
@@ -44,10 +53,19 @@ export function useUnifiedMarginData() {
             );
         }
 
-        // Cleanup function - only runs on unmount
+        // Cleanup function - runs on unmount and when dependencies change
         return () => {
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
+                // Clear the store first
+                const store = useUnifiedMarginStore.getState();
+                store.setMarginBucket(null);
+                store.setBalance(null);
+                store.setPositions([]);
+                store.setError(null);
+                store.setIsLoading(true);
+                store.setLastUpdateTime(0);
+                // Then unsubscribe
                 unifiedMarginPollingManager.unsubscribe();
             }
         };
