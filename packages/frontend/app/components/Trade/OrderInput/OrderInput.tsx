@@ -743,7 +743,6 @@ function OrderInput({
     }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
     useEffect(() => {
-        setIsMaxModeEnabled(false);
         let percent = 0;
 
         if (isReduceOnlyEnabled) {
@@ -761,6 +760,11 @@ function OrderInput({
         }
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
+        if (percent === 100) {
+            setIsMaxModeEnabled(true);
+        } else {
+            setIsMaxModeEnabled(false);
+        }
     }, [leverage]);
 
     const handleOnFocus = () => {
