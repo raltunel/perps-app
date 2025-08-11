@@ -1,8 +1,11 @@
 import { useMemo, useRef, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
+import { useCancelOrderService } from '~/hooks/useCancelOrderService';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -10,8 +13,6 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { useCancelOrderService } from '~/hooks/useCancelOrderService';
-import { useNotificationStore } from '~/stores/NotificationStore';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -25,6 +26,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
     const [isCancellingAll, setIsCancellingAll] = useState(false);
     const { executeCancelOrder } = useCancelOrderService();
+    const { formatNum } = useNumFormatter();
 
     const notifications = useNotificationStore();
 
@@ -45,7 +47,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
             // Show initial notification
             notifications.add({
                 title: 'Cancelling All Orders',
-                message: `Attempting to cancel ${filteredOrders.length} orders...`,
+                message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                 icon: 'spinner',
             });
 
@@ -112,27 +114,79 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
             });
 
             // Show result notification
-            if (successCount > 0 && failureCount === 0) {
-                notifications.add({
-                    title: 'All Orders Cancelled',
-                    message: `Successfully cancelled all ${successCount} orders`,
-                    icon: 'check',
-                    removeAfter: 5000,
+            if (successCount > 0) {
+                let successOrderSignature: string | undefined;
+                results.forEach((result) => {
+                    if (result.status === 'fulfilled' && result.value.success) {
+                        successOrderSignature = result.value.signature;
+                    }
                 });
-            } else if (successCount > 0 && failureCount > 0) {
-                notifications.add({
-                    title: 'Partial Success',
-                    message: `Cancelled ${successCount} orders, ${failureCount} failed`,
-                    icon: 'error',
-                    removeAfter: 8000,
-                });
+                if (successCount === 1) {
+                    results.forEach((result) => {
+                        if (
+                            result.status === 'fulfilled' &&
+                            result.value.success
+                        ) {
+                            const usdValueOfOrderStr = formatNum(
+                                result.value.order.orderValue || 0,
+                                2,
+                                true,
+                                true,
+                            );
+                            const order = result.value.order;
+                            notifications.add({
+                                title: 'Order Cancelled',
+                                message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                                icon: 'check',
+                                removeAfter: 5000,
+                                txLink: successOrderSignature
+                                    ? `${blockExplorer}/tx/${successOrderSignature}`
+                                    : undefined,
+                            });
+                        }
+                    });
+                } else {
+                    notifications.add({
+                        title: 'All Orders Cancelled',
+                        message: `Successfully cancelled all ${successCount} orders`,
+                        icon: 'check',
+                        removeAfter: 5000,
+                        txLink: successOrderSignature
+                            ? `${blockExplorer}/tx/${successOrderSignature}`
+                            : undefined,
+                    });
+                }
             } else {
-                notifications.add({
-                    title: 'Cancel All Failed',
-                    message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
-                    icon: 'error',
-                    removeAfter: 8000,
+                let failedOrderSignature: string | undefined;
+                results.forEach((result) => {
+                    if (
+                        result.status === 'fulfilled' &&
+                        !result.value.success
+                    ) {
+                        failedOrderSignature = result.value.signature;
+                    }
                 });
+                if (successCount > 0 && failureCount > 0) {
+                    notifications.add({
+                        title: 'Partial Success',
+                        message: `Cancelled ${successCount} orders, ${failureCount} failed`,
+                        icon: 'error',
+                        removeAfter: 8000,
+                        txLink: failedOrderSignature
+                            ? `${blockExplorer}/tx/${failedOrderSignature}`
+                            : undefined,
+                    });
+                } else {
+                    notifications.add({
+                        title: 'Cancel All Failed',
+                        message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
+                        icon: 'error',
+                        removeAfter: 8000,
+                        txLink: failedOrderSignature
+                            ? `${blockExplorer}/tx/${failedOrderSignature}`
+                            : undefined,
+                    });
+                }
             }
         } catch (error) {
             console.error('❌ Error during cancel all operation:', error);
