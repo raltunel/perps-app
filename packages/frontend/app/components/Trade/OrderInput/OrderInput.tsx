@@ -2177,7 +2177,16 @@ function OrderInput({
                                 denom: symbolInfo?.coin || '',
                             }}
                             usdOrderValue={usdOrderValue}
-                            limitPrice={price}
+                            limitPrice={formatNum(
+                                parseFormattedNum(price),
+                                2,
+                                true,
+                                true,
+                                false,
+                                false,
+                                0,
+                                true,
+                            )}
                             submitFn={submitLimitBuy}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')
@@ -2205,7 +2214,16 @@ function OrderInput({
                                 denom: symbolInfo?.coin || '',
                             }}
                             usdOrderValue={usdOrderValue}
-                            limitPrice={price}
+                            limitPrice={formatNum(
+                                parseFormattedNum(price),
+                                2,
+                                true,
+                                true,
+                                false,
+                                false,
+                                0,
+                                true,
+                            )}
                             submitFn={submitLimitSell}
                             toggleEnabled={() =>
                                 activeOptions.toggle('skipOpenOrderConfirm')

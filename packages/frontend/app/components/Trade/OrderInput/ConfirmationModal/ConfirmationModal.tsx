@@ -83,7 +83,16 @@ export default function ConfirmationModal(props: propsIF) {
             return '-';
         }
 
-        return formatNum(humanReadablePrice);
+        return formatNum(
+            humanReadablePrice,
+            null,
+            true,
+            true,
+            false,
+            false,
+            0,
+            true,
+        );
     }, [liquidationPrice, formatNum]);
 
     const dataInfo: InfoItem[] = [
