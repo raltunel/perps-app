@@ -105,7 +105,7 @@ export function processUserOrder(
             triggerPx: data.triggerPx ? parseNum(data.triggerPx) : undefined,
             triggerCondition: data.triggerCondition,
             orderType: data.orderType || '',
-            orderValue: Math.round(data.sz * (markPx || 1)),
+            orderValue: Math.round(data.sz * (markPx || 1) * 100) / 100,
         };
     }
 
