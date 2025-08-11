@@ -158,9 +158,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
     // Use memoized value to prevent unnecessary re-renders
-    const { wsEnvironment } = useDebugStore();
+    const { wsEnvironment, isDebugWalletActive } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+
     return (
         <>
             <Layout>
@@ -182,7 +183,11 @@ export default function App() {
                         <SdkProvider
                             environment={wsEnvironment}
                             marketEndpoint={MARKET_WS_ENDPOINT}
-                            userEndpoint={USER_WS_ENDPOINT}
+                            userEndpoint={
+                                isDebugWalletActive
+                                    ? MARKET_WS_ENDPOINT
+                                    : USER_WS_ENDPOINT
+                            }
                         >
                             <TutorialProvider>
                                 <WsConnectionChecker />
