@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -10,6 +10,8 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
+import { useCancelOrderService } from '~/hooks/useCancelOrderService';
+import { useNotificationStore } from '~/stores/NotificationStore';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -21,10 +23,130 @@ interface OpenOrdersTableProps {
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
+    const [isCancellingAll, setIsCancellingAll] = useState(false);
+    const { executeCancelOrder } = useCancelOrderService();
+
+    const notifications = useNotificationStore();
 
     const handleCancel = (time: number, coin: string) => {
         if (onCancel) {
             onCancel(time, coin);
+        }
+    };
+
+    const handleCancelAll = async () => {
+        if (filteredOrders.length === 0) {
+            return;
+        }
+
+        setIsCancellingAll(true);
+
+        try {
+            // Show initial notification
+            notifications.add({
+                title: 'Cancelling All Orders',
+                message: `Attempting to cancel ${filteredOrders.length} orders...`,
+                icon: 'spinner',
+            });
+
+            const cancelPromises = filteredOrders.map(async (order) => {
+                if (!order.oid) {
+                    return {
+                        success: false,
+                        error: 'Order ID not found',
+                        order,
+                    };
+                }
+
+                try {
+                    const result = await executeCancelOrder({
+                        orderId: order.oid,
+                    });
+
+                    return {
+                        ...result,
+                        order,
+                    };
+                } catch (error) {
+                    return {
+                        success: false,
+                        error:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error',
+                        order,
+                    };
+                }
+            });
+
+            // Wait for all cancel operations to complete
+            const results = await Promise.allSettled(cancelPromises);
+
+            let successCount = 0;
+            let failureCount = 0;
+            const failedOrders: string[] = [];
+
+            results.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    const cancelResult = result.value;
+                    if (cancelResult.success) {
+                        successCount++;
+                        // Call the onCancel callback for successful cancellations
+                        if (onCancel) {
+                            onCancel(
+                                cancelResult.order.timestamp,
+                                cancelResult.order.coin,
+                            );
+                        }
+                    } else {
+                        failureCount++;
+                        failedOrders.push(
+                            `${cancelResult.order.coin} (${cancelResult.error})`,
+                        );
+                    }
+                } else {
+                    failureCount++;
+                    const order = filteredOrders[index];
+                    failedOrders.push(`${order.coin} (${result.reason})`);
+                }
+            });
+
+            // Show result notification
+            if (successCount > 0 && failureCount === 0) {
+                notifications.add({
+                    title: 'All Orders Cancelled',
+                    message: `Successfully cancelled all ${successCount} orders`,
+                    icon: 'check',
+                    removeAfter: 5000,
+                });
+            } else if (successCount > 0 && failureCount > 0) {
+                notifications.add({
+                    title: 'Partial Success',
+                    message: `Cancelled ${successCount} orders, ${failureCount} failed`,
+                    icon: 'error',
+                    removeAfter: 8000,
+                });
+            } else {
+                notifications.add({
+                    title: 'Cancel All Failed',
+                    message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
+                    icon: 'error',
+                    removeAfter: 8000,
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error during cancel all operation:', error);
+            notifications.add({
+                title: 'Cancel All Failed',
+                message:
+                    error instanceof Error
+                        ? error.message
+                        : 'Unknown error occurred',
+                icon: 'error',
+                removeAfter: 5000,
+            });
+        } finally {
+            setIsCancellingAll(false);
         }
     };
 
@@ -69,6 +191,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         sortBy={sortBy as OrderDataSortBy}
                         sortDirection={sortDirection}
                         sortClickHandler={sortClickHandler}
+                        hasActiveOrders={
+                            filteredOrders.length > 0 && !isCancellingAll
+                        }
+                        onCancelAll={handleCancelAll}
                     />
                 )}
                 renderRow={(order, index) => (
