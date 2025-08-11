@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
@@ -43,12 +43,15 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
 
         setIsCancellingAll(true);
 
+        const slug = makeSlug(10);
+
         try {
             // Show initial notification
             notifications.add({
                 title: 'Cancelling All Orders',
                 message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                 icon: 'spinner',
+                slug,
             });
 
             const cancelPromises = filteredOrders.map(async (order) => {
@@ -105,11 +108,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         failedOrders.push(
                             `${cancelResult.order.coin} (${cancelResult.error})`,
                         );
+                        notifications.remove(slug);
                     }
                 } else {
                     failureCount++;
                     const order = filteredOrders[index];
                     failedOrders.push(`${order.coin} (${result.reason})`);
+                    notifications.remove(slug);
                 }
             });
 
@@ -134,6 +139,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 true,
                             );
                             const order = result.value.order;
+                            notifications.remove(slug);
                             notifications.add({
                                 title: 'Order Cancelled',
                                 message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
@@ -146,6 +152,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         }
                     });
                 } else {
+                    notifications.remove(slug);
                     notifications.add({
                         title: 'All Orders Cancelled',
                         message: `Successfully cancelled all ${successCount} orders`,
@@ -167,6 +174,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     }
                 });
                 if (successCount > 0 && failureCount > 0) {
+                    notifications.remove(slug);
                     notifications.add({
                         title: 'Partial Success',
                         message: `Cancelled ${successCount} orders, ${failureCount} failed`,
@@ -177,6 +185,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             : undefined,
                     });
                 } else {
+                    notifications.remove(slug);
                     notifications.add({
                         title: 'Cancel All Failed',
                         message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,
@@ -190,6 +199,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
             }
         } catch (error) {
             console.error('❌ Error during cancel all operation:', error);
+            notifications.remove(slug);
             notifications.add({
                 title: 'Cancel All Failed',
                 message:
