@@ -149,14 +149,14 @@ export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 export const MIN_POSITION_USD_SIZE = 0.01;
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_API_URL || 'https://api.yperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_INFO_ENDPOINT =
     import.meta.env.VITE_MARKET_INFO_ENDPOINT || MARKET_API_URL + '/info';
 
 export const MARKET_WS_ENDPOINT =
-    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_WS_ENDPOINT || 'https://api.yperliquid.xyz';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const USER_WS_ENDPOINT =

@@ -35,6 +35,7 @@ import {
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
@@ -229,7 +230,10 @@ function OrderInput({
 
     const { buys, sells } = useOrderBookStore();
 
-    const markPx = symbolInfo?.markPx;
+    // backup mark price for when symbolInfo not available
+    // Get Pyth price for the current symbol
+    const pythPriceData = usePythPrice(symbol);
+    const markPx = symbolInfo?.markPx || pythPriceData?.price;
 
     const {
         parseFormattedNum,
@@ -1254,7 +1258,7 @@ function OrderInput({
                 // });
             }
             // Get best ask price for buy order
-            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
 
             // Execute the market buy order
             const result = await executeMarketOrder({
@@ -1338,7 +1342,7 @@ function OrderInput({
                 // });
             }
             // Get best bid price for sell order
-            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
 
             // Execute the market sell order
             const result = await executeMarketOrder({
