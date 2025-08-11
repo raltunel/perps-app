@@ -1881,7 +1881,7 @@ function OrderInput({
               : 'Submit';
 
     return (
-        <div ref={orderInputRef} className={styles.mainContainer}>
+        <div ref={orderInputRef} className={styles.order_input}>
             <AnimatePresence mode='wait'>
                 {showLaunchpad ? (
                     <motion.div
