@@ -20,6 +20,7 @@ interface propsIF {
     isProcessing?: boolean;
     setIsProcessingOrder?: (value: boolean) => void;
     liquidationPrice?: number | null;
+    usdOrderValue?: number;
 }
 type InfoItem = {
     label: string;
@@ -40,6 +41,7 @@ export default function ConfirmationModal(props: propsIF) {
         isProcessing,
         setIsProcessingOrder,
         liquidationPrice,
+        usdOrderValue,
     } = props;
 
     const { getBsColor } = useAppSettings();
@@ -97,6 +99,17 @@ export default function ConfirmationModal(props: propsIF) {
         {
             label: 'Size',
             value: `${size.qty || '--'} ${size.denom}`,
+            valueStyle: {
+                color: tx.includes('buy')
+                    ? getBsColor().buy
+                    : getBsColor().sell,
+            },
+        },
+        {
+            label: 'Order Value',
+            value: usdOrderValue
+                ? formatNum(usdOrderValue, null, true, true)
+                : '-',
             valueStyle: {
                 color: tx.includes('buy')
                     ? getBsColor().buy
