@@ -2,7 +2,7 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
 import { filter } from 'd3';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
@@ -16,6 +16,7 @@ import {
     processUserTwapHistory,
     processUserTwapSliceFills,
 } from '~/processors/processUserFills';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -34,7 +35,15 @@ import type {
 } from '~/utils/UserDataIFs';
 
 export default function WebDataConsumer() {
-    const DUMMY_ADDRESS = '0x0000000000000000000000000000000000000000';
+    const { debugWallet, isDebugWalletActive } = useDebugStore();
+
+    const DUMMY_ADDRESS = useMemo(() => {
+        if (isDebugWalletActive) {
+            return debugWallet.address;
+        }
+        return '0x0000000000000000000000000000000000000000';
+    }, [isDebugWalletActive, debugWallet]);
+
     const {
         favKeys,
         setFavCoins,
