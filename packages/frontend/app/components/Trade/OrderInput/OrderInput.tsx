@@ -1349,9 +1349,7 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(
-                    notionalSymbolQtyNum * (bestBidPrice || 1),
-                ),
+                Math.round(notionalSymbolQtyNum * (bestBidPrice || 1)),
                 2,
                 true,
                 true,
@@ -1444,7 +1442,7 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                Math.round(notionalSymbolQtyNum * (markPx || 1)),
                 2,
                 true,
                 true,
@@ -1535,7 +1533,7 @@ function OrderInput({
             });
 
             const usdValueOfOrderStr = formatNum(
-                roundDownToHundredth(notionalSymbolQtyNum * limitPrice),
+                Math.round(notionalSymbolQtyNum * (markPx || 1)),
                 2,
                 true,
                 true,
