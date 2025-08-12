@@ -774,12 +774,6 @@ function OrderInput({
         }
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
-        // if (percent === 100) {
-        //     console.log('maxMode: ' + true);
-        //     setIsMaxModeEnabled(true);
-        // } else {
-        //     setIsMaxModeEnabled(false);
-        // }
     }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
     useEffect(() => {
@@ -867,12 +861,10 @@ function OrderInput({
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
-                    // setIsMaxModeEnabled(true);
                 } else {
                     setUserExceededAvailableMargin(false);
                     if (percent > 99) {
                         setPositionSliderPercentageValue(100);
-                        // setIsMaxModeEnabled(true);
                     } else {
                         setPositionSliderPercentageValue(percent);
                         setIsMaxModeEnabled(false);
