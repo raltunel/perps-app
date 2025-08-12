@@ -19,6 +19,7 @@ import {
 import { useDebugStore } from '~/stores/DebugStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { WsChannels } from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
@@ -83,6 +84,9 @@ export default function WebDataConsumer() {
     // Use unified margin data for both balance and positions
     const { positions: unifiedPositions } = useUnifiedMarginData();
 
+    const { setPositions: setUnifiedPositions, setBalance: setUnifiedBalance } =
+        useUnifiedMarginStore();
+
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
     const userBalancesRef = useRef<UserBalanceIF[]>([]);
@@ -103,6 +107,9 @@ export default function WebDataConsumer() {
     const fetchedChannelsRef = useRef<Set<string>>(new Set());
 
     const notifiedOrdersRef = useRef<Set<number>>(new Set());
+
+    const debugWalletActiveRef = useRef<boolean>(false);
+    debugWalletActiveRef.current = isDebugWalletActive;
 
     useEffect(() => {
         const foundCoin = coins.find((coin) => coin.coin === symbol);
@@ -289,6 +296,11 @@ export default function WebDataConsumer() {
             if (accountOverviewRef.current) {
                 setAccountOverview(accountOverviewRef.current);
             }
+            if (debugWalletActiveRef.current) {
+                setPositions(positionsRef.current);
+                setUnifiedPositions(positionsRef.current);
+                setUserBalances(userBalancesRef.current);
+            }
             setFetchedChannels(new Set([...fetchedChannelsRef.current]));
         }, 1000);
 
@@ -369,6 +381,11 @@ export default function WebDataConsumer() {
             // This ensures market data always comes from the market endpoint
             setCoins(data.data.coins);
             setCoinPriceMap(data.data.coinPriceMap);
+
+            if (debugWalletActiveRef.current) {
+                positionsRef.current = data.data.positions;
+                userBalancesRef.current = data.data.userBalances;
+            }
         },
         [setCoins, setCoinPriceMap],
     );
@@ -783,7 +800,7 @@ export default function WebDataConsumer() {
 
     // Update positions in TradeDataStore when unified data changes
     useEffect(() => {
-        if (unifiedPositions) {
+        if (unifiedPositions && !debugWalletActiveRef.current) {
             setPositions(unifiedPositions);
         }
     }, [unifiedPositions, setPositions]);
