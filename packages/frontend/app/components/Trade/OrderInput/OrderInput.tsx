@@ -22,7 +22,6 @@ import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
-import useDebounce from '~/hooks/useDebounce';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
@@ -581,14 +580,32 @@ function OrderInput({
         );
     }, [usdAvailableToTrade, marginRequired]);
 
-    const collateralInsufficientDebounced = useDebounce(
+    function useCollateralInsufficientDebounce(
+        value: boolean,
+        delay: number,
+    ): boolean {
+        const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
+
+        useEffect(() => {
+            // Only set the debounced value if value is true
+            if (value) {
+                const timer = setTimeout(() => {
+                    setDebouncedValue(true);
+                }, delay);
+                return () => clearTimeout(timer);
+            } else {
+                setDebouncedValue(false);
+                return () => {};
+            }
+        }, [value, delay]);
+
+        return debouncedValue;
+    }
+
+    const collateralInsufficientDebounced = useCollateralInsufficientDebounce(
         collateralInsufficient,
         500,
     );
-
-    const displayCollateralInsufficient = collateralInsufficient
-        ? collateralInsufficientDebounced
-        : false;
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -757,15 +774,18 @@ function OrderInput({
         }
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
-        if (percent === 100) {
-            setIsMaxModeEnabled(true);
-        } else {
-            setIsMaxModeEnabled(false);
-        }
+        // if (percent === 100) {
+        //     console.log('maxMode: ' + true);
+        //     setIsMaxModeEnabled(true);
+        // } else {
+        //     setIsMaxModeEnabled(false);
+        // }
     }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
     useEffect(() => {
         let percent = 0;
+
+        setIsEditingSizeInput(false);
 
         if (isReduceOnlyEnabled) {
             if (marginBucket?.netPosition) {
@@ -847,12 +867,12 @@ function OrderInput({
                 if (percent > 100) {
                     setUserExceededAvailableMargin(true);
                     setPositionSliderPercentageValue(100);
-                    setIsMaxModeEnabled(true);
+                    // setIsMaxModeEnabled(true);
                 } else {
                     setUserExceededAvailableMargin(false);
                     if (percent > 99) {
                         setPositionSliderPercentageValue(100);
-                        setIsMaxModeEnabled(true);
+                        // setIsMaxModeEnabled(true);
                     } else {
                         setPositionSliderPercentageValue(percent);
                         setIsMaxModeEnabled(false);
@@ -1732,7 +1752,7 @@ function OrderInput({
     ]);
 
     const isDisabled =
-        displayCollateralInsufficient ||
+        collateralInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
@@ -1821,7 +1841,7 @@ function OrderInput({
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
         if (isReduceInWrongDirection) return 'Switch direction to reduce';
-        if (displayCollateralInsufficient) return 'Insufficient collateral';
+        if (collateralInsufficientDebounced) return 'Insufficient collateral';
         if (isReduceOnlyExceedingPositionSize)
             return 'Reduce only exceeds position size';
         if (sizeLessThanMinimum) return 'Order size below minimum';
@@ -1840,7 +1860,7 @@ function OrderInput({
     }, [submitButtonRecentlyClicked]);
 
     const disabledReason = getDisabledReason(
-        displayCollateralInsufficient,
+        collateralInsufficientDebounced,
         sizeLessThanMinimum,
         sizeMoreThanMaximum,
         isPriceInvalid,
@@ -1895,7 +1915,7 @@ function OrderInput({
     const submitButtonText =
         normalizedEquity < MIN_POSITION_USD_SIZE
             ? 'Deposit to Trade'
-            : displayCollateralInsufficient
+            : collateralInsufficientDebounced
               ? tradeDirection === 'buy'
                   ? 'Max Long - Deposit to Trade'
                   : 'Max Short - Deposit to Trade'
