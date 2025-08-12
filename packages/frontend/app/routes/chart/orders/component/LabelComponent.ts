@@ -489,7 +489,7 @@ const LabelComponent = ({
             const newPrice = tempSelectedLine.parentLine.yPrice;
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
             const side = tempSelectedLine.parentLine.side;
-
+            const type = tempSelectedLine.parentLine.textValue.type;
             try {
                 // If cancel was successful, create a new order with the updated price
                 // Note: You'll need to provide the correct order parameters based on your application's needs
@@ -550,6 +550,8 @@ const LabelComponent = ({
                     icon: 'error',
                 });
             }
+
+            console.log({ type, orderId, newPrice });
 
             tempSelectedLine = undefined;
             setIsDrag(false);
