@@ -1823,7 +1823,7 @@ function OrderInput({
     ]);
 
     const getDisabledReason = (
-        collateralInsufficient: boolean,
+        collateralInsufficientDebounced: boolean,
         sizeLessThanMinimum: boolean,
         sizeMoreThanMaximum: boolean,
         isPriceInvalid: boolean,
@@ -1832,7 +1832,8 @@ function OrderInput({
         isReduceOnlyExceedingPositionSize: boolean,
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
-        if (isReduceInWrongDirection) return 'Switch direction to reduce';
+        if (isReduceInWrongDirection)
+            return `Open position is ${tradeDirection === 'buy' ? 'long' : 'short'}, switch to ${tradeDirection === 'buy' ? 'sell' : 'buy'}`;
         if (collateralInsufficientDebounced) return 'Insufficient collateral';
         if (isReduceOnlyExceedingPositionSize)
             return 'Reduce only exceeds position size';
@@ -1907,11 +1908,13 @@ function OrderInput({
     const submitButtonText =
         normalizedEquity < MIN_POSITION_USD_SIZE
             ? 'Deposit to Trade'
-            : collateralInsufficientDebounced
-              ? tradeDirection === 'buy'
-                  ? 'Max Long - Deposit to Trade'
-                  : 'Max Short - Deposit to Trade'
-              : 'Submit';
+            : isReduceInWrongDirection
+              ? 'Switch Direction to Reduce'
+              : collateralInsufficientDebounced
+                ? tradeDirection === 'buy'
+                    ? 'Max Long - Deposit to Trade'
+                    : 'Max Short - Deposit to Trade'
+                : 'Submit';
 
     return (
         <div ref={orderInputRef} className={styles.order_input}>
