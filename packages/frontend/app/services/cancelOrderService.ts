@@ -138,6 +138,9 @@ export class CancelOrderService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                 };
             }
         } catch (error) {
