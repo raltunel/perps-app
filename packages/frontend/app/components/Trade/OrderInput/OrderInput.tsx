@@ -273,9 +273,17 @@ function OrderInput({
 
     useEffect(() => {
         // set mid price input as default price when market changes
-        setMidPriceAsPriceInput();
+        if (!obChosenPrice) {
+            setMidPriceAsPriceInput();
+        }
         setIsMidModeActive(false);
-    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
+    }, [
+        marketOrderType,
+        !buys.length,
+        !sells.length,
+        buys?.[0]?.coin,
+        obChosenPrice,
+    ]);
 
     const [isMidModeActive, setIsMidModeActive] = useState(false);
     const confirmOrderModal = useModal<modalContentT>('closed');
