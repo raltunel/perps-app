@@ -147,7 +147,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
                 <script
                     defer
-                    data-domain='ambient.finance'
+                    data-domain='perps.ambient.finance'
                     src='https://plausible.io/js/script.js'
                 ></script>
             </head>
