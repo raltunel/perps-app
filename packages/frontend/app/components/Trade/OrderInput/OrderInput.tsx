@@ -22,6 +22,7 @@ import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import useDebounce from '~/hooks/useDebounce';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
@@ -579,6 +580,15 @@ function OrderInput({
             !usdAvailableToTrade || usdAvailableToTrade < marginRequired - 0.01
         );
     }, [usdAvailableToTrade, marginRequired]);
+
+    const collateralInsufficientDebounced = useDebounce(
+        collateralInsufficient,
+        500,
+    );
+
+    const displayCollateralInsufficient = collateralInsufficient
+        ? collateralInsufficientDebounced
+        : false;
 
     useEffect(() => {
         setNotionalSymbolQtyNum(0);
@@ -1722,7 +1732,7 @@ function OrderInput({
     ]);
 
     const isDisabled =
-        collateralInsufficient ||
+        displayCollateralInsufficient ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
         isPriceInvalid ||
@@ -1811,7 +1821,7 @@ function OrderInput({
     ) => {
         if (isMarketOrderLoading) return 'Processing order...';
         if (isReduceInWrongDirection) return 'Switch direction to reduce';
-        if (collateralInsufficient) return 'Insufficient collateral';
+        if (displayCollateralInsufficient) return 'Insufficient collateral';
         if (isReduceOnlyExceedingPositionSize)
             return 'Reduce only exceeds position size';
         if (sizeLessThanMinimum) return 'Order size below minimum';
@@ -1830,7 +1840,7 @@ function OrderInput({
     }, [submitButtonRecentlyClicked]);
 
     const disabledReason = getDisabledReason(
-        collateralInsufficient,
+        displayCollateralInsufficient,
         sizeLessThanMinimum,
         sizeMoreThanMaximum,
         isPriceInvalid,
@@ -1885,7 +1895,7 @@ function OrderInput({
     const submitButtonText =
         normalizedEquity < MIN_POSITION_USD_SIZE
             ? 'Deposit to Trade'
-            : collateralInsufficient
+            : displayCollateralInsufficient
               ? tradeDirection === 'buy'
                   ? 'Max Long - Deposit to Trade'
                   : 'Max Short - Deposit to Trade'
