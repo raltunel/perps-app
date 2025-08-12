@@ -1,6 +1,7 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import { useCallback, useEffect, useRef } from 'react';
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 
 export function useUnifiedMarginData() {
@@ -19,6 +20,10 @@ export function useUnifiedMarginData() {
     );
 
     const isSessionEstablished = isEstablished(sessionState);
+    const { isDebugWalletActive } = useDebugStore();
+    const isDebugWalletActiveRef = useRef(isDebugWalletActive);
+    isDebugWalletActiveRef.current = isDebugWalletActive;
+    const forceRestart = useRef(false);
 
     useEffect(() => {
         // Track session state changes
@@ -26,7 +31,7 @@ export function useUnifiedMarginData() {
             lastSessionStateRef.current !== isSessionEstablished;
         lastSessionStateRef.current = isSessionEstablished;
 
-        if (!isSessionEstablished) {
+        if (!isSessionEstablished || isDebugWalletActive) {
             // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
@@ -38,6 +43,9 @@ export function useUnifiedMarginData() {
                 store.setError(null);
                 store.setIsLoading(true);
                 store.setLastUpdateTime(0);
+                if (isDebugWalletActiveRef.current) {
+                    forceRestart.current = true;
+                }
                 // Then unsubscribe
                 unifiedMarginPollingManager.unsubscribe();
             }
@@ -45,12 +53,16 @@ export function useUnifiedMarginData() {
         }
 
         // Subscribe only if not already subscribed and session just became established
-        if (!hasSubscribedRef.current && sessionChanged) {
+        if (
+            (!hasSubscribedRef.current && sessionChanged) ||
+            forceRestart.current
+        ) {
             hasSubscribedRef.current = true;
             unifiedMarginPollingManager.subscribe(
                 sessionState.connection,
                 sessionState.walletPublicKey,
             );
+            forceRestart.current = false;
         }
 
         // Cleanup function - runs on unmount and when dependencies change
@@ -65,11 +77,14 @@ export function useUnifiedMarginData() {
                 store.setError(null);
                 store.setIsLoading(true);
                 store.setLastUpdateTime(0);
+                if (isDebugWalletActiveRef.current) {
+                    forceRestart.current = true;
+                }
                 // Then unsubscribe
                 unifiedMarginPollingManager.unsubscribe();
             }
         };
-    }, [isSessionEstablished]); // Only depend on session established state
+    }, [isSessionEstablished, isDebugWalletActive]); // Only depend on session established state
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished) {
