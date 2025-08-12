@@ -145,6 +145,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
+                <script
+                    defer
+                    data-domain='ambient.finance'
+                    src='https://plausible.io/js/script.js'
+                ></script>
             </head>
             <body>
                 {children}
