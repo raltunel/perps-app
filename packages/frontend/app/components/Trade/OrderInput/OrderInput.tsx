@@ -273,9 +273,18 @@ function OrderInput({
 
     useEffect(() => {
         // set mid price input as default price when market changes
-        setMidPriceAsPriceInput();
+        console.log({ obChosenPrice });
+        if (!obChosenPrice) {
+            setMidPriceAsPriceInput();
+        }
         setIsMidModeActive(false);
-    }, [marketOrderType, !buys.length, !sells.length, buys?.[0]?.coin]);
+    }, [
+        marketOrderType,
+        !buys.length,
+        !sells.length,
+        buys?.[0]?.coin,
+        obChosenPrice,
+    ]);
 
     const [isMidModeActive, setIsMidModeActive] = useState(false);
     const confirmOrderModal = useModal<modalContentT>('closed');
@@ -632,6 +641,7 @@ function OrderInput({
 
         if (obChosenPrice > 0) {
             setIsMidModeActive(false);
+            console.log({ obChosenPrice });
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
