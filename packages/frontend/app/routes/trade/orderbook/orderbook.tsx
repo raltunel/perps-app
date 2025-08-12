@@ -244,7 +244,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     const rowClickHandler = useCallback(
         (order: OrderBookRowIF, type: OrderRowClickTypes, rowIndex: number) => {
-            console.log({ orderClickDisabled });
             if (orderClickDisabled) return;
 
             if (rowLockTimeoutRef.current) {
@@ -252,11 +251,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
             }
             lockOrderBook.current = true;
             if (type === OrderRowClickTypes.PRICE) {
-                console.log({ order });
                 setObChosenPrice(order.px);
             } else if (type === OrderRowClickTypes.AMOUNT) {
                 let amount = 0;
-                console.log({ order });
                 if (order.type === 'buy') {
                     for (let i = 0; i <= rowIndex; i++) {
                         amount += buys[i].sz;

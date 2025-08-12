@@ -273,7 +273,6 @@ function OrderInput({
 
     useEffect(() => {
         // set mid price input as default price when market changes
-        console.log({ obChosenPrice });
         if (!obChosenPrice) {
             setMidPriceAsPriceInput();
         }
@@ -641,7 +640,6 @@ function OrderInput({
 
         if (obChosenPrice > 0) {
             setIsMidModeActive(false);
-            console.log({ obChosenPrice });
             setPrice(formatNumWithOnlyDecimals(obChosenPrice));
             handleTypeChange();
         }
