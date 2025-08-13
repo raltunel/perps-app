@@ -78,7 +78,7 @@ body {
     overflow: hidden;
 }
 
-@media (max-height: 700px) {
+@media (max-height: 750px) {
     /* expand the order input to the full right col on short screens */
     .containerNew {
         grid-template-areas:
