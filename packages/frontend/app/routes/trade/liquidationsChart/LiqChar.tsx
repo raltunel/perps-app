@@ -653,16 +653,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const isBuy = centerY < offsetY;
 
-        const price = currentBuyDataRef.current.reduce(
-            (total, liq) =>
-                liq.ratio != null && liq.px < mousePoint
-                    ? total + liq.ratio
-                    : total,
-            0,
-        );
+        const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
+
+        const snappedPrice = hoveredArray.current
+            .filter((item) =>
+                isBuy ? item.px < mousePoint : item.px > mousePoint,
+            )
+            .reduce((closest: OrderBookRowIF, item: OrderBookRowIF) => {
+                if (!closest) return item;
+                return Math.abs(item.px - mousePoint) <
+                    Math.abs(closest.px - mousePoint)
+                    ? item
+                    : closest;
+            });
+
+        const price =
+            snappedPrice && snappedPrice.total
+                ? snappedPrice.total.toFixed(2)
+                : 0;
 
         liqTooltipRef.current.html(
-            '<p>' + 20 + '%</p>' + '<p> $' + price.toFixed(2) + ' </p>',
+            '<p>' + 20 + '%</p>' + '<p>' + price + ' </p>',
         );
 
         const width = liqTooltipRef.current
