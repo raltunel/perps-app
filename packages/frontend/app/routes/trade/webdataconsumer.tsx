@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
+import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useWorker } from '~/hooks/useWorker';
 import type { WebData2Output } from '~/hooks/workers/webdata2.worker';
@@ -72,6 +73,9 @@ export default function WebDataConsumer() {
 
     // Use unified margin data for both balance and positions
     const { positions: unifiedPositions } = useUnifiedMarginData();
+
+    // Initialize market order log pre-fetching
+    useMarketOrderLog();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
