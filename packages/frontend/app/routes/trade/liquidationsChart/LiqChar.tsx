@@ -18,6 +18,12 @@ interface LiquidationsChartProps {
     height?: number;
 }
 
+interface LineData {
+    x: number;
+    y: number;
+    offsetY: number;
+}
+
 const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const {
         sellData,
@@ -29,26 +35,41 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
+    const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
+    const d3CanvasLiqContianer = useRef<HTMLDivElement | null>(null);
     const gap = 4;
 
     // All refs instead of state
     const xScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const buyYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const sellYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
+    const pageYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sellAreaSeriesRef = useRef<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const buyAreaSeriesRef = useRef<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const highlightedSellAreaSeriesRef = useRef<any>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const highlightedBuyAreaSeriesRef = useRef<any>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sellLineSeriesRef = useRef<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const buyLineSeriesRef = useRef<any>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const hoverLineSeriesRef = useRef<any>(null);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const liqTooltipRef = useRef<any>(null);
 
     const currentBuyDataRef = useRef<OrderBookRowIF[]>([]);
     const currentSellDataRef = useRef<OrderBookRowIF[]>([]);
     const currentLiqBuysRef = useRef<OrderBookLiqIF[]>([]);
     const currentLiqSellsRef = useRef<OrderBookLiqIF[]>([]);
+    const hoverLineDataRef = useRef<LineData[]>([]);
+
+    const highlightHoveredArea = useRef(false);
 
     const { orderCount } = useOrderBookStore();
     const orderCountRef = useRef(0);
@@ -257,9 +278,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .domain([bottomBoundarySell, topBoundarySell])
             .range([centerY - gapSize, 0]);
 
+        const pageYScale = d3
+            .scaleLinear()
+            .domain([0, 100])
+            .range([heightRef.current, 0]);
+
         xScaleRef.current = xScale;
         buyYScaleRef.current = buyYScale;
         sellYScaleRef.current = sellYScale;
+        pageYScaleRef.current = pageYScale;
 
         const canvas = d3
             .select(d3CanvasLiq.current)
@@ -350,7 +377,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 // Draw liquidation lines using our custom function
                 drawLiquidationLines(context);
             })
-            .on('measure', (event: CustomEvent) => {
+            .on('measure', () => {
                 sellArea?.context(context);
                 sellLine?.context(context);
                 buyArea?.context(context);
@@ -405,6 +432,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         }
         if (buyAreaSeriesRef.current) {
             buyAreaSeriesRef.current.xScale(xScale).yScale(buyYScale);
+        }
+        if (highlightedSellAreaSeriesRef.current) {
+            highlightedSellAreaSeriesRef.current
+                .xScale(xScale)
+                .yScale(sellYScale);
+        }
+        if (highlightedBuyAreaSeriesRef.current) {
+            highlightedBuyAreaSeriesRef.current
+                .xScale(xScale)
+                .yScale(buyYScale);
         }
         if (sellLineSeriesRef.current) {
             sellLineSeriesRef.current.xScale(xScale).yScale(sellYScale);
@@ -553,6 +590,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 const container = d3.select(d3CanvasLiq.current).node() as any;
                 if (container) container.requestRedraw();
 
+                const hoveredContainer = d3
+                    .select(d3CanvasLiqHover.current)
+                    .node() as any;
+                if (hoveredContainer) {
+                    hoveredContainer.requestRedraw();
+                }
+
                 if (progress < 1) {
                     animFrameRef.current = requestAnimationFrame(anim);
                 } else {
@@ -567,6 +611,108 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         },
         [animDuration, interPolateData, interPolateLiqData, updateScalesOnly],
     );
+
+    const mousemove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+        if (
+            !xScaleRef.current ||
+            !pageYScaleRef.current ||
+            !buyYScaleRef.current
+        )
+            return;
+
+        const canvas = d3
+            .select(d3CanvasLiqHover.current)
+            .select('canvas')
+            .node() as HTMLCanvasElement;
+
+        const rect = canvas.getBoundingClientRect();
+
+        const offsetY = event.clientY - rect?.top;
+        const offsetX = event.clientX - rect?.left;
+
+        // Calculate hover line data
+        hoverLineDataRef.current = [
+            {
+                x: xScaleRef.current.invert(xScaleRef.current.range()[0]),
+                y: pageYScaleRef.current.invert(offsetY),
+                offsetY: offsetY,
+            },
+            {
+                x: xScaleRef.current.invert(offsetX + 10),
+                y: pageYScaleRef.current.invert(offsetY),
+                offsetY: offsetY,
+            },
+        ];
+
+        // Fill and place tooltip
+        if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
+
+        const mousePoint = buyYScaleRef.current.invert(offsetY);
+
+        const centerY = heightRef.current / 2;
+
+        const isBuy = centerY < offsetY;
+
+        const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
+
+        const snappedPrice = hoveredArray.current
+            .filter((item) =>
+                isBuy ? item.px < mousePoint : item.px > mousePoint,
+            )
+            .reduce((closest: OrderBookRowIF, item: OrderBookRowIF) => {
+                if (!closest) return item;
+                return Math.abs(item.px - mousePoint) <
+                    Math.abs(closest.px - mousePoint)
+                    ? item
+                    : closest;
+            });
+
+        const price =
+            snappedPrice && snappedPrice.total
+                ? snappedPrice.total.toFixed(2)
+                : 0;
+
+        liqTooltipRef.current.html(
+            '<p>' + 20 + '%</p>' + '<p>' + price + ' </p>',
+        );
+
+        const width = liqTooltipRef.current
+            .node()
+            .getBoundingClientRect().width;
+
+        const height = liqTooltipRef.current
+            .node()
+            .getBoundingClientRect().height;
+
+        const horizontal = offsetX - width / 2;
+        const vertical = offsetY - (height + 10);
+
+        liqTooltipRef.current
+            .style('visibility', 'visible')
+            .style('top', vertical + 'px')
+            .style(
+                'left',
+                Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+            );
+
+        highlightHoveredArea.current = true;
+    }, []);
+
+    const clipCanvas = (
+        point: number,
+        clipEdge: number,
+        canvas: HTMLCanvasElement,
+    ) => {
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+        const startY = point;
+        const endY = clipEdge - startY;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0, startY, canvas.width, endY);
+        ctx.clip();
+    };
 
     useEffect(() => {
         if (buyData.length === 0 || sellData.length === 0) return;
@@ -613,6 +759,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     .on('draw', null)
                     .on('measure', null);
             }
+            // Clear D3 event listeners
+            if (d3CanvasLiqHover.current) {
+                d3.select(d3CanvasLiqHover.current)
+                    .on('draw', null)
+                    .on('measure', null);
+            }
 
             // Clear refs
             currentBuyDataRef.current = [];
@@ -628,20 +780,176 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             buyAreaSeriesRef.current = null;
             sellLineSeriesRef.current = null;
             buyLineSeriesRef.current = null;
+            pageYScaleRef.current = null;
+            hoverLineSeriesRef.current = null;
         };
     }, []);
 
+    useEffect(() => {
+        d3.select(d3CanvasLiqContianer.current).on(
+            'mousemove',
+            function (event: React.MouseEvent<HTMLDivElement>) {
+                mousemove(event);
+            },
+            { passive: true },
+        );
+
+        d3.select(d3CanvasLiqContianer.current).on(
+            'mouseout',
+            function (event: React.MouseEvent<HTMLDivElement>) {
+                highlightHoveredArea.current = false;
+                hoverLineDataRef.current = [];
+                liqTooltipRef.current.style('visibility', 'hidden');
+            },
+            { passive: true },
+        );
+
+        if (
+            d3
+                .select(d3CanvasLiqContianer.current)
+                .select('.liqTooltip')
+                .node() === null
+        ) {
+            const liqTooltip = d3
+                .select(d3CanvasLiqContianer.current)
+                .append('div')
+                .attr('class', 'liqTooltip')
+                .style('position', 'absolute')
+                .style('text-align', 'center')
+                .style('align-items', 'center')
+                .style('background', 'rgba(78, 78, 100, 0.47)')
+                .style('padding', '3px')
+                .style('font-size', 'small')
+                .style('pointer-events', 'none')
+                .style('visibility', 'hidden');
+
+            liqTooltipRef.current = liqTooltip;
+        }
+    }, []);
+
+    useEffect(() => {
+        const curve = d3.curveLinear;
+
+        if (
+            !xScaleRef.current ||
+            !pageYScaleRef.current ||
+            !sellYScaleRef.current ||
+            !buyYScaleRef.current
+        )
+            return;
+
+        const buyRgbaColor = sellColorRef.current;
+        const sellRgbaColor = buyColorRef.current;
+        const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
+        const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
+        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
+        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
+
+        const highlightedBuyArea = d3fc
+            .seriesCanvasArea()
+            .orient('horizontal')
+            .curve(curve)
+            .decorate((context: CanvasRenderingContext2D) => {
+                context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
+            })
+            .mainValue((d: OrderBookRowIF) => d.ratio)
+            .crossValue((d: OrderBookRowIF) => d.px)
+            .xScale(xScaleRef.current)
+            .yScale(buyYScaleRef.current);
+
+        const highlightedSellArea = d3fc
+            .seriesCanvasArea()
+            .orient('horizontal')
+            .curve(curve)
+            .decorate((context: CanvasRenderingContext2D) => {
+                context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
+            })
+            .mainValue((d: OrderBookRowIF) => d.ratio)
+            .crossValue((d: OrderBookRowIF) => d.px)
+            .xScale(xScaleRef.current)
+            .yScale(sellYScaleRef.current);
+
+        const hoverLine = d3fc
+            .seriesCanvasLine()
+            .orient('horizontal')
+            .curve(curve)
+            .mainValue((d: LineData) => d.x)
+            .crossValue((d: LineData) => d.y)
+            .xScale(xScaleRef.current)
+            .yScale(pageYScaleRef.current)
+            .decorate((context: CanvasRenderingContext2D) => {
+                context.strokeStyle = '#8b98a5';
+                context.lineWidth = 1.5;
+            });
+
+        highlightedSellAreaSeriesRef.current = highlightedSellArea;
+        highlightedBuyAreaSeriesRef.current = highlightedBuyArea;
+        hoverLineSeriesRef.current = hoverLine;
+
+        const hoveredCanvas = d3
+            .select(d3CanvasLiqHover.current)
+            .select('canvas')
+            .node() as HTMLCanvasElement;
+        if (!hoveredCanvas) return;
+
+        const hovereContext = hoveredCanvas.getContext('2d');
+        if (!hovereContext) return;
+
+        const centerY = heightRef.current / 2;
+
+        const hoveredContainer = d3
+            .select(d3CanvasLiqHover.current)
+            .node() as any;
+        if (hoveredContainer) hoveredContainer.requestRedraw();
+
+        d3.select(d3CanvasLiqHover.current)
+            .on('draw', () => {
+                if (highlightHoveredArea.current) {
+                    clipCanvas(
+                        hoverLineDataRef.current[0].offsetY,
+                        centerY,
+                        hoveredCanvas,
+                    );
+
+                    hoverLine(hoverLineDataRef.current);
+                    highlightedBuyArea(currentBuyDataRef.current);
+                    highlightedSellArea(currentSellDataRef.current);
+                }
+            })
+            .on('measure', () => {
+                hoverLine?.context(hovereContext);
+                highlightedBuyArea?.context(hovereContext);
+                highlightedSellArea?.context(hovereContext);
+            });
+    }, [width, height]);
+
     return (
-        <>
+        <div
+            ref={d3CanvasLiqContianer}
+            style={{
+                position: 'relative',
+                width: `${widthRef.current}px`,
+                height: `${heightRef.current}px`,
+            }}
+        >
+            <d3fc-canvas
+                ref={d3CanvasLiqHover}
+                style={{
+                    position: 'absolute',
+                    width: `${widthRef.current}px`,
+                    height: `${heightRef.current}px`,
+                }}
+            ></d3fc-canvas>
+
             <d3fc-canvas
                 ref={d3CanvasLiq}
                 style={{
-                    position: 'relative',
+                    position: 'absolute',
                     width: `${widthRef.current}px`,
                     height: `${heightRef.current}px`,
                 }}
             />
-        </>
+        </div>
     );
 };
 
