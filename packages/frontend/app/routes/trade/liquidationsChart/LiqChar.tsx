@@ -613,7 +613,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     );
 
     const mousemove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
-        if (!xScaleRef.current || !pageYScaleRef.current) return;
+        if (
+            !xScaleRef.current ||
+            !pageYScaleRef.current ||
+            !buyYScaleRef.current
+        )
+            return;
 
         const canvas = d3
             .select(d3CanvasLiqHover.current)
@@ -640,16 +645,44 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         ];
 
         // Fill and place tooltip
-        if (!liqTooltipRef.current) return;
+        if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
+
+        const mousePoint = buyYScaleRef.current.invert(offsetY);
+
+        const centerY = heightRef.current / 2;
+
+        const isBuy = centerY < offsetY;
+
+        const price = currentBuyDataRef.current.reduce(
+            (total, liq) =>
+                liq.ratio != null && liq.px < mousePoint
+                    ? total + liq.ratio
+                    : total,
+            0,
+        );
 
         liqTooltipRef.current.html(
-            '<p>' + 20 + '%</p>' + '<p> $' + 1000 + ' </p>',
+            '<p>' + 20 + '%</p>' + '<p> $' + price.toFixed(2) + ' </p>',
         );
+
+        const width = liqTooltipRef.current
+            .node()
+            .getBoundingClientRect().width;
+
+        const height = liqTooltipRef.current
+            .node()
+            .getBoundingClientRect().height;
+
+        const horizontal = offsetX - width / 2;
+        const vertical = offsetY - (height + 10);
 
         liqTooltipRef.current
             .style('visibility', 'visible')
-            .style('top', offsetY - 20 + 'px')
-            .style('left', offsetX - 50 + 'px');
+            .style('top', vertical + 'px')
+            .style(
+                'left',
+                Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+            );
 
         highlightHoveredArea.current = true;
     }, []);
@@ -773,9 +806,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 .style('position', 'absolute')
                 .style('text-align', 'center')
                 .style('align-items', 'center')
-                .style('background', 'rgba(10, 10, 19, 0.47)')
+                .style('background', 'rgba(78, 78, 100, 0.47)')
                 .style('padding', '3px')
                 .style('font-size', 'small')
+                .style('pointer-events', 'none')
                 .style('visibility', 'hidden');
 
             liqTooltipRef.current = liqTooltip;
