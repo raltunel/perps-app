@@ -24,7 +24,11 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
-import { MARKET_WS_ENDPOINT, USER_WS_ENDPOINT } from './utils/Constants';
+import {
+    MARKET_WS_ENDPOINT,
+    RPC_ENDPOINT,
+    USER_WS_ENDPOINT,
+} from './utils/Constants';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -141,6 +145,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
+                <script
+                    defer
+                    data-domain='perps.ambient.finance'
+                    src='https://plausible.io/js/script.js'
+                ></script>
             </head>
             <body>
                 {children}
@@ -161,10 +170,8 @@ export default function App() {
         <>
             <Layout>
                 <FogoSessionProvider
-                    endpoint='https://testnet.fogo.io/'
-                    {...(window.location.hostname === 'localhost' && {
-                        domain: 'https://perps.ambient.finance',
-                    })}
+                    endpoint={RPC_ENDPOINT}
+                    domain='https://perps.ambient.finance'
                     tokens={[
                         // NATIVE_MINT.toBase58(),
                         'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',

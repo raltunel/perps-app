@@ -1,18 +1,24 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { LuPen } from 'react-icons/lu';
 import { RiExternalLinkLine } from 'react-icons/ri';
 import { useNavigate } from 'react-router';
 import Modal from '~/components/Modal/Modal';
 import ShareModal from '~/components/ShareModal/ShareModal';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import { useNumFormatter } from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useLeverageStore } from '~/stores/LeverageStore';
+import { useNotificationStore } from '~/stores/NotificationStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
+import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
+import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -26,8 +32,12 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         const { position } = props;
         const { coinPriceMap } = useTradeDataStore();
+        const { buys, sells } = useOrderBookStore();
         const { formatNum } = useNumFormatter();
         const { getBsColor } = useAppSettings();
+        const notifications = useNotificationStore();
+        const { executeMarketOrder } = useMarketOrderService();
+        const [isClosing, setIsClosing] = useState(false);
 
         const showTpSl = false;
 
@@ -53,6 +63,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             }
             return ret;
         }, [position.tp, position.sl, formatNum]);
+
+        const setLeverage = useLeverageStore(
+            (state) => state.setPreferredLeverage,
+        );
+
+        const { symbol } = useTradeDataStore();
+        useEffect(() => {
+            if (symbol.toLowerCase() === position.coin.toLowerCase()) {
+                setLeverage(position.leverage.value);
+            }
+        }, [symbol]);
 
         // Memoize hexToRgba
         const hexToRgba = useCallback((hex: string, alpha: number): string => {
@@ -91,10 +112,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             modalCtrl.open();
         }, [modalCtrl]);
 
-        // const openLeverageModal = useCallback(() => {
-        //     setModalContent('leverage');
-        //     modalCtrl.open();
-        // }, [modalCtrl]);
+        const openLeverageModal = useCallback(() => {
+            setModalContent('leverage');
+            modalCtrl.open();
+        }, [modalCtrl]);
 
         // Memoize modal content
         const renderModalContent = useCallback(() => {
@@ -106,8 +127,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 return (
                     <LeverageSliderModal
                         currentLeverage={position.leverage.value}
-                        maxLeverage={position.maxLeverage}
                         onClose={modalCtrl.close}
+                        onConfirm={(value) => {
+                            console.log({ value });
+                        }}
                     />
                 );
             } else if (modalContent === 'tpsl') {
@@ -119,6 +142,20 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         />
                     </Modal>
                 );
+            } else if (modalContent === 'limitChase') {
+                return (
+                    <LimitCloseModal
+                        position={position}
+                        close={modalCtrl.close}
+                    />
+                );
+            } else if (modalContent === 'marketClose') {
+                return (
+                    <MarketCloseModal
+                        position={position}
+                        close={modalCtrl.close}
+                    />
+                );
             }
             return null;
         }, [modalContent, modalCtrl.close, position]);
@@ -127,6 +164,74 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const handleCoinClick = useCallback(() => {
             navigate(`/v2/trade/${position.coin?.toLowerCase()}`);
         }, [navigate, position.coin]);
+
+        // Handle market close
+        const handleMarketClose = useCallback(async () => {
+            if (isClosing || !position.szi) return;
+
+            setIsClosing(true);
+
+            try {
+                // Show pending notification
+                // notifications.add({
+                //     title: 'Closing Position',
+                //     message: `Market closing ${Math.abs(position.szi)} ${position.coin}`,
+                //     icon: 'spinner',
+                // });
+
+                // Get order book prices for the closing order
+                const closingSide = position.szi > 0 ? 'sell' : 'buy';
+                const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
+                const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+
+                // Execute market order in opposite direction
+                const result = await executeMarketOrder({
+                    quantity: Math.abs(position.szi), // Use absolute value of position size
+                    side: closingSide, // Opposite side to close
+                    leverage: position.leverage?.value,
+                    bestBidPrice:
+                        closingSide === 'sell' ? bestBidPrice : undefined,
+                    bestAskPrice:
+                        closingSide === 'buy' ? bestAskPrice : undefined,
+                });
+
+                if (result.success) {
+                    notifications.add({
+                        title: 'Position Closed',
+                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                        icon: 'check',
+                    });
+                } else {
+                    notifications.add({
+                        title: 'Close Failed',
+                        message: String(
+                            result.error || 'Failed to close position',
+                        ),
+                        icon: 'error',
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error closing position:', error);
+                notifications.add({
+                    title: 'Close Failed',
+                    message: String(
+                        error instanceof Error
+                            ? error.message
+                            : 'Unknown error occurred',
+                    ),
+                    icon: 'error',
+                });
+            } finally {
+                setIsClosing(false);
+            }
+        }, [
+            position,
+            executeMarketOrder,
+            notifications,
+            isClosing,
+            buys,
+            sells,
+        ]);
 
         // Memoize funding values and tooltip
         const fundingToShow = useMemo(
@@ -145,6 +250,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
 
         const isLinkDisabled = position.coin.toLowerCase() !== 'btc';
 
+        const liquidationDisp = useMemo(() => {
+            if (position.liquidationPx === null) return '-';
+            if (position.liquidationPx <= 0) {
+                return '0';
+            }
+            if (position.liquidationPx > 1_000_000) {
+                return '>' + formatNum(1_000_000);
+            }
+            return formatNum(position.liquidationPx);
+        }, [position.liquidationPx, formatNum]);
+
         return (
             <div
                 className={`${styles.rowContainer} ${!showTpSl ? styles.noTpSl : ''}`}
@@ -162,18 +278,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     >
                         {position.coin}
                     </span>
-                    {/* {position.leverage.value && (
-                        <span
-                            className={styles.badge}
-                            onClick={openLeverageModal}
-                            style={{
-                                color: baseColor,
-                                backgroundColor: hexToRgba(baseColor, 0.15),
-                            }}
-                        >
-                            {position.leverage.value}x
-                        </span>
-                    )} */}
+                    {position.leverage.value &&
+                        position.coin.toLowerCase() === 'btc' && (
+                            <span
+                                className={styles.badge}
+                                onClick={openLeverageModal}
+                                style={{
+                                    color: baseColor,
+                                    backgroundColor: hexToRgba(baseColor, 0.15),
+                                }}
+                            >
+                                {Math.floor(position.leverage.value)}x
+                            </span>
+                        )}
                 </div>
                 <div
                     className={`${styles.cell} ${styles.sizeCell}`}
@@ -216,7 +333,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     <RiExternalLinkLine color='var(--text2)' />
                 </div>
                 <div className={`${styles.cell} ${styles.liqPriceCell}`}>
-                    {formatNum(position.liquidationPx)}
+                    {liquidationDisp}
                 </div>
                 <div className={`${styles.cell} ${styles.marginCell}`}>
                     {formatNum(position.marginUsed, 2)}
@@ -247,7 +364,31 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 <div className={`${styles.cell} ${styles.closeCell}`}>
                     <div className={styles.actionContainer}>
                         {/* <button className={styles.actionButton}>Limit</button> */}
-                        <button className={styles.actionButton}>Market</button>
+                        {/* <button
+                            className={styles.actionButton}
+                            onClick={handleMarketClose}
+                            disabled={isClosing}
+                        >
+                            {isClosing ? 'Closing...' : 'Market'}
+                        </button> */}
+                        <button
+                            className={styles.actionButton}
+                            onClick={() => {
+                                setModalContent('marketClose');
+                                modalCtrl.open();
+                            }}
+                        >
+                            Market
+                        </button>
+                        <button
+                            className={styles.actionButton}
+                            onClick={() => {
+                                setModalContent('limitChase');
+                                modalCtrl.open();
+                            }}
+                        >
+                            Limit
+                        </button>
                     </div>
                 </div>
                 {modalCtrl.isOpen && renderModalContent()}

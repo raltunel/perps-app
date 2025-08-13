@@ -22,6 +22,7 @@ interface GenericTableProps<
     F extends (...args: Parameters<F>) => Promise<T[]>,
 > {
     data: T[];
+    noDataMessage?: string;
     renderHeader: (
         sortDirection: TableSortDirection,
         sortClickHandler: (key: S) => void,
@@ -61,6 +62,7 @@ export default function GenericTable<
 
     const {
         data,
+        noDataMessage,
         renderHeader,
         renderRow,
         sorterMethod,
@@ -140,6 +142,9 @@ export default function GenericTable<
 
     const [rowLimit, setRowLimit] = useState(slicedLimit);
 
+    const isHttpInfoCallsDisabled = true;
+    const isShowAllEnabled = true;
+
     const checkShadow = useCallback(() => {
         const tableBody = document.getElementById(
             `${id}-tableBody`,
@@ -174,7 +179,9 @@ export default function GenericTable<
 
         const rowCount = Math.floor(tableBody.clientHeight / rowHeight);
 
-        if (rowCount > slicedLimit) {
+        if (isShowAllEnabled) {
+            setRowLimit(Infinity);
+        } else if (rowCount > slicedLimit) {
             setRowLimit(rowCount);
         } else {
             setRowLimit(slicedLimit);
@@ -253,7 +260,7 @@ export default function GenericTable<
         } else {
             setTableState(TableState.FILLED);
         }
-    }, [isFetched, dataToShow]);
+    }, [isFetched, dataToShow, storageKey]);
 
     const handleSort = (key: S) => {
         let nextBy: S | undefined;
@@ -382,85 +389,97 @@ export default function GenericTable<
 
     return (
         <div
-            className={styles.tableWrapper}
+            className={`${styles.tableWrapper} ${
+                isShowAllEnabled ? styles.showAllWrapper : ''
+            }`}
             style={{
                 height: heightOverride,
             }}
         >
-            {tableState === TableState.LOADING ? (
-                <SkeletonTable
-                    rows={skeletonRows}
-                    colRatios={skeletonColRatios}
-                />
-            ) : (
-                <>
-                    <span
-                        id={`${id}-headerContainer`}
-                        className={styles.headerContainer}
-                    >
-                        {renderHeader(sortDirection, handleSort, sortBy)}
-                    </span>
-                    <div
-                        id={`${id}-tableBody`}
-                        className={`${styles.tableBody} ${
-                            pageMode ? styles.pageMode : styles.notPage
-                        }`}
-                    >
-                        {tableState === TableState.FILLED &&
-                            dataToShow.map(renderRow)}
-                        {tableState === TableState.EMPTY &&
-                            isSessionEstablished && <NoDataRow />}
-                        {!isSessionEstablished && (
-                            <div className={styles.sessionButtonContainer}>
-                                <SessionButton />
-                            </div>
-                        )}
-
-                        {sortedData.length > 0 && (
-                            <div
-                                id={`${id}-actionsContainer`}
-                                className={styles.actionsContainer}
-                            >
-                                {sortedData.length > slicedLimit &&
-                                    !pageMode &&
-                                    viewAllLink &&
-                                    viewAllLink.length > 0 && (
-                                        <a
-                                            href='#'
-                                            className={styles.viewAllLink}
-                                            onClick={handleViewAll}
-                                        >
-                                            View All
-                                        </a>
-                                    )}
-                                {tableModel &&
-                                    (pageMode || csvDataFetcher) &&
-                                    tableModel.some(
-                                        (header) => header.exportable,
-                                    ) && (
-                                        <a
-                                            href='#'
-                                            className={styles.exportLink}
-                                            onClick={handleExportCsv}
-                                        >
-                                            Export as CSV
-                                        </a>
-                                    )}
-                            </div>
-                        )}
-
-                        {pageMode && (
-                            <GenericTablePagination
-                                totalCount={sortedData.length}
-                                page={page}
-                                setPage={setPage}
-                                rowsPerPage={rowsPerPage}
-                                onRowsPerPageChange={setRowsPerPage}
-                            />
-                        )}
+            <div
+                id={`${id}-tableBody`}
+                className={`${styles.tableBody} ${
+                    pageMode ? styles.pageMode : styles.notPage
+                } ${isShowAllEnabled ? styles.scrollVisible : ''}`}
+            >
+                <span
+                    id={`${id}-headerContainer`}
+                    className={styles.headerContainer}
+                >
+                    {tableState === TableState.LOADING ? (
+                        <div /> // for header during loading
+                    ) : (
+                        renderHeader(sortDirection, handleSort, sortBy)
+                    )}
+                </span>
+                {isSessionEstablished && tableState === TableState.LOADING && (
+                    <SkeletonTable
+                        rows={skeletonRows}
+                        colRatios={skeletonColRatios}
+                    />
+                )}
+                {isSessionEstablished &&
+                    tableState === TableState.FILLED &&
+                    dataToShow.map(renderRow)}
+                {isSessionEstablished && tableState === TableState.EMPTY && (
+                    <NoDataRow text={noDataMessage} />
+                )}
+                {!isSessionEstablished && (
+                    <div className={styles.sessionButtonContainer}>
+                        <SessionButton />
                     </div>
-                </>
-            )}
+                )}
+
+                {!isHttpInfoCallsDisabled && sortedData.length > 0 && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={styles.actionsContainer}
+                    >
+                        {sortedData.length > slicedLimit &&
+                            !pageMode &&
+                            viewAllLink &&
+                            viewAllLink.length > 0 && (
+                                <a
+                                    href='#'
+                                    className={styles.viewAllLink}
+                                    onClick={handleViewAll}
+                                >
+                                    View All
+                                </a>
+                            )}
+                        {tableModel &&
+                            (pageMode || csvDataFetcher) &&
+                            tableModel.some((header) => header.exportable) && (
+                                <a
+                                    href='#'
+                                    className={styles.exportLink}
+                                    onClick={handleExportCsv}
+                                >
+                                    Export as CSV
+                                </a>
+                            )}
+                    </div>
+                )}
+
+                {isHttpInfoCallsDisabled && (
+                    <div
+                        id={`${id}-actionsContainer`}
+                        className={
+                            styles.actionsContainer + ' ' + styles.showAllMode
+                        }
+                    ></div>
+                )}
+
+                {pageMode && (
+                    <GenericTablePagination
+                        totalCount={sortedData.length}
+                        page={page}
+                        setPage={setPage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={setRowsPerPage}
+                    />
+                )}
+            </div>
         </div>
     );
 }

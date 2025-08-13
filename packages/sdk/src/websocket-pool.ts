@@ -4,6 +4,7 @@ import {
     type SocketType,
     type Callback,
     type ActiveSubscription,
+    type ErrCallback,
 } from './websocket-instance';
 import type { Subscription } from './utils/types';
 
@@ -43,6 +44,7 @@ const CHANNEL_TO_SOCKET_TYPE: Record<string, SocketType> = {
     userTwapSliceFills: 'user',
     userTwapHistory: 'user',
     notification: 'user',
+    error: 'user',
 };
 
 export class WebSocketPool {
@@ -140,7 +142,11 @@ export class WebSocketPool {
     /**
      * Subscribe to a channel, automatically routing to the correct socket
      */
-    public subscribe(subscription: Subscription, callback: Callback) {
+    public subscribe(
+        subscription: Subscription,
+        callback: Callback,
+        errorCallback?: ErrCallback,
+    ) {
         const socket = this.getSocketForSubscription(subscription);
 
         if (!socket) {
@@ -149,7 +155,12 @@ export class WebSocketPool {
             );
         }
 
-        return socket.subscribe(subscription, callback);
+        return socket.subscribe(
+            subscription,
+            callback,
+            undefined,
+            errorCallback,
+        );
     }
 
     /**
@@ -337,8 +348,12 @@ export class MultiSocketInfo {
         });
     }
 
-    public subscribe(subscription: Subscription, callback: Callback) {
-        return this.pool.subscribe(subscription, callback);
+    public subscribe(
+        subscription: Subscription,
+        callback: Callback,
+        errorCallback?: ErrCallback,
+    ) {
+        return this.pool.subscribe(subscription, callback, errorCallback);
     }
 
     public unsubscribe(

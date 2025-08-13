@@ -22,6 +22,10 @@ interface DebugStore {
     setSdkEnabled: (sdkEnabled: boolean) => void;
     isWsSleepMode: boolean;
     setIsWsSleepMode: (isWsSleepMode: boolean) => void;
+    isDebugWalletActive: boolean;
+    setIsDebugWalletActive: (isDebugWalletActive: boolean) => void;
+    usePythOracle: boolean;
+    setUsePythOracle: (usePythOracle: boolean) => void;
     pauseLiqAnimation: boolean;
     setPauseLiqAnimation: (pauseLiqAnimation: boolean) => void;
 }
@@ -44,7 +48,7 @@ export const useDebugStore = create<DebugStore>((set) => ({
                 | 'mainnet'
                 | 'testnet',
         }),
-    debugWallet: debugWallets[0],
+    debugWallet: debugWallets[2],
     setDebugWallet: (debugWallet: DebugWallet) => set({ debugWallet }),
     isWsEnabled: true,
     setIsWsEnabled: (isWsEnabled: boolean) => set({ isWsEnabled }),
@@ -52,6 +56,11 @@ export const useDebugStore = create<DebugStore>((set) => ({
     setSdkEnabled: (sdkEnabled: boolean) => set({ sdkEnabled }),
     isWsSleepMode: false,
     setIsWsSleepMode: (isWsSleepMode: boolean) => set({ isWsSleepMode }),
+    isDebugWalletActive: false,
+    setIsDebugWalletActive: (isDebugWalletActive: boolean) =>
+        set({ isDebugWalletActive }),
+    usePythOracle: true, // Default to Pyth as requested
+    setUsePythOracle: (usePythOracle: boolean) => set({ usePythOracle }),
     pauseLiqAnimation: false,
     setPauseLiqAnimation: (pauseLiqAnimation: boolean) =>
         set({ pauseLiqAnimation }),

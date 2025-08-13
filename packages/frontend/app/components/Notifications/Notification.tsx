@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ImSpinner8 } from 'react-icons/im';
 import {
     IoAlertCircleOutline,
@@ -12,29 +12,76 @@ import styles from './Notification.module.css';
 interface propsIF {
     data: notificationIF;
     dismiss: (id: number) => void;
+    onMouseEnter?: (slug: number) => void;
+    onMouseLeave?: (slug: number) => void;
+    shouldPauseDismissal?: boolean;
 }
 
 export default function Notification(props: propsIF) {
-    const { data, dismiss } = props;
+    const {
+        data,
+        dismiss,
+        onMouseEnter,
+        onMouseLeave,
+        shouldPauseDismissal = false,
+    } = props;
     // create and memoize the UNIX time when this element was mounted
     const createdAt = useRef<number>(Date.now());
 
     const { getBsColor } = useAppSettings();
 
     // time period (ms) after which to auto-dismiss the notification
-    const DISMISS_AFTER = 5000;
+    const DISMISS_AFTER = data.removeAfter || 5000;
 
     // logic to remove this elem from the DOM after a timeout, yes the
-    // ... logic shown is convoluted, any changes will result in all
-    // ... notifications being dismissed together or the timer being
-    // ... reset any time a notification disappears
+    const [isHovered, setIsHovered] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout>(null);
+
+    // Track if we're in the middle of a debounce
+    const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [isDebouncedHovered, setIsDebouncedHovered] = useState(false);
+
+    // Debounce hover state changes
     useEffect(() => {
-        const autoDismiss: NodeJS.Timeout = setTimeout(
-            () => dismiss(data.slug),
-            DISMISS_AFTER - (Date.now() - createdAt.current),
-        );
-        return () => clearTimeout(autoDismiss);
-    }, [dismiss]);
+        if (isHovered || shouldPauseDismissal) {
+            // Clear any pending debounce timer when hovering starts
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+                debounceTimerRef.current = null;
+            }
+            setIsDebouncedHovered(true);
+        } else {
+            // Set a timer to update hover state after debounce period
+            debounceTimerRef.current = setTimeout(() => {
+                setIsDebouncedHovered(false);
+                debounceTimerRef.current = null;
+            }, 500); // 500ms debounce
+        }
+
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, [isHovered, shouldPauseDismissal]);
+
+    // Setup auto-dismiss timer, but only when not hovered and not in group hover state
+    useEffect(() => {
+        if (!isDebouncedHovered) {
+            timeoutRef.current = setTimeout(
+                () => dismiss(data.slug),
+                Math.max(0, DISMISS_AFTER - (Date.now() - createdAt.current)),
+            );
+        } else if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [dismiss, isDebouncedHovered, data.slug]);
 
     // px size at which to render SVG icons
     const ICON_SIZE = 24;
@@ -84,7 +131,17 @@ export default function Notification(props: propsIF) {
     }
 
     return (
-        <section className={styles.notification}>
+        <section
+            className={styles.notification}
+            onMouseEnter={() => {
+                setIsHovered(true);
+                onMouseEnter?.(data.slug);
+            }}
+            onMouseLeave={() => {
+                setIsHovered(false);
+                onMouseLeave?.(data.slug);
+            }}
+        >
             <header>
                 <div className={styles.header_content}>
                     {data.icon === 'spinner' && (
@@ -111,6 +168,16 @@ export default function Notification(props: propsIF) {
                 />
             </header>
             <p>{formatMessage(data.message)}</p>
+            {data.txLink && (
+                <a
+                    href={data.txLink}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className={styles.txLink}
+                >
+                    View on explorer
+                </a>
+            )}
         </section>
     );
 }

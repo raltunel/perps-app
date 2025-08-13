@@ -20,8 +20,8 @@ import type {
 
 type Callback = (msg: any) => void;
 
-import type { Environment } from './config';
-import { API_URLS } from './config';
+import type { ErrCallback } from './websocket-instance';
+import { API_URLS, type Environment } from './config';
 
 interface InfoOptions {
     environment: Environment;
@@ -262,6 +262,7 @@ export class Info extends API {
     public subscribe(
         subscription: Subscription,
         callback: Callback,
+        errorCallback?: ErrCallback,
     ): { subId?: number; unsubscribe: () => void } {
         if (
             subscription.type === 'l2Book' ||
@@ -278,6 +279,7 @@ export class Info extends API {
             const result = this.multiSocketInfo.subscribe(
                 subscription,
                 callback,
+                errorCallback,
             );
             return {
                 unsubscribe: result.unsubscribe,

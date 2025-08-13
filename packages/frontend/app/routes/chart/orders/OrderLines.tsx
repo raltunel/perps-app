@@ -48,11 +48,20 @@ export default function OrderLines({
     >(undefined);
 
     useEffect(() => {
-        const updatedLines = openLines.map((line) =>
-            selectedLine && line.oid === selectedLine.parentLine.oid
-                ? selectedLine.parentLine
-                : line,
-        );
+        let matchFound = false;
+
+        const updatedLines = openLines.map((line) => {
+            if (selectedLine && line.oid === selectedLine.parentLine.oid) {
+                matchFound = true;
+                return selectedLine.parentLine;
+            }
+            return line;
+        });
+
+        if (selectedLine && !matchFound) {
+            setSelectedLine(undefined);
+        }
+
         setLines([...updatedLines, ...positionLines]);
     }, [openLines, positionLines, selectedLine]);
 
@@ -119,7 +128,9 @@ export default function OrderLines({
     }, [chart, scaleData]);
 
     useEffect(() => {
-        if (!scaleData || !lines.length || !chart || !canvasSize) return;
+        if (!scaleData || !chart || !canvasSize) return;
+
+        if (!lines.length) setVisibleLines([]);
 
         const [minY, maxY] = scaleData.yScale.domain();
 
