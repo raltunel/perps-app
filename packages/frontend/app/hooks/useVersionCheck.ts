@@ -8,6 +8,8 @@ export function useVersionCheck() {
     const isDeployPreview = process.env.CONTEXT === 'deploy-preview';
     const isBranchDeploy = process.env.CONTEXT === 'branch-deploy';
 
+    console.log({ deployContext: process.env.CONTEXT });
+
     useEffect(() => {
         fetch('/version.json', { cache: 'no-store' })
             .then((res) => res.json())
