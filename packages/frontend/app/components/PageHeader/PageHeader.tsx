@@ -121,16 +121,26 @@ export default function PageHeader() {
     const prevIsUserConnected = useRef(isUserConnected);
 
     useEffect(() => {
-        // Only trigger when transitioning from true to false
-        if (prevIsUserConnected.current === true && isUserConnected === false) {
-            plausible('Logout');
+        if (prevIsUserConnected.current === false && isUserConnected === true) {
+            console.log('Login');
+            plausible('Login');
             // plausible('Logout', {
             //     props: {
             //         location: 'Page Header',
             //     },
             // });
+        } else if (
+            prevIsUserConnected.current === true &&
+            isUserConnected === false
+        ) {
+            console.log('Logout');
+            plausible('Logout');
+            // plausible('Login', {
+            //     props: {
+            //         location: 'Page Header',
+            //     },
+            // });
         }
-        // Update ref for next render
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
 
