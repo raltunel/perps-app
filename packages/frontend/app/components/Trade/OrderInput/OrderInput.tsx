@@ -1592,7 +1592,7 @@ function OrderInput({
                 notifications.remove(slug);
                 notifications.add({
                     title: 'Sell / Short Limit Order Placed',
-                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
