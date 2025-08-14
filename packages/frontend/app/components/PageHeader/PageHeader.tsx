@@ -122,7 +122,6 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
-            console.log('Login');
             plausible('Login');
             // plausible('Logout', {
             //     props: {
@@ -133,7 +132,6 @@ export default function PageHeader() {
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
-            console.log('Logout');
             plausible('Logout');
             // plausible('Login', {
             //     props: {
