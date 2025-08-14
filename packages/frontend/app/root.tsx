@@ -148,7 +148,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <script
                     defer
                     data-domain='perps.ambient.finance'
-                    src='https://plausible.io/js/script.tagged-events.js'
+                    src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                 ></script>
             </head>
             <body>
