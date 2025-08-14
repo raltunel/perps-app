@@ -6,6 +6,7 @@ import {
 } from '@crocswap-libs/ambient-ember';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MARKET_ORDER_PRICE_OFFSET_USD } from '~/utils/Constants';
+import { marketOrderLogManager } from './MarketOrderLogManager';
 
 export interface MarketOrderResult {
     success: boolean;
@@ -75,6 +76,15 @@ export class MarketOrderService {
                 console.log('  - Calculated userSetImBps:', userSetImBps);
             }
 
+            // Get the cached market order log page to avoid RPC call
+            const cachedLogPage = marketOrderLogManager.getCachedLogPage();
+            if (cachedLogPage !== undefined) {
+                console.log(
+                    '  - Using cached marketOrderLogPage:',
+                    cachedLogPage,
+                );
+            }
+
             // Calculate fill prices based on order book
             let fillPrice: bigint;
             if (params.side === 'buy') {
@@ -118,6 +128,8 @@ export class MarketOrderService {
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
+                console.log('  - Log page:', cachedLogPage);
+
                 const orderParams: any = {
                     marketId: marketId,
                     orderId: orderId,
@@ -132,6 +144,7 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
+                    marketOrderLogPage: cachedLogPage,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -158,6 +171,7 @@ export class MarketOrderService {
                     keeper: sessionPublicKey,
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true, // Ensure fill at market is included
+                    marketOrderLogPage: cachedLogPage,
                 };
 
                 const transaction = buildOrderEntryTransaction(

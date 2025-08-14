@@ -145,7 +145,12 @@ export default function Notification(props: propsIF) {
             <header>
                 <div className={styles.header_content}>
                     {data.icon === 'spinner' && (
-                        <ImSpinner8 size={ICON_SIZE} color='var(--accent1)' />
+                        <div className={styles.rotate}>
+                            <ImSpinner8
+                                size={ICON_SIZE}
+                                color='var(--accent1)'
+                            />
+                        </div>
                     )}
                     {data.icon === 'check' && (
                         <IoCheckmarkCircleOutline

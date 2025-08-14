@@ -254,7 +254,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
             if (result.success) {
                 notifications.add({
-                    title: 'Position Closed',
+                    title:
+                        positionSize < 100
+                            ? `${positionSize}% of Position Closed`
+                            : 'Position Closed',
                     message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
                     icon: 'check',
                     txLink: result.signature
