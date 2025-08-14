@@ -36,6 +36,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
+    const d3CanvasLiqLines = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqContianer = useRef<HTMLDivElement | null>(null);
     const gap = 4;
 
@@ -122,14 +123,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const obBuyBlock = document.getElementById('orderbook-buy-block');
             const obSellBlock = document.getElementById('orderbook-sell-block');
 
+            const basicMenuContainer = document.getElementById(
+                'order-trades-list-container',
+            );
+
+            const tradeListHeight = basicMenuContainer
+                ? basicMenuContainer?.getBoundingClientRect().height / 2
+                : 0;
             const obBuyBlockHeight =
-                obBuyBlock?.getBoundingClientRect().height || 0;
+                obBuyBlock?.getBoundingClientRect().height ||
+                tradeListHeight ||
+                0;
             const obSellBlockHeight =
-                obSellBlock?.getBoundingClientRect().height || 0;
+                obSellBlock?.getBoundingClientRect().height ||
+                tradeListHeight ||
+                0;
             const midHeaderHeight =
                 midHeader?.getBoundingClientRect().height || 0;
 
             const rowHeight = obBuyBlockHeight / orderCountRef.current;
+
+            if (obBuyBlockHeight === 0 || obSellBlockHeight === 0) return;
 
             context.save();
 
@@ -369,13 +383,18 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         d3.select(d3CanvasLiq.current)
             .on('draw', () => {
+                if (hoverLineDataRef.current.length > 0) {
+                    clipCanvas(
+                        hoverLineDataRef.current[0].offsetY,
+                        canvas,
+                        true,
+                    );
+                }
+
                 sellArea(currentSellDataRef.current);
                 buyArea(currentBuyDataRef.current);
                 sellLine(currentSellDataRef.current);
                 buyLine(currentBuyDataRef.current);
-
-                // Draw liquidation lines using our custom function
-                drawLiquidationLines(context);
             })
             .on('measure', () => {
                 sellArea?.context(context);
@@ -383,6 +402,24 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 buyArea?.context(context);
                 buyLine?.context(context);
             });
+    }, [width, height]);
+
+    useEffect(() => {
+        const canvas = d3
+            .select(d3CanvasLiqLines.current)
+            .select('canvas')
+            .node() as HTMLCanvasElement;
+        if (!canvas) return;
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        const container = d3.select(d3CanvasLiqLines.current).node() as any;
+        if (container) container.requestRedraw();
+
+        d3.select(d3CanvasLiqLines.current).on('draw', () => {
+            // Draw liquidation lines using our custom function
+            drawLiquidationLines(context);
+        });
     }, [width, height, drawLiquidationLines]);
 
     const updateScalesOnly = useCallback(() => {
@@ -590,6 +627,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 const container = d3.select(d3CanvasLiq.current).node() as any;
                 if (container) container.requestRedraw();
 
+                const lineContainer = d3
+                    .select(d3CanvasLiqLines.current)
+                    .node() as any;
+                if (lineContainer) lineContainer.requestRedraw();
+
                 const hoveredContainer = d3
                     .select(d3CanvasLiqHover.current)
                     .node() as any;
@@ -700,18 +742,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const clipCanvas = (
         point: number,
-        clipEdge: number,
-        canvas: HTMLCanvasElement,
+        highlightedCanvas: HTMLCanvasElement,
+        reverse: boolean = false,
     ) => {
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const ctx = highlightedCanvas.getContext(
+            '2d',
+        ) as CanvasRenderingContext2D;
+
+        const clipEdge = highlightedCanvas.height / 2;
 
         const startY = point;
         const endY = clipEdge - startY;
 
         ctx.save();
         ctx.beginPath();
-        ctx.rect(0, startY, canvas.width, endY);
-        ctx.clip();
+
+        reverse &&
+            ctx.rect(0, 0, highlightedCanvas.width, highlightedCanvas.height);
+
+        ctx.rect(0, startY, highlightedCanvas.width, endY);
+
+        reverse ? ctx.clip('evenodd') : ctx.clip();
     };
 
     useEffect(() => {
@@ -762,6 +813,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             // Clear D3 event listeners
             if (d3CanvasLiqHover.current) {
                 d3.select(d3CanvasLiqHover.current)
+                    .on('draw', null)
+                    .on('measure', null);
+            }
+
+            if (d3CanvasLiqLines.current) {
+                d3.select(d3CanvasLiqLines.current)
                     .on('draw', null)
                     .on('measure', null);
             }
@@ -842,8 +899,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const sellRgbaColor = buyColorRef.current;
         const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
         const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
-        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
-        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
+        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.2;
+        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.2;
 
         const highlightedBuyArea = d3fc
             .seriesCanvasArea()
@@ -895,8 +952,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const hovereContext = hoveredCanvas.getContext('2d');
         if (!hovereContext) return;
 
-        const centerY = heightRef.current / 2;
-
         const hoveredContainer = d3
             .select(d3CanvasLiqHover.current)
             .node() as any;
@@ -904,12 +959,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         d3.select(d3CanvasLiqHover.current)
             .on('draw', () => {
+                if (hoverLineDataRef.current.length === 0) return;
+
                 if (highlightHoveredArea.current) {
                     clipCanvas(
                         hoverLineDataRef.current[0].offsetY,
-                        centerY,
                         hoveredCanvas,
                     );
+
+                    sellLineSeriesRef.current(currentSellDataRef.current);
+                    buyLineSeriesRef.current(currentBuyDataRef.current);
 
                     hoverLine(hoverLineDataRef.current);
                     highlightedBuyArea(currentBuyDataRef.current);
@@ -920,6 +979,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 hoverLine?.context(hovereContext);
                 highlightedBuyArea?.context(hovereContext);
                 highlightedSellArea?.context(hovereContext);
+                sellLineSeriesRef.current?.context(hovereContext);
+                buyLineSeriesRef.current?.context(hovereContext);
             });
     }, [width, height]);
 
@@ -932,6 +993,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 height: `${heightRef.current}px`,
             }}
         >
+            <d3fc-canvas
+                ref={d3CanvasLiqLines}
+                style={{
+                    position: 'absolute',
+                    width: `${widthRef.current}px`,
+                    height: `${heightRef.current}px`,
+                }}
+            ></d3fc-canvas>
+
             <d3fc-canvas
                 ref={d3CanvasLiqHover}
                 style={{
