@@ -4,7 +4,7 @@ import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import type { LimitOrderParams } from '~/services/limitOrderService';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
 import {
@@ -306,12 +306,14 @@ const LabelComponent = ({
             return;
         }
 
+        const slug = makeSlug(10);
         try {
             // Show pending notification
             notifications.add({
                 title: 'Cancel Order Pending',
                 message: `Cancelling order`,
                 icon: 'spinner',
+                slug,
             });
 
             // Execute the cancel order
@@ -320,6 +322,7 @@ const LabelComponent = ({
             });
 
             if (result.success) {
+                notifications.remove(slug);
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -330,6 +333,7 @@ const LabelComponent = ({
                         : undefined,
                 });
             } else {
+                notifications.remove(slug);
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
@@ -342,6 +346,7 @@ const LabelComponent = ({
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
+            notifications.remove(slug);
             notifications.add({
                 title: 'Cancel Failed',
                 message:
