@@ -3,7 +3,7 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 // import {
 //     DFLT_EMBER_MARKET,
@@ -116,6 +116,31 @@ export default function PageHeader() {
     useEffect(() => {
         setMarginBucket(marginBucket);
     }, [marginBucket, setMarginBucket]);
+
+    // Holds previous user connection status
+    const prevIsUserConnected = useRef(isUserConnected);
+
+    useEffect(() => {
+        if (prevIsUserConnected.current === false && isUserConnected === true) {
+            plausible('Login');
+            // plausible('Logout', {
+            //     props: {
+            //         location: 'Page Header',
+            //     },
+            // });
+        } else if (
+            prevIsUserConnected.current === true &&
+            isUserConnected === false
+        ) {
+            plausible('Logout');
+            // plausible('Login', {
+            //     props: {
+            //         location: 'Page Header',
+            //     },
+            // });
+        }
+        prevIsUserConnected.current = isUserConnected;
+    }, [isUserConnected]);
 
     return (
         <>
