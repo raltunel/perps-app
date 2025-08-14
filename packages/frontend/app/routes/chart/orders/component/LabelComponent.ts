@@ -301,8 +301,8 @@ const LabelComponent = ({
         }
     }, [chart, drawnLabelsRef.current, isDrag]);
 
-    const handleCancel = async (orderId: number) => {
-        if (!orderId) {
+    const handleCancel = async (order: LineData) => {
+        if (!order.oid) {
             notifications.add({
                 title: 'Cancel Failed',
                 message: 'Order ID not found',
@@ -312,18 +312,25 @@ const LabelComponent = ({
         }
 
         const slug = makeSlug(10);
+
+        const usdValueOfOrderStr = formatNum(
+            (order.quantityTextValue || 0) * (symbolInfo?.markPx || 1),
+            2,
+            true,
+            true,
+        );
         try {
             // Show pending notification
             notifications.add({
                 title: 'Cancel Order Pending',
-                message: `Cancelling order`,
+                message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                 icon: 'spinner',
                 slug,
             });
 
             // Execute the cancel order
             const result = await executeCancelOrder({
-                orderId,
+                orderId: order.oid,
             });
 
             if (result.success) {
@@ -331,7 +338,7 @@ const LabelComponent = ({
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
-                    message: `Successfully cancelled order`,
+                    message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                     icon: 'check',
                     txLink: result.signature
                         ? blockExplorer + result.signature
@@ -401,7 +408,7 @@ const LabelComponent = ({
                         if (found) {
                             console.log({ found });
                             if (found.parentLine.oid)
-                                handleCancel(found.parentLine.oid);
+                                handleCancel(found.parentLine);
                             console.log(found.parentLine.textValue);
                         }
                     }
