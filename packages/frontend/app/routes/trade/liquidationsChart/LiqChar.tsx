@@ -123,14 +123,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const obBuyBlock = document.getElementById('orderbook-buy-block');
             const obSellBlock = document.getElementById('orderbook-sell-block');
 
+            const basicMenuContainer = document.getElementById(
+                'order-trades-list-container',
+            );
+
+            const tradeListHeight = basicMenuContainer
+                ? basicMenuContainer?.getBoundingClientRect().height / 2
+                : 0;
             const obBuyBlockHeight =
-                obBuyBlock?.getBoundingClientRect().height || 0;
+                obBuyBlock?.getBoundingClientRect().height ||
+                tradeListHeight ||
+                0;
             const obSellBlockHeight =
-                obSellBlock?.getBoundingClientRect().height || 0;
+                obSellBlock?.getBoundingClientRect().height ||
+                tradeListHeight ||
+                0;
             const midHeaderHeight =
                 midHeader?.getBoundingClientRect().height || 0;
 
             const rowHeight = obBuyBlockHeight / orderCountRef.current;
+
+            if (obBuyBlockHeight === 0 || obSellBlockHeight === 0) return;
 
             context.save();
 
