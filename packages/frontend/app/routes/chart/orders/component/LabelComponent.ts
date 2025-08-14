@@ -510,7 +510,7 @@ const LabelComponent = ({
 
             try {
                 const usdValueOfOrderStr = formatNum(
-                    (quantity || 0) * newPrice,
+                    (quantity || 0) * (symbolInfo?.markPx || 1),
                     2,
                     true,
                     true,
