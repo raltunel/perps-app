@@ -8,8 +8,6 @@ export function useVersionCheck() {
     const isDeployPreview = import.meta.env.VITE_CONTEXT === 'deploy-preview';
     const isBranchDeploy = import.meta.env.VITE_CONTEXT === 'branch-deploy';
 
-    console.log({ deployContext: import.meta.env.VITE_CONTEXT });
-
     useEffect(() => {
         fetch('/version.json', { cache: 'no-store' })
             .then((res) => res.json())
