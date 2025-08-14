@@ -266,7 +266,7 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`plausible-event-name=Login+Button+Click plausible-event-location=Page+Header`}
+                        className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
                     >
                         <SessionButton />
                     </span>
