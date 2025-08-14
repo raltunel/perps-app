@@ -1,4 +1,5 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
+import { PublicKey } from '@solana/web3.js';
 import { useCallback, useEffect, useRef } from 'react';
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -20,10 +21,13 @@ export function useUnifiedMarginData() {
     );
 
     const isSessionEstablished = isEstablished(sessionState);
-    const { isDebugWalletActive } = useDebugStore();
+    const { isDebugWalletActive, manualAddressEnabled, manualAddress } =
+        useDebugStore();
     const isDebugWalletActiveRef = useRef(isDebugWalletActive);
     isDebugWalletActiveRef.current = isDebugWalletActive;
     const forceRestart = useRef(false);
+
+    const lastSubscribedAddressRef = useRef<string>('');
 
     useEffect(() => {
         // Track session state changes
@@ -62,6 +66,8 @@ export function useUnifiedMarginData() {
                 sessionState.connection,
                 sessionState.walletPublicKey,
             );
+            lastSubscribedAddressRef.current =
+                sessionState.walletPublicKey.toString();
             forceRestart.current = false;
         }
 
@@ -85,6 +91,41 @@ export function useUnifiedMarginData() {
             }
         };
     }, [isSessionEstablished, isDebugWalletActive]); // Only depend on session established state
+
+    useEffect(() => {
+        if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
+            if (
+                lastSubscribedAddressRef.current !== manualAddress &&
+                isSessionEstablished
+            ) {
+                console.log('>>> unsubscribe and subscribe to manual address');
+                unifiedMarginPollingManager.unsubscribe();
+                unifiedMarginPollingManager.subscribe(
+                    sessionState.connection,
+                    new PublicKey(manualAddress),
+                );
+                lastSubscribedAddressRef.current = manualAddress;
+            }
+        } else {
+            if (isSessionEstablished) {
+                if (
+                    lastSubscribedAddressRef.current !==
+                    sessionState.walletPublicKey.toString()
+                ) {
+                    console.log(
+                        '>>> unsubscribe and subscribe to fogo address',
+                    );
+                    unifiedMarginPollingManager.unsubscribe();
+                    unifiedMarginPollingManager.subscribe(
+                        sessionState.connection,
+                        sessionState.walletPublicKey,
+                    );
+                    lastSubscribedAddressRef.current =
+                        sessionState.walletPublicKey.toString();
+                }
+            }
+        }
+    }, [manualAddressEnabled, manualAddress, isSessionEstablished]);
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished) {
