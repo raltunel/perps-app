@@ -425,7 +425,9 @@ export default function GenericTable<
                     <NoDataRow text={noDataMessage} />
                 )}
                 {!isSessionEstablished && (
-                    <div className={styles.sessionButtonContainer}>
+                    <div
+                        className={`plausible-event-name=Login+Button+Click plausible-event-name=GenericTable+Login+Button+Click ${styles.sessionButtonContainer}`}
+                    >
                         <SessionButton />
                     </div>
                 )}
