@@ -4,7 +4,7 @@ export function useVersionCheck() {
     const [showReload, setShowReload] = useState(false);
     const currentVersion = useRef(null);
 
-    const isProduction = process.env.CONTEXT === 'production';
+    // const isProduction = process.env.CONTEXT === 'production';
     const isDeployPreview = process.env.CONTEXT === 'deploy-preview';
     const isBranchDeploy = process.env.CONTEXT === 'branch-deploy';
 
@@ -29,11 +29,8 @@ export function useVersionCheck() {
                         }
                     });
             },
-            isProduction
-                ? 5 * 60 * 1000
-                : isDeployPreview || isBranchDeploy
-                  ? 30 * 1000
-                  : 0, // Check every 5 minutes in production, every 30 seconds in deploy preview or branch-deploy and never if not on any of those
+            // check every 30 seconds in deploy preview or branch-deploy and every 5 minutes elsewhere
+            isDeployPreview || isBranchDeploy ? 30 * 1000 : 5 * 60 * 1000,
         );
 
         return () => clearInterval(interval);
