@@ -4,6 +4,9 @@
   publish = "build/client"
   command = "node scripts/generate-announcements.js && node scripts/write-version.js && pnpm build"
 
+[build.environment]
+VITE_CONTEXT = "${CONTEXT}"
+
 [dev]
   command = "npm run dev"
   framework = "vite"
