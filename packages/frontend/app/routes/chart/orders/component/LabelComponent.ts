@@ -325,6 +325,9 @@ const LabelComponent = ({
                     title: 'Order Cancelled',
                     message: `Successfully cancelled order`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             } else {
                 // Show error notification
@@ -332,6 +335,9 @@ const LabelComponent = ({
                     title: 'Cancel Failed',
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             }
         } catch (error) {
