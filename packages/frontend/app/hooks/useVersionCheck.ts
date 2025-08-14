@@ -5,10 +5,10 @@ export function useVersionCheck() {
     const currentVersion = useRef(null);
 
     // const isProduction = process.env.CONTEXT === 'production';
-    const isDeployPreview = process.env.CONTEXT === 'deploy-preview';
-    const isBranchDeploy = process.env.CONTEXT === 'branch-deploy';
+    const isDeployPreview = import.meta.env.CONTEXT === 'deploy-preview';
+    const isBranchDeploy = import.meta.env.CONTEXT === 'branch-deploy';
 
-    console.log({ deployContext: process.env.CONTEXT });
+    console.log({ deployContext: import.meta.env.CONTEXT });
 
     useEffect(() => {
         fetch('/version.json', { cache: 'no-store' })
