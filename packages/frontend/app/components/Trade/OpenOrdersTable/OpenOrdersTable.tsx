@@ -142,7 +142,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             notifications.remove(slug);
                             notifications.add({
                                 title: 'Order Cancelled',
-                                message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                                message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
                                 icon: 'check',
                                 removeAfter: 5000,
                                 txLink: successOrderSignature
