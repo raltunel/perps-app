@@ -216,7 +216,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     ? { mantissa: selectedResolution.mantissa }
                     : {}),
             };
-            subscribeToPoller('info', subKey, postOrderBookRaw, 200);
+            subscribeToPoller('info', subKey, postOrderBookRaw, 500);
             return () => {
                 unsubscribeFromPoller('info', subKey);
             };
