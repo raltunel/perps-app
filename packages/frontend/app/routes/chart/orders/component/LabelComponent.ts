@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
+import useNumFormatter from '~/hooks/useNumFormatter';
 import type { LimitOrderParams } from '~/services/limitOrderService';
-import { useNotificationStore } from '~/stores/NotificationStore';
+import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
 import {
@@ -56,9 +58,12 @@ const LabelComponent = ({
 
     const notifications = useNotificationStore();
 
+    const { formatNum } = useNumFormatter();
+
+    const symbolInfo = useTradeDataStore((state) => state.symbolInfo);
+
     const { executeCancelOrder } = useCancelOrderService();
     const { executeLimitOrder } = useLimitOrderService();
-    const { add } = useNotificationStore();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
@@ -296,8 +301,8 @@ const LabelComponent = ({
         }
     }, [chart, drawnLabelsRef.current, isDrag]);
 
-    const handleCancel = async (orderId: number) => {
-        if (!orderId) {
+    const handleCancel = async (order: LineData) => {
+        if (!order.oid) {
             notifications.add({
                 title: 'Cancel Failed',
                 message: 'Order ID not found',
@@ -306,36 +311,54 @@ const LabelComponent = ({
             return;
         }
 
+        const slug = makeSlug(10);
+
+        const usdValueOfOrderStr = formatNum(
+            (order.quantityTextValue || 0) * (symbolInfo?.markPx || 1),
+            2,
+            true,
+            true,
+        );
         try {
             // Show pending notification
             notifications.add({
                 title: 'Cancel Order Pending',
-                message: `Cancelling order`,
+                message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                 icon: 'spinner',
+                slug,
             });
 
             // Execute the cancel order
             const result = await executeCancelOrder({
-                orderId,
+                orderId: order.oid,
             });
 
             if (result.success) {
+                notifications.remove(slug);
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
-                    message: `Successfully cancelled order`,
+                    message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                     icon: 'check',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             } else {
+                notifications.remove(slug);
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
+                    txLink: result.signature
+                        ? blockExplorer + result.signature
+                        : undefined,
                 });
             }
         } catch (error) {
             console.error('❌ Error cancelling order:', error);
+            notifications.remove(slug);
             notifications.add({
                 title: 'Cancel Failed',
                 message:
@@ -385,7 +408,7 @@ const LabelComponent = ({
                         if (found) {
                             console.log({ found });
                             if (found.parentLine.oid)
-                                handleCancel(found.parentLine.oid);
+                                handleCancel(found.parentLine);
                             console.log(found.parentLine.textValue);
                         }
                     }
@@ -490,7 +513,23 @@ const LabelComponent = ({
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
             const side = tempSelectedLine.parentLine.side;
 
+            const slug = makeSlug(10);
+
             try {
+                const usdValueOfOrderStr = formatNum(
+                    (quantity || 0) * (symbolInfo?.markPx || 1),
+                    2,
+                    true,
+                    true,
+                );
+                // Show pending notification
+                notifications.add({
+                    title: 'Limit Order Update Pending',
+                    message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                    icon: 'spinner',
+                    slug,
+                });
+
                 // If cancel was successful, create a new order with the updated price
                 // Note: You'll need to provide the correct order parameters based on your application's needs
                 const newOrderParams: LimitOrderParams = {
@@ -515,7 +554,8 @@ const LabelComponent = ({
                         limitOrderResult.error,
                     );
                     // Show error notification to user
-                    add({
+                    notifications.remove(slug);
+                    notifications.add({
                         title: 'Failed to update order',
                         message:
                             limitOrderResult.error || 'Unknown error occurred',
@@ -527,10 +567,10 @@ const LabelComponent = ({
                     });
                 } else {
                     // Show success notification
-                    add({
+                    notifications.remove(slug);
+                    notifications.add({
                         title: 'Order updated',
-                        message:
-                            'The order has been successfully updated with the new price.',
+                        message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                         icon: 'check',
                         removeAfter: 10000,
                         txLink: limitOrderResult.signature
@@ -541,7 +581,8 @@ const LabelComponent = ({
             } catch (error) {
                 setSelectedLine(undefined);
                 console.error('Error updating order:', error);
-                add({
+                notifications.remove(slug);
+                notifications.add({
                     title: 'Error updating order',
                     message:
                         error instanceof Error
