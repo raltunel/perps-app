@@ -56,7 +56,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }, []);
 
     const bindEmptyAddress = () => {
-        setUserAddress(debugWallets[2].address);
+        if (isDebugWalletActive) {
+            setUserAddress(debugWallets[2].address);
+        } else {
+            setUserAddress('');
+        }
         resetUserData();
     };
 
@@ -114,7 +118,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
                 setUserAddress(fogoAddress);
             }
         }
-    }, [manualAddressEnabled, manualAddress]);
+    }, [manualAddressEnabled, manualAddress, isDebugWalletActive]);
 
     return (
         <AppContext.Provider

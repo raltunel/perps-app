@@ -1,9 +1,10 @@
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { PublicKey } from '@solana/web3.js';
-import { useCallback, useEffect, useRef } from 'react';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { unifiedMarginPollingManager } from '~/services/UnifiedMarginPollingManager';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
+import { RPC_ENDPOINT } from '~/utils/Constants';
 
 export function useUnifiedMarginData() {
     const sessionState = useSession();
@@ -28,6 +29,11 @@ export function useUnifiedMarginData() {
     const forceRestart = useRef(false);
 
     const lastSubscribedAddressRef = useRef<string>('');
+
+    const defaultConnection = useMemo(() => {
+        const connection = new Connection(RPC_ENDPOINT, 'confirmed');
+        return connection;
+    }, []);
 
     useEffect(() => {
         // Track session state changes
@@ -109,6 +115,14 @@ export function useUnifiedMarginData() {
                 );
                 lastSubscribedAddressRef.current = manualAddress;
                 hasSubscribedRef.current = true;
+            } else {
+                unifiedMarginPollingManager.unsubscribe();
+                unifiedMarginPollingManager.subscribe(
+                    defaultConnection,
+                    new PublicKey(manualAddress),
+                );
+                lastSubscribedAddressRef.current = manualAddress;
+                hasSubscribedRef.current = true;
             }
         } else {
             if (isSessionEstablished) {
@@ -127,7 +141,12 @@ export function useUnifiedMarginData() {
                 }
             }
         }
-    }, [manualAddressEnabled, manualAddress, isSessionEstablished]);
+    }, [
+        manualAddressEnabled,
+        manualAddress,
+        isSessionEstablished,
+        defaultConnection,
+    ]);
 
     const forceRefresh = useCallback(async () => {
         if (!isSessionEstablished) {

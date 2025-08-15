@@ -207,7 +207,9 @@ export default function ComboBoxContainer() {
                                 }
                                 className={styles.subInfo}
                             >
-                                {userAddress}
+                                {userAddress && userAddress.length > 0
+                                    ? userAddress
+                                    : 'Double click to add address manually'}
                             </div>
                         </Tooltip>
                     )}
