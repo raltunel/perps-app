@@ -8,6 +8,7 @@ import type {
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useDebugStore } from '~/stores/DebugStore';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -81,6 +82,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const { pauseLiqAnimation } = useDebugStore();
     const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
     pauseLiqAnimationRef.current = pauseLiqAnimation;
+
+    const { formatNum } = useNumFormatter();
 
     const widthRef = useRef(width);
     widthRef.current = width;
@@ -710,12 +713,20 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             });
 
         const price =
-            snappedPrice && snappedPrice.total
-                ? snappedPrice.total.toFixed(2)
-                : 0;
+            snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
+
+        const finalTotal =
+            hoveredArray.current[hoveredArray.current.length - 1].total;
+
+        const percentage = (price / finalTotal) * 100;
 
         liqTooltipRef.current.html(
-            '<p>' + 20 + '%</p>' + '<p>' + price + ' </p>',
+            '<p>' +
+                formatNum(percentage) +
+                '%</p>' +
+                '<p>' +
+                formatNum(price, 2) +
+                ' </p>',
         );
 
         const width = liqTooltipRef.current
