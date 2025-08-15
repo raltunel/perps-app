@@ -3,6 +3,7 @@ import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
@@ -72,6 +73,9 @@ export default function WebDataConsumer() {
 
     // Use unified margin data for both balance and positions
     const { positions: unifiedPositions } = useUnifiedMarginData();
+
+    // Initialize market order log pre-fetching
+    useMarketOrderLog();
 
     const openOrdersRef = useRef<OrderDataIF[]>([]);
     const positionsRef = useRef<PositionIF[]>([]);
@@ -583,7 +587,7 @@ export default function WebDataConsumer() {
                         if (!notifiedOrdersRef.current.has(fill.oid)) {
                             const usdValueOfFillStr = formatNum(
                                 fill.sz * fill.px,
-                                2,
+                                fill.px > 10_000 ? 0 : 2,
                                 true,
                                 true,
                             );
@@ -592,8 +596,8 @@ export default function WebDataConsumer() {
                             notifiedOrdersRef.current.add(fill.oid);
 
                             notificationStore.add({
-                                title: 'Order Filled',
-                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px)}`,
+                                title: `${fill.side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Order Filled`,
+                                message: `Successfully filled ${fill.side} order for ${usdValueOfFillStr} of ${fill.coin} at ${formatNum(fill.px, fill.px > 10_000 ? 0 : 2, true, true)}`,
                                 icon: 'check',
                                 removeAfter: 5000,
                             });

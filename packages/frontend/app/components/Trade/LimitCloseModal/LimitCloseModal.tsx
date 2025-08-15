@@ -309,8 +309,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
             if (result.success) {
                 notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice)}`,
+                    title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
+                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
