@@ -164,7 +164,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         midHeaderHeight +
                         rowHeight * index +
                         rowHeight / 2 +
-                        4;
+                        midHeaderHeight / 2;
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
