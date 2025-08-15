@@ -1,6 +1,12 @@
 import { instructions } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
-import { useCallback, useRef, useState, type ChangeEvent } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useRef,
+    useState,
+    type ChangeEvent,
+} from 'react';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -78,6 +84,10 @@ export default function ComboBoxContainer() {
         },
         [setManualAddress],
     );
+
+    useEffect(() => {
+        setAddressInputVal('');
+    }, [isDebugWalletActive]);
 
     return (
         <section className={styles.comboBoxContainers}>

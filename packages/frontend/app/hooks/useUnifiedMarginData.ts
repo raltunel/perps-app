@@ -93,18 +93,22 @@ export function useUnifiedMarginData() {
     }, [isSessionEstablished, isDebugWalletActive]); // Only depend on session established state
 
     useEffect(() => {
+        if (isDebugWalletActiveRef.current) {
+            return;
+        }
+
         if (manualAddressEnabled && manualAddress && manualAddress.length > 0) {
             if (
                 lastSubscribedAddressRef.current !== manualAddress &&
                 isSessionEstablished
             ) {
-                console.log('>>> unsubscribe and subscribe to manual address');
                 unifiedMarginPollingManager.unsubscribe();
                 unifiedMarginPollingManager.subscribe(
                     sessionState.connection,
                     new PublicKey(manualAddress),
                 );
                 lastSubscribedAddressRef.current = manualAddress;
+                hasSubscribedRef.current = true;
             }
         } else {
             if (isSessionEstablished) {
@@ -112,9 +116,6 @@ export function useUnifiedMarginData() {
                     lastSubscribedAddressRef.current !==
                     sessionState.walletPublicKey.toString()
                 ) {
-                    console.log(
-                        '>>> unsubscribe and subscribe to fogo address',
-                    );
                     unifiedMarginPollingManager.unsubscribe();
                     unifiedMarginPollingManager.subscribe(
                         sessionState.connection,
@@ -122,6 +123,7 @@ export function useUnifiedMarginData() {
                     );
                     lastSubscribedAddressRef.current =
                         sessionState.walletPublicKey.toString();
+                    hasSubscribedRef.current = true;
                 }
             }
         }
