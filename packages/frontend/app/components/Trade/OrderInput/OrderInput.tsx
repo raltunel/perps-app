@@ -1299,6 +1299,7 @@ function OrderInput({
                     message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
                     icon: 'spinner',
                     slug,
+                    removeAfter: 60000,
                 });
             }
 
@@ -1413,6 +1414,7 @@ function OrderInput({
                     message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
                     icon: 'spinner',
                     slug,
+                    removeAfter: 60000,
                 });
             }
 
@@ -1536,6 +1538,7 @@ function OrderInput({
                 message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
         }
 
@@ -1657,6 +1660,7 @@ function OrderInput({
                 message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
         }
 
