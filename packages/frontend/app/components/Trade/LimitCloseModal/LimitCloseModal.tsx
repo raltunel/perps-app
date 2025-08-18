@@ -308,12 +308,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             });
 
             if (result.success) {
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Close Order Placed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Close Order Placed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
                     message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -324,12 +326,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Close Order Failed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Close Order Failed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
