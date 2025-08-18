@@ -69,6 +69,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
             const timeOfSubmission = Date.now();

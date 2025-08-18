@@ -53,6 +53,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
             const cancelPromises = filteredOrders.map(async (order) => {
