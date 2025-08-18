@@ -253,6 +253,14 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             );
 
             if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Placed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 notifications.add({
                     title:
                         positionSize < 100
@@ -266,6 +274,14 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Failed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Close Failed',
                     message: result.error || 'Failed to close position',

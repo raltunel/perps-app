@@ -197,6 +197,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 });
 
                 if (result.success) {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Placed',
+                                orderType: 'Market',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Position Closed',
                         message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
@@ -206,6 +214,14 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             : undefined,
                     });
                 } else {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Failed',
+                                orderType: 'Market',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Close Failed',
                         message: String(

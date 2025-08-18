@@ -53,6 +53,13 @@ export default function PageHeader() {
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
 
+    useEffect(() => {
+        // track initial site landing
+        if (typeof plausible === 'function') {
+            plausible('Landing');
+        }
+    }, []);
+
     // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
@@ -122,22 +129,16 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
-            plausible('Login');
-            // plausible('Logout', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                plausible('Login');
+            }
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
-            plausible('Logout');
-            // plausible('Login', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                plausible('Logout');
+            }
         }
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
