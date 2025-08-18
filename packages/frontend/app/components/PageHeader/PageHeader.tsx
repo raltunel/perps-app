@@ -53,6 +53,11 @@ export default function PageHeader() {
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
 
+    useEffect(() => {
+        // track initial site landing
+        plausible('Landing');
+    }, []);
+
     // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
