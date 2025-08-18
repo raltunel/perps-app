@@ -140,6 +140,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             );
                             const order = result.value.order;
                             notifications.remove(slug);
+                            plausible('Onchain Action', {
+                                props: { actionType: 'Limit Order Cancelled' },
+                            });
                             notifications.add({
                                 title: 'Order Cancelled',
                                 message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
@@ -153,6 +156,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     });
                 } else {
                     notifications.remove(slug);
+                    plausible('Onchain Action', {
+                        props: { actionType: 'All Limit Orders Cancelled' },
+                    });
                     notifications.add({
                         title: 'All Orders Cancelled',
                         message: `Successfully cancelled all ${successCount} orders`,
@@ -175,6 +181,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 });
                 if (successCount > 0 && failureCount > 0) {
                     notifications.remove(slug);
+                    plausible('Onchain Action', {
+                        props: { actionType: 'Partial Limit Orders Cancelled' },
+                    });
                     notifications.add({
                         title: 'Partial Success',
                         message: `Cancelled ${successCount} orders, ${failureCount} failed`,
@@ -186,6 +195,9 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     });
                 } else {
                     notifications.remove(slug);
+                    plausible('Onchain Action', {
+                        props: { actionType: 'Cancel All Failed' },
+                    });
                     notifications.add({
                         title: 'Cancel All Failed',
                         message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,

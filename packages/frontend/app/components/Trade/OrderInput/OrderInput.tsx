@@ -1311,6 +1311,9 @@ function OrderInput({
 
             if (result.success) {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Market Buy Order Successful' },
+                });
                 // Show success notification
                 notifications.add({
                     title: 'Buy Order Successful',
@@ -1323,6 +1326,9 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Market Buy Order Failed' },
+                });
                 // Show error notification
                 notifications.add({
                     title: 'Buy Order Failed',
@@ -1398,6 +1404,9 @@ function OrderInput({
 
             if (result.success) {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Market Sell Order Successful' },
+                });
                 // Show success notification
                 notifications.add({
                     title: 'Sell Order Successful',
@@ -1410,6 +1419,9 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Market Sell Order Failed' },
+                });
                 // Show error notification
                 notifications.add({
                     title: 'Sell Order Failed',
@@ -1495,6 +1507,9 @@ function OrderInput({
 
             if (result.success) {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Limit Buy Order Placed' },
+                });
                 notifications.add({
                     title: 'Buy / Long Limit Order Placed',
                     message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -1506,6 +1521,9 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Limit Buy Order Failed' },
+                });
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
@@ -1590,6 +1608,9 @@ function OrderInput({
 
             if (result.success) {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Limit Sell Order Placed' },
+                });
                 notifications.add({
                     title: 'Sell / Short Limit Order Placed',
                     message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -1601,6 +1622,9 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: { actionType: 'Limit Sell Order Failed' },
+                });
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
