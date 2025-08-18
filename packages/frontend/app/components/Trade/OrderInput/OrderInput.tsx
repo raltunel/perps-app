@@ -1307,16 +1307,19 @@ function OrderInput({
                 side: 'buy',
                 leverage: leverage,
                 bestAskPrice: bestAskPrice,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Market Buy Order Successful',
-                        orderType: 'Market',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Buy Order Successful',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Buy Order Successful',
@@ -1329,12 +1332,14 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Market Buy Order Failed',
-                        orderType: 'Market',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Buy Order Failed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Buy Order Failed',
@@ -1406,16 +1411,19 @@ function OrderInput({
                 side: 'sell',
                 leverage: leverage,
                 bestBidPrice: bestBidPrice,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Market Sell Order Successful',
-                        orderType: 'Market',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Sell Order Successful',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Sell Order Successful',
@@ -1428,12 +1436,14 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Market Sell Order Failed',
-                        orderType: 'Market',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Sell Order Failed',
+                            orderType: 'Market',
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Sell Order Failed',
@@ -1515,16 +1525,19 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Buy Order Placed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Buy Order Placed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Buy / Long Limit Order Placed',
                     message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -1536,12 +1549,14 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Buy Order Failed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Buy Order Failed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
@@ -1622,16 +1637,19 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Sell Order Placed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Sell Order Placed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Sell / Short Limit Order Placed',
                     message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -1643,12 +1661,14 @@ function OrderInput({
                 });
             } else {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Sell Order Failed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Sell Order Failed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',

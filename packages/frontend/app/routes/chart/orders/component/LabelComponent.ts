@@ -319,12 +319,14 @@ const LabelComponent = ({
 
             if (result.success) {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Order Cancelled',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancelled',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -336,12 +338,14 @@ const LabelComponent = ({
                 });
             } else {
                 notifications.remove(slug);
-                plausible('Onchain Action', {
-                    props: {
-                        actionType: 'Limit Order Cancel Failed',
-                        orderType: 'Limit',
-                    },
-                });
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancel Failed',
+                            orderType: 'Limit',
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
@@ -553,12 +557,14 @@ const LabelComponent = ({
                     );
                     // Show error notification to user
                     notifications.remove(slug);
-                    plausible('Onchain Action', {
-                        props: {
-                            actionType: 'Limit Order Update Failed',
-                            orderType: 'Limit',
-                        },
-                    });
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Update Failed',
+                                orderType: 'Limit',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Failed to update order',
                         message:
@@ -572,12 +578,14 @@ const LabelComponent = ({
                 } else {
                     // Show success notification
                     notifications.remove(slug);
-                    plausible('Onchain Action', {
-                        props: {
-                            actionType: 'Limit Order Updated',
-                            orderType: 'Limit',
-                        },
-                    });
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Updated',
+                                orderType: 'Limit',
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Order updated',
                         message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
