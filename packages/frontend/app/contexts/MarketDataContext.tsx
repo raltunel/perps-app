@@ -81,7 +81,7 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({
             type: 'metaAndAssetCtxs',
         };
 
-        subscribeToPoller('info', marketSub, processMarketPollData, 500);
+        subscribeToPoller('info', marketSub, processMarketPollData, 2000);
 
         return () => {
             unsubscribeFromPoller('info', marketSub);
