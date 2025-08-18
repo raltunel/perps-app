@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -11,6 +11,8 @@ import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
 import {
     findLimitLabelAtPosition,
+    getMainSeriesPaneIndex,
+    getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
@@ -77,32 +79,25 @@ const LabelComponent = ({
             let widthAttr = canvasSize?.width;
 
             if (overlayCanvasRef.current) {
-                const chartDiv = document.getElementById('tv_chart');
-                const iframe = chartDiv?.querySelector(
-                    'iframe',
-                ) as HTMLIFrameElement;
-                const iframeDoc =
-                    iframe?.contentDocument || iframe?.contentWindow?.document;
+                const { iframeDoc, paneCanvas } =
+                    getPaneCanvasAndIFrameDoc(chart);
 
-                if (iframeDoc) {
-                    const paneCanvas = iframeDoc.querySelector(
-                        'canvas[data-name="pane-canvas"]',
-                    ) as HTMLCanvasElement;
-                    const width = overlayCanvasRef.current.style.width;
-                    const height = overlayCanvasRef.current.style?.height;
+                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
 
-                    heightAttr = paneCanvas?.height;
-                    widthAttr = paneCanvas.width;
+                const width = overlayCanvasRef.current.style.width;
+                const height = overlayCanvasRef.current.style?.height;
 
-                    if (
-                        width !== canvasSize?.styleWidth ||
-                        height !== canvasSize?.styleWidth
-                    ) {
-                        overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
-                        overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
-                        overlayCanvasRef.current.width = paneCanvas.width;
-                        overlayCanvasRef.current.height = paneCanvas.height;
-                    }
+                heightAttr = paneCanvas?.height;
+                widthAttr = paneCanvas.width;
+
+                if (
+                    width !== canvasSize?.styleWidth ||
+                    height !== canvasSize?.styleWidth
+                ) {
+                    overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
+                    overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
+                    overlayCanvasRef.current.width = paneCanvas.width;
+                    overlayCanvasRef.current.height = paneCanvas.height;
                 }
             }
 
@@ -214,7 +209,7 @@ const LabelComponent = ({
         selectedLine,
     ]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (!isDrag) {
             const overlayOffsetX = overlayCanvasMousePositionRef.current.x;
             const overlayOffsetY = overlayCanvasMousePositionRef.current.y;
@@ -235,7 +230,8 @@ const LabelComponent = ({
             }
         }
     }, [
-        overlayCanvasMousePositionRef.current,
+        overlayCanvasMousePositionRef.current.x,
+        overlayCanvasMousePositionRef.current.y,
         JSON.stringify(drawnLabelsRef.current),
         isDrag,
     ]);
@@ -248,51 +244,39 @@ const LabelComponent = ({
                     .crossHairMoved()
                     .subscribe(null, ({ offsetX, offsetY }) => {
                         if (chart) {
-                            const chartDiv =
-                                document.getElementById('tv_chart');
-                            const iframe = chartDiv?.querySelector(
-                                'iframe',
-                            ) as HTMLIFrameElement;
+                            const { paneCanvas } =
+                                getPaneCanvasAndIFrameDoc(chart);
 
-                            const iframeDoc = iframe.contentDocument;
+                            if (!paneCanvas) return;
 
-                            if (iframeDoc) {
-                                const paneCanvas = iframeDoc.querySelector(
-                                    'canvas[data-name="pane-canvas"]',
-                                ) as HTMLCanvasElement;
+                            const rect = paneCanvas?.getBoundingClientRect();
 
-                                const rect =
-                                    paneCanvas?.getBoundingClientRect();
+                            if (rect && paneCanvas && offsetX && offsetY) {
+                                const cssOffsetX = offsetX - rect.left;
+                                const cssOffsetY = offsetY - rect.top;
 
-                                if (rect && paneCanvas && offsetX && offsetY) {
-                                    const cssOffsetX = offsetX - rect.left;
-                                    const cssOffsetY = offsetY - rect.top;
+                                const scaleY =
+                                    paneCanvas?.height / rect?.height;
+                                const scaleX = paneCanvas.width / rect.width;
 
-                                    const scaleY =
-                                        paneCanvas?.height / rect?.height;
-                                    const scaleX =
-                                        paneCanvas.width / rect.width;
+                                const overlayOffsetX = cssOffsetX * scaleX;
+                                const overlayOffsetY = cssOffsetY * scaleY;
 
-                                    const overlayOffsetX = cssOffsetX * scaleX;
-                                    const overlayOffsetY = cssOffsetY * scaleY;
+                                const isLabel = findLimitLabelAtPosition(
+                                    overlayOffsetX,
+                                    overlayOffsetY,
+                                    drawnLabelsRef.current,
+                                    false,
+                                );
+                                overlayCanvasMousePositionRef.current = {
+                                    x: overlayOffsetX,
+                                    y: overlayOffsetY,
+                                };
 
-                                    const isLabel = findLimitLabelAtPosition(
-                                        overlayOffsetX,
-                                        overlayOffsetY,
-                                        drawnLabelsRef.current,
-                                        false,
-                                    );
-
-                                    overlayCanvasMousePositionRef.current = {
-                                        x: overlayOffsetX,
-                                        y: overlayOffsetY,
-                                    };
-
-                                    if (isLabel) {
-                                        if (overlayCanvasRef.current)
-                                            overlayCanvasRef.current.style.pointerEvents =
-                                                'auto';
-                                    }
+                                if (isLabel) {
+                                    if (overlayCanvasRef.current)
+                                        overlayCanvasRef.current.style.pointerEvents =
+                                            'auto';
                                 }
                             }
                         }
@@ -335,6 +319,12 @@ const LabelComponent = ({
 
             if (result.success) {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: {
+                        actionType: 'Limit Order Cancelled',
+                        orderType: 'Limit',
+                    },
+                });
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -346,6 +336,12 @@ const LabelComponent = ({
                 });
             } else {
                 notifications.remove(slug);
+                plausible('Onchain Action', {
+                    props: {
+                        actionType: 'Limit Order Cancel Failed',
+                        orderType: 'Limit',
+                    },
+                });
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
@@ -472,9 +468,11 @@ const LabelComponent = ({
             let advancedValue = scaleData?.yScale.invert(clientY);
 
             if (chart) {
-                const priceScalePane = chart
-                    .activeChart()
-                    .getPanes()[0] as IPaneApi;
+                const paneIndex = getMainSeriesPaneIndex(chart);
+                if (paneIndex === null) return;
+                const priceScalePane = chart.activeChart().getPanes()[
+                    paneIndex
+                ] as IPaneApi;
 
                 const priceScale = priceScalePane.getMainSourcePriceScale();
                 if (priceScale) {
@@ -555,6 +553,12 @@ const LabelComponent = ({
                     );
                     // Show error notification to user
                     notifications.remove(slug);
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Update Failed',
+                            orderType: 'Limit',
+                        },
+                    });
                     notifications.add({
                         title: 'Failed to update order',
                         message:
@@ -568,6 +572,12 @@ const LabelComponent = ({
                 } else {
                     // Show success notification
                     notifications.remove(slug);
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Updated',
+                            orderType: 'Limit',
+                        },
+                    });
                     notifications.add({
                         title: 'Order updated',
                         message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
