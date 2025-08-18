@@ -132,7 +132,14 @@ export default function SliderTrack({
                             <div
                                 className={styles.minimumLabel}
                                 style={{
-                                    left: `${minimumPercentage}%`,
+                                    left:
+                                        minimumValue < 3.5
+                                            ? 0
+                                            : `${minimumPercentage}%`,
+                                    transform:
+                                        minimumValue < 3.5
+                                            ? 'none'
+                                            : 'translateX(-130%)',
                                 }}
                                 onMouseEnter={() =>
                                     setSliderBelowMinimumLeverage?.(true)
