@@ -14,6 +14,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
@@ -185,6 +186,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
                 const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
+                const timeOfSubmission = Date.now();
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
@@ -202,6 +204,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             props: {
                                 actionType: 'Market Close Order Placed',
                                 orderType: 'Market',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -219,6 +225,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             props: {
                                 actionType: 'Market Close Order Failed',
                                 orderType: 'Market',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
