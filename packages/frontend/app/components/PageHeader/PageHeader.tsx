@@ -55,7 +55,9 @@ export default function PageHeader() {
 
     useEffect(() => {
         // track initial site landing
-        plausible('Landing');
+        if (typeof plausible === 'function') {
+            plausible('Landing');
+        }
     }, []);
 
     // data to generate nav links in page header
@@ -127,22 +129,16 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
-            plausible('Login');
-            // plausible('Logout', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                plausible('Login');
+            }
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
-            plausible('Logout');
-            // plausible('Login', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                plausible('Logout');
+            }
         }
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
