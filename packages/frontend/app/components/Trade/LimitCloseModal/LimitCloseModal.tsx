@@ -10,6 +10,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -299,6 +300,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             true,
         );
 
+        const timeOfSubmission = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -313,6 +315,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         props: {
                             actionType: 'Limit Close Order Placed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -331,6 +337,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         props: {
                             actionType: 'Limit Close Order Failed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }

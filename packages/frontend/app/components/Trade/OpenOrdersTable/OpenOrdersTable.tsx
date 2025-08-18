@@ -6,6 +6,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -84,6 +85,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 }
             });
 
+            const timeOfSubmission = Date.now();
             // Wait for all cancel operations to complete
             const results = await Promise.allSettled(cancelPromises);
 
@@ -145,6 +147,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                     props: {
                                         actionType: 'Limit Order Cancelled',
                                         orderType: 'Limit',
+                                        txDuration: getDurationSegment(
+                                            timeOfSubmission,
+                                            Date.now(),
+                                        ),
                                     },
                                 });
                             }
@@ -166,6 +172,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             props: {
                                 actionType: 'All Limit Orders Cancelled',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -196,6 +206,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             props: {
                                 actionType: 'Partial Limit Orders Cancelled',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -215,6 +229,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             props: {
                                 actionType: 'Cancel All Failed',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
