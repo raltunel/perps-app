@@ -130,7 +130,6 @@ export class MarketOrderService {
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
                 console.log('  - Log page:', cachedLogPage);
-                console.log({ params });
 
                 const orderParams: any = {
                     marketId: marketId,
@@ -159,7 +158,6 @@ export class MarketOrderService {
                 console.log('  - Transaction details:', transaction);
                 return transaction;
             } else {
-                console.log({ params });
                 console.log('  - Building market SELL order...');
                 const orderParams: any = {
                     marketId: marketId,

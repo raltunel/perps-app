@@ -100,7 +100,6 @@ export class LimitOrderService {
 
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
-                console.log({ params });
                 console.log('  - Building limit BUY order...');
                 const orderParams: any = {
                     marketId: marketId,
@@ -127,7 +126,6 @@ export class LimitOrderService {
                 console.log('✅ Limit buy order built successfully');
                 return transaction;
             } else {
-                console.log({ params });
                 console.log('  - Building limit SELL order...');
                 const orderParams: any = {
                     marketId: marketId,
