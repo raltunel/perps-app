@@ -311,6 +311,7 @@ const LabelComponent = ({
                 message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
             const timeOfSubmission = Date.now();
@@ -540,6 +541,7 @@ const LabelComponent = ({
                     message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'spinner',
                     slug,
+                    removeAfter: 60000,
                 });
 
                 // If cancel was successful, create a new order with the updated price
