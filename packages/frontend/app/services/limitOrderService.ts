@@ -20,6 +20,7 @@ export interface LimitOrderParams {
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     replaceOrderId?: bigint; // Optional order ID to replace an existing order
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -114,6 +115,7 @@ export class LimitOrderService {
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -139,6 +141,7 @@ export class LimitOrderService {
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 console.log('  - Order parameters:', orderParams);
