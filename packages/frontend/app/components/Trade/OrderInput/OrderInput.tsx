@@ -39,6 +39,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -1301,6 +1302,8 @@ function OrderInput({
                 });
             }
 
+            const timeOfSubmission = Date.now();
+
             // Execute the market buy order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1317,6 +1320,10 @@ function OrderInput({
                         props: {
                             actionType: 'Market Buy Order Successful',
                             orderType: 'Market',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1337,6 +1344,10 @@ function OrderInput({
                         props: {
                             actionType: 'Market Buy Order Failed',
                             orderType: 'Market',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1405,6 +1416,8 @@ function OrderInput({
                 });
             }
 
+            const timeOfSubmission = Date.now();
+
             // Execute the market sell order
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -1421,6 +1434,10 @@ function OrderInput({
                         props: {
                             actionType: 'Market Sell Order Successful',
                             orderType: 'Market',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1441,6 +1458,10 @@ function OrderInput({
                         props: {
                             actionType: 'Market Sell Order Failed',
                             orderType: 'Market',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1518,6 +1539,7 @@ function OrderInput({
             });
         }
 
+        const timeOfSubmission = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1535,6 +1557,10 @@ function OrderInput({
                         props: {
                             actionType: 'Limit Buy Order Placed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1554,6 +1580,10 @@ function OrderInput({
                         props: {
                             actionType: 'Limit Buy Order Failed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1630,6 +1660,7 @@ function OrderInput({
             });
         }
 
+        const timeOfSubmission = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1647,6 +1678,10 @@ function OrderInput({
                         props: {
                             actionType: 'Limit Sell Order Placed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -1666,6 +1701,10 @@ function OrderInput({
                         props: {
                             actionType: 'Limit Sell Order Failed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }

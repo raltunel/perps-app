@@ -9,6 +9,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import {
     findLimitLabelAtPosition,
     getMainSeriesPaneIndex,
@@ -312,6 +313,7 @@ const LabelComponent = ({
                 slug,
             });
 
+            const timeOfSubmission = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
                 orderId: order.oid,
@@ -324,6 +326,10 @@ const LabelComponent = ({
                         props: {
                             actionType: 'Limit Order Cancelled',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -343,6 +349,10 @@ const LabelComponent = ({
                         props: {
                             actionType: 'Limit Order Cancel Failed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -546,6 +556,7 @@ const LabelComponent = ({
                     // ... other required parameters
                 } as LimitOrderParams; // Cast to the correct type
 
+                const timeOfSubmission = Date.now();
                 const limitOrderResult =
                     await executeLimitOrder(newOrderParams);
 
@@ -562,6 +573,10 @@ const LabelComponent = ({
                             props: {
                                 actionType: 'Limit Order Update Failed',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }
@@ -583,6 +598,10 @@ const LabelComponent = ({
                             props: {
                                 actionType: 'Limit Order Updated',
                                 orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
                             },
                         });
                     }

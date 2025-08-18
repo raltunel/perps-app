@@ -6,6 +6,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
@@ -70,6 +71,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 slug,
             });
 
+            const timeOfSubmission = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
                 orderId: order.oid,
@@ -82,6 +84,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         props: {
                             actionType: 'Limit Order Cancelled',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
@@ -107,6 +113,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                         props: {
                             actionType: 'Limit Order Cancel Failed',
                             orderType: 'Limit',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
                         },
                     });
                 }
