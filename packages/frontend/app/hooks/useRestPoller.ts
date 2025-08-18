@@ -21,6 +21,7 @@ export function useRestPoller(props: UsePollerIF = {}) {
         payload: any,
         handler: (data: any) => void,
         intervalMs: number,
+        callInit: boolean = false,
     ) => {
         const key = toKey(endpoint, payload);
         const interval = setInterval(() => {
@@ -33,6 +34,17 @@ export function useRestPoller(props: UsePollerIF = {}) {
                 return data;
             });
         }, intervalMs);
+
+        if (callInit) {
+            fetch(`${url}/${endpoint}`, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+            }).then(async (res) => {
+                const data = await res.json();
+                handler(data);
+            });
+        }
+
         intervalMap.set(key, interval);
     };
 
