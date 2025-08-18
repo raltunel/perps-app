@@ -20,6 +20,7 @@ export interface LimitOrderParams {
     side: 'buy' | 'sell';
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     replaceOrderId?: bigint; // Optional order ID to replace an existing order
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -99,6 +100,7 @@ export class LimitOrderService {
 
             // Build the appropriate transaction based on side
             if (params.side === 'buy') {
+                console.log({ params });
                 console.log('  - Building limit BUY order...');
                 const orderParams: any = {
                     marketId: marketId,
@@ -114,6 +116,7 @@ export class LimitOrderService {
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -124,6 +127,7 @@ export class LimitOrderService {
                 console.log('✅ Limit buy order built successfully');
                 return transaction;
             } else {
+                console.log({ params });
                 console.log('  - Building limit SELL order...');
                 const orderParams: any = {
                     marketId: marketId,
@@ -139,6 +143,7 @@ export class LimitOrderService {
                     includesFillAtMarket: true,
                     cancelOrderId: params.replaceOrderId,
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 console.log('  - Order parameters:', orderParams);

@@ -21,6 +21,7 @@ export interface MarketOrderParams {
     leverage?: number; // Optional leverage multiplier for calculating userSetImBps
     bestBidPrice?: number; // Best bid price from order book (for sell orders)
     bestAskPrice?: number; // Best ask price from order book (for buy orders)
+    reduceOnly?: boolean; // Optional reduce-only flag
 }
 
 /**
@@ -129,6 +130,7 @@ export class MarketOrderService {
             if (params.side === 'buy') {
                 console.log('  - Building market BUY order...');
                 console.log('  - Log page:', cachedLogPage);
+                console.log({ params });
 
                 const orderParams: any = {
                     marketId: marketId,
@@ -145,6 +147,7 @@ export class MarketOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true,
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(
@@ -156,6 +159,7 @@ export class MarketOrderService {
                 console.log('  - Transaction details:', transaction);
                 return transaction;
             } else {
+                console.log({ params });
                 console.log('  - Building market SELL order...');
                 const orderParams: any = {
                     marketId: marketId,
@@ -172,6 +176,7 @@ export class MarketOrderService {
                     userSetImBps: userSetImBps,
                     includesFillAtMarket: true, // Ensure fill at market is included
                     marketOrderLogPage: cachedLogPage,
+                    reduceOnly: params.reduceOnly,
                 };
 
                 const transaction = buildOrderEntryTransaction(

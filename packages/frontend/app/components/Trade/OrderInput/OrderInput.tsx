@@ -1307,6 +1307,7 @@ function OrderInput({
                 side: 'buy',
                 leverage: leverage,
                 bestAskPrice: bestAskPrice,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
@@ -1394,6 +1395,7 @@ function OrderInput({
                 side: 'sell',
                 leverage: leverage,
                 bestBidPrice: bestBidPrice,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
@@ -1491,6 +1493,7 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
@@ -1586,6 +1589,7 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
             if (result.success) {
