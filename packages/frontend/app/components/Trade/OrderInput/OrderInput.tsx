@@ -1312,7 +1312,10 @@ function OrderInput({
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Buy Order Successful' },
+                    props: {
+                        actionType: 'Market Buy Order Successful',
+                        orderType: 'Market',
+                    },
                 });
                 // Show success notification
                 notifications.add({
@@ -1327,7 +1330,10 @@ function OrderInput({
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Buy Order Failed' },
+                    props: {
+                        actionType: 'Market Buy Order Failed',
+                        orderType: 'Market',
+                    },
                 });
                 // Show error notification
                 notifications.add({
@@ -1405,7 +1411,10 @@ function OrderInput({
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Sell Order Successful' },
+                    props: {
+                        actionType: 'Market Sell Order Successful',
+                        orderType: 'Market',
+                    },
                 });
                 // Show success notification
                 notifications.add({
@@ -1420,7 +1429,10 @@ function OrderInput({
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Sell Order Failed' },
+                    props: {
+                        actionType: 'Market Sell Order Failed',
+                        orderType: 'Market',
+                    },
                 });
                 // Show error notification
                 notifications.add({
@@ -1508,7 +1520,10 @@ function OrderInput({
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Buy Order Placed' },
+                    props: {
+                        actionType: 'Limit Buy Order Placed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: 'Buy / Long Limit Order Placed',
@@ -1522,7 +1537,10 @@ function OrderInput({
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Buy Order Failed' },
+                    props: {
+                        actionType: 'Limit Buy Order Failed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: 'Limit Order Failed',
@@ -1609,7 +1627,10 @@ function OrderInput({
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Sell Order Placed' },
+                    props: {
+                        actionType: 'Limit Sell Order Placed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: 'Sell / Short Limit Order Placed',
@@ -1623,7 +1644,10 @@ function OrderInput({
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Sell Order Failed' },
+                    props: {
+                        actionType: 'Limit Sell Order Failed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: 'Limit Order Failed',

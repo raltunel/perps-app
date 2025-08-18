@@ -309,7 +309,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
             if (result.success) {
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Close Order Placed' },
+                    props: {
+                        actionType: 'Limit Close Order Placed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
@@ -322,7 +325,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             } else {
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Close Order Failed' },
+                    props: {
+                        actionType: 'Limit Close Order Failed',
+                        orderType: 'Limit',
+                    },
                 });
                 notifications.add({
                     title: 'Limit Order Failed',

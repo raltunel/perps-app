@@ -254,7 +254,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
             if (result.success) {
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Close Order Placed' },
+                    props: {
+                        actionType: 'Market Close Order Placed',
+                        orderType: 'Market',
+                    },
                 });
                 notifications.add({
                     title:
@@ -270,7 +273,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 });
             } else {
                 plausible('Onchain Action', {
-                    props: { actionType: 'Market Close Order Failed' },
+                    props: {
+                        actionType: 'Market Close Order Failed',
+                        orderType: 'Market',
+                    },
                 });
                 notifications.add({
                     title: 'Close Failed',

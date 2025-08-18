@@ -320,7 +320,10 @@ const LabelComponent = ({
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Order Cancelled' },
+                    props: {
+                        actionType: 'Limit Order Cancelled',
+                        orderType: 'Limit',
+                    },
                 });
                 // Show success notification
                 notifications.add({
@@ -334,7 +337,10 @@ const LabelComponent = ({
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Order Cancel Failed' },
+                    props: {
+                        actionType: 'Limit Order Cancel Failed',
+                        orderType: 'Limit',
+                    },
                 });
                 // Show error notification
                 notifications.add({
@@ -548,7 +554,10 @@ const LabelComponent = ({
                     // Show error notification to user
                     notifications.remove(slug);
                     plausible('Onchain Action', {
-                        props: { actionType: 'Limit Order Update Failed' },
+                        props: {
+                            actionType: 'Limit Order Update Failed',
+                            orderType: 'Limit',
+                        },
                     });
                     notifications.add({
                         title: 'Failed to update order',
@@ -564,7 +573,10 @@ const LabelComponent = ({
                     // Show success notification
                     notifications.remove(slug);
                     plausible('Onchain Action', {
-                        props: { actionType: 'Limit Order Updated' },
+                        props: {
+                            actionType: 'Limit Order Updated',
+                            orderType: 'Limit',
+                        },
                     });
                     notifications.add({
                         title: 'Order updated',

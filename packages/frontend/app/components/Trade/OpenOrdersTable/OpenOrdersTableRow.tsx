@@ -78,7 +78,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             if (result.success) {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Order Cancelled' },
+                    props: {
+                        actionType: 'Limit Order Cancelled',
+                        orderType: 'Limit',
+                    },
                 });
                 // Show success notification
                 notifications.add({
@@ -98,7 +101,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             } else {
                 notifications.remove(slug);
                 plausible('Onchain Action', {
-                    props: { actionType: 'Limit Order Cancel Failed' },
+                    props: {
+                        actionType: 'Limit Order Cancel Failed',
+                        orderType: 'Limit',
+                    },
                 });
                 // Show error notification
                 notifications.add({

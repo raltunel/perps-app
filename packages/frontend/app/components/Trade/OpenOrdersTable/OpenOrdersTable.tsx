@@ -141,7 +141,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             const order = result.value.order;
                             notifications.remove(slug);
                             plausible('Onchain Action', {
-                                props: { actionType: 'Limit Order Cancelled' },
+                                props: {
+                                    actionType: 'Limit Order Cancelled',
+                                    orderType: 'Limit',
+                                },
                             });
                             notifications.add({
                                 title: 'Order Cancelled',
@@ -157,7 +160,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 } else {
                     notifications.remove(slug);
                     plausible('Onchain Action', {
-                        props: { actionType: 'All Limit Orders Cancelled' },
+                        props: {
+                            actionType: 'All Limit Orders Cancelled',
+                            orderType: 'Limit',
+                        },
                     });
                     notifications.add({
                         title: 'All Orders Cancelled',
@@ -182,7 +188,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 if (successCount > 0 && failureCount > 0) {
                     notifications.remove(slug);
                     plausible('Onchain Action', {
-                        props: { actionType: 'Partial Limit Orders Cancelled' },
+                        props: {
+                            actionType: 'Partial Limit Orders Cancelled',
+                            orderType: 'Limit',
+                        },
                     });
                     notifications.add({
                         title: 'Partial Success',
@@ -196,7 +205,10 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 } else {
                     notifications.remove(slug);
                     plausible('Onchain Action', {
-                        props: { actionType: 'Cancel All Failed' },
+                        props: {
+                            actionType: 'Cancel All Failed',
+                            orderType: 'Limit',
+                        },
                     });
                     notifications.add({
                         title: 'Cancel All Failed',
