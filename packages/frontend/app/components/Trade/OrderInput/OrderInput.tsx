@@ -1319,7 +1319,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Succeeded',
+                            actionType: 'Market Order Success',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
@@ -1346,7 +1346,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Failed',
+                            actionType: 'Market Order Fail',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
@@ -1376,7 +1376,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Market Order Failed',
+                        actionType: 'Market Order Fail',
                         direction: 'Buy',
                         orderType: 'Market',
                         maxActive: isMaxModeEnabled,
@@ -1456,7 +1456,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Succeeded',
+                            actionType: 'Market Order Success',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
@@ -1483,7 +1483,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Failed',
+                            actionType: 'Market Order Fail',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
@@ -1513,7 +1513,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Market Order Failed',
+                        actionType: 'Market Order Fail',
                         direction: 'Sell',
                         orderType: 'Market',
                         maxActive: isMaxModeEnabled,
@@ -1602,7 +1602,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Succeeded',
+                            actionType: 'Limit Order Success',
                             orderType: 'Limit',
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
@@ -1628,7 +1628,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Failed',
+                            actionType: 'Limit Order Fail',
                             orderType: 'Limit',
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
@@ -1658,7 +1658,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Order Failed',
+                        actionType: 'Limit Order Fail',
                         orderType: 'Limit',
                         direction: 'Buy',
                         maxActive: isMaxModeEnabled,
@@ -1747,7 +1747,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Succeeded',
+                            actionType: 'Limit Order Success',
                             orderType: 'Limit',
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
@@ -1773,7 +1773,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Failed',
+                            actionType: 'Limit Order Fail',
                             orderType: 'Limit',
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
@@ -1803,7 +1803,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Order Failed',
+                        actionType: 'Limit Order Fail',
                         orderType: 'Limit',
                         direction: 'Sell',
                         maxActive: isMaxModeEnabled,
