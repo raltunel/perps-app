@@ -146,8 +146,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             if (typeof plausible === 'function') {
                                 plausible('Onchain Action', {
                                     props: {
-                                        actionType: 'Limit Order Cancelled',
+                                        actionType:
+                                            'Limit Order Cancel Succeeded',
                                         orderType: 'Limit',
+                                        direction:
+                                            order.side === 'buy'
+                                                ? 'Buy'
+                                                : 'Sell',
                                         txDuration: getDurationSegment(
                                             timeOfSubmission,
                                             Date.now(),
@@ -171,7 +176,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'All Limit Orders Cancelled',
+                                actionType:
+                                    'All Limit Orders Cancels Succeeded',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
@@ -205,7 +211,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Partial Limit Orders Cancelled',
+                                actionType:
+                                    'Partial Limit Orders Cancels Succeeded',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,

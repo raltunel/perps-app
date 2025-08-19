@@ -313,8 +313,9 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Close Order Placed',
+                            actionType: 'Limit Close Order Succeeded',
                             orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -337,6 +338,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         props: {
                             actionType: 'Limit Close Order Failed',
                             orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
