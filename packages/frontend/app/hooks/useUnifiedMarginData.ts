@@ -35,6 +35,14 @@ export function useUnifiedMarginData() {
         return connection;
     }, []);
 
+    // backup side effect to clear margin bucket if set after logout
+    useEffect(() => {
+        if (!isSessionEstablished && !isDebugWalletActive && !!marginBucket) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
+        }
+    }, [isSessionEstablished, isDebugWalletActive, marginBucket]);
+
     useEffect(() => {
         // Track session state changes
         const sessionChanged =
