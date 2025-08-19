@@ -149,14 +149,11 @@ export default function PageHeader() {
             if (typeof plausible === 'function') {
                 const loginTime = Number(localStorage.getItem('loginTime'));
                 plausible('Session Established', {
-                    props: loginTime
-                        ? {
-                              loginTime: getDurationSegment(
-                                  loginTime,
-                                  Date.now(),
-                              ),
-                          }
-                        : undefined,
+                    props: {
+                        loginTime: loginTime
+                            ? getDurationSegment(loginTime, Date.now())
+                            : 'no login button clicked',
+                    },
                 });
             }
             localStorage.removeItem('loginTime');
