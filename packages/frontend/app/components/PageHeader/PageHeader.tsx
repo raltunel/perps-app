@@ -29,12 +29,29 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
+
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                if (!isUserConnected) {
+                    localStorage.setItem('loginTime', Date.now().toString());
+                }
+            };
+
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, [isUserConnected]);
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -130,8 +147,16 @@ export default function PageHeader() {
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
-                plausible('Session Established');
+                plausible('Session Established', {
+                    props: {
+                        loginTime: getDurationSegment(
+                            Number(localStorage.getItem('loginTime')) || 0,
+                            Date.now(),
+                        ),
+                    },
+                });
             }
+            localStorage.removeItem('loginTime');
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
@@ -293,6 +318,7 @@ export default function PageHeader() {
                     )}
                     <span
                         className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </span>
