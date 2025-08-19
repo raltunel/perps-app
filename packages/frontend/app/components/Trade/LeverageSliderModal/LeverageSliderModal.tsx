@@ -5,9 +5,9 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 // import Tooltip from '~/components/Tooltip/Tooltip';
 import { calcLeverageFloor } from '@crocswap-libs/ambient-ember';
 import { useSetUserMarginService } from '~/hooks/useSetUserMarginService';
+import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import LeverageSlider from '../OrderInput/LeverageSlider/LeverageSlider';
 import styles from './LeverageSliderModal.module.css';
@@ -35,7 +35,7 @@ export default function LeverageSliderModal({
     const setPreferredLeverage = useLeverageStore(
         (state) => state.setPreferredLeverage,
     );
-    const { marginBucket } = useTradeDataStore();
+    const { marginBucket } = useUnifiedMarginData();
     const [leverageFloor, setLeverageFloor] = useState<number>();
 
     const { isLoading, error, executeSetUserMargin } =
