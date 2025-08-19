@@ -1319,7 +1319,8 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Buy Order Successful',
+                            actionType: 'Market Order Succeeded',
+                            direction: 'Buy',
                             orderType: 'Market',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
@@ -1343,7 +1344,8 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Buy Order Failed',
+                            actionType: 'Market Order Failed',
+                            direction: 'Buy',
                             orderType: 'Market',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
@@ -1434,7 +1436,8 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Sell Order Successful',
+                            actionType: 'Market Order Succeeded',
+                            direction: 'Sell',
                             orderType: 'Market',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
@@ -1458,7 +1461,8 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Sell Order Failed',
+                            actionType: 'Market Order Failed',
+                            direction: 'Sell',
                             orderType: 'Market',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
@@ -1558,8 +1562,9 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Buy Order Placed',
+                            actionType: 'Limit Order Succeeded',
                             orderType: 'Limit',
+                            direction: 'Buy',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -1581,8 +1586,9 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Buy Order Failed',
+                            actionType: 'Limit Order Failed',
                             orderType: 'Limit',
+                            direction: 'Buy',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -1680,8 +1686,9 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Sell Order Placed',
+                            actionType: 'Limit Order Succeeded',
                             orderType: 'Limit',
+                            direction: 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -1703,8 +1710,9 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Sell Order Failed',
+                            actionType: 'Limit Order Failed',
                             orderType: 'Limit',
+                            direction: 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -2204,7 +2212,7 @@ function OrderInput({
                                 >
                                     <button
                                         data-testid='submit-order-button'
-                                        className={`plausible-event-name=Submit+Order+Button+Click plausible-event-maxActive=${isMaxModeEnabled} plausible-event-skipConfirm=${activeOptions.skipOpenOrderConfirm} plausible-event-orderType=${marketOrderType} ${styles.submit_button}`}
+                                        className={`plausible-event-name=Submit+Order+Button+Click plausible-event-maxActive=${isMaxModeEnabled} plausible-event-skipConfirm=${activeOptions.skipOpenOrderConfirm} plausible-event-orderType=${marketOrderType === 'limit' ? 'Limit' : 'Market'} plausible-event-direction=${tradeDirection === 'buy' ? 'Buy' : 'Sell'} ${styles.submit_button}`}
                                         style={{
                                             backgroundColor:
                                                 tradeDirection === 'buy'

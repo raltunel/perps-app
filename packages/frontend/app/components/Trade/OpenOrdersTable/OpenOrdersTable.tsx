@@ -146,8 +146,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             if (typeof plausible === 'function') {
                                 plausible('Onchain Action', {
                                     props: {
-                                        actionType: 'Limit Order Cancelled',
+                                        actionType:
+                                            'Limit Order Cancel Succeeded',
                                         orderType: 'Limit',
+                                        direction:
+                                            order.side === 'buy'
+                                                ? 'Buy'
+                                                : 'Sell',
                                         txDuration: getDurationSegment(
                                             timeOfSubmission,
                                             Date.now(),
@@ -171,7 +176,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'All Limit Orders Cancelled',
+                                actionType: 'Limit Order Cancel All Succeeded',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
@@ -205,7 +210,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Partial Limit Orders Cancelled',
+                                actionType:
+                                    'Limit Order Cancel All Partially Succeeded',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
@@ -228,7 +234,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Cancel All Failed',
+                                actionType: 'Limit Order Cancel All Failed',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
