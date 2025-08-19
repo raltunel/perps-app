@@ -339,6 +339,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                             actionType: 'Limit Close Order Fail',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
+                            errorMessage: result.error || 'Transaction failed',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -358,6 +359,19 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             }
         } catch (error) {
             console.error(`❌ Error submitting limit ${side} order:`, error);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Close Order Fail',
+                        orderType: 'Limit',
+                        direction: side === 'buy' ? 'Buy' : 'Sell',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Limit Order Failed',
                 message:
