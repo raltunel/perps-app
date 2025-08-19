@@ -130,14 +130,14 @@ export default function PageHeader() {
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
-                plausible('Login');
+                plausible('Session Established');
             }
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
             if (typeof plausible === 'function') {
-                plausible('Logout');
+                plausible('Session Ended');
             }
         }
         prevIsUserConnected.current = isUserConnected;
