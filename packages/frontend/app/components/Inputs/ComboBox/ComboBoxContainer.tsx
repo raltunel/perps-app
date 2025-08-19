@@ -42,6 +42,10 @@ export default function ComboBoxContainer() {
         setManualAddressEnabled,
         manualAddress,
         setManualAddress,
+        useMockLeverage,
+        setUseMockLeverage,
+        mockMinimumLeverage,
+        setMockMinimumLeverage,
     } = useDebugStore();
 
     // useEffect(() => {
@@ -213,6 +217,30 @@ export default function ComboBoxContainer() {
                             </div>
                         </Tooltip>
                     )}
+                </div>
+            )}
+            <div
+                className={`${styles.sdkToggle} ${useMockLeverage ? styles.active : styles.disabled}`}
+                onClick={() => setUseMockLeverage(!useMockLeverage)}
+            >
+                <div className={styles.sdkToggleButton}>Mock Lev</div>
+            </div>
+
+            {useMockLeverage && (
+                <div>
+                    <input
+                        type='number'
+                        value={mockMinimumLeverage}
+                        onChange={(e) =>
+                            setMockMinimumLeverage(
+                                parseFloat(e.target.value) || 1,
+                            )
+                        }
+                        step='0.1'
+                        min='1'
+                        max='100'
+                    />
+                    <span style={{ fontSize: '12px', color: '#999' }}></span>
                 </div>
             )}
 

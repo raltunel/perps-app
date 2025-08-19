@@ -148,7 +148,10 @@ export default function SliderTrack({
                                     setSliderBelowMinimumLeverage?.(false)
                                 }
                             >
-                                Min: {Math.trunc(minimumValue)}x
+                                Min:{' '}
+                                {minimumValue < 3
+                                    ? `${minimumValue.toFixed(1)}x`
+                                    : `${Math.trunc(minimumValue)}x`}{' '}
                             </div>
                         )}
                     </>
