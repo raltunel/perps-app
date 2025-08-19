@@ -315,6 +315,18 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 icon: 'error',
                 removeAfter: 10000,
             });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Market Close Order Fail',
+                        orderType: 'Market',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         } finally {
             setIsProcessingOrder(false);
             close();
