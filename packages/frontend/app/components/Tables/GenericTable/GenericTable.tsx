@@ -9,13 +9,13 @@ import GenericTablePagination from '~/components/Pagination/GenericTablePaginati
 import NoDataRow from '~/components/Skeletons/NoDataRow';
 import SkeletonTable from '~/components/Skeletons/SkeletonTable/SkeletonTable';
 import { useIsClient } from '~/hooks/useIsClient';
+import { useDebugStore } from '~/stores/DebugStore';
 import {
     TableState,
     type HeaderCell,
     type TableSortDirection,
 } from '~/utils/CommonIFs';
 import styles from './GenericTable.module.css';
-import { useDebugStore } from '~/stores/DebugStore';
 
 interface GenericTableProps<
     T,
@@ -442,6 +442,13 @@ export default function GenericTable<
                 {!isSessionEstablished && (
                     <div
                         className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer}`}
+                        onClick={() => {
+                            // save current time in local storage
+                            localStorage.setItem(
+                                'loginTime',
+                                Date.now().toString(),
+                            );
+                        }}
                     >
                         <SessionButton />
                     </div>

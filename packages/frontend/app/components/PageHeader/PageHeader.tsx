@@ -29,6 +29,7 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
@@ -129,9 +130,26 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
+            console.log(
+                'Session Established',
+                localStorage.getItem('loginTime'),
+                Number(localStorage.getItem('loginTime')),
+                getDurationSegment(
+                    Number(localStorage.getItem('loginTime')) || 0,
+                    Date.now(),
+                ),
+            );
             if (typeof plausible === 'function') {
-                plausible('Session Established');
+                plausible('Session Established', {
+                    props: {
+                        loginTime: getDurationSegment(
+                            Number(localStorage.getItem('loginTime')) || 0,
+                            Date.now(),
+                        ),
+                    },
+                });
             }
+            localStorage.removeItem('loginTime');
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
@@ -293,6 +311,15 @@ export default function PageHeader() {
                     )}
                     <span
                         className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
+                        onClick={() => {
+                            if (!isUserConnected) {
+                                // save current time in local storage
+                                localStorage.setItem(
+                                    'loginTime',
+                                    Date.now().toString(),
+                                );
+                            }
+                        }}
                     >
                         <SessionButton />
                     </span>

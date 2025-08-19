@@ -219,6 +219,13 @@ function DepositDropdown(props: propsIF) {
                         </p>
                         <span
                             className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview`}
+                            onClick={() => {
+                                // save current time in local storage
+                                localStorage.setItem(
+                                    'loginTime',
+                                    Date.now().toString(),
+                                );
+                            }}
                         >
                             <SessionButton />
                         </span>
