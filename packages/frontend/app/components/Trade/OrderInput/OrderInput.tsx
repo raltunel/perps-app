@@ -29,6 +29,7 @@ import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     makeSlug,
@@ -58,7 +59,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { useDebugStore } from '~/stores/DebugStore';
 
 export interface OrderTypeOption {
     value: string;
@@ -914,6 +914,10 @@ function OrderInput({
         }
     }, [sizeDisplay, isEditingSizeInput]);
 
+    useEffect(() => {
+        updateSliderAfterOrder();
+    }, [usdAvailableToTrade]);
+
     const handleSizeInputBlur = useCallback(() => {
         handleSizeInputUpdate();
         setIsEditingSizeInput(false);
@@ -1275,6 +1279,10 @@ function OrderInput({
         ],
     );
 
+    const updateSliderAfterOrder = useCallback(() => {
+        if (!isEditingSizeInput) handleSizeInputUpdate();
+    }, [isEditingSizeInput, handleSizeInputUpdate]);
+
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // Validate position size
@@ -1351,6 +1359,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                updateSliderAfterOrder();
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
@@ -1488,6 +1497,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                updateSliderAfterOrder();
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
