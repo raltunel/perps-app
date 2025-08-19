@@ -202,7 +202,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Succeeded',
+                                actionType: 'Market Close Order Success',
                                 orderType: 'Market',
                                 direction: closingSide,
                                 txDuration: getDurationSegment(
@@ -224,7 +224,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Failed',
+                                actionType: 'Market Close Order Fail',
                                 orderType: 'Market',
                                 direction: closingSide,
                                 txDuration: getDurationSegment(

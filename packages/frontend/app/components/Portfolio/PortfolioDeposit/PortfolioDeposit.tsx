@@ -132,7 +132,7 @@ function PortfolioDeposit(props: propsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Deposit Failed',
+                            actionType: 'Deposit Fail',
                             maxActive: maxActive,
                             errorMessage: result.error || 'Transaction failed',
                             txDuration: getDurationSegment(
@@ -159,7 +159,7 @@ function PortfolioDeposit(props: propsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Deposit Succeeded',
+                            actionType: 'Deposit Success',
                             maxActive: maxActive,
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
