@@ -1,6 +1,6 @@
 {
     "name": "@perps-app/frontend",
-    "version": "0.1.21-4",
+    "version": "0.1.21-5",
     "private": true,
     "type": "module",
     "scripts": {
