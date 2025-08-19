@@ -250,6 +250,18 @@ function PortfolioWithdraw({
             setError(
                 error instanceof Error ? error.message : 'Withdrawal failed',
             );
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Withdrawal Fail',
+                        maxActive: maxModeActive,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     }, [
         withdrawInputNum,

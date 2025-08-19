@@ -187,6 +187,18 @@ function PortfolioDeposit(props: propsIF) {
         } catch (error) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Deposit Fail',
+                        maxActive: maxActive,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 

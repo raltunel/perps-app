@@ -380,6 +380,19 @@ const LabelComponent = ({
                         : 'Unknown error occurred',
                 icon: 'error',
             });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Order Cancel Fail',
+                        orderType: 'Limit',
+                        direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     };
 
@@ -633,6 +646,19 @@ const LabelComponent = ({
                             : 'Unknown error occurred',
                     icon: 'error',
                 });
+                if (typeof plausible === 'function') {
+                    plausible('Offchain Failure', {
+                        props: {
+                            actionType: 'Limit Order Update Fail',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            errorMessage:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                        },
+                    });
+                }
             }
 
             tempSelectedLine = undefined;
