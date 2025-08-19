@@ -6,6 +6,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
@@ -68,8 +69,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
+            const timeOfSubmission = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
                 orderId: order.oid,
@@ -77,6 +80,19 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
 
             if (result.success) {
                 notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancel Success',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -94,6 +110,19 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 }
             } else {
                 notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancel Fail',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',

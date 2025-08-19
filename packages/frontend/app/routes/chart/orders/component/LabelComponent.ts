@@ -9,6 +9,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import {
     findLimitLabelAtPosition,
     getMainSeriesPaneIndex,
@@ -310,8 +311,10 @@ const LabelComponent = ({
                 message: `Cancelling ${order.side} limit order for ${usdValueOfOrderStr} of ${symbolInfo?.coin}`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
+            const timeOfSubmission = Date.now();
             // Execute the cancel order
             const result = await executeCancelOrder({
                 orderId: order.oid,
@@ -319,6 +322,19 @@ const LabelComponent = ({
 
             if (result.success) {
                 notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancel Success',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Order Cancelled',
@@ -330,6 +346,19 @@ const LabelComponent = ({
                 });
             } else {
                 notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Order Cancel Fail',
+                            orderType: 'Limit',
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Cancel Failed',
@@ -351,6 +380,19 @@ const LabelComponent = ({
                         : 'Unknown error occurred',
                 icon: 'error',
             });
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Order Cancel Fail',
+                        orderType: 'Limit',
+                        direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     };
 
@@ -514,6 +556,7 @@ const LabelComponent = ({
                     message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'spinner',
                     slug,
+                    removeAfter: 60000,
                 });
 
                 // If cancel was successful, create a new order with the updated price
@@ -530,6 +573,7 @@ const LabelComponent = ({
                     // ... other required parameters
                 } as LimitOrderParams; // Cast to the correct type
 
+                const timeOfSubmission = Date.now();
                 const limitOrderResult =
                     await executeLimitOrder(newOrderParams);
 
@@ -541,6 +585,19 @@ const LabelComponent = ({
                     );
                     // Show error notification to user
                     notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Update Fail',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Failed to update order',
                         message:
@@ -554,6 +611,19 @@ const LabelComponent = ({
                 } else {
                     // Show success notification
                     notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Update Success',
+                                orderType: 'Limit',
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Order updated',
                         message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
@@ -576,9 +646,20 @@ const LabelComponent = ({
                             : 'Unknown error occurred',
                     icon: 'error',
                 });
+                if (typeof plausible === 'function') {
+                    plausible('Offchain Failure', {
+                        props: {
+                            actionType: 'Limit Order Update Fail',
+                            orderType: 'Limit',
+                            direction: side === 'buy' ? 'Buy' : 'Sell',
+                            errorMessage:
+                                error instanceof Error
+                                    ? error.message
+                                    : 'Unknown error occurred',
+                        },
+                    });
+                }
             }
-
-            console.log({ type, orderId, newPrice });
 
             tempSelectedLine = undefined;
             setIsDrag(false);
