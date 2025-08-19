@@ -58,6 +58,7 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
+import { useDebugStore } from '~/stores/DebugStore';
 
 export interface OrderTypeOption {
     value: string;
@@ -231,6 +232,7 @@ function OrderInput({
     } = useTradeDataStore();
 
     const { buys, sells } = useOrderBookStore();
+    const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
     // Get Pyth price for the current symbol
@@ -1162,10 +1164,15 @@ function OrderInput({
             value: leverage,
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
-            // minimumValue: 50,
-            minimumValue: leverageFloor,
+            minimumValue: useMockLeverage ? mockMinimumLeverage : leverageFloor,
         }),
-        [leverage, handleLeverageChange, leverageFloor],
+        [
+            leverage,
+            handleLeverageChange,
+            leverageFloor,
+            useMockLeverage,
+            mockMinimumLeverage,
+        ],
     );
 
     // const chasePriceProps = useMemo(
