@@ -7,6 +7,7 @@ import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
 
@@ -166,6 +167,7 @@ function PortfolioWithdraw({
             return;
         }
 
+        const timeOfSubmission = Date.now();
         try {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
@@ -188,6 +190,19 @@ function PortfolioWithdraw({
 
             // Check if the result indicates failure
             if (result && result.success === false) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Withdrawal Fail',
+                            maxActive: maxModeActive,
+                            errorMessage: result.error || 'Transaction failed',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
@@ -202,6 +217,18 @@ function PortfolioWithdraw({
             } else {
                 setTransactionStatus('success');
 
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Withdrawal Success',
+                            maxActive: maxModeActive,
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 // Show success notification
                 notificationStore.add({
                     title: 'Withdrawal Successful',
@@ -335,7 +362,6 @@ function PortfolioWithdraw({
                 bg='accent1'
                 onClick={handleWithdraw}
                 disabled={isButtonDisabled}
-                className={`plausible-event-name=Withdraw+Button+Click plausible-event-maxActive=${maxModeActive}`}
             >
                 {transactionStatus === 'pending'
                     ? 'Confirming Transaction...'
