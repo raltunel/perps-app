@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useCallback, useEffect } from 'react';
 import { ORDERBOOK_POLL_URL } from '~/utils/Constants';
 
