@@ -29,12 +29,29 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
+
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                if (!isUserConnected) {
+                    localStorage.setItem('loginTime', Date.now().toString());
+                }
+            };
+
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, [isUserConnected]);
 
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,6 +69,13 @@ export default function PageHeader() {
 
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
+
+    useEffect(() => {
+        // track initial site landing
+        if (typeof plausible === 'function') {
+            plausible('Landing');
+        }
+    }, []);
 
     // data to generate nav links in page header
     const navLinks = [
@@ -122,22 +146,24 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
-            plausible('Login');
-            // plausible('Logout', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                const loginTime = Number(localStorage.getItem('loginTime'));
+                plausible('Session Established', {
+                    props: {
+                        loginTime: loginTime
+                            ? getDurationSegment(loginTime, Date.now())
+                            : 'no login button clicked',
+                    },
+                });
+            }
+            localStorage.removeItem('loginTime');
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false
         ) {
-            plausible('Logout');
-            // plausible('Login', {
-            //     props: {
-            //         location: 'Page Header',
-            //     },
-            // });
+            if (typeof plausible === 'function') {
+                plausible('Session Ended');
+            }
         }
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
@@ -292,6 +318,7 @@ export default function PageHeader() {
                     )}
                     <span
                         className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </span>

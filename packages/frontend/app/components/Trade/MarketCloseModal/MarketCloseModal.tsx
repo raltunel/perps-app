@@ -10,6 +10,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -236,6 +237,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
             const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
+            const timeOfSubmission = Date.now();
             // Execute market order in opposite direction to close position
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -253,6 +255,19 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             );
 
             if (result.success) {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Success',
+                            orderType: 'Market',
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 notifications.add({
                     title:
                         positionSize < 100
@@ -266,6 +281,19 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     removeAfter: 5000,
                 });
             } else {
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Close Order Fail',
+                            orderType: 'Market',
+                            direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txDuration: getDurationSegment(
+                                timeOfSubmission,
+                                Date.now(),
+                            ),
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Close Failed',
                     message: result.error || 'Failed to close position',

@@ -6,6 +6,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { blockExplorer, EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type {
     OrderDataIF,
     OrderDataSortBy,
@@ -52,6 +53,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
                 icon: 'spinner',
                 slug,
+                removeAfter: 60000,
             });
 
             const cancelPromises = filteredOrders.map(async (order) => {
@@ -84,6 +86,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 }
             });
 
+            const timeOfSubmission = Date.now();
             // Wait for all cancel operations to complete
             const results = await Promise.allSettled(cancelPromises);
 
@@ -140,6 +143,23 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                             );
                             const order = result.value.order;
                             notifications.remove(slug);
+                            if (typeof plausible === 'function') {
+                                plausible('Onchain Action', {
+                                    props: {
+                                        actionType:
+                                            'Limit Order Cancel Success',
+                                        orderType: 'Limit',
+                                        direction:
+                                            order.side === 'buy'
+                                                ? 'Buy'
+                                                : 'Sell',
+                                        txDuration: getDurationSegment(
+                                            timeOfSubmission,
+                                            Date.now(),
+                                        ),
+                                    },
+                                });
+                            }
                             notifications.add({
                                 title: 'Order Cancelled',
                                 message: `Successfully cancelled ${order.side} limit order for ${usdValueOfOrderStr} of ${order.coin}`,
@@ -153,6 +173,18 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     });
                 } else {
                     notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Cancel All Success',
+                                orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'All Orders Cancelled',
                         message: `Successfully cancelled all ${successCount} orders`,
@@ -175,6 +207,19 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                 });
                 if (successCount > 0 && failureCount > 0) {
                     notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType:
+                                    'Limit Order Cancel All Partial Success',
+                                orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Partial Success',
                         message: `Cancelled ${successCount} orders, ${failureCount} failed`,
@@ -186,6 +231,18 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     });
                 } else {
                     notifications.remove(slug);
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Limit Order Cancel All Fail',
+                                orderType: 'Limit',
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Cancel All Failed',
                         message: `Failed to cancel any orders. ${failedOrders.slice(0, 3).join(', ')}${failedOrders.length > 3 ? '...' : ''}`,

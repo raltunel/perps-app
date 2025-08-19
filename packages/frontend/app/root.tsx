@@ -83,6 +83,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
+    const isProduction = import.meta.env.VITE_CONTEXT === 'production';
+
     return (
         <html lang='en'>
             <head>
@@ -146,11 +148,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                <script
-                    defer
-                    data-domain='perps.ambient.finance'
-                    src='https://plausible.io/js/script.pageview-props.tagged-events.js'
-                ></script>
+                {isProduction && (
+                    <script
+                        defer
+                        data-domain='perps.ambient.finance'
+                        src='https://plausible.io/js/script.pageview-props.tagged-events.js'
+                    ></script>
+                )}
             </head>
             <body>
                 {children}
@@ -167,6 +171,7 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
+
     return (
         <>
             <Layout>

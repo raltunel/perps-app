@@ -14,6 +14,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
@@ -185,6 +186,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
                 const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
+                const timeOfSubmission = Date.now();
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
@@ -197,6 +199,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 });
 
                 if (result.success) {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Success',
+                                orderType: 'Market',
+                                direction: closingSide,
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Position Closed',
                         message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
@@ -206,6 +221,19 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                             : undefined,
                     });
                 } else {
+                    if (typeof plausible === 'function') {
+                        plausible('Onchain Action', {
+                            props: {
+                                actionType: 'Market Close Order Fail',
+                                orderType: 'Market',
+                                direction: closingSide,
+                                txDuration: getDurationSegment(
+                                    timeOfSubmission,
+                                    Date.now(),
+                                ),
+                            },
+                        });
+                    }
                     notifications.add({
                         title: 'Close Failed',
                         message: String(
