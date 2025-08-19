@@ -8,6 +8,7 @@ import {
     useNotificationStore,
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
+import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
@@ -25,7 +26,7 @@ interface PropsIF {
 export default function MarketCloseModal({ close, position }: PropsIF) {
     const { formatNumWithOnlyDecimals } = useNumFormatter();
 
-    const { symbolInfo } = useTradeDataStore();
+    const { symbolInfo, symbol } = useTradeDataStore();
 
     const { executeMarketOrder } = useMarketOrderService();
     const { buys, sells } = useOrderBookStore();
@@ -37,8 +38,9 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const MIN_ORDER_VALUE = 1;
 
     const isPositionLong = position.szi > 0;
+    const pythPriceData = usePythPrice(symbol);
 
-    const markPx = symbolInfo?.markPx;
+    const markPx = symbolInfo?.markPx || pythPriceData?.price;
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
@@ -234,8 +236,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         try {
             // Get order book prices for the closing order
             const closingSide = isPositionLong ? 'sell' : 'buy';
-            const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
-            const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
+            const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
+            const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
 
             const timeOfSubmission = Date.now();
             // Execute market order in opposite direction to close position
