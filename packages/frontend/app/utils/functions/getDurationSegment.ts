@@ -54,6 +54,6 @@ export const getDurationSegment = (
                                                         : durationSeconds <
                                                             86400
                                                           ? '< 1d'
-                                                          : 'slow';
+                                                          : 'unknown';
     return durationSegment;
 };
