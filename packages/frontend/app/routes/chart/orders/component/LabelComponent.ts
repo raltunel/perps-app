@@ -327,7 +327,7 @@ const LabelComponent = ({
                         props: {
                             actionType: 'Limit Order Cancelled',
                             orderType: 'Limit',
-                            direction: order.side,
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -351,7 +351,7 @@ const LabelComponent = ({
                         props: {
                             actionType: 'Limit Order Cancel Failed',
                             orderType: 'Limit',
-                            direction: order.side,
+                            direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
@@ -577,7 +577,7 @@ const LabelComponent = ({
                             props: {
                                 actionType: 'Limit Order Update Failed',
                                 orderType: 'Limit',
-                                direction: side,
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
                                     Date.now(),
@@ -603,7 +603,7 @@ const LabelComponent = ({
                             props: {
                                 actionType: 'Limit Order Updated',
                                 orderType: 'Limit',
-                                direction: side,
+                                direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
                                     Date.now(),
