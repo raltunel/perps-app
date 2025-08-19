@@ -147,13 +147,16 @@ export default function PageHeader() {
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
+                const loginTime = Number(localStorage.getItem('loginTime'));
                 plausible('Session Established', {
-                    props: {
-                        loginTime: getDurationSegment(
-                            Number(localStorage.getItem('loginTime')) || 0,
-                            Date.now(),
-                        ),
-                    },
+                    props: loginTime
+                        ? {
+                              loginTime: getDurationSegment(
+                                  loginTime,
+                                  Date.now(),
+                              ),
+                          }
+                        : undefined,
                 });
             }
             localStorage.removeItem('loginTime');
