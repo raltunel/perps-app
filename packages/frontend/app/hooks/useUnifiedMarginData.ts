@@ -35,6 +35,14 @@ export function useUnifiedMarginData() {
         return connection;
     }, []);
 
+    // backup side effect to clear margin bucket if set after logout
+    useEffect(() => {
+        if (!isSessionEstablished && !isDebugWalletActive && !!marginBucket) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
+        }
+    }, [isSessionEstablished, isDebugWalletActive, marginBucket]);
+
     useEffect(() => {
         // Track session state changes
         const sessionChanged =
@@ -42,12 +50,12 @@ export function useUnifiedMarginData() {
         lastSessionStateRef.current = isSessionEstablished;
 
         if (!isSessionEstablished || isDebugWalletActive) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
                 // Clear the store first
-                const store = useUnifiedMarginStore.getState();
-                store.setMarginBucket(null);
                 store.setBalance(null);
                 store.setPositions([]);
                 store.setError(null);
