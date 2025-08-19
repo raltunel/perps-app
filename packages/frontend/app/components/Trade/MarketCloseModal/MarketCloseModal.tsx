@@ -258,7 +258,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Close Order Succeeded',
+                            actionType: 'Market Close Order Success',
                             orderType: 'Market',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
@@ -284,7 +284,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Close Order Failed',
+                            actionType: 'Market Close Order Fail',
                             orderType: 'Market',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(

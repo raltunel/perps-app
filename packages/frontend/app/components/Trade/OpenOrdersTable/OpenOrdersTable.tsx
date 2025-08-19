@@ -147,7 +147,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                                 plausible('Onchain Action', {
                                     props: {
                                         actionType:
-                                            'Limit Order Cancel Succeeded',
+                                            'Limit Order Cancel Success',
                                         orderType: 'Limit',
                                         direction:
                                             order.side === 'buy'
@@ -176,7 +176,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Cancel All Succeeded',
+                                actionType: 'Limit Order Cancel All Success',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
@@ -211,7 +211,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                         plausible('Onchain Action', {
                             props: {
                                 actionType:
-                                    'Limit Order Cancel All Partially Succeeded',
+                                    'Limit Order Cancel All Partial Success',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,
@@ -234,7 +234,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Cancel All Failed',
+                                actionType: 'Limit Order Cancel All Fail',
                                 orderType: 'Limit',
                                 txDuration: getDurationSegment(
                                     timeOfSubmission,

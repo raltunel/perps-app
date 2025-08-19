@@ -325,7 +325,7 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancelled',
+                            actionType: 'Limit Order Cancel Success',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
@@ -349,7 +349,7 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancel Failed',
+                            actionType: 'Limit Order Cancel Fail',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
@@ -575,7 +575,7 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Update Failed',
+                                actionType: 'Limit Order Update Fail',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txDuration: getDurationSegment(
@@ -601,7 +601,7 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Updated',
+                                actionType: 'Limit Order Update Success',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txDuration: getDurationSegment(
