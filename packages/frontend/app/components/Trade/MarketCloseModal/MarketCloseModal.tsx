@@ -286,6 +286,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         props: {
                             actionType: 'Market Close Order Fail',
                             orderType: 'Market',
+                            errorMessage: result.error || 'Transaction failed',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
