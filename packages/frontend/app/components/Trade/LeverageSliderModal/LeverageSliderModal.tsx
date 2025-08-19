@@ -42,7 +42,10 @@ export default function LeverageSliderModal({
         useSetUserMarginService();
 
     useEffect(() => {
-        if (!marginBucket) return;
+        if (!marginBucket) {
+            setLeverageFloor(undefined);
+            return;
+        }
         const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
         setLeverageFloor(10_000 / Number(leverageFloor));
     }, [marginBucket]);

@@ -42,12 +42,12 @@ export function useUnifiedMarginData() {
         lastSessionStateRef.current = isSessionEstablished;
 
         if (!isSessionEstablished || isDebugWalletActive) {
+            const store = useUnifiedMarginStore.getState();
+            store.setMarginBucket(null);
             // Only unsubscribe if we were actually subscribed
             if (hasSubscribedRef.current) {
                 hasSubscribedRef.current = false;
                 // Clear the store first
-                const store = useUnifiedMarginStore.getState();
-                store.setMarginBucket(null);
                 store.setBalance(null);
                 store.setPositions([]);
                 store.setError(null);
