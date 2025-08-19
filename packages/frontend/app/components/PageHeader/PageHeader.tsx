@@ -37,6 +37,22 @@ export default function PageHeader() {
 
     const isUserConnected = isEstablished(sessionState);
 
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                if (!isUserConnected) {
+                    localStorage.setItem('loginTime', Date.now().toString());
+                }
+            };
+
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, [isUserConnected]);
+
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
@@ -130,15 +146,6 @@ export default function PageHeader() {
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
-            console.log(
-                'Session Established',
-                localStorage.getItem('loginTime'),
-                Number(localStorage.getItem('loginTime')),
-                getDurationSegment(
-                    Number(localStorage.getItem('loginTime')) || 0,
-                    Date.now(),
-                ),
-            );
             if (typeof plausible === 'function') {
                 plausible('Session Established', {
                     props: {
@@ -311,15 +318,7 @@ export default function PageHeader() {
                     )}
                     <span
                         className={`${!isUserConnected ? 'plausible-event-name=Login+Button+Click plausible-event-location=Page+Header' : ''}`}
-                        onClick={() => {
-                            if (!isUserConnected) {
-                                // save current time in local storage
-                                localStorage.setItem(
-                                    'loginTime',
-                                    Date.now().toString(),
-                                );
-                            }
-                        }}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </span>

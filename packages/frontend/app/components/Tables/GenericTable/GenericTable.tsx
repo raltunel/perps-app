@@ -3,7 +3,14 @@ import {
     SessionButton,
     useSession,
 } from '@fogo/sessions-sdk-react';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { useNavigate } from 'react-router';
 import GenericTablePagination from '~/components/Pagination/GenericTablePagination';
 import NoDataRow from '~/components/Skeletons/NoDataRow';
@@ -61,6 +68,7 @@ export default function GenericTable<
 
     const sessionState = useSession();
 
+    const sessionButtonRef = useRef<HTMLDivElement>(null);
     const {
         data,
         noDataMessage,
@@ -402,6 +410,17 @@ export default function GenericTable<
         isDebugWalletActive,
     ]);
 
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                localStorage.setItem('loginTime', Date.now().toString());
+            };
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, []);
+
     return (
         <div
             className={`${styles.tableWrapper} ${
@@ -442,13 +461,7 @@ export default function GenericTable<
                 {!isSessionEstablished && (
                     <div
                         className={`plausible-event-name=Login+Button+Click plausible-event-location=Generic+Table ${styles.sessionButtonContainer}`}
-                        onClick={() => {
-                            // save current time in local storage
-                            localStorage.setItem(
-                                'loginTime',
-                                Date.now().toString(),
-                            );
-                        }}
+                        ref={sessionButtonRef}
                     >
                         <SessionButton />
                     </div>

@@ -75,8 +75,20 @@ function DepositDropdown(props: propsIF) {
         }
     }, [marginBucket]);
 
+    const sessionButtonRef = useRef<HTMLSpanElement>(null);
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
+
+    useEffect(() => {
+        const button = sessionButtonRef.current;
+        if (button) {
+            const handleClick = () => {
+                localStorage.setItem('loginTime', Date.now().toString());
+            };
+            button.addEventListener('click', handleClick);
+            return () => button.removeEventListener('click', handleClick);
+        }
+    }, []);
 
     const {
         //   accountOverview,
@@ -219,13 +231,7 @@ function DepositDropdown(props: propsIF) {
                         </p>
                         <span
                             className={`plausible-event-name=Login+Button+Click plausible-event-location=Account+Overview`}
-                            onClick={() => {
-                                // save current time in local storage
-                                localStorage.setItem(
-                                    'loginTime',
-                                    Date.now().toString(),
-                                );
-                            }}
+                            ref={sessionButtonRef}
                         >
                             <SessionButton />
                         </span>
