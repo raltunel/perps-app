@@ -17,28 +17,43 @@ export const getDurationSegment = (
                     ? '< 5s'
                     : durationSeconds < 10
                       ? '< 10s'
-                      : durationSeconds < 20
-                        ? '< 20s'
-                        : durationSeconds < 30
-                          ? '< 30s'
-                          : durationSeconds < 60
-                            ? '< 1m'
-                            : durationSeconds < 120
-                              ? '< 2m'
-                              : durationSeconds < 300
-                                ? '< 5m'
-                                : durationSeconds < 600
-                                  ? '< 10m'
-                                  : durationSeconds < 900
-                                    ? '< 15m'
-                                    : durationSeconds < 1800
-                                      ? '< 30m'
-                                      : durationSeconds < 3600
-                                        ? '< 1h'
-                                        : durationSeconds < 7200
-                                          ? '< 2h'
-                                          : durationSeconds < 86400
-                                            ? '< 1d'
-                                            : 'slow';
+                      : durationSeconds < 15
+                        ? '< 15s'
+                        : durationSeconds < 20
+                          ? '< 20s'
+                          : durationSeconds < 25
+                            ? '< 25s'
+                            : durationSeconds < 30
+                              ? '< 30s'
+                              : durationSeconds < 35
+                                ? '< 35s'
+                                : durationSeconds < 40
+                                  ? '< 40s'
+                                  : durationSeconds < 45
+                                    ? '< 45s'
+                                    : durationSeconds < 50
+                                      ? '< 50s'
+                                      : durationSeconds < 55
+                                        ? '< 55s'
+                                        : durationSeconds < 60
+                                          ? '< 1m'
+                                          : durationSeconds < 120
+                                            ? '< 2m'
+                                            : durationSeconds < 300
+                                              ? '< 5m'
+                                              : durationSeconds < 600
+                                                ? '< 10m'
+                                                : durationSeconds < 900
+                                                  ? '< 15m'
+                                                  : durationSeconds < 1800
+                                                    ? '< 30m'
+                                                    : durationSeconds < 3600
+                                                      ? '< 1h'
+                                                      : durationSeconds < 7200
+                                                        ? '< 2h'
+                                                        : durationSeconds <
+                                                            86400
+                                                          ? '< 1d'
+                                                          : 'slow';
     return durationSegment;
 };
