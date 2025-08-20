@@ -257,13 +257,14 @@ export class WithdrawService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : transactionResult?.signature === 'string'
-                          ? transactionResult.signature
-                          : 'Withdraw transaction failed';
+                        : 'Withdraw transaction failed';
                 console.error('❌ Withdraw order failed:', errorMessage);
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                     timeOfSubmission,
                 };
             }

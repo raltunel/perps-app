@@ -213,6 +213,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     result.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: result.signature,
                             },
                         });
                     }
@@ -239,6 +240,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     result.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: result.signature,
                             },
                         });
                     }

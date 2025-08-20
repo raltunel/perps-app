@@ -276,13 +276,13 @@ export class MarketOrderService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : transactionResult?.signature === 'string'
-                          ? transactionResult.signature
-                          : 'Order transaction failed';
+                        : 'Order transaction failed';
                 return {
                     success: false,
                     error: errorMessage,
-                    signature: transactionResult.signature,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                     timeOfSubmission,
                 };
             }

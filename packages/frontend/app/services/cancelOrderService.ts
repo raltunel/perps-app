@@ -147,9 +147,7 @@ export class CancelOrderService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : transactionResult?.signature === 'string'
-                          ? transactionResult.signature
-                          : 'Cancel order transaction failed';
+                        : 'Cancel order transaction failed';
                 console.error('❌ Cancel order failed:', errorMessage);
                 return {
                     success: false,

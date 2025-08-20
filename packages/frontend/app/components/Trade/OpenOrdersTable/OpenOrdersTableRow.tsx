@@ -94,6 +94,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -128,6 +129,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
