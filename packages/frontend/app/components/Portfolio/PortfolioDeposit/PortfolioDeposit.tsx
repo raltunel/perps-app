@@ -107,7 +107,7 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
 
         try {
             // Create a timeout promise
@@ -135,8 +135,12 @@ function PortfolioDeposit(props: propsIF) {
                             actionType: 'Deposit Fail',
                             maxActive: maxActive,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -161,8 +165,12 @@ function PortfolioDeposit(props: propsIF) {
                         props: {
                             actionType: 'Deposit Success',
                             maxActive: maxActive,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },

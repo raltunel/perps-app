@@ -239,7 +239,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
             const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
 
-            const timeOfSubmission = Date.now();
+            const timeOfTxBuildStart = Date.now();
             // Execute market order in opposite direction to close position
             const result = await executeMarketOrder({
                 quantity: notionalSymbolQtyNum,
@@ -263,8 +263,12 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                             actionType: 'Market Close Order Success',
                             orderType: 'Market',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -290,8 +294,12 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                             orderType: 'Market',
                             errorMessage: result.error || 'Transaction failed',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },

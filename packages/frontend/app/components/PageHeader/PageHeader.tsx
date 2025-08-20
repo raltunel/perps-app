@@ -65,7 +65,7 @@ export default function PageHeader() {
     const location = useLocation();
 
     // symbol for active market
-    const { symbol, setMarginBucket } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
 
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
@@ -135,11 +135,6 @@ export default function PageHeader() {
 
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
-
-    // Update TradeDataStore when unified margin data changes
-    useEffect(() => {
-        setMarginBucket(marginBucket);
-    }, [marginBucket, setMarginBucket]);
 
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);

@@ -16,6 +16,7 @@ import styles from './ComboBox.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { PublicKey } from '@solana/web3.js';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
+
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
         useTradeDataStore();
@@ -43,12 +44,11 @@ export default function ComboBoxContainer() {
         setManualAddressEnabled,
         manualAddress,
         setManualAddress,
+        useMockLeverage,
+        setUseMockLeverage,
+        mockMinimumLeverage,
+        setMockMinimumLeverage,
     } = useDebugStore();
-
-    // useEffect(() => {
-    //     const info = new Info({ environment: 'mock' });
-    //     console.log({ wsManager: info.wsManager });
-    // }, []);
 
     const currencies = ['USD', 'BTC', 'ETH'];
 
@@ -109,6 +109,31 @@ export default function ComboBoxContainer() {
                         />
                     )}
                 </div>
+
+                <div
+                    className={`${styles.sdkToggle} ${useMockLeverage ? styles.active : styles.disabled}`}
+                    onClick={() => setUseMockLeverage(!useMockLeverage)}
+                >
+                    <div className={styles.sdkToggleButton}>Lev</div>
+                </div>
+
+                {useMockLeverage && (
+                    <div>
+                        <input
+                            type='number'
+                            value={mockMinimumLeverage}
+                            onChange={(e) =>
+                                setMockMinimumLeverage(
+                                    parseFloat(e.target.value) || 1,
+                                )
+                            }
+                            step='0.1'
+                            min='1'
+                            max='100'
+                        />
+                    </div>
+                )}
+
                 <div className={styles.currencySelector}>
                     <ComboBox
                         value={selectedCurrency}
@@ -118,6 +143,7 @@ export default function ComboBoxContainer() {
                 </div>
                 <div className={styles.divider} />
             </div>
+
             <HorizontalScrollable
                 excludes={['debug-wallet-static-area']}
                 wrapperId='trade-page-left-section'
