@@ -262,6 +262,9 @@ export class WithdrawService {
                 return {
                     success: false,
                     error: errorMessage,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                     timeOfSubmission,
                 };
             }

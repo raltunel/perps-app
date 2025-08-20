@@ -204,6 +204,7 @@ function PortfolioWithdraw({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -234,6 +235,7 @@ function PortfolioWithdraw({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
