@@ -167,7 +167,7 @@ function PortfolioWithdraw({
             return;
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
         try {
             // Create a timeout promise
             const timeoutPromise = new Promise((_, reject) => {
@@ -181,7 +181,7 @@ function PortfolioWithdraw({
             });
 
             // Race between the withdraw and the timeout
-            const result = await Promise.race([
+            const result: any = await Promise.race([
                 maxModeActive || userAtTheirMax
                     ? onWithdraw()
                     : onWithdraw(withdrawInputNum),
@@ -196,8 +196,12 @@ function PortfolioWithdraw({
                             actionType: 'Withdrawal Fail',
                             maxActive: maxModeActive,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -222,8 +226,12 @@ function PortfolioWithdraw({
                         props: {
                             actionType: 'Withdrawal Success',
                             maxActive: maxModeActive,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },

@@ -12,6 +12,7 @@ export interface LimitOrderResult {
     error?: string;
     signature?: string;
     confirmed?: boolean;
+    timeOfSubmission?: number;
 }
 
 export interface LimitOrderParams {
@@ -219,6 +220,7 @@ export class LimitOrderService {
 
             // Send the transaction using Fogo session
             console.log('  - Calling sendTransaction...');
+            const timeOfSubmission = Date.now();
             const transactionResult = await sendTransaction(instructions);
 
             console.log('📥 Transaction result:', transactionResult);
@@ -236,6 +238,7 @@ export class LimitOrderService {
                     success: true,
                     signature: transactionResult.signature,
                     confirmed: transactionResult.confirmed,
+                    timeOfSubmission,
                 };
             } else {
                 const errorMessage =
@@ -246,6 +249,7 @@ export class LimitOrderService {
                     success: false,
                     error: errorMessage,
                     signature: transactionResult.signature,
+                    timeOfSubmission,
                 };
             }
         } catch (error) {

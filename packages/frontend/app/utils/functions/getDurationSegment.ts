@@ -1,7 +1,10 @@
 export const getDurationSegment = (
-    timeOfSubmission: number,
-    timeOfCompletion: number,
+    timeOfSubmission?: number | undefined,
+    timeOfCompletion: number | undefined = Date.now(),
 ) => {
+    if (!timeOfSubmission) {
+        return 'unknown';
+    }
     const duration = timeOfCompletion - timeOfSubmission;
     const durationSeconds = duration / 1000;
     const durationSegment =
