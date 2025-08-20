@@ -95,9 +95,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
@@ -133,9 +130,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }

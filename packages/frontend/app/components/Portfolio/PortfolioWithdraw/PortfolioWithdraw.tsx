@@ -205,9 +205,6 @@ function PortfolioWithdraw({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
@@ -239,9 +236,6 @@ function PortfolioWithdraw({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
