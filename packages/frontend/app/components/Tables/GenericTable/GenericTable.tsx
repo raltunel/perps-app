@@ -414,7 +414,10 @@ export default function GenericTable<
         const button = sessionButtonRef.current;
         if (button) {
             const handleClick = () => {
-                localStorage.setItem('loginTime', Date.now().toString());
+                localStorage.setItem(
+                    'loginButtonClickTime',
+                    Date.now().toString(),
+                );
             };
             button.addEventListener('click', handleClick);
             return () => button.removeEventListener('click', handleClick);
