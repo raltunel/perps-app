@@ -30,6 +30,7 @@ import {
     USER_WS_ENDPOINT,
 } from './utils/Constants';
 import { MarketDataProvider } from './contexts/MarketDataContext';
+import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -190,6 +191,7 @@ export default function App() {
                     enableUnlimited={true}
                 >
                     <AppProvider>
+                        <UnifiedMarginDataProvider>
                         <MarketDataProvider>
                             <SdkProvider
                                 environment={wsEnvironment}
@@ -231,6 +233,7 @@ export default function App() {
                                 <RuntimeDomManipulation />
                             </SdkProvider>
                         </MarketDataProvider>
+                        </UnifiedMarginDataProvider>
                     </AppProvider>
                 </FogoSessionProvider>
             </Layout>

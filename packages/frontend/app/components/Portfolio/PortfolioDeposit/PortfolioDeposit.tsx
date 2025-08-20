@@ -107,7 +107,7 @@ function PortfolioDeposit(props: propsIF) {
             return;
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
 
         try {
             // Create a timeout promise
@@ -135,8 +135,12 @@ function PortfolioDeposit(props: propsIF) {
                             actionType: 'Deposit Fail',
                             maxActive: maxActive,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -161,8 +165,12 @@ function PortfolioDeposit(props: propsIF) {
                         props: {
                             actionType: 'Deposit Success',
                             maxActive: maxActive,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -187,6 +195,18 @@ function PortfolioDeposit(props: propsIF) {
         } catch (error) {
             setTransactionStatus('failed');
             setError(error instanceof Error ? error.message : 'Deposit failed');
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Deposit Fail',
+                        maxActive: maxActive,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
         }
     }, [availableBalance, onDeposit, formatNum, depositInputNum, maxActive]);
 
