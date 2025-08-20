@@ -29,6 +29,7 @@ import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
     makeSlug,
@@ -58,7 +59,6 @@ import ScaleOrders from './ScaleOrders/ScaleOrders';
 import SizeInput from './SizeInput/SizeInput';
 import StopPrice from './StopPrice/StopPrice';
 import TradeDirection from './TradeDirection/TradeDirection';
-import { useDebugStore } from '~/stores/DebugStore';
 
 export interface OrderTypeOption {
     value: string;
@@ -1313,7 +1313,7 @@ function OrderInput({
                 });
             }
 
-            const timeOfSubmission = Date.now();
+            const timeOfTxBuildStart = Date.now();
 
             // Execute the market buy order
             const result = await executeMarketOrder({
@@ -1334,8 +1334,12 @@ function OrderInput({
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1362,8 +1366,12 @@ function OrderInput({
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1450,7 +1458,7 @@ function OrderInput({
                 });
             }
 
-            const timeOfSubmission = Date.now();
+            const timeOfTxBuildStart = Date.now();
 
             // Execute the market sell order
             const result = await executeMarketOrder({
@@ -1471,8 +1479,12 @@ function OrderInput({
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1499,8 +1511,12 @@ function OrderInput({
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1596,7 +1612,7 @@ function OrderInput({
             });
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1617,8 +1633,12 @@ function OrderInput({
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1645,8 +1665,12 @@ function OrderInput({
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage:
                                 result.error || 'Failed to place limit order',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1741,7 +1765,7 @@ function OrderInput({
             });
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1762,8 +1786,12 @@ function OrderInput({
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
@@ -1791,7 +1819,7 @@ function OrderInput({
                             errorMessage:
                                 result.error || 'Failed to place limit order',
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
                         },
