@@ -129,7 +129,9 @@ export class SetUserMarginService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Set user margin transaction failed';
+                        : transactionResult?.signature === 'string'
+                          ? transactionResult.signature
+                          : 'Set user margin transaction failed';
                 console.error('❌ Set user margin failed:', errorMessage);
                 return {
                     success: false,

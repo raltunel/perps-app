@@ -276,7 +276,9 @@ export class MarketOrderService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Order transaction failed';
+                        : transactionResult?.signature === 'string'
+                          ? transactionResult.signature
+                          : 'Order transaction failed';
                 return {
                     success: false,
                     error: errorMessage,

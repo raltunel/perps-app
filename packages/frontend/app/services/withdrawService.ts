@@ -257,7 +257,9 @@ export class WithdrawService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : 'Withdraw transaction failed';
+                        : transactionResult?.signature === 'string'
+                          ? transactionResult.signature
+                          : 'Withdraw transaction failed';
                 console.error('❌ Withdraw order failed:', errorMessage);
                 return {
                     success: false,
