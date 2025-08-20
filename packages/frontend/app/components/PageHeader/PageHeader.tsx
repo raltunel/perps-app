@@ -75,6 +75,13 @@ export default function PageHeader() {
 
     const landingTime = useRef<number>(Date.now());
 
+    // useEffect(() => {
+    //     // track initial site landing
+    //     if (typeof plausible === 'function') {
+    //         plausible('Landing');
+    //     }
+    // }, []);
+
     // data to generate nav links in page header
     const navLinks = [
         { name: 'Trade', path: `/v2/trade/${symbol}` },
