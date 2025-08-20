@@ -104,6 +104,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
+    const mouseYRef = useRef(0);
+
     useEffect(() => {
         buyColorRef.current = getBsColor().buy;
         sellColorRef.current = getBsColor().sell;
@@ -321,6 +323,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const sellRgbaColor = buyColorRef.current;
         const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
         const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
+
         if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
         if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
 
@@ -329,6 +332,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
+                const isBuy = mouseYRef.current > heightRef.current / 2;
+                const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
+                if (d3sellRgbaColor) {
+                    d3sellRgbaColor.opacity =
+                        hoverLineDataRef.current.length > 0 && !isBuy
+                            ? 0.2
+                            : 0.4;
+                }
+
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
@@ -341,6 +353,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
+                const isBuy = mouseYRef.current > heightRef.current / 2;
+                const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
+                if (d3buyRgbaColor) {
+                    d3buyRgbaColor.opacity =
+                        hoverLineDataRef.current.length > 0 && isBuy
+                            ? 0.2
+                            : 0.4;
+                }
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
@@ -698,6 +718,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const isBuy = centerY < offsetY;
 
+        mouseYRef.current = offsetY;
+
         const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
 
         const snappedPrice = hoveredArray.current
@@ -910,8 +932,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const sellRgbaColor = buyColorRef.current;
         const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
         const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
-        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.2;
-        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.2;
+        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
+        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
 
         const highlightedBuyArea = d3fc
             .seriesCanvasArea()
