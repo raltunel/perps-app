@@ -272,6 +272,9 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -304,6 +307,9 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
