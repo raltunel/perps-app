@@ -1343,6 +1343,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1376,6 +1379,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1490,6 +1496,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1523,6 +1532,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1646,6 +1658,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1679,6 +1694,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1801,6 +1819,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1830,6 +1851,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }

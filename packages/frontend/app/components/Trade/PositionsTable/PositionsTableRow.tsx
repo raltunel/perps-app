@@ -214,6 +214,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     Date.now(),
                                 ),
                                 txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }
@@ -241,6 +244,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                                     Date.now(),
                                 ),
                                 txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }

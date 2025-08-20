@@ -337,6 +337,9 @@ const LabelComponent = ({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -366,6 +369,9 @@ const LabelComponent = ({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
