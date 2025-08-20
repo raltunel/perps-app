@@ -143,6 +143,7 @@ function PortfolioDeposit(props: propsIF) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -173,6 +174,7 @@ function PortfolioDeposit(props: propsIF) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }

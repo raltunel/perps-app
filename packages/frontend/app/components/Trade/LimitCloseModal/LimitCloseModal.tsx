@@ -320,6 +320,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -344,6 +345,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }

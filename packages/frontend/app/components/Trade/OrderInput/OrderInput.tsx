@@ -1342,6 +1342,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1374,6 +1375,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1487,6 +1489,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1519,6 +1522,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1641,6 +1645,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1673,6 +1678,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1794,6 +1800,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1822,6 +1829,7 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }

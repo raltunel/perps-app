@@ -280,7 +280,9 @@ export class MarketOrderService {
                 return {
                     success: false,
                     error: errorMessage,
-                    signature: transactionResult.signature,
+                    signature: transactionResult.signature
+                        ? transactionResult.signature
+                        : undefined,
                     timeOfSubmission,
                 };
             }

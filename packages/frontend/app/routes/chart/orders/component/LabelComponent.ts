@@ -336,6 +336,7 @@ const LabelComponent = ({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -364,6 +365,7 @@ const LabelComponent = ({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -607,6 +609,7 @@ const LabelComponent = ({
                                     limitOrderResult.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: limitOrderResult.signature,
                             },
                         });
                     }
@@ -637,6 +640,7 @@ const LabelComponent = ({
                                     limitOrderResult.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: limitOrderResult.signature,
                             },
                         });
                     }
