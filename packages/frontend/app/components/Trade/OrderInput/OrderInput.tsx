@@ -1234,7 +1234,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
-            autoFocus: true,
+            autoFocus: window.innerWidth > 768, // do not autofocus on mobile
         }),
         [
             handleSizeChange,
@@ -1342,6 +1342,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1374,6 +1378,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1487,6 +1495,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1519,6 +1531,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1641,6 +1657,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1673,6 +1693,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1794,6 +1818,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -1822,6 +1850,10 @@ function OrderInput({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
