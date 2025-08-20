@@ -336,6 +336,10 @@ const LabelComponent = ({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -364,6 +368,10 @@ const LabelComponent = ({
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -607,6 +615,7 @@ const LabelComponent = ({
                                     limitOrderResult.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: limitOrderResult.signature,
                             },
                         });
                     }
@@ -637,6 +646,7 @@ const LabelComponent = ({
                                     limitOrderResult.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: limitOrderResult.signature,
                             },
                         });
                     }

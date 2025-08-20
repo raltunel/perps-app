@@ -128,7 +128,7 @@ export default function LeverageSliderModal({
                 notificationStore.add({
                     title: 'Transaction Failed',
                     message: result.error || 'Failed to update leverage',
-                    icon: 'xmark',
+                    icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
@@ -146,7 +146,7 @@ export default function LeverageSliderModal({
             notificationStore.add({
                 title: 'Transaction Error',
                 message: errorMessage,
-                icon: 'xmark',
+                icon: 'error',
             });
         } finally {
             setIsProcessing(false);

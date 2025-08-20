@@ -320,6 +320,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
@@ -344,6 +348,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
+                            explorerLink: result.signature
+                                ? blockExplorer + '/tx/' + result.signature
+                                : undefined,
                         },
                     });
                 }
