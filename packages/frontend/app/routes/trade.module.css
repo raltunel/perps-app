@@ -213,15 +213,13 @@ body {
 
     .container {
         grid-template-rows: 1fr;
-        height: 100vh;
-        height: 100dvh; /* Use dynamic viewport height for better mobile support */
+        height: 100dvh;
         gap: 0;
     }
 
     .containerTop {
         grid-template-columns: 1fr;
-        height: 100vh;
-        height: 100dvh; /* Use dynamic viewport height for better mobile support */
+        height: 100dvh;
         gap: 0;
         border-radius: 0;
         padding-top: 120px;
@@ -273,13 +271,11 @@ body {
         top: 150px;
         left: 0;
         width: 100%;
-        /* Keep the original calculation but use dvh */
         height: calc(100dvh - 150px);
         background: var(--bg-dark1);
         overflow-y: auto !important;
         display: none;
         border-radius: 0;
-        /* Reduce bottom padding from 60px to 20px */
         padding-bottom: 20px !important;
         -webkit-overflow-scrolling: touch;
     }
