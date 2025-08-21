@@ -44,7 +44,10 @@ export default function PageHeader() {
         if (button) {
             const handleClick = () => {
                 if (!isUserConnected) {
-                    localStorage.setItem('loginTime', Date.now().toString());
+                    localStorage.setItem(
+                        'loginButtonClickTime',
+                        Date.now().toString(),
+                    );
                 }
             };
 
@@ -70,12 +73,14 @@ export default function PageHeader() {
     // Use unified margin data
     const { marginBucket } = useUnifiedMarginData();
 
-    useEffect(() => {
-        // track initial site landing
-        if (typeof plausible === 'function') {
-            plausible('Landing');
-        }
-    }, []);
+    const landingTime = useRef<number>(Date.now());
+
+    // useEffect(() => {
+    //     // track initial site landing
+    //     if (typeof plausible === 'function') {
+    //         plausible('Landing');
+    //     }
+    // }, []);
 
     // data to generate nav links in page header
     const navLinks = [
@@ -142,16 +147,27 @@ export default function PageHeader() {
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
-                const loginTime = Number(localStorage.getItem('loginTime'));
+                const loginButtonClickTime = Number(
+                    localStorage.getItem('loginButtonClickTime'),
+                );
                 plausible('Session Established', {
                     props: {
-                        loginTime: loginTime
-                            ? getDurationSegment(loginTime, Date.now())
+                        loginTime: loginButtonClickTime
+                            ? getDurationSegment(
+                                  loginButtonClickTime,
+                                  Date.now(),
+                              )
                             : 'no login button clicked',
+                        loginRefreshTime: !loginButtonClickTime
+                            ? getDurationSegment(
+                                  landingTime.current,
+                                  Date.now(),
+                              )
+                            : 'not refreshed',
                     },
                 });
             }
-            localStorage.removeItem('loginTime');
+            localStorage.removeItem('loginButtonClickTime');
         } else if (
             prevIsUserConnected.current === true &&
             isUserConnected === false

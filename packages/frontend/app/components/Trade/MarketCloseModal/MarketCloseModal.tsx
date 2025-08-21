@@ -260,7 +260,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Close Order Success',
+                            actionType: 'Market Close Success',
                             orderType: 'Market',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
@@ -271,6 +271,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -290,7 +291,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Close Order Fail',
+                            actionType: 'Market Close Fail',
                             orderType: 'Market',
                             errorMessage: result.error || 'Transaction failed',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
@@ -302,6 +303,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                                 result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -329,7 +331,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Market Close Order Fail',
+                        actionType: 'Market Close Fail',
                         orderType: 'Market',
                         errorMessage:
                             error instanceof Error
