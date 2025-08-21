@@ -313,13 +313,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Close Order Success',
+                            actionType: 'Limit Close Success',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
                             txDuration: getDurationSegment(
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -336,7 +337,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Close Order Fail',
+                            actionType: 'Limit Close Fail',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
                             errorMessage: result.error || 'Transaction failed',
@@ -344,6 +345,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                 timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -362,7 +364,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Close Order Fail',
+                        actionType: 'Limit Close Fail',
                         orderType: 'Limit',
                         direction: side === 'buy' ? 'Buy' : 'Sell',
                         errorMessage:

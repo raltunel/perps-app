@@ -2,6 +2,7 @@ import {
     calcLeverageFloor,
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
+    maxRemainingUserNotionalOI,
     type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
@@ -218,7 +219,20 @@ function OrderInput({
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minNotionalUsdOrderSize = 0.99;
-    const maxNotionalUsdOrderSize = 100_000;
+    const [maxNotionalUsdOrderSize, setMaxNotionalUsdOrderSize] =
+        useState<number>(100_000);
+
+    const OI_BUFFER = 100;
+
+    useEffect(() => {
+        if (!marginBucket) return;
+        const maxRemainingOI = maxRemainingUserNotionalOI(
+            marginBucket,
+            tradeDirection === 'buy',
+        );
+        const unscaledMaxRemainingOI = Number(maxRemainingOI) / 1e6;
+        setMaxNotionalUsdOrderSize(unscaledMaxRemainingOI - OI_BUFFER);
+    }, [marginBucket, tradeDirection]);
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
@@ -518,7 +532,7 @@ function OrderInput({
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const sizeMoreThanMaximum =
-        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
+        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize + OI_BUFFER;
 
     const currentPositionLessThanMinPositionSize =
         Math.abs(currentPositionNotionalSize) * (markPx || 1) <
@@ -1321,7 +1335,7 @@ function OrderInput({
                 });
             }
 
-            const timeOfSubmission = Date.now();
+            const timeOfTxBuildStart = Date.now();
 
             // Execute the market buy order
             const result = await executeMarketOrder({
@@ -1337,15 +1351,20 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Success',
+                            actionType: 'Market Success',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1365,16 +1384,21 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Fail',
+                            actionType: 'Market Fail',
                             direction: 'Buy',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1395,7 +1419,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Market Order Fail',
+                        actionType: 'Market Fail',
                         direction: 'Buy',
                         orderType: 'Market',
                         maxActive: isMaxModeEnabled,
@@ -1459,7 +1483,7 @@ function OrderInput({
                 });
             }
 
-            const timeOfSubmission = Date.now();
+            const timeOfTxBuildStart = Date.now();
 
             // Execute the market sell order
             const result = await executeMarketOrder({
@@ -1475,15 +1499,20 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Success',
+                            actionType: 'Market Success',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1503,16 +1532,21 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Market Order Fail',
+                            actionType: 'Market Fail',
                             direction: 'Sell',
                             orderType: 'Market',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1533,7 +1567,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Market Order Fail',
+                        actionType: 'Market Fail',
                         direction: 'Sell',
                         orderType: 'Market',
                         maxActive: isMaxModeEnabled,
@@ -1606,7 +1640,7 @@ function OrderInput({
             });
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1622,15 +1656,20 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Success',
+                            actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1648,17 +1687,22 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Fail',
+                            actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Buy',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
                             errorMessage:
                                 result.error || 'Failed to place limit order',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1678,7 +1722,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Order Fail',
+                        actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Buy',
                         maxActive: isMaxModeEnabled,
@@ -1751,7 +1795,7 @@ function OrderInput({
             });
         }
 
-        const timeOfSubmission = Date.now();
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1767,15 +1811,20 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Success',
+                            actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
                             skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1793,7 +1842,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Fail',
+                            actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Sell',
                             maxActive: isMaxModeEnabled,
@@ -1801,9 +1850,10 @@ function OrderInput({
                             errorMessage:
                                 result.error || 'Failed to place limit order',
                             txDuration: getDurationSegment(
-                                timeOfSubmission,
+                                result.timeOfSubmission,
                                 Date.now(),
                             ),
+                            txSignature: result.signature,
                         },
                     });
                 }
@@ -1823,7 +1873,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Order Fail',
+                        actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Sell',
                         maxActive: isMaxModeEnabled,

@@ -186,7 +186,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                 const bestBidPrice = buys.length > 0 ? buys[0].px : undefined;
                 const bestAskPrice = sells.length > 0 ? sells[0].px : undefined;
 
-                const timeOfSubmission = Date.now();
+                const timeOfTxBuildStart = Date.now();
                 // Execute market order in opposite direction
                 const result = await executeMarketOrder({
                     quantity: Math.abs(position.szi), // Use absolute value of position size
@@ -202,13 +202,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Success',
+                                actionType: 'Market Close Success',
                                 orderType: 'Market',
                                 direction: closingSide,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
                                 txDuration: getDurationSegment(
-                                    timeOfSubmission,
+                                    result.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }
@@ -224,13 +232,21 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Market Close Order Fail',
+                                actionType: 'Market Close Fail',
                                 orderType: 'Market',
                                 direction: closingSide,
+                                txBuildDuration: getDurationSegment(
+                                    timeOfTxBuildStart,
+                                    result.timeOfSubmission,
+                                ),
                                 txDuration: getDurationSegment(
-                                    timeOfSubmission,
+                                    result.timeOfSubmission,
                                     Date.now(),
                                 ),
+                                txSignature: result.signature,
+                                explorerLink: result.signature
+                                    ? blockExplorer + '/tx/' + result.signature
+                                    : undefined,
                             },
                         });
                     }
