@@ -2,6 +2,7 @@ import {
     calcLeverageFloor,
     calcLiqPriceOnNewOrder,
     calcMarginAvail,
+    maxRemainingUserNotionalOI,
     type MarginBucketAvail,
 } from '@crocswap-libs/ambient-ember';
 import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
@@ -218,7 +219,20 @@ function OrderInput({
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minNotionalUsdOrderSize = 0.99;
-    const maxNotionalUsdOrderSize = 100_000;
+    const [maxNotionalUsdOrderSize, setMaxNotionalUsdOrderSize] =
+        useState<number>(100_000);
+
+    const OI_BUFFER = 100;
+
+    useEffect(() => {
+        if (!marginBucket) return;
+        const maxRemainingOI = maxRemainingUserNotionalOI(
+            marginBucket,
+            tradeDirection === 'buy',
+        );
+        const unscaledMaxRemainingOI = Number(maxRemainingOI) / 1e6;
+        setMaxNotionalUsdOrderSize(unscaledMaxRemainingOI - OI_BUFFER);
+    }, [marginBucket, tradeDirection]);
 
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
 
@@ -518,7 +532,7 @@ function OrderInput({
         notionalUsdOrderSizeNum < minNotionalUsdOrderSize;
 
     const sizeMoreThanMaximum =
-        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize;
+        notionalUsdOrderSizeNum > maxNotionalUsdOrderSize + OI_BUFFER;
 
     const currentPositionLessThanMinPositionSize =
         Math.abs(currentPositionNotionalSize) * (markPx || 1) <
