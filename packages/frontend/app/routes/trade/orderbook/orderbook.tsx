@@ -29,6 +29,7 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 
 interface OrderBookProps {
     symbol: string;
@@ -216,7 +217,12 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     ? { mantissa: selectedResolution.mantissa }
                     : {}),
             };
-            subscribeToPoller('info', subKey, postOrderBookRaw, 500);
+            subscribeToPoller(
+                'info',
+                subKey,
+                postOrderBookRaw,
+                TIMEOUT_OB_POLLING,
+            );
             return () => {
                 unsubscribeFromPoller('info', subKey);
             };

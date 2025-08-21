@@ -7,7 +7,11 @@ import type {
     Mark,
     OnReadyCallback,
 } from '~/tv/charting_library/charting_library';
-import { POLLING_API_URL, WsChannels } from '~/utils/Constants';
+import {
+    POLLING_API_URL,
+    TIMEOUT_CANDLE_POLLING,
+    WsChannels,
+} from '~/utils/Constants';
 import {
     getHistoricalData,
     getMarkColorData,
@@ -247,19 +251,12 @@ export const createDataFeed = (
                     }),
                 }).then((res) => {
                     res.json().then((data) => {
-                        console.log('>>> candleSnapshot', data);
-                        console.log(
-                            '>>> symbolInfo.ticker',
-                            symbolInfo.ticker,
-                            data.s,
-                        );
                         const candleData = data[0];
                         if (
                             symbolInfo.ticker &&
                             candleData.s === symbolInfo.ticker
                         ) {
                             const tick = processWSCandleMessage(candleData);
-                            console.log('>>> tick', tick);
                             onTick(tick);
                             updateCandleCache(
                                 symbolInfo.ticker,
@@ -269,15 +266,13 @@ export const createDataFeed = (
                         }
                     });
                 });
-            }, 1000);
+            }, TIMEOUT_CANDLE_POLLING);
             const unsubscribe = () => clearInterval(poller);
             subscriptions.set(listenerGuid, { unsubscribe });
         },
 
         unsubscribeBars: (listenerGuid) => {
             const subscription = subscriptions.get(listenerGuid);
-            console.log('>>> unsubscribeBars', listenerGuid, subscription);
-
             if (subscription) {
                 try {
                     subscription.unsubscribe();

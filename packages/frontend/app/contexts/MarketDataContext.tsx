@@ -1,16 +1,13 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import type { MetaAndAssetCtxsData } from '@perps-app/sdk/src/utils/types';
 import React, {
     createContext,
     useCallback,
     useContext,
     useEffect,
-    useState,
-    type Dispatch,
-    type SetStateAction,
 } from 'react';
 import { useRestPoller } from '~/hooks/useRestPoller';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { TIMEOUT_MARKET_DATA_POLLING } from '~/utils/Constants';
 import { parseNum } from '~/utils/orderbook/OrderBookUtils';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
 
@@ -81,7 +78,13 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({
             type: 'metaAndAssetCtxs',
         };
 
-        subscribeToPoller('info', marketSub, processMarketPollData, 2000, true);
+        subscribeToPoller(
+            'info',
+            marketSub,
+            processMarketPollData,
+            TIMEOUT_MARKET_DATA_POLLING,
+            true,
+        );
 
         return () => {
             unsubscribeFromPoller('info', marketSub);
