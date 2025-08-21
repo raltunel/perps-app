@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useCallback, useEffect } from 'react';
-import { ORDERBOOK_POLL_URL } from '~/utils/Constants';
+import { POLLING_API_URL } from '~/utils/Constants';
 
 export interface UsePollerIF {
     url?: string;
 }
 
 export function useRestPoller(props: UsePollerIF = {}) {
-    const { url = ORDERBOOK_POLL_URL } = props;
+    const { url = POLLING_API_URL } = props;
 
     const intervalMap = new Map<string, NodeJS.Timeout>();
 

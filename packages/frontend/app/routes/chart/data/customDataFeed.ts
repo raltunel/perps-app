@@ -7,7 +7,7 @@ import type {
     Mark,
     OnReadyCallback,
 } from '~/tv/charting_library/charting_library';
-import { ORDERBOOK_POLL_URL, WsChannels } from '~/utils/Constants';
+import { POLLING_API_URL, WsChannels } from '~/utils/Constants';
 import {
     getHistoricalData,
     getMarkColorData,
@@ -234,7 +234,7 @@ export const createDataFeed = (
 
             const poller = setInterval(() => {
                 const currentTime = new Date().getTime();
-                fetch(`${ORDERBOOK_POLL_URL}/info`, {
+                fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
                     body: JSON.stringify({
                         type: 'candleSnapshot',
