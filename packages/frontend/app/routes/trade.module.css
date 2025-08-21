@@ -88,6 +88,7 @@ body {
     transition: all 0.2s ease;
     grid-template-columns: 1fr var(--order-book-width-desktop-small);
     gap: var(--gap-s);
+    align-items: flex-start;
 }
 
 .containerTop.orderBookLarge {

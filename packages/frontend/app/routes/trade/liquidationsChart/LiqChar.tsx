@@ -251,7 +251,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
             context.beginPath();
-            context.moveTo(20, yPos);
+            context.moveTo(0, yPos);
             context.lineTo(widthRef.current, yPos);
             context.stroke();
 
@@ -321,11 +321,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const buyRgbaColor = sellColorRef.current;
         const sellRgbaColor = buyColorRef.current;
-        const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
-        const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
-
-        if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
-        if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
 
         const sellArea = d3fc
             .seriesCanvasArea()
@@ -928,10 +923,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         )
             return;
 
-        const buyRgbaColor = sellColorRef.current;
-        const sellRgbaColor = buyColorRef.current;
-        const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
-        const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
+        const d3buyRgbaColor = d3.color(sellColorRef.current)?.copy();
+        const d3sellRgbaColor = d3.color(buyColorRef.current)?.copy();
         if (d3buyRgbaColor) d3buyRgbaColor.opacity = 0.4;
         if (d3sellRgbaColor) d3sellRgbaColor.opacity = 0.4;
 
@@ -1015,7 +1008,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 sellLineSeriesRef.current?.context(hovereContext);
                 buyLineSeriesRef.current?.context(hovereContext);
             });
-    }, [width, height]);
+    }, [width, height, bsColor]);
 
     return (
         <div
