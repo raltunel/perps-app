@@ -325,7 +325,7 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancel Success',
+                            actionType: 'Limit Cancel Success',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
@@ -337,9 +337,6 @@ const LabelComponent = ({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
@@ -357,7 +354,7 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancel Fail',
+                            actionType: 'Limit Cancel Fail',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
@@ -369,9 +366,6 @@ const LabelComponent = ({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
@@ -399,7 +393,7 @@ const LabelComponent = ({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        actionType: 'Limit Order Cancel Fail',
+                        actionType: 'Limit Cancel Fail',
                         orderType: 'Limit',
                         direction: order.side === 'buy' ? 'Buy' : 'Sell',
                         errorMessage:
@@ -604,7 +598,7 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Update Fail',
+                                actionType: 'Limit Update Fail',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txBuildDuration: getDurationSegment(
@@ -635,7 +629,7 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                actionType: 'Limit Order Update Success',
+                                actionType: 'Limit Update Success',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
                                 txBuildDuration: getDurationSegment(
@@ -675,7 +669,7 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Offchain Failure', {
                         props: {
-                            actionType: 'Limit Order Update Fail',
+                            actionType: 'Limit Update Fail',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
                             errorMessage:

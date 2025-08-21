@@ -83,7 +83,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancel Success',
+                            actionType: 'Limit Cancel Success',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
@@ -95,9 +95,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
@@ -121,7 +118,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            actionType: 'Limit Order Cancel Fail',
+                            actionType: 'Limit Cancel Fail',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
@@ -133,9 +130,6 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                                 Date.now(),
                             ),
                             txSignature: result.signature,
-                            explorerLink: result.signature
-                                ? blockExplorer + '/tx/' + result.signature
-                                : undefined,
                         },
                     });
                 }
