@@ -1248,7 +1248,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
-            autoFocus: true,
+            autoFocus: window.innerWidth > 768, // do not autofocus on mobile
         }),
         [
             handleSizeChange,
