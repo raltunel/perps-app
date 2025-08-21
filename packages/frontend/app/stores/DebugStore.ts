@@ -26,6 +26,15 @@ interface DebugStore {
     setIsDebugWalletActive: (isDebugWalletActive: boolean) => void;
     usePythOracle: boolean;
     setUsePythOracle: (usePythOracle: boolean) => void;
+    manualAddressEnabled: boolean;
+    setManualAddressEnabled: (manualAddressEnabled: boolean) => void;
+    manualAddress: string;
+    setManualAddress: (manualAddress: string) => void;
+
+    useMockLeverage: boolean;
+    setUseMockLeverage: (useMockLeverage: boolean) => void;
+    mockMinimumLeverage: number;
+    setMockMinimumLeverage: (mockMinimumLeverage: number) => void;
     pauseLiqAnimation: boolean;
     setPauseLiqAnimation: (pauseLiqAnimation: boolean) => void;
 }
@@ -61,6 +70,20 @@ export const useDebugStore = create<DebugStore>((set) => ({
         set({ isDebugWalletActive }),
     usePythOracle: true, // Default to Pyth as requested
     setUsePythOracle: (usePythOracle: boolean) => set({ usePythOracle }),
+    manualAddressEnabled: false,
+    setManualAddressEnabled: (manualAddressEnabled: boolean) => {
+        if (!manualAddressEnabled) {
+            set({ manualAddress: '' });
+        }
+        set({ manualAddressEnabled });
+    },
+    manualAddress: '',
+    setManualAddress: (manualAddress: string) => set({ manualAddress }),
+    useMockLeverage: false,
+    setUseMockLeverage: (useMockLeverage: boolean) => set({ useMockLeverage }),
+    mockMinimumLeverage: 1,
+    setMockMinimumLeverage: (mockMinimumLeverage: number) =>
+        set({ mockMinimumLeverage }),
     pauseLiqAnimation: false,
     setPauseLiqAnimation: (pauseLiqAnimation: boolean) =>
         set({ pauseLiqAnimation }),

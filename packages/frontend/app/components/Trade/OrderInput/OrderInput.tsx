@@ -29,8 +29,10 @@ import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import { useDebugStore } from '~/stores/DebugStore';
 import { useLeverageStore } from '~/stores/LeverageStore';
 import {
+    makeSlug,
     useNotificationStore,
     type NotificationStoreIF,
 } from '~/stores/NotificationStore';
@@ -38,6 +40,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
+import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -229,6 +232,7 @@ function OrderInput({
     } = useTradeDataStore();
 
     const { buys, sells } = useOrderBookStore();
+    const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
     // Get Pyth price for the current symbol
@@ -333,7 +337,10 @@ function OrderInput({
     );
 
     useEffect(() => {
-        if (!marginBucket) return;
+        if (!marginBucket) {
+            setLeverageFloor(undefined);
+            return;
+        }
         try {
             const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
             const leverageFloorNum = Number(leverageFloor);
@@ -1157,10 +1164,15 @@ function OrderInput({
             value: leverage,
             onChange: handleLeverageChange,
             minNotionalUsdOrderSize: minNotionalUsdOrderSize,
-            // minimumValue: 50,
-            minimumValue: leverageFloor,
+            minimumValue: useMockLeverage ? mockMinimumLeverage : leverageFloor,
         }),
-        [leverage, handleLeverageChange, leverageFloor],
+        [
+            leverage,
+            handleLeverageChange,
+            leverageFloor,
+            useMockLeverage,
+            mockMinimumLeverage,
+        ],
     );
 
     // const chasePriceProps = useMemo(
@@ -1276,28 +1288,12 @@ function OrderInput({
             return;
         }
 
+        const slug = makeSlug(10);
+
         try {
             setIsProcessingOrder(true);
-            if (activeOptions.skipOpenOrderConfirm) {
-                confirmOrderModal.close();
-                // notifications.add({
-                //     title: 'Order Submitted',
-                //     message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
-                //     icon: 'spinner',
-                //     removeAfter: 5000,
-                // });
-            }
             // Get best ask price for buy order
             const bestAskPrice = sells.length > 0 ? sells[0].px : markPx;
-
-            // Execute the market buy order
-            const result = await executeMarketOrder({
-                quantity: notionalSymbolQtyNum,
-                side: 'buy',
-                leverage: leverage,
-                bestAskPrice: bestAskPrice,
-            });
-
             const usdValueOfOrderStr = formatNum(
                 roundDownToHundredth(
                     notionalSymbolQtyNum * (bestAskPrice || 1),
@@ -1306,8 +1302,50 @@ function OrderInput({
                 true,
                 true,
             );
+            if (activeOptions.skipOpenOrderConfirm) {
+                confirmOrderModal.close();
+                notifications.add({
+                    title: 'Buy Order Pending',
+                    message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
+                    icon: 'spinner',
+                    slug,
+                    removeAfter: 60000,
+                });
+            }
+
+            const timeOfTxBuildStart = Date.now();
+
+            // Execute the market buy order
+            const result = await executeMarketOrder({
+                quantity: notionalSymbolQtyNum,
+                side: 'buy',
+                leverage: leverage,
+                bestAskPrice: bestAskPrice,
+                reduceOnly: isReduceOnlyEnabled,
+            });
 
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Success',
+                            direction: 'Buy',
+                            orderType: 'Market',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Buy Order Successful',
@@ -1319,6 +1357,28 @@ function OrderInput({
                         : undefined,
                 });
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Fail',
+                            direction: 'Buy',
+                            orderType: 'Market',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Buy Order Failed',
@@ -1332,6 +1392,22 @@ function OrderInput({
             }
         } catch (error) {
             console.error('❌ Error submitting market buy order:', error);
+            notifications.remove(slug);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Market Fail',
+                        direction: 'Buy',
+                        orderType: 'Market',
+                        maxActive: isMaxModeEnabled,
+                        skipConfirm: activeOptions.skipOpenOrderConfirm,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Buy Order Failed',
                 message:
@@ -1360,28 +1436,11 @@ function OrderInput({
             return;
         }
 
+        const slug = makeSlug(10);
+
         try {
-            setIsProcessingOrder(true);
-            if (activeOptions.skipOpenOrderConfirm) {
-                confirmOrderModal.close();
-                // notifications.add({
-                //     title: 'Order Submitted',
-                //     message: `Order submitted for ${notionalSymbolQtyNum.toFixed(6)} ${symbol}`,
-                //     icon: 'spinner',
-                //     removeAfter: 5000,
-                // });
-            }
             // Get best bid price for sell order
             const bestBidPrice = buys.length > 0 ? buys[0].px : markPx;
-
-            // Execute the market sell order
-            const result = await executeMarketOrder({
-                quantity: notionalSymbolQtyNum,
-                side: 'sell',
-                leverage: leverage,
-                bestBidPrice: bestBidPrice,
-            });
-
             const usdValueOfOrderStr = formatNum(
                 Math.round(notionalSymbolQtyNum * (bestBidPrice || 1) * 100) /
                     100,
@@ -1389,8 +1448,51 @@ function OrderInput({
                 true,
                 true,
             );
+            setIsProcessingOrder(true);
+            if (activeOptions.skipOpenOrderConfirm) {
+                confirmOrderModal.close();
+                notifications.add({
+                    title: 'Sell Order Pending',
+                    message: `Order submitted for ${usdValueOfOrderStr} of ${symbol}`,
+                    icon: 'spinner',
+                    slug,
+                    removeAfter: 60000,
+                });
+            }
+
+            const timeOfTxBuildStart = Date.now();
+
+            // Execute the market sell order
+            const result = await executeMarketOrder({
+                quantity: notionalSymbolQtyNum,
+                side: 'sell',
+                leverage: leverage,
+                bestBidPrice: bestBidPrice,
+                reduceOnly: isReduceOnlyEnabled,
+            });
 
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Success',
+                            direction: 'Sell',
+                            orderType: 'Market',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show success notification
                 notifications.add({
                     title: 'Sell Order Successful',
@@ -1402,6 +1504,28 @@ function OrderInput({
                         : undefined,
                 });
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Market Fail',
+                            direction: 'Sell',
+                            orderType: 'Market',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            errorMessage: result.error || 'Transaction failed',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 // Show error notification
                 notifications.add({
                     title: 'Sell Order Failed',
@@ -1414,7 +1538,23 @@ function OrderInput({
                 });
             }
         } catch (error) {
+            notifications.remove(slug);
             console.error('❌ Error submitting market sell order:', error);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Market Fail',
+                        direction: 'Sell',
+                        orderType: 'Market',
+                        maxActive: isMaxModeEnabled,
+                        skipConfirm: activeOptions.skipOpenOrderConfirm,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Sell Order Failed',
                 message:
@@ -1456,17 +1596,27 @@ function OrderInput({
         }
 
         setIsProcessingOrder(true);
+        const slug = makeSlug(10);
+
+        const usdValueOfOrderStr = formatNum(
+            Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
+            2,
+            true,
+            true,
+        );
 
         if (activeOptions.skipOpenOrderConfirm) {
             confirmOrderModal.close();
-            // Show pending notification
-            // notifications.add({
-            //     title: 'Buy / Long Limit Order Pending',
-            //     message: `Buying ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
-            //     icon: 'spinner',
-            // });
+            notifications.add({
+                title: 'Buy / Long Limit Order Pending',
+                message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
+                icon: 'spinner',
+                slug,
+                removeAfter: 60000,
+            });
         }
 
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1474,19 +1624,34 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'buy',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
-            const usdValueOfOrderStr = formatNum(
-                Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
-                2,
-                true,
-                true,
-            );
-
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Success',
+                            orderType: 'Limit',
+                            direction: 'Buy',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                    title: 'Buy / Long Limit Order Placed',
+                    message: `Successfully placed buy order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -1494,6 +1659,29 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Fail',
+                            orderType: 'Limit',
+                            direction: 'Buy',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            errorMessage:
+                                result.error || 'Failed to place limit order',
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
@@ -1505,7 +1693,23 @@ function OrderInput({
                 });
             }
         } catch (error) {
+            notifications.remove(slug);
             console.error('❌ Error submitting limit buy order:', error);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Fail',
+                        orderType: 'Limit',
+                        direction: 'Buy',
+                        maxActive: isMaxModeEnabled,
+                        skipConfirm: activeOptions.skipOpenOrderConfirm,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Limit Order Failed',
                 message:
@@ -1548,16 +1752,26 @@ function OrderInput({
 
         setIsProcessingOrder(true);
 
+        const usdValueOfOrderStr = formatNum(
+            Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
+            2,
+            true,
+            true,
+        );
+        const slug = makeSlug(10);
+
         if (activeOptions.skipOpenOrderConfirm) {
             confirmOrderModal.close();
-            // Show pending notification
-            // notifications.add({
-            //     title: 'Sell / Short Limit Order Pending',
-            //     message: `Selling ${formatNum(notionalSymbolQtyNum)} ${symbol} at ${formatNum(limitPrice)}`,
-            //     icon: 'spinner',
-            // });
+            notifications.add({
+                title: 'Sell / Short Limit Order Pending',
+                message: `Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                icon: 'spinner',
+                slug,
+                removeAfter: 60000,
+            });
         }
 
+        const timeOfTxBuildStart = Date.now();
         try {
             // Execute limit order
             const result = await executeLimitOrder({
@@ -1565,19 +1779,34 @@ function OrderInput({
                 price: roundDownToTenth(limitPrice),
                 side: 'sell',
                 leverage: leverage,
+                reduceOnly: isReduceOnlyEnabled,
             });
 
-            const usdValueOfOrderStr = formatNum(
-                Math.round(notionalSymbolQtyNum * (markPx || 1) * 100) / 100,
-                2,
-                true,
-                true,
-            );
-
             if (result.success) {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Success',
+                            orderType: 'Limit',
+                            direction: 'Sell',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            txBuildDuration: getDurationSegment(
+                                timeOfTxBuildStart,
+                                result.timeOfSubmission,
+                            ),
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
-                    title: 'Limit Order Placed',
-                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice)}`,
+                    title: 'Sell / Short Limit Order Placed',
+                    message: `Successfully placed sell order for ${usdValueOfOrderStr} of ${symbol} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -1585,6 +1814,25 @@ function OrderInput({
                     removeAfter: 5000,
                 });
             } else {
+                notifications.remove(slug);
+                if (typeof plausible === 'function') {
+                    plausible('Onchain Action', {
+                        props: {
+                            actionType: 'Limit Fail',
+                            orderType: 'Limit',
+                            direction: 'Sell',
+                            maxActive: isMaxModeEnabled,
+                            skipConfirm: activeOptions.skipOpenOrderConfirm,
+                            errorMessage:
+                                result.error || 'Failed to place limit order',
+                            txDuration: getDurationSegment(
+                                result.timeOfSubmission,
+                                Date.now(),
+                            ),
+                            txSignature: result.signature,
+                        },
+                    });
+                }
                 notifications.add({
                     title: 'Limit Order Failed',
                     message: result.error || 'Failed to place limit order',
@@ -1596,7 +1844,23 @@ function OrderInput({
                 });
             }
         } catch (error) {
+            notifications.remove(slug);
             console.error('❌ Error submitting limit sell order:', error);
+            if (typeof plausible === 'function') {
+                plausible('Offchain Failure', {
+                    props: {
+                        actionType: 'Limit Fail',
+                        orderType: 'Limit',
+                        direction: 'Sell',
+                        maxActive: isMaxModeEnabled,
+                        skipConfirm: activeOptions.skipOpenOrderConfirm,
+                        errorMessage:
+                            error instanceof Error
+                                ? error.message
+                                : 'Unknown error occurred',
+                    },
+                });
+            }
             notifications.add({
                 title: 'Limit Order Failed',
                 message:
@@ -2076,7 +2340,7 @@ function OrderInput({
                                 >
                                     <button
                                         data-testid='submit-order-button'
-                                        className={styles.submit_button}
+                                        className={`${styles.submit_button}`}
                                         style={{
                                             backgroundColor:
                                                 tradeDirection === 'buy'
