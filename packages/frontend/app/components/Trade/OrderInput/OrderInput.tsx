@@ -28,6 +28,7 @@ import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import packageJson from '../../../../package.json';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -1252,7 +1253,7 @@ function OrderInput({
             selectedMode,
             setSelectedMode,
             useTotalSize,
-            autoFocus: true,
+            autoFocus: window.innerWidth > 768, // do not autofocus on mobile
         }),
         [
             handleSizeChange,
@@ -1351,6 +1352,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Buy',
                             orderType: 'Market',
@@ -1384,6 +1386,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Buy',
                             orderType: 'Market',
@@ -1419,6 +1422,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Buy',
                         orderType: 'Market',
@@ -1499,6 +1503,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Sell',
                             orderType: 'Market',
@@ -1532,6 +1537,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Sell',
                             orderType: 'Market',
@@ -1567,6 +1573,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Sell',
                         orderType: 'Market',
@@ -1656,6 +1663,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Buy',
@@ -1687,6 +1695,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Buy',
@@ -1722,6 +1731,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Buy',
@@ -1811,6 +1821,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Sell',
@@ -1842,6 +1853,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Sell',
@@ -1873,6 +1885,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Sell',
