@@ -14,6 +14,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import packageJson from '../../../../package.json';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 
 interface propsIF {
@@ -132,6 +133,7 @@ function PortfolioDeposit(props: propsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Deposit Fail',
                             maxActive: maxActive,
                             errorMessage: result.error || 'Transaction failed',
@@ -164,6 +166,7 @@ function PortfolioDeposit(props: propsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Deposit Success',
                             maxActive: maxActive,
                             txBuildDuration: getDurationSegment(
@@ -200,6 +203,7 @@ function PortfolioDeposit(props: propsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Deposit Fail',
                         maxActive: maxActive,
                         errorMessage:
