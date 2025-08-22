@@ -240,6 +240,9 @@ export const createDataFeed = (
                 const currentTime = new Date().getTime();
                 fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({
                         type: 'candleSnapshot',
                         req: {
