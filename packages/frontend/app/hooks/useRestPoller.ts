@@ -30,6 +30,9 @@ export function useRestPoller(props: UsePollerIF = {}) {
             fetch(`${url}/${endpoint}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             }).then(async (res) => {
                 const data = await res.json();
                 handler(data);
@@ -41,6 +44,9 @@ export function useRestPoller(props: UsePollerIF = {}) {
             fetch(`${url}/${endpoint}`, {
                 method: 'POST',
                 body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             }).then(async (res) => {
                 const data = await res.json();
                 handler(data);
