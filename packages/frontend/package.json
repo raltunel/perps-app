@@ -1,4 +1,5 @@
 {
+    "$schema": "https://json.schemastore.org/package.json",
     "name": "@perps-app/frontend",
     "version": "0.1.28",
     "private": true,
