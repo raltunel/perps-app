@@ -20,7 +20,7 @@ export const MARKET_API_URL =
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const PROXY_API_URL =
-    import.meta.env.VITE_PROXY_API_URL ||
+    import.meta.env.VITE_POLLING_API_URL ||
     'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const MARKET_WS_ENDPOINT =
