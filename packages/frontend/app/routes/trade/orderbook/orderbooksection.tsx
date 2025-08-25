@@ -72,7 +72,10 @@ export default function OrderBookSection(props: propsIF) {
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
-        const orderBookSection = document.getElementById('orderBookSection');
+        let orderBookSection = document.getElementById('orderBookSection');
+        if (!orderBookSection) {
+            orderBookSection = document.getElementById('orderBookContainer');
+        }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
             dummyOrderRow?.getBoundingClientRect().height ||
