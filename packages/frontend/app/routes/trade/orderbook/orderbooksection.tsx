@@ -271,7 +271,7 @@ export default function OrderBookSection(props: propsIF) {
     // Mobile view logic
     if (mobileView) {
         if (mobileContent === 'orderBook') return orderBookComponent;
-        if (mobileContent === 'recentTrades') return orderBookTradesComponent;
+        if (mobileContent === 'recentTrades') return orderBookTradesComponent();
     }
 
     // Desktop view logic
