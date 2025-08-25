@@ -49,7 +49,7 @@ const dummyOrder: OrderBookRowIF = {
 
 // Custom hook to memoize slot arrays
 function useOrderSlots(orders: OrderBookRowIF[]) {
-    return useMemo(() => orders.map((order) => order.px), [orders]);
+    return useMemo(() => orders?.map((order) => order.px), [orders]);
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
@@ -81,8 +81,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // No useMemo for simple arithmetic
-    const buyPlaceHolderCount = Math.max(orderCount - buys.length, 0);
-    const sellPlaceHolderCount = Math.max(orderCount - sells.length, 0);
+    const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
+    const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
 
     const {
         userOrders,

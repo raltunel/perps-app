@@ -817,6 +817,40 @@ function OrderInput({
         setPositionSliderPercentageValue(percent);
     }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
+    const [userInputResultedIn100percent, setUserInputResultedIn100percent] =
+        useState(false);
+
+    function useShouldSetMaxModeEnabledDebounce(value: boolean, delay: number) {
+        const [debouncedValue, setDebouncedValue] = useState(value);
+
+        useEffect(() => {
+            // Set a timeout to update the debounced value after the specified delay
+            const timer = setTimeout(() => {
+                setDebouncedValue(value);
+            }, delay);
+
+            // Clean up the timeout if the value changes before the delay has passed
+            return () => {
+                clearTimeout(timer);
+            };
+        }, [value, delay]);
+
+        return value === true ? debouncedValue : false;
+    }
+
+    const debounceShouldSetMaxModeEnabled = useShouldSetMaxModeEnabledDebounce(
+        userInputResultedIn100percent,
+        1000,
+    );
+
+    useEffect(() => {
+        if (debounceShouldSetMaxModeEnabled) {
+            setIsMaxModeEnabled(true);
+        } else {
+            setIsMaxModeEnabled(false);
+        }
+    }, [debounceShouldSetMaxModeEnabled]);
+
     useEffect(() => {
         let percent = 0;
 
@@ -838,9 +872,9 @@ function OrderInput({
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
         if (percent === 100) {
-            setIsMaxModeEnabled(true);
+            setUserInputResultedIn100percent(true);
         } else {
-            setIsMaxModeEnabled(false);
+            setUserInputResultedIn100percent(false);
         }
     }, [leverage]);
 
@@ -904,16 +938,17 @@ function OrderInput({
                     if (isNaN(percent) || percent === Infinity) return;
                     if (percent > 100) {
                         setUserExceededAvailableMargin(!capAtMax);
-                        setIsMaxModeEnabled(capAtMax);
+                        setUserInputResultedIn100percent(capAtMax);
                         setPositionSliderPercentageValue(100);
                     } else {
                         setUserExceededAvailableMargin(false);
+                        setUserInputResultedIn100percent(false);
                         if (percent > 99) {
-                            setIsMaxModeEnabled(capAtMax);
+                            setUserInputResultedIn100percent(capAtMax);
                             setPositionSliderPercentageValue(100);
                         } else {
                             setPositionSliderPercentageValue(percent);
-                            setIsMaxModeEnabled(false);
+                            setUserInputResultedIn100percent(false);
                         }
                     }
                 }
