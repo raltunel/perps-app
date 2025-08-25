@@ -824,6 +824,10 @@ function OrderInput({
         const [debouncedValue, setDebouncedValue] = useState(value);
 
         useEffect(() => {
+            if (value === false) {
+                setDebouncedValue(false);
+                return;
+            }
             // Set a timeout to update the debounced value after the specified delay
             const timer = setTimeout(() => {
                 setDebouncedValue(value);
@@ -835,7 +839,7 @@ function OrderInput({
             };
         }, [value, delay]);
 
-        return value === true ? debouncedValue : false;
+        return debouncedValue;
     }
 
     const debounceShouldSetMaxModeEnabled = useShouldSetMaxModeEnabledDebounce(
