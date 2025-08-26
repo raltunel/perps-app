@@ -294,8 +294,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         setTimeout(() => {
                             orderElem?.classList.remove('divPulse');
                         }, 800);
-                    }, 200);
-                }, 800);
+                    }, 400);
+                }, 400);
             }
         },
         [
