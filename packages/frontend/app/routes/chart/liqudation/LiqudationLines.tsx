@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import type { LiqProps } from './LiqComponent';
 import * as d3fc from 'd3fc';
 import * as d3 from 'd3';
+import { useLiqudationLines } from './hooks/useLiquidationLines';
 
 export type HorizontalLineData = {
     yPrice: number;
     color: string;
-    oid?: number;
-    lineStyle: number;
+    strokeStyle: string;
     lineWidth: number;
     type: string;
+    dash?: number[];
 };
 
 const LiqudationLines = ({
@@ -21,28 +22,7 @@ const LiqudationLines = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLine, setHorizontalLine] = useState<any>();
 
-    const levels = [
-        {
-            value: 104000,
-            strokeStyle: '#FDE725',
-            lineWidth: 9,
-        },
-        { value: 104000, strokeStyle: '#461668', lineWidth: 3, dash: [1, 2] },
-        { value: 108000, strokeStyle: '#287D8D', lineWidth: 3, dash: [1, 2] },
-        {
-            value: 100000,
-            strokeStyle: '#2BAE7D',
-            lineWidth: 3,
-            dash: [1, 2],
-        },
-
-        {
-            value: 102000,
-            strokeStyle: '#462C79',
-            lineWidth: 3,
-            dash: [1, 2],
-        },
-    ];
+    const lines = useLiqudationLines();
 
     useEffect(() => {
         if (scaleData !== undefined && canvasSize) {
@@ -54,7 +34,7 @@ const LiqudationLines = ({
             const horizontalLine = d3fc
                 .annotationCanvasLine()
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .value((d: any) => d.value)
+                .value((d: any) => d.yPrice)
                 .yScale(scaleData?.yScale)
                 .xScale(dummyXScale)
                 .orient('horizontal');
@@ -101,7 +81,7 @@ const LiqudationLines = ({
 
             const render = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                horizontalLine(levels);
+                horizontalLine(lines);
 
                 if (zoomChanged) {
                     animationId = requestAnimationFrame(render);
@@ -123,7 +103,7 @@ const LiqudationLines = ({
     }, [
         horizontalLine,
         overlayCanvasRef.current === null,
-        JSON.stringify(levels),
+        JSON.stringify(lines),
         JSON.stringify(scaleData?.yScale.domain()),
         zoomChanged,
     ]);
