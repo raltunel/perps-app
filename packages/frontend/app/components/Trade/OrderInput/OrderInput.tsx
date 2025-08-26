@@ -155,6 +155,8 @@ function OrderInput({
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
     const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
 
+    const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
+
     const isUserLoggedIn = useMemo(() => {
         return isEstablished(sessionState);
     }, [sessionState]);
@@ -712,15 +714,6 @@ function OrderInput({
         setSizePercentageValue(percent);
     }, [!!maxTradeSizeInUsd, isReduceOnlyEnabled]);
 
-    // // update order size when mark price changes
-    // useEffect(() => {
-    //     if (!markPx) return;
-    //     const notionalQtyNum = sizePercentageValue
-    //         ? ((maxTradeSizeInUsd / markPx) * sizePercentageValue) / 100
-    //         : 0;
-    //     setNotionalQtyNum(notionalQtyNum);
-    // }, [markPx]);
-
     // update sizePercentageValue when notionalQtyNum changes
     useEffect(() => {
         if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
@@ -880,6 +873,23 @@ function OrderInput({
         maxTradeSizeInUsd,
         markPx,
     ]);
+
+    useEffect(() => {
+        if (shouldUpdateAfterTrade) {
+            if (!isSizeSetAsPercentage) {
+                const parsedSizeDisplay = parseFormattedNum(sizeDisplay.trim());
+                if (isNaN(parsedSizeDisplay)) return;
+                if (parsedSizeDisplay >= maxTradeSizeInUsd) {
+                    setNotionalQtyNum(maxTradeSizeInUsd);
+                    setSizePercentageValue(100);
+                    setIsSizeSetAsPercentage(true);
+                } else {
+                    updateNotionalQtyNumFromSizeDisplay();
+                }
+            }
+            setShouldUpdateAfterTrade(false);
+        }
+    }, [shouldUpdateAfterTrade]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -1194,6 +1204,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                setShouldUpdateAfterTrade(true);
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
