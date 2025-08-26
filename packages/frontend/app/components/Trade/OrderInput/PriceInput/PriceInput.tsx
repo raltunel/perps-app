@@ -51,6 +51,7 @@ export default function PriceInput(props: PropsIF) {
 
     return (
         <div
+            id='trade-module-price-input-container'
             className={`${styles.priceInputContainer}
              ${showMidButton ? styles.chaseLimit : ''}
              ${isModal ? styles.modalContainer : ''}
