@@ -717,17 +717,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
 
-        const snappedPrice = hoveredArray.current
-            .filter((item) =>
-                isBuy ? item.px < mousePoint : item.px > mousePoint,
-            )
-            .reduce((closest: OrderBookRowIF, item: OrderBookRowIF) => {
-                if (!closest) return item;
-                return Math.abs(item.px - mousePoint) <
-                    Math.abs(closest.px - mousePoint)
-                    ? item
-                    : closest;
-            });
+        const nearest = hoveredArray.current.filter((item) =>
+            isBuy ? item.px < mousePoint : item.px > mousePoint,
+        );
+
+        const snappedPrice =
+            nearest.length > 0
+                ? nearest.reduce(
+                      (closest: OrderBookRowIF, item: OrderBookRowIF) => {
+                          if (!closest) return item;
+                          return Math.abs(item.px - mousePoint) <
+                              Math.abs(closest.px - mousePoint)
+                              ? item
+                              : closest;
+                      },
+                  )
+                : hoveredArray.current[hoveredArray.current.length - 1];
 
         const price =
             snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
