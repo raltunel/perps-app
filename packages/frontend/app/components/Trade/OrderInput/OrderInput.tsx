@@ -458,9 +458,7 @@ function OrderInput({
     const getMaxTradeSizeInUsd = useCallback(
         (leverage: number) => {
             if (isReduceOnlyEnabled && marginBucket && markPx) {
-                return (
-                    (Math.abs(Number(marginBucket.netPosition)) / 1e8) * markPx
-                );
+                return Math.abs(currentPositionNotionalSize) * markPx;
             } else if (userBuyingPowerExceedsMaxOrderSize) {
                 return maxUsdOrderSize;
             } else {
@@ -469,7 +467,7 @@ function OrderInput({
         },
         [
             isReduceOnlyEnabled,
-            marginBucket,
+            currentPositionNotionalSize,
             usdAvailableToTrade,
             markPx,
             userBuyingPowerExceedsMaxOrderSize,
@@ -480,7 +478,7 @@ function OrderInput({
 
     const maxTradeSizeInUsd = useMemo(() => {
         return getMaxTradeSizeInUsd(leverage);
-    }, [getMaxTradeSizeInUsd, leverage]);
+    }, [getMaxTradeSizeInUsd, leverage, currentPositionNotionalSize]);
 
     const usdOrderValue = useMemo(() => {
         let orderValue = 0;
@@ -656,31 +654,20 @@ function OrderInput({
 
     // // update sizeDisplay when notionalQtyNum or selectedDenom changes
     useEffect(() => {
-        if (!isEditingSizeInput && !isMarginInsufficient) {
-            if (selectedDenom === 'symbol') {
-                setSizeDisplay(
-                    notionalQtyNum
-                        ? formatNumWithOnlyDecimals(notionalQtyNum, 6, true)
-                        : '',
-                );
-            } else if (markPx) {
-                const newSizeString = notionalQtyNum
-                    ? formatNumWithOnlyDecimals(
-                          notionalQtyNum * markPx,
-                          2,
-                          false,
-                      )
-                    : '';
-                setSizeDisplay(newSizeString);
-            }
+        if (isEditingSizeInput || !isSizeSetAsPercentage) return;
+        if (selectedDenom === 'symbol') {
+            setSizeDisplay(
+                notionalQtyNum
+                    ? formatNumWithOnlyDecimals(notionalQtyNum, 6, true)
+                    : '',
+            );
+        } else if (markPx) {
+            const newSizeString = notionalQtyNum
+                ? formatNumWithOnlyDecimals(notionalQtyNum * markPx, 2, false)
+                : '';
+            setSizeDisplay(newSizeString);
         }
-    }, [
-        notionalQtyNum,
-        selectedDenom,
-        isEditingSizeInput,
-        leverage,
-        isMarginInsufficient,
-    ]);
+    }, [notionalQtyNum, selectedDenom, isEditingSizeInput, leverage, markPx]);
 
     const setSizeSliderPercentageFromLeverage = useCallback(
         (maxTradeSizeInUsd: number) => {
@@ -708,7 +695,7 @@ function OrderInput({
     }, [notionalQtyNum, markPx, maxTradeSizeInUsd]);
 
     useEffect(() => {
-        if (!maxTradeSizeInUsd) return;
+        if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
         setIsEditingSizeInput(false);
         const percent = Math.min(getCurrentPercentageOfMaxTradeSize(), 100);
         setSizePercentageValue(percent);
