@@ -16,6 +16,7 @@ const LiqudationLines = ({
     overlayCanvasRef,
     canvasSize,
     scaleData,
+    zoomChanged,
 }: LiqProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLine, setHorizontalLine] = useState<any>();
@@ -25,7 +26,6 @@ const LiqudationLines = ({
             value: 104000,
             strokeStyle: '#FDE725',
             lineWidth: 9,
-            globalAlpha: 0.7,
         },
         { value: 104000, strokeStyle: '#461668', lineWidth: 3, dash: [1, 2] },
         { value: 108000, strokeStyle: '#287D8D', lineWidth: 3, dash: [1, 2] },
@@ -88,7 +88,7 @@ const LiqudationLines = ({
             //     return horizontalBand;
             // });
         }
-    }, [scaleData, canvasSize]);
+    }, [scaleData, canvasSize === undefined]);
 
     useEffect(() => {
         if (overlayCanvasRef.current && horizontalLine) {
@@ -97,15 +97,36 @@ const LiqudationLines = ({
 
             horizontalLine.context(ctx);
 
+            let animationId: number;
+
             const render = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 horizontalLine(levels);
+
+                if (zoomChanged) {
+                    animationId = requestAnimationFrame(render);
+                }
             };
 
-            render();
+            if (zoomChanged) {
+                animationId = requestAnimationFrame(render);
+            } else {
+                render();
+            }
+
+            return () => {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
         }
-    }, [horizontalLine, overlayCanvasRef.current === null, levels]);
+    }, [
+        horizontalLine,
+        overlayCanvasRef.current === null,
+        JSON.stringify(levels),
+        JSON.stringify(scaleData?.yScale.domain()),
+        zoomChanged,
+    ]);
 
     return null;
 };

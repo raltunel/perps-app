@@ -6,18 +6,21 @@ export interface LiqProps {
     canvasSize: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
+    zoomChanged: boolean;
 }
 
 const LiqComponent = ({
     overlayCanvasRef,
     canvasSize,
     scaleData,
+    zoomChanged,
 }: LiqProps) => {
     return (
         <LiqudationLines
             canvasSize={canvasSize}
             overlayCanvasRef={overlayCanvasRef}
             scaleData={scaleData}
+            zoomChanged={zoomChanged}
         />
     );
 };
