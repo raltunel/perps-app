@@ -218,7 +218,7 @@ function OrderInput({
         setMaxUsdOrderSize(unscaledMaxRemainingOI - OI_BUFFER);
     }, [marginBucket, tradeDirection]);
 
-    const [selectedDenom, setSelectedDenom] = useState<'usd' | 'symbol'>('usd');
+    const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
     const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
         useTradeDataStore();
@@ -1070,8 +1070,8 @@ function OrderInput({
             className: 'custom-input',
             ariaLabel: 'Size input',
             symbol,
-            selectedDenom,
             isEditing: isEditingSizeInput,
+            selectedDenom,
             setSelectedDenom,
             useTotalSize,
             autoFocus: window.innerWidth > 768, // do not autofocus on mobile
@@ -1084,6 +1084,7 @@ function OrderInput({
             symbol,
             useTotalSize,
             sizeDisplay,
+            setSelectedDenom,
         ],
     );
 

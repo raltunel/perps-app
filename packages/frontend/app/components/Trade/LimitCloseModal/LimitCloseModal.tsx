@@ -49,7 +49,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
 
     const [price, setPrice] = useState(String(getMidPrice()));
-    const [selectedMode, setSelectedMode] = useState<OrderBookMode>('usd');
+    const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
     const [isMidModeActive, setIsMidModeActive] = useState(false);
 
     const originalSize = Math.abs(position.szi);
@@ -84,7 +84,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     // Initialize sizeDisplay based on selectedMode
     useEffect(() => {
         if (!isEditingSizeInput) {
-            if (selectedMode === 'symbol') {
+            if (selectedDenom === 'symbol') {
                 setSizeDisplay(
                     notionalSymbolQtyNum
                         ? formatNumWithOnlyDecimals(
@@ -106,13 +106,13 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 );
             }
         }
-    }, [notionalSymbolQtyNum, selectedMode, isEditingSizeInput, markPx]);
+    }, [notionalSymbolQtyNum, selectedDenom, isEditingSizeInput, markPx]);
 
     // Update sizeDisplay when markPx changes
     useEffect(() => {
         if (
             !isEditingSizeInput &&
-            selectedMode !== 'symbol' &&
+            selectedDenom !== 'symbol' &&
             sizeDisplay &&
             markPx
         ) {
@@ -127,7 +127,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     useEffect(() => {
         if (
             !isEditingSizeInput &&
-            selectedMode === 'usd' &&
+            selectedDenom === 'usd' &&
             sizeDisplay &&
             markPx
         ) {
@@ -138,7 +138,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 );
             }
         }
-    }, [selectedMode]);
+    }, [selectedDenom]);
 
     useEffect(() => {
         if (!lastChangedBySlider.current) return;
@@ -157,14 +157,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
 
     useEffect(() => {
         console.log(
-            'Mode switched to:',
-            selectedMode,
+            'Denom switched to:',
+            selectedDenom,
             'sizeDisplay:',
             sizeDisplay,
             'markPx:',
             markPx,
         );
-    }, [selectedMode]);
+    }, [selectedDenom]);
 
     const handleSizeChange = (
         val: string | React.ChangeEvent<HTMLInputElement>,
@@ -185,7 +185,7 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         const parsed = parseFormattedNum(sizeDisplay.trim());
         if (!isNaN(parsed)) {
             const adjusted =
-                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+                selectedDenom === 'symbol' ? parsed : parsed / (markPx || 1);
             setNotionalSymbolQtyNum(adjusted);
 
             if (adjusted > originalSize) {
@@ -496,8 +496,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         ariaLabel='size-input'
                         useTotalSize={false}
                         symbol={position.coin}
-                        selectedMode={selectedMode}
-                        setSelectedMode={setSelectedMode}
+                        selectedDenom={selectedDenom}
+                        setSelectedDenom={setSelectedDenom}
                         isModal
                     />
                     <div className={styles.position_size_container}>
