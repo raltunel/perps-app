@@ -16,8 +16,10 @@ interface PropsIF {
     selectedDenom: OrderBookMode;
     setSelectedDenom: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
+    onUnfocus?: () => void;
     isModal?: boolean;
     autoFocus?: boolean;
+    isEditing?: boolean;
 }
 
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
@@ -33,7 +35,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         selectedDenom,
         setSelectedDenom,
         onFocus,
+        onUnfocus,
         isModal = false,
+        isEditing = false,
     } = props;
 
     // temporarily only show BTC in the limit close modal
@@ -50,6 +54,19 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         },
         [setSelectedDenom, symbol],
     );
+
+    // Handle blur when isEditing becomes false
+    React.useEffect(() => {
+        if (!isEditing) {
+            const input = document.getElementById(
+                'trade-module-size-input',
+            ) as HTMLInputElement;
+            if (document.activeElement === input) {
+                input.blur();
+                onUnfocus?.();
+            }
+        }
+    }, [isEditing, onUnfocus]);
 
     // autofocus trade-module-size-input when user clicks anywhere in sizeInputContainer except for the tokenButton
     const handleContainerClick = useCallback((e: React.MouseEvent) => {

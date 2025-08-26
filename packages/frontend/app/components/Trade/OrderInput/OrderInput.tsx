@@ -712,6 +712,15 @@ function OrderInput({
         setSizePercentageValue(percent);
     }, [!!maxTradeSizeInUsd, isReduceOnlyEnabled]);
 
+    // // update order size when mark price changes
+    // useEffect(() => {
+    //     if (!markPx) return;
+    //     const notionalQtyNum = sizePercentageValue
+    //         ? ((maxTradeSizeInUsd / markPx) * sizePercentageValue) / 100
+    //         : 0;
+    //     setNotionalQtyNum(notionalQtyNum);
+    // }, [markPx]);
+
     // update sizePercentageValue when notionalQtyNum changes
     useEffect(() => {
         if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
@@ -862,14 +871,14 @@ function OrderInput({
     };
 
     useEffect(() => {
-        if (!isMarginInsufficient && !notionalQtyNum)
+        if (isSizeSetAsPercentage && !isEditingSizeInput)
             setNotionalQtyNumFromPercentage(sizePercentageValue);
     }, [
         isSizeSetAsPercentage,
-        isMarginInsufficient,
-        leverage,
+        isEditingSizeInput,
         sizePercentageValue,
         maxTradeSizeInUsd,
+        markPx,
     ]);
 
     // CHASE OPTION---------------------------------------------------
@@ -1057,6 +1066,7 @@ function OrderInput({
             ariaLabel: 'Size input',
             symbol,
             selectedDenom,
+            isEditing: isEditingSizeInput,
             setSelectedDenom,
             useTotalSize,
             autoFocus: window.innerWidth > 768, // do not autofocus on mobile
