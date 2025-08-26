@@ -28,6 +28,7 @@ import { useLimitOrderService } from '~/hooks/useLimitOrderService';
 import { useMarketOrderService } from '~/hooks/useMarketOrderService';
 import { useModal } from '~/hooks/useModal';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import packageJson from '../../../../package.json';
 import { useAppOptions, type useAppOptionsIF } from '~/stores/AppOptionsStore';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useDebugStore } from '~/stores/DebugStore';
@@ -488,6 +489,25 @@ function OrderInput({
         return roundedAvailableToTrade;
     }, [marginBucket, leverage, tradeDirection]);
 
+    const getUsdAvailableToTrade = useCallback(() => {
+        if (!marginBucket) return 0;
+        // Calculate implied maintenance margin from leverage
+        const mmBps = Math.floor(10000 / leverage);
+        const releveragedBucket = calcMarginAvail(marginBucket, mmBps);
+        const normalizedAvailableToTrade =
+            Number(
+                tradeDirection === 'buy'
+                    ? releveragedBucket?.availToBuy || 0
+                    : releveragedBucket?.availToSell || 0,
+            ) / 1_000_000;
+
+        const roundedAvailableToTrade =
+            normalizedAvailableToTrade < MIN_POSITION_USD_SIZE
+                ? 0
+                : normalizedAvailableToTrade;
+        return roundedAvailableToTrade;
+    }, [marginBucket, leverage, tradeDirection]);
+
     const userBuyingPowerExceedsMaxOrderSize =
         usdAvailableToTrade * leverage > maxNotionalUsdOrderSize;
 
@@ -601,10 +621,7 @@ function OrderInput({
         );
     }, [usdAvailableToTrade, marginRequired]);
 
-    function useCollateralInsufficientDebounce(
-        value: boolean,
-        delay: number,
-    ): boolean {
+    function useDebounceOnTrue(value: boolean, delay: number): boolean {
         const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
 
         useEffect(() => {
@@ -623,7 +640,7 @@ function OrderInput({
         return debouncedValue;
     }
 
-    const collateralInsufficientDebounced = useCollateralInsufficientDebounce(
+    const collateralInsufficientDebounced = useDebounceOnTrue(
         collateralInsufficient,
         500,
     );
@@ -797,6 +814,22 @@ function OrderInput({
         setPositionSliderPercentageValue(percent);
     }, [!!usdAvailableToTrade, isReduceOnlyEnabled, isMaxModeEnabled]);
 
+    const [userInputResultedIn100percent, setUserInputResultedIn100percent] =
+        useState(false);
+
+    const debounceShouldSetMaxModeEnabled = useDebounceOnTrue(
+        userInputResultedIn100percent,
+        1000,
+    );
+
+    useEffect(() => {
+        if (debounceShouldSetMaxModeEnabled) {
+            setIsMaxModeEnabled(true);
+        } else {
+            setIsMaxModeEnabled(false);
+        }
+    }, [debounceShouldSetMaxModeEnabled]);
+
     useEffect(() => {
         let percent = 0;
 
@@ -817,11 +850,6 @@ function OrderInput({
         }
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
-        if (percent === 100) {
-            setIsMaxModeEnabled(true);
-        } else {
-            setIsMaxModeEnabled(false);
-        }
     }, [leverage]);
 
     const handleOnFocus = () => {
@@ -841,74 +869,81 @@ function OrderInput({
         [],
     );
 
-    const handleSizeInputUpdate = useCallback(() => {
-        const parsed = parseFormattedNum(sizeDisplay.trim());
-        if (!isNaN(parsed)) {
-            const adjusted =
-                selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
-            setNotionalSymbolQtyNum(
-                isMaxModeEnabled || parsed === maxNotionalUsdOrderSize
-                    ? isReduceOnlyEnabled
-                        ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
-                        : userBuyingPowerExceedsMaxOrderSize
-                          ? maxNotionalUsdOrderSize / (markPx || 1)
-                          : (usdAvailableToTrade * leverage) / (markPx || 1)
-                    : adjusted,
-            );
-            if (isUserLoggedIn) {
-                const usdValue = isMaxModeEnabled
-                    ? userBuyingPowerExceedsMaxOrderSize
-                        ? maxNotionalUsdOrderSize
-                        : usdAvailableToTrade * leverage
-                    : selectedMode === 'symbol'
-                      ? adjusted * (markPx || 1)
-                      : parsed;
-                let percent = 0;
-                if (isReduceOnlyEnabled) {
-                    if (marginBucket?.netPosition) {
-                        const unscaledPositionSize =
-                            Math.abs(Number(marginBucket?.netPosition)) / 1e8;
-                        percent =
-                            (usdValue /
-                                (unscaledPositionSize * (markPx || 1))) *
-                            100;
+    const handleSizeInputUpdate = useCallback(
+        (capAtMax = false) => {
+            const parsed = parseFormattedNum(sizeDisplay.trim());
+            if (!isNaN(parsed)) {
+                const adjusted =
+                    selectedMode === 'symbol' ? parsed : parsed / (markPx || 1);
+                const usdToTrade = getUsdAvailableToTrade();
+                setNotionalSymbolQtyNum(
+                    isMaxModeEnabled || parsed === maxNotionalUsdOrderSize
+                        ? isReduceOnlyEnabled
+                            ? Math.abs(Number(marginBucket?.netPosition)) / 1e8
+                            : userBuyingPowerExceedsMaxOrderSize
+                              ? maxNotionalUsdOrderSize / (markPx || 1)
+                              : (usdToTrade * leverage) / (markPx || 1)
+                        : adjusted,
+                );
+                if (isUserLoggedIn) {
+                    const usdValue = isMaxModeEnabled
+                        ? userBuyingPowerExceedsMaxOrderSize
+                            ? maxNotionalUsdOrderSize
+                            : usdToTrade * leverage
+                        : selectedMode === 'symbol'
+                          ? adjusted * (markPx || 1)
+                          : parsed;
+                    let percent = 0;
+                    if (isReduceOnlyEnabled) {
+                        if (marginBucket?.netPosition) {
+                            const unscaledPositionSize =
+                                Math.abs(Number(marginBucket?.netPosition)) /
+                                1e8;
+                            percent =
+                                (usdValue /
+                                    (unscaledPositionSize * (markPx || 1))) *
+                                100;
+                        }
+                    } else {
+                        percent = userBuyingPowerExceedsMaxOrderSize
+                            ? (usdValue / maxNotionalUsdOrderSize) * 100
+                            : (usdValue / leverage / usdToTrade) * 100;
                     }
-                } else {
-                    percent = userBuyingPowerExceedsMaxOrderSize
-                        ? (usdValue / maxNotionalUsdOrderSize) * 100
-                        : (usdValue / leverage / usdAvailableToTrade) * 100;
-                }
-                if (isNaN(percent) || percent === Infinity) return;
-                if (percent > 100) {
-                    setUserExceededAvailableMargin(true);
-                    setPositionSliderPercentageValue(100);
-                } else {
-                    setUserExceededAvailableMargin(false);
-                    if (percent > 99) {
+                    if (isNaN(percent) || percent === Infinity) return;
+                    if (percent > 100) {
+                        setUserExceededAvailableMargin(!capAtMax);
+                        setUserInputResultedIn100percent(capAtMax);
                         setPositionSliderPercentageValue(100);
                     } else {
-                        setPositionSliderPercentageValue(percent);
-                        setIsMaxModeEnabled(false);
+                        setUserExceededAvailableMargin(false);
+                        if (percent > 99) {
+                            setUserInputResultedIn100percent(capAtMax);
+                            setPositionSliderPercentageValue(100);
+                        } else {
+                            setPositionSliderPercentageValue(percent);
+                            setUserInputResultedIn100percent(false);
+                        }
                     }
                 }
+            } else if (sizeDisplay.trim() === '') {
+                setNotionalSymbolQtyNum(0);
             }
-        } else if (sizeDisplay.trim() === '') {
-            setNotionalSymbolQtyNum(0);
-        }
-    }, [
-        sizeDisplay,
-        selectedMode,
-        markPx,
-        leverage,
-        isUserLoggedIn,
-        isReduceOnlyEnabled,
-        usdAvailableToTrade,
-        marginBucket?.netPosition,
-        maxNotionalUsdOrderSize,
-        userBuyingPowerExceedsMaxOrderSize,
-        isMaxModeEnabled,
-        userExceededAvailableMargin,
-    ]);
+        },
+        [
+            sizeDisplay,
+            selectedMode,
+            markPx,
+            leverage,
+            isUserLoggedIn,
+            isReduceOnlyEnabled,
+            marginBucket?.netPosition,
+            maxNotionalUsdOrderSize,
+            userBuyingPowerExceedsMaxOrderSize,
+            isMaxModeEnabled,
+            userExceededAvailableMargin,
+            getUsdAvailableToTrade,
+        ],
+    );
 
     useEffect(() => {
         if (!userExceededAvailableMargin) handleSizeInputUpdate();
@@ -927,6 +962,10 @@ function OrderInput({
             }
         }
     }, [sizeDisplay, isEditingSizeInput]);
+
+    useEffect(() => {
+        updateSliderAfterOrder(true);
+    }, [usdAvailableToTrade]);
 
     const handleSizeInputBlur = useCallback(() => {
         handleSizeInputUpdate();
@@ -1289,6 +1328,13 @@ function OrderInput({
         ],
     );
 
+    const updateSliderAfterOrder = useCallback(
+        (capAtMax = false) => {
+            if (!isEditingSizeInput) handleSizeInputUpdate(capAtMax);
+        },
+        [isEditingSizeInput, handleSizeInputUpdate],
+    );
+
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // Validate position size
@@ -1343,6 +1389,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Buy',
                             orderType: 'Market',
@@ -1375,6 +1422,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Buy',
                             orderType: 'Market',
@@ -1410,6 +1458,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Buy',
                         orderType: 'Market',
@@ -1490,6 +1539,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Success',
                             direction: 'Sell',
                             orderType: 'Market',
@@ -1522,6 +1572,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Fail',
                             direction: 'Sell',
                             orderType: 'Market',
@@ -1557,6 +1608,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Market Fail',
                         direction: 'Sell',
                         orderType: 'Market',
@@ -1646,6 +1698,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Buy',
@@ -1677,6 +1730,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Buy',
@@ -1712,6 +1766,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Buy',
@@ -1801,6 +1856,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Success',
                             orderType: 'Limit',
                             direction: 'Sell',
@@ -1832,6 +1888,7 @@ function OrderInput({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Limit Fail',
                             orderType: 'Limit',
                             direction: 'Sell',
@@ -1863,6 +1920,7 @@ function OrderInput({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Limit Fail',
                         orderType: 'Limit',
                         direction: 'Sell',

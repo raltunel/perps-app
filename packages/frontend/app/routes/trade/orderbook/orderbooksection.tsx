@@ -87,7 +87,10 @@ export default function OrderBookSection(props: propsIF) {
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
-        const orderBookSection = document.getElementById('orderBookSection');
+        let orderBookSection = document.getElementById('orderBookSection');
+        if (!orderBookSection) {
+            orderBookSection = document.getElementById('orderBookContainer');
+        }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
             dummyOrderRow?.getBoundingClientRect().height ||
@@ -283,7 +286,7 @@ export default function OrderBookSection(props: propsIF) {
     // Mobile view logic
     if (mobileView) {
         if (mobileContent === 'orderBook') return orderBookComponent;
-        if (mobileContent === 'recentTrades') return orderBookTradesComponent;
+        if (mobileContent === 'recentTrades') return orderBookTradesComponent();
     }
 
     // Desktop view logic

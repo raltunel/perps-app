@@ -12,6 +12,7 @@ import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import packageJson from '../../../../package.json';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
@@ -260,6 +261,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Close Success',
                             orderType: 'Market',
                             direction: closingSide === 'buy' ? 'Buy' : 'Sell',
@@ -291,6 +293,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
+                            version: packageJson.version,
                             actionType: 'Market Close Fail',
                             orderType: 'Market',
                             errorMessage: result.error || 'Transaction failed',
@@ -331,6 +334,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
+                        version: packageJson.version,
                         actionType: 'Market Close Fail',
                         orderType: 'Market',
                         errorMessage:

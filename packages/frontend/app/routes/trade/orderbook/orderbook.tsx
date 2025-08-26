@@ -10,7 +10,7 @@ import BasicDivider from '~/components/Dividers/BasicDivider';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
 import useNumFormatter from '~/hooks/useNumFormatter';
-import { useSdk } from '~/hooks/useSdk';
+import { useRestPoller } from '~/hooks/useRestPoller';
 import { useWorker } from '~/hooks/useWorker';
 import type { OrderBookOutput } from '~/hooks/workers/orderbook.worker';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -29,6 +29,7 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
+import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 
 interface OrderBookProps {
     symbol: string;
@@ -48,7 +49,7 @@ const dummyOrder: OrderBookRowIF = {
 
 // Custom hook to memoize slot arrays
 function useOrderSlots(orders: OrderBookRowIF[]) {
-    return useMemo(() => orders.map((order) => order.px), [orders]);
+    return useMemo(() => orders?.map((order) => order.px), [orders]);
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
@@ -56,7 +57,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     orderCount,
     heightOverride,
 }) => {
-    const { info } = useSdk();
+    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
     const orderClickDisabled = false;
 
@@ -85,8 +86,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // No useMemo for simple arithmetic
-    const buyPlaceHolderCount = Math.max(orderCount - buys.length, 0);
-    const sellPlaceHolderCount = Math.max(orderCount - sells.length, 0);
+    const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
+    const sellPlaceHolderCount = Math.max(orderCount - sells?.length || 0, 0);
 
     // useEffect(() => {
     //     console.log('buys', buys);
@@ -216,7 +217,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, symbolInfo?.coin, selectedResolution, setSelectedResolution]);
 
     useEffect(() => {
-        if (!info || !symbol) return;
+        if (!symbol) return;
         setOrderBookState(TableState.LOADING);
         if (selectedResolution) {
             const subKey = {
@@ -229,12 +230,18 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     ? { mantissa: selectedResolution.mantissa }
                     : {}),
             };
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+            subscribeToPoller(
+                'info',
+                subKey,
+                postOrderBookRaw,
+                TIMEOUT_OB_POLLING,
+                true,
+            );
             return () => {
-                unsubscribe();
+                unsubscribeFromPoller('info', subKey);
             };
         }
-    }, [selectedResolution, info, symbol, postOrderBookRaw]);
+    }, [selectedResolution, symbol]);
 
     const midHeader = useCallback(
         (id: string) => (
