@@ -24,6 +24,8 @@ interface LeverageSliderProps {
     maxLeverage?: number;
     hideTitle?: boolean;
     minimumValue?: number;
+    isDragging?: boolean;
+    setIsDragging?: (value: boolean) => void;
 }
 
 const LEVERAGE_CONFIG = {
@@ -66,6 +68,8 @@ export default function LeverageSlider({
     hideTitle = false,
     minimumValue,
     onClick,
+    isDragging,
+    setIsDragging,
 }: LeverageSliderProps) {
     const { symbolInfo } = useTradeDataStore();
     const {
@@ -88,7 +92,6 @@ export default function LeverageSlider({
     const [inputValue, setInputValue] = useState<string>(
         currentValue.toString(),
     );
-    const [isDragging, setIsDragging] = useState<boolean>(false);
     const [tickMarks, setTickMarks] = useState<number[]>([]);
     const [hoverValue, setHoverValue] = useState<number | null>(null);
     const [isHovering, setIsHovering] = useState<boolean>(false);
