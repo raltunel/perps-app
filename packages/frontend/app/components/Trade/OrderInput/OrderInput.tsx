@@ -689,7 +689,6 @@ function OrderInput({
 
     // update notionalQtyNum when mark price changes
     useEffect(() => {
-        console.log({ isLeverageBeingDragged });
         if (!markPx || isEditingSizeInput || isLeverageBeingDragged) return;
         let notionalQtyNum = 0;
         if (isSizeSetAsPercentage) {
