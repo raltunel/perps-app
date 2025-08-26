@@ -282,6 +282,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
             if (switchTab) {
                 switchTab('order' as TabType);
+                setTimeout(() => {
+                    const orderElem = document.getElementById(
+                        'trade-module-price-input-container',
+                    );
+                    orderElem?.classList.add('inputPulse');
+                    setTimeout(() => {
+                        orderElem?.classList.remove('inputPulse');
+                    }, 800);
+                }, 200);
             }
         },
         [
