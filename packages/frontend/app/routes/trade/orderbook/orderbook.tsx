@@ -281,16 +281,21 @@ const OrderBook: React.FC<OrderBookProps> = ({
             }, 1000);
 
             if (switchTab) {
-                switchTab('order' as TabType);
+                const obRow = document.getElementById('order-row-' + order.px);
+                obRow?.classList.add('divPulse');
                 setTimeout(() => {
-                    const orderElem = document.getElementById(
-                        'trade-module-price-input-container',
-                    );
-                    orderElem?.classList.add('inputPulse');
+                    obRow?.classList.remove('divPulse');
+                    switchTab('order' as TabType);
                     setTimeout(() => {
-                        orderElem?.classList.remove('inputPulse');
-                    }, 800);
-                }, 200);
+                        const orderElem = document.getElementById(
+                            'trade-module-price-input-container',
+                        );
+                        orderElem?.classList.add('divPulse');
+                        setTimeout(() => {
+                            orderElem?.classList.remove('divPulse');
+                        }, 800);
+                    }, 200);
+                }, 800);
             }
         },
         [

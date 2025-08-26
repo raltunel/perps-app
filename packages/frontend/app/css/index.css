@@ -354,7 +354,7 @@ ol[role='list'] {
     width: 10rem;
 }
 
-@keyframes inputPulse {
+@keyframes divPulse {
     0% {
         box-shadow: inset 0 0 30px 5px
             color-mix(in srgb, var(--accent1) 0%, transparent) !important;
@@ -369,6 +369,6 @@ ol[role='list'] {
     }
 }
 
-.inputPulse {
-    animation: inputPulse 0.4s ease-in-out 0s 2 forwards;
+.divPulse {
+    animation: divPulse 0.4s ease-in-out 0s 2 forwards;
 }
