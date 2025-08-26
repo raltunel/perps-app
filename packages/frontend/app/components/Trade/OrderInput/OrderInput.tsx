@@ -621,10 +621,7 @@ function OrderInput({
         );
     }, [usdAvailableToTrade, marginRequired]);
 
-    function useCollateralInsufficientDebounce(
-        value: boolean,
-        delay: number,
-    ): boolean {
+    function useDebounceOnTrue(value: boolean, delay: number): boolean {
         const [debouncedValue, setDebouncedValue] = useState<boolean>(value);
 
         useEffect(() => {
@@ -643,7 +640,7 @@ function OrderInput({
         return debouncedValue;
     }
 
-    const collateralInsufficientDebounced = useCollateralInsufficientDebounce(
+    const collateralInsufficientDebounced = useDebounceOnTrue(
         collateralInsufficient,
         500,
     );
@@ -820,29 +817,7 @@ function OrderInput({
     const [userInputResultedIn100percent, setUserInputResultedIn100percent] =
         useState(false);
 
-    function useShouldSetMaxModeEnabledDebounce(value: boolean, delay: number) {
-        const [debouncedValue, setDebouncedValue] = useState(value);
-
-        useEffect(() => {
-            if (value === false) {
-                setDebouncedValue(false);
-                return;
-            }
-            // Set a timeout to update the debounced value after the specified delay
-            const timer = setTimeout(() => {
-                setDebouncedValue(value);
-            }, delay);
-
-            // Clean up the timeout if the value changes before the delay has passed
-            return () => {
-                clearTimeout(timer);
-            };
-        }, [value, delay]);
-
-        return debouncedValue;
-    }
-
-    const debounceShouldSetMaxModeEnabled = useShouldSetMaxModeEnabledDebounce(
+    const debounceShouldSetMaxModeEnabled = useDebounceOnTrue(
         userInputResultedIn100percent,
         1000,
     );
@@ -875,11 +850,6 @@ function OrderInput({
         }
         setUserExceededAvailableMargin(false);
         setPositionSliderPercentageValue(percent);
-        if (percent === 100) {
-            setUserInputResultedIn100percent(true);
-        } else {
-            setUserInputResultedIn100percent(false);
-        }
     }, [leverage]);
 
     const handleOnFocus = () => {
@@ -946,7 +916,6 @@ function OrderInput({
                         setPositionSliderPercentageValue(100);
                     } else {
                         setUserExceededAvailableMargin(false);
-                        setUserInputResultedIn100percent(false);
                         if (percent > 99) {
                             setUserInputResultedIn100percent(capAtMax);
                             setPositionSliderPercentageValue(100);

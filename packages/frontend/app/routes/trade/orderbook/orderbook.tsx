@@ -30,11 +30,13 @@ import {
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
 import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+import type { TabType } from '~/routes/trade';
 
 interface OrderBookProps {
     symbol: string;
     orderCount: number;
     heightOverride?: string;
+    switchTab?: (tab: TabType) => void;
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -56,6 +58,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     symbol,
     orderCount,
     heightOverride,
+    switchTab,
 }) => {
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
@@ -276,8 +279,33 @@ const OrderBook: React.FC<OrderBookProps> = ({
             rowLockTimeoutRef.current = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
+
+            if (switchTab) {
+                const obRow = document.getElementById('order-row-' + order.px);
+                obRow?.classList.add('divPulse');
+                setTimeout(() => {
+                    obRow?.classList.remove('divPulse');
+                    switchTab('order' as TabType);
+                    setTimeout(() => {
+                        const orderElem = document.getElementById(
+                            'trade-module-price-input-container',
+                        );
+                        orderElem?.classList.add('divPulse');
+                        setTimeout(() => {
+                            orderElem?.classList.remove('divPulse');
+                        }, 800);
+                    }, 400);
+                }, 400);
+            }
         },
-        [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+        [
+            buys,
+            sells,
+            orderCount,
+            setObChosenPrice,
+            setObChosenAmount,
+            switchTab,
+        ],
     );
 
     const getRandWidth = useCallback(
