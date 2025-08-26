@@ -13,8 +13,8 @@ interface PropsIF {
     ariaLabel?: string;
     useTotalSize: boolean;
     symbol: string;
-    selectedMode: OrderBookMode;
-    setSelectedMode: React.Dispatch<React.SetStateAction<OrderBookMode>>;
+    selectedDenom: OrderBookMode;
+    setSelectedDenom: React.Dispatch<React.SetStateAction<OrderBookMode>>;
     onFocus: () => void;
     isModal?: boolean;
     autoFocus?: boolean;
@@ -30,8 +30,8 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         ariaLabel,
         useTotalSize,
         symbol,
-        selectedMode,
-        setSelectedMode,
+        selectedDenom,
+        setSelectedDenom,
         onFocus,
         isModal = false,
     } = props;
@@ -46,9 +46,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     // Memoized ComboBox onChange handler
     const handleComboBoxChange = useCallback(
         (val: string) => {
-            setSelectedMode(val === symbol.toUpperCase() ? 'symbol' : 'usd');
+            setSelectedDenom(val === symbol.toUpperCase() ? 'symbol' : 'usd');
         },
-        [setSelectedMode, symbol],
+        [setSelectedDenom, symbol],
     );
 
     // autofocus trade-module-size-input when user clicks anywhere in sizeInputContainer except for the tokenButton
@@ -97,9 +97,9 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 }}
             >
                 <ComboBox
-                    key={selectedMode}
+                    key={selectedDenom}
                     value={
-                        selectedMode === 'usd' ? 'USD' : symbol.toUpperCase()
+                        selectedDenom === 'usd' ? 'USD' : symbol.toUpperCase()
                     }
                     options={comboBoxOptions}
                     onChange={handleComboBoxChange}
