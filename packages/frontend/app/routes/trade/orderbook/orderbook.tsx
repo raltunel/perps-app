@@ -291,6 +291,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                             'trade-module-price-input-container',
                         );
                         orderElem?.classList.add('divPulse');
+                        // orderElem?.style.setProperty('background-color', 'red');
                         setTimeout(() => {
                             orderElem?.classList.remove('divPulse');
                         }, 800);
