@@ -283,7 +283,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 />
             </div>
             <div ref={tabContentRef} className={styles.tabContent}>
-                <div className={styles.startGap} />
+                <div className={styles.startGap}>Liquidation Chart</div>
                 {renderTabContent()}
             </div>
         </div>

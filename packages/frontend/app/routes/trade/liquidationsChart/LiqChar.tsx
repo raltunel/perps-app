@@ -327,13 +327,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
-                const isBuy = mouseYRef.current > heightRef.current / 2;
+                // const isBuy = mouseYRef.current > heightRef.current / 2;
                 const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
+
                 if (d3sellRgbaColor) {
                     d3sellRgbaColor.opacity =
-                        hoverLineDataRef.current.length > 0 && !isBuy
-                            ? 0.2
-                            : 0.4;
+                        hoverLineDataRef.current.length > 0 ? 0.2 : 0.4;
                 }
 
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
@@ -348,13 +347,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
-                const isBuy = mouseYRef.current > heightRef.current / 2;
+                // const isBuy = mouseYRef.current > heightRef.current / 2;
                 const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
+
                 if (d3buyRgbaColor) {
                     d3buyRgbaColor.opacity =
-                        hoverLineDataRef.current.length > 0 && isBuy
-                            ? 0.2
-                            : 0.4;
+                        hoverLineDataRef.current.length > 0 ? 0.2 : 0.4;
                 }
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
@@ -717,17 +715,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
 
-        const snappedPrice = hoveredArray.current
-            .filter((item) =>
-                isBuy ? item.px < mousePoint : item.px > mousePoint,
-            )
-            .reduce((closest: OrderBookRowIF, item: OrderBookRowIF) => {
-                if (!closest) return item;
-                return Math.abs(item.px - mousePoint) <
-                    Math.abs(closest.px - mousePoint)
-                    ? item
-                    : closest;
-            });
+        const nearest = hoveredArray.current.filter((item) =>
+            isBuy ? item.px < mousePoint : item.px > mousePoint,
+        );
+
+        const snappedPrice =
+            nearest.length > 0
+                ? nearest.reduce(
+                      (closest: OrderBookRowIF, item: OrderBookRowIF) => {
+                          if (!closest) return item;
+                          return Math.abs(item.px - mousePoint) <
+                              Math.abs(closest.px - mousePoint)
+                              ? item
+                              : closest;
+                      },
+                  )
+                : hoveredArray.current[hoveredArray.current.length - 1];
 
         const price =
             snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
