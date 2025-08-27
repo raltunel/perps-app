@@ -7,7 +7,6 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../package.json';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OpenOrdersTable.module.css';
@@ -84,9 +83,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Cancel Success',
                             orderType: 'Limit',
+                            success: true,
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
@@ -120,9 +119,9 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Cancel Fail',
                             orderType: 'Limit',
+                            success: false,
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
