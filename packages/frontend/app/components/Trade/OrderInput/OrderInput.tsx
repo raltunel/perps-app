@@ -206,7 +206,7 @@ function OrderInput({
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
     const minUsdOrderSize = 0.99;
-    const [maxUsdOrderSize, setMaxUsdOrderSize] = useState<number>(100_000);
+    const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
     const OI_BUFFER = 100;
 
@@ -219,7 +219,7 @@ function OrderInput({
             tradeDirection === 'buy',
         );
         const unscaledMaxRemainingOI = Number(maxRemainingOI) / 1e6;
-        setMaxUsdOrderSize(unscaledMaxRemainingOI - OI_BUFFER);
+        setMaxRemainingOI(unscaledMaxRemainingOI - OI_BUFFER);
     }, [marginBucket, tradeDirection]);
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
@@ -456,6 +456,10 @@ function OrderInput({
         return roundedAvailableToTrade;
     }, [marginBucket, leverage, tradeDirection]);
 
+    const maxOrderSizeWouldExceedRemainingOI = useMemo(() => {
+        return usdAvailableToTrade * leverage > maxRemainingOI;
+    }, [usdAvailableToTrade, leverage, maxRemainingOI]);
+
     const getMaxTradeSizeInUsd = useCallback(
         (leverageParam: number) => {
             if (isReduceOnlyEnabled && marginBucket && markPx) {
@@ -463,17 +467,17 @@ function OrderInput({
             }
 
             const exceedsMax =
-                usdAvailableToTrade * leverageParam > maxUsdOrderSize;
+                usdAvailableToTrade * leverageParam > maxRemainingOI;
 
             if (exceedsMax) {
-                return maxUsdOrderSize;
+                return maxRemainingOI;
             } else {
                 return usdAvailableToTrade * leverageParam;
             }
         },
         [
             usdAvailableToTrade,
-            maxUsdOrderSize,
+            maxRemainingOI,
             isReduceOnlyEnabled,
             marginBucket,
             markPx,
@@ -515,8 +519,8 @@ function OrderInput({
     }, [usdOrderSizeNum, minUsdOrderSize]);
 
     const sizeMoreThanMaximum = useMemo(() => {
-        return usdOrderSizeNum > maxUsdOrderSize + OI_BUFFER;
-    }, [usdOrderSizeNum, maxUsdOrderSize]);
+        return usdOrderSizeNum > maxRemainingOI + OI_BUFFER;
+    }, [usdOrderSizeNum, maxRemainingOI]);
 
     const currentPositionLessThanMinPositionSize = useMemo(() => {
         return (
@@ -2175,6 +2179,25 @@ function OrderInput({
                                         </span>
                                     </div>
                                 ))}
+                                {maxOrderSizeWouldExceedRemainingOI &&
+                                    sizePercentageValue === 100 && (
+                                        <div
+                                            className={
+                                                styles.inputDetailsDataContent
+                                            }
+                                        >
+                                            <span
+                                                style={{
+                                                    color: 'var(--orange)',
+                                                    textAlign: 'center',
+                                                    width: '100%',
+                                                }}
+                                            >
+                                                Position size limited by open
+                                                interest cap
+                                            </span>
+                                        </div>
+                                    )}
                             </div>
 
                             {/* {marketOrderType === 'chase_limit' && (
