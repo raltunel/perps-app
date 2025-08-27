@@ -208,22 +208,25 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
     }, [symbol, symbolInfo?.coin]);
 
+    const subKey = useMemo(() => {
+        if (!selectedResolution) return undefined;
+        return {
+            type: 'l2Book' as const,
+            coin: symbol,
+            ...(selectedResolution.nsigfigs
+                ? { nSigFigs: selectedResolution.nsigfigs }
+                : {}),
+            ...(selectedResolution.mantissa
+                ? { mantissa: selectedResolution.mantissa }
+                : {}),
+        };
+    }, [selectedResolution, symbol]);
+
     useEffect(() => {
-        console.log('>>> orderbook symbol', symbol);
-        if (!symbol) return;
-        if (!info) return;
+        console.log('>>> orderbook subKey', subKey);
+        if (!subKey || !info) return;
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
+        if (subKey) {
             // subscribeToPoller(
             //     'info',
             //     subKey,
@@ -239,7 +242,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 unsubscribe();
             };
         }
-    }, [selectedResolution, symbol, info]);
+    }, [subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => (
