@@ -178,6 +178,11 @@ function OrderInput({
 
     const [notionalQtyNum, setNotionalQtyNum] = useState(0);
     // Track if we're processing an order
+
+    // useEffect(() => {
+    //     console.log({ notionalQtyNum });
+    // }, [notionalQtyNum]);
+
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
     const [sizeDisplay, setSizeDisplay] = useState('');
@@ -632,6 +637,7 @@ function OrderInput({
 
     const handleLeverageChange = (value: number) => {
         setLeverage(value);
+        setIsEditingSizeInput(false);
     };
 
     useEffect(() => {
