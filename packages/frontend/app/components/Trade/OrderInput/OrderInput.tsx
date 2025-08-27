@@ -712,7 +712,7 @@ function OrderInput({
         }
         const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
         setNotionalQtyNum(newNotionalQtyNum);
-    }, [markPx, isLeverageBeingDragged]);
+    }, [markPx, isLeverageBeingDragged, isReduceOnlyEnabled]);
 
     const getCurrentPercentageOfMaxTradeSize = useCallback(() => {
         return ((notionalQtyNum * (markPx || 1)) / maxTradeSizeInUsd) * 100;
