@@ -180,7 +180,7 @@ function OrderInput({
     // Track if we're processing an order
 
     // useEffect(() => {
-    //     console.log({ notionalQtyNum });
+    //     console.log('new notionalQtyNum', notionalQtyNum);
     // }, [notionalQtyNum]);
 
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
@@ -674,7 +674,7 @@ function OrderInput({
                 : '';
             setSizeDisplay(newSizeString);
         }
-    }, [notionalQtyNum, selectedDenom, isEditingSizeInput, markPx]);
+    }, [notionalQtyNum, selectedDenom, isEditingSizeInput]);
 
     const setSizeSliderPercentageFromLeverage = useCallback(
         (maxTradeSizeInUsd: number) => {
@@ -710,7 +710,8 @@ function OrderInput({
                     : 0;
             }
         }
-        setNotionalQtyNum(notionalQtyNum);
+        const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
+        setNotionalQtyNum(newNotionalQtyNum);
     }, [markPx, isLeverageBeingDragged]);
 
     const getCurrentPercentageOfMaxTradeSize = useCallback(() => {
@@ -753,7 +754,8 @@ function OrderInput({
         if (!isNaN(parsed)) {
             const notionalSizeInputQty =
                 selectedDenom === 'symbol' ? parsed : parsed / (markPx || 1);
-            setNotionalQtyNum(notionalSizeInputQty);
+            const newNotionalQtyNum = Number(notionalSizeInputQty.toFixed(8));
+            setNotionalQtyNum(newNotionalQtyNum);
         } else if (sizeDisplay.trim() === '') {
             setNotionalQtyNum(0);
         }
@@ -855,7 +857,10 @@ function OrderInput({
             if (!markPx) return;
             const notionalQtyNum =
                 ((value / 100) * getMaxTradeSizeInUsd(leverage)) / markPx;
-            if (notionalQtyNum) setNotionalQtyNum(notionalQtyNum);
+            if (notionalQtyNum) {
+                const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
+                setNotionalQtyNum(newNotionalQtyNum);
+            }
         },
         [getMaxTradeSizeInUsd, markPx, leverage],
     );
@@ -878,7 +883,10 @@ function OrderInput({
                 const parsedSizeDisplay = parseFormattedNum(sizeDisplay.trim());
                 if (isNaN(parsedSizeDisplay)) return;
                 if (parsedSizeDisplay >= maxTradeSizeInUsd) {
-                    setNotionalQtyNum(maxTradeSizeInUsd / (markPx || 1));
+                    const newNotionalQtyNum = Number(
+                        (maxTradeSizeInUsd / (markPx || 1)).toFixed(8),
+                    );
+                    setNotionalQtyNum(newNotionalQtyNum);
                     setSizePercentageValue(100);
                     setIsSizeSetAsPercentage(true);
                 } else {
