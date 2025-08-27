@@ -503,7 +503,7 @@ function OrderInput({
     }, [usdOrderValue, leverage]);
 
     const isMarginInsufficient = useMemo(() => {
-        return usdAvailableToTrade < marginRequired - 0.01;
+        return usdAvailableToTrade < marginRequired * 0.99;
     }, [usdAvailableToTrade, marginRequired]);
 
     const usdOrderSizeNum = useMemo(() => {
