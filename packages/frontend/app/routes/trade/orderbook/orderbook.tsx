@@ -34,7 +34,6 @@ import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
 
 interface OrderBookProps {
-    symbol: string;
     orderCount: number;
     heightOverride?: string;
     switchTab?: (tab: TabType) => void;
@@ -56,7 +55,6 @@ function useOrderSlots(orders: OrderBookRowIF[]) {
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
-    symbol,
     orderCount,
     heightOverride,
     switchTab,
@@ -96,6 +94,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         symbolInfo,
         setObChosenPrice,
         setObChosenAmount,
+        symbol,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -214,7 +213,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (!symbol) return;
         if (!info) return;
         setOrderBookState(TableState.LOADING);
-        console.log('>>> selectedResolution', selectedResolution);
         if (selectedResolution) {
             const subKey = {
                 type: 'l2Book' as const,
