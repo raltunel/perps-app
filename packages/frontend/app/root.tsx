@@ -31,7 +31,7 @@ import {
 } from './utils/Constants';
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
-import packageJson from '../../../package.json';
+import packageJson from '../package.json';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -150,7 +150,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {!isProduction && (
+                {isProduction && (
                     <script
                         defer
                         event-version={packageJson.version}
