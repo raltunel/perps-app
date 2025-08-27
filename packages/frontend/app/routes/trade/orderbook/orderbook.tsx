@@ -29,8 +29,9 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+// import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
 import type { TabType } from '~/routes/trade';
+import { useSdk } from '~/hooks/useSdk';
 
 interface OrderBookProps {
     symbol: string;
@@ -60,7 +61,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
     heightOverride,
     switchTab,
 }) => {
-    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    // TODO: Can be uncommented if we want to use the rest poller
+    // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    const { info } = useSdk();
 
     const orderClickDisabled = false;
 
@@ -207,8 +210,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, symbolInfo?.coin]);
 
     useEffect(() => {
+        console.log('>>> orderbook symbol', symbol);
         if (!symbol) return;
+        if (!info) return;
         setOrderBookState(TableState.LOADING);
+        console.log('>>> selectedResolution', selectedResolution);
         if (selectedResolution) {
             const subKey = {
                 type: 'l2Book' as const,
@@ -220,18 +226,22 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     ? { mantissa: selectedResolution.mantissa }
                     : {}),
             };
-            subscribeToPoller(
-                'info',
-                subKey,
-                postOrderBookRaw,
-                TIMEOUT_OB_POLLING,
-                true,
-            );
+            // subscribeToPoller(
+            //     'info',
+            //     subKey,
+            //     postOrderBookRaw,
+            //     TIMEOUT_OB_POLLING,
+            //     true,
+            // );
+
+            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
             return () => {
-                unsubscribeFromPoller('info', subKey);
+                // unsubscribeFromPoller('info', subKey);
+                unsubscribe();
             };
         }
-    }, [selectedResolution, symbol]);
+    }, [selectedResolution, symbol, info]);
 
     const midHeader = useCallback(
         (id: string) => (
