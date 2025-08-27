@@ -170,6 +170,18 @@ export default function AppOptions() {
             >
                 Apply Defaults
             </div>
+
+            <div
+                className={styles.apply_defaults}
+                onClick={() => {
+                    // Clear persisted split height
+                    localStorage.removeItem('chartTopHeight');
+                    // Tell the Trade page to recompute defaults immediately
+                    window.dispatchEvent(new CustomEvent('trade:resetLayout'));
+                }}
+            >
+                Reset Layout (Chart/Table)
+            </div>
         </section>
     );
 }
