@@ -1859,6 +1859,7 @@ function OrderInput({
     }, [isReduceOnlyEnabled, marginBucket, tradeDirection]);
 
     const isReduceOnlyExceedingPositionSize = useMemo(() => {
+        if (isNaN(notionalQtyNum)) return false;
         return (
             isReduceOnlyEnabled &&
             !!marginBucket &&
@@ -2179,7 +2180,8 @@ function OrderInput({
                                         </span>
                                     </div>
                                 ))}
-                                {maxOrderSizeWouldExceedRemainingOI &&
+                                {!isReduceOnlyEnabled &&
+                                    maxOrderSizeWouldExceedRemainingOI &&
                                     sizePercentageValue === 100 && (
                                         <div
                                             className={
