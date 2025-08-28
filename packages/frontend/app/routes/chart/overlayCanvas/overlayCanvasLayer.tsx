@@ -219,6 +219,26 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         }
     }, [chart]);
 
+    useEffect(() => {
+        if (
+            canvasRef.current === null ||
+            canvasSize === undefined ||
+            scaleDataRef.current === null
+        )
+            return;
+
+        const { width, height } = canvasSize;
+
+        canvasRef.current.width = width;
+        canvasRef.current.style.width = `${width}px`;
+
+        canvasRef.current.height = height;
+        canvasRef.current.style.height = `${height}px`;
+
+        scaleDataRef.current.yScale.range([height, 0]);
+        scaleDataRef.current.scaleSymlog.range([width, 0]);
+    }, [canvasSize]);
+
     return (
         <>
             {children({
