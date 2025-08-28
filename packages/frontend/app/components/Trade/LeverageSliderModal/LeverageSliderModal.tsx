@@ -160,6 +160,9 @@ export default function LeverageSliderModal({
         notificationStore,
     ]);
 
+    const [isLeverageBeingDragged, setIsLeverageBeingDragged] =
+        useState<boolean>(false);
+
     return (
         <Modal title='Adjust Leverage' close={onClose}>
             <div className={styles.leverageSliderContainer}>
@@ -174,6 +177,8 @@ export default function LeverageSliderModal({
                         hideTitle={true}
                         className={styles.modalSlider}
                         minimumValue={leverageFloor}
+                        isDragging={isLeverageBeingDragged}
+                        setIsDragging={setIsLeverageBeingDragged}
                     />
                 </div>
 
