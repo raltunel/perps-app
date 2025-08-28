@@ -645,7 +645,8 @@ function OrderInput({
     };
 
     useEffect(() => {
-        setSizeSliderPercentageFromLeverage(getMaxTradeSizeInUsd(leverage));
+        const maxTradeSizeInUsd = getMaxTradeSizeInUsd(leverage);
+        setSizeSliderPercentageFromLeverage(maxTradeSizeInUsd);
     }, [leverage]);
 
     // update sizeDisplay when selectedDenom between USD and Symbol
@@ -2064,6 +2065,44 @@ function OrderInput({
         [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
     );
 
+    const maxTradeSizeWarningLong = useMemo(
+        () =>
+            maxOrderSizeWouldExceedRemainingOI
+                ? tradeDirection === 'buy'
+                    ? marginBucket?.netPosition && marginBucket.netPosition > 0
+                        ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
+                        : `The current maximum trade size for this market is limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                    : marginBucket?.netPosition && marginBucket.netPosition < 0
+                      ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
+                      : `The current maximum trade size for this market is limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                : '',
+        [
+            maxOrderSizeWouldExceedRemainingOI,
+            tradeDirection,
+            marginBucket,
+            symbolInfo?.coin.toUpperCase(),
+        ],
+    );
+
+    const maxTradeSizeWarningShort = useMemo(
+        () =>
+            maxOrderSizeWouldExceedRemainingOI
+                ? tradeDirection === 'buy'
+                    ? marginBucket?.netPosition && marginBucket.netPosition > 0
+                        ? `Max position size limited by OI cap`
+                        : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                    : marginBucket?.netPosition && marginBucket.netPosition < 0
+                      ? `Max position size limited by OI cap`
+                      : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                : '',
+        [
+            maxOrderSizeWouldExceedRemainingOI,
+            tradeDirection,
+            marginBucket,
+            symbolInfo?.coin.toUpperCase(),
+        ],
+    );
+
     return (
         <div ref={orderInputRef} className={styles.order_input}>
             <AnimatePresence mode='wait'>
@@ -2181,23 +2220,41 @@ function OrderInput({
                                     </div>
                                 ))}
                                 {!isReduceOnlyEnabled &&
-                                    maxOrderSizeWouldExceedRemainingOI &&
-                                    sizePercentageValue === 100 && (
+                                    maxOrderSizeWouldExceedRemainingOI && (
                                         <div
-                                            className={
-                                                styles.inputDetailsDataContent
-                                            }
+                                            style={{
+                                                width: '100%',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                            }}
                                         >
-                                            <span
-                                                style={{
-                                                    color: 'var(--orange)',
-                                                    textAlign: 'center',
-                                                    width: '100%',
-                                                }}
+                                            <Tooltip
+                                                content={
+                                                    maxTradeSizeWarningLong
+                                                }
+                                                position='bottom'
                                             >
-                                                Position size limited by open
-                                                interest cap
-                                            </span>
+                                                <div
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '4px',
+                                                        color: 'var(--orange)',
+                                                        justifyContent:
+                                                            'center',
+                                                        width: '100%',
+                                                        fontSize:
+                                                            'var(--font-size-s)',
+                                                    }}
+                                                >
+                                                    <span>
+                                                        {
+                                                            maxTradeSizeWarningShort
+                                                        }
+                                                    </span>
+                                                    <LuCircleHelp size={12} />
+                                                </div>
+                                            </Tooltip>
                                         </div>
                                     )}
                             </div>
