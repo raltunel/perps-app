@@ -35,7 +35,14 @@ export default function Trade() {
     const { marginBucket } = useUnifiedMarginData();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    const { orderBookMode } = useAppSettings();
+
+    const {
+        orderBookMode,
+        chartTopHeight: storedHeight,
+        setChartTopHeight,
+        resetLayoutHeights,
+    } = useAppSettings();
+
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
@@ -162,7 +169,6 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView
                         mobileContent='orderBook'
-                        chartTopHeight={chartTopHeight}
                         switchTab={switchTab}
                     />
                 )}
@@ -179,7 +185,6 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView
                         mobileContent='recentTrades'
-                        chartTopHeight={chartTopHeight}
                     />
                 )}
             </div>
@@ -195,26 +200,26 @@ export default function Trade() {
     } = usePortfolioModals();
 
     // --------------------------------------------
-    // CONTROLLABLE CHART/TABLE SPLIT
-    // - TABLE_DEFAULT should match  .wallet max-height in CSS
-    // - TABLE_MIN prevents pushing the table any smaller
-    const TABLE_DEFAULT = 195;
+    // CONTROLLABLE CHART/TABLE SPLIT (persisted)
+    // --------------------------------------------
+    // These control alignment with right column wallet:
+    const TABLE_DEFAULT = 195; // should match .wallet max-height in CSS
     const TABLE_MIN = 195;
     const CHART_MIN = 200;
 
-    // read from LS
-    const fromLS = () => {
-        const v = localStorage.getItem('chartTopHeight');
-        return v ? Math.max(CHART_MIN, parseInt(v)) : null;
-    };
+    const leftColRef = useRef<HTMLDivElement | null>(null);
 
-    const [chartTopHeight, setChartTopHeight] = useState<number>(
-        fromLS() ?? 570,
+    // local state used while dragging for immediate feedback
+    const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
+        storedHeight ?? 570,
     );
     const startHeightRef = useRef(chartTopHeight);
-
-    const leftColRef = useRef<HTMLDivElement | null>(null);
     const [maxTop, setMaxTop] = useState<number>(Infinity);
+
+    const setHeightBoth = (h: number) => {
+        setChartTopHeightLocal(h);
+        setChartTopHeight(h);
+    };
 
     const getGap = () => {
         const raw = getComputedStyle(document.documentElement)
@@ -224,50 +229,78 @@ export default function Trade() {
         return Number.isFinite(n) ? n : 8;
     };
 
-    // Compute default top height so that table = TABLE_DEFAULT
+    // Compute default from layout
     const setDefaultFromLayout = useCallback(() => {
         const col = leftColRef.current;
         if (!col) return;
+
         const gap = getGap();
         const total = col.clientHeight;
 
         const top = Math.max(CHART_MIN, total - TABLE_DEFAULT - gap);
+        setChartTopHeightLocal(top);
         setChartTopHeight(top);
 
-        // cap max so the user cannot push table below TABLE_MIN
         const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
         setMaxTop(max);
-    }, [TABLE_DEFAULT, TABLE_MIN]);
+    }, [setChartTopHeight]);
 
+    // On mount / when store changes:
+    useEffect(() => {
+        const col = leftColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+        setMaxTop(max);
+
+        if (storedHeight == null) {
+            // if no user override, compute from layout
+            requestAnimationFrame(setDefaultFromLayout);
+        } else {
+            // clamp the stored value to current bounds
+            const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
+            setChartTopHeightLocal(clamped);
+            if (clamped !== storedHeight) setChartTopHeight(clamped);
+        }
+    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+    // Recompute (or clamp) when the left column resizes
+    useEffect(() => {
+        const col = leftColRef.current;
+        if (!col) return;
+        const ro = new ResizeObserver(() => {
+            const gap = getGap();
+            const total = col.clientHeight;
+            const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+            setMaxTop(max);
+
+            if (storedHeight == null) {
+                setDefaultFromLayout();
+            } else {
+                setChartTopHeightLocal((h) =>
+                    Math.min(Math.max(h, CHART_MIN), max),
+                );
+            }
+        });
+        ro.observe(col);
+        return () => ro.disconnect();
+    }, [storedHeight, setDefaultFromLayout]);
+
+    //  listen for global reset event
     useEffect(() => {
         const handler = () => {
-            // ensure LS key is gone and recompute based on current viewport
-            localStorage.removeItem('chartTopHeight');
-            setDefaultFromLayout();
+            resetLayoutHeights();
+            requestAnimationFrame(setDefaultFromLayout);
         };
-
         window.addEventListener('trade:resetLayout', handler as EventListener);
         return () =>
             window.removeEventListener(
                 'trade:resetLayout',
                 handler as EventListener,
             );
-    }, [setDefaultFromLayout]);
-
-    // If no LS value, compute default from layout on mount and when left column resizes
-    useEffect(() => {
-        if (!localStorage.getItem('chartTopHeight')) {
-            requestAnimationFrame(() => setDefaultFromLayout());
-        }
-    }, [setDefaultFromLayout]);
-
-    useEffect(() => {
-        const col = leftColRef.current;
-        if (!col) return;
-        const ro = new ResizeObserver(() => setDefaultFromLayout());
-        ro.observe(col);
-        return () => ro.disconnect();
-    }, [setDefaultFromLayout]);
+    }, [resetLayoutHeights, setDefaultFromLayout]);
 
     const clamp = (n: number) => Math.max(CHART_MIN, Math.min(n, maxTop));
 
@@ -355,7 +388,7 @@ export default function Trade() {
                                 startHeightRef.current = chartTopHeight;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
-                                setChartTopHeight(
+                                setChartTopHeightLocal(
                                     clamp(startHeightRef.current + d.height),
                                 );
                             }}
@@ -363,14 +396,10 @@ export default function Trade() {
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
-                                setChartTopHeight(next);
-                                localStorage.setItem(
-                                    'chartTopHeight',
-                                    String(next),
-                                );
+                                setHeightBoth(next);
                             }}
                         >
-                            {/* TOP: chart + orderbook.  */}
+                            {/* TOP: chart + orderbook. Force 100% to fill Resizable */}
                             <section
                                 className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
                                 style={{ height: '100%' }}
@@ -413,15 +442,12 @@ export default function Trade() {
                                     id='orderBookSection'
                                     className={styles.orderBook}
                                 >
-                                    <MemoizedOrderBookSection
-                                        symbol={symbol}
-                                        chartTopHeight={chartTopHeight}
-                                    />
+                                    <MemoizedOrderBookSection symbol={symbol} />
                                 </div>
                             </section>
                         </Resizable>
 
-                        {/* BOTTOM*/}
+                        {/* BOTTOM: table auto-fills leftover space */}
                         <section
                             className={styles.table}
                             id='tutorial-trade-table'

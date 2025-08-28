@@ -166,12 +166,13 @@ export default function AppOptions() {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
+                    useAppSettings.getState().resetLayoutHeights();
                 }}
             >
                 Apply Defaults
             </div>
 
-            <div
+            {/* <div
                 className={styles.apply_defaults}
                 onClick={() => {
                     // Clear persisted split height
@@ -181,7 +182,7 @@ export default function AppOptions() {
                 }}
             >
                 Reset Layout (Chart/Table)
-            </div>
+            </div> */}
         </section>
     );
 }
