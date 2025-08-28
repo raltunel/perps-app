@@ -211,7 +211,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const getWarningMessage = () => {
         if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
         if (notionalSymbolQtyNum > originalSize)
-            return 'Size cannot exceed your position size';
+            return 'Size cannot exceed your position';
         if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
         return '';
     };
@@ -418,6 +418,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 </p>
                 <div className={styles.content}>
                     <SizeInput
+                        inputId='market-close-size-input'
                         value={sizeDisplay}
                         onChange={handleSizeChange}
                         onFocus={handleOnFocus}

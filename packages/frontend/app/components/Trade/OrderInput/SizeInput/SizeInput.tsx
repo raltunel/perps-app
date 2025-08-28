@@ -5,6 +5,7 @@ import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import styles from './SizeInput.module.css';
 
 interface PropsIF {
+    inputId?: string;
     value: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement> | string) => void;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
@@ -25,6 +26,7 @@ interface PropsIF {
 const SizeInput: React.FC<PropsIF> = React.memo((props) => {
     const {
         value,
+        inputId,
         onChange,
         onBlur,
         onKeyDown,
@@ -94,7 +96,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
         >
             <span>{useTotalSize ? 'Total Size' : 'Size'}</span>
             <NumFormattedInput
-                id='trade-module-size-input'
+                id={inputId || 'trade-module-size-input'}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
