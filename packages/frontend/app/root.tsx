@@ -50,14 +50,60 @@ class ComponentErrorBoundary extends React.Component<
 
     componentDidCatch(error: Error, info: React.ErrorInfo) {
         console.error('Component error:', error, info);
+
+        // Log error to Plausible
+        if (
+            typeof window !== 'undefined' &&
+            typeof window.plausible === 'function'
+        ) {
+            window.plausible('Component Error', {
+                props: {
+                    error: error.message,
+                    componentStack: info.componentStack,
+                    name: error.name,
+                },
+            });
+        }
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className='component-error'>
-                    <h3>Something went wrong</h3>
-                    <button onClick={() => this.setState({ hasError: false })}>
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textAlign: 'center',
+                        padding: '20px',
+                        boxSizing: 'border-box',
+                        overflow: 'hidden',
+                        backgroundColor: 'var(--dark2)',
+                    }}
+                >
+                    <h3 style={{ marginBottom: '16px' }}>
+                        Something went wrong
+                    </h3>
+                    <button
+                        onClick={() => this.setState({ hasError: false })}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--accent1)',
+                            cursor: 'pointer',
+                            padding: '0',
+                            font: 'inherit',
+                            textDecoration: 'underline',
+                            display: 'inline',
+                            marginTop: '8px',
+                        }}
+                    >
                         Try Again
                     </button>
                 </div>
@@ -150,7 +196,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {isProduction && (
+                {!isProduction && (
                     <script
                         defer
                         event-version={packageJson.version}
