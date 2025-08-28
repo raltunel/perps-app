@@ -63,7 +63,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
           : notionalSymbolQtyNum * (position.entryPx - markPx);
 
     const isQtyLessThanMinValue = useMemo(() => {
-        return notionalSymbolQtyNum * (markPx || 1) < MIN_ORDER_VALUE;
+        return notionalSymbolQtyNum * (markPx || 1) < MIN_ORDER_VALUE * 0.99;
     }, [markPx, notionalSymbolQtyNum]);
 
     // Initialize sizeDisplay based on selectedMode
