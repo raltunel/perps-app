@@ -56,10 +56,31 @@ class ComponentErrorBoundary extends React.Component<
             typeof window !== 'undefined' &&
             typeof window.plausible === 'function'
         ) {
+            // Truncate componentStack to be less than 2000 bytes
+            const maxBytes = 2000;
+            let componentStack = info.componentStack || '';
+
+            // Convert to Buffer to handle multi-byte characters correctly
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(componentStack);
+
+            if (encoded.length > maxBytes) {
+                // Create a new Uint8Array with maxBytes length
+                const truncated = new Uint8Array(maxBytes);
+                // Copy the first maxBytes - 3 bytes (for '...')
+                truncated.set(encoded.subarray(0, maxBytes - 3));
+                // Add ellipsis
+                truncated.set([0x2e, 0x2e, 0x2e], maxBytes - 3);
+                // Convert back to string
+                componentStack = new TextDecoder('utf-8', {
+                    fatal: false,
+                }).decode(truncated);
+            }
+
             window.plausible('Component Error', {
                 props: {
                     error: error.message,
-                    componentStack: info.componentStack,
+                    componentStack: componentStack,
                     name: error.name,
                 },
             });
