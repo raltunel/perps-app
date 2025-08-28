@@ -10,7 +10,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -34,8 +34,6 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
     const { parseFormattedNum, formatNum } = useNumFormatter();
-
-    const MIN_ORDER_VALUE = 1;
 
     const isPositionLong = position.szi > 0;
     const pythPriceData = usePythPrice(symbol);

@@ -40,7 +40,11 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
-import { blockExplorer, MIN_POSITION_USD_SIZE } from '~/utils/Constants';
+import {
+    blockExplorer,
+    MIN_ORDER_VALUE,
+    MIN_POSITION_USD_SIZE,
+} from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
@@ -201,7 +205,6 @@ function OrderInput({
     const [priceRangeMax, setPriceRangeMax] = useState('90000');
     const [priceRangeTotalOrders, setPriceRangeTotalOrders] = useState('2');
 
-    const minUsdOrderSize = 0.99;
     const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
     const OI_BUFFER = 100;
@@ -516,8 +519,12 @@ function OrderInput({
     }, [notionalQtyNum, markPx]);
 
     const sizeLessThanMinimum = useMemo(() => {
-        return !usdOrderSizeNum || usdOrderSizeNum < minUsdOrderSize;
-    }, [usdOrderSizeNum, minUsdOrderSize]);
+        return (
+            !usdOrderSizeNum ||
+            (usdOrderSizeNum < MIN_ORDER_VALUE * 0.99 &&
+                !(isReduceOnlyEnabled && sizePercentageValue === 100))
+        );
+    }, [usdOrderSizeNum, isReduceOnlyEnabled, sizePercentageValue]);
 
     const sizeMoreThanMaximum = useMemo(() => {
         return usdOrderSizeNum > maxRemainingOI + OI_BUFFER;
@@ -597,7 +604,7 @@ function OrderInput({
             const validatedLeverage = validateAndApplyLeverageForMarket(
                 symbol,
                 symbolInfo.maxLeverage,
-                minUsdOrderSize,
+                MIN_ORDER_VALUE,
             );
             setLeverage(validatedLeverage);
         } else if (
@@ -1005,7 +1012,7 @@ function OrderInput({
         () => ({
             value: leverage,
             onChange: handleLeverageChange,
-            minNotionalUsdOrderSize: minUsdOrderSize,
+            minNotionalUsdOrderSize: MIN_ORDER_VALUE,
             minimumValue: useMockLeverage ? mockMinimumLeverage : leverageFloor,
             isDragging: isLeverageBeingDragged,
             setIsDragging: setIsLeverageBeingDragged,
@@ -1121,10 +1128,24 @@ function OrderInput({
         ],
     );
 
-    // const updateSliderAfterOrder = useCallback(() => {
-    //     if (!isEditingSizeInput) handleSizeInputUpdate();
-    // }, [isEditingSizeInput, handleSizeInputUpdate]);
+    const isSubminimumClose = useMemo(
+        () =>
+            notionalQtyNum &&
+            usdOrderSizeNum < MIN_ORDER_VALUE * 0.99 &&
+            isReduceOnlyEnabled &&
+            sizePercentageValue === 100,
+        [
+            notionalQtyNum,
+            usdOrderSizeNum,
+            isReduceOnlyEnabled,
+            sizePercentageValue,
+        ],
+    );
 
+    const subminimumCloseQty = useMemo(
+        () => MIN_ORDER_VALUE / (markPx || 1),
+        [markPx],
+    );
     // fn to submit a 'Buy' market order
     async function submitMarketBuy(): Promise<void> {
         // Validate position size
@@ -1165,7 +1186,9 @@ function OrderInput({
 
             // Execute the market buy order
             const result = await executeMarketOrder({
-                quantity: notionalQtyNum,
+                quantity: isSubminimumClose
+                    ? subminimumCloseQty
+                    : notionalQtyNum,
                 side: 'buy',
                 leverage: leverage,
                 bestAskPrice: bestAskPrice,
@@ -1315,7 +1338,9 @@ function OrderInput({
 
             // Execute the market sell order
             const result = await executeMarketOrder({
-                quantity: notionalQtyNum,
+                quantity: isSubminimumClose
+                    ? subminimumCloseQty
+                    : notionalQtyNum,
                 side: 'sell',
                 leverage: leverage,
                 bestBidPrice: bestBidPrice,
@@ -2035,7 +2060,11 @@ function OrderInput({
                 ? tradeDirection === 'buy'
                     ? 'Max Long - Deposit to Trade'
                     : 'Max Short - Deposit to Trade'
-                : 'Submit';
+                : notionalQtyNum && sizeLessThanMinimum
+                  ? isReduceOnlyEnabled
+                      ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum or 100%`
+                      : `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                  : 'Submit';
 
     const inputDetailsData = useMemo(
         () => [

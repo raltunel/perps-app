@@ -9,7 +9,7 @@ import {
 } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -30,8 +30,6 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     const { symbolInfo } = useTradeDataStore();
 
     const markPx = symbolInfo?.markPx || 1;
-
-    const MIN_ORDER_VALUE = 1;
 
     const { executeLimitOrder } = useLimitOrderService();
 
