@@ -46,7 +46,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
     const originalSize = Math.abs(position.szi);
 
-    const [positionSize, setPositionSize] = useState(100);
+    const [sizePercentageValue, setSizePercentageValue] = useState(100);
     const [notionalSymbolQtyNum, setNotionalSymbolQtyNum] =
         useState(originalSize);
     const [sizeDisplay, setSizeDisplay] = useState('');
@@ -62,7 +62,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
           ? notionalSymbolQtyNum * (markPx - position.entryPx)
           : notionalSymbolQtyNum * (position.entryPx - markPx);
 
-    const isLessThanMinValue = useMemo(() => {
+    const isQtyLessThanMinValue = useMemo(() => {
         return notionalSymbolQtyNum * (markPx || 1) < MIN_ORDER_VALUE;
     }, [markPx, notionalSymbolQtyNum]);
 
@@ -128,17 +128,17 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     useEffect(() => {
         if (!lastChangedBySlider.current) return;
 
-        const calculatedSize = (originalSize * positionSize) / 100;
+        const calculatedSize = (originalSize * sizePercentageValue) / 100;
         setNotionalSymbolQtyNum(calculatedSize);
 
         if (Math.abs(calculatedSize) < 1e-8) {
             setIsOverLimit(true);
-        } else if (positionSize > 0) {
+        } else if (sizePercentageValue > 0) {
             if (calculatedSize <= originalSize && calculatedSize > 0) {
                 setIsOverLimit(false);
             }
         }
-    }, [positionSize, originalSize]);
+    }, [sizePercentageValue, originalSize]);
 
     const handleSizeChange = (
         val: string | React.ChangeEvent<HTMLInputElement>,
@@ -163,19 +163,19 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             setNotionalSymbolQtyNum(adjusted);
 
             if (adjusted > originalSize) {
-                setPositionSize(100);
+                setSizePercentageValue(100);
                 setIsOverLimit(true);
             } else if (Math.abs(adjusted) < 1e-8) {
-                setPositionSize(0);
+                setSizePercentageValue(0);
                 setIsOverLimit(true);
             } else {
                 const percentage = (adjusted / originalSize) * 100;
-                setPositionSize(Math.round(Math.max(0, percentage)));
+                setSizePercentageValue(Math.round(Math.max(0, percentage)));
                 setIsOverLimit(false);
             }
         } else if (sizeDisplay.trim() === '') {
             setNotionalSymbolQtyNum(0);
-            setPositionSize(0);
+            setSizePercentageValue(0);
             setIsOverLimit(true);
         } else {
             setIsOverLimit(true);
@@ -203,7 +203,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
     const handlePositionSizeChange = (val: number) => {
         lastChangedBySlider.current = true;
-        setPositionSize(val);
+        setSizePercentageValue(val);
         setIsOverLimit(val === 0);
         setIsEditingSizeInput(false);
     };
@@ -217,6 +217,16 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     };
 
     const notifications: NotificationStoreIF = useNotificationStore();
+
+    const isCompleteClose = useMemo(
+        () => isQtyLessThanMinValue && sizePercentageValue === 100,
+        [isQtyLessThanMinValue, sizePercentageValue],
+    );
+
+    const completeCloseQty = useMemo(
+        () => MIN_ORDER_VALUE / (markPx || 1),
+        [markPx],
+    );
 
     // fn to execute market close
     async function executeMarketClose(): Promise<void> {
@@ -242,11 +252,14 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             const timeOfTxBuildStart = Date.now();
             // Execute market order in opposite direction to close position
             const result = await executeMarketOrder({
-                quantity: notionalSymbolQtyNum,
+                quantity: isCompleteClose
+                    ? completeCloseQty
+                    : notionalSymbolQtyNum,
                 side: closingSide,
                 leverage: position.leverage?.value,
                 bestBidPrice: closingSide === 'sell' ? bestBidPrice : undefined,
                 bestAskPrice: closingSide === 'buy' ? bestAskPrice : undefined,
+                reduceOnly: isCompleteClose,
             });
 
             const usdValueOfOrderStr = formatNum(
@@ -278,8 +291,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 }
                 notifications.add({
                     title:
-                        positionSize < 100
-                            ? `${positionSize}% of Position Closed`
+                        sizePercentageValue < 100
+                            ? `${sizePercentageValue}% of Position Closed`
                             : 'Position Closed',
                     message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
                     icon: 'check',
@@ -383,8 +396,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 const step = 5;
                 const newValue =
                     e.key === 'ArrowRight'
-                        ? Math.min(100, positionSize + step)
-                        : Math.max(0, positionSize - step);
+                        ? Math.min(100, sizePercentageValue + step)
+                        : Math.max(0, sizePercentageValue - step);
 
                 handlePositionSizeChange(newValue);
                 return;
@@ -407,7 +420,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [positionSize, isProcessingOrder, isOverLimit, close]);
+    }, [sizePercentageValue, isProcessingOrder, isOverLimit, close]);
 
     return (
         <Modal title='Market Close' close={close}>
@@ -434,7 +447,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     />
                     <div className={styles.position_size_container}>
                         <PositionSize
-                            value={positionSize}
+                            value={sizePercentageValue}
                             onChange={handlePositionSizeChange}
                             isModal
                         />
@@ -465,11 +478,11 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         disabled={
                             isProcessingOrder ||
                             isOverLimit ||
-                            isLessThanMinValue
+                            (isQtyLessThanMinValue && !isCompleteClose)
                         }
                     >
-                        {isLessThanMinValue
-                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                        {isQtyLessThanMinValue && !isCompleteClose
+                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum or 100%`
                             : isProcessingOrder
                               ? 'Processing...'
                               : 'Confirm'}
