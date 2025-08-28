@@ -177,12 +177,8 @@ function OrderInput({
     const [sizePercentageValue, setSizePercentageValue] = useState(0);
 
     const [notionalQtyNum, setNotionalQtyNum] = useState(0);
+
     // Track if we're processing an order
-
-    // useEffect(() => {
-    //     console.log('new notionalQtyNum', notionalQtyNum);
-    // }, [notionalQtyNum]);
-
     const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
     const [sizeDisplay, setSizeDisplay] = useState('');
@@ -460,6 +456,11 @@ function OrderInput({
         return usdAvailableToTrade * leverage > maxRemainingOI;
     }, [usdAvailableToTrade, leverage, maxRemainingOI]);
 
+    const maxOrderSizeWouldExceedRemainingOIDebounced = useDebounceOnTrue(
+        maxOrderSizeWouldExceedRemainingOI,
+        500,
+    );
+
     const getMaxTradeSizeInUsd = useCallback(
         (leverageParam: number) => {
             if (isReduceOnlyEnabled && marginBucket && markPx) {
@@ -717,7 +718,17 @@ function OrderInput({
         }
         const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
         setNotionalQtyNum(newNotionalQtyNum);
-    }, [markPx, isLeverageBeingDragged, isReduceOnlyEnabled, tradeDirection]);
+        if (shouldUpdateAfterTrade) {
+            setShouldUpdateAfterTrade(false);
+        }
+    }, [
+        markPx,
+        isLeverageBeingDragged,
+        isReduceOnlyEnabled,
+        tradeDirection,
+        shouldUpdateAfterTrade,
+        !!maxTradeSizeInUsd,
+    ]);
 
     const getCurrentPercentageOfMaxTradeSize = useCallback(() => {
         return ((notionalQtyNum * (markPx || 1)) / maxTradeSizeInUsd) * 100;
@@ -877,26 +888,6 @@ function OrderInput({
         if (isSizeSetAsPercentage && !isEditingSizeInput)
             setNotionalQtyNumFromPercentage(sizePercentageValue);
     }, [sizePercentageValue]);
-
-    useEffect(() => {
-        if (shouldUpdateAfterTrade) {
-            if (!isSizeSetAsPercentage) {
-                const parsedSizeDisplay = parseFormattedNum(sizeDisplay.trim());
-                if (isNaN(parsedSizeDisplay)) return;
-                if (parsedSizeDisplay >= maxTradeSizeInUsd) {
-                    const newNotionalQtyNum = Number(
-                        (maxTradeSizeInUsd / (markPx || 1)).toFixed(8),
-                    );
-                    setNotionalQtyNum(newNotionalQtyNum);
-                    setSizePercentageValue(100);
-                    setIsSizeSetAsPercentage(true);
-                } else {
-                    updateNotionalQtyNumFromSizeDisplay();
-                }
-            }
-            setShouldUpdateAfterTrade(false);
-        }
-    }, [shouldUpdateAfterTrade]);
 
     // CHASE OPTION---------------------------------------------------
     // code disabled 07 Jul 25
@@ -1364,6 +1355,7 @@ function OrderInput({
                         ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
+                setShouldUpdateAfterTrade(true);
             } else {
                 notifications.remove(slug);
                 if (typeof plausible === 'function') {
@@ -2216,7 +2208,7 @@ function OrderInput({
                                     </div>
                                 ))}
                                 {!isReduceOnlyEnabled &&
-                                    maxOrderSizeWouldExceedRemainingOI && (
+                                    maxOrderSizeWouldExceedRemainingOIDebounced && (
                                         <div
                                             style={{
                                                 width: '100%',
