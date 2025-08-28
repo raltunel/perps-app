@@ -2071,10 +2071,10 @@ function OrderInput({
                 ? tradeDirection === 'buy'
                     ? marginBucket?.netPosition && marginBucket.netPosition > 0
                         ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                        : `The current maximum trade size for this market is limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                        : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
                     : marginBucket?.netPosition && marginBucket.netPosition < 0
                       ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                      : `The current maximum trade size for this market is limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                      : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
                 : '',
         [
             maxOrderSizeWouldExceedRemainingOI,
