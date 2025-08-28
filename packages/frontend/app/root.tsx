@@ -217,7 +217,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {!isProduction && (
+                {isProduction && (
                     <script
                         defer
                         event-version={packageJson.version}
