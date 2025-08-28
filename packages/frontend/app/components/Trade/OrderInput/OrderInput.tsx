@@ -717,7 +717,7 @@ function OrderInput({
         }
         const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
         setNotionalQtyNum(newNotionalQtyNum);
-    }, [markPx, isLeverageBeingDragged, isReduceOnlyEnabled]);
+    }, [markPx, isLeverageBeingDragged, isReduceOnlyEnabled, tradeDirection]);
 
     const getCurrentPercentageOfMaxTradeSize = useCallback(() => {
         return ((notionalQtyNum * (markPx || 1)) / maxTradeSizeInUsd) * 100;
@@ -765,10 +765,6 @@ function OrderInput({
             setNotionalQtyNum(0);
         }
     }, [sizeDisplay, selectedDenom, markPx]);
-
-    useEffect(() => {
-        if (!isMarginInsufficient) updateNotionalQtyNumFromSizeDisplay();
-    }, [tradeDirection]);
 
     // update slider on debounce after user has paused typing and updating sizeDisplay
     useEffect(() => {
