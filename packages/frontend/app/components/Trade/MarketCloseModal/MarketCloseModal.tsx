@@ -219,11 +219,16 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     const notifications: NotificationStoreIF = useNotificationStore();
 
     const isCompleteClose = useMemo(
-        () => isQtyLessThanMinValue && sizePercentageValue === 100,
-        [isQtyLessThanMinValue, sizePercentageValue],
+        () => sizePercentageValue === 100,
+        [sizePercentageValue],
     );
 
-    const completeCloseQty = useMemo(
+    const isSubminimumClose = useMemo(
+        () => isQtyLessThanMinValue && isCompleteClose,
+        [isQtyLessThanMinValue, isCompleteClose],
+    );
+
+    const subminimumCloseQty = useMemo(
         () => MIN_ORDER_VALUE / (markPx || 1),
         [markPx],
     );
@@ -253,7 +258,9 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
             // Execute market order in opposite direction to close position
             const result = await executeMarketOrder({
                 quantity: isCompleteClose
-                    ? completeCloseQty
+                    ? isSubminimumClose
+                        ? subminimumCloseQty
+                        : notionalSymbolQtyNum * 1.01
                     : notionalSymbolQtyNum,
                 side: closingSide,
                 leverage: position.leverage?.value,
