@@ -169,6 +169,7 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView
                         mobileContent='orderBook'
+                        chartTopHeight={chartTopHeight}
                         switchTab={switchTab}
                     />
                 )}
@@ -185,6 +186,7 @@ export default function Trade() {
                         symbol={symbol}
                         mobileView
                         mobileContent='recentTrades'
+                        chartTopHeight={chartTopHeight}
                     />
                 )}
             </div>
@@ -442,7 +444,10 @@ export default function Trade() {
                                     id='orderBookSection'
                                     className={styles.orderBook}
                                 >
-                                    <MemoizedOrderBookSection symbol={symbol} />
+                                    <MemoizedOrderBookSection
+                                        symbol={symbol}
+                                        chartTopHeight={chartTopHeight}
+                                    />
                                 </div>
                             </section>
                         </Resizable>
