@@ -167,6 +167,13 @@ export default function AppOptions() {
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
                     useAppSettings.getState().resetLayoutHeights();
+                    if (typeof plausible === 'function') {
+                        plausible('Trade Table Resize', {
+                            props: {
+                                percentOfWindowHeight: 'default',
+                            },
+                        });
+                    }
                 }}
             >
                 Apply Defaults

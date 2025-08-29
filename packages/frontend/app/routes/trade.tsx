@@ -22,6 +22,7 @@ import { useTutorial } from '~/hooks/useTutorial';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
+import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -145,6 +146,17 @@ export default function Trade() {
     const setHeightBoth = (h: number) => {
         setChartTopHeightLocal(h);
         setChartTopHeight(h);
+        if (typeof plausible === 'function') {
+            const newTradeTableHeightAsPercentageOfWindowHeight =
+                ((window.innerHeight - h) / window.innerHeight) * 100;
+            plausible('Trade Table Resize', {
+                props: {
+                    percentOfWindowHeight: getSizePercentageSegment(
+                        newTradeTableHeightAsPercentageOfWindowHeight,
+                    ),
+                },
+            });
+        }
     };
 
     const getGap = () => {
