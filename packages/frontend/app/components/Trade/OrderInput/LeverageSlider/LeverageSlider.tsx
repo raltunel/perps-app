@@ -13,6 +13,7 @@ import { getLeverageIntervals } from '~/utils/functions/getLeverageIntervals';
 import InputField from './InputField';
 import styles from './LeverageSlider.module.css';
 import SliderTrack from './SliderTrack';
+import { BTC_MAX_LEVERAGE } from '~/utils/Constants';
 
 interface LeverageSliderProps {
     value: number;
@@ -24,8 +25,8 @@ interface LeverageSliderProps {
     maxLeverage?: number;
     hideTitle?: boolean;
     minimumValue?: number;
-    isDragging?: boolean;
-    setIsDragging?: (value: boolean) => void;
+    isDragging: boolean;
+    setIsDragging: (value: boolean) => void;
 }
 
 const LEVERAGE_CONFIG = {
@@ -82,7 +83,7 @@ export default function LeverageSlider({
     const maximumInputValue = modalMode
         ? maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE
         : symbolInfo?.coin === 'BTC'
-          ? 100
+          ? BTC_MAX_LEVERAGE
           : symbolInfo?.maxLeverage || LEVERAGE_CONFIG.DEFAULT_MAX_LEVERAGE;
 
     const effectiveMinimum =
@@ -641,7 +642,9 @@ export default function LeverageSlider({
     const handleMarketChange = useCallback(() => {
         const effectiveSymbol = symbolInfo?.coin;
         const currentMaxLeverage =
-            effectiveSymbol === 'BTC' ? 100 : symbolInfo?.maxLeverage;
+            effectiveSymbol === 'BTC'
+                ? BTC_MAX_LEVERAGE
+                : symbolInfo?.maxLeverage;
 
         if (!effectiveSymbol || !currentMaxLeverage) {
             return;

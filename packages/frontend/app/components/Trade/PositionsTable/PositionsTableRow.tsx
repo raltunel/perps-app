@@ -13,7 +13,7 @@ import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer } from '~/utils/Constants';
+import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getDurationSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
@@ -73,7 +73,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         const { symbol } = useTradeDataStore();
         useEffect(() => {
             if (symbol.toLowerCase() === position.coin.toLowerCase()) {
-                setLeverage(position.leverage.value);
+                setLeverage(
+                    Math.min(position.leverage.value, BTC_MAX_LEVERAGE),
+                );
             }
         }, [symbol]);
 

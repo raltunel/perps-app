@@ -42,6 +42,7 @@ import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore, type marginModesT } from '~/stores/TradeDataStore';
 import {
     blockExplorer,
+    BTC_MAX_LEVERAGE,
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
 } from '~/utils/Constants';
@@ -342,11 +343,12 @@ function OrderInput({
             const leverageFloor = calcLeverageFloor(marginBucket, 10_000_000n);
             const leverageFloorNum = Number(leverageFloor);
             if (!leverageFloorNum) return;
-            setLeverageFloor(10_000 / leverageFloorNum);
+            const newLeverageFloor = 10_000 / leverageFloorNum;
+            setLeverageFloor(Math.min(newLeverageFloor, BTC_MAX_LEVERAGE));
         } catch {
             setLeverageFloor(100);
         }
-    }, [marginBucket]);
+    }, [marginBucket, symbolInfo?.maxLeverage]);
 
     useEffect(() => {
         if (!marginBucket) {
@@ -648,7 +650,7 @@ function OrderInput({
     }, []);
 
     const handleLeverageChange = (value: number) => {
-        setLeverage(value);
+        setLeverage(Math.min(value, BTC_MAX_LEVERAGE));
         setIsEditingSizeInput(false);
     };
 
