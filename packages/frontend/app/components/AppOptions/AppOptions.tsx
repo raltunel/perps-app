@@ -170,7 +170,7 @@ export default function AppOptions() {
                     if (typeof plausible === 'function') {
                         plausible('Trade Table Resize', {
                             props: {
-                                percentOfWindowHeight: 'default',
+                                tradeTablePercentOfWindowHeight: 'default',
                             },
                         });
                     }
