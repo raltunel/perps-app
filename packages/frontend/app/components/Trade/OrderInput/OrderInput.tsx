@@ -2235,7 +2235,8 @@ function OrderInput({
                                     </div>
                                 ))}
                                 {!isReduceOnlyEnabled &&
-                                    maxOrderSizeWouldExceedRemainingOIDebounced && (
+                                    maxOrderSizeWouldExceedRemainingOIDebounced &&
+                                    !!notionalQtyNum && (
                                         <div
                                             style={{
                                                 width: '100%',
