@@ -46,7 +46,11 @@ import {
     MIN_ORDER_VALUE,
     MIN_POSITION_USD_SIZE,
 } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import {
+    getDurationSegment,
+    getLeverageSegment,
+    getSizePercentageSegment,
+} from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import evenSvg from '../../../assets/icons/EvenPriceDistribution.svg';
 import flatSvg from '../../../assets/icons/FlatPriceDistribution.svg';
@@ -1225,6 +1229,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1260,6 +1267,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1290,6 +1300,9 @@ function OrderInput({
                                 ? error.message
                                 : 'Unknown error occurred',
                         success: false,
+                        leverage: getLeverageSegment(leverage),
+                        sizePercentage:
+                            getSizePercentageSegment(sizePercentageValue),
                     },
                 });
             }
@@ -1377,6 +1390,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1412,6 +1428,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1442,6 +1461,9 @@ function OrderInput({
                                 ? error.message
                                 : 'Unknown error occurred',
                         success: false,
+                        leverage: getLeverageSegment(leverage),
+                        sizePercentage:
+                            getSizePercentageSegment(sizePercentageValue),
                     },
                 });
             }
@@ -1537,6 +1559,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1571,6 +1596,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1600,6 +1628,9 @@ function OrderInput({
                                 ? error.message
                                 : 'Unknown error occurred',
                         success: false,
+                        leverage: getLeverageSegment(leverage),
+                        sizePercentage:
+                            getSizePercentageSegment(sizePercentageValue),
                     },
                 });
             }
@@ -1695,6 +1726,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1725,6 +1759,9 @@ function OrderInput({
                                 Date.now(),
                             ),
                             txSignature: result.signature,
+                            leverage: getLeverageSegment(leverage),
+                            sizePercentage:
+                                getSizePercentageSegment(sizePercentageValue),
                         },
                     });
                 }
@@ -1754,6 +1791,9 @@ function OrderInput({
                                 ? error.message
                                 : 'Unknown error occurred',
                         success: false,
+                        leverage: getLeverageSegment(leverage),
+                        sizePercentage:
+                            getSizePercentageSegment(sizePercentageValue),
                     },
                 });
             }

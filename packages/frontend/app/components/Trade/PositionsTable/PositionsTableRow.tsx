@@ -14,7 +14,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer, BTC_MAX_LEVERAGE } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
 import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';

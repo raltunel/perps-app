@@ -10,7 +10,7 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
