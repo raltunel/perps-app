@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -32,6 +32,7 @@ import {
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
+import { getResolutionSegment } from './utils/functions/getSegment';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -79,9 +80,9 @@ class ComponentErrorBoundary extends React.Component<
 
             window.plausible('Component Error', {
                 props: {
-                    error: error.message,
+                    errorMessage: error.message,
                     componentStack: componentStack,
-                    name: error.name,
+                    errorName: error.name,
                 },
             });
         }
@@ -154,6 +155,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     const isProduction = import.meta.env.VITE_CONTEXT === 'production';
 
+    const [innerHeight, setInnerHeight] = useState<number>();
+    const [innerWidth, setInnerWidth] = useState<number>();
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setInnerHeight(window.innerHeight);
+            setInnerWidth(window.innerWidth);
+        }
+    }, []);
+
     return (
         <html lang='en'>
             <head>
@@ -221,6 +232,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <script
                         defer
                         event-version={packageJson.version}
+                        event-windowHeight={
+                            innerHeight
+                                ? getResolutionSegment(innerHeight)
+                                : undefined
+                        }
+                        event-windowWidth={
+                            innerWidth
+                                ? getResolutionSegment(innerWidth)
+                                : undefined
+                        }
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

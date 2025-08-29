@@ -151,7 +151,7 @@ export default function Trade() {
                 ((window.innerHeight - h) / window.innerHeight) * 100;
             plausible('Trade Table Resize', {
                 props: {
-                    percentOfWindowHeight: getSizePercentageSegment(
+                    tradeTablePercentOfWindowHeight: getSizePercentageSegment(
                         newTradeTableHeightAsPercentageOfWindowHeight,
                     ),
                 },
