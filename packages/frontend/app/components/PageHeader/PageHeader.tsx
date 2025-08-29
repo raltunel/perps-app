@@ -29,7 +29,7 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
