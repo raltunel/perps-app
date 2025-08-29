@@ -876,10 +876,8 @@ function OrderInput({
             if (!markPx) return;
             const notionalQtyNum =
                 ((value / 100) * getMaxTradeSizeInUsd(leverage)) / markPx;
-            if (notionalQtyNum) {
-                const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
-                setNotionalQtyNum(newNotionalQtyNum);
-            }
+            const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
+            setNotionalQtyNum(newNotionalQtyNum);
         },
         [getMaxTradeSizeInUsd, markPx, leverage],
     );
