@@ -190,3 +190,57 @@ export const getSizePercentageSegment = (sizePercentage: number) => {
                                                           : 'unknown';
     return sizePercentageSegment;
 };
+
+export const getResolutionSegment = (resolution: number) => {
+    const resolutionSegment =
+        resolution < 100
+            ? '< 100'
+            : resolution < 200
+              ? '< 200'
+              : resolution < 300
+                ? '< 300'
+                : resolution < 400
+                  ? '< 400'
+                  : resolution < 500
+                    ? '< 500'
+                    : resolution < 600
+                      ? '< 600'
+                      : resolution < 700
+                        ? '< 700'
+                        : resolution < 800
+                          ? '< 800'
+                          : resolution < 900
+                            ? '< 900'
+                            : resolution < 1000
+                              ? '< 1000'
+                              : resolution < 1200
+                                ? '< 1200'
+                                : resolution < 1500
+                                  ? '< 1500'
+                                  : resolution < 2000
+                                    ? '< 2000'
+                                    : resolution < 2500
+                                      ? '< 2500'
+                                      : resolution < 3000
+                                        ? '< 3000'
+                                        : resolution < 4000
+                                          ? '< 4000'
+                                          : resolution < 5000
+                                            ? '< 5000'
+                                            : resolution < 6000
+                                              ? '< 6000'
+                                              : resolution < 7000
+                                                ? '< 7000'
+                                                : resolution < 8000
+                                                  ? '< 8000'
+                                                  : resolution < 9000
+                                                    ? '< 9000'
+                                                    : resolution < 10000
+                                                      ? '< 10000'
+                                                      : resolution > 10000
+                                                        ? '> 10000'
+                                                        : resolution === 10000
+                                                          ? '10000'
+                                                          : '> 10000';
+    return resolutionSegment;
+};

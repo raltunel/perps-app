@@ -32,6 +32,7 @@ import {
 import { MarketDataProvider } from './contexts/MarketDataContext';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
+import { getResolutionSegment } from './utils/functions/getSegment';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -222,10 +223,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {isProduction && (
+                {!isProduction && (
                     <script
                         defer
                         event-version={packageJson.version}
+                        event-height={getResolutionSegment(window.innerHeight)}
+                        event-width={getResolutionSegment(window.innerWidth)}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>
