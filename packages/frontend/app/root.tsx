@@ -154,6 +154,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     const isProduction = import.meta.env.VITE_CONTEXT === 'production';
 
+    useEffect(() => {
+        console.log('Window height:', window.innerHeight);
+        console.log('Window width:', window.innerWidth);
+    }, []);
+
     return (
         <html lang='en'>
             <head>
