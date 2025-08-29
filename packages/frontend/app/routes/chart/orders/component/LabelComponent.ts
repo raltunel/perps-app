@@ -17,11 +17,7 @@ import {
     getXandYLocationForChartDrag,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import {
-    formatLineLabel,
-    getPricetoPixel,
-    quantityTextFormatWithComma,
-} from '../customOrderLineUtils';
+import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 
@@ -128,13 +124,11 @@ const LabelComponent = ({
                         textColor: '#3C91FF',
                         borderColor: line.color,
                     },
-                    ...(line.quantityTextValue
+                    ...(line.quantityText
                         ? [
                               {
                                   type: 'Quantity' as LabelType,
-                                  text: quantityTextFormatWithComma(
-                                      line.quantityTextValue,
-                                  ),
+                                  text: line.quantityText,
                                   backgroundColor: '#000000',
                                   textColor: '#FFFFFF',
                                   borderColor: '#3C91FF',
