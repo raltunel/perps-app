@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import {
     isRouteErrorResponse,
     Links,
@@ -155,9 +155,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     const isProduction = import.meta.env.VITE_CONTEXT === 'production';
 
+    const [innerHeight, setInnerHeight] = useState<number>();
+    const [innerWidth, setInnerWidth] = useState<number>();
+
     useEffect(() => {
-        console.log('Window height:', window.innerHeight);
-        console.log('Window width:', window.innerWidth);
+        if (typeof window !== 'undefined') {
+            console.log('Window height:', window.innerHeight);
+            setInnerHeight(window.innerHeight);
+            console.log('Window width:', window.innerWidth);
+            setInnerWidth(window.innerWidth);
+        }
     }, []);
 
     return (
@@ -227,8 +234,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <script
                         defer
                         event-version={packageJson.version}
-                        event-height={getResolutionSegment(window.innerHeight)}
-                        event-width={getResolutionSegment(window.innerWidth)}
+                        event-height={getResolutionSegment(innerHeight)}
+                        event-width={getResolutionSegment(innerWidth)}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>
