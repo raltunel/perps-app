@@ -80,9 +80,9 @@ class ComponentErrorBoundary extends React.Component<
 
             window.plausible('Component Error', {
                 props: {
-                    error: error.message,
+                    errorMessage: error.message,
                     componentStack: componentStack,
-                    name: error.name,
+                    errorName: error.name,
                 },
             });
         }
@@ -232,12 +232,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     <script
                         defer
                         event-version={packageJson.version}
-                        event-height={
+                        event-windowHeight={
                             innerHeight
                                 ? getResolutionSegment(innerHeight)
                                 : undefined
                         }
-                        event-width={
+                        event-windowWidth={
                             innerWidth
                                 ? getResolutionSegment(innerWidth)
                                 : undefined
