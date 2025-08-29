@@ -1,5 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { Resizable } from 're-resizable';
+import type { NumberSize } from 're-resizable';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
 import OrderInput from '~/components/Trade/OrderInput/OrderInput';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
@@ -21,7 +23,6 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 
-// Memoize components that don't need frequent re-renders
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
 const MemoizedOrderBookSection = memo(OrderBookSection);
@@ -34,7 +35,14 @@ export default function Trade() {
     const { marginBucket } = useUnifiedMarginData();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    const { orderBookMode } = useAppSettings();
+
+    const {
+        orderBookMode,
+        chartTopHeight: storedHeight,
+        setChartTopHeight,
+        resetLayoutHeights,
+    } = useAppSettings();
+
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
@@ -44,13 +52,7 @@ export default function Trade() {
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
-    const visibilityRefs = useRef<{
-        order: boolean;
-        chart: boolean;
-        book: boolean;
-        recent: boolean;
-        positions: boolean;
-    }>({
+    const visibilityRefs = useRef({
         order: false,
         chart: false,
         book: false,
@@ -64,24 +66,19 @@ export default function Trade() {
                 setIsMobile(window.innerWidth <= 768);
             }
         };
-
         checkIfMobile();
-
         let resizeTimer: NodeJS.Timeout | undefined;
         const handleResize = () => {
             if (resizeTimer) clearTimeout(resizeTimer);
             resizeTimer = setTimeout(checkIfMobile, 100);
         };
-
         window.addEventListener('resize', handleResize, { passive: true });
-
         return () => {
             clearTimeout(resizeTimer);
             window.removeEventListener('resize', handleResize);
         };
     }, [isMobile]);
 
-    // Memoize switchTab so it's always stable
     const switchTab = useCallback(
         (tab: TabType) => {
             if (activeTab === tab) return;
@@ -92,9 +89,7 @@ export default function Trade() {
                 recent: tab === 'recent',
                 positions: tab === 'positions',
             };
-            requestAnimationFrame(() => {
-                setActiveTab(tab);
-            });
+            requestAnimationFrame(() => setActiveTab(tab));
         },
         [activeTab],
     );
@@ -106,12 +101,8 @@ export default function Trade() {
                 setDebugToolbarOpen(!debugToolbarOpenRef.current);
             }
         };
-
         window.addEventListener('keydown', keydownHandler);
-
-        return () => {
-            window.removeEventListener('keydown', keydownHandler);
-        };
+        return () => window.removeEventListener('keydown', keydownHandler);
     }, []);
 
     useEffect(() => {
@@ -134,25 +125,128 @@ export default function Trade() {
     const { showTutorial, handleTutorialComplete, handleTutorialSkip } =
         useTutorial();
 
-    // Tab list and handlers
-    const tabList: { key: TabType; label: string }[] = useMemo(
-        () => [
-            { key: 'order', label: 'Order' },
-            { key: 'chart', label: 'Chart' },
-            { key: 'book', label: 'Book' },
-            { key: 'recent', label: 'Recent' },
-            { key: 'positions', label: 'Positions' },
-        ],
+    // --------------------------------------------
+    // CONTROLLABLE CHART/TABLE SPLIT (persisted)
+    // --------------------------------------------
+    // These control alignment with right column wallet:
+    const TABLE_DEFAULT = 195; // should match .wallet max-height in CSS
+    const TABLE_MIN = 195;
+    const CHART_MIN = 200;
+
+    const leftColRef = useRef<HTMLDivElement | null>(null);
+
+    // local state used while dragging for immediate feedback
+    const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
+        storedHeight ?? 570,
+    );
+    const startHeightRef = useRef(chartTopHeight);
+    const [maxTop, setMaxTop] = useState<number>(Infinity);
+
+    const setHeightBoth = (h: number) => {
+        setChartTopHeightLocal(h);
+        setChartTopHeight(h);
+    };
+
+    const getGap = () => {
+        const raw = getComputedStyle(document.documentElement)
+            .getPropertyValue('--gap-s')
+            .trim();
+        const n = parseFloat(raw);
+        return Number.isFinite(n) ? n : 8;
+    };
+
+    // Compute default from layout
+    const setDefaultFromLayout = useCallback(() => {
+        const col = leftColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+
+        const top = Math.max(CHART_MIN, total - TABLE_DEFAULT - gap);
+        setChartTopHeightLocal(top);
+        setChartTopHeight(top);
+
+        const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+        setMaxTop(max);
+    }, [setChartTopHeight]);
+
+    // On mount / when store changes:
+    useEffect(() => {
+        const col = leftColRef.current;
+        if (!col) return;
+
+        const gap = getGap();
+        const total = col.clientHeight;
+        const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+        setMaxTop(max);
+
+        if (storedHeight == null) {
+            // if no user override, compute from layout
+            requestAnimationFrame(setDefaultFromLayout);
+        } else {
+            // clamp the stored value to current bounds
+            const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
+            setChartTopHeightLocal(clamped);
+            if (clamped !== storedHeight) setChartTopHeight(clamped);
+        }
+    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+    // Recompute (or clamp) when the left column resizes
+    useEffect(() => {
+        const col = leftColRef.current;
+        if (!col) return;
+        const ro = new ResizeObserver(() => {
+            const gap = getGap();
+            const total = col.clientHeight;
+            const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+            setMaxTop(max);
+
+            if (storedHeight == null) {
+                setDefaultFromLayout();
+            } else {
+                setChartTopHeightLocal((h) =>
+                    Math.min(Math.max(h, CHART_MIN), max),
+                );
+            }
+        });
+        ro.observe(col);
+        return () => ro.disconnect();
+    }, [storedHeight, setDefaultFromLayout]);
+
+    //  listen for global reset event
+    useEffect(() => {
+        const handler = () => {
+            resetLayoutHeights();
+            requestAnimationFrame(setDefaultFromLayout);
+        };
+        window.addEventListener('trade:resetLayout', handler as EventListener);
+        return () =>
+            window.removeEventListener(
+                'trade:resetLayout',
+                handler as EventListener,
+            );
+    }, [resetLayoutHeights, setDefaultFromLayout]);
+
+    const clamp = (n: number) => Math.max(CHART_MIN, Math.min(n, maxTop));
+
+    const tabList = useMemo(
+        () =>
+            [
+                { key: 'order', label: 'Order' },
+                { key: 'chart', label: 'Chart' },
+                { key: 'book', label: 'Book' },
+                { key: 'recent', label: 'Recent' },
+                { key: 'positions', label: 'Positions' },
+            ] as const,
         [],
     );
 
-    // Stable tab click handler
     const handleTabClick = useCallback(
         (tab: TabType) => () => switchTab(tab),
         [switchTab],
     );
 
-    // Memoized tab navigation
     const MobileTabNavigation = useMemo(
         () => (
             <div className={styles.mobileTabNav}>
@@ -172,15 +266,15 @@ export default function Trade() {
         [activeTab, handleTabClick, tabList],
     );
 
-    // Memoize mobile views with all relevant dependencies
     const mobileOrderBookView = useMemo(
         () => (
             <div className={styles.mobileOnlyOrderBook}>
                 {(activeTab === 'book' || visibilityRefs.current.book) && (
                     <MemoizedOrderBookSection
                         symbol={symbol}
-                        mobileView={true}
+                        mobileView
                         mobileContent='orderBook'
+                        chartTopHeight={chartTopHeight}
                         switchTab={switchTab}
                     />
                 )}
@@ -195,8 +289,9 @@ export default function Trade() {
                 {(activeTab === 'recent' || visibilityRefs.current.recent) && (
                     <MemoizedOrderBookSection
                         symbol={symbol}
-                        mobileView={true}
+                        mobileView
                         mobileContent='recentTrades'
+                        chartTopHeight={chartTopHeight}
                     />
                 )}
             </div>
@@ -281,61 +376,112 @@ export default function Trade() {
             <WebDataConsumer />
             {symbol && (
                 <div className={styles.containerNew}>
-                    <section
-                        className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
-                    >
-                        <div
-                            id='trade-page-left-section'
-                            className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
+                    {/* LEFT COLUMN */}
+                    <div className={styles.leftCol} ref={leftColRef}>
+                        <Resizable
+                            size={{ width: '100%', height: chartTopHeight }}
+                            minHeight={CHART_MIN}
+                            maxHeight={maxTop}
+                            enable={{ bottom: true }}
+                            handleStyles={{
+                                bottom: { height: '8px', cursor: 'row-resize' },
+                            }}
+                            onResizeStart={() => {
+                                startHeightRef.current = chartTopHeight;
+                            }}
+                            onResize={(e, dir, ref, d: NumberSize) => {
+                                setChartTopHeightLocal(
+                                    clamp(startHeightRef.current + d.height),
+                                );
+                            }}
+                            onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                const next = clamp(
+                                    startHeightRef.current + d.height,
+                                );
+                                setHeightBoth(next);
+                            }}
                         >
-                            {debugToolbarOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.2 }}
-                                    className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                            {/* TOP: chart + orderbook. Force 100% to fill Resizable */}
+                            <section
+                                className={`${styles.containerTop} ${orderBookMode === 'large' ? styles.orderBookLarge : ''}`}
+                                style={{ height: '100%' }}
+                            >
+                                <div
+                                    id='trade-page-left-section'
+                                    className={`${styles.containerTopLeft} ${styles.symbolSectionWrapper} ${debugToolbarOpen ? styles.debugToolbarOpen : ''}`}
                                 >
-                                    <ComboBoxContainer />
-                                </motion.div>
-                            )}
-                            <div
-                                id='watchlistSection'
-                                className={styles.watchlist}
-                            >
-                                <WatchList />
-                            </div>
-                            <div
-                                id='symbolInfoSection'
-                                className={styles.symbolInfo}
-                            >
-                                <MemoizedSymbolInfo />
-                            </div>
-                            <div id='chartSection' className={styles.chart}>
-                                <MemoizedTradingViewWrapper />
-                            </div>
-                        </div>
-                        <div id='orderBookSection' className={styles.orderBook}>
-                            <MemoizedOrderBookSection symbol={symbol} />
-                        </div>
-                    </section>
-                    <section className={styles.table} id='tutorial-trade-table'>
-                        <MemoizedTradeTable />
-                    </section>
-                    <section className={styles.order_input}>
-                        <OrderInput
-                            marginBucket={marginBucket}
-                            isAnyPortfolioModalOpen={isAnyPortfolioModalOpen}
-                        />
-                    </section>
-                    <section className={styles.wallet}>
-                        <DepositDropdown
-                            marginBucket={marginBucket}
-                            openDepositModal={openDepositModal}
-                            openWithdrawModal={openWithdrawModal}
-                            PortfolioModalsRenderer={PortfolioModalsRenderer}
-                        />
-                    </section>
+                                    {debugToolbarOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className={`${styles.debugToolbar} ${debugToolbarOpen ? styles.open : ''}`}
+                                        >
+                                            <ComboBoxContainer />
+                                        </motion.div>
+                                    )}
+                                    <div
+                                        id='watchlistSection'
+                                        className={styles.watchlist}
+                                    >
+                                        <WatchList />
+                                    </div>
+                                    <div
+                                        id='symbolInfoSection'
+                                        className={styles.symbolInfo}
+                                    >
+                                        <MemoizedSymbolInfo />
+                                    </div>
+                                    <div
+                                        id='chartSection'
+                                        className={styles.chart}
+                                    >
+                                        <MemoizedTradingViewWrapper />
+                                    </div>
+                                </div>
+                                <div
+                                    id='orderBookSection'
+                                    className={styles.orderBook}
+                                >
+                                    <MemoizedOrderBookSection
+                                        symbol={symbol}
+                                        chartTopHeight={chartTopHeight}
+                                    />
+                                </div>
+                            </section>
+                        </Resizable>
+
+                        {/* BOTTOM: table auto-fills leftover space */}
+                        <section
+                            className={styles.table}
+                            id='tutorial-trade-table'
+                        >
+                            <MemoizedTradeTable />
+                        </section>
+                    </div>
+
+                    {/* RIGHT COLUMN */}
+                    <div className={styles.rightCol}>
+                        <section className={styles.order_input}>
+                            <OrderInput
+                                marginBucket={marginBucket}
+                                isAnyPortfolioModalOpen={
+                                    isAnyPortfolioModalOpen
+                                }
+                            />
+                        </section>
+                        <section className={styles.wallet}>
+                            <DepositDropdown
+                                marginBucket={marginBucket}
+                                openDepositModal={openDepositModal}
+                                openWithdrawModal={openWithdrawModal}
+                                PortfolioModalsRenderer={
+                                    PortfolioModalsRenderer
+                                }
+                            />
+                        </section>
+                    </div>
                 </div>
             )}
             <AdvancedTutorialController
