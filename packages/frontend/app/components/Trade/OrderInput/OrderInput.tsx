@@ -2231,33 +2231,34 @@ function OrderInput({
                                                 justifyContent: 'center',
                                             }}
                                         >
-                                            <Tooltip
-                                                content={
-                                                    maxTradeSizeWarningLong
-                                                }
-                                                position='bottom'
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    color: 'var(--orange)',
+                                                    justifyContent: 'center',
+                                                    width: '100%',
+                                                    fontSize:
+                                                        'var(--font-size-s)',
+                                                }}
                                             >
-                                                <div
+                                                <span
                                                     style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '4px',
-                                                        color: 'var(--orange)',
-                                                        justifyContent:
-                                                            'center',
-                                                        width: '100%',
-                                                        fontSize:
-                                                            'var(--font-size-s)',
+                                                        cursor: 'default',
                                                     }}
                                                 >
-                                                    <span>
-                                                        {
-                                                            maxTradeSizeWarningShort
-                                                        }
-                                                    </span>
+                                                    {maxTradeSizeWarningShort}
+                                                </span>
+                                                <Tooltip
+                                                    content={
+                                                        maxTradeSizeWarningLong
+                                                    }
+                                                    position='bottom'
+                                                >
                                                     <LuCircleHelp size={12} />
-                                                </div>
-                                            </Tooltip>
+                                                </Tooltip>
+                                            </div>
                                         </div>
                                     )}
                             </div>
