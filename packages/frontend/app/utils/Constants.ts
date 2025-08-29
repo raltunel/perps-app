@@ -149,11 +149,13 @@ export const MIN_VISIBLE_ORDER_LABEL_RATIO = 0.8;
 export const MIN_POSITION_USD_SIZE = 0.01;
 
 export const MARKET_API_URL =
-    import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    // import.meta.env.VITE_MARKET_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_MARKET_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const POLLING_API_URL =
-    import.meta.env.VITE_POLLING_API_URL || 'https://api.hyperliquid.xyz';
+    // import.meta.env.VITE_POLLING_API_URL || 'https://api.hyperliquid.xyz';
+    import.meta.env.VITE_POLLING_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
 export const POLLING_API_INFO_ENDPOINT =
@@ -209,7 +211,7 @@ export type Environment = keyof typeof API_URLS;
 export const DEFAULT_API_ENVIRONMENT: Environment = 'mock';
 
 export const TIMEOUT_OB_POLLING =
-    import.meta.env.VITE_TIMEOUT_OB_POLLING || 2 * SECONDS;
+    import.meta.env.VITE_TIMEOUT_OB_POLLING || 0.1 * SECONDS;
 export const TIMEOUT_MARKET_DATA_POLLING =
     import.meta.env.VITE_TIMEOUT_MARKET_DATA_POLLING || 2 * SECONDS;
 export const TIMEOUT_CANDLE_POLLING =
