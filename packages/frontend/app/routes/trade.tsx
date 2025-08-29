@@ -125,82 +125,6 @@ export default function Trade() {
     const { showTutorial, handleTutorialComplete, handleTutorialSkip } =
         useTutorial();
 
-    const tabList = useMemo(
-        () =>
-            [
-                { key: 'order', label: 'Order' },
-                { key: 'chart', label: 'Chart' },
-                { key: 'book', label: 'Book' },
-                { key: 'recent', label: 'Recent' },
-                { key: 'positions', label: 'Positions' },
-            ] as const,
-        [],
-    );
-
-    const handleTabClick = useCallback(
-        (tab: TabType) => () => switchTab(tab),
-        [switchTab],
-    );
-
-    const MobileTabNavigation = useMemo(
-        () => (
-            <div className={styles.mobileTabNav}>
-                <div className={styles.mobileTabBtns}>
-                    {tabList.map(({ key, label }) => (
-                        <button
-                            key={key}
-                            className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
-                            onClick={handleTabClick(key)}
-                        >
-                            {label}
-                        </button>
-                    ))}
-                </div>
-            </div>
-        ),
-        [activeTab, handleTabClick, tabList],
-    );
-
-    const mobileOrderBookView = useMemo(
-        () => (
-            <div className={styles.mobileOnlyOrderBook}>
-                {(activeTab === 'book' || visibilityRefs.current.book) && (
-                    <MemoizedOrderBookSection
-                        symbol={symbol}
-                        mobileView
-                        mobileContent='orderBook'
-                        chartTopHeight={chartTopHeight}
-                        switchTab={switchTab}
-                    />
-                )}
-            </div>
-        ),
-        [symbol, activeTab, switchTab],
-    );
-
-    const mobileRecentTradesView = useMemo(
-        () => (
-            <div className={styles.mobileOnlyRecentTrades}>
-                {(activeTab === 'recent' || visibilityRefs.current.recent) && (
-                    <MemoizedOrderBookSection
-                        symbol={symbol}
-                        mobileView
-                        mobileContent='recentTrades'
-                        chartTopHeight={chartTopHeight}
-                    />
-                )}
-            </div>
-        ),
-        [symbol, activeTab],
-    );
-
-    const {
-        openDepositModal,
-        openWithdrawModal,
-        PortfolioModalsRenderer,
-        isAnyPortfolioModalOpen,
-    } = usePortfolioModals();
-
     // --------------------------------------------
     // CONTROLLABLE CHART/TABLE SPLIT (persisted)
     // --------------------------------------------
@@ -305,6 +229,82 @@ export default function Trade() {
     }, [resetLayoutHeights, setDefaultFromLayout]);
 
     const clamp = (n: number) => Math.max(CHART_MIN, Math.min(n, maxTop));
+
+    const tabList = useMemo(
+        () =>
+            [
+                { key: 'order', label: 'Order' },
+                { key: 'chart', label: 'Chart' },
+                { key: 'book', label: 'Book' },
+                { key: 'recent', label: 'Recent' },
+                { key: 'positions', label: 'Positions' },
+            ] as const,
+        [],
+    );
+
+    const handleTabClick = useCallback(
+        (tab: TabType) => () => switchTab(tab),
+        [switchTab],
+    );
+
+    const MobileTabNavigation = useMemo(
+        () => (
+            <div className={styles.mobileTabNav}>
+                <div className={styles.mobileTabBtns}>
+                    {tabList.map(({ key, label }) => (
+                        <button
+                            key={key}
+                            className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
+                            onClick={handleTabClick(key)}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        ),
+        [activeTab, handleTabClick, tabList],
+    );
+
+    const mobileOrderBookView = useMemo(
+        () => (
+            <div className={styles.mobileOnlyOrderBook}>
+                {(activeTab === 'book' || visibilityRefs.current.book) && (
+                    <MemoizedOrderBookSection
+                        symbol={symbol}
+                        mobileView
+                        mobileContent='orderBook'
+                        chartTopHeight={chartTopHeight}
+                        switchTab={switchTab}
+                    />
+                )}
+            </div>
+        ),
+        [symbol, activeTab, switchTab],
+    );
+
+    const mobileRecentTradesView = useMemo(
+        () => (
+            <div className={styles.mobileOnlyRecentTrades}>
+                {(activeTab === 'recent' || visibilityRefs.current.recent) && (
+                    <MemoizedOrderBookSection
+                        symbol={symbol}
+                        mobileView
+                        mobileContent='recentTrades'
+                        chartTopHeight={chartTopHeight}
+                    />
+                )}
+            </div>
+        ),
+        [symbol, activeTab],
+    );
+
+    const {
+        openDepositModal,
+        openWithdrawModal,
+        PortfolioModalsRenderer,
+        isAnyPortfolioModalOpen,
+    } = usePortfolioModals();
 
     // Mobile view
     if (isMobile && symbol) {
