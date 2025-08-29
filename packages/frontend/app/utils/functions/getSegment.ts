@@ -213,34 +213,50 @@ export const getResolutionSegment = (resolution: number) => {
                             ? '< 900'
                             : resolution < 1000
                               ? '< 1000'
-                              : resolution < 1200
-                                ? '< 1200'
-                                : resolution < 1500
-                                  ? '< 1500'
-                                  : resolution < 2000
-                                    ? '< 2000'
-                                    : resolution < 2500
-                                      ? '< 2500'
-                                      : resolution < 3000
-                                        ? '< 3000'
-                                        : resolution < 4000
-                                          ? '< 4000'
-                                          : resolution < 5000
-                                            ? '< 5000'
-                                            : resolution < 6000
-                                              ? '< 6000'
-                                              : resolution < 7000
-                                                ? '< 7000'
-                                                : resolution < 8000
-                                                  ? '< 8000'
-                                                  : resolution < 9000
-                                                    ? '< 9000'
-                                                    : resolution < 10000
-                                                      ? '< 10000'
-                                                      : resolution > 10000
-                                                        ? '> 10000'
-                                                        : resolution === 10000
-                                                          ? '10000'
-                                                          : '> 10000';
+                              : resolution < 1100
+                                ? '< 1100'
+                                : resolution < 1200
+                                  ? '< 1200'
+                                  : resolution < 1300
+                                    ? '< 1300'
+                                    : resolution < 1400
+                                      ? '< 1400'
+                                      : resolution < 1500
+                                        ? '< 1500'
+                                        : resolution < 1600
+                                          ? '< 1600'
+                                          : resolution < 1700
+                                            ? '< 1700'
+                                            : resolution < 1800
+                                              ? '< 1800'
+                                              : resolution < 1900
+                                                ? '< 1900'
+                                                : resolution < 2000
+                                                  ? '< 2000'
+                                                  : resolution < 2500
+                                                    ? '< 2500'
+                                                    : resolution < 3000
+                                                      ? '< 3000'
+                                                      : resolution < 4000
+                                                        ? '< 4000'
+                                                        : resolution < 5000
+                                                          ? '< 5000'
+                                                          : resolution < 6000
+                                                            ? '< 6000'
+                                                            : resolution < 7000
+                                                              ? '< 7000'
+                                                              : resolution <
+                                                                  8000
+                                                                ? '< 8000'
+                                                                : resolution <
+                                                                    9000
+                                                                  ? '< 9000'
+                                                                  : resolution <
+                                                                      10000
+                                                                    ? '< 10000'
+                                                                    : resolution >=
+                                                                        10000
+                                                                      ? '>= 10000'
+                                                                      : 'unknown';
     return resolutionSegment;
 };

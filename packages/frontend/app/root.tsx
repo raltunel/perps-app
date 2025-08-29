@@ -160,9 +160,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            console.log('Window height:', window.innerHeight);
             setInnerHeight(window.innerHeight);
-            console.log('Window width:', window.innerWidth);
             setInnerWidth(window.innerWidth);
         }
     }, []);
@@ -230,7 +228,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {!isProduction && (
+                {isProduction && (
                     <script
                         defer
                         event-version={packageJson.version}
