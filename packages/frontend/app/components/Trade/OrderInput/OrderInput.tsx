@@ -208,7 +208,7 @@ function OrderInput({
 
     const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
-    const OI_BUFFER = 100;
+    const OI_BUFFER = 0.995;
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
@@ -219,7 +219,7 @@ function OrderInput({
             tradeDirection === 'buy',
         );
         const unscaledMaxRemainingOI = Number(maxRemainingOI) / 1e6;
-        setMaxRemainingOI(unscaledMaxRemainingOI - OI_BUFFER);
+        setMaxRemainingOI(unscaledMaxRemainingOI * OI_BUFFER);
     }, [marginBucket, tradeDirection]);
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
@@ -513,8 +513,18 @@ function OrderInput({
     }, [usdOrderValue, leverage]);
 
     const isMarginInsufficient = useMemo(() => {
-        return usdAvailableToTrade < marginRequired * 0.99;
-    }, [usdAvailableToTrade, marginRequired]);
+        return (
+            !isReduceOnlyEnabled &&
+            (usdAvailableToTrade < marginRequired * 0.99 ||
+                (!maxTradeSizeInUsd && sizePercentageValue > 0))
+        );
+    }, [
+        usdAvailableToTrade,
+        marginRequired,
+        sizePercentageValue,
+        maxTradeSizeInUsd,
+        isReduceOnlyEnabled,
+    ]);
 
     const usdOrderSizeNum = useMemo(() => {
         return Math.floor(notionalQtyNum * (markPx || 1) * 100) / 100;
@@ -529,7 +539,7 @@ function OrderInput({
     }, [usdOrderSizeNum, isReduceOnlyEnabled, sizePercentageValue]);
 
     const sizeMoreThanMaximum = useMemo(() => {
-        return usdOrderSizeNum > maxRemainingOI + OI_BUFFER;
+        return usdOrderSizeNum > maxRemainingOI / OI_BUFFER;
     }, [usdOrderSizeNum, maxRemainingOI]);
 
     const currentPositionLessThanMinPositionSize = useMemo(() => {
@@ -698,7 +708,7 @@ function OrderInput({
                 ((notionalQtyNum * markPx) / maxTradeSizeInUsd) * 100,
                 100,
             );
-            setSizePercentageValue(percentage);
+            setSizePercentageValue(Math.max(percentage, 0));
             if (percentage === 100) {
                 setIsSizeSetAsPercentage(true);
                 setNotionalQtyNumFromPercentage(100);
@@ -726,7 +736,7 @@ function OrderInput({
             }
         }
         const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
-        setNotionalQtyNum(newNotionalQtyNum);
+        setNotionalQtyNum(Math.max(newNotionalQtyNum, 0));
         if (shouldUpdateAfterTrade) {
             setShouldUpdateAfterTrade(false);
         }
@@ -747,14 +757,14 @@ function OrderInput({
         if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
         setIsEditingSizeInput(false);
         const percent = Math.min(getCurrentPercentageOfMaxTradeSize(), 100);
-        setSizePercentageValue(percent);
+        setSizePercentageValue(Math.max(percent, 0));
     }, [isReduceOnlyEnabled]);
 
     // update sizePercentageValue when notionalQtyNum changes
     useEffect(() => {
         if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
         const percent = Math.min(getCurrentPercentageOfMaxTradeSize(), 100);
-        setSizePercentageValue(percent);
+        setSizePercentageValue(Math.max(percent, 0));
     }, [notionalQtyNum]);
 
     const handleOnFocus = () => {
@@ -780,8 +790,7 @@ function OrderInput({
             const notionalSizeInputQty =
                 selectedDenom === 'symbol' ? parsed : parsed / (markPx || 1);
             const newNotionalQtyNum = Number(notionalSizeInputQty.toFixed(8));
-            console.log({ newNotionalQtyNum });
-            setNotionalQtyNum(newNotionalQtyNum);
+            setNotionalQtyNum(Math.max(newNotionalQtyNum, 0));
         } else if (sizeDisplay.trim() === '') {
             setNotionalQtyNum(0);
         }
@@ -880,7 +889,7 @@ function OrderInput({
             const notionalQtyNum =
                 ((value / 100) * getMaxTradeSizeInUsd(leverage)) / markPx;
             const newNotionalQtyNum = Number(notionalQtyNum.toFixed(8));
-            setNotionalQtyNum(newNotionalQtyNum);
+            setNotionalQtyNum(Math.max(newNotionalQtyNum, 0));
         },
         [getMaxTradeSizeInUsd, markPx, leverage],
     );
@@ -1890,7 +1899,12 @@ function OrderInput({
         );
     }, [isReduceOnlyEnabled, marginBucket, tradeDirection, notionalQtyNum]);
 
+    const userExceededOI = useMemo(() => {
+        return maxTradeSizeInUsd < 0;
+    }, [maxTradeSizeInUsd]);
+
     const isDisabled =
+        userExceededOI ||
         isMarginInsufficientDebounced ||
         sizeLessThanMinimum ||
         sizeMoreThanMaximum ||
@@ -1970,6 +1984,7 @@ function OrderInput({
     ]);
 
     const getDisabledReason = (
+        userExceededOI: boolean,
         collateralInsufficientDebounced: boolean,
         sizeLessThanMinimum: boolean,
         sizeMoreThanMaximum: boolean,
@@ -1978,6 +1993,7 @@ function OrderInput({
         isReduceInWrongDirection: boolean,
         isReduceOnlyExceedingPositionSize: boolean,
     ) => {
+        if (userExceededOI) return '1 BTC position limit reached';
         if (isMarketOrderLoading) return 'Processing order...';
         if (isReduceInWrongDirection)
             return `Open position is ${tradeDirection === 'buy' ? 'long' : 'short'}, switch to ${tradeDirection === 'buy' ? 'sell' : 'buy'}`;
@@ -2000,6 +2016,7 @@ function OrderInput({
     }, [submitButtonRecentlyClicked]);
 
     const disabledReason = getDisabledReason(
+        userExceededOI,
         isMarginInsufficientDebounced,
         sizeLessThanMinimum,
         sizeMoreThanMaximum,
@@ -2052,20 +2069,21 @@ function OrderInput({
         '[data-testid="submit-order-button"]',
     );
 
-    const submitButtonText =
-        normalizedEquity < MIN_POSITION_USD_SIZE
-            ? 'Deposit to Trade'
-            : isReduceInWrongDirection
-              ? 'Switch Direction to Reduce'
-              : isMarginInsufficientDebounced
-                ? tradeDirection === 'buy'
-                    ? 'Max Long - Deposit to Trade'
-                    : 'Max Short - Deposit to Trade'
-                : notionalQtyNum && sizeLessThanMinimum
-                  ? isReduceOnlyEnabled
-                      ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum or 100%`
-                      : `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
-                  : 'Submit';
+    const submitButtonText = userExceededOI
+        ? 'Max Open Interest Reached'
+        : normalizedEquity < MIN_POSITION_USD_SIZE
+          ? 'Deposit to Trade'
+          : isReduceInWrongDirection
+            ? 'Switch Direction to Reduce'
+            : isMarginInsufficientDebounced
+              ? tradeDirection === 'buy'
+                  ? 'Max Long - Deposit to Trade'
+                  : 'Max Short - Deposit to Trade'
+              : notionalQtyNum && sizeLessThanMinimum
+                ? isReduceOnlyEnabled
+                    ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum or 100%`
+                    : `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                : 'Submit';
 
     const inputDetailsData = useMemo(
         () => [
@@ -2225,7 +2243,8 @@ function OrderInput({
                                 ))}
                                 {!isReduceOnlyEnabled &&
                                     maxOrderSizeWouldExceedRemainingOIDebounced &&
-                                    !!notionalQtyNum && (
+                                    (!!sizePercentageValue ||
+                                        !!sizeDisplay) && (
                                         <div
                                             style={{
                                                 width: '100%',
