@@ -732,21 +732,21 @@ function OrderInput({
         markPx,
         isLeverageBeingDragged,
         isReduceOnlyEnabled,
-        tradeDirection,
         shouldUpdateAfterTrade,
-        !!maxTradeSizeInUsd,
+        maxTradeSizeInUsd,
     ]);
 
     const getCurrentPercentageOfMaxTradeSize = useCallback(() => {
         return ((notionalQtyNum * (markPx || 1)) / maxTradeSizeInUsd) * 100;
     }, [notionalQtyNum, markPx, maxTradeSizeInUsd]);
 
+    // update size slider when specific size qty entered and reduce only toggled
     useEffect(() => {
         if (!maxTradeSizeInUsd || isSizeSetAsPercentage) return;
         setIsEditingSizeInput(false);
         const percent = Math.min(getCurrentPercentageOfMaxTradeSize(), 100);
         setSizePercentageValue(percent);
-    }, [!!maxTradeSizeInUsd, isReduceOnlyEnabled]);
+    }, [isReduceOnlyEnabled]);
 
     // update sizePercentageValue when notionalQtyNum changes
     useEffect(() => {
@@ -778,6 +778,7 @@ function OrderInput({
             const notionalSizeInputQty =
                 selectedDenom === 'symbol' ? parsed : parsed / (markPx || 1);
             const newNotionalQtyNum = Number(notionalSizeInputQty.toFixed(8));
+            console.log({ newNotionalQtyNum });
             setNotionalQtyNum(newNotionalQtyNum);
         } else if (sizeDisplay.trim() === '') {
             setNotionalQtyNum(0);
@@ -2082,40 +2083,26 @@ function OrderInput({
 
     const maxTradeSizeWarningLong = useMemo(
         () =>
-            maxOrderSizeWouldExceedRemainingOI
-                ? tradeDirection === 'buy'
-                    ? marginBucket?.netPosition && marginBucket.netPosition > 0
-                        ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                        : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
-                    : marginBucket?.netPosition && marginBucket.netPosition < 0
-                      ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                      : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
-                : '',
-        [
-            maxOrderSizeWouldExceedRemainingOI,
-            tradeDirection,
-            marginBucket,
-            symbolInfo?.coin.toUpperCase(),
-        ],
+            tradeDirection === 'buy'
+                ? marginBucket?.netPosition && marginBucket.netPosition > 0
+                    ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
+                    : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
+                : marginBucket?.netPosition && marginBucket.netPosition < 0
+                  ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
+                  : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`,
+        [tradeDirection, marginBucket, symbolInfo?.coin.toUpperCase()],
     );
 
     const maxTradeSizeWarningShort = useMemo(
         () =>
-            maxOrderSizeWouldExceedRemainingOI
-                ? tradeDirection === 'buy'
-                    ? marginBucket?.netPosition && marginBucket.netPosition > 0
-                        ? `Max position size limited by OI cap`
-                        : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
-                    : marginBucket?.netPosition && marginBucket.netPosition < 0
-                      ? `Max position size limited by OI cap`
-                      : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
-                : '',
-        [
-            maxOrderSizeWouldExceedRemainingOI,
-            tradeDirection,
-            marginBucket,
-            symbolInfo?.coin.toUpperCase(),
-        ],
+            tradeDirection === 'buy'
+                ? marginBucket?.netPosition && marginBucket.netPosition > 0
+                    ? `Max position size limited by OI cap`
+                    : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                : marginBucket?.netPosition && marginBucket.netPosition < 0
+                  ? `Max position size limited by OI cap`
+                  : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`,
+        [tradeDirection, marginBucket, symbolInfo?.coin.toUpperCase()],
     );
 
     return (
