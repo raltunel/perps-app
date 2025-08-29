@@ -166,10 +166,23 @@ export default function AppOptions() {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
+                    useAppSettings.getState().resetLayoutHeights();
                 }}
             >
                 Apply Defaults
             </div>
+
+            {/* <div
+                className={styles.apply_defaults}
+                onClick={() => {
+                    // Clear persisted split height
+                    localStorage.removeItem('chartTopHeight');
+                    // Tell the Trade page to recompute defaults immediately
+                    window.dispatchEvent(new CustomEvent('trade:resetLayout'));
+                }}
+            >
+                Reset Layout (Chart/Table)
+            </div> */}
         </section>
     );
 }
