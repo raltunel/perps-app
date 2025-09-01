@@ -15,6 +15,7 @@ type LabelOptions = {
 type DrawSegmentedRectOptions = {
     x: number;
     y: number;
+    color: string;
     labelOptions: LabelOptions[];
 };
 
@@ -28,32 +29,49 @@ export type LabelLocation = {
 
 export function drawLabel(
     ctx: CanvasRenderingContext2D,
-    { x, y, labelOptions }: DrawSegmentedRectOptions,
+    { x, y, color, labelOptions }: DrawSegmentedRectOptions,
+    isDragable: boolean,
 ) {
     const dpr = window.devicePixelRatio || 1;
     const height = 15 * dpr;
 
+    const verticalLineWidth = 2 * dpr;
+    const verticalLineHeight = height / 1.3;
+
     ctx.save();
     ctx.font = `bold ${10 * dpr}px sans-serif`;
     const padding = 4;
+    const yPadding = (padding / 2) * dpr;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-
     let cursorX = x;
     const labelLocations: LabelLocation[] = [];
 
     for (let i = 0; i < labelOptions.length; i++) {
         const { text, backgroundColor, textColor, borderColor, type } =
             labelOptions[i];
+
+        const isAddVerticalLine = isDragable && type === 'Main';
         const textMetrics = ctx.measureText(text);
-        const textWidth = textMetrics.width;
-        const segmentWidth = textWidth + padding * 2;
+        const textWidth = isAddVerticalLine
+            ? textMetrics.width + padding * 2 * dpr
+            : textMetrics.width;
+
+        const lineX = x + padding * dpr;
+        const lineY = y + yPadding / 2;
+
+        const segmentWidth = textWidth + padding * 3;
 
         ctx.fillStyle = backgroundColor;
-        ctx.fillRect(cursorX, y, segmentWidth, height);
+        ctx.fillRect(cursorX, y - yPadding, segmentWidth, height + yPadding);
 
         ctx.strokeStyle = borderColor;
-        ctx.strokeRect(cursorX, y, segmentWidth, height);
+        ctx.strokeRect(cursorX, y - yPadding, segmentWidth, height + yPadding);
+
+        if (isAddVerticalLine) {
+            ctx.fillStyle = color;
+            ctx.fillRect(lineX, lineY, verticalLineWidth, verticalLineHeight);
+        }
 
         ctx.fillStyle = textColor;
         ctx.fillText(text, cursorX + segmentWidth / 2, y + height / 2);
@@ -75,15 +93,20 @@ export function drawLabel(
 
 export function drawLiqLabel(
     ctx: CanvasRenderingContext2D,
-    { x, y, labelOptions }: DrawSegmentedRectOptions,
+    { x, y, color, labelOptions }: DrawSegmentedRectOptions,
     chartWidth: number,
 ) {
     const dpr = window.devicePixelRatio || 1;
     const height = 18 * dpr;
 
+    const verticalLineWidth = 2 * dpr;
+    const verticalLineHeight = height / 1.5;
+
     ctx.save();
     ctx.font = `bold ${11 * dpr}px sans-serif`;
     const padding = 4 * dpr;
+    const yPadding = (padding / 3) * dpr;
+
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
 
@@ -92,17 +115,32 @@ export function drawLiqLabel(
 
     for (let i = 0; i < labelOptions.length; i++) {
         const { text, backgroundColor, type, textColor } = labelOptions[i];
+        const isAddVerticalLine = type === 'Main';
+
         const textMetrics = ctx.measureText(text);
         const textWidth = textMetrics.width;
         const segmentWidth = textWidth + padding * 2 + 15;
+
         ctx.fillStyle = backgroundColor;
-        ctx.fillRect(cursorX, y, segmentWidth, height);
+        ctx.fillRect(cursorX, y - yPadding, segmentWidth, height + yPadding);
 
         ctx.lineWidth = 2;
         ctx.strokeStyle = LIQ_PRICE_LINE_COLOR;
-        ctx.strokeRect(cursorX, y, segmentWidth, height);
+        ctx.strokeRect(cursorX, y - yPadding, segmentWidth, height + yPadding);
 
         if (type === 'Main') {
+            if (isAddVerticalLine) {
+                // dragable vertical line
+                const lineX = x + padding * dpr;
+                const lineY = y + yPadding;
+                ctx.fillStyle = color;
+                ctx.fillRect(
+                    lineX,
+                    lineY,
+                    verticalLineWidth,
+                    verticalLineHeight,
+                );
+            }
             // Liq. Price
             ctx.fillStyle = LIQ_PRICE_LINE_COLOR;
             ctx.fillText(text, cursorX + segmentWidth / 2, y + height / 2);

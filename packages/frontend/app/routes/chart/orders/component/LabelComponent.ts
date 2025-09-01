@@ -151,11 +151,16 @@ const LabelComponent = ({
                 let labelLocations = [];
 
                 if (line.type !== 'LIQ') {
-                    labelLocations = drawLabel(ctx, {
-                        x: xPixel,
-                        y: yPricePixel,
-                        labelOptions,
-                    });
+                    labelLocations = drawLabel(
+                        ctx,
+                        {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                            color: line.color,
+                        },
+                        line.type === 'LIMIT',
+                    );
                 } else {
                     labelLocations = drawLiqLabel(
                         ctx,
@@ -163,6 +168,7 @@ const LabelComponent = ({
                             x: xPixel,
                             y: yPricePixel,
                             labelOptions,
+                            color: line.color,
                         },
                         canvasSize.width,
                     );
