@@ -494,6 +494,7 @@ const LabelComponent = ({
             );
 
             if (isLabel) {
+                canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
                 setSelectedLine(isLabel);
@@ -703,6 +704,8 @@ const LabelComponent = ({
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'grab';
+
                     overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
             }, 300);
