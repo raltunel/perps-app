@@ -29,7 +29,7 @@ import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
@@ -321,7 +321,7 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-location=Page+Header` : ''}`}
+                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Page+Header` : ''}`}
                         ref={sessionButtonRef}
                     >
                         <SessionButton />
