@@ -105,7 +105,7 @@ export function drawLiqLabel(
     ctx.save();
     ctx.font = `bold ${11 * dpr}px sans-serif`;
     const padding = 4 * dpr;
-    const yPadding = (padding / 3) * dpr;
+    const yPadding = padding / 3;
 
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
@@ -131,7 +131,7 @@ export function drawLiqLabel(
         if (type === 'Main') {
             if (isAddVerticalLine) {
                 // dragable vertical line
-                const lineX = x + padding * dpr;
+                const lineX = x + padding;
                 const lineY = y + yPadding;
                 ctx.fillStyle = color;
                 ctx.fillRect(
