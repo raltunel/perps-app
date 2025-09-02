@@ -44,6 +44,9 @@ export default function Trade() {
     const { marginBucket } = useUnifiedMarginData();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
+    // add refs near the other refs
+    const lastColHeightRef = useRef<number | null>(null);
+    const lastWinInnerHeightRef = useRef<number>(window.innerHeight);
 
     const {
         orderBookMode,
@@ -229,12 +232,16 @@ export default function Trade() {
     }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
 
     // Recompute (or clamp) when the left column resizes
+    // Recompute (or clamp) only when HEIGHT changes
+    // Recompute (or clamp) when the left column (re)mounts or resizes.
+    // We rebind when mobile/desktop toggles so we never hold a stale node.
     useEffect(() => {
-        const col = leftColRef.current;
-        if (!col) return;
+        let raf = 0;
 
-        // Function to recalculate and apply chart/table split
-        const applyFromUserRatioNow = () => {
+        const apply = () => {
+            const col = leftColRef.current;
+            if (!col) return;
+
             const gap = getGap();
             const total = col.clientHeight;
             const available = Math.max(0, total - gap);
@@ -246,7 +253,6 @@ export default function Trade() {
                 userRatioRef.current != null &&
                 available > 0
             ) {
-                // If user has resized manually, preserve their ratio
                 const desired = userRatioRef.current * available;
                 const next = Math.max(CHART_MIN, Math.min(desired, max));
                 if (Math.abs(next - (chartTopHeightRef.current ?? 0)) > 0.5) {
@@ -254,8 +260,6 @@ export default function Trade() {
                     chartTopHeightRef.current = next;
                 }
             } else {
-                // Otherwise, stick to the default table height
-
                 const topByDefault = Math.max(
                     CHART_MIN,
                     total - TABLE_DEFAULT - gap,
@@ -267,35 +271,27 @@ export default function Trade() {
                 }
             }
         };
-        // Throttle resize handling so we don’t recalc on every single DOM event.
-        // this is more for performance.
-        const scheduleApply = () => {
-            if (resizeRafId.current != null) return;
-            resizeRafId.current = requestAnimationFrame(() => {
-                resizeRafId.current = null;
-                applyFromUserRatioNow();
-            });
-        };
-        // Watch for changes in the left column's size (e.g. flex layout shifts,
-        // container resizing, or when the user resizes the draggable split).
-        // Whenever it changes, we recalc the chart/table heights.
-        const ro = new ResizeObserver(scheduleApply);
-        ro.observe(col);
 
-        // This is to make sure we recalc on full window resizes too,
-        // because viewport changes (like browser chrome hiding or scrollbars appearing)
-        // can affect available height even if the column itself didn’t trigger ResizeObserver.
-        window.addEventListener('resize', scheduleApply, { passive: true });
+        const schedule = () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(apply);
+        };
+
+        const ro = new ResizeObserver(schedule);
+        const el = leftColRef.current;
+        if (el) ro.observe(el);
+
+        window.addEventListener('resize', schedule, { passive: true });
+
+        // run once after (re)binding
+        schedule();
 
         return () => {
-            if (resizeRafId.current != null) {
-                cancelAnimationFrame(resizeRafId.current);
-                resizeRafId.current = null;
-            }
+            if (raf) cancelAnimationFrame(raf);
             ro.disconnect();
-            window.removeEventListener('resize', scheduleApply);
+            window.removeEventListener('resize', schedule);
         };
-    }, []);
+    }, [isMobile]); // <— rebind when going in/out of mobile
 
     //  listen for global reset event
     useEffect(() => {
@@ -462,7 +458,11 @@ export default function Trade() {
             {symbol && (
                 <div className={styles.containerNew}>
                     {/* LEFT COLUMN */}
-                    <div className={styles.leftCol} ref={leftColRef}>
+                    <div
+                        className={styles.leftCol}
+                        ref={leftColRef}
+                        key={isMobile ? 'm' : 'd'}
+                    >
                         <Resizable
                             size={{ width: '100%', height: chartTopHeight }}
                             minHeight={CHART_MIN}
