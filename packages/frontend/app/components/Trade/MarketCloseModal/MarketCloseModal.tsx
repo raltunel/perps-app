@@ -10,7 +10,11 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
+import {
+    blockExplorer,
+    MAX_BTC_NOTIONAL,
+    MIN_ORDER_VALUE,
+} from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -246,6 +250,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
+        const maxNotional = MAX_BTC_NOTIONAL;
+
+        const notionalExceedsMax = notionalSymbolQtyNum > maxNotional;
+
         try {
             // Get order book prices for the closing order
             const closingSide = isPositionLong ? 'sell' : 'buy';
@@ -258,8 +266,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 quantity: isCompleteClose
                     ? isSubminimumClose
                         ? subminimumCloseQty
-                        : notionalSymbolQtyNum * 1.01
-                    : notionalSymbolQtyNum,
+                        : Math.min(notionalSymbolQtyNum * 1.01, maxNotional)
+                    : !notionalExceedsMax
+                      ? notionalSymbolQtyNum
+                      : maxNotional,
                 side: closingSide,
                 leverage: position.leverage?.value,
                 bestBidPrice: closingSide === 'sell' ? bestBidPrice : undefined,
