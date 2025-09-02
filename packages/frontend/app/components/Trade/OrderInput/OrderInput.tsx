@@ -212,7 +212,7 @@ function OrderInput({
 
     const [maxRemainingOI, setMaxRemainingOI] = useState<number>(100_000);
 
-    const OI_BUFFER = 0.992;
+    const OI_BUFFER = 0.9995;
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
