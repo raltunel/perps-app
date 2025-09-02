@@ -58,7 +58,12 @@ export function drawLabel(
             : textMetrics.width;
 
         const lineX = x + padding * dpr;
-        const lineY = y + yPadding / 2;
+
+        const top = y - yPadding;
+        const bottom = top + height + yPadding;
+        const labelCenterY = top + (bottom - top) / 2;
+
+        const lineY = labelCenterY - verticalLineHeight / 2;
 
         const segmentWidth = textWidth + padding * 3;
 
@@ -132,7 +137,11 @@ export function drawLiqLabel(
             if (isAddVerticalLine) {
                 // dragable vertical line
                 const lineX = x + padding;
-                const lineY = y + yPadding;
+                const top = y - yPadding;
+                const bottom = top + height + yPadding;
+                const labelCenterY = top + (bottom - top) / 2;
+
+                const lineY = labelCenterY - verticalLineHeight / 2;
                 ctx.fillStyle = color;
                 ctx.fillRect(
                     lineX,
