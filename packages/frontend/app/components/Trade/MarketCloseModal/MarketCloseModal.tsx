@@ -10,7 +10,11 @@ import {
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { usePythPrice } from '~/stores/PythPriceStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer, MIN_ORDER_VALUE } from '~/utils/Constants';
+import {
+    blockExplorer,
+    MAX_BTC_NOTIONAL,
+    MIN_ORDER_VALUE,
+} from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { OrderBookMode } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/UserDataIFs';
@@ -231,6 +235,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         [markPx],
     );
 
+    const maxNotional = MAX_BTC_NOTIONAL;
+
     // fn to execute market close
     async function executeMarketClose(): Promise<void> {
         // Validate position size
@@ -258,7 +264,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 quantity: isCompleteClose
                     ? isSubminimumClose
                         ? subminimumCloseQty
-                        : notionalSymbolQtyNum * 1.01
+                        : Math.min(notionalSymbolQtyNum * 1.01, maxNotional) // add 1% buffer to prevent dust remaining after close, but do not exceed max size
                     : notionalSymbolQtyNum,
                 side: closingSide,
                 leverage: position.leverage?.value,
