@@ -52,6 +52,8 @@ export default function Trade() {
         resetLayoutHeights,
     } = useAppSettings();
 
+    const resizeRafId = useRef<number | null>(null);
+
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
@@ -141,7 +143,13 @@ export default function Trade() {
     );
     const startHeightRef = useRef(chartTopHeight);
     const [maxTop, setMaxTop] = useState<number>(Infinity);
-    const ratioRef = useRef<number | null>(null);
+    const userRatioRef = useRef<number | null>(null);
+    const hasUserOverrideRef = useRef<boolean>(false);
+
+    const chartTopHeightRef = useRef<number>(chartTopHeight);
+    useEffect(() => {
+        chartTopHeightRef.current = chartTopHeight;
+    }, [chartTopHeight]);
 
     const setHeightBoth = (h: number) => {
         setChartTopHeightLocal(h);
@@ -166,13 +174,12 @@ export default function Trade() {
         const n = parseFloat(raw);
         return Number.isFinite(n) ? n : 8;
     };
+    // calculates available height in left column
     const getAvailable = () => {
         const col = leftColRef.current;
         if (!col) return null;
         const gap = getGap();
         const total = col.clientHeight;
-        // space shared by top + gap + bottom = total
-        // so "available" for top+bottom is total - gap
         return Math.max(0, total - gap);
     };
 
@@ -183,22 +190,19 @@ export default function Trade() {
 
         const gap = getGap();
         const total = col.clientHeight;
-        const available = Math.max(0, total - gap);
 
-        // Compute top so the table defaults to TABLE_DEFAULT
+        // Keep table at TABLE_DEFAULT px in default mode
         const top = Math.max(CHART_MIN, total - TABLE_DEFAULT - gap);
 
+        // LOCAL update only
         setChartTopHeightLocal(top);
-        setChartTopHeight(top);
-
-        // Seed ratio from computed top
-        ratioRef.current = available > 0 ? top / available : null;
 
         const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
         setMaxTop(max);
-    }, [setChartTopHeight]);
+    }, [setChartTopHeightLocal]);
 
     // On mount / when store changes:
+    // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
         const col = leftColRef.current;
         if (!col) return;
@@ -210,16 +214,17 @@ export default function Trade() {
         setMaxTop(max);
 
         if (storedHeight == null) {
-            // no user override, compute from layout and set ratio
+            // DEFAULT MODE: no user override, no persistence, no ratio
+            hasUserOverrideRef.current = false;
+            userRatioRef.current = null;
             requestAnimationFrame(setDefaultFromLayout);
         } else {
-            // clamp stored px to current bounds
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
             setChartTopHeightLocal(clamped);
             if (clamped !== storedHeight) setChartTopHeight(clamped);
 
-            // seed ratio from stored px so we can scale on future container resizes
-            ratioRef.current = available > 0 ? clamped / available : null;
+            hasUserOverrideRef.current = true;
+            userRatioRef.current = available > 0 ? clamped / available : null;
         }
     }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
 
@@ -228,37 +233,76 @@ export default function Trade() {
         const col = leftColRef.current;
         if (!col) return;
 
-        const ro = new ResizeObserver(() => {
+        // Function to recalculate and apply chart/table split
+        const applyFromUserRatioNow = () => {
             const gap = getGap();
             const total = col.clientHeight;
             const available = Math.max(0, total - gap);
             const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
             setMaxTop(max);
 
-            if (ratioRef.current != null && available > 0) {
-                // maintain visual proportion across resizes/breakpoints
-                const next = clamp(ratioRef.current * available);
-                setChartTopHeightLocal(next);
-                setChartTopHeight(next);
-            } else if (storedHeight == null) {
-                // fall back to layout default when no stored height nor ratio
-                setDefaultFromLayout();
+            if (
+                hasUserOverrideRef.current &&
+                userRatioRef.current != null &&
+                available > 0
+            ) {
+                // If user has resized manually, preserve their ratio
+                const desired = userRatioRef.current * available;
+                const next = Math.max(CHART_MIN, Math.min(desired, max));
+                if (Math.abs(next - (chartTopHeightRef.current ?? 0)) > 0.5) {
+                    setChartTopHeightLocal(next);
+                    chartTopHeightRef.current = next;
+                }
             } else {
-                // no ratio yet — keep clamping current px
-                setChartTopHeightLocal((h) =>
-                    Math.min(Math.max(h, CHART_MIN), max),
-                );
-            }
-        });
+                // Otherwise, stick to the default table height
 
+                const topByDefault = Math.max(
+                    CHART_MIN,
+                    total - TABLE_DEFAULT - gap,
+                );
+                const next = Math.min(topByDefault, max);
+                if (Math.abs(next - (chartTopHeightRef.current ?? 0)) > 0.5) {
+                    setChartTopHeightLocal(next);
+                    chartTopHeightRef.current = next;
+                }
+            }
+        };
+        // Throttle resize handling so we don’t recalc on every single DOM event.
+        // this is more for performance.
+        const scheduleApply = () => {
+            if (resizeRafId.current != null) return;
+            resizeRafId.current = requestAnimationFrame(() => {
+                resizeRafId.current = null;
+                applyFromUserRatioNow();
+            });
+        };
+        // Watch for changes in the left column's size (e.g. flex layout shifts,
+        // container resizing, or when the user resizes the draggable split).
+        // Whenever it changes, we recalc the chart/table heights.
+        const ro = new ResizeObserver(scheduleApply);
         ro.observe(col);
-        return () => ro.disconnect();
-    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+        // This is to make sure we recalc on full window resizes too,
+        // because viewport changes (like browser chrome hiding or scrollbars appearing)
+        // can affect available height even if the column itself didn’t trigger ResizeObserver.
+        window.addEventListener('resize', scheduleApply, { passive: true });
+
+        return () => {
+            if (resizeRafId.current != null) {
+                cancelAnimationFrame(resizeRafId.current);
+                resizeRafId.current = null;
+            }
+            ro.disconnect();
+            window.removeEventListener('resize', scheduleApply);
+        };
+    }, []);
 
     //  listen for global reset event
     useEffect(() => {
         const handler = () => {
-            resetLayoutHeights();
+            resetLayoutHeights(); // clears store
+            hasUserOverrideRef.current = false;
+            userRatioRef.current = null;
             requestAnimationFrame(setDefaultFromLayout);
         };
         window.addEventListener('trade:resetLayout', handler as EventListener);
@@ -436,17 +480,10 @@ export default function Trade() {
                                 );
                                 setChartTopHeightLocal(tentative);
 
-                                const col = leftColRef.current;
-                                if (col) {
-                                    const gap = getGap();
-                                    const available = Math.max(
-                                        0,
-                                        col.clientHeight - gap,
-                                    );
-                                    ratioRef.current =
-                                        available > 0
-                                            ? tentative / available
-                                            : null;
+                                const available = getAvailable();
+                                if (available && available > 0) {
+                                    userRatioRef.current =
+                                        tentative / available;
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
@@ -454,17 +491,15 @@ export default function Trade() {
                                     startHeightRef.current + d.height,
                                 );
 
+                                hasUserOverrideRef.current = true;
+
+                                // Persist px to store
                                 setHeightBoth(next);
 
-                                const col = leftColRef.current;
-                                if (col) {
-                                    const gap = getGap();
-                                    const available = Math.max(
-                                        0,
-                                        col.clientHeight - gap,
-                                    );
-                                    ratioRef.current =
-                                        available > 0 ? next / available : null;
+                                // Capture the user's chosen ratio for future container resizes
+                                const available = getAvailable();
+                                if (available && available > 0) {
+                                    userRatioRef.current = next / available;
                                 }
                             }}
                         >
