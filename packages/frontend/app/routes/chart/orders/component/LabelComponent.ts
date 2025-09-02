@@ -25,6 +25,7 @@ import {
 } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
+import * as d3fc from 'd3fc';
 
 interface LabelProps {
     lines: LineData[];
@@ -70,7 +71,44 @@ const LabelComponent = ({
     const { executeLimitOrder } = useLimitOrderService();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [horizontalLine, setHorizontalLine] = useState<any>();
+
     const [isDrag, setIsDrag] = useState(false);
+
+    useEffect(() => {
+        if (scaleData !== undefined && canvasSize && isChartReady) {
+            const dummyXScale = d3
+                .scaleLinear()
+                .domain([0, 1])
+                .range([0, canvasSize.width]);
+
+            const horizontalLine = d3fc
+                .annotationCanvasLine()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .value((d: any) => d.yPrice)
+                .yScale(scaleData?.yScale)
+                .xScale(dummyXScale)
+                .orient('horizontal');
+
+            horizontalLine.decorate(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (context: CanvasRenderingContext2D, d: any) => {
+                    context.strokeStyle = d.color;
+                    context.fillStyle = d.color;
+                    context.lineWidth = d.lineWidth;
+                    if (d.dash) {
+                        context.setLineDash(d.dash);
+                    }
+                },
+            );
+
+            setHorizontalLine(() => {
+                return horizontalLine;
+            });
+        }
+    }, [scaleData, canvasSize === undefined, isChartReady]);
+
     useEffect(() => {
         if (!chart || !isChartReady || !ctx || !canvasSize) return;
 
@@ -102,14 +140,17 @@ const LabelComponent = ({
                     overlayCanvasRef.current.height = paneCanvas.height;
                 }
             }
-
             drawnLabelsRef.current.map((i) => {
                 const data = i.labelLocations;
                 data?.forEach((item) => {
-                    ctx.clearRect(item.x, item.y, item.width, item.height);
+                    ctx.clearRect(0, item.y, canvasSize.width, item.height);
                 });
             });
 
+            if (horizontalLine) {
+                horizontalLine.context(ctx);
+                horizontalLine(lines);
+            }
             const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(
                     chart,
@@ -209,6 +250,7 @@ const LabelComponent = ({
         zoomChanged,
         canvasSize,
         selectedLine,
+        horizontalLine,
     ]);
 
     useLayoutEffect(() => {
@@ -480,13 +522,12 @@ const LabelComponent = ({
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
         let originalPrice: number | undefined = undefined;
-        const dpr = window.devicePixelRatio || 1;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
             const rect = canvas.getBoundingClientRect();
-            const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
-            const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
+            const offsetY = event.sourceEvent.clientY - rect?.top;
+            const offsetX = event.sourceEvent.clientX - rect?.left;
 
             const isLabel = findLimitLabelAtPosition(
                 offsetX,
