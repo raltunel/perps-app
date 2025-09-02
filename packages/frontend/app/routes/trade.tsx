@@ -1,4 +1,12 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    memo,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useLayoutEffect,
+} from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { Resizable } from 're-resizable';
 import type { NumberSize } from 're-resizable';
@@ -36,6 +44,9 @@ export default function Trade() {
     const { marginBucket } = useUnifiedMarginData();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
+    // add refs near the other refs
+    const lastColHeightRef = useRef<number | null>(null);
+    const lastWinInnerHeightRef = useRef<number>(window.innerHeight);
 
     const {
         orderBookMode,
@@ -43,6 +54,8 @@ export default function Trade() {
         setChartTopHeight,
         resetLayoutHeights,
     } = useAppSettings();
+
+    const resizeRafId = useRef<number | null>(null);
 
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
@@ -61,24 +74,15 @@ export default function Trade() {
         positions: false,
     });
 
-    useEffect(() => {
-        const checkIfMobile = () => {
-            if (window.innerWidth <= 768 !== isMobile) {
-                setIsMobile(window.innerWidth <= 768);
-            }
-        };
-        checkIfMobile();
-        let resizeTimer: NodeJS.Timeout | undefined;
-        const handleResize = () => {
-            if (resizeTimer) clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(checkIfMobile, 100);
-        };
-        window.addEventListener('resize', handleResize, { passive: true });
-        return () => {
-            clearTimeout(resizeTimer);
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [isMobile]);
+    useLayoutEffect(() => {
+        const mq = window.matchMedia('(max-width: 768px)');
+        const update = () => setIsMobile(mq.matches);
+
+        update();
+
+        mq.addEventListener('change', update);
+        return () => mq.removeEventListener('change', update);
+    }, []);
 
     const switchTab = useCallback(
         (tab: TabType) => {
@@ -142,6 +146,13 @@ export default function Trade() {
     );
     const startHeightRef = useRef(chartTopHeight);
     const [maxTop, setMaxTop] = useState<number>(Infinity);
+    const userRatioRef = useRef<number | null>(null);
+    const hasUserOverrideRef = useRef<boolean>(false);
+
+    const chartTopHeightRef = useRef<number>(chartTopHeight);
+    useEffect(() => {
+        chartTopHeightRef.current = chartTopHeight;
+    }, [chartTopHeight]);
 
     const setHeightBoth = (h: number) => {
         setChartTopHeightLocal(h);
@@ -166,6 +177,14 @@ export default function Trade() {
         const n = parseFloat(raw);
         return Number.isFinite(n) ? n : 8;
     };
+    // calculates available height in left column
+    const getAvailable = () => {
+        const col = leftColRef.current;
+        if (!col) return null;
+        const gap = getGap();
+        const total = col.clientHeight;
+        return Math.max(0, total - gap);
+    };
 
     // Compute default from layout
     const setDefaultFromLayout = useCallback(() => {
@@ -175,61 +194,111 @@ export default function Trade() {
         const gap = getGap();
         const total = col.clientHeight;
 
+        // Keep table at TABLE_DEFAULT px in default mode
         const top = Math.max(CHART_MIN, total - TABLE_DEFAULT - gap);
+
+        // LOCAL update only
         setChartTopHeightLocal(top);
-        setChartTopHeight(top);
 
         const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
         setMaxTop(max);
-    }, [setChartTopHeight]);
+    }, [setChartTopHeightLocal]);
 
     // On mount / when store changes:
+    // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
         const col = leftColRef.current;
         if (!col) return;
 
         const gap = getGap();
         const total = col.clientHeight;
+        const available = Math.max(0, total - gap);
         const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
         setMaxTop(max);
 
         if (storedHeight == null) {
-            // if no user override, compute from layout
+            // DEFAULT MODE: no user override, no persistence, no ratio
+            hasUserOverrideRef.current = false;
+            userRatioRef.current = null;
             requestAnimationFrame(setDefaultFromLayout);
         } else {
-            // clamp the stored value to current bounds
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
             setChartTopHeightLocal(clamped);
             if (clamped !== storedHeight) setChartTopHeight(clamped);
+
+            hasUserOverrideRef.current = true;
+            userRatioRef.current = available > 0 ? clamped / available : null;
         }
     }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
 
     // Recompute (or clamp) when the left column resizes
+    // Recompute (or clamp) only when HEIGHT changes
+    // Recompute (or clamp) when the left column (re)mounts or resizes.
+    // We rebind when mobile/desktop toggles so we never hold a stale node.
     useEffect(() => {
-        const col = leftColRef.current;
-        if (!col) return;
-        const ro = new ResizeObserver(() => {
+        let raf = 0;
+
+        const apply = () => {
+            const col = leftColRef.current;
+            if (!col) return;
+
             const gap = getGap();
             const total = col.clientHeight;
+            const available = Math.max(0, total - gap);
             const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
             setMaxTop(max);
 
-            if (storedHeight == null) {
-                setDefaultFromLayout();
+            if (
+                hasUserOverrideRef.current &&
+                userRatioRef.current != null &&
+                available > 0
+            ) {
+                const desired = userRatioRef.current * available;
+                const next = Math.max(CHART_MIN, Math.min(desired, max));
+                if (Math.abs(next - (chartTopHeightRef.current ?? 0)) > 0.5) {
+                    setChartTopHeightLocal(next);
+                    chartTopHeightRef.current = next;
+                }
             } else {
-                setChartTopHeightLocal((h) =>
-                    Math.min(Math.max(h, CHART_MIN), max),
+                const topByDefault = Math.max(
+                    CHART_MIN,
+                    total - TABLE_DEFAULT - gap,
                 );
+                const next = Math.min(topByDefault, max);
+                if (Math.abs(next - (chartTopHeightRef.current ?? 0)) > 0.5) {
+                    setChartTopHeightLocal(next);
+                    chartTopHeightRef.current = next;
+                }
             }
-        });
-        ro.observe(col);
-        return () => ro.disconnect();
-    }, [storedHeight, setDefaultFromLayout]);
+        };
+
+        const schedule = () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(apply);
+        };
+
+        const ro = new ResizeObserver(schedule);
+        const el = leftColRef.current;
+        if (el) ro.observe(el);
+
+        window.addEventListener('resize', schedule, { passive: true });
+
+        // run once after (re)binding
+        schedule();
+
+        return () => {
+            if (raf) cancelAnimationFrame(raf);
+            ro.disconnect();
+            window.removeEventListener('resize', schedule);
+        };
+    }, [isMobile]); // <— rebind when going in/out of mobile
 
     //  listen for global reset event
     useEffect(() => {
         const handler = () => {
-            resetLayoutHeights();
+            resetLayoutHeights(); // clears store
+            hasUserOverrideRef.current = false;
+            userRatioRef.current = null;
             requestAnimationFrame(setDefaultFromLayout);
         };
         window.addEventListener('trade:resetLayout', handler as EventListener);
@@ -389,7 +458,11 @@ export default function Trade() {
             {symbol && (
                 <div className={styles.containerNew}>
                     {/* LEFT COLUMN */}
-                    <div className={styles.leftCol} ref={leftColRef}>
+                    <div
+                        className={styles.leftCol}
+                        ref={leftColRef}
+                        key={isMobile ? 'm' : 'd'}
+                    >
                         <Resizable
                             size={{ width: '100%', height: chartTopHeight }}
                             minHeight={CHART_MIN}
@@ -402,15 +475,32 @@ export default function Trade() {
                                 startHeightRef.current = chartTopHeight;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
-                                setChartTopHeightLocal(
-                                    clamp(startHeightRef.current + d.height),
+                                const tentative = clamp(
+                                    startHeightRef.current + d.height,
                                 );
+                                setChartTopHeightLocal(tentative);
+
+                                const available = getAvailable();
+                                if (available && available > 0) {
+                                    userRatioRef.current =
+                                        tentative / available;
+                                }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
+
+                                hasUserOverrideRef.current = true;
+
+                                // Persist px to store
                                 setHeightBoth(next);
+
+                                // Capture the user's chosen ratio for future container resizes
+                                const available = getAvailable();
+                                if (available && available > 0) {
+                                    userRatioRef.current = next / available;
+                                }
                             }}
                         >
                             {/* TOP: chart + orderbook. Force 100% to fill Resizable */}
