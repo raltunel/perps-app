@@ -235,6 +235,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         [markPx],
     );
 
+    const maxNotional = MAX_BTC_NOTIONAL;
+
     // fn to execute market close
     async function executeMarketClose(): Promise<void> {
         // Validate position size
@@ -250,10 +252,6 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
 
         setIsProcessingOrder(true);
 
-        const maxNotional = MAX_BTC_NOTIONAL;
-
-        const notionalExceedsMax = notionalSymbolQtyNum > maxNotional;
-
         try {
             // Get order book prices for the closing order
             const closingSide = isPositionLong ? 'sell' : 'buy';
@@ -266,10 +264,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 quantity: isCompleteClose
                     ? isSubminimumClose
                         ? subminimumCloseQty
-                        : Math.min(notionalSymbolQtyNum * 1.01, maxNotional)
-                    : !notionalExceedsMax
-                      ? notionalSymbolQtyNum
-                      : maxNotional,
+                        : Math.min(notionalSymbolQtyNum * 1.01, maxNotional) // add 1% buffer to prevent dust remaining after close, but do not exceed max size
+                    : notionalSymbolQtyNum,
                 side: closingSide,
                 leverage: position.leverage?.value,
                 bestBidPrice: closingSide === 'sell' ? bestBidPrice : undefined,
