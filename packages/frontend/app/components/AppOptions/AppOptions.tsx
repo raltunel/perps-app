@@ -15,6 +15,17 @@ import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
 
+const languages = [
+    {
+        text: 'English (US) 🇺🇸',
+        value: 'en',
+    },
+    {
+        text: 'French 🇫🇷',
+        value: 'fr',
+    },
+];
+
 export interface appOptionDataIF {
     slug: appOptions;
     text: string;
@@ -22,8 +33,15 @@ export interface appOptionDataIF {
 
 export default function AppOptions() {
     const activeOptions: useAppOptionsIF = useAppOptions();
-    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
-        useAppSettings();
+    const {
+        numFormat,
+        setNumFormat,
+        bsColor,
+        setBsColor,
+        getBsColor,
+        lang2,
+        setLang2,
+    } = useAppSettings();
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -159,6 +177,20 @@ export default function AppOptions() {
                         },
                     )}
                 />
+                <OptionLineSelect
+                    text='Language'
+                    active={
+                        <div>
+                            {languages.find((l) => l.value === lang2)?.text}
+                        </div>
+                    }
+                    options={languages.map((lang) => {
+                        return {
+                            readable: <div>{lang.text}</div>,
+                            set: () => setLang2(lang.value),
+                        };
+                    })}
+                />
             </ul>
             <div
                 className={styles.apply_defaults}
@@ -166,6 +198,7 @@ export default function AppOptions() {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
+                    setLang2('en');
                     useAppSettings.getState().resetLayoutHeights();
                     if (typeof plausible === 'function') {
                         plausible('Trade Table Resize', {
