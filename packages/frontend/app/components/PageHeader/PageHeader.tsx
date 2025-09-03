@@ -39,9 +39,19 @@ export default function PageHeader() {
     const userDataStore = useUserDataStore();
     useEffect(() => {
         const REFERRAL_CODE_URL_PARAM = 'referral';
-        const referralCode = searchParams.get(REFERRAL_CODE_URL_PARAM);
+        const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
+        const referralCode =
+            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
+            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
         if (referralCode) {
             userDataStore.setReferralCode(referralCode);
+            const newSearchParams = new URLSearchParams(
+                searchParams.toString(),
+            );
+            newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
+            newSearchParams.delete(ALTERNATE_REFERRAL_CODE_URL_PARAM);
+            const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
+            window.history.replaceState({}, '', newUrl); // remove referral code from URL
         }
     }, [searchParams]);
 
