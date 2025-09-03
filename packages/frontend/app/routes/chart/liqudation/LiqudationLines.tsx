@@ -37,7 +37,8 @@ const LiqudationLines = ({
                 .value((d: any) => d.yPrice)
                 .yScale(scaleData?.yScale)
                 .xScale(dummyXScale)
-                .orient('horizontal');
+                .orient('horizontal')
+                .label('');
 
             horizontalLine.decorate(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -69,6 +70,19 @@ const LiqudationLines = ({
             // });
         }
     }, [scaleData, canvasSize === undefined]);
+
+    // Update scale range on canvas size change
+    useEffect(() => {
+        if (scaleData !== undefined && canvasSize && horizontalLine) {
+            const dummyXScale = d3
+                .scaleLinear()
+                .domain([0, 1])
+                .range([0, canvasSize.width]);
+
+            horizontalLine.yScale(scaleData.yScale);
+            horizontalLine.xScale(dummyXScale);
+        }
+    }, [scaleData, canvasSize]);
 
     useEffect(() => {
         if (overlayCanvasRef.current && horizontalLine) {
