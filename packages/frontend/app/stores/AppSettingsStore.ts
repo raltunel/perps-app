@@ -52,6 +52,9 @@ type AppSettingsStore = {
     chartTopHeight: number | null;
     setChartTopHeight: (h: number | null) => void;
     resetLayoutHeights: () => void;
+
+    lang2: string;
+    setLang2: (l: string) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
@@ -78,6 +81,9 @@ export const useAppSettings = create<AppSettingsStore>()(
             setChartTopHeight: (h) => set({ chartTopHeight: h }),
             resetLayoutHeights: () =>
                 set({ chartTopHeight: DEFAULT_CHART_TOP_HEIGHT }),
+
+            lang2: 'en',
+            setLang2: (l: string) => set({ lang2: l }),
         }),
         {
             name: LS_KEY,
@@ -87,6 +93,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,
                 lang: state.lang,
+                lang2: state.lang2,
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
             }),
