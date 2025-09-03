@@ -25,7 +25,8 @@ export const useUserDataStore = create<UserDataStore>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
-            partialize: (state) => ({
+            version: 1,
+            partialize: (state: UserDataStore) => ({
                 referralCode: state.referralCode,
             }),
         },
