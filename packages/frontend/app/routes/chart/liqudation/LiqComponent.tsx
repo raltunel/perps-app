@@ -20,17 +20,17 @@ const LiqComponent = ({
 }: LiqProps) => {
     return (
         <>
-            <LiqudationLines
-                canvasSize={canvasSize}
-                overlayCanvasRef={overlayCanvasRef}
-                canvasWrapperRef={canvasWrapperRef}
-                scaleData={scaleData}
-                zoomChanged={zoomChanged}
-            />
             <LiqLineTooltip
                 canvasSize={canvasSize}
                 canvasWrapperRef={canvasWrapperRef}
                 overlayCanvasRef={overlayCanvasRef}
+                scaleData={scaleData}
+                zoomChanged={zoomChanged}
+            />
+            <LiqudationLines
+                canvasSize={canvasSize}
+                overlayCanvasRef={overlayCanvasRef}
+                canvasWrapperRef={canvasWrapperRef}
                 scaleData={scaleData}
                 zoomChanged={zoomChanged}
             />

@@ -2,6 +2,10 @@ import { useCallback, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import type { LiqProps } from './LiqComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useLiqudationLines } from './hooks/useLiquidationLines';
+import { getPaneCanvasAndIFrameDoc } from '../overlayCanvas/overlayCanvasUtils';
+import useNumFormatter from '~/hooks/useNumFormatter';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 const LiqLineTooltip = ({
     overlayCanvasRef,
@@ -15,37 +19,78 @@ const LiqLineTooltip = ({
 
     const { chart } = useTradingView();
 
-    const mousemove = useCallback((offsetX: number, offsetY: number) => {
-        // Fill and place tooltip
-        if (!liqLineTooltipRef.current) return;
+    const lines = useLiqudationLines();
 
-        liqLineTooltipRef.current.html(
-            '<p>' +
-                23 + // formatNum(percentage) +
-                '%</p>' +
-                '<p>' +
-                55 + // formatNum(price, 2) +
-                ' </p>',
-        );
+    const { bsColor, getBsColor } = useAppSettings();
 
-        // const width = liqLineTooltipRef.current
-        //     .node()
-        //     .getBoundingClientRect().width;
+    const { formatNum } = useNumFormatter();
 
-        // const height = liqLineTooltipRef.current
-        //     .node()
-        //     .getBoundingClientRect().height;
+    const checkLines = useCallback(
+        (offsetX: number, offsetY: number) => {
+            if (!lines?.length || !scaleData?.yScale) return null;
 
-        // const horizontal = offsetX - width / 2;
-        // const vertical = offsetY - (height + 10);
+            const tolerance = 10; // pixels
 
-        liqLineTooltipRef.current
-            .style('visibility', 'visible')
-            .style('top', offsetY + 'px')
-            .style('left', offsetX + 'px');
+            for (const line of lines) {
+                const y = scaleData.yScale(line.yPrice);
 
-        // highlightHoveredArea.current = true;
-    }, []);
+                if (Math.abs(y - offsetY) <= tolerance) {
+                    return line;
+                }
+            }
+
+            return null;
+        },
+        [lines, scaleData],
+    );
+
+    const mousemove = useCallback(
+        (offsetX: number, offsetY: number) => {
+            // Fill and place tooltip
+            if (!liqLineTooltipRef.current) return;
+            if (!scaleData || !scaleData.yScale) return;
+            if (chart === null) return;
+
+            const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+
+            if (!paneCanvas) return;
+
+            const rect = paneCanvas?.getBoundingClientRect();
+
+            const cssOffsetX = offsetX - rect.left;
+            const cssOffsetY = offsetY - rect.top;
+
+            const placedLine = checkLines(cssOffsetX, cssOffsetY);
+
+            if (!placedLine) {
+                liqLineTooltipRef.current.style('visibility', 'hidden');
+                return;
+            }
+
+            const buyColor = getBsColor().buy;
+            const sellColor = getBsColor().sell;
+
+            // formatNum(percentage) +
+            liqLineTooltipRef.current.html(
+                `<p style="color:var(--text3, #88888f)"> ${
+                    placedLine.type === 'buy' ? 'Long ' : 'Short '
+                } Liquidations </p>` +
+                    `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
+                    `<p style="color: var(--text2, #bcbcc4)"> Volume: 1,23 TKN </p>` +
+                    `<p style="color: var(--text3, #88888f)"> Address: 0x6587... </p>`,
+            );
+
+            const horizontal = cssOffsetX + 10;
+
+            liqLineTooltipRef.current
+                .style('visibility', 'visible')
+                .style('top', cssOffsetY + 'px')
+                .style('left', horizontal + 'px');
+
+            // highlightHoveredArea.current = true;
+        },
+        [lines, scaleData],
+    );
 
     useEffect(() => {
         if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
@@ -73,21 +118,26 @@ const LiqLineTooltip = ({
                 .select(canvasWrapperRef.current)
                 .append('div')
                 .attr('class', 'liqLineTooltip')
+                .style('z-index', '10')
                 .style('position', 'absolute')
-                .style('text-align', 'center')
-                .style('align-items', 'center')
-                .style('background', 'red')
-                .style('padding', '3px')
-                .style('font-size', 'small')
+                .style('text-align', 'start')
+                .style('align-items', 'start')
+                .style('padding', '10px 14px')
+                .style('line-height', '1.4')
+                .style('font-size', '16px')
                 .style('pointer-events', 'none')
-                .style('width', '50px')
-                .style('height', '50px')
-                .style('background', 'white')
+                .style('background', 'var(--bg-dark2, #111117)')
+                .style('border-radius', 'var(--radius-s, 4px)')
+                .style('border', '1px solid var(--bg-dark6, #3e3e42)')
                 .style('visibility', 'hidden');
 
             liqLineTooltipRef.current = liqLineTooltip;
         }
-    }, [overlayCanvasRef.current === null, canvasWrapperRef.current === null]);
+    }, [
+        chart,
+        overlayCanvasRef.current === null,
+        canvasWrapperRef.current === null,
+    ]);
 
     return null;
 };

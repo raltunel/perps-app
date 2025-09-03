@@ -4,7 +4,7 @@ import styles from './LiquidationsChartSection.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
-import LiquidationsChart from './LiqChar';
+import LiquidationsChart from './LiquidationOBChart';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
