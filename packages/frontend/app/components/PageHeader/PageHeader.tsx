@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useSearchParams } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -33,6 +33,10 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 
 export default function PageHeader() {
+    const REFERRAL_CODE_URL_PARAM = 'referral';
+    const [searchParams] = useSearchParams();
+    console.log(searchParams.get(REFERRAL_CODE_URL_PARAM));
+
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
