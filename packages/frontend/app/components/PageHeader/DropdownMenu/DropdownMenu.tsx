@@ -54,7 +54,7 @@ const DropdownMenu = ({ setIsDropdownMenuOpen }: DropdownMenuProps) => {
                     onClick={() => {
                         window.open(item.url, '_blank');
                         if (typeof plausible === 'function') {
-                            plausible('external-link-click', {
+                            plausible('External Link Clicked', {
                                 props: {
                                     linkType: item.name,
                                 },
