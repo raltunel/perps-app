@@ -31,11 +31,19 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
+import { useUserDataStore } from '~/stores/UserDataStore';
 
 export default function PageHeader() {
-    const REFERRAL_CODE_URL_PARAM = 'referral';
+    // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
-    console.log(searchParams.get(REFERRAL_CODE_URL_PARAM));
+    const userDataStore = useUserDataStore();
+    useEffect(() => {
+        const REFERRAL_CODE_URL_PARAM = 'referral';
+        const referralCode = searchParams.get(REFERRAL_CODE_URL_PARAM);
+        if (referralCode) {
+            userDataStore.setReferralCode(referralCode);
+        }
+    }, [searchParams]);
 
     const sessionState = useSession();
 
