@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface UserDataStore {
     userAddress: string;
@@ -8,12 +9,22 @@ export interface UserDataStore {
     clearReferralCode: () => void;
 }
 
-export const useUserDataStore = create<UserDataStore>((set) => ({
-    userAddress: '',
-    setUserAddress: (userAddress: string) => {
-        set({ userAddress });
-    },
-    referralCode: '',
-    setReferralCode: (r: string) => set({ referralCode: r }),
-    clearReferralCode: () => set({ referralCode: '' }),
-}));
+const LS_KEY = 'USER_DATA';
+
+export const useUserDataStore = create<UserDataStore>()(
+    persist(
+        (set) => ({
+            userAddress: '',
+            setUserAddress: (userAddress: string) => {
+                set({ userAddress });
+            },
+            referralCode: '',
+            setReferralCode: (r: string) => set({ referralCode: r }),
+            clearReferralCode: () => set({ referralCode: '' }),
+        }),
+        {
+            name: LS_KEY,
+            storage: createJSONStorage(() => localStorage),
+        },
+    ),
+);
