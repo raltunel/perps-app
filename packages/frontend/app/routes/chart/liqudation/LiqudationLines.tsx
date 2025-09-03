@@ -15,6 +15,7 @@ export type HorizontalLineData = {
 
 const LiqudationLines = ({
     overlayCanvasRef,
+    canvasWrapperRef,
     canvasSize,
     scaleData,
     zoomChanged,
