@@ -9,7 +9,8 @@
         "close": "Cerrar",
         "loading": "Cargando...",
         "error": "Error",
-        "success": "Éxito"
+        "success": "Éxito",
+        "applyDefaults": "Aplicar Predeterminados"
     },
     "navigation": {
         "home": "Inicio",

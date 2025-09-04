@@ -38,7 +38,7 @@ export default function AppOptions() {
         lang2,
         setLang2,
     } = useAppSettings();
-    const { i18n, ready } = useTranslation();
+    const { i18n, t, ready } = useTranslation();
 
     // if (ready) console.log(i18n.resolvedLanguage);
 
@@ -214,7 +214,7 @@ export default function AppOptions() {
                     }
                 }}
             >
-                Apply Defaults
+                {t('common.applyDefaults')}
             </div>
 
             {/* <div

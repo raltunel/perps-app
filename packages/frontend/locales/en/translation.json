@@ -9,7 +9,8 @@
         "close": "Close",
         "loading": "Loading...",
         "error": "Error",
-        "success": "Success"
+        "success": "Success",
+        "applyDefaults": "Apply Defaults"
     },
     "navigation": {
         "home": "Home",
