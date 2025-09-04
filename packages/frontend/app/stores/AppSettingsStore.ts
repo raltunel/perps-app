@@ -1,11 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import {
-    Langs,
-    NumFormatTypes,
-    type LangType,
-    type NumFormat,
-} from '~/utils/Constants';
+import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 
 type bsColors = `#${string}`;
 
@@ -42,9 +37,6 @@ type AppSettingsStore = {
     setNumFormat: (numFormat: NumFormat) => void;
     getNumFormat: () => NumFormat;
 
-    lang: LangType;
-    setLang: (lang: LangType) => void;
-
     bsColor: colorSetNames;
     setBsColor: (c: colorSetNames) => void;
     getBsColor: () => colorSetIF;
@@ -52,9 +44,6 @@ type AppSettingsStore = {
     chartTopHeight: number | null;
     setChartTopHeight: (h: number | null) => void;
     resetLayoutHeights: () => void;
-
-    lang2: string;
-    setLang2: (l: string) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
@@ -70,9 +59,6 @@ export const useAppSettings = create<AppSettingsStore>()(
             setNumFormat: (numFormat) => set({ numFormat }),
             getNumFormat: () => get().numFormat,
 
-            lang: Langs[0],
-            setLang: (lang) => set({ lang }),
-
             bsColor: 'default',
             setBsColor: (c) => set({ bsColor: c }),
             getBsColor: () => bsColorSets[get().bsColor],
@@ -81,9 +67,6 @@ export const useAppSettings = create<AppSettingsStore>()(
             setChartTopHeight: (h) => set({ chartTopHeight: h }),
             resetLayoutHeights: () =>
                 set({ chartTopHeight: DEFAULT_CHART_TOP_HEIGHT }),
-
-            lang2: 'en',
-            setLang2: (l: string) => set({ lang2: l }),
         }),
         {
             name: LS_KEY,
@@ -92,8 +75,6 @@ export const useAppSettings = create<AppSettingsStore>()(
             partialize: (state) => ({
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,
-                lang: state.lang,
-                lang2: state.lang2,
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
             }),

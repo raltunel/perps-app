@@ -15,7 +15,6 @@ import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
 
 const languageOptions = {
     en: 'English 🇺🇸',
@@ -29,20 +28,9 @@ export interface appOptionDataIF {
 
 export default function AppOptions() {
     const activeOptions: useAppOptionsIF = useAppOptions();
-    const {
-        numFormat,
-        setNumFormat,
-        bsColor,
-        setBsColor,
-        getBsColor,
-        lang2,
-        setLang2,
-    } = useAppSettings();
-    const { i18n, t, ready } = useTranslation();
-
-    // if (ready) console.log(i18n.resolvedLanguage);
-
-    useEffect(() => console.log(ready, i18n.resolvedLanguage), [ready]);
+    const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
+        useAppSettings();
+    const { i18n, t } = useTranslation();
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
@@ -203,7 +191,6 @@ export default function AppOptions() {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
-                    setLang2('en');
                     useAppSettings.getState().resetLayoutHeights();
                     if (typeof plausible === 'function') {
                         plausible('Trade Table Resize', {
