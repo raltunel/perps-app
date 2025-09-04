@@ -4,7 +4,10 @@ import * as d3fc from 'd3fc';
 import * as d3 from 'd3';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
 import type { IPaneApi } from '~/tv/charting_library';
-import { getMainSeriesPaneIndex } from '../overlayCanvas/overlayCanvasUtils';
+import {
+    getMainSeriesPaneIndex,
+    updateOverlayCanvasSize,
+} from '../overlayCanvas/overlayCanvasUtils';
 import { useTradingView } from '~/contexts/TradingviewContext';
 
 export type HorizontalLineData = {
@@ -18,7 +21,6 @@ export type HorizontalLineData = {
 
 const LiqudationLines = ({
     overlayCanvasRef,
-    canvasWrapperRef,
     canvasSize,
     scaleData,
     zoomChanged,
@@ -137,6 +139,8 @@ const LiqudationLines = ({
             const priceScale = priceScalePane.getMainSourcePriceScale();
 
             const render = () => {
+                updateOverlayCanvasSize(canvas, canvasSize);
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 if (priceScale) {
@@ -176,6 +180,7 @@ const LiqudationLines = ({
         JSON.stringify(lines),
         JSON.stringify(scaleData?.yScale.domain()),
         zoomChanged,
+        canvasSize,
     ]);
 
     return null;

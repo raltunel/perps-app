@@ -16,6 +16,7 @@ import {
     getMainSeriesPaneIndex,
     getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
+    updateOverlayCanvasSize,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
 import {
@@ -143,30 +144,15 @@ const LabelComponent = ({
         let animationFrameId: number | null = null;
 
         const draw = () => {
-            let heightAttr = canvasSize?.height;
-            let widthAttr = canvasSize?.width;
+            const heightAttr = canvasSize?.height;
+            const widthAttr = canvasSize?.width;
 
             if (overlayCanvasRef.current) {
+                updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
                 const { iframeDoc, paneCanvas } =
                     getPaneCanvasAndIFrameDoc(chart);
 
                 if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
-
-                const width = overlayCanvasRef.current.style.width;
-                const height = overlayCanvasRef.current.style?.height;
-
-                heightAttr = paneCanvas?.height;
-                widthAttr = paneCanvas.width;
-
-                if (
-                    width !== canvasSize?.styleWidth ||
-                    height !== canvasSize?.styleWidth
-                ) {
-                    overlayCanvasRef.current.style.width = `${canvasSize?.styleWidth}px`;
-                    overlayCanvasRef.current.style.height = `${canvasSize?.styleHeight}px`;
-                    overlayCanvasRef.current.width = paneCanvas.width;
-                    overlayCanvasRef.current.height = paneCanvas.height;
-                }
             }
             drawnLabelsRef.current.map((i) => {
                 const data = i.labelLocations;
@@ -592,7 +578,7 @@ const LabelComponent = ({
         const handleDragging = (event: any) => {
             const { offsetY: clientY } = getXandYLocationForChartDrag(
                 event,
-                canvas.getBoundingClientRect(),
+                dpr,
             );
 
             let advancedValue = scaleData?.yScale.invert(clientY);
