@@ -1,0 +1,47 @@
+{
+    "common": {
+        "yes": "Sí",
+        "no": "No",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "close": "Cerrar",
+        "loading": "Cargando...",
+        "error": "Error",
+        "success": "Éxito"
+    },
+    "navigation": {
+        "home": "Inicio",
+        "about": "Acerca de",
+        "contact": "Contacto",
+        "settings": "Configuración",
+        "profile": "Perfil",
+        "logout": "Cerrar sesión"
+    },
+    "auth": {
+        "login": "Iniciar sesión",
+        "register": "Registrarse",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "forgotPassword": "¿Olvidaste tu contraseña?",
+        "loginSuccess": "Inicio de sesión exitoso",
+        "loginError": "Credenciales inválidas"
+    },
+    "forms": {
+        "name": "Nombre",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "phone": "Teléfono",
+        "address": "Dirección",
+        "submit": "Enviar",
+        "required": "Este campo es obligatorio"
+    },
+    "messages": {
+        "welcome": "Bienvenido",
+        "hello": "¡Hola {{name}}!",
+        "goodbye": "Adiós",
+        "thankYou": "Gracias",
+        "pleaseWait": "Por favor espera..."
+    }
+}

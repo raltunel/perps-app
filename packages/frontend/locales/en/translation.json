@@ -1,0 +1,47 @@
+{
+    "common": {
+        "yes": "Yes",
+        "no": "No",
+        "cancel": "Cancel",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "close": "Close",
+        "loading": "Loading...",
+        "error": "Error",
+        "success": "Success"
+    },
+    "navigation": {
+        "home": "Home",
+        "about": "About",
+        "contact": "Contact",
+        "settings": "Settings",
+        "profile": "Profile",
+        "logout": "Logout"
+    },
+    "auth": {
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "forgotPassword": "Forgot Password?",
+        "loginSuccess": "Login successful",
+        "loginError": "Invalid credentials"
+    },
+    "forms": {
+        "name": "Name",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "address": "Address",
+        "submit": "Submit",
+        "required": "This field is required"
+    },
+    "messages": {
+        "welcome": "Welcome",
+        "hello": "Hello {{name}}!",
+        "goodbye": "Goodbye",
+        "thankYou": "Thank you",
+        "pleaseWait": "Please wait..."
+    }
+}
