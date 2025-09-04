@@ -356,9 +356,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         );
                         if (resolution) {
                             if (typeof plausible === 'function') {
-                                plausible('Orderbook Resolution Update', {
+                                plausible('Resolution Update', {
                                     props: {
-                                        orderbookResolution: resolution.val,
+                                        resolutionType: 'orderbook',
+                                        resolution: resolution.val,
                                     },
                                 });
                             }
