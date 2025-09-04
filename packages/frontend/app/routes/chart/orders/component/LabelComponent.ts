@@ -149,10 +149,6 @@ const LabelComponent = ({
 
             if (overlayCanvasRef.current) {
                 updateOverlayCanvasSize(overlayCanvasRef.current, canvasSize);
-                const { iframeDoc, paneCanvas } =
-                    getPaneCanvasAndIFrameDoc(chart);
-
-                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
             }
             drawnLabelsRef.current.map((i) => {
                 const data = i.labelLocations;
