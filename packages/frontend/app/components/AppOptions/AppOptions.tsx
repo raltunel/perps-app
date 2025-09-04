@@ -17,16 +17,10 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 
-const languages = [
-    {
-        text: 'English (US) 🇺🇸',
-        value: 'en',
-    },
-    {
-        text: 'French 🇫🇷',
-        value: 'fr',
-    },
-];
+const languageOptions = {
+    en: 'English 🇺🇸',
+    es: 'Español 🇪🇸',
+};
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -188,15 +182,19 @@ export default function AppOptions() {
                     text='Language'
                     active={
                         <div>
-                            {languages.find((l) => l.value === lang2)?.text}
+                            {languageOptions[
+                                i18n?.resolvedLanguage as keyof typeof languageOptions
+                            ] ?? languageOptions.en}
                         </div>
                     }
-                    options={languages.map((lang) => {
-                        return {
-                            readable: <div>{lang.text}</div>,
-                            set: () => setLang2(lang.value),
-                        };
-                    })}
+                    options={Object.entries(languageOptions).map(
+                        (lang: [string, string]) => {
+                            return {
+                                readable: <div>{lang[1]}</div>,
+                                set: () => i18n.changeLanguage(lang[0]),
+                            };
+                        },
+                    )}
                 />
             </ul>
             <div
