@@ -179,9 +179,12 @@ export const USER_WS_ENDPOINT =
 export const blockExplorer =
     import.meta.env.VITE_BLOCK_EXPLORER || 'https://fogoscan.com';
 
-export const RPC_ENDPOINT =
-    import.meta.env.VITE_RPC_ENDPOINT || 'https://testnet.fogo.io';
+// export const RPC_ENDPOINT =
+//     import.meta.env.VITE_RPC_ENDPOINT || 'https://testnet.fogo.io';
 
+export const RPC_ENDPOINT =
+    import.meta.env.VITE_RPC_ENDPOINT ||
+    'https://paymaster.fogo.io/api/sponsor_pubkey?domain=https://perps.ambient.finance';
 // Market Order Constants
 /**
  * Price offset for market orders in USD.
