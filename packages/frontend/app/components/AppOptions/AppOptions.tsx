@@ -14,6 +14,8 @@ import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
+import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 
 const languages = [
     {
@@ -42,6 +44,11 @@ export default function AppOptions() {
         lang2,
         setLang2,
     } = useAppSettings();
+    const { i18n, ready } = useTranslation();
+
+    // if (ready) console.log(i18n.resolvedLanguage);
+
+    useEffect(() => console.log(ready, i18n.resolvedLanguage), [ready]);
 
     // !important:  this file instantiates children directly instead of using
     // !important:  ... .map() functions so we can easily mix different types
