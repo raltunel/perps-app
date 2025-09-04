@@ -74,6 +74,9 @@ const LabelComponent = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLine, setHorizontalLine] = useState<any>();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
+
     const [isDrag, setIsDrag] = useState(false);
 
     useEffect(() => {
@@ -89,9 +92,30 @@ const LabelComponent = ({
                 .value((d: any) => d.yPrice)
                 .yScale(scaleData?.yScale)
                 .xScale(dummyXScale)
-                .orient('horizontal');
-
+                .orient('horizontal')
+                .label('');
             horizontalLine.decorate(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (context: CanvasRenderingContext2D, d: any) => {
+                    context.strokeStyle = d.color;
+                    context.fillStyle = d.color;
+                    context.lineWidth = d.lineWidth;
+                    if (d.dash) {
+                        context.setLineDash(d.dash);
+                    }
+                },
+            );
+
+            const horizontalLineLogScale = d3fc
+                .annotationCanvasLine()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .value((d: any) => d.yPrice)
+                .yScale(scaleData?.scaleSymlog)
+                .xScale(dummyXScale)
+                .orient('horizontal')
+                .label('');
+
+            horizontalLineLogScale.decorate(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (context: CanvasRenderingContext2D, d: any) => {
                     context.strokeStyle = d.color;
@@ -105,6 +129,10 @@ const LabelComponent = ({
 
             setHorizontalLine(() => {
                 return horizontalLine;
+            });
+
+            setHorizontalLineLogScale(() => {
+                return horizontalLineLogScale;
             });
         }
     }, [scaleData, canvasSize === undefined, isChartReady]);
@@ -147,9 +175,23 @@ const LabelComponent = ({
                 });
             });
 
-            if (horizontalLine) {
-                horizontalLine.context(ctx);
-                horizontalLine(lines);
+            const paneIndex = getMainSeriesPaneIndex(chart);
+            if (paneIndex === null)
+                return { pixel: 0, chartHeight: 0, textHeight: 0 };
+            const priceScalePane = chart.activeChart().getPanes()[
+                paneIndex
+            ] as IPaneApi;
+            const priceScale = priceScalePane.getMainSourcePriceScale();
+            if (priceScale) {
+                const isLogarithmic = priceScale.getMode() === 1;
+
+                if (horizontalLineLogScale && isLogarithmic) {
+                    horizontalLineLogScale.context(ctx);
+                    horizontalLineLogScale(lines);
+                } else if (horizontalLine) {
+                    horizontalLine.context(ctx);
+                    horizontalLine(lines);
+                }
             }
             const linesWithLabels = lines.map((line) => {
                 const yPricePixel = getPricetoPixel(
@@ -251,6 +293,8 @@ const LabelComponent = ({
         canvasSize,
         selectedLine,
         horizontalLine,
+        horizontalLineLogScale,
+        scaleData?.yScale.domain(),
     ]);
 
     useLayoutEffect(() => {
@@ -522,12 +566,13 @@ const LabelComponent = ({
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
         let originalPrice: number | undefined = undefined;
+        const dpr = window.devicePixelRatio || 1;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
             const rect = canvas.getBoundingClientRect();
-            const offsetY = event.sourceEvent.clientY - rect?.top;
-            const offsetX = event.sourceEvent.clientX - rect?.left;
+            const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
+            const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
 
             const isLabel = findLimitLabelAtPosition(
                 offsetX,

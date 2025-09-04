@@ -158,7 +158,6 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         canvas.addEventListener('mousemove', handleMouseMove);
 
         const updateCanvasSize = () => {
-            const dpr = window.devicePixelRatio || 1;
             const width = paneCanvas.width;
             const height = paneCanvas?.height;
 
@@ -168,8 +167,8 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             canvas.height = height;
             canvas.style.height = `${height}px`;
 
-            yScale.range([canvas.height * dpr, 0]);
-            scaleSymlog.range([canvas.height * dpr, 0]);
+            yScale.range([canvas.height, 0]);
+            scaleSymlog.range([canvas.height, 0]);
         };
 
         updateCanvasSize();
@@ -177,8 +176,6 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const observer = new ResizeObserver((result: any) => {
             if (result) {
-                const dpr = window.devicePixelRatio || 1;
-
                 setCanvasSize({
                     styleWidth: result[0].contentRect.width,
                     styleHeight: result[0].contentRect?.height,
@@ -186,8 +183,8 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
                     height: paneCanvas?.height,
                 });
 
-                yScale.range([result[0].contentRect?.height * dpr, 0]);
-                scaleSymlog.range([result[0].contentRect?.height * dpr, 0]);
+                yScale.range([result[0].contentRect?.height, 0]);
+                scaleSymlog.range([result[0].contentRect?.height, 0]);
             }
         });
 
@@ -239,7 +236,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         canvasRef.current.style.height = `${height}px`;
 
         scaleDataRef.current.yScale.range([height, 0]);
-        scaleDataRef.current.scaleSymlog.range([width, 0]);
+        scaleDataRef.current.scaleSymlog.range([height, 0]);
     }, [canvasSize]);
 
     return (
