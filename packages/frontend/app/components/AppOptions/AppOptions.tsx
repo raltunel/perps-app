@@ -192,6 +192,20 @@ export default function AppOptions() {
                     setNumFormat(NumFormatTypes[0]);
                     setBsColor('default');
                     useAppSettings.getState().resetLayoutHeights();
+
+                    // reset language to browser default or English if unsupported
+                    const browserLanguages = navigator.languages || [
+                        navigator.language,
+                    ];
+                    const supportedLanguages = Object.keys(languageOptions); // ['en', 'es']
+                    const defaultLanguage =
+                        browserLanguages
+                            .map((lang) => lang.split('-')[0]) // Convert 'en-US' to 'en'
+                            .find((lang) =>
+                                supportedLanguages.includes(lang),
+                            ) || 'en';
+                    i18n.changeLanguage(defaultLanguage);
+
                     if (typeof plausible === 'function') {
                         plausible('Trade Table Resize', {
                             props: {
