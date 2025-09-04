@@ -26,4 +26,10 @@ i18n.use(LanguageDetector)
         },
     });
 
+i18n.on('languageChanged', (lng: string) => {
+    console.debug('Language changed to: ', lng);
+    console.debug('Resolved language: ', i18n.resolvedLanguage);
+    console.debug('Available languages: ', Object.keys(resources));
+});
+
 export default i18n;
