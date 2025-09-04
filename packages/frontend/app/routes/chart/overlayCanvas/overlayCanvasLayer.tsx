@@ -15,6 +15,7 @@ interface OverlayCanvasLayerProps {
     pointerEvents?: 'none' | 'auto';
     children: (props: {
         canvasRef: React.RefObject<HTMLCanvasElement | null>;
+        canvasWrapperRef: React.RefObject<HTMLDivElement | null>;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         canvasSize: any;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -31,6 +32,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     children,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const canvasWrapperRef = useRef<HTMLDivElement | null>(null);
     const { chart, isChartReady } = useTradingView();
 
     const [isPaneChanged, setIsPaneChanged] = useState(false);
@@ -132,6 +134,18 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
 
         if (!canvasRef.current) {
+            const wrapper = iframeDoc.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.width = paneCanvas.width + 'px';
+            wrapper.style.height = paneCanvas.height + 'px';
+            wrapper.style.pointerEvents = pointerEvents;
+            wrapper.style.zIndex = zIndex.toString();
+            wrapper.style.top = '0';
+            wrapper.style.left = '0';
+            wrapper.id = id + '-wrapper';
+
+            paneCanvas.parentNode.appendChild(wrapper);
+
             const newCanvas = iframeDoc.createElement('canvas');
             newCanvas.id = id;
             newCanvas.style.position = 'absolute';
@@ -142,8 +156,10 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             newCanvas.style.zIndex = zIndex.toString();
             newCanvas.width = paneCanvas.width;
             newCanvas.height = paneCanvas.height;
-            paneCanvas.parentNode.appendChild(newCanvas);
+            wrapper.appendChild(newCanvas);
+
             canvasRef.current = newCanvas;
+            canvasWrapperRef.current = wrapper;
         }
 
         const canvas = canvasRef.current;
@@ -221,6 +237,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
     useEffect(() => {
         if (
+            canvasWrapperRef.current === null ||
             canvasRef.current === null ||
             canvasSize === undefined ||
             scaleDataRef.current === null
@@ -235,6 +252,10 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         canvasRef.current.height = height;
         canvasRef.current.style.height = `${height}px`;
 
+        canvasWrapperRef.current.style.width = `${width}px`;
+
+        canvasWrapperRef.current.style.height = `${height}px`;
+
         scaleDataRef.current.yScale.range([height, 0]);
         scaleDataRef.current.scaleSymlog.range([height, 0]);
     }, [canvasSize]);
@@ -243,6 +264,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         <>
             {children({
                 canvasRef,
+                canvasWrapperRef,
                 canvasSize: canvasSize,
                 scaleData: scaleDataRef.current,
                 mousePositionRef,
