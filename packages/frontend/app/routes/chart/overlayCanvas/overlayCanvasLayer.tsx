@@ -6,6 +6,7 @@ import {
     getPaneCanvasAndIFrameDoc,
     mousePositionRef,
     scaleDataRef,
+    type CanvasSize,
 } from './overlayCanvasUtils';
 import type { IPaneApi } from '~/tv/charting_library';
 
@@ -44,8 +45,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
     const isZoomingRef = useRef(false);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [canvasSize, setCanvasSize] = useState<any>();
+    const [canvasSize, setCanvasSize] = useState<CanvasSize>();
 
     useEffect(() => {
         if (!chart || !scaleDataRef.current) return;
@@ -118,7 +118,7 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         if (!chart || !isChartReady) return;
 
         const isFirstInit = !scaleDataRef.current;
-
+        const dpr = window.devicePixelRatio || 1;
         if (isFirstInit) {
             const yScale = d3.scaleLinear();
 
@@ -136,8 +136,8 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
         if (!canvasRef.current) {
             const wrapper = iframeDoc.createElement('div');
             wrapper.style.position = 'absolute';
-            wrapper.style.width = paneCanvas.width + 'px';
-            wrapper.style.height = paneCanvas.height + 'px';
+            wrapper.style.width = paneCanvas.width / dpr + 'px';
+            wrapper.style.height = paneCanvas.height / dpr + 'px';
             wrapper.style.pointerEvents = pointerEvents;
             wrapper.style.zIndex = zIndex.toString();
             wrapper.style.top = '0';
@@ -156,6 +156,8 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             newCanvas.style.zIndex = zIndex.toString();
             newCanvas.width = paneCanvas.width;
             newCanvas.height = paneCanvas.height;
+            newCanvas.style.height = `${paneCanvas.height / dpr}px`;
+            newCanvas.style.width = `${paneCanvas.width / dpr}px`;
             wrapper.appendChild(newCanvas);
 
             canvasRef.current = newCanvas;
@@ -173,34 +175,23 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
 
         canvas.addEventListener('mousemove', handleMouseMove);
 
-        const updateCanvasSize = () => {
-            const width = paneCanvas.width;
-            const height = paneCanvas?.height;
-
-            canvas.width = width;
-            canvas.style.width = `${width}px`;
-
-            canvas.height = height;
-            canvas.style.height = `${height}px`;
-
-            yScale.range([canvas.height, 0]);
-            scaleSymlog.range([canvas.height, 0]);
-        };
-
-        updateCanvasSize();
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const observer = new ResizeObserver((result: any) => {
             if (result) {
                 setCanvasSize({
-                    styleWidth: result[0].contentRect.width,
-                    styleHeight: result[0].contentRect?.height,
                     width: paneCanvas.width,
-                    height: paneCanvas?.height,
+                    height: paneCanvas.height,
                 });
 
-                yScale.range([result[0].contentRect?.height, 0]);
-                scaleSymlog.range([result[0].contentRect?.height, 0]);
+                if (canvasWrapperRef.current) {
+                    canvasWrapperRef.current.style.width =
+                        result[0].contentRect.width + 'px';
+                    canvasWrapperRef.current.style.height =
+                        result[0].contentRect.height + 'px';
+                }
+
+                yScale.range([paneCanvas.height, 0]);
+                scaleSymlog.range([paneCanvas.height, 0]);
             }
         });
 
@@ -234,31 +225,6 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             });
         }
     }, [chart]);
-
-    useEffect(() => {
-        if (
-            canvasWrapperRef.current === null ||
-            canvasRef.current === null ||
-            canvasSize === undefined ||
-            scaleDataRef.current === null
-        )
-            return;
-
-        const { width, height } = canvasSize;
-
-        canvasRef.current.width = width;
-        canvasRef.current.style.width = `${width}px`;
-
-        canvasRef.current.height = height;
-        canvasRef.current.style.height = `${height}px`;
-
-        canvasWrapperRef.current.style.width = `${width}px`;
-
-        canvasWrapperRef.current.style.height = `${height}px`;
-
-        scaleDataRef.current.yScale.range([height, 0]);
-        scaleDataRef.current.scaleSymlog.range([width, 0]);
-    }, [canvasSize]);
 
     return (
         <>

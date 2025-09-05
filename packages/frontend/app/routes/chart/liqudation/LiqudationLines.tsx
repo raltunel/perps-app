@@ -3,6 +3,12 @@ import type { LiqProps } from './LiqComponent';
 import * as d3fc from 'd3fc';
 import * as d3 from 'd3';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
+import type { IPaneApi } from '~/tv/charting_library';
+import {
+    getMainSeriesPaneIndex,
+    updateOverlayCanvasSize,
+} from '../overlayCanvas/overlayCanvasUtils';
+import { useTradingView } from '~/contexts/TradingviewContext';
 
 export type HorizontalLineData = {
     yPrice: number;
@@ -15,7 +21,6 @@ export type HorizontalLineData = {
 
 const LiqudationLines = ({
     overlayCanvasRef,
-    canvasWrapperRef,
     canvasSize,
     scaleData,
     zoomChanged,
@@ -23,7 +28,11 @@ const LiqudationLines = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLine, setHorizontalLine] = useState<any>();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
+
     const lines = useLiqudationLines();
+    const { chart } = useTradingView();
 
     useEffect(() => {
         if (scaleData !== undefined && canvasSize) {
@@ -52,6 +61,25 @@ const LiqudationLines = ({
                 },
             );
 
+            const horizontalLineLogScale = d3fc
+                .annotationCanvasLine()
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .value((d: any) => d.yPrice)
+                .yScale(scaleData?.scaleSymlog)
+                .xScale(dummyXScale)
+                .orient('horizontal')
+                .label('');
+
+            horizontalLineLogScale.decorate(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (context: CanvasRenderingContext2D, d: any) => {
+                    context.strokeStyle = d.strokeStyle;
+                    context.fillStyle = d.strokeStyle;
+                    context.lineWidth = d.lineWidth;
+                    if (d.dash) context.setLineDash(d.dash);
+                    if (d.globalAlpha) context.globalAlpha = d.globalAlpha;
+                },
+            );
             // const horizontalBand = d3fc
             //     .annotationCanvasBand()
             //     .orient('horizontal')
@@ -64,6 +92,10 @@ const LiqudationLines = ({
 
             setHorizontalLine(() => {
                 return horizontalLine;
+            });
+
+            setHorizontalLineLogScale(() => {
+                return horizontalLineLogScale;
             });
 
             // setHorizontalBand(() => {
@@ -86,7 +118,12 @@ const LiqudationLines = ({
     }, [scaleData, canvasSize]);
 
     useEffect(() => {
-        if (overlayCanvasRef.current && horizontalLine) {
+        if (
+            overlayCanvasRef.current &&
+            horizontalLine &&
+            chart &&
+            horizontalLineLogScale
+        ) {
             const canvas = overlayCanvasRef.current;
             const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
@@ -94,9 +131,29 @@ const LiqudationLines = ({
 
             let animationId: number;
 
+            const paneIndex = getMainSeriesPaneIndex(chart) || 0;
+
+            const priceScalePane = chart.activeChart().getPanes()[
+                paneIndex
+            ] as IPaneApi;
+            const priceScale = priceScalePane.getMainSourcePriceScale();
+
             const render = () => {
+                updateOverlayCanvasSize(canvas, canvasSize);
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                horizontalLine(lines);
+
+                if (priceScale) {
+                    const isLogarithmic = priceScale.getMode() === 1;
+
+                    if (horizontalLineLogScale && isLogarithmic) {
+                        horizontalLineLogScale.context(ctx);
+                        horizontalLineLogScale(lines);
+                    } else if (horizontalLine) {
+                        horizontalLine.context(ctx);
+                        horizontalLine(lines);
+                    }
+                }
 
                 if (zoomChanged) {
                     animationId = requestAnimationFrame(render);
@@ -116,11 +173,14 @@ const LiqudationLines = ({
             };
         }
     }, [
+        chart,
         horizontalLine,
+        horizontalLineLogScale,
         overlayCanvasRef.current === null,
         JSON.stringify(lines),
         JSON.stringify(scaleData?.yScale.domain()),
         zoomChanged,
+        canvasSize,
     ]);
 
     return null;
