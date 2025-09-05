@@ -81,6 +81,8 @@ const LabelComponent = ({
     const [isDrag, setIsDrag] = useState(false);
 
     useEffect(() => {
+        const dpr = Math.round(window.devicePixelRatio) || 1;
+
         if (scaleData !== undefined && canvasSize && isChartReady) {
             const dummyXScale = d3
                 .scaleLinear()
@@ -100,9 +102,12 @@ const LabelComponent = ({
                 (context: CanvasRenderingContext2D, d: any) => {
                     context.strokeStyle = d.color;
                     context.fillStyle = d.color;
-                    context.lineWidth = d.lineWidth;
+                    context.lineWidth = d.lineWidth * dpr;
                     if (d.dash) {
-                        context.setLineDash(d.dash);
+                        const scaledDash = d.dash.map(
+                            (val: number) => val * dpr,
+                        );
+                        context.setLineDash(scaledDash);
                     }
                 },
             );
@@ -121,9 +126,12 @@ const LabelComponent = ({
                 (context: CanvasRenderingContext2D, d: any) => {
                     context.strokeStyle = d.color;
                     context.fillStyle = d.color;
-                    context.lineWidth = d.lineWidth;
+                    context.lineWidth = d.lineWidth * dpr;
                     if (d.dash) {
-                        context.setLineDash(d.dash);
+                        const scaledDash = d.dash.map(
+                            (val: number) => val * dpr,
+                        );
+                        context.setLineDash(scaledDash);
                     }
                 },
             );
