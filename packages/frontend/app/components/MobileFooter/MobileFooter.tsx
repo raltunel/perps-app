@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React from 'react';
-import { Link } from 'react-router';
+import { NavLink } from 'react-router';
 import styles from './MobileFooter.module.css';
 import { RiHome2Line } from 'react-icons/ri';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
@@ -10,6 +10,8 @@ interface NavItem {
     name: string;
     path: string;
     icon: React.ReactNode;
+    end?: boolean;
+    // for exact matching like home
 }
 
 const MobileFooter: React.FC = () => {
@@ -18,6 +20,7 @@ const MobileFooter: React.FC = () => {
             name: 'Home',
             path: '/',
             icon: homeSvg,
+            end: true,
         },
         {
             name: 'Trade',
@@ -51,10 +54,16 @@ const MobileFooter: React.FC = () => {
 };
 
 const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
-    const { name, path, icon } = item;
+    const { name, path, icon, end } = item;
 
     return (
-        <Link to={path} className={styles.navItem}>
+        <NavLink
+            to={path}
+            end={end}
+            className={({ isActive }) =>
+                `${styles.navItem} ${isActive ? styles.active : ''}`
+            }
+        >
             <motion.div
                 className={styles.iconWrapper}
                 whileTap={{ scale: 0.95 }}
@@ -63,7 +72,7 @@ const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
                 <div className={styles.icon}>{icon}</div>
                 <span className={styles.label}>{name}</span>
             </motion.div>
-        </Link>
+        </NavLink>
     );
 });
 
@@ -155,8 +164,8 @@ const tradeSvg = (
 //     </svg>
 // );
 
-const referralsSvg = <MdOutlinePeopleAlt color='white' size={23} />;
+const referralsSvg = <MdOutlinePeopleAlt size={23} />;
 
-const homeSvg = <RiHome2Line color='white' size={23} />;
+const homeSvg = <RiHome2Line size={23} />;
 
 export default React.memo(MobileFooter);

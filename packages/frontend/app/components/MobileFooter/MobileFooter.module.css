@@ -18,7 +18,6 @@
 }
 
 .navItem {
-    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -28,14 +27,10 @@
     transition: all 0.2s ease;
     height: 100%;
 }
-/* small active indicator that animates between items */
-.activeBar {
-    position: absolute;
-    top: 0; /* sits at the top edge of the footer item */
-    height: 2px;
-    width: 28px;
-    border-radius: 2px;
-    background: var(--accent1, #7371fc);
+
+.active .icon,
+.active .label {
+    color: var(--accent1, #7371fc);
 }
 
 .iconWrapper {

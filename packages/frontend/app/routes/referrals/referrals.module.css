@@ -169,6 +169,9 @@
         overflow: visible;
         min-height: 0;
     }
+    .container::-webkit-scrollbar {
+        display: none !important; /* Chrome, Safari, and Opera */
+    }
 
     .tableContainer {
         display: flex;
