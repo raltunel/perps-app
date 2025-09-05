@@ -171,9 +171,12 @@ export default function AppOptions() {
                     text='Language'
                     active={
                         <div>
-                            {languageOptions[
-                                i18n?.resolvedLanguage as keyof typeof languageOptions
-                            ] ?? languageOptions.en}
+                            {
+                                languageOptions[
+                                    (i18n?.language?.split('-')[0] ||
+                                        'en') as keyof typeof languageOptions
+                                ]
+                            }
                         </div>
                     }
                     options={Object.entries(languageOptions).map(
