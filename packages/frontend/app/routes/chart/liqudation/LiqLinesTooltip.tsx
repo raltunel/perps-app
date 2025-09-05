@@ -28,13 +28,14 @@ const LiqLineTooltip = ({
     const checkLines = useCallback(
         (offsetX: number, offsetY: number) => {
             if (!lines?.length || !scaleData?.yScale) return null;
+            const dpr = window.devicePixelRatio || 1;
 
             const tolerance = 10; // pixels
 
             for (const line of lines) {
                 const y = scaleData.yScale(line.yPrice);
-
-                if (Math.abs(y - offsetY) <= tolerance) {
+                const localOffsetY = offsetY * dpr;
+                if (Math.abs(y - localOffsetY) <= tolerance) {
                     return line;
                 }
             }

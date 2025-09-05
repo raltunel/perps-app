@@ -11,8 +11,8 @@ const TradingViewWrapper: React.FC = () => {
     return (
         <TradingViewProvider>
             <TradingViewChart />
-            <OrderLinesOverlayCanvas />
             {liquidationsActive && <LiquidationOverlayCanvas />}
+            <OrderLinesOverlayCanvas />
         </TradingViewProvider>
     );
 };
