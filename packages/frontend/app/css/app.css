@@ -1,26 +1,25 @@
 @import './index.css';
 
-/* 
-  1) The container that wraps everything
-  2) Ensures the entire page occupies the full viewport height
-  3) Uses a column flex layout
-*/
+/* Shared vars */
+:root {
+    --footer-h: 56px;
+}
+
+/* --- Root grid: header + content --- */
 .root-container {
     display: grid;
-    grid-template-rows: 56px 1fr;
+    grid-template-rows: 56px 1fr; /* header + content only */
     height: 100vh;
-    height: 100svh; /* Added for mobile browsers */
+    height: 100svh; /* mobile browsers */
     color: white;
 }
 
+/* Footer is hidden on desktop */
 .mobile-footer {
     display: none;
 }
 
-/* 
-  Allows the main content area to grow and fill remaining space 
-  (pushing the footer to the bottom if there's not enough content)
-*/
+/* --- Main content area --- */
 .content {
     height: 100%;
     overflow-y: auto;
@@ -36,7 +35,7 @@
     padding: 0;
 }
 
-/* Simple styling examples for header/footer */
+/* --- Header style (unchanged) --- */
 .header {
     height: 56px;
     display: flex;
@@ -50,35 +49,41 @@
     color: var(--accent1);
 }
 
+/* ------------------- Mobile ------------------- */
 @media (max-width: 768px) {
     .root-container {
-        /* Mobile: header, content,  footer */
-        /* grid-template-rows: 56px 1fr 56px;  */
-        grid-template-rows: 56px 1fr; /* Mobile: header, content,  footer */
+        /* Do NOT reserve a 3rd row when footer is fixed */
+        grid-template-rows: 56px 1fr;
         overflow-x: hidden;
     }
 
-    /* Show the footer only on mobile with proper positioning */
+    /* Fixed mobile footer (safe-area friendly) */
     .mobile-footer {
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 56px;
-        background-color: var(--bg-dark2, #222);
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        position: fixed;
+
         bottom: 0;
         left: 0;
         right: 0;
         z-index: 100;
     }
 
-    /* Make the main content scrollable with padding for the footer */
-    .content:not(.home-page) {
-        padding-bottom: 50px;
+    /* Ensure content never sits under the fixed footer */
+    .content {
+        padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
     }
 
+    .content:not(.home-page) {
+        /* keep side paddings; bottom handled above */
+        padding-left: var(--padding-s, 8px);
+        padding-right: var(--padding-s, 8px);
+    }
+
+    /* If you truly need zero extra padding on the home page, you can
+       leave this empty. The .content rule above already protects
+       against overlap by adding bottom padding globally on mobile. */
     .content.home-page {
-        padding-bottom: 0;
+        /* intentionally no override */
     }
 }

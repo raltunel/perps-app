@@ -2,6 +2,8 @@ import { motion } from 'framer-motion';
 import React from 'react';
 import { Link } from 'react-router';
 import styles from './MobileFooter.module.css';
+import { RiHome2Line } from 'react-icons/ri';
+import { MdOutlinePeopleAlt } from 'react-icons/md';
 
 // Define the navigation item type
 interface NavItem {
@@ -13,25 +15,30 @@ interface NavItem {
 const MobileFooter: React.FC = () => {
     const navItems: NavItem[] = [
         {
+            name: 'Home',
+            path: '/',
+            icon: homeSvg,
+        },
+        {
             name: 'Trade',
             path: '/v2/trade',
             icon: tradeSvg,
         },
         {
-            name: 'Explore',
-            path: '/v2/leaderboards',
-            icon: exploreSvg,
+            name: 'Referrals',
+            path: '/v2/referrals',
+            icon: referralsSvg,
         },
-        {
-            name: 'Account',
-            path: '/v2/portfolio',
-            icon: accountSvg,
-        },
-        {
-            name: 'Chat',
-            path: '/v2/chat',
-            icon: chatSvg,
-        },
+        // {
+        //     name: 'Account',
+        //     path: '/v2/portfolio',
+        //     icon: accountSvg,
+        // },
+        // {
+        //     name: 'Chat',
+        //     path: '/v2/chat',
+        //     icon: chatSvg,
+        // },
     ];
 
     return (
@@ -71,7 +78,7 @@ const tradeSvg = (
     >
         <path
             d='M18.84 10.87C19.7853 11.2224 20.6265 11.8075 21.2858 12.5712C21.945 13.3349 22.4011 14.2524 22.6117 15.2391C22.8224 16.2257 22.7809 17.2495 22.491 18.2158C22.2012 19.1822 21.6723 20.0598 20.9534 20.7676C20.2345 21.4754 19.3487 21.9905 18.378 22.2652C17.4072 22.54 16.3829 22.5655 15.3997 22.3395C14.4165 22.1134 13.5061 21.6431 12.7528 20.972C11.9995 20.3009 11.4276 19.4507 11.09 18.5M7.75 6.5H8.75V10.5M17.46 14.38L18.16 15.09L15.34 17.91M14.75 8.5C14.75 11.8137 12.0637 14.5 8.75 14.5C5.43629 14.5 2.75 11.8137 2.75 8.5C2.75 5.18629 5.43629 2.5 8.75 2.5C12.0637 2.5 14.75 5.18629 14.75 8.5Z'
-            stroke='currentColor'
+            stroke='var(--text1)'
             strokeLinecap='round'
             strokeLinejoin='round'
         />
@@ -146,5 +153,9 @@ const chatSvg = (
         />
     </svg>
 );
+
+const referralsSvg = <MdOutlinePeopleAlt color='white' size={23} />;
+
+const homeSvg = <RiHome2Line color='white' size={23} />;
 
 export default React.memo(MobileFooter);
