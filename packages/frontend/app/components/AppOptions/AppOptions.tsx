@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 const languageOptions = {
     en: 'English 🇺🇸',
     es: 'Español 🇪🇸',
+    zh: '中文 🇨🇳',
 };
 
 export interface appOptionDataIF {
