@@ -1,6 +1,5 @@
 @import './index.css';
 
-/* Shared vars */
 :root {
     --footer-h: 56px;
 }
@@ -35,7 +34,6 @@
     padding: 0;
 }
 
-/* --- Header style (unchanged) --- */
 .header {
     height: 56px;
     display: flex;
@@ -52,12 +50,10 @@
 /* ------------------- Mobile ------------------- */
 @media (max-width: 768px) {
     .root-container {
-        /* Do NOT reserve a 3rd row when footer is fixed */
         grid-template-rows: 56px 1fr;
         overflow-x: hidden;
     }
 
-    /* Fixed mobile footer (safe-area friendly) */
     .mobile-footer {
         display: flex;
         align-items: center;
@@ -69,21 +65,12 @@
         z-index: 100;
     }
 
-    /* Ensure content never sits under the fixed footer */
     .content {
         padding-bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
     }
 
     .content:not(.home-page) {
-        /* keep side paddings; bottom handled above */
         padding-left: var(--padding-s, 8px);
         padding-right: var(--padding-s, 8px);
-    }
-
-    /* If you truly need zero extra padding on the home page, you can
-       leave this empty. The .content rule above already protects
-       against overlap by adding bottom padding globally on mobile. */
-    .content.home-page {
-        /* intentionally no override */
     }
 }
