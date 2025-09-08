@@ -222,7 +222,11 @@ const LabelComponent = ({
                 false,
             );
 
-            if (isLabel && isLabel.matchType === 'onLabel') {
+            if (
+                isLabel &&
+                isLabel.matchType === 'onLabel' &&
+                isLabel.label.type !== 'Cancel'
+            ) {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
             } else {
@@ -468,7 +472,11 @@ const LabelComponent = ({
                             true,
                         );
 
-                        if (found && found.matchType === 'onLabel') {
+                        if (
+                            found &&
+                            found.matchType === 'onLabel' &&
+                            found.label.type === 'Cancel'
+                        ) {
                             console.log({ found });
                             if (found.parentLine.oid)
                                 handleCancel(found.parentLine);
@@ -518,7 +526,11 @@ const LabelComponent = ({
                 false,
             );
 
-            if (isLabel && isLabel.matchType === 'onLabel') {
+            if (
+                isLabel &&
+                isLabel.matchType === 'onLabel' &&
+                isLabel.label.type !== 'Cancel'
+            ) {
                 canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
