@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "Tak",
+        "no": "Nie",
+        "cancel": "Anuluj",
+        "save": "Zapisz",
+        "delete": "Usuń",
+        "edit": "Edytuj",
+        "close": "Zamknij",
+        "loading": "Ładowanie...",
+        "error": "Błąd",
+        "success": "Sukces",
+        "applyDefaults": "Przywróć domyślne",
+        "learnMore": "Dowiedz się więcej"
+    },
+    "navigation": {
+        "home": "Strona główna",
+        "about": "O nas",
+        "contact": "Kontakt",
+        "settings": "Ustawienia",
+        "profile": "Profil",
+        "logout": "Wyloguj",
+        "trade": "Handluj",
+        "chart": "Wykres",
+        "book": "Księga zleceń",
+        "recent": "Ostatnie",
+        "positions": "Pozycje"
+    },
+    "auth": {
+        "login": "Zaloguj się",
+        "register": "Zarejestruj się",
+        "email": "E-mail",
+        "password": "Hasło",
+        "forgotPassword": "Zapomniałeś hasła?",
+        "loginSuccess": "Zalogowano pomyślnie",
+        "loginError": "Nieprawidłowe dane logowania"
+    },
+    "forms": {
+        "name": "Imię i nazwisko",
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
+        "phone": "Telefon",
+        "address": "Adres",
+        "submit": "Wyślij",
+        "required": "To pole jest wymagane"
+    },
+    "messages": {
+        "welcome": "Witaj",
+        "hello": "Cześć {{name}}!",
+        "goodbye": "Do widzenia",
+        "thankYou": "Dziękuję",
+        "pleaseWait": "Proszę czekać..."
+    },
+    "home": {
+        "title": "Handluj kontraktami na Ambient",
+        "subtitle": "Szybka realizacja. Brak opłat za pobranie. Dźwignia do 100x.",
+        "startTrading": "Zacznij handlować",
+        "learnMore": "Dowiedz się więcej",
+        "hero": {
+            "heading1": "Od Zera do ",
+            "one": "Jeden",
+            "heading2": "Zdecentralizowany Protokół Handlowy",
+            "description": "Ambient to zupełnie nowy rodzaj zdecentralizowanej giełdy kontraktów terminowych, łączącej unikalne natywne produkty DeFi z doświadczeniem użytkownika konkurującym z giełdami scentralizowanymi",
+            "stats": {
+                "totalVolume": "Całkowity wolumen",
+                "activeUsers": "Aktywni użytkownicy"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Polecenia",
+        "description": "Polecaj użytkowników i zarabiaj nagrody. Partnerzy otrzymują wyższe wynagrodzenie.",
+        "tradersReferred": "Poleceni traderzy",
+        "rewardsEarned": "Zarobione nagrody"
+    }
+}

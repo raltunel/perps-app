@@ -23,6 +23,7 @@ const languageOptions = {
     fr: 'Français 🇫🇷',
     ja: '日本語 🇯🇵',
     nl: 'Nederlands 🇳🇱',
+    pl: 'Polski 🇵🇱',
     'pt-BR': 'Português (BR) 🇧🇷',
     uk: 'Українська 🇺🇦',
     zh: '中文 (简体) 🇨🇳',
