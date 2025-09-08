@@ -11,9 +11,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
-import Section1 from '~/components/Home/Section1/Section1';
-import Investors from '~/components/Home/Investors/Investors';
-import Section2 from '~/components/Home/Section2/Section2';
+import TradeButton from '~/components/Home/TradeButton/TradeButton';
 
 interface FloatingTokenProps {
     src: string;

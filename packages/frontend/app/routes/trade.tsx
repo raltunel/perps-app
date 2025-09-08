@@ -354,7 +354,6 @@ export default function Trade() {
             <div className={styles.mobileOnlyOrderBook}>
                 {(activeTab === 'book' || visibilityRefs.current.book) && (
                     <MemoizedOrderBookSection
-                        symbol={symbol}
                         mobileView
                         mobileContent='orderBook'
                         chartTopHeight={chartTopHeight}
@@ -371,7 +370,6 @@ export default function Trade() {
             <div className={styles.mobileOnlyRecentTrades}>
                 {(activeTab === 'recent' || visibilityRefs.current.recent) && (
                     <MemoizedOrderBookSection
-                        symbol={symbol}
                         mobileView
                         mobileContent='recentTrades'
                         chartTopHeight={chartTopHeight}
@@ -549,7 +547,6 @@ export default function Trade() {
                                     className={styles.orderBook}
                                 >
                                     <MemoizedOrderBookSection
-                                        symbol={symbol}
                                         chartTopHeight={chartTopHeight}
                                     />
                                 </div>
