@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "Evet",
+        "no": "Hayır",
+        "cancel": "İptal",
+        "save": "Kaydet",
+        "delete": "Sil",
+        "edit": "Düzenle",
+        "close": "Kapat",
+        "loading": "Yükleniyor...",
+        "error": "Hata",
+        "success": "Başarılı",
+        "applyDefaults": "Varsayılanları Uygula",
+        "learnMore": "Daha Fazla Bilgi"
+    },
+    "navigation": {
+        "home": "Ana Sayfa",
+        "about": "Hakkımızda",
+        "contact": "İletişim",
+        "settings": "Ayarlar",
+        "profile": "Profil",
+        "logout": "Çıkış Yap",
+        "trade": "İşlem",
+        "chart": "Grafik",
+        "book": "Emir Defteri",
+        "recent": "Son İşlemler",
+        "positions": "Pozisyonlar"
+    },
+    "auth": {
+        "login": "Giriş Yap",
+        "register": "Kayıt Ol",
+        "email": "E-posta",
+        "password": "Şifre",
+        "forgotPassword": "Şifremi Unuttum?",
+        "loginSuccess": "Başarıyla giriş yapıldı",
+        "loginError": "Geçersiz kimlik bilgileri"
+    },
+    "forms": {
+        "name": "Ad Soyad",
+        "firstName": "Ad",
+        "lastName": "Soyad",
+        "phone": "Telefon Numarası",
+        "address": "Adres",
+        "submit": "Gönder",
+        "required": "Bu alan zorunludur"
+    },
+    "messages": {
+        "welcome": "Hoş Geldiniz",
+        "hello": "Merhaba {{name}}!",
+        "goodbye": "Güle güle",
+        "thankYou": "Teşekkürler",
+        "pleaseWait": "Lütfen bekleyiniz..."
+    },
+    "home": {
+        "title": "Ambient ile Süresiz Vadeli İşlem Yapın",
+        "subtitle": "Hızlı işlem. Ücretsiz komisyon. 100x'e kadar kaldıraç.",
+        "startTrading": "İşleme Başla",
+        "learnMore": "Daha Fazla Bilgi",
+        "hero": {
+            "heading1": "Sıfırdan ",
+            "one": "Bir",
+            "heading2": "Merkeziyetsiz İşlem Protokolü",
+            "description": "Ambient, benzersiz DeFi ürünlerini CEX'lerle rekabet eden kullanıcı deneyimiyle birleştiren yeni bir merkeziyetsiz vadeli işlem borsasıdır",
+            "stats": {
+                "totalVolume": "Toplam İşlem Hacmi",
+                "activeUsers": "Aktif Kullanıcılar"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Tavsiye",
+        "description": "Kullanıcıları davet edin ve ödüller kazanın. Ortaklar daha yüksek ödüller kazanır.",
+        "tradersReferred": "Yönlendirilen İşlemciler",
+        "rewardsEarned": "Kazanılan Ödüller"
+    }
+}

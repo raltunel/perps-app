@@ -19,6 +19,7 @@ import zhTranslation from '../locales/zh/translation.json';
 import zhHKTranslation from '../locales/zh-HK/translation.json';
 import zhTWTranslation from '../locales/zh-TW/translation.json';
 import idTranslation from '../locales/id/translation.json';
+import trTranslation from '../locales/tr/translation.json';
 import viTranslation from '../locales/vi/translation.json';
 
 const resources = {
@@ -75,6 +76,9 @@ const resources = {
     },
     vi: {
         translation: viTranslation,
+    },
+    tr: {
+        translation: trTranslation,
     },
 };
 
