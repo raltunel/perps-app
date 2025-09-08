@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "Oui",
+        "no": "Non",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "delete": "Supprimer",
+        "edit": "Modifier",
+        "close": "Fermer",
+        "loading": "Chargement...",
+        "error": "Erreur",
+        "success": "Succès",
+        "applyDefaults": "Appliquer les paramètres par défaut",
+        "learnMore": "En savoir plus"
+    },
+    "navigation": {
+        "home": "Accueil",
+        "about": "À propos",
+        "contact": "Contact",
+        "settings": "Paramètres",
+        "profile": "Profil",
+        "logout": "Déconnexion",
+        "trade": "Échanger",
+        "chart": "Graphique",
+        "book": "Carnet d'ordres",
+        "recent": "Récents",
+        "positions": "Positions"
+    },
+    "auth": {
+        "login": "Connexion",
+        "register": "S'inscrire",
+        "email": "E-mail",
+        "password": "Mot de passe",
+        "forgotPassword": "Mot de passe oublié ?",
+        "loginSuccess": "Connexion réussie",
+        "loginError": "Identifiants invalides"
+    },
+    "forms": {
+        "name": "Nom",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "phone": "Téléphone",
+        "address": "Adresse",
+        "submit": "Envoyer",
+        "required": "Ce champ est obligatoire"
+    },
+    "messages": {
+        "welcome": "Bienvenue",
+        "hello": "Bonjour {{name}} !",
+        "goodbye": "Au revoir",
+        "thankYou": "Merci",
+        "pleaseWait": "Veuillez patienter..."
+    },
+    "home": {
+        "title": "Échangez des contrats avec Ambient",
+        "subtitle": "Exécution rapide. Frais preneur zéro. Effet de levier jusqu'à 100x.",
+        "startTrading": "Commencer à trader",
+        "learnMore": "En savoir plus",
+        "hero": {
+            "heading1": "De Zéro à ",
+            "one": "Un",
+            "heading2": "Protocole d'Échange Décentralisé",
+            "description": "Ambient est un tout nouveau type de DEX de contrats perpétuels décentralisés combinant des produits natifs DeFi uniques avec une expérience utilisateur rivalisant avec les CEX",
+            "stats": {
+                "totalVolume": "Volume Total",
+                "activeUsers": "Utilisateurs Actifs"
+            }
+        }
+    },
+    "referrals": {
+        "title": "Parrainage",
+        "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés gagnent des récompenses plus importantes.",
+        "tradersReferred": "Traders Parrainés",
+        "rewardsEarned": "Récompenses Gagnées"
+    }
+}
