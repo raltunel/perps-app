@@ -5,7 +5,6 @@ import styles from './MobileFooter.module.css';
 import { RiHome2Line } from 'react-icons/ri';
 import { MdOutlinePeopleAlt } from 'react-icons/md';
 
-// Define the navigation item type
 interface NavItem {
     name: string;
     path: string;
@@ -27,11 +26,11 @@ const MobileFooter: React.FC = () => {
             path: '/v2/trade',
             icon: tradeSvg,
         },
-        {
-            name: 'Referrals',
-            path: '/v2/referrals',
-            icon: referralsSvg,
-        },
+        // {
+        //     name: 'Referrals',
+        //     path: '/v2/referrals',
+        //     icon: referralsSvg,
+        // },
         // {
         //     name: 'Account',
         //     path: '/v2/portfolio',
@@ -164,7 +163,7 @@ const tradeSvg = (
 //     </svg>
 // );
 
-const referralsSvg = <MdOutlinePeopleAlt size={23} />;
+// const referralsSvg = <MdOutlinePeopleAlt size={23} />;
 
 const homeSvg = <RiHome2Line size={23} />;
 
