@@ -10,6 +10,7 @@ import nlTranslation from '../locales/nl/translation.json';
 import ukTranslation from '../locales/uk/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import zhHKTranslation from '../locales/zh-HK/translation.json';
+import zhTWTranslation from '../locales/zh-TW/translation.json';
 import idTranslation from '../locales/id/translation.json';
 import viTranslation from '../locales/vi/translation.json';
 
@@ -37,6 +38,9 @@ const resources = {
     },
     'zh-HK': {
         translation: zhHKTranslation,
+    },
+    'zh-TW': {
+        translation: zhTWTranslation,
     },
     id: {
         translation: idTranslation,
