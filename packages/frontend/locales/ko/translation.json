@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "예",
+        "no": "아니오",
+        "cancel": "취소",
+        "save": "저장",
+        "delete": "삭제",
+        "edit": "편집",
+        "close": "닫기",
+        "loading": "로드 중...",
+        "error": "오류",
+        "success": "성공",
+        "applyDefaults": "기본값 적용",
+        "learnMore": "자세히 보기"
+    },
+    "navigation": {
+        "home": "홈",
+        "about": "소개",
+        "contact": "문의",
+        "settings": "설정",
+        "profile": "프로필",
+        "logout": "로그아웃",
+        "trade": "거래",
+        "chart": "차트",
+        "book": "호가창",
+        "recent": "최근",
+        "positions": "포지션"
+    },
+    "auth": {
+        "login": "로그인",
+        "register": "회원가입",
+        "email": "이메일",
+        "password": "비밀번호",
+        "forgotPassword": "비밀번호를 잊으셨나요?",
+        "loginSuccess": "로그인 성공",
+        "loginError": "잘못된 자격 증명"
+    },
+    "forms": {
+        "name": "이름",
+        "firstName": "이름",
+        "lastName": "성",
+        "phone": "전화번호",
+        "address": "주소",
+        "submit": "제출",
+        "required": "이 필드는 필수 항목입니다"
+    },
+    "messages": {
+        "welcome": "환영합니다",
+        "hello": "안녕하세요 {{name}}님!",
+        "goodbye": "안녕히 가세요",
+        "thankYou": "감사합니다",
+        "pleaseWait": "잠시만 기다려 주세요..."
+    },
+    "home": {
+        "title": "Ambient로 선물 거래하기",
+        "subtitle": "빠른 체결. 테이커 수수료 무료. 최대 100배 레버리지.",
+        "startTrading": "거래 시작하기",
+        "learnMore": "자세히 알아보기",
+        "hero": {
+            "heading1": "제로에서 ",
+            "one": "하나",
+            "heading2": "분산형 거래 프로토콜",
+            "description": "Ambient는 탈중앙화 선물 DEX의 새로운 패러다임으로, 독보적인 DeFi 네이티브 제품과 중앙화 거래소를 뛰어넘는 사용자 경험을 제공합니다",
+            "stats": {
+                "totalVolume": "총 거래량",
+                "activeUsers": "활성 사용자"
+            }
+        }
+    },
+    "referrals": {
+        "title": "추천",
+        "description": "사용자를 추천하고 보상을 받으세요. 제휴사는 더 큰 보상을 얻습니다.",
+        "tradersReferred": "추천된 트레이더",
+        "rewardsEarned": "획득한 보상"
+    }
+}

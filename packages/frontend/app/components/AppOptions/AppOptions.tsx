@@ -22,6 +22,7 @@ const languageOptions = {
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
     ja: '日本語 🇯🇵',
+    ko: '한국어 🇰🇷',
     nl: 'Nederlands 🇳🇱',
     pl: 'Polski 🇵🇱',
     'pt-BR': 'Português (BR) 🇧🇷',

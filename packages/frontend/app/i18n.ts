@@ -7,6 +7,7 @@ import enTranslation from '../locales/en/translation.json';
 import esTranslation from '../locales/es/translation.json';
 import frTranslation from '../locales/fr/translation.json';
 import jaTranslation from '../locales/ja/translation.json';
+import koTranslation from '../locales/ko/translation.json';
 import nlTranslation from '../locales/nl/translation.json';
 import plTranslation from '../locales/pl/translation.json';
 import ptBRTranslation from '../locales/pt-BR/translation.json';
@@ -32,6 +33,9 @@ const resources = {
     },
     ja: {
         translation: jaTranslation,
+    },
+    ko: {
+        translation: koTranslation,
     },
     nl: {
         translation: nlTranslation,
