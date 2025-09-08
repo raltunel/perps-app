@@ -20,6 +20,7 @@ const languageOptions = {
     en: 'English 🇺🇸',
     es: 'Español 🇪🇸',
     zh: '中文 🇨🇳',
+    vi: 'Tiếng Việt 🇻🇳',
 };
 
 export interface appOptionDataIF {
