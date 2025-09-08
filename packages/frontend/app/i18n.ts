@@ -7,6 +7,7 @@ import enTranslation from '../locales/en/translation.json';
 import esTranslation from '../locales/es/translation.json';
 import jaTranslation from '../locales/ja/translation.json';
 import nlTranslation from '../locales/nl/translation.json';
+import ptBRTranslation from '../locales/pt-BR/translation.json';
 import ukTranslation from '../locales/uk/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import zhHKTranslation from '../locales/zh-HK/translation.json';
@@ -29,6 +30,9 @@ const resources = {
     },
     nl: {
         translation: nlTranslation,
+    },
+    'pt-BR': {
+        translation: ptBRTranslation,
     },
     uk: {
         translation: ukTranslation,
