@@ -222,7 +222,7 @@ const LabelComponent = ({
                 false,
             );
 
-            if (isLabel) {
+            if (isLabel && isLabel.matchType === 'onLabel') {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
             } else {
@@ -245,7 +245,7 @@ const LabelComponent = ({
                     .crossHairMoved()
                     .subscribe(null, ({ offsetX, offsetY }) => {
                         if (chart) {
-                            const { paneCanvas } =
+                            const { iframeDoc, paneCanvas } =
                                 getPaneCanvasAndIFrameDoc(chart);
 
                             if (!paneCanvas) return;
@@ -275,9 +275,24 @@ const LabelComponent = ({
                                 };
 
                                 if (isLabel) {
-                                    if (overlayCanvasRef.current)
-                                        overlayCanvasRef.current.style.pointerEvents =
-                                            'auto';
+                                    if (overlayCanvasRef.current) {
+                                        if (isLabel.matchType === 'onLabel') {
+                                            overlayCanvasRef.current.style.pointerEvents =
+                                                'auto';
+                                        }
+
+                                        if (isLabel.matchType === 'onLine') {
+                                            const pane =
+                                                iframeDoc?.querySelector(
+                                                    '.chart-markup-table.pane',
+                                                );
+                                            if (pane) {
+                                                (
+                                                    pane as HTMLElement
+                                                ).style.cursor = 'crosshair';
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -443,7 +458,7 @@ const LabelComponent = ({
                             true,
                         );
 
-                        if (found) {
+                        if (found && found.matchType === 'onLabel') {
                             console.log({ found });
                             if (found.parentLine.oid)
                                 handleCancel(found.parentLine);
@@ -493,7 +508,7 @@ const LabelComponent = ({
                 false,
             );
 
-            if (isLabel) {
+            if (isLabel && isLabel.matchType === 'onLabel') {
                 canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;

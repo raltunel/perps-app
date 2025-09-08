@@ -21,7 +21,11 @@ export function findLimitLabelAtPosition(
     y: number,
     drawnLabels: LineData[],
     isCancel: boolean,
-): { label: LabelLocation; parentLine: LineData } | null {
+): {
+    label: LabelLocation;
+    parentLine: LineData;
+    matchType: 'onLabel' | 'onLine';
+} | null {
     for (let i = drawnLabels.length - 1; i >= 0; i--) {
         if (drawnLabels[i].type === 'PNL') continue;
         const labelLocs = drawnLabels[i].labelLocations;
@@ -37,7 +41,19 @@ export function findLimitLabelAtPosition(
                 const endY = loc.y + loc?.height;
 
                 if (x >= startX && x <= endX && y >= startY && y <= endY) {
-                    return { label: loc, parentLine: drawnLabels[i] };
+                    return {
+                        label: loc,
+                        parentLine: drawnLabels[i],
+                        matchType: 'onLabel',
+                    };
+                }
+
+                if (y >= startY && y <= endY) {
+                    return {
+                        label: loc,
+                        parentLine: drawnLabels[i],
+                        matchType: 'onLine',
+                    };
                 }
             }
         }
