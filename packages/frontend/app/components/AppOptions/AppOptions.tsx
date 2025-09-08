@@ -19,7 +19,8 @@ import { useTranslation } from 'react-i18next';
 const languageOptions = {
     en: 'English 🇺🇸',
     es: 'Español 🇪🇸',
-    zh: '中文 🇨🇳',
+    zh: '中文 (简体) 🇨🇳',
+    'zh-HK': '中文 (繁體) 🇭🇰',
     vi: 'Tiếng Việt 🇻🇳',
 };
 
