@@ -12,6 +12,7 @@ import koTranslation from '../locales/ko/translation.json';
 import nlTranslation from '../locales/nl/translation.json';
 import plTranslation from '../locales/pl/translation.json';
 import ptBRTranslation from '../locales/pt-BR/translation.json';
+import ptPTTranslation from '../locales/pt-PT/translation.json';
 import ukTranslation from '../locales/uk/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import zhHKTranslation from '../locales/zh-HK/translation.json';
@@ -49,6 +50,9 @@ const resources = {
     },
     'pt-BR': {
         translation: ptBRTranslation,
+    },
+    'pt-PT': {
+        translation: ptPTTranslation,
     },
     uk: {
         translation: ukTranslation,

@@ -27,6 +27,7 @@ const languageOptions = {
     nl: 'Nederlands 🇳🇱',
     pl: 'Polski 🇵🇱',
     'pt-BR': 'Português (BR) 🇧🇷',
+    'pt-PT': 'Português (PT) 🇵🇹',
     uk: 'Українська 🇺🇦',
     zh: '中文 (简体) 🇨🇳',
     'zh-HK': '中文 (香港) 🇭🇰',
