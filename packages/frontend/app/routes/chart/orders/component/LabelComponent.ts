@@ -275,17 +275,27 @@ const LabelComponent = ({
                                 };
 
                                 if (isLabel) {
+                                    const pane = iframeDoc?.querySelector(
+                                        '.chart-markup-table.pane',
+                                    );
+
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
-                                            overlayCanvasRef.current.style.pointerEvents =
-                                                'auto';
+                                            if (
+                                                isLabel.label.type === 'Cancel'
+                                            ) {
+                                                if (pane) {
+                                                    (
+                                                        pane as HTMLElement
+                                                    ).style.cursor = 'pointer';
+                                                }
+                                            } else {
+                                                overlayCanvasRef.current.style.pointerEvents =
+                                                    'auto';
+                                            }
                                         }
 
                                         if (isLabel.matchType === 'onLine') {
-                                            const pane =
-                                                iframeDoc?.querySelector(
-                                                    '.chart-markup-table.pane',
-                                                );
                                             if (pane) {
                                                 (
                                                     pane as HTMLElement
@@ -719,7 +729,7 @@ const LabelComponent = ({
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
-                    overlayCanvasRef.current.style.cursor = 'grab';
+                    overlayCanvasRef.current.style.cursor = 'pointer';
 
                     overlayCanvasRef.current.style.pointerEvents = 'none';
                 }

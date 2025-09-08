@@ -20,43 +20,47 @@ export function findLimitLabelAtPosition(
     x: number,
     y: number,
     drawnLabels: LineData[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isCancel: boolean,
 ): {
     label: LabelLocation;
     parentLine: LineData;
     matchType: 'onLabel' | 'onLine';
 } | null {
+    let yMathcLineLoc = undefined;
+    let yMathcParentLine = undefined;
+
     for (let i = drawnLabels.length - 1; i >= 0; i--) {
         if (drawnLabels[i].type === 'PNL') continue;
         const labelLocs = drawnLabels[i].labelLocations;
         if (!labelLocs) continue;
 
         for (const loc of labelLocs) {
-            const isLocCancel = loc.type === 'Cancel';
+            const startX = loc.x;
+            const endX = loc.x + loc.width;
+            const startY = loc.y;
+            const endY = loc.y + loc?.height;
 
-            if (isCancel === isLocCancel) {
-                const startX = loc.x;
-                const endX = loc.x + loc.width;
-                const startY = loc.y;
-                const endY = loc.y + loc?.height;
+            if (x >= startX && x <= endX && y >= startY && y <= endY) {
+                return {
+                    label: loc,
+                    parentLine: drawnLabels[i],
+                    matchType: 'onLabel',
+                };
+            }
 
-                if (x >= startX && x <= endX && y >= startY && y <= endY) {
-                    return {
-                        label: loc,
-                        parentLine: drawnLabels[i],
-                        matchType: 'onLabel',
-                    };
-                }
-
-                if (y >= startY && y <= endY) {
-                    return {
-                        label: loc,
-                        parentLine: drawnLabels[i],
-                        matchType: 'onLine',
-                    };
-                }
+            if (y >= startY && y <= endY) {
+                yMathcLineLoc = loc;
+                yMathcParentLine = drawnLabels[i];
             }
         }
+    }
+    if (yMathcLineLoc && yMathcParentLine) {
+        return {
+            label: yMathcLineLoc,
+            parentLine: yMathcParentLine,
+            matchType: 'onLine',
+        };
     }
     return null;
 }
