@@ -6,6 +6,7 @@ import deTranslation from '../locales/de/translation.json';
 import enTranslation from '../locales/en/translation.json';
 import esTranslation from '../locales/es/translation.json';
 import frTranslation from '../locales/fr/translation.json';
+import itTranslation from '../locales/it/translation.json';
 import jaTranslation from '../locales/ja/translation.json';
 import koTranslation from '../locales/ko/translation.json';
 import nlTranslation from '../locales/nl/translation.json';
@@ -30,6 +31,9 @@ const resources = {
     },
     fr: {
         translation: frTranslation,
+    },
+    it: {
+        translation: itTranslation,
     },
     ja: {
         translation: jaTranslation,
