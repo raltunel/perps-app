@@ -1,0 +1,76 @@
+{
+    "common": {
+        "yes": "はい",
+        "no": "いいえ",
+        "cancel": "キャンセル",
+        "save": "保存",
+        "delete": "削除",
+        "edit": "編集",
+        "close": "閉じる",
+        "loading": "読み込み中...",
+        "error": "エラー",
+        "success": "成功",
+        "applyDefaults": "デフォルトを適用",
+        "learnMore": "詳細を見る"
+    },
+    "navigation": {
+        "home": "ホーム",
+        "about": "当社について",
+        "contact": "お問い合わせ",
+        "settings": "設定",
+        "profile": "プロフィール",
+        "logout": "ログアウト",
+        "trade": "取引",
+        "chart": "チャート",
+        "book": "板情報",
+        "recent": "最近の取引",
+        "positions": "ポジション"
+    },
+    "auth": {
+        "login": "ログイン",
+        "register": "新規登録",
+        "email": "メールアドレス",
+        "password": "パスワード",
+        "forgotPassword": "パスワードをお忘れですか？",
+        "loginSuccess": "ログインに成功しました",
+        "loginError": "ログイン情報が正しくありません"
+    },
+    "forms": {
+        "name": "名前",
+        "firstName": "名",
+        "lastName": "姓",
+        "phone": "電話番号",
+        "address": "住所",
+        "submit": "送信",
+        "required": "この項目は必須です"
+    },
+    "messages": {
+        "welcome": "ようこそ",
+        "hello": "こんにちは、{{name}}さん！",
+        "goodbye": "さようなら",
+        "thankYou": "ありがとうございます",
+        "pleaseWait": "お待ちください..."
+    },
+    "home": {
+        "title": "Ambientでパーペチュアル契約を取引",
+        "subtitle": "高速な約定。テイカー手数料無料。最大100倍のレバレッジ。",
+        "startTrading": "取引を始める",
+        "learnMore": "詳細を見る",
+        "hero": {
+            "heading1": "ゼロから始まる",
+            "one": "一",
+            "heading2": "分散型取引プロトコル",
+            "description": "Ambientは、独自のDeFiネイティブ製品と、CEXに匹敵するユーザーエクスペリエンスを組み合わせた、全く新しい分散型パーペチュアルDEXです",
+            "stats": {
+                "totalVolume": "取引高合計",
+                "activeUsers": "アクティブユーザー"
+            }
+        }
+    },
+    "referrals": {
+        "title": "紹介プログラム",
+        "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多くの報酬を獲得できます。",
+        "tradersReferred": "紹介済みトレーダー",
+        "rewardsEarned": "獲得報酬"
+    }
+}

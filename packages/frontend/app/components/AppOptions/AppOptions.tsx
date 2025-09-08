@@ -20,6 +20,7 @@ const languageOptions = {
     en: 'English 🇺🇸',
     de: 'Deutsch 🇩🇪',
     es: 'Español 🇪🇸',
+    ja: '日本語 🇯🇵',
     zh: '中文 (简体) 🇨🇳',
     'zh-HK': '中文 (繁體) 🇭🇰',
     id: 'Bahasa Indonesia 🇮🇩',
