@@ -21,6 +21,7 @@ const languageOptions = {
     es: 'Español 🇪🇸',
     zh: '中文 (简体) 🇨🇳',
     'zh-HK': '中文 (繁體) 🇭🇰',
+    id: 'Bahasa Indonesia 🇮🇩',
     vi: 'Tiếng Việt 🇻🇳',
 };
 

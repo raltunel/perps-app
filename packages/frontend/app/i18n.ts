@@ -6,6 +6,7 @@ import enTranslation from '../locales/en/translation.json';
 import esTranslation from '../locales/es/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import zhHKTranslation from '../locales/zh-HK/translation.json';
+import idTranslation from '../locales/id/translation.json';
 import viTranslation from '../locales/vi/translation.json';
 
 const resources = {
@@ -20,6 +21,9 @@ const resources = {
     },
     'zh-HK': {
         translation: zhHKTranslation,
+    },
+    id: {
+        translation: idTranslation,
     },
     vi: {
         translation: viTranslation,
