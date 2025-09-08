@@ -57,9 +57,9 @@
         "startTrading": "Bắt đầu Giao dịch",
         "learnMore": "Tìm hiểu thêm",
         "hero": {
-            "heading1": "Giao thức Giao dịch",
-            "one": "Phi Tập Trung",
-            "heading2": "Từ Không đến Một",
+            "heading1": "Từ Không đến",
+            "one": "Một",
+            "heading2": "Phi Tập Trung Giao thức Giao dịch",
             "description": "Ambient là một loại sàn giao dịch phi tập trung (DEX) hoàn toàn mới cho hợp đồng tương lai vĩnh viễn, kết hợp các sản phẩm DeFi độc đáo với trải nghiệm người dùng ngang ngửa các sàn tập trung",
             "stats": {
                 "totalVolume": "Tổng Khối lượng",
