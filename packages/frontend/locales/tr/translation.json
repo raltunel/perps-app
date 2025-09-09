@@ -89,5 +89,14 @@
         "explanation": "{{token}} adresinize gönderilecektir.",
         "availableToWithdraw": "Çekilecek",
         "input_prompt": "Çekilecek tutarı girin (minimum ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "Seçenekler",
+        "skipOpenOrderConfirm": "Açık sipariş onayını atla",
+        "enableTxNotifications": "İşlem bildirimlerini etkinleştir",
+        "enableBackgroundFillNotif": "Arka plan doldurma bildirimlerini etkinleştir",
+        "numberFormat": "Sayı formatı",
+        "color": "Renk",
+        "language": "Dil"
     }
 }

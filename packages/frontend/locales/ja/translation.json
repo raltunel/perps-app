@@ -89,5 +89,14 @@
         "explanation": "{{token}}があなたのアドレスに送信されます。",
         "availableToWithdraw": "出金可能",
         "input_prompt": "出金額を入力してください (最小 ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "オプション",
+        "skipOpenOrderConfirm": "開いている注文の確認をスキップする",
+        "enableTxNotifications": "取引通知を有効にする",
+        "enableBackgroundFillNotif": "バックグラウンドのフィル通知を有効にする",
+        "numberFormat": "数値フォーマット",
+        "color": "色",
+        "language": "言語"
     }
 }

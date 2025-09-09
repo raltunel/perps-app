@@ -89,5 +89,14 @@
         "explanation": "{{token}} sera envoyé à votre adresse.",
         "availableToWithdraw": "Disponible pour retirer",
         "input_prompt": "Entrez le montant (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "Options",
+        "skipOpenOrderConfirm": "Ignorer la confirmation de la commande ouverte",
+        "enableTxNotifications": "Activer les notifications de transaction",
+        "enableBackgroundFillNotif": "Activer les notifications de remplissage en arrière-plan",
+        "numberFormat": "Format de nombre",
+        "color": "Couleur",
+        "language": "Langue"
     }
 }

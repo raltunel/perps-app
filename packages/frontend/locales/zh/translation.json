@@ -89,5 +89,14 @@
         "explanation": "{{token}}将发送到您的地址。",
         "availableToWithdraw": "可供提款",
         "input_prompt": "输入金额 (最小 ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "选项",
+        "skipOpenOrderConfirm": "跳过未完成订单确认",
+        "enableTxNotifications": "启用交易通知",
+        "enableBackgroundFillNotif": "启用背景填充通知",
+        "numberFormat": "数字格式",
+        "color": "颜色",
+        "language": "语言"
     }
 }

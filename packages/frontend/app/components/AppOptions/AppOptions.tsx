@@ -48,7 +48,7 @@ export default function AppOptions() {
         <section className={styles.app_options}>
             <ul>
                 <OptionLine
-                    text='Skip Open Order Confirmation'
+                    text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
                     toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
                 />
@@ -77,17 +77,17 @@ export default function AppOptions() {
             {/* <div className={styles.horizontal_divider} /> */}
             <ul>
                 {/* <OptionLine
-                    text='Display Verbose Errors'
+                    text={t('appSettings.displayVerboseErrors')}
                     isChecked={activeOptions['displayVerboseErrors']}
                     toggle={() => activeOptions.toggle('displayVerboseErrors')}
                 /> */}
                 <OptionLine
-                    text='Enable Transaction Notifications'
+                    text={t('appSettings.enableTxNotifications')}
                     isChecked={activeOptions['enableTxNotifications']}
                     toggle={() => activeOptions.toggle('enableTxNotifications')}
                 />
                 <OptionLine
-                    text='Enable Background Fill Notifications'
+                    text={t('appSettings.enableBackgroundFillNotif')}
                     isChecked={activeOptions['enableBackgroundFillNotif']}
                     toggle={() =>
                         activeOptions.toggle('enableBackgroundFillNotif')
@@ -129,7 +129,7 @@ export default function AppOptions() {
             <div className={styles.horizontal_divider} />
             <ul>
                 <OptionLineSelect
-                    text='Number Format'
+                    text={t('appSettings.numberFormat')}
                     active={numFormat.label}
                     options={NumFormatTypes.map((n: NumFormat) => ({
                         readable: n.label,
@@ -137,7 +137,7 @@ export default function AppOptions() {
                     }))}
                 />
                 <OptionLineSelect
-                    text='Color'
+                    text={t('appSettings.color')}
                     active={
                         <div style={{ gap: '10px' }}>
                             <div>
@@ -172,7 +172,7 @@ export default function AppOptions() {
                     )}
                 />
                 <OptionLineSelect
-                    text='Language'
+                    text={t('appSettings.language')}
                     active={
                         <div>
                             {
