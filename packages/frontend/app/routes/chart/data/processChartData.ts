@@ -32,11 +32,23 @@ export const processLastCandleWithPx = (
     lastCandle: Bar,
     px: number,
     resolution: ResolutionString,
+    isNewCandle?: boolean,
 ): Bar => {
     const time = getCurrentCandleTime(resolution);
+    if (isNewCandle) {
+        return {
+            open: lastCandle.close,
+            close: px,
+            high: px,
+            low: px,
+            time,
+        };
+    }
     return {
         ...lastCandle,
         close: px,
+        high: px > lastCandle.high ? px : lastCandle.high,
+        low: px < lastCandle.low ? px : lastCandle.low,
         time,
     };
 };

@@ -28,6 +28,7 @@ import {
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
+    getCurrentCandleTime,
 } from './utils/utils';
 import type { Bar } from '~/tv/charting_library';
 
@@ -46,10 +47,9 @@ export const createDataFeed = (
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
-    let lastBar: Bar | null = null;
+    let lastBarMap: Map<string, Bar | null> = new Map();
     let lastPrice: number = 0;
     const updateLastPrice = (price: number) => {
-        console.log('>>> updateLastPrice  ? ??  ??  ?? ? ? ?', price);
         lastPrice = price;
     };
     const datafeed: IDatafeedChartApi & {
@@ -107,6 +107,8 @@ export const createDataFeed = (
             const { from, to } = periodParams;
             const symbol = symbolInfo.ticker;
 
+            const currentCandleTime = getCurrentCandleTime(resolution);
+
             if (symbol) {
                 try {
                     const bars = await getHistoricalData(
@@ -115,9 +117,25 @@ export const createDataFeed = (
                         from,
                         to,
                     );
-                    console.log('>>> lastBar', bars?.[bars.length - 1]);
-                    lastBar = bars?.[bars.length - 1] || null;
-                    lastPrice = bars?.[bars.length - 1]?.close || 0;
+
+                    if (bars && bars.length > 0) {
+                        const last = bars.reduce((latest, current) => {
+                            return current.time > latest.time
+                                ? current
+                                : latest;
+                        });
+                        const lastBar = lastBarMap.get(resolution);
+                        if (lastBar) {
+                            if (last.time > lastBar.time) {
+                                lastPrice = last.close;
+                                lastBarMap.set(resolution, last);
+                            }
+                        } else {
+                            // lastBar = last;
+                            lastBarMap.set(resolution, last);
+                        }
+                    }
+
                     bars && onResult(bars, { noData: bars.length === 0 });
                 } catch (error) {
                     console.error('Error loading historical data:', error);
@@ -239,29 +257,43 @@ export const createDataFeed = (
         },
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
-            console.log(
-                '>>> subscribeBars',
-                symbolInfo,
-                resolution,
-                onTick,
-                listenerGuid,
-            );
-
             const poller = setInterval(() => {
+                const lastBar = lastBarMap.get(resolution);
                 if (!lastBar) return;
 
-                const updatedBar = processLastCandleWithPx(
-                    lastBar as Bar,
-                    lastPrice,
-                    resolution,
-                );
-                console.log('>>> updatedBar', updatedBar);
-                onTick(updatedBar);
-                updateCandleCache(
-                    symbolInfo.ticker as string,
-                    resolution,
-                    updatedBar,
-                );
+                const currentCandleTime = getCurrentCandleTime(resolution);
+                let updatedBar;
+                if (lastBar.time < currentCandleTime) {
+                    onTick(lastBar);
+
+                    updatedBar = processLastCandleWithPx(
+                        lastBar as Bar,
+                        lastPrice,
+                        resolution,
+                        true,
+                    );
+                    lastBarMap.set(resolution, updatedBar);
+                    // lastBar = updatedBar;
+                } else {
+                    updatedBar = processLastCandleWithPx(
+                        lastBar as Bar,
+                        lastPrice,
+                        resolution,
+                    );
+                    // console.log(
+                    //     '>>> update bar as with last candle',
+                    //     updatedBar,
+                    // );
+                }
+
+                if (updatedBar) {
+                    onTick(updatedBar);
+                    updateCandleCache(
+                        symbolInfo.ticker as string,
+                        resolution,
+                        updatedBar,
+                    );
+                }
             }, 200);
             const unsubscribe = () => clearInterval(poller);
             subscriptions.set(listenerGuid, { unsubscribe });
