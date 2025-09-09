@@ -13,8 +13,12 @@
         "applyDefaults": "Apply Defaults",
         "learnMore": "Learn More",
         "deposit": "Deposit",
-        "withdraw": "Withdraw",
-        "transfer": "Transfer"
+        "transfer": "Transfer",
+        "withdraw": "Withdraw"
+    },
+    "transactions": {
+        "marginMode": "Margin Mode",
+        "description": "View your transaction history"
     },
     "navigation": {
         "home": "Home",
@@ -52,7 +56,8 @@
         "hello": "Hello {{name}}!",
         "goodbye": "Goodbye",
         "thankYou": "Thank you",
-        "pleaseWait": "Please wait..."
+        "pleaseWait": "Please wait...",
+        "connectWalletForTrading": "Connect your wallet to start trading with zero gas."
     },
     "home": {
         "title": "Trade Perps With Ambient",

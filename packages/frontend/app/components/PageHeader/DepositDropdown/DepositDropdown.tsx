@@ -233,7 +233,7 @@ function DepositDropdown(props: propsIF) {
                 ) : (
                     <div className={styles.notConnectedContainer}>
                         <p className={styles.notConnectedText}>
-                            Connect your wallet to start trading with zero gas.
+                            {t('messages.connectWalletForTrading')}
                         </p>
                         <span
                             className={`plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Account+Overview`}

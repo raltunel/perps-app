@@ -74,6 +74,7 @@ import type {
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
+import { useTranslation } from 'react-i18next';
 
 const useOnlyMarket = false;
 
@@ -150,6 +151,9 @@ function OrderInput({
     marginBucket: MarginBucketAvail | null;
     isAnyPortfolioModalOpen: boolean;
 }) {
+    // hook to manage translations of user-facing copy
+    const { t } = useTranslation();
+
     // Track if the OrderInput component is focused
     const [isFocused, setIsFocused] = useState(false);
     const orderInputRef = useRef<HTMLDivElement>(null);
@@ -2393,7 +2397,7 @@ function OrderInput({
                     close={confirmOrderModal.close}
                     title={
                         confirmOrderModal.content === 'margin'
-                            ? 'Margin Mode'
+                            ? t('transactions.marginMode')
                             : confirmOrderModal.content === 'scale'
                               ? 'Scale Options'
                               : confirmOrderModal.content === 'market_buy'
