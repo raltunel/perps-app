@@ -246,9 +246,6 @@ export const createDataFeed = (
                 onTick,
                 listenerGuid,
             );
-            if (!info) return console.log('SDK is not ready');
-
-            const intervalParam = convertResolutionToIntervalParam(resolution);
 
             const poller = setInterval(() => {
                 if (!lastBar) return;
