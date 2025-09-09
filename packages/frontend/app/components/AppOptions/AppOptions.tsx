@@ -205,11 +205,14 @@ export default function AppOptions() {
                     const browserLanguages = navigator.languages || [
                         navigator.language,
                     ];
+
                     const supportedLanguages = Object.keys(languageOptions); // ['en', 'es']
                     const defaultLanguage =
-                        browserLanguages.find((lang) =>
-                            supportedLanguages.includes(lang),
-                        ) || 'en';
+                        browserLanguages
+                            .map((lang) => lang.split('-')[0]) // Convert 'en-US' to 'en'
+                            .find((lang) =>
+                                supportedLanguages.includes(lang),
+                            ) || 'en';
                     i18n.changeLanguage(defaultLanguage);
 
                     if (typeof plausible === 'function') {
