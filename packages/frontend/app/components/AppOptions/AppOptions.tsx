@@ -17,26 +17,13 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 
 const languageOptions = {
-    en: 'English 🇺🇸 🇬🇧 🇨🇦 🇦🇺',
-    de: 'Deutsch 🇩🇪',
+    en: 'English 🇺🇸 🇬🇧 🇨🇦 🇦🇺 🇮🇳',
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
-    it: 'Italiano 🇮🇹',
-    nl: 'Nederlands 🇳🇱',
-    pl: 'Polski 🇵🇱',
-    'pt-PT': 'Português (PT) 🇵🇹',
-    'pt-BR': 'Português (BR) 🇧🇷',
-    id: 'Bahasa Indonesia 🇮🇩',
     tr: 'Türkçe 🇹🇷',
-    el: 'Ελληνικά 🇬🇷',
-    uk: 'Українська 🇺🇦',
-    vi: 'Tiếng Việt 🇻🇳',
     ja: '日本語 🇯🇵',
     ko: '한국어 🇰🇷',
-    hi: 'हिंदी 🇮🇳',
     zh: '中文 (简体) 🇨🇳',
-    'zh-HK': '中文 (香港) 🇭🇰',
-    'zh-TW': '中文 (台灣) 🇹🇼',
 };
 
 export interface appOptionDataIF {
