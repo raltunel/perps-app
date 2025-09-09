@@ -17,7 +17,7 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 
 const languageOptions = {
-    en: 'English 🇺🇸 🇬🇧 🇨🇦 🇦🇺 🇮🇳',
+    en: 'English 🇬🇧',
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
     tr: 'Türkçe 🇹🇷',
@@ -177,7 +177,7 @@ export default function AppOptions() {
                         <div>
                             {
                                 languageOptions[
-                                    (i18n?.language ||
+                                    (i18n?.language?.split('-')[0] ||
                                         'en') as keyof typeof languageOptions
                                 ]
                             }
