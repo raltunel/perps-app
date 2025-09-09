@@ -17,8 +17,20 @@
         "withdraw": "Withdraw"
     },
     "transactions": {
+        "orderTypes": "Order Types",
         "marginMode": "Margin Mode",
-        "description": "View your transaction history"
+        "scaleOptions": "Scale Options",
+        "confirmBuyOrder": "Confirm Buy Order",
+        "confirmSellOrder": "Confirm Sell Order",
+        "confirmLimitBuyOrder": "Confirm Limit Buy Order",
+        "confirmLimitSellOrder": "Confirm Limit Sell Order",
+        "availableToTrade": "Available to Trade",
+        "availableToTradeTooltip": "Deposited fUSD",
+        "currentPosition": "Current Position",
+        "currentPositionTooltip": "Current {{symbol}} position size",
+        "maxOpenInterestReached": "Max Open Interest Reached",
+        "depositToTrade": "Deposit to Trade",
+        "switchDirectionToReduce": "Switch Direction to Reduce"
     },
     "navigation": {
         "home": "Home",

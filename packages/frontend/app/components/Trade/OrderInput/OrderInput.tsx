@@ -2114,11 +2114,11 @@ function OrderInput({
     );
 
     const submitButtonText = userExceededOI
-        ? 'Max Open Interest Reached'
+        ? t('transactions.maxOpenInterestReached')
         : normalizedEquity < MIN_POSITION_USD_SIZE
-          ? 'Deposit to Trade'
+          ? t('transactions.depositToTrade')
           : isReduceInWrongDirection
-            ? 'Switch Direction to Reduce'
+            ? t('transactions.switchDirectionToReduce')
             : isMarginInsufficientDebounced
               ? tradeDirection === 'buy'
                   ? 'Max Long - Deposit to Trade'
@@ -2132,13 +2132,13 @@ function OrderInput({
     const inputDetailsData = useMemo(
         () => [
             {
-                label: 'Available to Trade',
-                tooltipLabel: 'Deposited fUSD',
+                label: t('transactions.availableToTrade'),
+                tooltipLabel: t('transactions.availableToTradeTooltip'),
                 value: displayNumAvailableToTrade,
             },
             {
-                label: 'Current Position',
-                tooltipLabel: `Current ${symbol} position size`,
+                label: t('transactions.currentPosition'),
+                tooltipLabel: t('transactions.currentPositionTooltip'),
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
@@ -2188,7 +2188,7 @@ function OrderInput({
                             >
                                 <MdKeyboardArrowLeft />
                             </div>
-                            <h3>Order Types</h3>
+                            <h3>{t('transactions.orderTypes')}</h3>
                             <button
                                 className={styles.trade_type_toggle}
                                 onClick={() => setShowLaunchpad(false)}
@@ -2399,15 +2399,15 @@ function OrderInput({
                         confirmOrderModal.content === 'margin'
                             ? t('transactions.marginMode')
                             : confirmOrderModal.content === 'scale'
-                              ? 'Scale Options'
+                              ? t('transactions.scaleOptions')
                               : confirmOrderModal.content === 'market_buy'
-                                ? 'Confirm Buy Order'
+                                ? t('transactions.confirmBuyOrder')
                                 : confirmOrderModal.content === 'market_sell'
-                                  ? 'Confirm Sell Order'
+                                  ? t('transactions.confirmSellOrder')
                                   : confirmOrderModal.content === 'limit_buy'
-                                    ? 'Confirm Limit Buy Order'
+                                    ? t('transactions.confirmLimitBuyOrder')
                                     : confirmOrderModal.content === 'limit_sell'
-                                      ? 'Confirm Limit Sell Order'
+                                      ? t('transactions.confirmLimitSellOrder')
                                       : ''
                     }
                 >
