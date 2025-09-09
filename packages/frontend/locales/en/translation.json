@@ -95,5 +95,9 @@
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo"
+    },
+    "withdraw": {
+        "prompt": "Withdraw {{token}} to Fogo",
+        "explanation": "{{token}} will be sent to your address."
     }
 }

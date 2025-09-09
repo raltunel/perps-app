@@ -10,6 +10,7 @@ import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     portfolio: {
@@ -35,6 +36,8 @@ function PortfolioWithdraw({
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
+
+    const { t } = useTranslation();
 
     const {
         formatNum,
@@ -305,9 +308,9 @@ function PortfolioWithdraw({
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
                 {/* <h4>Withdraw {unitValue} to Fogo</h4> */}
-                <h4>Withdraw fUSD to Fogo</h4>
+                <h4>{t('withdraw.prompt', { token: 'fUSD' })}</h4>
                 <div>
-                    <p>fUSD will be sent to your address.</p>
+                    <p>{t('withdraw.explanation', { token: 'fUSD' })}</p>
                 </div>
             </div>
 
@@ -392,7 +395,7 @@ function PortfolioWithdraw({
                     ? 'Confirming Transaction...'
                     : isProcessing
                       ? 'Processing...'
-                      : 'Withdraw'}
+                      : t('common.withdraw')}
             </SimpleButton>
         </div>
     );

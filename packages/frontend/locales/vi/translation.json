@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Gửi {{token}} từ Fogo"
+    },
+    "withdraw": {
+        "prompt": "Rút {{token}} về Fogo",
+        "explanation": "{{token}} sẽ được gửi đến địa chỉ của bạn."
     }
 }

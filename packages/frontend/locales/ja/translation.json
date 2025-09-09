@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Fogoから{{token}}を入金する"
+    },
+    "withdraw": {
+        "prompt": "Fogoに{{token}}を出金する",
+        "explanation": "{{token}}があなたのアドレスに送信されます。"
     }
 }

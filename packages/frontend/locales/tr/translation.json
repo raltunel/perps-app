@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Fogo'dan {{token}} yatır"
+    },
+    "withdraw": {
+        "prompt": "Fogo'ya {{token}} çek",
+        "explanation": "{{token}} adresinize gönderilecektir."
     }
 }

@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "喺 Fogo 存入 {{token}}"
+    },
+    "withdraw": {
+        "prompt": "從 Fogo 提取 {{token}}",
+        "explanation": "{{token}} 會發送到你嘅地址。"
     }
 }

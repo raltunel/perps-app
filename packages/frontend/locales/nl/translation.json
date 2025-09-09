@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Stort {{token}} van Fogo"
+    },
+    "withdraw": {
+        "prompt": "Neem {{token}} op naar Fogo",
+        "explanation": "{{token}} wordt naar uw adres gestuurd."
     }
 }

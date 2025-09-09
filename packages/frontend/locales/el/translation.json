@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Κατάθεση {{token}} από την Fogo"
+    },
+    "withdraw": {
+        "prompt": "Ανάληψη {{token}} προς την Fogo",
+        "explanation": "Το {{token}} θα σταλεί στη διεύθυνσή σας."
     }
 }

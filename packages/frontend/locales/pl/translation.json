@@ -78,5 +78,9 @@
     },
     "deposit": {
         "prompt": "Wpłać {{token}} z Fogo"
+    },
+    "withdraw": {
+        "prompt": "Wypłać {{token}} do Fogo",
+        "explanation": "{{token}} zostanie wysłany na Twój adres."
     }
 }
