@@ -100,6 +100,7 @@ export function drawLiqLabel(
     ctx: CanvasRenderingContext2D,
     { x, y, color, labelOptions }: DrawSegmentedRectOptions,
     chartWidth: number,
+    isLiqPriceLineDraggable: boolean,
 ) {
     const dpr = window.devicePixelRatio || 1;
     const height = 18 * dpr;
@@ -120,7 +121,7 @@ export function drawLiqLabel(
 
     for (let i = 0; i < labelOptions.length; i++) {
         const { text, backgroundColor, type, textColor } = labelOptions[i];
-        const isAddVerticalLine = type === 'Main';
+        const isAddVerticalLine = type === 'Main' && isLiqPriceLineDraggable;
 
         const textMetrics = ctx.measureText(text);
         const textWidth = textMetrics.width;

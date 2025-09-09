@@ -66,6 +66,9 @@ const LabelComponent = ({
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
+
+    const isLiqPriceLineDraggable = false;
+
     useEffect(() => {
         if (!chart || !isChartReady || !ctx || !canvasSize) return;
 
@@ -171,6 +174,7 @@ const LabelComponent = ({
                             color: line.color,
                         },
                         canvasSize.width,
+                        isLiqPriceLineDraggable,
                     );
                 }
 
@@ -219,7 +223,7 @@ const LabelComponent = ({
                 overlayOffsetX,
                 overlayOffsetY,
                 drawnLabelsRef.current,
-                false,
+                isLiqPriceLineDraggable,
             );
 
             if (
@@ -271,7 +275,7 @@ const LabelComponent = ({
                                     overlayOffsetX,
                                     overlayOffsetY,
                                     drawnLabelsRef.current,
-                                    false,
+                                    isLiqPriceLineDraggable,
                                 );
                                 overlayCanvasMousePositionRef.current = {
                                     x: overlayOffsetX,
@@ -469,7 +473,7 @@ const LabelComponent = ({
                             offsetX,
                             offsetY,
                             drawnLabelsRef.current,
-                            true,
+                            isLiqPriceLineDraggable,
                         );
 
                         if (
@@ -523,7 +527,7 @@ const LabelComponent = ({
                 offsetX,
                 offsetY,
                 drawnLabelsRef.current,
-                false,
+                isLiqPriceLineDraggable,
             );
 
             if (
