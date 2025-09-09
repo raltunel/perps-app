@@ -19,18 +19,23 @@ import {
     updateCandleCache,
     updateMarkDataWithSubscription,
 } from './candleDataCache';
-import { processWSCandleMessage } from './processChartData';
+import {
+    processLastCandleWithPx,
+    processWSCandleMessage,
+} from './processChartData';
 import {
     convertResolutionToIntervalParam,
     mapResolutionToInterval,
     resolutionToSecondsMiliSeconds,
     supportedResolutions,
 } from './utils/utils';
+import type { Bar } from '~/tv/charting_library';
 
 const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
+    updateLastPrice: (price: number) => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -41,8 +46,15 @@ export const createDataFeed = (
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
+    let lastBar: Bar | null = null;
+    let lastPrice: number = 0;
+    const updateLastPrice = (price: number) => {
+        console.log('>>> updateLastPrice  ? ??  ??  ?? ? ? ?', price);
+        lastPrice = price;
+    };
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
+        updateLastPrice: (price: number) => void;
     } = {
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
@@ -103,7 +115,9 @@ export const createDataFeed = (
                         from,
                         to,
                     );
-
+                    console.log('>>> lastBar', bars?.[bars.length - 1]);
+                    lastBar = bars?.[bars.length - 1] || null;
+                    lastPrice = bars?.[bars.length - 1]?.close || 0;
                     bars && onResult(bars, { noData: bars.length === 0 });
                 } catch (error) {
                     console.error('Error loading historical data:', error);
@@ -237,39 +251,21 @@ export const createDataFeed = (
             const intervalParam = convertResolutionToIntervalParam(resolution);
 
             const poller = setInterval(() => {
-                const currentTime = new Date().getTime();
-                fetch(`${POLLING_API_URL}/info`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        type: 'candleSnapshot',
-                        req: {
-                            coin: symbolInfo.ticker,
-                            interval: intervalParam,
-                            endTime: currentTime,
-                            startTime: currentTime - 1000 * 10,
-                        },
-                    }),
-                }).then((res) => {
-                    res.json().then((data) => {
-                        const candleData = data[0];
-                        if (
-                            symbolInfo.ticker &&
-                            candleData.s === symbolInfo.ticker
-                        ) {
-                            const tick = processWSCandleMessage(candleData);
-                            onTick(tick);
-                            updateCandleCache(
-                                symbolInfo.ticker,
-                                resolution,
-                                tick,
-                            );
-                        }
-                    });
-                });
-            }, TIMEOUT_CANDLE_POLLING);
+                if (!lastBar) return;
+
+                const updatedBar = processLastCandleWithPx(
+                    lastBar as Bar,
+                    lastPrice,
+                    resolution,
+                );
+                console.log('>>> updatedBar', updatedBar);
+                onTick(updatedBar);
+                updateCandleCache(
+                    symbolInfo.ticker as string,
+                    resolution,
+                    updatedBar,
+                );
+            }, 200);
             const unsubscribe = () => clearInterval(poller);
             subscriptions.set(listenerGuid, { unsubscribe });
         },
@@ -295,6 +291,7 @@ export const createDataFeed = (
         },
 
         updateUserAddress,
+        updateLastPrice,
     } as CustomDataFeedType;
 
     return datafeed as CustomDataFeedType;
