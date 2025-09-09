@@ -36,6 +36,7 @@ export const useLiqudationLines = (): HorizontalLineData[] => {
                 lineWidth,
                 type: item.type,
                 dash,
+                globalAlpha: 0.6,
             };
         });
     };
