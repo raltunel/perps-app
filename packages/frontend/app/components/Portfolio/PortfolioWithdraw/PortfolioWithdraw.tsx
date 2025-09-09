@@ -292,7 +292,7 @@ function PortfolioWithdraw({
     const infoItems = useMemo(
         () => [
             {
-                label: 'Available to withdraw',
+                label: t('withdraw.availableToWithdraw'),
                 value: !isNaN(portfolio.availableBalance)
                     ? formatNum(portfolio.availableBalance, 2, true, true)
                     : '-',
@@ -315,7 +315,7 @@ function PortfolioWithdraw({
             </div>
 
             <div className={styles.input_container}>
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 {showInvalidSizeWarning ? (
                     userBalanceLessThanMinimum ? (
                         <span>
@@ -328,7 +328,9 @@ function PortfolioWithdraw({
                     )
                 ) : null}
                 <NumFormattedInput
-                    placeholder='Enter amount (min $1)'
+                    placeholder={t('withdraw.input_prompt', {
+                        MIN_WITHDRAW_AMOUNT,
+                    })}
                     value={rawInputString}
                     onChange={(
                         event: string | React.ChangeEvent<HTMLInputElement>,

@@ -14,7 +14,10 @@
         "learnMore": "En savoir plus",
         "deposit": "Dépôt",
         "withdraw": "Retirer",
-        "transfer": "Transfert"
+        "transfer": "Transfert",
+        "amount": "Montant",
+        "max": "Max",
+        "min": "Min"
     },
     "navigation": {
         "home": "Accueil",
@@ -77,10 +80,14 @@
         "rewardsEarned": "Récompenses Gagnées"
     },
     "deposit": {
-        "prompt": "Dépôt {{token}} depuis Fogo"
+        "prompt": "Dépôt {{token}} depuis Fogo",
+        "input_prompt": "Entrez le montant (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Disponible pour dépôt"
     },
     "withdraw": {
         "prompt": "Retirer {{token}} vers Fogo",
-        "explanation": "{{token}} sera envoyé à votre adresse."
+        "explanation": "{{token}} sera envoyé à votre adresse.",
+        "availableToWithdraw": "Disponible pour retirer",
+        "input_prompt": "Entrez le montant (min ${{MIN_WITHDRAW_AMOUNT}})"
     }
 }

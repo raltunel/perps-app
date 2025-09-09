@@ -14,7 +14,10 @@
         "learnMore": "詳細を見る",
         "deposit": "入金",
         "withdraw": "出金",
-        "transfer": "送金"
+        "transfer": "送金",
+        "amount": "金額",
+        "max": "最大",
+        "min": "最小"
     },
     "navigation": {
         "home": "ホーム",
@@ -77,10 +80,14 @@
         "rewardsEarned": "獲得報酬"
     },
     "deposit": {
-        "prompt": "Fogoから{{token}}を入金する"
+        "prompt": "Fogoから{{token}}を入金する",
+        "input_prompt": "入金額を入力してください (最小 ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "入金可能"
     },
     "withdraw": {
         "prompt": "Fogoに{{token}}を出金する",
-        "explanation": "{{token}}があなたのアドレスに送信されます。"
+        "explanation": "{{token}}があなたのアドレスに送信されます。",
+        "availableToWithdraw": "出金可能",
+        "input_prompt": "出金額を入力してください (最小 ${{MIN_WITHDRAW_AMOUNT}})"
     }
 }

@@ -14,7 +14,10 @@
         "learnMore": "자세히 보기",
         "deposit": "입금",
         "withdraw": "출금",
-        "transfer": "송금"
+        "transfer": "송금",
+        "amount": "금액",
+        "max": "최대",
+        "min": "최소"
     },
     "navigation": {
         "home": "홈",
@@ -77,6 +80,14 @@
         "rewardsEarned": "획득한 보상"
     },
     "deposit": {
-        "prompt": "Fogo에서 {{token}}을 입금하세요"
+        "prompt": "Fogo에서 {{token}}을 입금하세요",
+        "input_prompt": "입금액을 입력하세요 (최소 ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "입금 가능"
+    },
+    "withdraw": {
+        "prompt": "Fogo에서 {{token}}을 입금하세요",
+        "explanation": "{{token}}이 주소로 전송됩니다.",
+        "availableToWithdraw": "출금 가능",
+        "input_prompt": "출금액을 입력하세요 (최소 ${{MIN_WITHDRAW_AMOUNT}})"
     }
 }

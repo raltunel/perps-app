@@ -14,7 +14,10 @@
         "learnMore": "Daha Fazla Bilgi",
         "deposit": "Yatırmak",
         "withdraw": "Çekmek",
-        "transfer": "Transfer etmek"
+        "transfer": "Transfer etmek",
+        "amount": "Miktar",
+        "max": "Maksimum",
+        "min": "Minimum"
     },
     "navigation": {
         "home": "Ana Sayfa",
@@ -77,10 +80,14 @@
         "rewardsEarned": "Kazanılan Ödüller"
     },
     "deposit": {
-        "prompt": "Fogo'dan {{token}} yatır"
+        "prompt": "Fogo'dan {{token}} yatır",
+        "input_prompt": "Yatırılan tutarı girin (minimum ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Yatırılabilecek"
     },
     "withdraw": {
         "prompt": "Fogo'ya {{token}} çek",
-        "explanation": "{{token}} adresinize gönderilecektir."
+        "explanation": "{{token}} adresinize gönderilecektir.",
+        "availableToWithdraw": "Çekilecek",
+        "input_prompt": "Çekilecek tutarı girin (minimum ${{MIN_WITHDRAW_AMOUNT}})"
     }
 }

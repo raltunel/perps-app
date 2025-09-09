@@ -14,7 +14,10 @@
         "learnMore": "了解更多",
         "deposit": "存款",
         "withdraw": "取款",
-        "transfer": "转账"
+        "transfer": "转账",
+        "amount": "金额",
+        "max": "最大",
+        "min": "最小"
     },
     "navigation": {
         "home": "首页",
@@ -77,10 +80,14 @@
         "rewardsEarned": "已获奖励"
     },
     "deposit": {
-        "prompt": "从Fogo存入{{token}}"
+        "prompt": "从Fogo存入{{token}}",
+        "input_prompt": "输入金额 (最小 ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "可存入"
     },
     "withdraw": {
         "prompt": "从Fogo提取{{token}}",
-        "explanation": "{{token}}将发送到您的地址。"
+        "explanation": "{{token}}将发送到您的地址。",
+        "availableToWithdraw": "可供提款",
+        "input_prompt": "输入金额 (最小 ${{MIN_WITHDRAW_AMOUNT}})"
     }
 }
