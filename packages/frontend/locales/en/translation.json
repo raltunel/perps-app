@@ -11,7 +11,10 @@
         "error": "Error",
         "success": "Success",
         "applyDefaults": "Apply Defaults",
-        "learnMore": "Learn More"
+        "learnMore": "Learn More",
+        "deposit": "Deposit",
+        "withdraw": "Withdraw",
+        "transfer": "Transfer"
     },
     "navigation": {
         "home": "Home",
@@ -72,5 +75,8 @@
         "description": "Refer users to earn rewards. Affiliates earn greater rewards.",
         "tradersReferred": "Traders Referred",
         "rewardsEarned": "Rewards Earned"
+    },
+    "deposit": {
+        "prompt": "Deposit {{token}} from Fogo"
     }
 }

@@ -11,7 +11,10 @@
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
-        "learnMore": "了解更多"
+        "learnMore": "了解更多",
+        "deposit": "存款",
+        "withdraw": "取款",
+        "transfer": "转账"
     },
     "navigation": {
         "home": "首页",
@@ -72,5 +75,8 @@
         "description": "推荐用户赚取奖励。推荐人可获得更高奖励。",
         "tradersReferred": "已推荐交易者",
         "rewardsEarned": "已获奖励"
+    },
+    "deposit": {
+        "prompt": "从Fogo存入{{token}}"
     }
 }

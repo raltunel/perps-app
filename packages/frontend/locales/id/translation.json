@@ -11,7 +11,10 @@
         "error": "Kesalahan",
         "success": "Berhasil",
         "applyDefaults": "Terapkan Default",
-        "learnMore": "Pelajari Lebih Lanjut"
+        "learnMore": "Pelajari Lebih Lanjut",
+        "deposit": "Menyetor",
+        "withdraw": "Menarik",
+        "transfer": "Mentransfer"
     },
     "navigation": {
         "home": "Beranda",
@@ -72,5 +75,8 @@
         "description": "Rekomendasikan pengguna untuk mendapatkan hadiah. Afiliasi mendapatkan hadiah lebih besar.",
         "tradersReferred": "Pedagang yang Direkomendasikan",
         "rewardsEarned": "Hadiah yang Diperoleh"
+    },
+    "deposit": {
+        "prompt": "Deposite {{token}} dari Fogo"
     }
 }

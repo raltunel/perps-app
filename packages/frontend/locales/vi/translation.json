@@ -11,7 +11,10 @@
         "error": "Lỗi",
         "success": "Thành công",
         "applyDefaults": "Áp dụng mặc định",
-        "learnMore": "Tìm hiểu thêm"
+        "learnMore": "Tìm hiểu thêm",
+        "deposit": "Gửi tiền",
+        "withdraw": "Rút tiền",
+        "transfer": "Chuyển khoản"
     },
     "navigation": {
         "home": "Trang chủ",
@@ -72,5 +75,8 @@
         "description": "Giới thiệu người dùng để nhận phần thưởng. Đối tác giới thiệu nhận được phần thưởng lớn hơn.",
         "tradersReferred": "Người dùng Đã Giới thiệu",
         "rewardsEarned": "Phần thưởng Đã nhận"
+    },
+    "deposit": {
+        "prompt": "Gửi {{token}} từ Fogo"
     }
 }

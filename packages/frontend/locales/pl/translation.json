@@ -11,7 +11,10 @@
         "error": "Błąd",
         "success": "Sukces",
         "applyDefaults": "Przywróć domyślne",
-        "learnMore": "Dowiedz się więcej"
+        "learnMore": "Dowiedz się więcej",
+        "deposit": "Wpłacić",
+        "withdraw": "Wypłacić",
+        "transfer": "Przelewać"
     },
     "navigation": {
         "home": "Strona główna",
@@ -72,5 +75,8 @@
         "description": "Polecaj użytkowników i zarabiaj nagrody. Partnerzy otrzymują wyższe wynagrodzenie.",
         "tradersReferred": "Poleceni traderzy",
         "rewardsEarned": "Zarobione nagrody"
+    },
+    "deposit": {
+        "prompt": "Wpłać {{token}} z Fogo"
     }
 }

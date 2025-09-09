@@ -11,7 +11,10 @@
         "error": "Fehler",
         "success": "Erfolg",
         "applyDefaults": "Standardwerte übernehmen",
-        "learnMore": "Mehr erfahren"
+        "learnMore": "Mehr erfahren",
+        "deposit": "Einzahlung",
+        "withdraw": "Abheben",
+        "transfer": "Überweisung"
     },
     "navigation": {
         "home": "Startseite",
@@ -72,5 +75,8 @@
         "description": "Empfehlen Sie Nutzer und verdienen Sie Prämien. Partner erhalten höhere Prämien.",
         "tradersReferred": "Empfohlene Händler",
         "rewardsEarned": "Verdiente Prämien"
+    },
+    "deposit": {
+        "prompt": "Zahlen Sie {{token}} von Fogo ein"
     }
 }

@@ -11,7 +11,10 @@
         "error": "Hata",
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları Uygula",
-        "learnMore": "Daha Fazla Bilgi"
+        "learnMore": "Daha Fazla Bilgi",
+        "deposit": "Yatırmak",
+        "withdraw": "Çekmek",
+        "transfer": "Transfer etmek"
     },
     "navigation": {
         "home": "Ana Sayfa",
@@ -72,5 +75,8 @@
         "description": "Kullanıcıları davet edin ve ödüller kazanın. Ortaklar daha yüksek ödüller kazanır.",
         "tradersReferred": "Yönlendirilen İşlemciler",
         "rewardsEarned": "Kazanılan Ödüller"
+    },
+    "deposit": {
+        "prompt": "Fogo'dan {{token}} yatır"
     }
 }

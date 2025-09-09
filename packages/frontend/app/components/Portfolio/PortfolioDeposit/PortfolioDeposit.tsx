@@ -15,6 +15,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     portfolio: {
@@ -31,6 +32,7 @@ interface propsIF {
 
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
+    const { t } = useTranslation();
     const notificationStore = useNotificationStore();
     const {
         formatNum,
@@ -271,7 +273,7 @@ function PortfolioDeposit(props: propsIF) {
         <div className={styles.container}>
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
-                <h4>Deposit {selectedToken.symbol} from Fogo</h4>
+                <h4>{t('deposit.prompt', { token: selectedToken.symbol })}</h4>
             </div>
 
             <TokenDropdown
@@ -344,7 +346,7 @@ function PortfolioDeposit(props: propsIF) {
                     ? 'Confirming Transaction...'
                     : isProcessing
                       ? 'Processing...'
-                      : 'Deposit'}
+                      : t('common.deposit')}
             </SimpleButton>
         </div>
     );

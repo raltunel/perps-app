@@ -11,7 +11,10 @@
         "error": "Errore",
         "success": "Successo",
         "applyDefaults": "Ripristina impostazioni predefinite",
-        "learnMore": "Scopri di più"
+        "learnMore": "Scopri di più",
+        "deposit": "Deposito",
+        "withdraw": "Prelievo",
+        "transfer": "Trasferimento"
     },
     "navigation": {
         "home": "Home",
@@ -72,5 +75,8 @@
         "description": "Raccomanda utenti per guadagnare ricompense. Gli affiliati guadagnano ricompense maggiori.",
         "tradersReferred": "Trader Raccomandati",
         "rewardsEarned": "Ricompense Guadagnate"
+    },
+    "deposit": {
+        "prompt": "Deposita {{token}} da Fogo"
     }
 }

@@ -11,7 +11,10 @@
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
-        "learnMore": "자세히 보기"
+        "learnMore": "자세히 보기",
+        "deposit": "입금",
+        "withdraw": "출금",
+        "transfer": "송금"
     },
     "navigation": {
         "home": "홈",
@@ -72,5 +75,8 @@
         "description": "사용자를 추천하고 보상을 받으세요. 제휴사는 더 큰 보상을 얻습니다.",
         "tradersReferred": "추천된 트레이더",
         "rewardsEarned": "획득한 보상"
+    },
+    "deposit": {
+        "prompt": "Fogo에서 {{token}}을 입금하세요"
     }
 }

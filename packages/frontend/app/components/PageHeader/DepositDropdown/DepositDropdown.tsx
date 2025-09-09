@@ -19,6 +19,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './DepositDropdown.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     marginBucket: MarginBucketAvail | null;
@@ -60,6 +61,8 @@ function DepositDropdown(props: propsIF) {
         openWithdrawModal,
         PortfolioModalsRenderer,
     } = props;
+
+    const { t } = useTranslation();
 
     const [balanceNum, setBalanceNum] = useState<number>(0);
     const [unrealizedPnlNum, setUnrealizedPnlNum] = useState<number>(0);
@@ -217,14 +220,14 @@ function DepositDropdown(props: propsIF) {
                             onClick={handleDeposit}
                             className={styles.depositButton}
                         >
-                            Deposit
+                            {t('common.deposit')}
                         </SimpleButton>
                         <SimpleButton
                             bg={isDropdown ? 'dark4' : 'dark3'}
                             hoverBg='accent1'
                             onClick={handleWithdraw}
                         >
-                            Withdraw
+                            {t('common.withdraw')}
                         </SimpleButton>
                     </div>
                 ) : (

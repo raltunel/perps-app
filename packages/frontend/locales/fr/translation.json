@@ -11,7 +11,10 @@
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
-        "learnMore": "En savoir plus"
+        "learnMore": "En savoir plus",
+        "deposit": "Dépôt",
+        "withdraw": "Retirer",
+        "transfer": "Transfert"
     },
     "navigation": {
         "home": "Accueil",
@@ -72,5 +75,8 @@
         "description": "Parrainez des utilisateurs pour gagner des récompenses. Les affiliés gagnent des récompenses plus importantes.",
         "tradersReferred": "Traders Parrainés",
         "rewardsEarned": "Récompenses Gagnées"
+    },
+    "deposit": {
+        "prompt": "Dépôt {{token}} depuis Fogo"
     }
 }

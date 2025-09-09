@@ -11,7 +11,10 @@
         "error": "Erro",
         "success": "Sucesso",
         "applyDefaults": "Aplicar predefinições",
-        "learnMore": "Saber mais"
+        "learnMore": "Saber mais",
+        "deposit": "Depositar",
+        "withdraw": "Retirar",
+        "transfer": "Transferir"
     },
     "navigation": {
         "home": "Início",
@@ -72,5 +75,8 @@
         "description": "Indique utilizadores para ganhar recompensas. Os afiliados ganham recompensas maiores.",
         "tradersReferred": "Traders Indicados",
         "rewardsEarned": "Recompensas Ganhas"
+    },
+    "deposit": {
+        "prompt": "Depositar {{token}} da Fogo"
     }
 }

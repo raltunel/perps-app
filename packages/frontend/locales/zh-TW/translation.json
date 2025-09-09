@@ -11,7 +11,10 @@
         "error": "錯誤",
         "success": "成功",
         "applyDefaults": "套用預設值",
-        "learnMore": "了解更多"
+        "learnMore": "了解更多",
+        "deposit": "存款",
+        "withdraw": "取款",
+        "transfer": "轉帳"
     },
     "navigation": {
         "home": "首頁",
@@ -72,5 +75,8 @@
         "description": "推薦用戶賺取獎勵。推薦人可獲得更高獎勵。",
         "tradersReferred": "已推薦交易者",
         "rewardsEarned": "已獲獎勵"
+    },
+    "deposit": {
+        "prompt": "從 Fogo 存入 {{token}}"
     }
 }

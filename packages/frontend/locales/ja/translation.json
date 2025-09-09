@@ -11,7 +11,10 @@
         "error": "エラー",
         "success": "成功",
         "applyDefaults": "デフォルトを適用",
-        "learnMore": "詳細を見る"
+        "learnMore": "詳細を見る",
+        "deposit": "入金",
+        "withdraw": "出金",
+        "transfer": "送金"
     },
     "navigation": {
         "home": "ホーム",
@@ -72,5 +75,8 @@
         "description": "ユーザーを紹介して報酬を獲得。アフィリエイトはより多くの報酬を獲得できます。",
         "tradersReferred": "紹介済みトレーダー",
         "rewardsEarned": "獲得報酬"
+    },
+    "deposit": {
+        "prompt": "Fogoから{{token}}を入金する"
     }
 }
