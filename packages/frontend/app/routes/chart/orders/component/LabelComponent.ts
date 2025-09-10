@@ -9,8 +9,7 @@ import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
 import { blockExplorer } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../../package.json';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import {
     findLimitLabelAtPosition,
     getMainSeriesPaneIndex,
@@ -402,10 +401,10 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Cancel Success',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            success: true,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -432,10 +431,10 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Cancel Fail',
                             orderType: 'Limit',
                             direction: order.side === 'buy' ? 'Buy' : 'Sell',
+                            success: false,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
                                 result.timeOfSubmission,
@@ -472,7 +471,6 @@ const LabelComponent = ({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Limit Cancel Fail',
                         orderType: 'Limit',
                         direction: order.side === 'buy' ? 'Buy' : 'Sell',
@@ -678,10 +676,10 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Limit Update Fail',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
+                                success: false,
                                 txBuildDuration: getDurationSegment(
                                     timeOfTxBuildStart,
                                     limitOrderResult.timeOfSubmission,
@@ -710,10 +708,10 @@ const LabelComponent = ({
                     if (typeof plausible === 'function') {
                         plausible('Onchain Action', {
                             props: {
-                                version: packageJson.version,
                                 actionType: 'Limit Update Success',
                                 orderType: 'Limit',
                                 direction: side === 'buy' ? 'Buy' : 'Sell',
+                                success: true,
                                 txBuildDuration: getDurationSegment(
                                     timeOfTxBuildStart,
                                     limitOrderResult.timeOfSubmission,
@@ -751,10 +749,10 @@ const LabelComponent = ({
                 if (typeof plausible === 'function') {
                     plausible('Offchain Failure', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Limit Update Fail',
                             orderType: 'Limit',
                             direction: side === 'buy' ? 'Buy' : 'Sell',
+                            success: false,
                             errorMessage:
                                 error instanceof Error
                                     ? error.message
