@@ -187,6 +187,13 @@
     transition: all 0.2s ease;
 }
 
+.warningText {
+    margin-top: 8px;
+    font-size: var(--font-size-xs, 11px);
+    color: var(--orange);
+    line-height: 1.4;
+}
+
 .textArea:focus {
     outline: none;
     border-color: var(--accent1);

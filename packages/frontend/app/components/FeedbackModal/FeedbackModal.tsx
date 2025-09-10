@@ -1,5 +1,5 @@
 import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './FeedbackModal.module.css';
 
 type FeedbackType = 'positive' | 'negative' | null;
@@ -15,11 +15,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!feedbackType && !feedbackText.trim()) return;
-
-        // Truncate feedback to be less than 2000 bytes
+    const truncatedFeedbackText = useMemo(() => {
         let truncatedFeedbackText = feedbackText;
         const maxBytes = 2000;
         const encoder = new TextEncoder();
@@ -32,6 +28,16 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 fatal: false,
             }).decode(truncated);
         }
+        return truncatedFeedbackText;
+    }, [feedbackText]);
+
+    const truncatedMatchesOriginal = useMemo(() => {
+        return feedbackText === truncatedFeedbackText;
+    }, [feedbackText, truncatedFeedbackText]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!feedbackType && !feedbackText.trim()) return;
         setIsSubmitting(true);
 
         try {
@@ -122,6 +128,12 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     placeholder='Your feedback helps us improve...'
                                     rows={5}
                                 />
+                                {!truncatedMatchesOriginal && (
+                                    <div className={styles.warningText}>
+                                        Your feedback exceeds the maximum length
+                                        and will be truncated.
+                                    </div>
+                                )}
                             </div>
                         </div>
 
