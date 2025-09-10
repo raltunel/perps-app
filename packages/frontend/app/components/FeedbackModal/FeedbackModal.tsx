@@ -1,5 +1,5 @@
 import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import styles from './FeedbackModal.module.css';
 
 type FeedbackType = 'positive' | 'negative' | null;
@@ -14,6 +14,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     const [feedbackText, setFeedbackText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     // Handle keyboard shortcuts
     useEffect(() => {
@@ -155,12 +156,24 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                         : 'What can we improve?'}
                                 </label>
                                 <textarea
+                                    ref={textareaRef}
                                     id='feedback-text'
                                     className={styles.textArea}
                                     value={feedbackText}
                                     onChange={(e) =>
                                         setFeedbackText(e.target.value)
                                     }
+                                    onFocus={() => {
+                                        // Small timeout to ensure the keyboard is shown
+                                        setTimeout(() => {
+                                            textareaRef.current?.scrollIntoView(
+                                                {
+                                                    behavior: 'smooth',
+                                                    block: 'center',
+                                                },
+                                            );
+                                        }, 100);
+                                    }}
                                     placeholder='Your anonymous feedback helps us improve...'
                                     rows={5}
                                 />
