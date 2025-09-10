@@ -1,5 +1,5 @@
 import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './FeedbackModal.module.css';
 
 type FeedbackType = 'positive' | 'negative' | null;
@@ -14,6 +14,40 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     const [feedbackText, setFeedbackText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
+
+    // Handle keyboard shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Submit form on Ctrl/Cmd + Enter
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const form = document.querySelector('form');
+                if (form) {
+                    const submitEvent = new Event('submit', {
+                        cancelable: true,
+                        bubbles: true,
+                    });
+                    const shouldSubmit = form.dispatchEvent(submitEvent);
+                    if (shouldSubmit) {
+                        form.requestSubmit();
+                    }
+                }
+            }
+            // Close modal on Escape
+            if (e.key === 'Escape') {
+                handleClose();
+            }
+            if (isSubmitted && e.key === 'Enter') {
+                handleClose();
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('keydown', handleKeyDown);
+        }
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isOpen, onClose, isSubmitted]);
 
     const truncatedFeedbackText = useMemo(() => {
         let truncatedFeedbackText = feedbackText;
