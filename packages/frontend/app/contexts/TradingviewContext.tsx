@@ -490,7 +490,10 @@ export const TradingViewProvider: React.FC<{ children: React.ReactNode }> = ({
 
     useEffect(() => {
         if (symbolInfo) {
-            dataFeedRef.current?.updateLastPrice(symbolInfo.markPx);
+            dataFeedRef.current?.updateLastPrice(
+                symbolInfo.coin,
+                symbolInfo.markPx,
+            );
         }
     }, [symbolInfo]);
 

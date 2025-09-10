@@ -36,7 +36,7 @@ const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
-    updateLastPrice: (price: number) => void;
+    updateLastPrice: (symbol: string, price: number) => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -48,13 +48,13 @@ export const createDataFeed = (
         currentUserAddress = newAddress;
     };
     let lastBarMap: Map<string, Bar | null> = new Map();
-    let lastPrice: number = 0;
-    const updateLastPrice = (price: number) => {
-        lastPrice = price;
+    let lastPriceMap: Map<string, number> = new Map();
+    const updateLastPrice = (symbol: string, price: number) => {
+        lastPriceMap.set(symbol, price);
     };
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
-        updateLastPrice: (price: number) => void;
+        updateLastPrice: (symbol: string, price: number) => void;
     } = {
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
@@ -124,15 +124,17 @@ export const createDataFeed = (
                                 ? current
                                 : latest;
                         });
-                        const lastBar = lastBarMap.get(resolution);
+                        const lastBar = lastBarMap.get(
+                            `${symbol}-${resolution}`,
+                        );
                         if (lastBar) {
                             if (last.time > lastBar.time) {
-                                lastPrice = last.close;
-                                lastBarMap.set(resolution, last);
+                                lastPriceMap.set(symbol, last.close);
+                                lastBarMap.set(`${symbol}-${resolution}`, last);
                             }
                         } else {
                             // lastBar = last;
-                            lastBarMap.set(resolution, last);
+                            lastBarMap.set(`${symbol}-${resolution}`, last);
                         }
                     }
 
@@ -258,8 +260,13 @@ export const createDataFeed = (
 
         subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
             const poller = setInterval(() => {
-                const lastBar = lastBarMap.get(resolution);
+                const lastBar = lastBarMap.get(
+                    `${symbolInfo.ticker as string}-${resolution}`,
+                );
+                const lastPrice =
+                    lastPriceMap.get(symbolInfo.ticker as string) || 0;
                 if (!lastBar) return;
+                if (lastPrice === 0) return;
 
                 const currentCandleTime = getCurrentCandleTime(resolution);
                 let updatedBar;
@@ -272,7 +279,10 @@ export const createDataFeed = (
                         resolution,
                         true,
                     );
-                    lastBarMap.set(resolution, updatedBar);
+                    lastBarMap.set(
+                        `${symbolInfo.ticker as string}-${resolution}`,
+                        updatedBar,
+                    );
                     // lastBar = updatedBar;
                 } else {
                     updatedBar = processLastCandleWithPx(
