@@ -1,4 +1,7 @@
-/* Base styles */
+:root {
+    --footer-h: 56px; /* mobile footer height */
+}
+
 html,
 body {
     overscroll-behavior-x: none;
@@ -15,109 +18,60 @@ body {
 .containerNew {
     height: 100%;
     display: grid;
-    grid-template-rows: 1fr var(--trade-tables-height-desktop);
+    grid-template-rows: 1fr;
     grid-template-columns: 1fr var(--trade-module-width-desktop-small);
-    grid-template-areas:
-        'market_data order_input'
-        'table wallet';
     gap: var(--gap-s);
 }
 
-.market_data {
-    grid-area: market_data;
+.leftCol {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     height: 100%;
-    display: grid;
-    grid-template-rows: 40px 40px 1fr;
-    grid-template-columns: 1fr var(--order-book-width-desktop-small);
-    grid-template-areas:
-        'watchlist order_book'
-        'symbol_info order_book'
-        'chart order_book';
-    width: 100%;
-    gap: var(--gap-s);
     overflow: hidden;
+    gap: var(--gap-s);
 }
 
-.order_book {
-    grid-area: order_book;
-}
-
-.order_input {
-    grid-area: order_input;
-}
-
-.order_book {
-    grid-area: order_book;
-}
-
-.wallet {
-    grid-area: wallet;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-dark2);
-    border-radius: var(--radius-m);
+.rightCol {
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
-    overflow: hidden;
-}
-
-@media (max-height: 750px) {
-    /* expand the order input to the full right col on short screens */
-    .containerNew {
-        grid-template-areas:
-            'top_left order_input'
-            'chart order_input';
-    }
-    .wallet {
-        display: none;
-    }
-}
-
-.containerTop,
-.containerBottom {
-    display: grid;
+    min-height: 0;
     height: 100%;
-    border-radius: var(--radius-m);
-    justify-content: center;
-    align-items: center;
 }
 
+/* Top (chart + order book) */
 .containerTop {
     width: 100%;
-    transition: all 0.2s ease;
+    height: 100%;
+    display: grid;
     grid-template-columns: 1fr var(--order-book-width-desktop-small);
     gap: var(--gap-s);
-    align-items: flex-start;
+    border-radius: var(--radius-m);
+    transition: none;
 }
 
 .containerTop.orderBookLarge {
     grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled);
 }
 
-.containerBottom {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-columns: 1fr var(--trade-module-width-desktop-small);
-    gap: var(--gap-s);
-}
-
+/* Bottom (trade table) */
 .table {
     background: var(--bg-dark2);
-    height: 100%;
     border-radius: var(--radius-m);
-    overflow-y: hidden;
-    min-height: var(--trade-tables-min-height-desktop);
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
+/* Top-left grid inside chart pane */
 .containerTopLeft {
     height: 100%;
     display: grid;
     grid-template-rows: 40px 40px 1fr;
-    min-width: 0;
-    /* width: 100%; */
-
+    width: 100%;
     gap: var(--gap-s);
 }
 
@@ -129,10 +83,10 @@ body {
     grid-template-rows: 30px 40px 40px 1fr;
 }
 
+/* Panels */
 .watchlist,
 .symbolInfo {
     background: var(--bg-dark2);
-    height: 100%;
     border-radius: var(--radius-m);
 }
 
@@ -148,17 +102,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    min-height: 0;
 }
 
 .orderBook,
 .tradeModules,
 .liquidationsChart,
-.symbolSectionWrapper {
+.symbolSectionWrapper,
+.chart {
+    max-height: none;
     overflow: hidden;
-    max-height: calc(
-        100vh - var(--trade-tables-height-desktop) -
-            var(--header-height-desktop) - var(--gap-s)
-    );
 }
 
 .orderBook {
@@ -180,6 +133,24 @@ body {
     gap: var(--gap-s);
     grid-template-columns: minmax(0, 1fr);
     height: 100%;
+    overflow: hidden;
+}
+
+.chartLayout.liqActive {
+    grid-template-columns: minmax(0, 1fr) var(--order-book-width-desktop-small);
+}
+
+.liquidationsChart {
+    position: relative;
+    overflow: hidden;
+}
+
+.chartLayout {
+    transition: all 0.2s ease-in-out;
+    display: grid;
+    gap: var(--gap-s);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
 }
 
 .chartLayout.liqActive {
@@ -192,9 +163,32 @@ body {
     overflow: hidden;
 }
 
-.chart {
-    max-height: 61vh;
+.orderBook > * {
+    min-height: 0;
+}
+.orderBook > *:last-child {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+/* Wallet & right column */
+.wallet {
+    grid-area: wallet;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark2);
+    border-radius: var(--radius-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
     overflow: hidden;
+}
+
+/* Debug toolbar */
+.debugToolbar {
+    background: var(--bg-dark2);
+    border-radius: var(--radius-s);
+    padding: var(--gap-s);
 }
 
 /* Desktop styles (1920px and above) */
@@ -210,6 +204,7 @@ body {
     .containerTop.orderBookLarge {
         grid-template-columns: 1fr var(--order-book-width-desktop-large-doubled);
     }
+
     .containerBottom {
         grid-template-columns: 1fr var(
                 --trade-module-width-desktop-large,
@@ -241,15 +236,14 @@ body {
         background: var(--bg-dark2, #111117);
     }
 
+    /* Do not clamp to 100dvh; fixed sections will handle height */
     .container {
         grid-template-rows: 1fr;
-        height: 100dvh;
         gap: 0;
     }
 
     .containerTop {
         grid-template-columns: 1fr;
-        height: 100dvh;
         gap: 0;
         border-radius: 0;
         padding-top: 120px;
@@ -260,7 +254,7 @@ body {
         position: fixed;
         top: 105px;
         left: 0;
-        width: 100%;
+        right: 0;
         height: 40px;
         background: var(--bg-dark1);
         z-index: 200;
@@ -296,12 +290,14 @@ body {
         color: var(--text1);
     }
 
+    /* KEY FIX: respect the fixed footer space */
     .mobileSection {
         position: fixed;
         top: 150px;
         left: 0;
-        width: 100%;
-        height: calc(100dvh - 150px);
+        right: 0;
+        bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
+        height: auto; /* top/bottom define the box */
         background: var(--bg-dark1);
         overflow-y: auto !important;
         display: none;
@@ -332,7 +328,6 @@ body {
         padding: 0 var(--padding-s);
     }
 
-    /* Mobile order book section styling */
     .mobileOrderBook,
     .mobileRecentTrades {
         height: 100%;
@@ -341,7 +336,6 @@ body {
         flex-direction: column;
     }
 
-    /* Mobile book section tabs - for subcategories inside Book view */
     .mobileBookTabs {
         display: flex;
         width: 100%;
@@ -383,4 +377,23 @@ body {
     .containerBottom {
         display: none;
     }
+}
+
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    height: 100%;
+    min-height: 0;
+}
+
+.order_input {
+    flex: 1;
+    min-height: 300px;
+}
+
+.wallet {
+    flex: 0 0 auto;
+    height: 100%;
+    max-height: 195px;
 }

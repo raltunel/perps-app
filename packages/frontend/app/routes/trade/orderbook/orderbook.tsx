@@ -29,12 +29,14 @@ import {
 } from '~/utils/orderbook/OrderBookUtils';
 import styles from './orderbook.module.css';
 import OrderRow, { OrderRowClickTypes } from './orderrow/orderrow';
-import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+// import { TIMEOUT_OB_POLLING } from '~/utils/Constants';
+import type { TabType } from '~/routes/trade';
+import { useSdk } from '~/hooks/useSdk';
 
 interface OrderBookProps {
-    symbol: string;
     orderCount: number;
     heightOverride?: string;
+    switchTab?: (tab: TabType) => void;
 }
 
 const dummyOrder: OrderBookRowIF = {
@@ -53,11 +55,13 @@ function useOrderSlots(orders: OrderBookRowIF[]) {
 }
 
 const OrderBook: React.FC<OrderBookProps> = ({
-    symbol,
     orderCount,
     heightOverride,
+    switchTab,
 }) => {
-    const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    // TODO: Can be uncommented if we want to use the rest poller
+    // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+    const { info } = useSdk();
 
     const orderClickDisabled = false;
 
@@ -101,6 +105,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         symbolInfo,
         setObChosenPrice,
         setObChosenAmount,
+        symbol,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -216,32 +221,41 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
     }, [symbol, symbolInfo?.coin, selectedResolution, setSelectedResolution]);
 
+    const subKey = useMemo(() => {
+        if (!selectedResolution) return undefined;
+        return {
+            type: 'l2Book' as const,
+            coin: symbol,
+            ...(selectedResolution.nsigfigs
+                ? { nSigFigs: selectedResolution.nsigfigs }
+                : {}),
+            ...(selectedResolution.mantissa
+                ? { mantissa: selectedResolution.mantissa }
+                : {}),
+        };
+    }, [selectedResolution, symbol]);
+
     useEffect(() => {
-        if (!symbol) return;
+        console.log('>>> orderbook subKey', subKey);
+        if (!subKey || !info) return;
         setOrderBookState(TableState.LOADING);
-        if (selectedResolution) {
-            const subKey = {
-                type: 'l2Book' as const,
-                coin: symbol,
-                ...(selectedResolution.nsigfigs
-                    ? { nSigFigs: selectedResolution.nsigfigs }
-                    : {}),
-                ...(selectedResolution.mantissa
-                    ? { mantissa: selectedResolution.mantissa }
-                    : {}),
-            };
-            subscribeToPoller(
-                'info',
-                subKey,
-                postOrderBookRaw,
-                TIMEOUT_OB_POLLING,
-                true,
-            );
+        if (subKey) {
+            // subscribeToPoller(
+            //     'info',
+            //     subKey,
+            //     postOrderBookRaw,
+            //     TIMEOUT_OB_POLLING,
+            //     true,
+            // );
+
+            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
+
             return () => {
-                unsubscribeFromPoller('info', subKey);
+                // unsubscribeFromPoller('info', subKey);
+                unsubscribe();
             };
         }
-    }, [selectedResolution, symbol]);
+    }, [subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => (
@@ -289,8 +303,33 @@ const OrderBook: React.FC<OrderBookProps> = ({
             rowLockTimeoutRef.current = setTimeout(() => {
                 lockOrderBook.current = false;
             }, 1000);
+
+            if (switchTab) {
+                const obRow = document.getElementById('order-row-' + order.px);
+                obRow?.classList.add('divPulse');
+                setTimeout(() => {
+                    obRow?.classList.remove('divPulse');
+                    switchTab('order' as TabType);
+                    setTimeout(() => {
+                        const orderElem = document.getElementById(
+                            'trade-module-price-input-container',
+                        );
+                        orderElem?.classList.add('divPulse');
+                        setTimeout(() => {
+                            orderElem?.classList.remove('divPulse');
+                        }, 800);
+                    }, 400);
+                }, 400);
+            }
         },
-        [buys, sells, orderCount, setObChosenPrice, setObChosenAmount],
+        [
+            buys,
+            sells,
+            orderCount,
+            setObChosenPrice,
+            setObChosenAmount,
+            switchTab,
+        ],
     );
 
     const getRandWidth = useCallback(
@@ -329,6 +368,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
                             (resolution) => resolution.val === Number(value),
                         );
                         if (resolution) {
+                            if (typeof plausible === 'function') {
+                                plausible('Resolution Update', {
+                                    props: {
+                                        resolutionType: 'orderbook',
+                                        resolution: resolution.val,
+                                    },
+                                });
+                            }
                             setSelectedResolution(resolution);
                         }
                     }}

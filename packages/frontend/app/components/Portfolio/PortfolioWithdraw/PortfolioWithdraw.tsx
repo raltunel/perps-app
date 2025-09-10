@@ -7,8 +7,7 @@ import useDebounce from '~/hooks/useDebounce';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer } from '~/utils/Constants';
-import { getDurationSegment } from '~/utils/functions/getDurationSegment';
-import packageJson from '../../../../package.json';
+import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
 
@@ -194,8 +193,8 @@ function PortfolioWithdraw({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Withdrawal Fail',
+                            success: false,
                             maxActive: maxModeActive,
                             errorMessage: result.error || 'Transaction failed',
                             txBuildDuration: getDurationSegment(
@@ -227,8 +226,8 @@ function PortfolioWithdraw({
                 if (typeof plausible === 'function') {
                     plausible('Onchain Action', {
                         props: {
-                            version: packageJson.version,
                             actionType: 'Withdrawal Success',
+                            success: true,
                             maxActive: maxModeActive,
                             txBuildDuration: getDurationSegment(
                                 timeOfTxBuildStart,
@@ -266,8 +265,8 @@ function PortfolioWithdraw({
             if (typeof plausible === 'function') {
                 plausible('Offchain Failure', {
                     props: {
-                        version: packageJson.version,
                         actionType: 'Withdrawal Fail',
+                        success: false,
                         maxActive: maxModeActive,
                         errorMessage:
                             error instanceof Error
