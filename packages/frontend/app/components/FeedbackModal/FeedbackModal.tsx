@@ -81,6 +81,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                         rating: feedbackType,
                         feedback: truncatedFeedbackText,
                         url: window.location.href,
+                        user_agent: navigator.userAgent,
                     },
                 });
             }
