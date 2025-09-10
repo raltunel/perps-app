@@ -25,7 +25,7 @@ interface propsIF {
     isDropdown?: boolean;
     openDepositModal: () => void;
     openWithdrawModal: () => void;
-    PortfolioModalsRenderer: React.ReactNode;
+    PortfolioModalsRenderer?: React.ReactNode;
 }
 
 const tooltipSvg = (

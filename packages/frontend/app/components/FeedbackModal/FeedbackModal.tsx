@@ -1,0 +1,156 @@
+import { FaThumbsUp, FaThumbsDown, FaTimes } from 'react-icons/fa';
+import { useState } from 'react';
+import styles from './FeedbackModal.module.css';
+
+type FeedbackType = 'positive' | 'negative' | null;
+
+interface FeedbackModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
+    const [feedbackType, setFeedbackType] = useState<FeedbackType>(null);
+    const [feedbackText, setFeedbackText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!feedbackType || !feedbackText.trim()) return;
+
+        setIsSubmitting(true);
+
+        try {
+            // TODO: Replace with actual feedback submission logic
+            console.log('Submitting feedback:', { feedbackType, feedbackText });
+            await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error('Error submitting feedback:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleClose = () => {
+        setFeedbackType(null);
+        setFeedbackText('');
+        setIsSubmitted(false);
+        onClose();
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div
+            className={`${styles.overlay} ${isOpen ? styles.visible : ''}`}
+            onClick={handleClose}
+        >
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                <button
+                    className={styles.closeIcon}
+                    onClick={handleClose}
+                    aria-label='Close feedback form'
+                >
+                    <FaTimes />
+                </button>
+
+                {!isSubmitted ? (
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.header}>
+                            <h2 className={styles.title}>
+                                Share Your Feedback
+                            </h2>
+                            <p className={styles.subtitle}>
+                                We're always looking to improve. What are your
+                                thoughts?
+                            </p>
+                        </div>
+
+                        <div>
+                            <label className={styles.label}>
+                                How would you rate your experience?
+                            </label>
+                            <div className={styles.feedbackButtons}>
+                                <button
+                                    type='button'
+                                    className={`${styles.feedbackButton} ${feedbackType === 'positive' ? styles.selected : ''}`}
+                                    onClick={() => setFeedbackType('positive')}
+                                >
+                                    <FaThumbsUp className={styles.icon} />
+                                </button>
+                                <button
+                                    type='button'
+                                    className={`${styles.feedbackButton} ${feedbackType === 'negative' ? styles.selected : ''}`}
+                                    onClick={() => setFeedbackType('negative')}
+                                >
+                                    <FaThumbsDown className={styles.icon} />
+                                </button>
+                            </div>
+
+                            <div className={styles.textAreaContainer}>
+                                <label
+                                    htmlFor='feedback-text'
+                                    className={styles.label}
+                                >
+                                    {feedbackType === 'positive'
+                                        ? 'What do you like most?'
+                                        : 'What can we improve?'}
+                                </label>
+                                <textarea
+                                    id='feedback-text'
+                                    className={styles.textArea}
+                                    value={feedbackText}
+                                    onChange={(e) =>
+                                        setFeedbackText(e.target.value)
+                                    }
+                                    placeholder='Your feedback helps us improve...'
+                                    required
+                                    rows={5}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.buttonGroup}>
+                            <button
+                                type='button'
+                                className={styles.cancelButton}
+                                onClick={handleClose}
+                                disabled={isSubmitting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type='submit'
+                                className={styles.submitButton}
+                                disabled={
+                                    !feedbackType ||
+                                    !feedbackText.trim() ||
+                                    isSubmitting
+                                }
+                            >
+                                {isSubmitting ? 'Sending...' : 'Send Feedback'}
+                            </button>
+                        </div>
+                    </form>
+                ) : (
+                    <div className={styles.successMessage}>
+                        <div className={styles.successIcon}>✓</div>
+                        <h2 className={styles.successTitle}>Thank You!</h2>
+                        <p className={styles.successText}>
+                            We appreciate your feedback and will use it to
+                            improve our service.
+                        </p>
+                        <button
+                            className={styles.closeButton}
+                            onClick={handleClose}
+                        >
+                            Close
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
