@@ -18,11 +18,7 @@ import {
     updateOverlayCanvasSize,
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
-import {
-    formatLineLabel,
-    getPricetoPixel,
-    quantityTextFormatWithComma,
-} from '../customOrderLineUtils';
+import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import * as d3fc from 'd3fc';
@@ -78,6 +74,8 @@ const LabelComponent = ({
     const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
 
     const [isDrag, setIsDrag] = useState(false);
+
+    const isLiqPriceLineDraggable = false;
 
     useEffect(() => {
         const dpr = Math.round(window.devicePixelRatio) || 1;
@@ -201,13 +199,11 @@ const LabelComponent = ({
                         textColor: '#3C91FF',
                         borderColor: line.color,
                     },
-                    ...(line.quantityTextValue
+                    ...(line.quantityText
                         ? [
                               {
                                   type: 'Quantity' as LabelType,
-                                  text: quantityTextFormatWithComma(
-                                      line.quantityTextValue,
-                                  ),
+                                  text: line.quantityText,
                                   backgroundColor: '#000000',
                                   textColor: '#FFFFFF',
                                   borderColor: '#3C91FF',
@@ -230,11 +226,16 @@ const LabelComponent = ({
                 let labelLocations = [];
 
                 if (line.type !== 'LIQ') {
-                    labelLocations = drawLabel(ctx, {
-                        x: xPixel,
-                        y: yPricePixel,
-                        labelOptions,
-                    });
+                    labelLocations = drawLabel(
+                        ctx,
+                        {
+                            x: xPixel,
+                            y: yPricePixel,
+                            labelOptions,
+                            color: line.color,
+                        },
+                        line.type === 'LIMIT',
+                    );
                 } else {
                     labelLocations = drawLiqLabel(
                         ctx,
@@ -242,8 +243,10 @@ const LabelComponent = ({
                             x: xPixel,
                             y: yPricePixel,
                             labelOptions,
+                            color: line.color,
                         },
                         canvasSize.width,
+                        isLiqPriceLineDraggable,
                     );
                 }
 
@@ -295,10 +298,14 @@ const LabelComponent = ({
                 overlayOffsetX,
                 overlayOffsetY,
                 drawnLabelsRef.current,
-                false,
+                isLiqPriceLineDraggable,
             );
 
-            if (isLabel) {
+            if (
+                isLabel &&
+                isLabel.matchType === 'onLabel' &&
+                isLabel.label.type !== 'Cancel'
+            ) {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
             } else {
@@ -321,7 +328,7 @@ const LabelComponent = ({
                     .crossHairMoved()
                     .subscribe(null, ({ offsetX, offsetY }) => {
                         if (chart) {
-                            const { paneCanvas } =
+                            const { iframeDoc, paneCanvas } =
                                 getPaneCanvasAndIFrameDoc(chart);
 
                             if (!paneCanvas) return;
@@ -343,7 +350,7 @@ const LabelComponent = ({
                                     overlayOffsetX,
                                     overlayOffsetY,
                                     drawnLabelsRef.current,
-                                    false,
+                                    isLiqPriceLineDraggable,
                                 );
                                 overlayCanvasMousePositionRef.current = {
                                     x: overlayOffsetX,
@@ -351,9 +358,34 @@ const LabelComponent = ({
                                 };
 
                                 if (isLabel) {
-                                    if (overlayCanvasRef.current)
-                                        overlayCanvasRef.current.style.pointerEvents =
-                                            'auto';
+                                    const pane = iframeDoc?.querySelector(
+                                        '.chart-markup-table.pane',
+                                    );
+
+                                    if (overlayCanvasRef.current) {
+                                        if (isLabel.matchType === 'onLabel') {
+                                            if (
+                                                isLabel.label.type === 'Cancel'
+                                            ) {
+                                                if (pane) {
+                                                    (
+                                                        pane as HTMLElement
+                                                    ).style.cursor = 'pointer';
+                                                }
+                                            } else {
+                                                overlayCanvasRef.current.style.pointerEvents =
+                                                    'auto';
+                                            }
+                                        }
+
+                                        if (isLabel.matchType === 'onLine') {
+                                            if (pane) {
+                                                (
+                                                    pane as HTMLElement
+                                                ).style.cursor = 'crosshair';
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -516,10 +548,14 @@ const LabelComponent = ({
                             offsetX,
                             offsetY,
                             drawnLabelsRef.current,
-                            true,
+                            isLiqPriceLineDraggable,
                         );
 
-                        if (found) {
+                        if (
+                            found &&
+                            found.matchType === 'onLabel' &&
+                            found.label.type === 'Cancel'
+                        ) {
                             console.log({ found });
                             if (found.parentLine.oid)
                                 handleCancel(found.parentLine);
@@ -566,10 +602,15 @@ const LabelComponent = ({
                 offsetX,
                 offsetY,
                 drawnLabelsRef.current,
-                false,
+                isLiqPriceLineDraggable,
             );
 
-            if (isLabel) {
+            if (
+                isLabel &&
+                isLabel.matchType === 'onLabel' &&
+                isLabel.label.type !== 'Cancel'
+            ) {
+                canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
                 setSelectedLine(isLabel);
@@ -614,16 +655,7 @@ const LabelComponent = ({
             setSelectedLine(tempSelectedLine);
         };
 
-        const handleDragEnd = async () => {
-            if (
-                !tempSelectedLine ||
-                originalPrice === undefined ||
-                tempSelectedLine.parentLine.oid === undefined ||
-                tempSelectedLine.parentLine.side === undefined
-            ) {
-                return;
-            }
-
+        async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
             const orderId = tempSelectedLine.parentLine.oid;
             const newPrice = tempSelectedLine.parentLine.yPrice;
             const quantity = tempSelectedLine.parentLine.quantityTextValue;
@@ -631,6 +663,7 @@ const LabelComponent = ({
 
             const slug = makeSlug(10);
 
+            if (!orderId || !side) return;
             try {
                 const usdValueOfOrderStr = formatNum(
                     (quantity || 0) * (symbolInfo?.markPx || 1),
@@ -761,11 +794,34 @@ const LabelComponent = ({
                     });
                 }
             }
+        }
 
+        function liqPriceDragEnd(tempSelectedLine: LabelLocationData) {
+            console.log(
+                'Liq. Price Line dragend',
+                tempSelectedLine.parentLine.yPrice,
+            );
+            setSelectedLine(undefined);
+        }
+
+        const handleDragEnd = async () => {
+            if (!tempSelectedLine || originalPrice === undefined) {
+                return;
+            }
+
+            if (tempSelectedLine.parentLine.type === 'LIMIT') {
+                limitOrderDragEnd(tempSelectedLine);
+            }
+
+            if (tempSelectedLine.parentLine.type === 'LIQ') {
+                liqPriceDragEnd(tempSelectedLine);
+            }
             tempSelectedLine = undefined;
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
+
                     overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
             }, 300);
