@@ -42,7 +42,7 @@ const LiqLineTooltip = ({
 
             return null;
         },
-        [lines, scaleData],
+        [scaleData, lines],
     );
 
     const mousemove = useCallback(
@@ -77,20 +77,33 @@ const LiqLineTooltip = ({
                     placedLine.type === 'buy' ? 'Long ' : 'Short '
                 } Liquidations </p>` +
                     `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
-                    `<p style="color: var(--text2, #bcbcc4)"> Volume: 1,23 TKN </p>` +
-                    `<p style="color: var(--text3, #88888f)"> Address: 0x6587... </p>`,
+                    `<p style="color: var(--text2, #bcbcc4)"> Volume: 1,23 TKN </p>`,
             );
 
-            const horizontal = cssOffsetX + 10;
+            const width = liqLineTooltipRef.current
+                .node()
+                .getBoundingClientRect().width;
+
+            const height = liqLineTooltipRef.current
+                .node()
+                .getBoundingClientRect().height;
+
+            const horizontal =
+                cssOffsetX + width + 10 > rect.right - rect.left
+                    ? cssOffsetX - width - 10
+                    : cssOffsetX + 10;
+
+            const vertical =
+                cssOffsetY + height > rect.bottom - rect.top
+                    ? cssOffsetY - height
+                    : cssOffsetY;
 
             liqLineTooltipRef.current
                 .style('visibility', 'visible')
-                .style('top', cssOffsetY + 'px')
+                .style('top', vertical + 'px')
                 .style('left', horizontal + 'px');
-
-            // highlightHoveredArea.current = true;
         },
-        [lines, scaleData],
+        [scaleData, lines],
     );
 
     useEffect(() => {
@@ -128,13 +141,15 @@ const LiqLineTooltip = ({
                 .style('font-size', '16px')
                 .style('pointer-events', 'none')
                 .style('background', 'var(--bg-dark2, #111117)')
-                .style('border-radius', 'var(--radius-s, 4px)')
+                .style('border-radius', 'var(--radius-s, 6px)')
                 .style('border', '1px solid var(--bg-dark6, #3e3e42)')
+                .style('min-width', '150px')
                 .style('visibility', 'hidden');
 
             liqLineTooltipRef.current = liqLineTooltip;
         }
     }, [
+        lines,
         chart,
         overlayCanvasRef.current === null,
         canvasWrapperRef.current === null,
