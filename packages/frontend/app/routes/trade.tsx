@@ -423,18 +423,6 @@ export default function Trade() {
                     )}
                 </div>
 
-                {liquidationsActive && (
-                    <motion.div
-                        id='liquidationsChart'
-                        className={styles.liquidationsChart}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        <LiquidationsChartSection symbol={symbol} />
-                    </motion.div>
-                )}
                 <div
                     className={`${styles.mobileSection} ${styles.mobileBook} ${activeTab === 'book' ? styles.active : ''}`}
                     style={{ display: activeTab === 'book' ? 'block' : 'none' }}
