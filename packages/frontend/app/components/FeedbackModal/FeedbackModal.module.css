@@ -23,7 +23,7 @@
 .modal {
     background: var(--bg-dark2);
     border-radius: 8px;
-    padding: 0;
+    padding: 24px;
     width: 100%;
     max-width: 398px;
     box-shadow: var(--dropdown-box-shadow);
@@ -34,8 +34,32 @@
     font-family: var(--font-family-main);
     position: relative;
     min-height: 300px;
-    padding: 24px;
     box-sizing: border-box;
+}
+
+.closeIcon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+    line-height: 1;
+    z-index: 10;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.closeIcon:hover {
+    color: var(--text1);
 }
 
 @keyframes slideUp {

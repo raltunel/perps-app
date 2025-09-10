@@ -80,10 +80,6 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                             <h2 className={styles.title}>
                                 Share Your Feedback
                             </h2>
-                            <p className={styles.subtitle}>
-                                We're always looking to improve. What are your
-                                thoughts?
-                            </p>
                         </div>
 
                         <div>
