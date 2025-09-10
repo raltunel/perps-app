@@ -17,14 +17,32 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!feedbackType || !feedbackText.trim()) return;
+        if (!feedbackType && !feedbackText.trim()) return;
 
+        // Truncate feedback to be less than 2000 bytes
+        let truncatedFeedbackText = feedbackText;
+        const maxBytes = 2000;
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(truncatedFeedbackText);
+        if (encoded.length > maxBytes) {
+            const truncated = new Uint8Array(maxBytes);
+            truncated.set(encoded.subarray(0, maxBytes - 3));
+            truncated.set([0x2e, 0x2e, 0x2e], maxBytes - 3);
+            truncatedFeedbackText = new TextDecoder('utf-8', {
+                fatal: false,
+            }).decode(truncated);
+        }
         setIsSubmitting(true);
 
         try {
-            // TODO: Replace with actual feedback submission logic
-            console.log('Submitting feedback:', { feedbackType, feedbackText });
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+            if (typeof plausible === 'function') {
+                plausible('Feedback', {
+                    props: {
+                        rating: feedbackType,
+                        feedback: truncatedFeedbackText,
+                    },
+                });
+            }
             setIsSubmitted(true);
         } catch (error) {
             console.error('Error submitting feedback:', error);
@@ -106,7 +124,6 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                         setFeedbackText(e.target.value)
                                     }
                                     placeholder='Your feedback helps us improve...'
-                                    required
                                     rows={5}
                                 />
                             </div>
@@ -125,8 +142,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                 type='submit'
                                 className={styles.submitButton}
                                 disabled={
-                                    !feedbackType ||
-                                    !feedbackText.trim() ||
+                                    (!feedbackType && !feedbackText.trim()) ||
                                     isSubmitting
                                 }
                             >
@@ -139,8 +155,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                         <div className={styles.successIcon}>✓</div>
                         <h2 className={styles.successTitle}>Thank You!</h2>
                         <p className={styles.successText}>
-                            We appreciate your feedback and will use it to
-                            improve our service.
+                            We appreciate your feedback.
                         </p>
                         <button
                             className={styles.closeButton}
