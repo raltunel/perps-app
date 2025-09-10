@@ -229,7 +229,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
-            subscribeToPoller('info', subKey, postOrderBookRaw, 300, true);
+            subscribeToPoller('info', subKey, postOrderBookRaw, 600, true);
 
             // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
