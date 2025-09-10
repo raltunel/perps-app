@@ -161,7 +161,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                                     onChange={(e) =>
                                         setFeedbackText(e.target.value)
                                     }
-                                    placeholder='Your feedback helps us improve...'
+                                    placeholder='Your anonymous feedback helps us improve...'
                                     rows={5}
                                 />
                                 {!truncatedMatchesOriginal && (
