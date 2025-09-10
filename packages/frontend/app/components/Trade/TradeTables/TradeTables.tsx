@@ -20,6 +20,7 @@ import VaultDepositorsTable from '../VaultDepositorsTable/VaultDepositorsTable';
 import styles from './TradeTable.module.css';
 import { useDebugStore } from '~/stores/DebugStore';
 import useMediaQuery from '~/hooks/useMediaQuery';
+import { t } from 'i18next';
 export interface FilterOption {
     id: string;
     label: string;
@@ -248,7 +249,7 @@ export default function TradeTable(props: TradeTableProps) {
             default:
                 return (
                     <div className={styles.emptyState}>
-                        Select a tab to view data
+                        {t('tradeTable.selectATabToViewData')}
                     </div>
                 );
         }

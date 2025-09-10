@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styles from './MarginModal.module.css';
 import { type marginModesT } from '~/stores/TradeDataStore';
+import { t } from 'i18next';
 
 interface propsIF {
     initial: marginModesT;
@@ -22,13 +23,8 @@ export default function MarginModal(props: propsIF) {
                     }
                     onClick={() => setIntermediate('cross')}
                 >
-                    <h3>Cross Margin</h3>
-                    <p>
-                        All cross positions share the same cross margin as
-                        collateral. In the event of liquidation, your cross
-                        margin balance and any remaining open positions under
-                        assets in this mode may be forfeited.
-                    </p>
+                    <h3>{t('margin.cross.heading')}</h3>
+                    <p>{t('margin.cross.blurb')}</p>
                 </button>
                 <button
                     className={
@@ -36,17 +32,13 @@ export default function MarginModal(props: propsIF) {
                     }
                     onClick={() => setIntermediate('isolated')}
                 >
-                    <h3>Isolated Mode</h3>
-                    <p>
-                        Manage your risk on individual positions by restricting
-                        the amount of margin allocated to each. If the margin
-                        ratio of an isolated position reaches 100%, the position
-                        will be liquidated. Margin can be added or removed to
-                        individual positions in this mode.
-                    </p>
+                    <h3>{t('margin.isolated.heading')}</h3>
+                    <p>{t('margin.isolated.blurb')}</p>
                 </button>
             </div>
-            <button onClick={() => handleConfirm(intermediate)}>Confirm</button>
+            <button onClick={() => handleConfirm(intermediate)}>
+                {t('common.confirm')}
+            </button>
         </section>
     );
 }

@@ -6,6 +6,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import type { modalContentT } from '../OrderInput';
 import styles from './ConfirmationModal.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     tx: modalContentT;
@@ -43,6 +44,8 @@ export default function ConfirmationModal(props: propsIF) {
         liquidationPrice,
         usdOrderValue,
     } = props;
+
+    const { t } = useTranslation();
 
     const { getBsColor } = useAppSettings();
 
@@ -97,7 +100,7 @@ export default function ConfirmationModal(props: propsIF) {
 
     const dataInfo: InfoItem[] = [
         {
-            label: 'Action',
+            label: t('transactions.action'),
             value: tx.includes('buy') ? 'Buy' : 'Sell',
             valueStyle: {
                 color: tx.includes('buy')
@@ -106,7 +109,7 @@ export default function ConfirmationModal(props: propsIF) {
             },
         },
         {
-            label: 'Size',
+            label: t('transactions.size'),
             value: `${size.qty || '--'} ${size.denom}`,
             valueStyle: {
                 color: tx.includes('buy')
@@ -115,7 +118,7 @@ export default function ConfirmationModal(props: propsIF) {
             },
         },
         {
-            label: 'Order Value',
+            label: t('transactions.orderValue'),
             value: usdOrderValue
                 ? formatNum(usdOrderValue, null, true, true)
                 : '-',
@@ -126,15 +129,16 @@ export default function ConfirmationModal(props: propsIF) {
             },
         },
         {
-            label: 'Price',
-            value: tx.includes('limit') ? limitPrice || '--' : 'Market',
+            label: t('transactions.price'),
+            value: tx.includes('limit')
+                ? limitPrice || '--'
+                : t('transactions.market'),
             className: styles.white,
         },
         {
-            label: 'Est. Liquidation Price',
+            label: t('transactions.estLiquidationPrice'),
             value: liquidationPriceDisplay,
-            tooltip:
-                'Estimated price at which your position will be liquidated',
+            tooltip: t('transactions.estimatedPriceAtWhichPosWillBeLiquidated'),
             className: styles.white,
         },
     ];
@@ -172,7 +176,7 @@ export default function ConfirmationModal(props: propsIF) {
                 <ToggleSwitch
                     isOn={!isEnabled}
                     onToggle={toggleEnabled}
-                    label={"Don't show this again"}
+                    label={t('transactions.dontShowThisAgain')}
                     // reverse
                 />
             </div>
@@ -187,10 +191,10 @@ export default function ConfirmationModal(props: propsIF) {
                 disabled={isProcessing}
             >
                 {isProcessing
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : tx.includes('buy')
-                      ? 'Buy / Long'
-                      : 'Sell / Short'}
+                      ? t('transactions.buyLong')
+                      : t('transactions.sellShort')}
             </button>
         </div>
     );

@@ -6,6 +6,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderDetails.module.css';
+import { t } from 'i18next';
 
 interface MarketInfoItem {
     label: string;
@@ -69,20 +70,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 })(),
             },
             orderMarketPrice === 'scale' && {
-                label: 'Avg. Entry Price',
-                tooltipLabel: 'average entry price',
+                label: t('transactions.avgEntryPrice'),
+                tooltipLabel: t('transactions.avgEntryPrice'),
                 value: '-',
             },
             {
-                label: 'Order Value',
-                tooltipLabel: 'order value',
+                label: t('transactions.orderValue'),
+                tooltipLabel: t('transactions.orderValue'),
                 value: usdOrderValue
                     ? formatNum(usdOrderValue, null, true, true)
                     : '-',
             },
             {
-                label: 'Margin Required',
-                tooltipLabel: 'margin required',
+                label: t('transactions.marginRequired'),
+                tooltipLabel: t('transactions.marginRequired'),
                 value: marginRequired
                     ? formatNum(marginRequired, null, true, true)
                     : '-',
@@ -101,17 +102,17 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     const twapInfoData: MarketInfoItem[] = useMemo(
         () => [
             {
-                label: 'Frequency',
-                tooltipLabel: 'frequency',
+                label: t('transactions.frequency'),
+                tooltipLabel: t('transactions.frequency'),
                 value: '30 seconds',
             },
             {
-                label: 'Run Time',
-                tooltipLabel: 'run time',
+                label: t('transactions.runTime'),
+                tooltipLabel: t('transactions.runTime'),
                 value: '30 minutes',
             },
             {
-                label: 'Number of Orders',
+                label: t('transactions.numberOfOrders'),
                 tooltipLabel: 'number of orders',
                 value: '61',
             },
@@ -122,13 +123,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     const limitInfoData: MarketInfoItem[] = useMemo(
         () => [
             {
-                label: 'Chasing Interval',
-                tooltipLabel: 'chasing interval',
+                label: t('transactions.chasingInterval'),
+                tooltipLabel: t('transactions.chasingInterval'),
                 value: 'Per 1s',
             },
             {
-                label: 'Size per suborder',
-                tooltipLabel: 'size per suborder',
+                label: t('transactions.sizePerSuborder'),
+                tooltipLabel: t('transactions.sizePerSuborder'),
                 value: '0.000 ETH',
             },
         ],
@@ -208,8 +209,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                     onClick={() => setIsTradeInfoExpanded(!isTradeInfoExpanded)}
                     aria-label={
                         isTradeInfoExpanded
-                            ? 'Collapse details'
-                            : 'Expand details'
+                            ? t('transactions.collapseDetails')
+                            : t('transactions.expandDetails')
                     }
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
