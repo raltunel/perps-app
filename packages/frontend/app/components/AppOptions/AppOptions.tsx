@@ -17,26 +17,13 @@ import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 
 const languageOptions = {
-    en: 'English 🇺🇸 🇬🇧 🇨🇦 🇦🇺',
-    de: 'Deutsch 🇩🇪',
+    en: 'English 🇬🇧',
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
-    it: 'Italiano 🇮🇹',
-    nl: 'Nederlands 🇳🇱',
-    pl: 'Polski 🇵🇱',
-    'pt-PT': 'Português (PT) 🇵🇹',
-    'pt-BR': 'Português (BR) 🇧🇷',
-    id: 'Bahasa Indonesia 🇮🇩',
     tr: 'Türkçe 🇹🇷',
-    el: 'Ελληνικά 🇬🇷',
-    uk: 'Українська 🇺🇦',
-    vi: 'Tiếng Việt 🇻🇳',
     ja: '日本語 🇯🇵',
     ko: '한국어 🇰🇷',
-    hi: 'हिंदी 🇮🇳',
     zh: '中文 (简体) 🇨🇳',
-    'zh-HK': '中文 (香港) 🇭🇰',
-    'zh-TW': '中文 (台灣) 🇹🇼',
 };
 
 export interface appOptionDataIF {
@@ -61,7 +48,7 @@ export default function AppOptions() {
         <section className={styles.app_options}>
             <ul>
                 <OptionLine
-                    text='Skip Open Order Confirmation'
+                    text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
                     toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
                 />
@@ -90,17 +77,17 @@ export default function AppOptions() {
             {/* <div className={styles.horizontal_divider} /> */}
             <ul>
                 {/* <OptionLine
-                    text='Display Verbose Errors'
+                    text={t('appSettings.displayVerboseErrors')}
                     isChecked={activeOptions['displayVerboseErrors']}
                     toggle={() => activeOptions.toggle('displayVerboseErrors')}
                 /> */}
                 <OptionLine
-                    text='Enable Transaction Notifications'
+                    text={t('appSettings.enableTxNotifications')}
                     isChecked={activeOptions['enableTxNotifications']}
                     toggle={() => activeOptions.toggle('enableTxNotifications')}
                 />
                 <OptionLine
-                    text='Enable Background Fill Notifications'
+                    text={t('appSettings.enableBackgroundFillNotif')}
                     isChecked={activeOptions['enableBackgroundFillNotif']}
                     toggle={() =>
                         activeOptions.toggle('enableBackgroundFillNotif')
@@ -142,7 +129,7 @@ export default function AppOptions() {
             <div className={styles.horizontal_divider} />
             <ul>
                 <OptionLineSelect
-                    text='Number Format'
+                    text={t('appSettings.numberFormat')}
                     active={numFormat.label}
                     options={NumFormatTypes.map((n: NumFormat) => ({
                         readable: n.label,
@@ -150,7 +137,7 @@ export default function AppOptions() {
                     }))}
                 />
                 <OptionLineSelect
-                    text='Color'
+                    text={t('appSettings.color')}
                     active={
                         <div style={{ gap: '10px' }}>
                             <div>
@@ -185,12 +172,12 @@ export default function AppOptions() {
                     )}
                 />
                 <OptionLineSelect
-                    text='Language'
+                    text={t('appSettings.language')}
                     active={
                         <div>
                             {
                                 languageOptions[
-                                    (i18n?.language ||
+                                    (i18n?.language?.split('-')[0] ||
                                         'en') as keyof typeof languageOptions
                                 ]
                             }
@@ -218,11 +205,14 @@ export default function AppOptions() {
                     const browserLanguages = navigator.languages || [
                         navigator.language,
                     ];
+
                     const supportedLanguages = Object.keys(languageOptions); // ['en', 'es']
                     const defaultLanguage =
-                        browserLanguages.find((lang) =>
-                            supportedLanguages.includes(lang),
-                        ) || 'en';
+                        browserLanguages
+                            .map((lang) => lang.split('-')[0]) // Convert 'en-US' to 'en'
+                            .find((lang) =>
+                                supportedLanguages.includes(lang),
+                            ) || 'en';
                     i18n.changeLanguage(defaultLanguage);
 
                     if (typeof plausible === 'function') {

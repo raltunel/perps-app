@@ -436,7 +436,7 @@ export default function PageHeader() {
                 <Modal
                     close={() => appSettingsModal.close()}
                     position={'center'}
-                    title='Options'
+                    title={t('appSettings.title')}
                 >
                     <AppOptions />
                 </Modal>

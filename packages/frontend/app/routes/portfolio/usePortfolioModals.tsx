@@ -5,6 +5,7 @@ import PortfolioSend from '~/components/Portfolio/PortfolioSend/PortfolioSend';
 import PortfolioWithdraw from '~/components/Portfolio/PortfolioWithdraw/PortfolioWithdraw';
 import { useModal } from '~/hooks/useModal';
 import { usePortfolioManager } from './usePortfolioManager';
+import { useTranslation } from 'react-i18next';
 
 export type PortfolioModalType = 'deposit' | 'withdraw' | 'send';
 
@@ -25,6 +26,7 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
     const depositModal = useModal('closed');
     const withdrawModal = useModal('closed');
     const sendModal = useModal('closed');
+    const { t } = useTranslation();
 
     const {
         selectedPortfolio,
@@ -158,11 +160,11 @@ export function usePortfolioModals(): UsePortfolioModalsReturn {
                 position='center'
                 title={
                     activePortfolioModalType === 'deposit'
-                        ? 'Deposit'
+                        ? t('common.deposit')
                         : activePortfolioModalType === 'withdraw'
-                          ? 'Withdraw'
+                          ? t('common.withdraw')
                           : activePortfolioModalType === 'send'
-                            ? 'Send'
+                            ? t('common.transfer')
                             : ''
                 }
             >

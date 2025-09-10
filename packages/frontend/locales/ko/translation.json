@@ -14,7 +14,10 @@
         "learnMore": "자세히 보기",
         "deposit": "입금",
         "withdraw": "출금",
-        "transfer": "송금"
+        "transfer": "송금",
+        "amount": "금액",
+        "max": "최대",
+        "min": "최소"
     },
     "navigation": {
         "home": "홈",
@@ -77,6 +80,23 @@
         "rewardsEarned": "획득한 보상"
     },
     "deposit": {
-        "prompt": "Fogo에서 {{token}}을 입금하세요"
+        "prompt": "Fogo에서 {{token}}을 입금하세요",
+        "input_prompt": "입금액을 입력하세요 (최소 ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "입금 가능"
+    },
+    "withdraw": {
+        "prompt": "Fogo에서 {{token}}을 입금하세요",
+        "explanation": "{{token}}이 주소로 전송됩니다.",
+        "availableToWithdraw": "출금 가능",
+        "input_prompt": "출금액을 입력하세요 (최소 ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "옵션",
+        "skipOpenOrderConfirm": "열린 주문 확인을 건너뛰기",
+        "enableTxNotifications": "트랜잭션 알림을 활성화",
+        "enableBackgroundFillNotif": "배경 채우기 알림을 활성화",
+        "numberFormat": "수치 형식",
+        "color": "색",
+        "language": "언어"
     }
 }

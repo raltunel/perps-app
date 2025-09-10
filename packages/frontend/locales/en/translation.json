@@ -17,7 +17,10 @@
         "withdraw": "Withdraw",
         "submit": "Submit",
         "quantity": "Quantity",
-        "confirm": "Confirm"
+        "confirm": "Confirm",
+        "amount": "Amount",
+        "max": "Max",
+        "min": "Min"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -169,6 +172,23 @@
         "rewardsEarned": "Rewards Earned"
     },
     "deposit": {
-        "prompt": "Deposit {{token}} from Fogo"
+        "prompt": "Deposit {{token}} from Fogo",
+        "input_prompt": "Enter amount (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Available to deposit"
+    },
+    "withdraw": {
+        "prompt": "Withdraw {{token}} to Fogo",
+        "explanation": "{{token}} will be sent to your address.",
+        "availableToWithdraw": "Available to withdraw",
+        "input_prompt": "Enter amount (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "Options",
+        "skipOpenOrderConfirm": "Skip Open Order Confirmation",
+        "enableTxNotifications": "Enable Transaction Notifications",
+        "enableBackgroundFillNotif": "Enable Background Fill Notifications",
+        "numberFormat": "Number Format",
+        "color": "Color",
+        "language": "Language"
     }
 }

@@ -232,7 +232,7 @@ function PortfolioDeposit(props: propsIF) {
 
         return [
             {
-                label: 'Available to deposit',
+                label: t('deposit.availableToDeposit'),
                 value: !isNaN(availableBalance)
                     ? formatNum(
                           availableBalance,
@@ -284,12 +284,14 @@ function PortfolioDeposit(props: propsIF) {
             />
 
             <div className={styles.input_container}>
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 {showInvalidSizeWarning && (
                     <span>{`Min: ${formatNum(MIN_DEPOSIT_AMOUNT, 2, true, true)}`}</span>
                 )}
                 <NumFormattedInput
-                    placeholder={`Enter amount (min $${MIN_DEPOSIT_AMOUNT})`}
+                    placeholder={t('deposit.input_prompt', {
+                        MIN_DEPOSIT_AMOUNT,
+                    })}
                     value={rawInputString}
                     onChange={handleDepositChange}
                     aria-label='deposit input'
@@ -308,7 +310,7 @@ function PortfolioDeposit(props: propsIF) {
                     )}
                 />
                 <button onClick={handleMaxClick} disabled={isProcessing}>
-                    Max
+                    {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (

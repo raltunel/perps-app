@@ -14,7 +14,10 @@
         "learnMore": "Aprende más",
         "deposit": "Depositar",
         "withdraw": "Retirar",
-        "transfer": "Transferir"
+        "transfer": "Transferir",
+        "amount": "Cantidad",
+        "max": "Máx",
+        "min": "Mín"
     },
     "navigation": {
         "home": "Inicio",
@@ -77,6 +80,23 @@
         "rewardsEarned": "Recompensas ganadas"
     },
     "deposit": {
-        "prompt": "Deposite {{token}} desde Fogo"
+        "prompt": "Deposite {{token}} desde Fogo",
+        "input_prompt": "Introduce la cantidad (min ${{MIN_DEPOSIT_AMOUNT}})",
+        "availableToDeposit": "Disponible para depositar"
+    },
+    "withdraw": {
+        "prompt": "Retire {{token}} a Fogo",
+        "explanation": "{{token}} será enviado a su dirección.",
+        "availableToWithdraw": "Disponible para retirar",
+        "input_prompt": "Introduce la cantidad (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "appSettings": {
+        "title": "Opciones",
+        "skipOpenOrderConfirm": "Saltar Confirmación de Orden Abierta",
+        "enableTxNotifications": "Habilitar Notificaciones de Transacción",
+        "enableBackgroundFillNotif": "Habilitar Notificaciones de Relleno en Segunda Plana",
+        "numberFormat": "Formato de Número",
+        "color": "Color",
+        "language": "Idioma"
     }
 }

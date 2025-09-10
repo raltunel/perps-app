@@ -10,6 +10,7 @@ import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     portfolio: {
@@ -35,6 +36,8 @@ function PortfolioWithdraw({
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
+
+    const { t } = useTranslation();
 
     const {
         formatNum,
@@ -289,7 +292,7 @@ function PortfolioWithdraw({
     const infoItems = useMemo(
         () => [
             {
-                label: 'Available to withdraw',
+                label: t('withdraw.availableToWithdraw'),
                 value: !isNaN(portfolio.availableBalance)
                     ? formatNum(portfolio.availableBalance, 2, true, true)
                     : '-',
@@ -305,14 +308,14 @@ function PortfolioWithdraw({
             <div className={styles.textContent}>
                 <img src={FogoLogo} alt='Fogo Chain Logo' width='64px' />
                 {/* <h4>Withdraw {unitValue} to Fogo</h4> */}
-                <h4>Withdraw fUSD to Fogo</h4>
+                <h4>{t('withdraw.prompt', { token: 'fUSD' })}</h4>
                 <div>
-                    <p>fUSD will be sent to your address.</p>
+                    <p>{t('withdraw.explanation', { token: 'fUSD' })}</p>
                 </div>
             </div>
 
             <div className={styles.input_container}>
-                <h6>Amount</h6>
+                <h6>{t('common.amount')}</h6>
                 {showInvalidSizeWarning ? (
                     userBalanceLessThanMinimum ? (
                         <span>
@@ -325,7 +328,9 @@ function PortfolioWithdraw({
                     )
                 ) : null}
                 <NumFormattedInput
-                    placeholder='Enter amount (min $1)'
+                    placeholder={t('withdraw.input_prompt', {
+                        MIN_WITHDRAW_AMOUNT,
+                    })}
                     value={rawInputString}
                     onChange={(
                         event: string | React.ChangeEvent<HTMLInputElement>,
@@ -392,7 +397,7 @@ function PortfolioWithdraw({
                     ? 'Confirming Transaction...'
                     : isProcessing
                       ? 'Processing...'
-                      : 'Withdraw'}
+                      : t('common.withdraw')}
             </SimpleButton>
         </div>
     );
