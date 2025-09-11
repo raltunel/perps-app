@@ -106,6 +106,7 @@
         "placingLimitOrderFor": "Placing limit order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}",
         "sellOrderPending": "Sell Order Pending",
         "orderSubmittedFor": "Order submitted for {{usdValueOfOrderStr}} of {{symbol}}",
+        "buyOrderPending": "Buy Order Pending",
         "buyOrderSuccessful": "Buy Order Successful",
         "successfullyBought": "Successfully bought {{usdValueOfOrderStr}} of {{symbol}}",
         "sellOrderSuccessful": "Sell Order Successful",
