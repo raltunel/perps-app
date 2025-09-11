@@ -110,7 +110,9 @@
         "buyOrderSuccessful": "Buy Order Successful",
         "successfullyBought": "Successfully bought {{usdValueOfOrderStr}} of {{symbol}}",
         "sellOrderSuccessful": "Sell Order Successful",
-        "successfullySold": "Successfully sold {{usdValueOfOrderStr}} of {{symbol}}"
+        "successfullySold": "Successfully sold {{usdValueOfOrderStr}} of {{symbol}}",
+        "sellOrderFailed": "Sell Order Failed",
+        "transactionFailed": "Transaction Failed"
     },
     "margin": {
         "cross": {
