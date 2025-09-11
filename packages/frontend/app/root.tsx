@@ -156,15 +156,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
     }, []);
 
     // const isProduction = import.meta.env.VITE_CONTEXT === 'production';
-    const isProduction = ['ambient.finance', 'perps.ambient.finance'].includes(
-        window.location.hostname,
-    );
-
+    const [isProduction, setIsProduction] = useState<boolean>();
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
+            setIsProduction(
+                ['ambient.finance', 'perps.ambient.finance'].includes(
+                    window.location.hostname,
+                ),
+            );
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
         }
