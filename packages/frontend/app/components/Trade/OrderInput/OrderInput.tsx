@@ -2233,11 +2233,11 @@ function OrderInput({
         () =>
             tradeDirection === 'buy'
                 ? marginBucket?.netPosition && marginBucket.netPosition > 0
-                    ? t('margin.maxPosSizeLimitedByOiCap')
+                    ? t('transactions.maxPosSizeLimitedByOiCap')
                     : t('transactions.maxTradeSizeLimitedTo') +
                       (symbolInfo?.coin.toUpperCase() === 'BTC' ? ' 1 BTC' : '')
                 : marginBucket?.netPosition && marginBucket.netPosition < 0
-                  ? t('margin.maxPosSizeLimitedByOiCap')
+                  ? t('transactions.maxPosSizeLimitedByOiCap')
                   : t('transactions.maxTradeSizeLimitedTo') +
                     (symbolInfo?.coin.toUpperCase() === 'BTC' ? ' 1 BTC' : ''),
         [tradeDirection, marginBucket, symbolInfo?.coin.toUpperCase()],
