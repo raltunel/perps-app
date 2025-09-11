@@ -155,7 +155,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const isProduction = import.meta.env.VITE_CONTEXT === 'production';
+    // const isProduction = import.meta.env.VITE_CONTEXT === 'production';
+    const isProduction = ['ambient.finance', 'perps.ambient.finance'].includes(
+        window.location.hostname,
+    );
 
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
