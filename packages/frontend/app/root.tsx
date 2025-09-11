@@ -184,7 +184,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
         }
-    }, [window]);
+    }, [typeof window !== 'undefined']);
 
     return (
         <html lang='en'>
