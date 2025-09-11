@@ -103,7 +103,9 @@
         "maxTradeSizeLimitedTo": "Max trade size limited",
         "yourPositionIsLimitedByOpenInterest": "Your {{coin}} position is limited by the {{limitedBy}} cap",
         "currentMaxTradeSizeForMarket": "The current maximum trade size for this market is {{limit}}",
-        "placingLimitOrderFor": "Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${limitPrice}"
+        "placingLimitOrderFor": "Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${limitPrice}",
+        "sellOrderSuccessful": "Sell Order Successful",
+        "successfullySold": "Successfully sold ${usdValueOfOrderStr} of ${symbol}"
     },
     "margin": {
         "cross": {
