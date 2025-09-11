@@ -164,6 +164,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         if (typeof window !== 'undefined') {
             setIsProduction(
                 [
+                    'deploy-preview-676--ambi-perps-us.netlify.app',
                     'ambient.finance',
                     'perps.ambient.finance',
                     'us.ambient.finance',
