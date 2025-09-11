@@ -161,6 +161,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
+        console.log({ windowType: typeof window });
         if (typeof window !== 'undefined') {
             setIsProduction(
                 [
