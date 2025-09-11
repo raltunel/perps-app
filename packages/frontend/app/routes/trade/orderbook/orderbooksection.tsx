@@ -193,7 +193,7 @@ export default function OrderBookSection(props: propsIF) {
                 <BasicMenu items={menuItems} icon={<BsThreeDots size={14} />} />
             </div>
         ),
-        [menuItems],
+        [menuItems, liquidationsActive],
     );
 
     const stackedOrderBook = useMemo(
@@ -225,7 +225,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, tradesMaxHeight],
+        [orderCount, tradesMaxHeight, liquidationsActive],
     );
 
     const largeOrderBook = useMemo(
@@ -264,7 +264,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount],
+        [orderCount, liquidationsActive],
     );
 
     const orderBookTabsComponent = (
