@@ -32,7 +32,7 @@
         "confirmLimitBuyOrder": "Confirm Limit Buy Order",
         "confirmLimitSellOrder": "Confirm Limit Sell Order",
         "availableToTrade": "Available to Trade",
-        "availableToTradeTooltip": "Deposited fUSD",
+        "availableToTradeTooltip": "Deposited {{symbol}}",
         "currentPosition": "Current Position",
         "currentPositionTooltip": "Current {{symbol}} position size",
         "maxOpenInterestReached": "Max Open Interest Reached",
@@ -53,6 +53,7 @@
         "unknownErrorOccurred": "Unknown error occurred",
         "failedToPlaceLimitOrder": "Failed to place limit order",
         "sellShortLimitOrderPlaced": "Sell / Short Limit Order Placed",
+        "sellShortLimitOrderPending": "Sell / Short Limit Order Pending",
         "successfullyPlacedSellOrderFor": "Successfully placed sell order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}",
         "placingSellShortLimitOrderFor": "Placing limit order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}",
         "enterValidLimitPrice": "Please enter valid limit price",
@@ -96,9 +97,13 @@
         "averageEntryPrice": "Average Entry Price",
         "marginRequired": "Margin Required",
         "maxPosSizeLimitedByOiCap": "Max position size limited by OI cap",
-        "openPositionIsXSwitchToY": "Open position is {{tradeDirection}}, switch to {{tradeDirection === 'buy' ? 'sell' : 'buy'}}",
+        "openPositionIsXSwitchToY": "Open position is {{x}}, switch to {{y}}",
         "buySellAtCurrentPrice": "Buy / Sell at Current Price",
-        "buySellAtSpecificPrice": "Buy / Sell at a Specific Price"
+        "buySellAtSpecificPrice": "Buy / Sell at a Specific Price",
+        "maxTradeSizeLimitedTo": "Max trade size limited",
+        "yourPositionIsLimitedByOpenInterest": "Your {{coin}} position is limited by the {{limitedBy}} cap",
+        "currentMaxTradeSizeForMarket": "The current maximum trade size for this market is {{limit}}",
+        "placingLimitOrderFor": "Placing limit order for ${usdValueOfOrderStr} of ${symbol} at ${limitPrice}"
     },
     "margin": {
         "cross": {

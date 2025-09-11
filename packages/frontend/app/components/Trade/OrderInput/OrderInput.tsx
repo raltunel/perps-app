@@ -1721,11 +1721,11 @@ function OrderInput({
         if (activeOptions.skipOpenOrderConfirm) {
             confirmOrderModal.close();
             notifications.add({
-                title: t('transactions.sellShortLimitOrderPlaced'),
+                title: t('transactions.sellShortLimitOrderPending'),
                 message: t('transactions.placingLimitOrderFor', {
                     usdValueOfOrderStr,
                     symbol,
-                    limitPrice,
+                    limitPrice: formatNum(limitPrice, 2, true, true),
                 }),
                 icon: 'spinner',
                 slug,
@@ -2081,7 +2081,10 @@ function OrderInput({
             return '1 BTC ' + t('transactions.positionLimitReached');
         if (isMarketOrderLoading) return t('transactions.processingOrder');
         if (isReduceInWrongDirection)
-            return t('openPositionIsXSwitchToY', { tradeDirection });
+            return t('openPositionIsXSwitchToY', {
+                x: tradeDirection,
+                y: tradeDirection === 'buy' ? 'sell' : 'buy',
+            });
         if (collateralInsufficientDebounced)
             return t('transactions.insufficientCollateral');
         if (isReduceOnlyExceedingPositionSize)
@@ -2176,12 +2179,16 @@ function OrderInput({
         () => [
             {
                 label: t('transactions.availableToTrade'),
-                tooltipLabel: t('transactions.availableToTradeTooltip'),
+                tooltipLabel: t('transactions.availableToTradeTooltip', {
+                    symbol: 'fUSD',
+                }),
                 value: displayNumAvailableToTrade,
             },
             {
                 label: t('transactions.currentPosition'),
-                tooltipLabel: t('transactions.currentPositionTooltip'),
+                tooltipLabel: t('transactions.currentPositionTooltip', {
+                    symbol,
+                }),
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
@@ -2192,11 +2199,33 @@ function OrderInput({
         () =>
             tradeDirection === 'buy'
                 ? marginBucket?.netPosition && marginBucket.netPosition > 0
-                    ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                    : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`
+                    ? t('transactions.yourPositionIsLimitedByOpenInterest', {
+                          coin: symbolInfo?.coin.toUpperCase(),
+                          limitedBy:
+                              symbolInfo?.coin.toUpperCase() === 'BTC'
+                                  ? '1 BTC'
+                                  : 'total open interest',
+                      })
+                    : t('transactions.currentMaxTradeSizeForMarket', {
+                          limit:
+                              symbolInfo?.coin.toUpperCase() === 'BTC'
+                                  ? '1 BTC'
+                                  : 'limited',
+                      })
                 : marginBucket?.netPosition && marginBucket.netPosition < 0
-                  ? `Your ${symbolInfo?.coin.toUpperCase()} position is limited by the ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC total open interest' : 'total open interest'} cap`
-                  : `The current maximum trade size for this market is ${symbolInfo?.coin.toUpperCase() === 'BTC' ? '1 BTC' : 'limited'}`,
+                  ? t('transactions.yourPositionIsLimitedByOpenInterest', {
+                        coin: symbolInfo?.coin.toUpperCase(),
+                        limitedBy:
+                            symbolInfo?.coin.toUpperCase() === 'BTC'
+                                ? '1 BTC'
+                                : 'total open interest',
+                    })
+                  : t('transactions.currentMaxTradeSizeForMarket', {
+                        limit:
+                            symbolInfo?.coin.toUpperCase() === 'BTC'
+                                ? '1 BTC'
+                                : 'limited',
+                    }),
         [tradeDirection, marginBucket, symbolInfo?.coin.toUpperCase()],
     );
 
@@ -2205,10 +2234,12 @@ function OrderInput({
             tradeDirection === 'buy'
                 ? marginBucket?.netPosition && marginBucket.netPosition > 0
                     ? t('margin.maxPosSizeLimitedByOiCap')
-                    : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`
+                    : t('transactions.maxTradeSizeLimitedTo') +
+                      (symbolInfo?.coin.toUpperCase() === 'BTC' ? ' 1 BTC' : '')
                 : marginBucket?.netPosition && marginBucket.netPosition < 0
                   ? t('margin.maxPosSizeLimitedByOiCap')
-                  : `Max trade size limited${symbolInfo?.coin.toUpperCase() === 'BTC' ? ' to 1 BTC' : ''}`,
+                  : t('transactions.maxTradeSizeLimitedTo') +
+                    (symbolInfo?.coin.toUpperCase() === 'BTC' ? ' 1 BTC' : ''),
         [tradeDirection, marginBucket, symbolInfo?.coin.toUpperCase()],
     );
 
