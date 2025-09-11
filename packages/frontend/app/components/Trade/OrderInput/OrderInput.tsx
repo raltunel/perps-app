@@ -2273,7 +2273,7 @@ function OrderInput({
                         <ul className={styles.launchpad_clickables}>
                             {marketOrderTypes.map((mo: OrderTypeOption) => (
                                 <li
-                                    key={JSON.stringify(mo)}
+                                    key={JSON.stringify(mo.value)}
                                     onClick={() => {
                                         handleMarketOrderTypeChange(mo.value);
                                         setShowLaunchpad(false);
