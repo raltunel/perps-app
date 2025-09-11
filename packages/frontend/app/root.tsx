@@ -155,13 +155,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    // const isProduction = import.meta.env.VITE_CONTEXT === 'production';
+    const isMainDeploy = import.meta.env.VITE_CONTEXT === 'production';
     const [isProduction, setIsProduction] = useState<boolean>();
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
-        console.log({ windowType: typeof window });
+        console.log({
+            isMainDeploy,
+            windowType: typeof window,
+            hostname: window.location.hostname,
+            isproduction: [
+                'deploy-preview-676--ambi-perps-us.netlify.app',
+                'ambient.finance',
+                'perps.ambient.finance',
+                'us.ambient.finance',
+            ].includes(window.location.hostname),
+        });
         if (typeof window !== 'undefined') {
             setIsProduction(
                 [
@@ -174,7 +184,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
         }
-    }, [typeof window !== 'undefined']);
+    }, [window]);
 
     return (
         <html lang='en'>
