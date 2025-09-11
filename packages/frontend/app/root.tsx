@@ -27,6 +27,7 @@ import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
 import {
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
+    SHOULD_LOG_ANALYTICS,
     SPLIT_TEST_VERSION,
     USER_WS_ENDPOINT,
 } from './utils/Constants';
@@ -155,36 +156,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const isMainDeploy = import.meta.env.VITE_CONTEXT === 'production';
-    const [isProduction, setIsProduction] = useState<boolean>();
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
-        console.log({
-            isMainDeploy,
-            windowType: typeof window,
-            hostname: window.location.hostname,
-            isproduction: [
-                'deploy-preview-676--ambi-perps-us.netlify.app',
-                'ambient.finance',
-                'perps.ambient.finance',
-                'us.ambient.finance',
-            ].includes(window.location.hostname),
-        });
         if (typeof window !== 'undefined') {
-            setIsProduction(
-                [
-                    'deploy-preview-676--ambi-perps-us.netlify.app',
-                    'ambient.finance',
-                    'perps.ambient.finance',
-                    'us.ambient.finance',
-                ].includes(window.location.hostname),
-            );
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
         }
-    }, [typeof window !== 'undefined']);
+    }, []);
 
     return (
         <html lang='en'>
@@ -249,7 +229,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     crossOrigin='anonymous'
                 />
                 <Links />
-                {isProduction && (
+                {SHOULD_LOG_ANALYTICS && (
                     <script
                         defer
                         event-version={packageJson.version}
