@@ -15,7 +15,7 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { blockExplorer, MIN_DEPOSIT_AMOUNT } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 interface propsIF {
     portfolio: {
@@ -32,7 +32,6 @@ interface propsIF {
 
 function PortfolioDeposit(props: propsIF) {
     const { portfolio, onDeposit, isProcessing = false } = props;
-    const { t } = useTranslation();
     const notificationStore = useNotificationStore();
     const {
         formatNum,

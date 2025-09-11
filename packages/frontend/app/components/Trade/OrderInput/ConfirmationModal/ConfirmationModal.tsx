@@ -4,9 +4,9 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
-import type { modalContentT } from '../OrderInput';
 import styles from './ConfirmationModal.module.css';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
+import type { modalContentT } from '~/utils/CommonIFs';
 
 interface propsIF {
     tx: modalContentT;
@@ -44,8 +44,6 @@ export default function ConfirmationModal(props: propsIF) {
         liquidationPrice,
         usdOrderValue,
     } = props;
-
-    const { t } = useTranslation();
 
     const { getBsColor } = useAppSettings();
 

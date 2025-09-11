@@ -1,7 +1,6 @@
 // Optimized Hero Section
 import { type CSSProperties, type JSX } from 'react';
 import { Link, useNavigation } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import styles from './home.module.css';
 
 import { motion } from 'framer-motion';
@@ -11,7 +10,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
-import TradeButton from '~/components/Home/TradeButton/TradeButton';
+import { t } from 'i18next';
 
 interface FloatingTokenProps {
     src: string;
@@ -124,7 +123,6 @@ export function meta() {
 }
 
 export default function Home(): JSX.Element {
-    const { t } = useTranslation();
     // const [hasVisited, setHasVisited] = useState(false);
 
     // useEffect(() => {

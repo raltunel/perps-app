@@ -14,7 +14,6 @@ import React, {
     useMemo,
     useRef,
     useState,
-    type JSX,
 } from 'react';
 import { GoZap } from 'react-icons/go';
 import { LuCircleHelp } from 'react-icons/lu';
@@ -74,7 +73,7 @@ import type {
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 const useOnlyMarket = false;
 
@@ -91,9 +90,6 @@ function OrderInput({
     marginBucket: MarginBucketAvail | null;
     isAnyPortfolioModalOpen: boolean;
 }) {
-    // hook to manage translations of user-facing copy
-    const { t } = useTranslation();
-
     const marketOrderTypes = useOnlyMarket
         ? [
               {

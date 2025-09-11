@@ -32,12 +32,11 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 
 export default function PageHeader() {
     // Feedback modal state
-    const { t } = useTranslation();
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
     const [feedbackType, setFeedbackType] = useState<
         'positive' | 'negative' | null

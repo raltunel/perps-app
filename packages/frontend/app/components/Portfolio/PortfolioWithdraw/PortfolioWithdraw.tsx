@@ -10,7 +10,7 @@ import { blockExplorer } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import FogoLogo from '../../../assets/tokens/FOGO.svg';
 import styles from './PortfolioWithdraw.module.css';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 interface propsIF {
     portfolio: {
@@ -36,8 +36,6 @@ function PortfolioWithdraw({
     const [transactionStatus, setTransactionStatus] = useState<
         'idle' | 'pending' | 'success' | 'failed'
     >('idle');
-
-    const { t } = useTranslation();
 
     const {
         formatNum,

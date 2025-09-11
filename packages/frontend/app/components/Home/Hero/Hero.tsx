@@ -1,11 +1,9 @@
-import { useTranslation } from 'react-i18next';
 import TradeButton from '../TradeButton/TradeButton';
 import AnimatedPath from './AnimatedPath';
 import styles from './Hero.module.css';
+import { t } from 'i18next';
 
 export default function Hero() {
-    const { t } = useTranslation();
-
     return (
         <div className={styles.hero_container}>
             <div className={styles.animated_background}>

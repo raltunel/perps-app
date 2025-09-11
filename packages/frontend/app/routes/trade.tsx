@@ -8,7 +8,7 @@ import {
     useLayoutEffect,
 } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 import { Resizable } from 're-resizable';
 import type { NumberSize } from 're-resizable';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -312,7 +312,6 @@ export default function Trade() {
 
     const clamp = (n: number) => Math.max(CHART_MIN, Math.min(n, maxTop));
 
-    const { t } = useTranslation();
     const tabList = useMemo(
         () =>
             [
