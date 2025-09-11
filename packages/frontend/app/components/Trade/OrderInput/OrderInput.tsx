@@ -1660,7 +1660,7 @@ function OrderInput({
                         errorMessage:
                             error instanceof Error
                                 ? error.message
-                                : t('transactions.unknownErrorOccurred'),
+                                : 'Unknown Error Occurred',
                         success: false,
                         leverage: getLeverageSegment(leverage),
                         sizePercentage:

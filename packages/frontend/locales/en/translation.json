@@ -20,7 +20,8 @@
         "confirm": "Confirm",
         "amount": "Amount",
         "max": "Max",
-        "min": "Min"
+        "min": "Min",
+        "positions": "Positions"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -95,7 +96,9 @@
         "averageEntryPrice": "Average Entry Price",
         "marginRequired": "Margin Required",
         "maxPosSizeLimitedByOiCap": "Max position size limited by OI cap",
-        "openPositionIsXSwitchToY": "Open position is {{tradeDirection}}, switch to {{tradeDirection === 'buy' ? 'sell' : 'buy'}}"
+        "openPositionIsXSwitchToY": "Open position is {{tradeDirection}}, switch to {{tradeDirection === 'buy' ? 'sell' : 'buy'}}",
+        "buySellAtCurrentPrice": "Buy / Sell at Current Price",
+        "buySellAtSpecificPrice": "Buy / Sell at a Specific Price"
     },
     "margin": {
         "cross": {

@@ -84,7 +84,7 @@ export default function TradeTable(props: TradeTableProps) {
 
         const availableTabs = [
             'Balances',
-            'Positions',
+            t('common.positions'),
             'Open Orders',
             // 'TWAP',
             'Trade History',
@@ -191,7 +191,7 @@ export default function TradeTable(props: TradeTableProps) {
         switch (selectedTradeTab) {
             case 'Balances':
                 return <BalancesTable />;
-            case 'Positions':
+            case t('common.positions'):
                 return (
                     <PositionsTable
                         isFetched={

@@ -17,7 +17,8 @@
         "transfer": "Transferir",
         "amount": "Cantidad",
         "max": "Máx",
-        "min": "Mín"
+        "min": "Mín",
+        "positions": "Posiciones"
     },
     "navigation": {
         "home": "Inicio",
