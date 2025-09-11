@@ -113,7 +113,8 @@
         "successfullySold": "Successfully sold {{usdValueOfOrderStr}} of {{symbol}}",
         "sellOrderFailed": "Sell Order Failed",
         "transactionFailed": "Transaction Failed",
-        "buyOrderFailed": "Buy Order Failed"
+        "buyOrderFailed": "Buy Order Failed",
+        "liquidationPrice": "Liquidation Price"
     },
     "margin": {
         "cross": {

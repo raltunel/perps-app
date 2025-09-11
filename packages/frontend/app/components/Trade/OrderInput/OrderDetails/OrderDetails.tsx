@@ -41,8 +41,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     const marketInfoData: MarketInfoItem[] = useMemo(() => {
         const arr: (MarketInfoItem | false)[] = [
             showLiquidationPrice && {
-                label: 'Liquidation Price',
-                tooltipLabel: 'liquidation price',
+                label: t('transactions.liquidationPrice'),
+                tooltipLabel: t('transactions.liquidationPrice'),
                 value: (() => {
                     if (
                         liquidationPrice === null ||
@@ -113,7 +113,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             },
             {
                 label: t('transactions.numberOfOrders'),
-                tooltipLabel: 'number of orders',
+                tooltipLabel: t('transactions.numberOfOrders'),
                 value: '61',
             },
         ],
