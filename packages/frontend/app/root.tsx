@@ -163,9 +163,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setIsProduction(
-                ['ambient.finance', 'perps.ambient.finance'].includes(
-                    window.location.hostname,
-                ),
+                [
+                    'ambient.finance',
+                    'perps.ambient.finance',
+                    'us.ambient.finance',
+                ].includes(window.location.hostname),
             );
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
