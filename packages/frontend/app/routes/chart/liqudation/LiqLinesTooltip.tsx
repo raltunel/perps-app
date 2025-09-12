@@ -6,6 +6,10 @@ import { useLiqudationLines } from './hooks/useLiquidationLines';
 import { getPaneCanvasAndIFrameDoc } from '../overlayCanvas/overlayCanvasUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
+import type {
+    CrossHairMovedEventParams,
+    ISubscription,
+} from '~/tv/charting_library';
 
 const LiqLineTooltip = ({
     overlayCanvasRef,
@@ -21,18 +25,24 @@ const LiqLineTooltip = ({
 
     const lines = useLiqudationLines();
 
-    const { bsColor, getBsColor } = useAppSettings();
+    const linesRef = useRef(lines);
+
+    const { getBsColor } = useAppSettings();
 
     const { formatNum } = useNumFormatter();
 
+    useEffect(() => {
+        linesRef.current = lines;
+    }, [lines]);
+
     const checkLines = useCallback(
         (offsetX: number, offsetY: number) => {
-            if (!lines?.length || !scaleData?.yScale) return null;
+            if (!linesRef.current?.length || !scaleData?.yScale) return null;
             const dpr = window.devicePixelRatio || 1;
 
             const tolerance = 10; // pixels
 
-            for (const line of lines) {
+            for (const line of linesRef.current) {
                 const y = scaleData.yScale(line.yPrice);
                 const localOffsetY = offsetY * dpr;
                 if (Math.abs(y - localOffsetY) <= tolerance) {
@@ -42,7 +52,7 @@ const LiqLineTooltip = ({
 
             return null;
         },
-        [scaleData, lines],
+        [scaleData, linesRef],
     );
 
     const mousemove = useCallback(
@@ -103,22 +113,30 @@ const LiqLineTooltip = ({
                 .style('top', vertical + 'px')
                 .style('left', horizontal + 'px');
         },
-        [scaleData, lines],
+        [scaleData, linesRef],
     );
 
     useEffect(() => {
         if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
 
+        let subscription: ISubscription<
+            (params: CrossHairMovedEventParams) => void
+        > | null = null;
+
+        const context = { name: 'crosshair-handler' };
+
+        const callbackCrosshair = (params: CrossHairMovedEventParams) => {
+            const { offsetX, offsetY } = params;
+            if (offsetX && offsetY) {
+                mousemove(offsetX, offsetY);
+            }
+        };
+
         if (chart) {
             chart.onChartReady(() => {
-                chart
-                    .activeChart()
-                    .crossHairMoved()
-                    .subscribe(null, ({ offsetX, offsetY }) => {
-                        if (offsetX && offsetY) {
-                            mousemove(offsetX, offsetY);
-                        }
-                    });
+                subscription = chart.activeChart().crossHairMoved();
+
+                subscription.subscribe(context, callbackCrosshair);
             });
         }
 
@@ -126,7 +144,7 @@ const LiqLineTooltip = ({
             d3
                 .select(canvasWrapperRef.current)
                 .select('.liqLineTooltip')
-                .node() === null
+                .empty()
         ) {
             const liqLineTooltip = d3
                 .select(canvasWrapperRef.current)
@@ -148,8 +166,27 @@ const LiqLineTooltip = ({
 
             liqLineTooltipRef.current = liqLineTooltip;
         }
+
+        return () => {
+            if (liqLineTooltipRef.current) {
+                liqLineTooltipRef.current.remove();
+                liqLineTooltipRef.current = null;
+            }
+
+            if (chart) {
+                try {
+                    if (subscription) {
+                        subscription.unsubscribe(context, callbackCrosshair);
+                        subscription = null;
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (error: unknown) {
+                    // console.error({ error });
+                }
+            }
+        };
     }, [
-        lines,
         chart,
         overlayCanvasRef.current === null,
         canvasWrapperRef.current === null,
