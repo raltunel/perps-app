@@ -84,7 +84,7 @@ export default function TradeTable(props: TradeTableProps) {
 
         const availableTabs = [
             'Balances',
-            t('common.positions'),
+            'common.positions',
             'Open Orders',
             // 'TWAP',
             'Trade History',
@@ -113,7 +113,7 @@ export default function TradeTable(props: TradeTableProps) {
 
         if (isMobile) {
             return filteredTabs.filter(
-                (tab) => tab === 'Positions' || tab === 'Open Orders',
+                (tab) => tab === 'common.positions' || tab === 'Open Orders',
             );
         }
 
@@ -125,10 +125,10 @@ export default function TradeTable(props: TradeTableProps) {
         // If we're on mobile and current tab isn't allowed, switch to Positions
         if (
             isMobile &&
-            selectedTradeTab !== 'Positions' &&
+            selectedTradeTab !== 'common.positions' &&
             selectedTradeTab !== 'Open Orders'
         ) {
-            handleTabChange('Positions');
+            handleTabChange('common.positions');
         }
     }, [selectedTradeTab]);
 
@@ -142,11 +142,11 @@ export default function TradeTable(props: TradeTableProps) {
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
-                handleTabChange('Positions');
+                handleTabChange('common.positions');
             }
         } else if (page === Pages.PORTFOLIO) {
             if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
-                handleTabChange('Positions');
+                handleTabChange('common.positions');
             }
         }
     }, [page]);
@@ -191,7 +191,7 @@ export default function TradeTable(props: TradeTableProps) {
         switch (selectedTradeTab) {
             case 'Balances':
                 return <BalancesTable />;
-            case t('common.positions'):
+            case 'common.positions':
                 return (
                     <PositionsTable
                         isFetched={

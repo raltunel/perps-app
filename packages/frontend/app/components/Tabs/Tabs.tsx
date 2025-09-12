@@ -12,6 +12,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './Tabs.module.css';
+import { t } from 'i18next';
 
 interface TabProps {
     label: string;
@@ -126,15 +127,15 @@ export default function Tabs(props: TabsProps) {
     const getTabLabel = (
         tab: string | { id: string; label: string },
     ): string => {
-        let label = typeof tab === 'string' ? tab : tab.label;
+        let label = typeof tab === 'string' ? t(tab) : t(tab.label);
         if (label === 'Balances' && webDataFetched && balancesCount > 0) {
             label = `Balances (${balancesCount})`;
         } else if (
-            label === 'Positions' &&
+            tab === 'common.positions' &&
             webDataFetched &&
             positionsCount > 0
         ) {
-            label = `Positions (${positionsCount})`;
+            label = `${t(tab)} (${positionsCount})`;
         } else if (
             label === 'Open Orders' &&
             webDataFetched &&
