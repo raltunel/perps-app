@@ -43,11 +43,11 @@
         "currentPosition": "Position actuelle",
         "currentPositionTooltip": "Taille de la position actuelle en {{symbol}}",
         "maxOpenInterestReached": "Intérêt ouvert maximal atteint",
-        "depositToTrade": "Dépôt pour échanger",
+        "depositToTrade": "Déposer pour échanger",
         "switchDirectionToReduce": "Changer de sens pour réduire",
-        "maxLongDepositToTrade": "Maximum achat (long) - Dépôt pour échanger",
-        "maxShortDepositToTrade": "Maximum vente (short) - Dépôt pour échanger",
-        "minimumOr100Percent": "Minimum ou 100%",
+        "maxLongDepositToTrade": "Maximum achat (long) - Déposer pour échanger",
+        "maxShortDepositToTrade": "Maximum vente (short) - Déposer pour échanger",
+        "minimumOr100Percent": "Minimum ou 100 %",
         "minimum": "Minimum",
         "invalidPrice": "Prix invalide",
         "orderSizeBelowMinimum": "Taille de l'ordre inférieure au minimum",
@@ -94,7 +94,7 @@
         "increasing": "En hausse",
         "decreasing": "En baisse",
         "totalOrders": "Nombre total d'ordres",
-        "orderRatioSumMustBe100": "La somme des ratios d'ordre doit être de 100%",
+        "orderRatioSumMustBe100": "La somme des ratios d'ordre doit être de 100 %",
         "collapseDetails": "Réduire les détails",
         "expandDetails": "Développer les détails",
         "frequency": "Fréquence",
@@ -137,7 +137,7 @@
         "isolated": {
             "title": "Isolé",
             "heading": "Mode Isolé",
-            "blurb": "Gérez votre risque sur des positions individuelles en limitant le montant de la marge allouée à chacune. Si le ratio de marge d’une position isolée atteint 100 %, la position sera liquidée. Dans ce mode, il est possible d’ajouter ou de retirer de la marge sur des positions individuelles."
+            "blurb": "Gérez votre risque sur des positions individuelles en limitant le montant de la marge allouée à chacune. Si le ratio de marge d’une position isolée atteint 100 %, la position sera liquidée. Dans ce mode, il est possible d’ajouter ou de retirer de la marge sur des positions individuelles."
         }
     },
     "tradeTable": {
@@ -240,7 +240,7 @@
         "rewardsEarned": "Récompenses Gagnées"
     },
     "deposit": {
-        "prompt": "Dépôt {{token}} depuis Fogo",
+        "prompt": "Déposer {{token}} depuis Fogo",
         "input_prompt": "Entrez le montant (min ${{MIN_DEPOSIT_AMOUNT}})",
         "availableToDeposit": "Disponible pour dépôt"
     },
@@ -252,7 +252,7 @@
     },
     "orderBook": {
         "tab": "Onglet",
-        "stacked": "Acumulé",
+        "stacked": "Accumulé",
         "large": "Grand",
         "book": "Carnet",
         "trades": "Transactions",
@@ -263,7 +263,7 @@
         "skipOpenOrderConfirm": "Ignorer la confirmation de la commande ouverte",
         "enableTxNotifications": "Activer les notifications de transaction",
         "enableBackgroundFillNotif": "Activer les notifications de remplissage en arrière-plan",
-        "numberFormat": "Format de nombre",
+        "numberFormat": "Format numérique",
         "color": "Couleur",
         "language": "Langue"
     },
