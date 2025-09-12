@@ -123,7 +123,9 @@
         "sellOrderFailed": "Orden de venta fallida",
         "transactionFailed": "Transacción fallida",
         "buyOrderFailed": "Orden de compra fallida",
-        "liquidationPrice": "Precio de liquidación"
+        "liquidationPrice": "Precio de liquidación",
+        "enterPrice": "Ingresar Precio",
+        "totalSize": "Tamaño Total"
     },
     "margin": {
         "cross": {
@@ -136,7 +138,25 @@
         }
     },
     "tradeTable": {
-        "selectATabToViewData": "Seleccione una pestaña para ver datos"
+        "selectATabToViewData": "Seleccione una pestaña para ver datos",
+        "time": "Hora",
+        "type": "Tipo",
+        "coin": "Moneda",
+        "direction": "Dirección",
+        "size": "Cantidad",
+        "filledSize": "Cantidad Ejecutada",
+        "orderValue": "Valor de la Orden",
+        "price": "Precio",
+        "reduceOnly": "Solo Reducir",
+        "triggerConditions": "Condiciones de Activación",
+        "tpsl": "TP/SL",
+        "status": "Estado",
+        "order": "Orden",
+        "long": "Largo",
+        "short": "Corto",
+        "noOpenPositions": "No hay posiciones abiertas",
+        "entryPrice": "Precio de Entrada",
+        "markPrice": "Precio de Mercado"
     },
     "navigation": {
         "home": "Inicio",
