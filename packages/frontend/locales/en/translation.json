@@ -86,6 +86,7 @@
         "buyLong": "Buy/Long",
         "sellShort": "Sell/Short",
         "confirmingTransaction": "Confirming transaction...",
+        "processing": "Processing...",
         "dontShowThisAgain": "Don't show this again",
         "estLiquidationPrice": "Estimated Liquidation Price",
         "estimatedPriceAtWhichPosWillBeLiquidated": "Estimated liquidation price for your position",

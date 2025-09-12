@@ -86,6 +86,8 @@
         "buyLong": "买入/做多",
         "sellShort": "卖出/做空",
         "confirmingTransaction": "交易确认中…",
+        "processing": "处理中…",
+        "deposit": "充值",
         "dontShowThisAgain": "不再显示",
         "estLiquidationPrice": "预估强平价格",
         "estimatedPriceAtWhichPosWillBeLiquidated": "仓位预估强平价格",

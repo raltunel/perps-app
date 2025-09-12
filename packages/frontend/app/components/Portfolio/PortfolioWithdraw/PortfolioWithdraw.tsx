@@ -392,9 +392,9 @@ function PortfolioWithdraw({
                 disabled={isButtonDisabled}
             >
                 {transactionStatus === 'pending'
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : isProcessing
-                      ? 'Processing...'
+                      ? t('transactions.processing')
                       : t('common.withdraw')}
             </SimpleButton>
         </div>

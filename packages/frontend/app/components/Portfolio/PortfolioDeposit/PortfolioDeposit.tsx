@@ -344,9 +344,9 @@ function PortfolioDeposit(props: propsIF) {
                 disabled={isButtonDisabled || isSizeInvalid}
             >
                 {transactionStatus === 'pending'
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : isProcessing
-                      ? 'Processing...'
+                      ? t('transactions.processing')
                       : t('common.deposit')}
             </SimpleButton>
         </div>
