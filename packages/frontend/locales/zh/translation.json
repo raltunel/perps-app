@@ -192,5 +192,23 @@
         "numberFormat": "数字格式",
         "color": "颜色",
         "language": "语言"
+    },
+    "symbolInfo": {
+        "mark": "标记价格",
+        "markTooltip": "为防止不公平强制平仓而计算的预估公允价值",
+        "oracle": "预言机",
+        "oracleTooltip": "来自 Pyth Network 预言机的实时价格",
+        "oracleTooltipPythStale": "Pyth Network 预言机（价格可能已过期）",
+        "oracleTooltipNoPyth": "从多个权威交易所汇总的外部市场价值",
+        "24hChange": "24小时变动",
+        "24hChangeTooltip": "过去24小时内的价格变动",
+        "24hVolume": "24小时成交量",
+        "24hVolumeTooltip": "过去24小时内的市场总成交量",
+        "openInterest": "未平仓合约",
+        "openInterestTooltip": "市场的总未平仓合约",
+        "fundingRate": "资金费率",
+        "fundingRateTooltip": "多头每小时支付空头的费率（为负时为空头支付多头）。资金费率没有额外费用，是用户之间的点对点转账，用于推动价格回归现货价格。",
+        "fundingCountdown": "资金结算倒计时",
+        "fundingCountdownTooltip": "距离下次资金结算的时间"
     }
 }

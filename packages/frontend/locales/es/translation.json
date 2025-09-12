@@ -225,5 +225,23 @@
         "numberFormat": "Formato de Número",
         "color": "Color",
         "language": "Idioma"
+    },
+    "symbolInfo": {
+        "mark": "Marca",
+        "markTooltip": "Valor justo estimado, calculado para evitar liquidaciones injustas",
+        "oracle": "Oráculo",
+        "oracleTooltip": "Precio en tiempo real del oráculo de Pyth Network",
+        "oracleTooltipPythStale": "Oráculo de Pyth Network (el precio puede no estar actualizado)",
+        "oracleTooltipNoPyth": "Un valor de mercado externo y agregado proveniente de múltiples intercambios de buena reputación",
+        "24hChange": "Cambio 24h",
+        "24hChangeTooltip": "Cambio en el precio durante las últimas 24 horas",
+        "24hVolume": "Volumen 24h",
+        "24hVolumeTooltip": "Volumen total del mercado durante las últimas 24 horas",
+        "openInterest": "Interés Abierto",
+        "openInterestTooltip": "Interés abierto total del mercado",
+        "fundingRate": "Tasa de Financiamiento",
+        "fundingRateTooltip": "La tasa por hora que los largos pagan a los cortos (si es negativa, los cortos pagan a los largos). No hay comisiones asociadas al financiamiento, que es una transferencia entre pares para acercar los precios al precio spot.",
+        "fundingCountdown": "Cuenta Regresiva del Financiamiento",
+        "fundingCountdownTooltip": "Tiempo restante hasta el próximo financiamiento"
     }
 }

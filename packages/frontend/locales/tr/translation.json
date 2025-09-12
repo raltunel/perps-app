@@ -192,5 +192,23 @@
         "numberFormat": "Sayı formatı",
         "color": "Renk",
         "language": "Dil"
+    },
+    "symbolInfo": {
+        "mark": "Gösterge",
+        "markTooltip": "Haksız tasfiyeleri önlemek için hesaplanan tahmini adil değer",
+        "oracle": "Oracle",
+        "oracleTooltip": "Pyth Network oracle ile gerçek zamanlı fiyat",
+        "oracleTooltipPythStale": "Pyth Network oracle (fiyat eski olabilir)",
+        "oracleTooltipNoPyth": "Birden fazla saygın borsadan alınan dış, birleştirilmiş piyasa değeri",
+        "24hChange": "24s Değişim",
+        "24hChangeTooltip": "Son 24 saatteki fiyat değişimi",
+        "24hVolume": "24s Hacim",
+        "24hVolumeTooltip": "Son 24 saatteki piyasanın toplam hacmi",
+        "openInterest": "Açık Pozisyon",
+        "openInterestTooltip": "Piyasanın toplam açık pozisyonu",
+        "fundingRate": "Fonlama Oranı",
+        "fundingRateTooltip": "Uzunlar saatlik olarak kısa pozisyonlara ödeme yapar (negatifse kısalar uzunlara ödeme yapar). Fonlama ile ilgili herhangi bir ücret yoktur, bu işlem fiyatların spot fiyata yaklaşmasını amaçlayan kullanıcılar arası transferdir.",
+        "fundingCountdown": "Fonlama Geri Sayım",
+        "fundingCountdownTooltip": "Sonraki fonlamaya kadar kalan süre"
     }
 }

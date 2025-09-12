@@ -192,5 +192,23 @@
         "numberFormat": "数値フォーマット",
         "color": "色",
         "language": "言語"
+    },
+    "symbolInfo": {
+        "mark": "マーク価格",
+        "markTooltip": "不当な清算を防ぐために計算された推定公正価値",
+        "oracle": "オラクル",
+        "oracleTooltip": "Pyth Networkオラクルからのリアルタイム価格",
+        "oracleTooltipPythStale": "Pyth Networkオラクル（価格が古い可能性があります）",
+        "oracleTooltipNoPyth": "複数の信頼できる取引所から集約された外部市場価格",
+        "24hChange": "24時間変動",
+        "24hChangeTooltip": "過去24時間の価格変動",
+        "24hVolume": "24時間取引量",
+        "24hVolumeTooltip": "過去24時間の市場全体の取引量",
+        "openInterest": "未決済建玉",
+        "openInterestTooltip": "市場の未決済建玉総額",
+        "fundingRate": "資金調達率",
+        "fundingRateTooltip": "ロングがショートに支払う時間あたりの資金率（負の場合はショートがロングに支払います）。資金調達には手数料はなく、ユーザー間のピアツーピアの送金によって価格を現物価格に近づけます。",
+        "fundingCountdown": "次回資金調達までの時間",
+        "fundingCountdownTooltip": "次の資金調達までの残り時間"
     }
 }

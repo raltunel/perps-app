@@ -226,5 +226,23 @@
         "numberFormat": "Number Format",
         "color": "Color",
         "language": "Language"
+    },
+    "symbolInfo": {
+        "mark": "Mark",
+        "markTooltip": "Estimated fair value, calculated to prevent unfair liquidations",
+        "oracle": "Oracle",
+        "oracleTooltip": "Real-time price from Pyth Network oracle",
+        "oracleTooltipPythStale": "Pyth Network oracle (price may be stale)",
+        "oracleTooltipNoPyth": "An external, aggregated market value sourced from multiple reputable exchanges",
+        "24hChange": "24h Change",
+        "24hChangeTooltip": "Change in price over the last 24 hours",
+        "24hVolume": "24h Volume",
+        "24hVolumeTooltip": "Total volume of the market over the last 24 hours",
+        "openInterest": "Open Interest",
+        "openInterestTooltip": "Total open interest of the market",
+        "fundingRate": "Funding Rate",
+        "fundingRateTooltip": "The hourly rate at which longs pay shorts (if negative, shorts pay longs). There are no fees associated with funding, which is a peer-to-peer transfer between users to push prices towards the spot price.",
+        "fundingCountdown": "Funding Countdown",
+        "fundingCountdownTooltip": "Time until the next funding"
     }
 }

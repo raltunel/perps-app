@@ -209,5 +209,23 @@
         "numberFormat": "Format de nombre",
         "color": "Couleur",
         "language": "Langue"
+    },
+    "symbolInfo": {
+        "mark": "Marque",
+        "markTooltip": "Valeur équitable estimée, calculée pour éviter des liquidations injustes",
+        "oracle": "Oracle",
+        "oracleTooltip": "Prix en temps réel de l’oracle Pyth Network",
+        "oracleTooltipPythStale": "Oracle de Pyth Network (le prix peut ne pas être à jour)",
+        "oracleTooltipNoPyth": "Une valeur de marché externe et agrégée provenant de plusieurs bourses réputées",
+        "24hChange": "Variation 24h",
+        "24hChangeTooltip": "Variation du prix au cours des dernières 24 heures",
+        "24hVolume": "Volume 24h",
+        "24hVolumeTooltip": "Volume total du marché au cours des dernières 24 heures",
+        "openInterest": "Intérêt Ouvert",
+        "openInterestTooltip": "Intérêt ouvert total du marché",
+        "fundingRate": "Taux de Financement",
+        "fundingRateTooltip": "Le taux horaire auquel les positions longues paient les positions courtes (si négatif, les courtes paient les longues). Aucun frais n’est associé au financement, il s’agit d’un transfert entre pairs visant à rapprocher les prix du prix spot.",
+        "fundingCountdown": "Compte à Rebours du Financement",
+        "fundingCountdownTooltip": "Temps restant avant le prochain financement"
     }
 }

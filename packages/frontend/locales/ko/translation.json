@@ -192,5 +192,23 @@
         "numberFormat": "수치 형식",
         "color": "색",
         "language": "언어"
+    },
+    "symbolInfo": {
+        "mark": "마크가격",
+        "markTooltip": "불공정한 청산을 방지하기 위해 계산된 추정 공정가치",
+        "oracle": "오라클",
+        "oracleTooltip": "Pyth Network 오라클의 실시간 가격",
+        "oracleTooltipPythStale": "Pyth Network 오라클 (가격이 오래되었을 수 있음)",
+        "oracleTooltipNoPyth": "여러 신뢰받는 거래소에서 집계된 외부 시장가",
+        "24hChange": "24시간 변동",
+        "24hChangeTooltip": "최근 24시간 동안의 가격 변동",
+        "24hVolume": "24시간 거래량",
+        "24hVolumeTooltip": "최근 24시간 동안의 전체 시장 거래량",
+        "openInterest": "미결제약정",
+        "openInterestTooltip": "전체 시장 미결제약정",
+        "fundingRate": "펀딩비율",
+        "fundingRateTooltip": "롱 포지션은 숏 포지션에 시간당 지급하는 비율(음수면 숏이 롱에 지불함). 펀딩에는 수수료가 없으며, 이는 사용자 간 가격을 현물가에 가깝게 조정하기 위한 P2P 전송입니다.",
+        "fundingCountdown": "펀딩 카운트다운",
+        "fundingCountdownTooltip": "다음 펀딩까지 남은 시간"
     }
 }
