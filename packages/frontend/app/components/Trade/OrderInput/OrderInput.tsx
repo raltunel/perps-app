@@ -2081,7 +2081,7 @@ function OrderInput({
             return '1 BTC ' + t('transactions.positionLimitReached');
         if (isMarketOrderLoading) return t('transactions.processingOrder');
         if (isReduceInWrongDirection)
-            return t('openPositionIsXSwitchToY', {
+            return t('transactions.openPositionIsXSwitchToY', {
                 x: tradeDirection,
                 y: tradeDirection === 'buy' ? 'sell' : 'buy',
             });
