@@ -11,20 +11,23 @@
         "error": "エラー",
         "success": "成功",
         "applyDefaults": "デフォルトを適用",
-        "learnMore": "詳細を見る",
+        "learnMore": "詳細はこちら",
         "deposit": "入金",
+        "transfer": "振替",
         "withdraw": "出金",
-        "transfer": "送金",
+        "submit": "送信",
+        "quantity": "数量",
+        "confirm": "確認",
         "amount": "金額",
         "max": "最大",
         "min": "最小",
         "positions": "ポジション",
-        "balances": "バランス",
-        "openOrders": "オープンオーダー",
+        "balances": "残高",
+        "openOrders": "未約定注文",
         "tradeHistory": "取引履歴",
-        "fundingHistory": "ファンドング履歴",
+        "fundingHistory": "資金履歴",
         "orderHistory": "注文履歴",
-        "depositsAndWithdrawals": "入出金履歴",
+        "depositsAndWithdrawals": "入出金",
         "twap": "TWAP"
     },
     "transactions": {
@@ -124,6 +127,18 @@
         "enterSize": "サイズを入力してください",
         "enterPrice": "価格を入力してください",
         "totalSize": "合計サイズ"
+    },
+    "margin": {
+        "cross": {
+            "title": "クロス",
+            "heading": "クロスマージン",
+            "blurb": "すべてのクロスポジションは、同じクロスマージンを担保として共有します。強制決済が発生した場合、このモードでのクロスマージン残高および資産下の残りの未決済ポジションは没収されることがあります。"
+        },
+        "isolated": {
+            "title": "アイソレーテッド",
+            "heading": "アイソレーテッドモード",
+            "blurb": "各ポジションに割り当てるマージン額を制限することで、個別ポジションごとのリスクを管理します。アイソレーテッドポジションのマージン率が100％に達すると、そのポジションは強制決済されます。このモードでは個別のポジションごとにマージンの追加や削除が可能です。"
+        }
     },
     "tradeTable": {
         "selectATabToViewData": "データを表示するにはタブを選択してください",

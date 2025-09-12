@@ -9,7 +9,7 @@ import {
     type UserTradeDataStore,
 } from './UserTradeDataStore';
 
-export type marginModesT = 'cross' | 'isolated';
+export type marginModesT = 'margin.cross.title' | 'margin.isolated.title';
 
 type TradeDataStore = UserTradeDataStore & {
     marginMode: marginModesT;
@@ -50,7 +50,7 @@ const useTradeDataStore = create<TradeDataStore>()(
     persist(
         (set, get) => ({
             ...createUserTradesSlice(set, get),
-            marginMode: 'cross',
+            marginMode: 'margin.cross.title',
             setMarginMode: (m: marginModesT) => set({ marginMode: m }),
             symbol: 'BTC',
             setSymbol: (symbol: string) => {

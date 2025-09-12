@@ -2311,7 +2311,7 @@ function OrderInput({
                             >
                                 <OrderDropdown
                                     options={marketOrderTypes}
-                                    value={marketOrderType}
+                                    value={t(marketOrderType)}
                                     onChange={handleMarketOrderTypeChange}
                                 />
                                 <SimpleButton
@@ -2322,7 +2322,7 @@ function OrderInput({
                                     bg='dark3'
                                     hoverBg='accent1'
                                 >
-                                    {marginMode}
+                                    {t(marginMode)}
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}

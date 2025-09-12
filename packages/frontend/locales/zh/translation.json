@@ -7,24 +7,27 @@
         "delete": "删除",
         "edit": "编辑",
         "close": "关闭",
-        "loading": "加载中...",
+        "loading": "加载中…",
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
         "learnMore": "了解更多",
-        "deposit": "存款",
-        "withdraw": "取款",
-        "transfer": "转账",
+        "deposit": "充值",
+        "transfer": "划转",
+        "withdraw": "提现",
+        "submit": "提交",
+        "quantity": "数量",
+        "confirm": "确认",
         "amount": "金额",
         "max": "最大",
         "min": "最小",
         "positions": "持仓",
         "balances": "余额",
-        "openOrders": "未完成订单",
+        "openOrders": "当前委托",
         "tradeHistory": "交易历史",
         "fundingHistory": "资金历史",
-        "orderHistory": "订单历史",
-        "depositsAndWithdrawals": "存款和取款",
+        "orderHistory": "委托历史",
+        "depositsAndWithdrawals": "充值与提现",
         "twap": "TWAP"
     },
     "transactions": {
@@ -124,6 +127,18 @@
         "enterSize": "输入数量",
         "enterPrice": "输入价格",
         "totalSize": "总数量"
+    },
+    "margin": {
+        "cross": {
+            "title": "全仓",
+            "heading": "全仓保证金",
+            "blurb": "所有全仓仓位共享相同的全仓保证金作为担保品。在发生强制平仓时，您的全仓保证金余额及此模式下资产中的任何剩余未平仓位可能会被没收。"
+        },
+        "isolated": {
+            "title": "逐仓",
+            "heading": "逐仓模式",
+            "blurb": "通过限制分配给每个仓位的保证金数量来管理单个仓位的风险。如果逐仓仓位的保证金率达到100%，该仓位将被强制平仓。在此模式下，可以为单个仓位增减保证金。"
+        }
     },
     "tradeTable": {
         "selectATabToViewData": "请选择一个标签以查看数据",

@@ -129,12 +129,14 @@
     },
     "margin": {
         "cross": {
+            "title": "Cruzado",
             "heading": "Margen Cruzado",
-            "blurb": "Todas las posiciones cruzadas comparten el mismo margen cruzado como colateral. En caso de liquidación, su saldo de margen cruzado y cualquier posición abierta restante bajo activos en este modo pueden ser confiscados."
+            "blurb": "Todas las posiciones cruzadas comparten el mismo margen cruzado como garantía. En caso de liquidación, su saldo de margen cruzado y cualquier posición abierta restante bajo los activos en este modo pueden perderse."
         },
         "isolated": {
+            "title": "Aislado",
             "heading": "Modo Aislado",
-            "blurb": "Gestione su riesgo en posiciones individuales restringiendo la cantidad de margen asignado a cada una. Si la proporción de margen de una posición aislada alcanza el 100%, la posición será liquidada. Se puede agregar o quitar margen de posiciones individuales en este modo."
+            "blurb": "Gestione su riesgo en posiciones individuales restringiendo la cantidad de margen asignado a cada una. Si el ratio de margen de una posición aislada alcanza el 100%, la posición será liquidada. En este modo se puede añadir o retirar margen a posiciones individuales."
         }
     },
     "tradeTable": {
