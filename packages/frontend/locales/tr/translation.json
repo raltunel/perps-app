@@ -12,19 +12,22 @@
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları Uygula",
         "learnMore": "Daha Fazla Bilgi",
-        "deposit": "Yatırmak",
-        "withdraw": "Çekmek",
-        "transfer": "Transfer etmek",
-        "amount": "Miktar",
-        "max": "Maksimum",
-        "min": "Minimum",
+        "deposit": "Yatır",
+        "transfer": "Transfer Et",
+        "withdraw": "Çek",
+        "submit": "Gönder",
+        "quantity": "Miktar",
+        "confirm": "Onayla",
+        "amount": "Tutar",
+        "max": "Maks",
+        "min": "Min",
         "positions": "Pozisyonlar",
         "balances": "Bakiyeler",
-        "openOrders": "Açık Siparişler",
-        "tradeHistory": "Tarihçe",
-        "fundingHistory": "Funding Tarihçe",
-        "orderHistory": "Sipariş Tarihçe",
-        "depositsAndWithdrawals": "Yatırımlar ve Çekimler",
+        "openOrders": "Açık Emirler",
+        "tradeHistory": "İşlem Geçmişi",
+        "fundingHistory": "Fonlama Geçmişi",
+        "orderHistory": "Emir Geçmişi",
+        "depositsAndWithdrawals": "Yatırma ve Çekme",
         "twap": "TWAP"
     },
     "transactions": {
@@ -124,6 +127,18 @@
         "enterSize": "Miktarı giriniz",
         "enterPrice": "Fiyatı giriniz",
         "totalSize": "Toplam Miktar"
+    },
+    "margin": {
+        "cross": {
+            "title": "Çapraz",
+            "heading": "Çapraz Marjin",
+            "blurb": "Tüm çapraz pozisyonlar teminat olarak aynı çapraz marjini paylaşır. Tasfiye durumunda, çapraz marjin bakiyeniz ve bu mod altındaki varlıklarda kalan açık pozisyonlarınız kaybedilebilir."
+        },
+        "isolated": {
+            "title": "İzolasyon",
+            "heading": "İzolasyon Modu",
+            "blurb": "Her bir pozisyona ayrılan marjin miktarını sınırlayarak bireysel pozisyonlardaki riskinizi yönetin. İzole bir pozisyonun marjin oranı %100’e ulaşırsa, pozisyon tasfiye edilir. Bu modda, bireysel pozisyonlara marjin eklemek veya çıkarmak mümkündür."
+        }
     },
     "tradeTable": {
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",

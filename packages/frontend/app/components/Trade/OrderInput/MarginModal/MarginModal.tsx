@@ -19,18 +19,26 @@ export default function MarginModal(props: propsIF) {
             <div className={styles.margin_buttons}>
                 <button
                     className={
-                        styles[intermediate === 'cross' ? 'selected' : '']
+                        styles[
+                            intermediate === 'margin.cross.title'
+                                ? 'selected'
+                                : ''
+                        ]
                     }
-                    onClick={() => setIntermediate('cross')}
+                    onClick={() => setIntermediate('margin.cross.title')}
                 >
                     <h3>{t('margin.cross.heading')}</h3>
                     <p>{t('margin.cross.blurb')}</p>
                 </button>
                 <button
                     className={
-                        styles[intermediate === 'isolated' ? 'selected' : '']
+                        styles[
+                            intermediate === 'margin.isolated.title'
+                                ? 'selected'
+                                : ''
+                        ]
                     }
-                    onClick={() => setIntermediate('isolated')}
+                    onClick={() => setIntermediate('margin.isolated.title')}
                 >
                     <h3>{t('margin.isolated.heading')}</h3>
                     <p>{t('margin.isolated.blurb')}</p>

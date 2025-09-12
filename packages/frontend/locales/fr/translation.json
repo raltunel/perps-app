@@ -5,25 +5,28 @@
         "cancel": "Annuler",
         "save": "Enregistrer",
         "delete": "Supprimer",
-        "edit": "Modifier",
+        "edit": "Éditer",
         "close": "Fermer",
         "loading": "Chargement...",
         "error": "Erreur",
         "success": "Succès",
-        "applyDefaults": "Appliquer les paramètres par défaut",
+        "applyDefaults": "Appliquer les valeurs par défaut",
         "learnMore": "En savoir plus",
         "deposit": "Dépôt",
+        "transfer": "Transférer",
         "withdraw": "Retirer",
-        "transfer": "Transfert",
+        "submit": "Soumettre",
+        "quantity": "Quantité",
+        "confirm": "Confirmer",
         "amount": "Montant",
         "max": "Max",
         "min": "Min",
         "positions": "Positions",
-        "balances": "Solde",
-        "openOrders": "Commandes ouvertes",
-        "tradeHistory": "Historique des trades",
-        "fundingHistory": "Historique des fondings",
-        "orderHistory": "Historique des commandes",
+        "balances": "Soldes",
+        "openOrders": "Ordres ouverts",
+        "tradeHistory": "Historique des transactions",
+        "fundingHistory": "Historique de financement",
+        "orderHistory": "Historique des ordres",
         "depositsAndWithdrawals": "Dépôts et retraits",
         "twap": "TWAP"
     },
@@ -124,6 +127,18 @@
         "enterSize": "Entrez la taille",
         "enterPrice": "Entrez le prix",
         "totalSize": "Taille totale"
+    },
+    "margin": {
+        "cross": {
+            "title": "Croisé",
+            "heading": "Marge Croisée",
+            "blurb": "Toutes les positions croisées partagent la même marge croisée comme garantie. En cas de liquidation, votre solde de marge croisée ainsi que toute position ouverte restante sous les actifs dans ce mode peuvent être perdues."
+        },
+        "isolated": {
+            "title": "Isolé",
+            "heading": "Mode Isolé",
+            "blurb": "Gérez votre risque sur des positions individuelles en limitant le montant de la marge allouée à chacune. Si le ratio de marge d’une position isolée atteint 100 %, la position sera liquidée. Dans ce mode, il est possible d’ajouter ou de retirer de la marge sur des positions individuelles."
+        }
     },
     "tradeTable": {
         "selectATabToViewData": "Sélectionnez un onglet pour voir les données",
