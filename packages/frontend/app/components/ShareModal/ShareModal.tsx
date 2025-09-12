@@ -13,6 +13,7 @@ import Modal from '../Modal/Modal';
 import perpsLogo from './perpsLogo.png';
 import shareCardBackground from './shareCardBackground.png';
 import styles from './ShareModal.module.css';
+import { t } from 'i18next';
 
 interface propsIF {
     close: () => void;
@@ -92,7 +93,9 @@ export default function ShareModal(props: propsIF) {
                                     backgroundColor: `var(--${memPosition.szi > 0 ? 'green' : 'red'}-dark)`,
                                 }}
                             >
-                                {(memPosition.szi > 0 ? 'Long' : 'Short') +
+                                {(memPosition.szi > 0
+                                    ? t('tradeTable.long')
+                                    : t('tradeTable.short')) +
                                     ' ' +
                                     Math.floor(memPosition.leverage.value)}
                                 x

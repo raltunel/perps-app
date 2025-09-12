@@ -61,7 +61,7 @@ export default function PositionsTable(props: PositionsTableProps) {
     return (
         <>
             <GenericTable
-                noDataMessage='No open positions'
+                noDataMessage={t('tradeTable.noOpenPositions')}
                 storageKey={`PositionsTable_${currentUserRef.current}`}
                 data={dataFilteredByType as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
