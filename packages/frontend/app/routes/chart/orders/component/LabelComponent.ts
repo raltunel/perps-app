@@ -298,8 +298,7 @@ const LabelComponent = ({
                                                         pane as HTMLElement
                                                     ).style.cursor = 'pointer';
                                                 }
-                                            }
-                                            if (
+                                            } else if (
                                                 isLabel.parentLine.type ===
                                                     'PNL' ||
                                                 (isLabel.parentLine.type ===
