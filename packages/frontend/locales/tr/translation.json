@@ -128,7 +128,8 @@
         "liquidationPrice": "Likidasyon fiyatı",
         "enterSize": "Miktarı girin",
         "enterPrice": "Fiyatı girin",
-        "totalSize": "Toplam miktar"
+        "totalSize": "Toplam miktar",
+        "cancelling": "İptal ediliyor..."
     },
     "margin": {
         "cross": {

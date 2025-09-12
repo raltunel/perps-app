@@ -126,7 +126,8 @@
         "liquidationPrice": "Precio de liquidación",
         "enterPrice": "Ingrese precio",
         "totalSize": "Tamaño total",
-        "enterSize": "Ingrese tamaño"
+        "enterSize": "Ingrese tamaño",
+        "cancelling": "Cancelar..."
     },
     "margin": {
         "cross": {

@@ -127,7 +127,8 @@
         "liquidationPrice": "Liquidation Price",
         "enterPrice": "Enter Price",
         "enterSize": "Enter Size",
-        "totalSize": "Total Size"
+        "totalSize": "Total Size",
+        "cancelling": "Cancelling..."
     },
     "margin": {
         "cross": {
