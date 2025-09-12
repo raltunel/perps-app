@@ -357,7 +357,7 @@ function PortfolioWithdraw({
                     disabled={isProcessing}
                     className={maxModeActive ? styles.active : ''}
                 >
-                    Max
+                    {t('common.max')}
                 </button>
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
@@ -392,9 +392,9 @@ function PortfolioWithdraw({
                 disabled={isButtonDisabled}
             >
                 {transactionStatus === 'pending'
-                    ? 'Confirming Transaction...'
+                    ? t('transactions.confirmingTransaction')
                     : isProcessing
-                      ? 'Processing...'
+                      ? t('transactions.processing')
                       : t('common.withdraw')}
             </SimpleButton>
         </div>
