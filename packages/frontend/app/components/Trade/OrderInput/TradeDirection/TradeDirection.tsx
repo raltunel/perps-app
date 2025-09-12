@@ -2,8 +2,8 @@ import { motion } from 'framer-motion';
 import React, { memo } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './TradeDirection.module.css';
-import type { OrderSide } from '../OrderInput';
 import { t } from 'i18next';
+import type { OrderSide } from '~/utils/CommonIFs';
 
 interface propsIF {
     tradeDirection: OrderSide;
