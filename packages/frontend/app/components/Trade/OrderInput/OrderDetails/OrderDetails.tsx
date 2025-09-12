@@ -106,12 +106,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             {
                 label: t('transactions.frequency'),
                 tooltipLabel: t('transactions.frequency'),
-                value: '30 seconds',
+                value: `30 ${t('time.seconds')}`,
             },
             {
                 label: t('transactions.runTime'),
                 tooltipLabel: t('transactions.runTime'),
-                value: '30 minutes',
+                value: `30 ${t('time.minutes')}`,
             },
             {
                 label: t('transactions.numberOfOrders'),
@@ -127,7 +127,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
             {
                 label: t('transactions.chasingInterval'),
                 tooltipLabel: t('transactions.chasingInterval'),
-                value: 'Per 1s',
+                value: `Per 1 ${t('time.second')}`,
             },
             {
                 label: t('transactions.sizePerSuborder'),

@@ -19,7 +19,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { MIN_POSITION_USD_SIZE } from '~/utils/Constants';
 import styles from './DepositDropdown.module.css';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     marginBucket: MarginBucketAvail | null;
@@ -61,6 +61,8 @@ function DepositDropdown(props: propsIF) {
         openWithdrawModal,
         PortfolioModalsRenderer,
     } = props;
+
+    const { i18n, t } = useTranslation();
 
     const [balanceNum, setBalanceNum] = useState<number>(0);
     const [unrealizedPnlNum, setUnrealizedPnlNum] = useState<number>(0);
@@ -187,7 +189,14 @@ function DepositDropdown(props: propsIF) {
             //     value: formatNum(accountOverview.crossAccountLeverage, 2) + 'x',
             // },
         ],
-        [balanceNum, unrealizedPnlNum, selectedCurrency, bsColor, formatNum],
+        [
+            balanceNum,
+            unrealizedPnlNum,
+            selectedCurrency,
+            bsColor,
+            formatNum,
+            i18n.language,
+        ],
     );
 
     // Memoize wallet connect handler
