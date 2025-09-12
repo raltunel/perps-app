@@ -120,7 +120,10 @@
         "sellOrderFailed": "Satış Emri Başarısız",
         "transactionFailed": "İşlem Başarısız",
         "buyOrderFailed": "Alış Emri Başarısız",
-        "liquidationPrice": "Likidasyon Fiyatı"
+        "liquidationPrice": "Likidasyon Fiyatı",
+        "enterSize": "Miktarı giriniz",
+        "enterPrice": "Fiyatı giriniz",
+        "totalSize": "Toplam Miktar"
     },
     "tradeTable": {
         "selectATabToViewData": "Verileri görüntülemek için bir sekme seçin",

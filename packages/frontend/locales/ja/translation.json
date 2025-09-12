@@ -120,7 +120,10 @@
         "sellOrderFailed": "売り注文に失敗しました",
         "transactionFailed": "取引に失敗しました",
         "buyOrderFailed": "買い注文に失敗しました",
-        "liquidationPrice": "清算価格"
+        "liquidationPrice": "清算価格",
+        "enterSize": "サイズを入力してください",
+        "enterPrice": "価格を入力してください",
+        "totalSize": "合計サイズ"
     },
     "tradeTable": {
         "selectATabToViewData": "データを表示するにはタブを選択してください",

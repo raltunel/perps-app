@@ -120,7 +120,10 @@
         "sellOrderFailed": "Échec de l'ordre de vente",
         "transactionFailed": "Échec de la transaction",
         "buyOrderFailed": "Échec de l'ordre d'achat",
-        "liquidationPrice": "Prix de liquidation"
+        "liquidationPrice": "Prix de liquidation",
+        "enterSize": "Entrez la taille",
+        "enterPrice": "Entrez le prix",
+        "totalSize": "Taille totale"
     },
     "tradeTable": {
         "selectATabToViewData": "Sélectionnez un onglet pour voir les données",

@@ -108,7 +108,7 @@ const SizeInput: React.FC<PropsIF> = React.memo((props) => {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                placeholder={t('transactions.enterPrice')}
+                placeholder={t('transactions.enterSize')}
                 onFocus={onFocus}
                 autoFocus={props.autoFocus}
             />

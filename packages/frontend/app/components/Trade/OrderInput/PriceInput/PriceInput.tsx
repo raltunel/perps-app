@@ -60,7 +60,7 @@ export default function PriceInput(props: PropsIF) {
               `}
             onClick={handleContainerClick}
         >
-            <span>Dogs</span>
+            <span>{t('transactions.price')}</span>
             <NumFormattedInput
                 id='trade-module-price-input'
                 value={value}
@@ -69,7 +69,7 @@ export default function PriceInput(props: PropsIF) {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                placeholder={t('common.enterPrice')}
+                placeholder={t('transactions.enterPrice')}
             />
             {showMidButton && (
                 <button
