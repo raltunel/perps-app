@@ -116,7 +116,7 @@ const useTradeDataStore = create<TradeDataStore>()(
             selectedCurrency: 'USD',
             setSelectedCurrency: (currency: string) =>
                 set({ selectedCurrency: currency }),
-            selectedTradeTab: 'Positions',
+            selectedTradeTab: 'common.positions',
             setSelectedTradeTab: (tab: string) => {
                 set({ selectedTradeTab: tab });
             },

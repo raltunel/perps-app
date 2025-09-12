@@ -83,14 +83,14 @@ export default function TradeTable(props: TradeTableProps) {
         if (!page) return [];
 
         const availableTabs = [
-            'Balances',
-            t('common.positions'),
-            'Open Orders',
-            // 'TWAP',
-            'Trade History',
-            'Funding History',
-            'Order History',
-            'Deposits and Withdrawals',
+            'common.balances',
+            'common.positions',
+            'common.openOrders',
+            // 'common.twap',
+            'common.tradeHistory',
+            // 'common.fundingHistory',
+            'common.orderHistory',
+            // 'common.depositsAndWithdrawals',
         ];
 
         if (vaultPage) {
@@ -113,7 +113,7 @@ export default function TradeTable(props: TradeTableProps) {
 
         if (isMobile) {
             return filteredTabs.filter(
-                (tab) => tab === 'Positions' || tab === 'Open Orders',
+                (tab) => tab === 'common.positions' || tab === 'Open Orders',
             );
         }
 
@@ -125,10 +125,10 @@ export default function TradeTable(props: TradeTableProps) {
         // If we're on mobile and current tab isn't allowed, switch to Positions
         if (
             isMobile &&
-            selectedTradeTab !== 'Positions' &&
+            selectedTradeTab !== 'common.positions' &&
             selectedTradeTab !== 'Open Orders'
         ) {
-            handleTabChange('Positions');
+            handleTabChange('common.positions');
         }
     }, [selectedTradeTab]);
 
@@ -142,11 +142,11 @@ export default function TradeTable(props: TradeTableProps) {
     useEffect(() => {
         if (page === Pages.TRADE) {
             if (tradePageBlackListTabs.has(selectedTradeTab)) {
-                handleTabChange('Positions');
+                handleTabChange('common.positions');
             }
         } else if (page === Pages.PORTFOLIO) {
             if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
-                handleTabChange('Positions');
+                handleTabChange('common.positions');
             }
         }
     }, [page]);
@@ -189,9 +189,9 @@ export default function TradeTable(props: TradeTableProps) {
 
     const renderTabContent = () => {
         switch (selectedTradeTab) {
-            case 'Balances':
+            case 'common.balances':
                 return <BalancesTable />;
-            case t('common.positions'):
+            case 'common.positions':
                 return (
                     <PositionsTable
                         isFetched={
@@ -202,7 +202,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                     />
                 );
-            case 'Open Orders':
+            case 'common.openOrders':
                 return (
                     <OpenOrdersTable
                         selectedFilter={selectedFilter}
@@ -212,14 +212,14 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             // case 'TWAP':
             //     return <TwapTable selectedFilter={selectedFilter} />;
-            case 'Trade History':
+            case 'common.tradeHistory':
                 return (
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
                     />
                 );
-            case 'Funding History':
+            case 'common.fundingHistory':
                 return (
                     <FundingHistoryTable
                         userFundings={userFundings}
@@ -227,7 +227,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                     />
                 );
-            case 'Order History':
+            case 'common.orderHistory':
                 return (
                     <OrderHistoryTable
                         selectedFilter={selectedFilter}
@@ -235,11 +235,11 @@ export default function TradeTable(props: TradeTableProps) {
                         isFetched={orderHistoryFetched}
                     />
                 );
-            case 'Deposits and Withdrawals':
+            case 'common.depositsAndWithdrawals':
                 return (
                     <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
                 );
-            case 'Depositors':
+            case 'common.depositors':
                 return (
                     <VaultDepositorsTable
                         isFetched={vaultFetched ?? false}
