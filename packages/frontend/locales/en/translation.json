@@ -124,12 +124,14 @@
         "sellOrderFailed": "Sell Order Failed",
         "transactionFailed": "Transaction Failed",
         "buyOrderFailed": "Buy Order Failed",
+        "closeFailed": "Failed to close position",
         "liquidationPrice": "Liquidation Price",
         "enterPrice": "Enter Price",
         "enterSize": "Enter Size",
         "totalSize": "Total Size",
         "cancelling": "Cancelling...",
-        "midButton": "MID"
+        "midButton": "MID",
+        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} of {{symbol}} position"
     },
     "margin": {
         "cross": {

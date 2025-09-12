@@ -307,7 +307,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         sizePercentageValue < 100
                             ? `${sizePercentageValue}% of Position Closed`
                             : 'Position Closed',
-                    message: `Successfully closed ${usdValueOfOrderStr} of ${symbolInfo?.coin} position`,
+                    message: `${t('transactions.successfullyClosedPosition', { usdValueOfOrderStr, symbol: symbolInfo?.coin })}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -337,7 +337,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 }
                 notifications.add({
                     title: 'Close Failed',
-                    message: result.error || 'Failed to close position',
+                    message: result.error || t('transactions.closeFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature

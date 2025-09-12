@@ -326,8 +326,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     });
                 }
                 notifications.add({
-                    title: `${side === 'buy' ? 'Buy / Long' : 'Sell / Short'} Limit Order Placed`,
-                    message: `Successfully placed ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(limitPrice, limitPrice > 10_000 ? 0 : 2, true, true)}`,
+                    title: `${side === 'buy' ? t('transactions.buyLongLimitOrderPlaced') : t('transactions.sellShortLimitOrderPlaced')}`,
+                    message: `${side === 'buy' ? t('transactions.successfullyPlacedBuyOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice }) : t('transactions.successfullyPlacedSellOrderFor', { usdValueOfOrderStr, symbol: symbolInfo?.coin, limitPrice })}`,
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -352,8 +352,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                     });
                 }
                 notifications.add({
-                    title: 'Limit Order Failed',
-                    message: result.error || 'Failed to place limit order',
+                    title: t('transactions.limitOrderFailed'),
+                    message: result.error || t('transactions.limitOrderFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
