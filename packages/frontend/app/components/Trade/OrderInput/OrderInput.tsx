@@ -2311,7 +2311,7 @@ function OrderInput({
                             >
                                 <OrderDropdown
                                     options={marketOrderTypes}
-                                    value={t(marketOrderType)}
+                                    value={marketOrderType}
                                     onChange={handleMarketOrderTypeChange}
                                 />
                                 <SimpleButton
