@@ -166,6 +166,7 @@
         "buyingPower": "Poder de compra",
         "contract": "Contrato",
         "positionValue": "Valor de la posición",
+        "entryPrice": "Precio de entrada",
         "pnl": "PnL (ROE%)",
         "liqPrice": "Precio de liquidación",
         "margin": "Margen",
