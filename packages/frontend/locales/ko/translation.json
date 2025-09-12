@@ -227,5 +227,19 @@
         "fundingRateTooltip": "롱 포지션은 숏 포지션에 시간당 지급하는 비율(음수면 숏이 롱에 지불함). 펀딩에는 수수료가 없으며, 이는 사용자 간 가격을 현물가에 가깝게 조정하기 위한 P2P 전송입니다.",
         "fundingCountdown": "펀딩 카운트다운",
         "fundingCountdownTooltip": "다음 펀딩까지 남은 시간"
+    },
+    "feedback": {
+        "menuLabel": "피드백",
+        "title": "피드백을 공유해주세요",
+        "ratingPrompt": "이용 경험을 어떻게 평가하시겠습니까?",
+        "sendFeedback": "피드백 보내기",
+        "positivePrompt": "가장 좋았던 점은 무엇인가요?",
+        "negativePrompt": "개선이 필요한 점은 무엇인가요?",
+        "placeholder": "익명 피드백은 서비스 개선에 도움이 됩니다...",
+        "warningText": "피드백이 최대 길이를 초과하여 일부가 잘립니다.",
+        "submitButtonText": "피드백 보내기",
+        "submittingButtonText": "보내는 중...",
+        "appreciateText": "피드백을 보내주셔서 감사합니다.",
+        "thanksText": "감사합니다!"
     }
 }

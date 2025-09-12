@@ -227,5 +227,19 @@
         "fundingRateTooltip": "ロングがショートに支払う時間あたりの資金率（負の場合はショートがロングに支払います）。資金調達には手数料はなく、ユーザー間のピアツーピアの送金によって価格を現物価格に近づけます。",
         "fundingCountdown": "次回資金調達までの時間",
         "fundingCountdownTooltip": "次の資金調達までの残り時間"
+    },
+    "feedback": {
+        "menuLabel": "フィードバック",
+        "title": "フィードバックの共有",
+        "ratingPrompt": "ご利用体験をどのように評価しますか？",
+        "sendFeedback": "フィードバックを送信",
+        "positivePrompt": "最も気に入った点は何ですか？",
+        "negativePrompt": "改善すべき点は何ですか？",
+        "placeholder": "あなたの匿名フィードバックはサービス向上に役立ちます…",
+        "warningText": "入力が最大文字数を超過したため、フィードバックが切り捨てられます。",
+        "submitButtonText": "フィードバックを送信",
+        "submittingButtonText": "送信中…",
+        "appreciateText": "フィードバックありがとうございます。",
+        "thanksText": "ありがとうございます！"
     }
 }
