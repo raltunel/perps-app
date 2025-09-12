@@ -123,7 +123,9 @@
         "sellOrderFailed": "Sell Order Failed",
         "transactionFailed": "Transaction Failed",
         "buyOrderFailed": "Buy Order Failed",
-        "liquidationPrice": "Liquidation Price"
+        "liquidationPrice": "Liquidation Price",
+        "enterPrice": "Enter Price",
+        "totalSize": "Total Size"
     },
     "margin": {
         "cross": {
@@ -136,7 +138,22 @@
         }
     },
     "tradeTable": {
-        "selectATabToViewData": "Select a tab to view data"
+        "selectATabToViewData": "Select a tab to view data",
+        "time": "Time",
+        "type": "Type",
+        "coin": "Coin",
+        "direction": "Direction",
+        "size": "Size",
+        "filledSize": "Filled Size",
+        "orderValue": "Order Value",
+        "price": "Price",
+        "reduceOnly": "Reduce Only",
+        "triggerConditions": "Trigger Conditions",
+        "tpsl": "TP/SL",
+        "status": "Status",
+        "order": "Order",
+        "long": "Long",
+        "short": "Short"
     },
     "navigation": {
         "home": "Home",
