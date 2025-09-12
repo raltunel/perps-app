@@ -2,8 +2,8 @@ import { motion } from 'framer-motion';
 import React, { memo } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './TradeDirection.module.css';
-import { t } from 'i18next';
 import type { OrderSide } from '~/utils/CommonIFs';
+import { useTranslation } from 'react-i18next';
 
 interface propsIF {
     tradeDirection: OrderSide;
@@ -13,6 +13,8 @@ interface propsIF {
 // In case of any bugs or issues with this component, please reach out to Jr.
 function TradeDirection(props: propsIF) {
     const { tradeDirection, setTradeDirection } = props;
+
+    const { t } = useTranslation();
 
     const { getBsColor } = useAppSettings();
 
