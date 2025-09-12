@@ -227,5 +227,19 @@
         "fundingRateTooltip": "Le taux horaire auquel les positions longues paient les positions courtes (si négatif, les courtes paient les longues). Aucun frais n’est associé au financement, il s’agit d’un transfert entre pairs visant à rapprocher les prix du prix spot.",
         "fundingCountdown": "Compte à Rebours du Financement",
         "fundingCountdownTooltip": "Temps restant avant le prochain financement"
+    },
+    "feedback": {
+        "menuLabel": "Commentaires",
+        "title": "Partagez vos commentaires",
+        "ratingPrompt": "Comment évalueriez-vous votre expérience ?",
+        "sendFeedback": "Envoyer des commentaires",
+        "positivePrompt": "Qu'est-ce que vous aimez le plus ?",
+        "negativePrompt": "Que pouvons-nous améliorer ?",
+        "placeholder": "Vos commentaires anonymes nous aident à améliorer nos services...",
+        "warningText": "Vos commentaires dépassent la longueur maximale et seront tronqués.",
+        "submitButtonText": "Envoyer des commentaires",
+        "submittingButtonText": "Envoi en cours...",
+        "appreciateText": "Merci pour vos commentaires.",
+        "thanksText": "Merci !"
     }
 }

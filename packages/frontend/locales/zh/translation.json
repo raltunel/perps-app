@@ -227,5 +227,19 @@
         "fundingRateTooltip": "多头每小时支付空头的费率（为负时为空头支付多头）。资金费率没有额外费用，是用户之间的点对点转账，用于推动价格回归现货价格。",
         "fundingCountdown": "资金结算倒计时",
         "fundingCountdownTooltip": "距离下次资金结算的时间"
+    },
+    "feedback": {
+        "menuLabel": "反馈",
+        "title": "分享您的反馈",
+        "ratingPrompt": "您如何评价您的体验？",
+        "sendFeedback": "发送反馈",
+        "positivePrompt": "您最喜欢什么？",
+        "negativePrompt": "我们可以改进什么？",
+        "placeholder": "您的匿名反馈帮助我们改进服务……",
+        "warningText": "您的反馈超过了最大长度，将被截断。",
+        "submitButtonText": "发送反馈",
+        "submittingButtonText": "发送中……",
+        "appreciateText": "感谢您的反馈。",
+        "thanksText": "谢谢！"
     }
 }

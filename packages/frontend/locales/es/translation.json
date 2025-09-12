@@ -244,5 +244,19 @@
         "fundingRateTooltip": "La tasa por hora que los largos pagan a los cortos (si es negativa, los cortos pagan a los largos). No hay comisiones asociadas al financiamiento, que es una transferencia entre pares para acercar los precios al precio spot.",
         "fundingCountdown": "Cuenta Regresiva del Financiamiento",
         "fundingCountdownTooltip": "Tiempo restante hasta el próximo financiamiento"
+    },
+    "feedback": {
+        "menuLabel": "Comentarios",
+        "title": "Comparte tus comentarios",
+        "ratingPrompt": "¿Cómo calificarías tu experiencia?",
+        "sendFeedback": "Enviar comentarios",
+        "positivePrompt": "¿Qué es lo que más te gusta?",
+        "negativePrompt": "¿Qué podemos mejorar?",
+        "placeholder": "Tus comentarios anónimos nos ayudan a mejorar...",
+        "warningText": "Tus comentarios exceden la longitud máxima y serán recortados.",
+        "submitButtonText": "Enviar comentarios",
+        "submittingButtonText": "Enviando...",
+        "appreciateText": "Agradecemos tus comentarios.",
+        "thanksText": "¡Gracias!"
     }
 }

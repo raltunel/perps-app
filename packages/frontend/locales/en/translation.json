@@ -262,5 +262,19 @@
         "fundingRateTooltip": "The hourly rate at which longs pay shorts (if negative, shorts pay longs). There are no fees associated with funding, which is a peer-to-peer transfer between users to push prices towards the spot price.",
         "fundingCountdown": "Funding Countdown",
         "fundingCountdownTooltip": "Time until the next funding"
+    },
+    "feedback": {
+        "menuLabel": "Feedback",
+        "title": "Share Your Feedback",
+        "ratingPrompt": "How would you rate your experience?",
+        "sendFeedback": "Send Feedback",
+        "positivePrompt": "What do you like most?",
+        "negativePrompt": "What can we improve?",
+        "placeholder": "Your anonymous feedback helps us improve...",
+        "warningText": "Your feedback exceeds the maximum length and will be truncated.",
+        "submitButtonText": "Send Feedback",
+        "submittingButtonText": "Sending...",
+        "appreciateText": "We appreciate your feedback.",
+        "thanksText": "Thank You!"
     }
 }

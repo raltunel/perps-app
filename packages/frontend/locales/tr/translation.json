@@ -227,5 +227,19 @@
         "fundingRateTooltip": "Uzunlar saatlik olarak kısa pozisyonlara ödeme yapar (negatifse kısalar uzunlara ödeme yapar). Fonlama ile ilgili herhangi bir ücret yoktur, bu işlem fiyatların spot fiyata yaklaşmasını amaçlayan kullanıcılar arası transferdir.",
         "fundingCountdown": "Fonlama Geri Sayım",
         "fundingCountdownTooltip": "Sonraki fonlamaya kadar kalan süre"
+    },
+    "feedback": {
+        "menuLabel": "Geri Bildirim",
+        "title": "Geri Bildiriminizi Paylaşın",
+        "ratingPrompt": "Deneyiminizi nasıl değerlendirsiniz?",
+        "sendFeedback": "Geri Bildirim Gönder",
+        "positivePrompt": "En çok neyi beğendiniz?",
+        "negativePrompt": "Neleri geliştirebiliriz?",
+        "placeholder": "Anonim geri bildiriminiz gelişmemize yardımcı olur...",
+        "warningText": "Geri bildiriminiz maksimum uzunluğu aşıyor ve kısaltılacak.",
+        "submitButtonText": "Geri Bildirim Gönder",
+        "submittingButtonText": "Gönderiliyor...",
+        "appreciateText": "Geri bildiriminiz için teşekkür ederiz.",
+        "thanksText": "Teşekkürler!"
     }
 }
