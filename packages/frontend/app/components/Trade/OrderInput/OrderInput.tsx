@@ -73,7 +73,7 @@ import type {
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const useOnlyMarket = false;
 
@@ -90,6 +90,10 @@ function OrderInput({
     marginBucket: MarginBucketAvail | null;
     isAnyPortfolioModalOpen: boolean;
 }) {
+    const {
+        t,
+        i18n: { language },
+    } = useTranslation();
     const marketOrderTypes = useOnlyMarket
         ? [
               {
@@ -2188,7 +2192,12 @@ function OrderInput({
                 value: `${displayNumCurrentPosition} ${symbol}`,
             },
         ],
-        [displayNumAvailableToTrade, displayNumCurrentPosition, symbol],
+        [
+            displayNumAvailableToTrade,
+            displayNumCurrentPosition,
+            symbol,
+            language,
+        ],
     );
 
     const maxTradeSizeWarningLong = useMemo(
