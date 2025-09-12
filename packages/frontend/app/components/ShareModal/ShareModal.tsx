@@ -113,11 +113,11 @@ export default function ShareModal(props: propsIF) {
                     </div>
                     <div className={styles.prices}>
                         <div className={styles.price}>
-                            <div>Entry Price</div>
+                            <div>{t('tradeTable.entryPrice')}</div>
                             <div>{formatNum(memPosition.entryPx)}</div>
                         </div>
                         <div className={styles.price}>
-                            <div>Mark Price</div>
+                            <div>{t('tradeTable.markPrice')}</div>
                             <div>
                                 {formatNum(
                                     coinPriceMap.get(memPosition.coin) ?? 0,

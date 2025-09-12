@@ -154,7 +154,9 @@
         "order": "Order",
         "long": "Long",
         "short": "Short",
-        "noOpenPositions": "No open positions"
+        "noOpenPositions": "No open positions",
+        "entryPrice": "Entry Price",
+        "markPrice": "Mark Price"
     },
     "navigation": {
         "home": "Home",
