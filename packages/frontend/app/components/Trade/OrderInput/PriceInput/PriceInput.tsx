@@ -60,7 +60,7 @@ export default function PriceInput(props: PropsIF) {
               `}
             onClick={handleContainerClick}
         >
-            <span>Dogs</span>
+            <span>{t('transactions.price')}</span>
             <NumFormattedInput
                 id='trade-module-price-input'
                 value={value}
