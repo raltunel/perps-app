@@ -196,7 +196,8 @@
         "hello": "Bonjour {{name}} !",
         "goodbye": "Au revoir",
         "thankYou": "Merci",
-        "pleaseWait": "Veuillez patienter..."
+        "pleaseWait": "Veuillez patienter...",
+        "connectWalletForTrading": "Connectez votre portefeuille pour commencer à trader sans gaz."
     },
     "home": {
         "title": "Échangez des contrats avec Ambient",

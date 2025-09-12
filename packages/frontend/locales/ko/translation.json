@@ -196,7 +196,8 @@
         "hello": "안녕하세요 {{name}}님!",
         "goodbye": "안녕히 가세요",
         "thankYou": "감사합니다",
-        "pleaseWait": "잠시만 기다려 주세요..."
+        "pleaseWait": "잠시만 기다려 주세요...",
+        "connectWalletForTrading": "지갑을 연결하여 가스 비용 없이 거래를 시작하세요."
     },
     "home": {
         "title": "Ambient로 선물 거래하기",

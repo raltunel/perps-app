@@ -196,7 +196,8 @@
         "hello": "Merhaba {{name}}!",
         "goodbye": "Güle güle",
         "thankYou": "Teşekkürler",
-        "pleaseWait": "Lütfen bekleyiniz..."
+        "pleaseWait": "Lütfen bekleyiniz...",
+        "connectWalletForTrading": "Sıfır gas ile işlem yapmaya başlamak için cüzdanınızı bağlayın."
     },
     "home": {
         "title": "Ambient ile Süresiz Vadeli İşlem Yapın",

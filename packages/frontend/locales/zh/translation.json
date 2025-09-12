@@ -196,7 +196,8 @@
         "hello": "你好，{{name}}！",
         "goodbye": "再见",
         "thankYou": "谢谢",
-        "pleaseWait": "请稍候..."
+        "pleaseWait": "请稍候...",
+        "connectWalletForTrading": "连接钱包以开始无gas交易。"
     },
     "home": {
         "title": "使用Ambient交易永续合约",

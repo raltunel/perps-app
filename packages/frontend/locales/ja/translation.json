@@ -196,7 +196,8 @@
         "hello": "こんにちは、{{name}}さん！",
         "goodbye": "さようなら",
         "thankYou": "ありがとうございます",
-        "pleaseWait": "お待ちください..."
+        "pleaseWait": "お待ちください...",
+        "connectWalletForTrading": "ウォレットを接続して、ガス代ゼロで取引を開始しましょう。"
     },
     "home": {
         "title": "Ambientでパーペチュアル契約を取引",
