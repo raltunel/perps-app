@@ -13,6 +13,7 @@ import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
+import { t } from 'i18next';
 
 interface PositionsTableProps {
     pageMode?: boolean;
