@@ -27,8 +27,12 @@
         "tradeHistory": "取引履歴",
         "fundingHistory": "資金履歴",
         "orderHistory": "注文履歴",
-        "depositsAndWithdrawals": "入出金",
-        "twap": "TWAP"
+        "depositsAndWithdrawals": "入出金履歴",
+        "twap": "TWAP",
+        "all": "すべて",
+        "active": "アクティブ",
+        "long": "Long",
+        "short": "Short"
     },
     "transactions": {
         "orderTypes": "注文タイプ",

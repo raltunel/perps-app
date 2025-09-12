@@ -10,7 +10,7 @@
         "loading": "Chargement...",
         "error": "Erreur",
         "success": "Succès",
-        "applyDefaults": "Appliquer les valeurs par défaut",
+        "applyDefaults": "Appliquer les paramètres par défaut",
         "learnMore": "En savoir plus",
         "deposit": "Dépôt",
         "transfer": "Transférer",
@@ -28,7 +28,11 @@
         "fundingHistory": "Historique de financement",
         "orderHistory": "Historique des ordres",
         "depositsAndWithdrawals": "Dépôts et retraits",
-        "twap": "TWAP"
+        "twap": "TWAP",
+        "all": "Tout",
+        "active": "Actif",
+        "long": "Long",
+        "short": "Short"
     },
     "transactions": {
         "orderTypes": "Types d’ordres",

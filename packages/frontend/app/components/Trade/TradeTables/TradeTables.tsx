@@ -37,12 +37,6 @@ const portfolioPageBlackListTabs = new Set([
     'Funding History',
     'Deposits and Withdrawals',
 ]);
-const filterOptions: FilterOption[] = [
-    { id: 'all', label: 'All' },
-    { id: 'active', label: 'Active' },
-    { id: 'long', label: 'Long' },
-    { id: 'short', label: 'Short' },
-];
 
 interface TradeTableProps {
     portfolioPage?: boolean;
@@ -53,6 +47,13 @@ interface TradeTableProps {
 
 export default function TradeTable(props: TradeTableProps) {
     const { portfolioPage, vaultPage, vaultFetched, vaultDepositors } = props;
+
+    const filterOptions: FilterOption[] = [
+        { id: 'all', label: t('common.all') },
+        { id: 'active', label: t('common.active') },
+        { id: 'long', label: t('common.long') },
+        { id: 'short', label: t('common.short') },
+    ];
 
     const {
         selectedTradeTab,
@@ -113,7 +114,8 @@ export default function TradeTable(props: TradeTableProps) {
 
         if (isMobile) {
             return filteredTabs.filter(
-                (tab) => tab === 'common.positions' || tab === 'Open Orders',
+                (tab) =>
+                    tab === 'common.positions' || tab === 'common.openOrders',
             );
         }
 
@@ -126,7 +128,7 @@ export default function TradeTable(props: TradeTableProps) {
         if (
             isMobile &&
             selectedTradeTab !== 'common.positions' &&
-            selectedTradeTab !== 'Open Orders'
+            selectedTradeTab !== 'common.openOrders'
         ) {
             handleTabChange('common.positions');
         }

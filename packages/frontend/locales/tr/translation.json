@@ -13,7 +13,7 @@
         "applyDefaults": "Varsayılanları uygula",
         "learnMore": "Daha fazla bilgi",
         "deposit": "Yatır",
-        "transfer": "Transfer et",
+        "transfer": "Transfer",
         "withdraw": "Çek",
         "submit": "Gönder",
         "quantity": "Miktar",
@@ -27,8 +27,12 @@
         "tradeHistory": "İşlem geçmişi",
         "fundingHistory": "Fonlama geçmişi",
         "orderHistory": "Emir geçmişi",
-        "depositsAndWithdrawals": "Yatırma ve çekme",
-        "twap": "TWAP"
+        "depositsAndWithdrawals": "Yatırma & çekme",
+        "twap": "TWAP",
+        "all": "Tümü",
+        "active": "Aktif",
+        "long": "Long",
+        "short": "Short"
     },
     "transactions": {
         "orderTypes": "Emir Türleri",

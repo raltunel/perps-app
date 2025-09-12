@@ -28,7 +28,11 @@
         "fundingHistory": "Historial de financiamiento",
         "orderHistory": "Historial de órdenes",
         "depositsAndWithdrawals": "Depósitos y retiros",
-        "twap": "TWAP"
+        "twap": "TWAP",
+        "all": "Todo",
+        "active": "Activo",
+        "long": "Long",
+        "short": "Short"
     },
     "transactions": {
         "orderTypes": "Tipos de órdenes",
