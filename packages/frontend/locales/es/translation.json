@@ -79,6 +79,7 @@
         "limit": "Límite",
         "price": "Precio",
         "size": "Tamaño",
+        "total": "Total",
         "action": "Acción",
         "ratio": "Proporción",
         "buyLong": "Compra / Largo",
@@ -206,6 +207,14 @@
         "explanation": "{{token}} será enviado a su dirección.",
         "availableToWithdraw": "Disponible para retirar",
         "input_prompt": "Ingrese monto (mín ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Pestaña",
+        "stacked": "Acumulado",
+        "large": "Grande",
+        "book": "Libro",
+        "trades": "Transacciones",
+        "spread": "Diferencial"
     },
     "appSettings": {
         "title": "Opciones",

@@ -79,6 +79,7 @@
         "limit": "Limit",
         "price": "Price",
         "size": "Size",
+        "total": "Total",
         "action": "Action",
         "ratio": "Ratio",
         "buyLong": "Buy / Long",
@@ -207,6 +208,14 @@
         "explanation": "{{token}} will be sent to your address.",
         "availableToWithdraw": "Available to withdraw",
         "input_prompt": "Enter amount (min ${{MIN_WITHDRAW_AMOUNT}})"
+    },
+    "orderBook": {
+        "tab": "Tab",
+        "stacked": "Stacked",
+        "large": "Large",
+        "book": "Book",
+        "trades": "Trades",
+        "spread": "Spread"
     },
     "appSettings": {
         "title": "Options",
