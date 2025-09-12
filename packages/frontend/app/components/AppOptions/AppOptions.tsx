@@ -15,6 +15,7 @@ import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
+import useMediaQuery from '~/hooks/useMediaQuery';
 
 const languageOptions = {
     en: 'English 🇬🇧',
@@ -33,6 +34,9 @@ export interface appOptionDataIF {
 
 export default function AppOptions() {
     const activeOptions: useAppOptionsIF = useAppOptions();
+
+    const isMobileVersion = useMediaQuery('(max-width: 768px)');
+
     const { numFormat, setNumFormat, bsColor, setBsColor, getBsColor } =
         useAppSettings();
     const { i18n, t } = useTranslation();
@@ -173,6 +177,7 @@ export default function AppOptions() {
                 />
                 <OptionLineSelect
                     text={t('appSettings.language')}
+                    dropDirection={isMobileVersion ? 'up' : 'down'}
                     active={
                         <div>
                             {
