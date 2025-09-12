@@ -241,5 +241,12 @@
         "submittingButtonText": "보내는 중...",
         "appreciateText": "피드백을 보내주셔서 감사합니다.",
         "thanksText": "감사합니다!"
+    },
+    "accountOverview": {
+        "heading": "계정 개요",
+        "balance": "잔고",
+        "balanceTooltip": "총 계정 자산",
+        "unrealizedPnl": "미실현 손익",
+        "unrealizedPnlTooltip": "미실현 이익 및 손실"
     }
 }

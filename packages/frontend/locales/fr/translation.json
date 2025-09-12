@@ -241,5 +241,12 @@
         "submittingButtonText": "Envoi en cours...",
         "appreciateText": "Merci pour vos commentaires.",
         "thanksText": "Merci !"
+    },
+    "accountOverview": {
+        "heading": "Aperçu du compte",
+        "balance": "Solde",
+        "balanceTooltip": "Valeur totale du compte",
+        "unrealizedPnl": "P&L non réalisé",
+        "unrealizedPnlTooltip": "Profits et pertes non réalisés"
     }
 }

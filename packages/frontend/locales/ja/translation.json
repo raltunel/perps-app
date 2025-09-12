@@ -241,5 +241,12 @@
         "submittingButtonText": "送信中…",
         "appreciateText": "フィードバックありがとうございます。",
         "thanksText": "ありがとうございます！"
+    },
+    "accountOverview": {
+        "heading": "アカウント概要",
+        "balance": "残高",
+        "balanceTooltip": "アカウントの合計資産",
+        "unrealizedPnl": "未実現損益",
+        "unrealizedPnlTooltip": "未実現の利益と損失"
     }
 }
