@@ -761,8 +761,6 @@ const LabelComponent = ({
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.cursor = 'pointer';
-
-                    overlayCanvasRef.current.style.pointerEvents = 'none';
                 }
             }, 300);
         };
