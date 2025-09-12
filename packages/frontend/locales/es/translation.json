@@ -53,7 +53,6 @@
         "orderSizeBelowMinimum": "Tamaño de la orden por debajo del mínimo",
         "orderSizeExceedsPositionLimits": "Tamaño de la orden excede los límites de posición",
         "insufficientCollateral": "Colateral insuficiente",
-        "reduceOnlyExceedsPositionSize": "Reducir solo excede el tamaño de la posición",
         "processingOrder": "Procesando orden...",
         "positionLimitReached": "Límite de posición alcanzado",
         "limitOrderFailed": "Fallo en la orden limitada",
