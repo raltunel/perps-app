@@ -241,5 +241,12 @@
         "submittingButtonText": "发送中……",
         "appreciateText": "感谢您的反馈。",
         "thanksText": "谢谢！"
+    },
+    "accountOverview": {
+        "heading": "账户总览",
+        "balance": "余额",
+        "balanceTooltip": "账户总权益",
+        "unrealizedPnl": "未实现盈亏",
+        "unrealizedPnlTooltip": "未实现的利润和损失"
     }
 }

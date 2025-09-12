@@ -241,5 +241,12 @@
         "submittingButtonText": "Gönderiliyor...",
         "appreciateText": "Geri bildiriminiz için teşekkür ederiz.",
         "thanksText": "Teşekkürler!"
+    },
+    "accountOverview": {
+        "heading": "Hesap Özeti",
+        "balance": "Bakiye",
+        "balanceTooltip": "Toplam hesap öz sermayesi",
+        "unrealizedPnl": "Gerçekleşmemiş Kar/Zarar",
+        "unrealizedPnlTooltip": "Gerçekleşmemiş kar ve zararlar"
     }
 }

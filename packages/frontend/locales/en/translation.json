@@ -276,5 +276,12 @@
         "submittingButtonText": "Sending...",
         "appreciateText": "We appreciate your feedback.",
         "thanksText": "Thank You!"
+    },
+    "accountOverview": {
+        "heading": "Account Overview",
+        "balance": "Balance",
+        "balanceTooltip": "Total account equity",
+        "unrealizedPnl": "Unrealized PnL",
+        "unrealizedPnlTooltip": "Unrealized profits and losses"
     }
 }

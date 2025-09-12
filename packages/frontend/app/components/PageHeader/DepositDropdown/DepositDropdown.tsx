@@ -139,16 +139,16 @@ function DepositDropdown(props: propsIF) {
     const overviewData = useMemo(
         () => [
             {
-                label: 'Balance',
-                tooltipContent: 'total account equity',
+                label: t('accountOverview.balance'),
+                tooltipContent: t('accountOverview.balanceTooltip'),
                 value: balanceLessThanMinPositionSize
                     ? formatNum(0, 2, true, true)
                     : formatNum(balanceNum, 2, true, true),
                 change: 0,
             },
             {
-                label: 'Unrealized PNL',
-                tooltipContent: 'Unrealized profits and losses',
+                label: t('accountOverview.unrealizedPnl'),
+                tooltipContent: t('accountOverview.unrealizedPnlTooltip'),
                 value: unrealizedPnlLessThanMinPositionSize
                     ? formatNum(0, 2, true, true)
                     : formatNum(unrealizedPnlNum, 2, true, true),
@@ -243,7 +243,7 @@ function DepositDropdown(props: propsIF) {
                 )}
                 {isUserConnected && (
                     <div className={styles.overviewContainer}>
-                        <h3>Account Overview</h3>
+                        <h3>{t('accountOverview.heading')}</h3>
                         {overviewData.map((data) => (
                             <div
                                 key={data.label}

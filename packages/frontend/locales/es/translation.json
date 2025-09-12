@@ -258,5 +258,12 @@
         "submittingButtonText": "Enviando...",
         "appreciateText": "Agradecemos tus comentarios.",
         "thanksText": "¡Gracias!"
+    },
+    "accountOverview": {
+        "heading": "Resumen de cuenta",
+        "balance": "Saldo",
+        "balanceTooltip": "Patrimonio total de la cuenta",
+        "unrealizedPnl": "PyG no realizado",
+        "unrealizedPnlTooltip": "Ganancias y pérdidas no realizadas"
     }
 }
