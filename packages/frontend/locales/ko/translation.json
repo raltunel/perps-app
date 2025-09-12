@@ -120,7 +120,10 @@
         "sellOrderFailed": "매도 주문 실패",
         "transactionFailed": "거래 실패",
         "buyOrderFailed": "매수 주문 실패",
-        "liquidationPrice": "청산 가격"
+        "liquidationPrice": "청산 가격",
+        "enterSize": "사이즈 입력",
+        "enterPrice": "가격 입력",
+        "totalSize": "총 사이즈"
     },
     "tradeTable": {
         "selectATabToViewData": "데이터를 보려면 탭을 선택하세요",
@@ -196,7 +199,8 @@
         "hello": "안녕하세요 {{name}}님!",
         "goodbye": "안녕히 가세요",
         "thankYou": "감사합니다",
-        "pleaseWait": "잠시만 기다려 주세요..."
+        "pleaseWait": "잠시만 기다려 주세요...",
+        "connectWalletForTrading": "지갑을 연결하여 가스 비용 없이 거래를 시작하세요."
     },
     "home": {
         "title": "Ambient로 선물 거래하기",

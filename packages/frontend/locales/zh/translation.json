@@ -120,7 +120,10 @@
         "sellOrderFailed": "卖出订单失败",
         "transactionFailed": "交易失败",
         "buyOrderFailed": "买入订单失败",
-        "liquidationPrice": "强平价格"
+        "liquidationPrice": "强平价格",
+        "enterSize": "输入数量",
+        "enterPrice": "输入价格",
+        "totalSize": "总数量"
     },
     "tradeTable": {
         "selectATabToViewData": "请选择一个标签以查看数据",
@@ -196,7 +199,8 @@
         "hello": "你好，{{name}}！",
         "goodbye": "再见",
         "thankYou": "谢谢",
-        "pleaseWait": "请稍候..."
+        "pleaseWait": "请稍候...",
+        "connectWalletForTrading": "连接钱包以开始无gas交易。"
     },
     "home": {
         "title": "使用Ambient交易永续合约",

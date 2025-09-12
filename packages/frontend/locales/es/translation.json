@@ -124,7 +124,8 @@
         "buyOrderFailed": "Orden de compra fallida",
         "liquidationPrice": "Precio de liquidación",
         "enterPrice": "Ingresar Precio",
-        "totalSize": "Tamaño Total"
+        "totalSize": "Tamaño Total",
+        "enterSize": "Ingresar Tamaño"
     },
     "margin": {
         "cross": {
