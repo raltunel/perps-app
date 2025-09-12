@@ -76,6 +76,7 @@
         "limit": "지정가",
         "price": "가격",
         "size": "수량",
+        "time": "시간",
         "total": "합계",
         "action": "동작",
         "ratio": "비율",

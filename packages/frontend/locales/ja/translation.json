@@ -76,6 +76,7 @@
         "limit": "指値",
         "price": "価格",
         "size": "数量",
+        "time": "時間",
         "total": "合計",
         "action": "アクション",
         "ratio": "比率",
