@@ -3,6 +3,7 @@ import styles from './OrderHistoryTable.module.css';
 import SortIcon from '~/components/Vault/SortIcon';
 import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
+import { t } from 'i18next';
 
 interface OrderHistoryTableHeaderProps {
     sortBy: OrderDataSortBy;
@@ -16,7 +17,7 @@ export const OrderHistoryTableModel:
     | HeaderCell<number>[]
     | HeaderCell<string>[] = [
     {
-        name: 'Time',
+        name: t('tradeTable.time'),
         key: 'timestamp',
         sortable: true,
         className: 'timeCell',
@@ -26,21 +27,21 @@ export const OrderHistoryTableModel:
         },
     },
     {
-        name: 'Type',
+        name: t('tradeTable.type'),
         key: 'orderType',
         sortable: true,
         className: 'typeCell',
         exportable: true,
     },
     {
-        name: 'Coin',
+        name: t('tradeTable.coin'),
         key: 'coin',
         sortable: true,
         className: 'coinCell',
         exportable: true,
     },
     {
-        name: 'Direction',
+        name: t('tradeTable.direction'),
         key: 'side',
         sortable: true,
         className: 'directionCell',
@@ -50,7 +51,7 @@ export const OrderHistoryTableModel:
         },
     },
     {
-        name: 'Size',
+        name: t('tradeTable.size'),
         key: 'sz',
         sortable: true,
         className: 'sizeCell',
@@ -60,14 +61,14 @@ export const OrderHistoryTableModel:
         },
     },
     {
-        name: 'Filled Size',
+        name: t('tradeTable.filledSize'),
         key: 'filledSz',
         sortable: true,
         className: 'filledSizeCell',
         exportable: true,
     },
     {
-        name: 'Order Value',
+        name: t('tradeTable.orderValue'),
         key: 'orderValue',
         sortable: true,
         className: 'orderValueCell',
@@ -75,7 +76,7 @@ export const OrderHistoryTableModel:
         exportAction: (v: number) => v.toFixed(3),
     },
     {
-        name: 'Price',
+        name: t('tradeTable.price'),
         key: 'limitPx',
         sortable: true,
         className: 'priceCell',
@@ -88,7 +89,7 @@ export const OrderHistoryTableModel:
             }),
     },
     {
-        name: 'Reduce Only',
+        name: t('tradeTable.reduceOnly'),
         key: 'reduceOnly',
         sortable: true,
         className: 'reduceOnlyCell',
@@ -98,7 +99,7 @@ export const OrderHistoryTableModel:
         },
     },
     {
-        name: 'Trigger Conditions',
+        name: t('tradeTable.triggerConditions'),
         key: 'triggerCondition',
         sortable: true,
         className: 'triggerConditionsCell',
@@ -120,14 +121,14 @@ export const OrderHistoryTableModel:
           ]
         : []),
     {
-        name: 'Status',
+        name: t('tradeTable.status'),
         key: 'status',
         sortable: true,
         className: 'statusCell',
         exportable: true,
     },
     {
-        name: 'Order ID',
+        name: t('tradeTable.orderId'),
         key: 'oid',
         sortable: true,
         className: 'orderIdCell',
