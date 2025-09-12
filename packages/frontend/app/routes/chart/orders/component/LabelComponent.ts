@@ -410,7 +410,7 @@ const LabelComponent = ({
                     message: String(result.error || 'Failed to cancel order'),
                     icon: 'error',
                     txLink: result.signature
-                        ? blockExplorer + result.signature
+                        ? `${blockExplorer}/tx/${result.signature}`
                         : undefined,
                 });
             }
