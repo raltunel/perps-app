@@ -5,15 +5,16 @@ import type { HeaderCell, TableSortDirection } from '~/utils/CommonIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import { t } from 'i18next';
 
-interface TradeHistoryTableHeaderProps {
+export interface TradeHistoryTableHeaderProps {
     sortBy?: UserFillSortBy;
     sortDirection: TableSortDirection;
     sortClickHandler: (key: UserFillSortBy) => void;
 }
 
-export const TradeHistoryTableModel:
-    | HeaderCell<number>[]
-    | HeaderCell<string>[] = [
+// This is the model that can be imported by other components
+export const getTradeHistoryTableModel = (): Array<
+    HeaderCell<number> | HeaderCell<string>
+> => [
     {
         name: t('tradeTable.time'),
         key: 'time',
@@ -94,6 +95,8 @@ export default function TradeHistoryTableHeader({
     sortDirection,
     sortClickHandler,
 }: TradeHistoryTableHeaderProps) {
+    // Get the model inside the component to ensure it updates with language changes
+    const TradeHistoryTableModel = getTradeHistoryTableModel();
     return (
         <div className={styles.headerContainer}>
             {TradeHistoryTableModel.map((header) => (

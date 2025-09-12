@@ -5,7 +5,7 @@ import type { OrderDataSortBy } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import { t } from 'i18next';
 
-interface OrderHistoryTableHeaderProps {
+export interface OrderHistoryTableHeaderProps {
     sortBy: OrderDataSortBy;
     sortDirection: TableSortDirection;
     sortClickHandler: (key: OrderDataSortBy) => void;
@@ -13,9 +13,10 @@ interface OrderHistoryTableHeaderProps {
 
 const showTpSl = false;
 
-export const OrderHistoryTableModel:
-    | HeaderCell<number>[]
-    | HeaderCell<string>[] = [
+// This is the model that can be imported by other components
+export const getOrderHistoryTableModel = (): Array<
+    HeaderCell<number> | HeaderCell<string>
+> => [
     {
         name: t('tradeTable.time'),
         key: 'timestamp',
@@ -137,11 +138,13 @@ export const OrderHistoryTableModel:
     },
 ];
 
-export default function OrderHistoryTableHeader(
-    props: OrderHistoryTableHeaderProps,
-) {
-    const { sortBy, sortDirection, sortClickHandler } = props;
-
+export const OrderHistoryTableHeader = ({
+    sortBy,
+    sortDirection,
+    sortClickHandler,
+}: OrderHistoryTableHeaderProps) => {
+    // Get the model inside the component to ensure it updates with language changes
+    const OrderHistoryTableModel = getOrderHistoryTableModel();
     return (
         <div
             className={`${styles.headerContainer} ${!showTpSl ? styles.noTpSl : ''}`}
@@ -170,4 +173,4 @@ export default function OrderHistoryTableHeader(
             ))}
         </div>
     );
-}
+};
