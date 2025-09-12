@@ -6,7 +6,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './OrderDetails.module.css';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface MarketInfoItem {
     label: string;
@@ -27,6 +27,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
     marginRequired,
     liquidationPrice,
 }) => {
+    const { i18n, t } = useTranslation();
     const { formatNum } = useNumFormatter();
     const { isTradeInfoExpanded, setIsTradeInfoExpanded } = useTradeDataStore();
 
@@ -97,6 +98,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
         marginRequired,
         formatNum,
         liquidationPrice,
+        i18n.language,
     ]);
 
     const twapInfoData: MarketInfoItem[] = useMemo(
@@ -117,7 +119,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 value: '61',
             },
         ],
-        [],
+        [i18n.language],
     );
 
     const limitInfoData: MarketInfoItem[] = useMemo(
@@ -133,7 +135,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({
                 value: '0.000 ETH',
             },
         ],
-        [],
+        [i18n.language],
     );
 
     const infoDataMap: Record<string, MarketInfoItem[]> = useMemo(
