@@ -129,7 +129,8 @@
         "enterSize": "数量を入力してください",
         "enterPrice": "価格を入力してください",
         "totalSize": "合計数量",
-        "cancelling": "キャンセル中..."
+        "cancelling": "キャンセル中...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {

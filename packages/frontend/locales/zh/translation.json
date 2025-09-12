@@ -129,7 +129,8 @@
         "enterSize": "输入数量",
         "enterPrice": "输入价格",
         "totalSize": "总数量",
-        "cancelling": "取消中..."
+        "cancelling": "取消中...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {

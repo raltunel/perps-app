@@ -127,7 +127,8 @@
         "enterPrice": "Ingrese precio",
         "totalSize": "Tamaño total",
         "enterSize": "Ingrese tamaño",
-        "cancelling": "Cancelar..."
+        "cancelling": "Cancelar...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {

@@ -129,7 +129,8 @@
         "enterSize": "Miktarı girin",
         "enterPrice": "Fiyatı girin",
         "totalSize": "Toplam miktar",
-        "cancelling": "İptal ediliyor..."
+        "cancelling": "İptal ediliyor...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {

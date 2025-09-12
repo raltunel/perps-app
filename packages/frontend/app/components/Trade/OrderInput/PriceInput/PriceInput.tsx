@@ -85,7 +85,7 @@ export default function PriceInput(props: PropsIF) {
                         }
                     }}
                 >
-                    Mid
+                    {t('transactions.midButton')}
                 </button>
             )}
         </div>

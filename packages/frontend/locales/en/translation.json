@@ -128,7 +128,8 @@
         "enterPrice": "Enter Price",
         "enterSize": "Enter Size",
         "totalSize": "Total Size",
-        "cancelling": "Cancelling..."
+        "cancelling": "Cancelling...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {

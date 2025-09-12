@@ -129,7 +129,8 @@
         "enterSize": "수량 입력",
         "enterPrice": "가격 입력",
         "totalSize": "총 수량",
-        "cancelling": "취소 중..."
+        "cancelling": "취소 중...",
+        "midButton": "MID"
     },
     "margin": {
         "cross": {
