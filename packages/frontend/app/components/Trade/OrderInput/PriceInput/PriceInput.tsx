@@ -69,8 +69,7 @@ export default function PriceInput(props: PropsIF) {
                 onKeyDown={onKeyDown}
                 className={className}
                 aria-label={ariaLabel}
-                // placeholder={t('common.enterPrice')}
-                placeholder='Hit it'
+                placeholder={t('common.enterPrice')}
             />
             {showMidButton && (
                 <button
