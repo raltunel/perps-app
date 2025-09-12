@@ -308,5 +308,17 @@
         "balanceTooltip": "총 계정 자산",
         "unrealizedPnl": "미실현 손익",
         "unrealizedPnlTooltip": "미실현 이익 및 손실"
+    },
+    "marketLimitClose": {
+        "marketHeading": "시장가 청산",
+        "marketDescription": "현재 시장 가격으로 포지션을 청산하는 주문이 전송됩니다.",
+        "minimumOr100Percent": "{{min}} 최소 또는 100%",
+        "noZeroSize": "수량은 0이 될 수 없습니다",
+        "sizeExceedsPosition": "수량이 포지션보다 클 수 없습니다",
+        "invalidOrderSizeTitle": "잘못된 주문 수량",
+        "invalidSize": "유효한 주문 수량을 입력하세요",
+        "limitHeading": "지정가 청산",
+        "limitDescription": "지정가로 포지션을 청산하는 주문이 전송됩니다.",
+        "estimatedClosedPnl": "예상 청산 손익(수수료 제외): {{estimatedPNL}}"
     }
 }

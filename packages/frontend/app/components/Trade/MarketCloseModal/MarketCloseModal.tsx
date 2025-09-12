@@ -21,6 +21,7 @@ import type { PositionIF } from '~/utils/UserDataIFs';
 import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './MarketCloseModal.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     close: () => void;
@@ -211,10 +212,11 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     };
 
     const getWarningMessage = () => {
-        if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
+        if (Math.abs(notionalSymbolQtyNum) < 1e-8)
+            return t('marketClose.noZeroSize');
         if (notionalSymbolQtyNum > originalSize)
-            return 'Size cannot exceed your position';
-        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
+            return t('marketClose.sizeExceedsPosition');
+        if (notionalSymbolQtyNum < 0) return t('marketClose.invalidSize');
         return '';
     };
 
@@ -242,8 +244,8 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
+                title: t('marketLimitClose.invalidOrderSizeTitle'),
+                message: t('marketLimitClose.invalidSize'),
                 icon: 'error',
             });
             close();
@@ -434,11 +436,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
     }, [sizePercentageValue, isProcessingOrder, isOverLimit, close]);
 
     return (
-        <Modal title='Market Close' close={close}>
+        <Modal title={t('marketLimitClose.marketHeading')} close={close}>
             <div className={styles.container}>
                 <p className={styles.description}>
-                    This will send an order to close your position at the
-                    current market price.
+                    {t('marketLimitClose.marketDescription')}
                 </p>
                 <div className={styles.content}>
                     <SizeInput
@@ -476,10 +477,14 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                                     : styles.estimatedPnlNegative
                             }
                         >
-                            Estimated closed PNL (without fees):{' '}
-                            <span>
-                                {formatNum(estimatedPNL, 2, true, true)}
-                            </span>
+                            {t('marketLimitClose.estimatedClosedPnl', {
+                                estimatedPNL: formatNum(
+                                    estimatedPNL,
+                                    2,
+                                    true,
+                                    true,
+                                ),
+                            })}
                         </p>
                     )}
 
@@ -493,10 +498,17 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                         }
                     >
                         {isQtyLessThanMinValue && !isCompleteClose
-                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum or 100%`
+                            ? t('marketLimitClose.minimumOr100Percent', {
+                                  min: formatNum(
+                                      MIN_ORDER_VALUE,
+                                      2,
+                                      true,
+                                      true,
+                                  ),
+                              })
                             : isProcessingOrder
-                              ? 'Processing...'
-                              : 'Confirm'}
+                              ? t('transactions.processing')
+                              : t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>

@@ -308,5 +308,17 @@
         "balanceTooltip": "アカウント合計資産",
         "unrealizedPnl": "未実現損益",
         "unrealizedPnlTooltip": "未実現利益と損失"
+    },
+    "marketLimitClose": {
+        "marketHeading": "成行決済",
+        "marketDescription": "現在の市場価格でポジションを決済する注文を送信します。",
+        "minimumOr100Percent": "{{min}} 最小または100%",
+        "noZeroSize": "サイズは0にできません",
+        "sizeExceedsPosition": "サイズがポジションを超えることはできません",
+        "invalidOrderSizeTitle": "無効な注文サイズ",
+        "invalidSize": "有効な注文サイズを入力してください",
+        "limitHeading": "指値決済",
+        "limitDescription": "指定した価格でポジションを決済する注文を送信します。",
+        "estimatedClosedPnl": "予想確定損益（手数料除く）：{{estimatedPNL}}"
     }
 }

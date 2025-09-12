@@ -17,6 +17,7 @@ import PositionSize from '../OrderInput/PositionSIze/PositionSize';
 import PriceInput from '../OrderInput/PriceInput/PriceInput';
 import SizeInput from '../OrderInput/SizeInput/SizeInput';
 import styles from './LimitCloseModal.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     close: () => void;
@@ -237,10 +238,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     };
 
     const getWarningMessage = () => {
-        if (Math.abs(notionalSymbolQtyNum) < 1e-8) return 'Size cannot be zero';
+        if (Math.abs(notionalSymbolQtyNum) < 1e-8)
+            return t('marketLimitClose.noZeroSize');
         if (notionalSymbolQtyNum > originalSize)
-            return 'Size cannot exceed your position';
-        if (notionalSymbolQtyNum < 0) return 'Please enter a valid size';
+            return t('marketLimitClose.sizeExceedsPosition');
+        if (notionalSymbolQtyNum < 0) return t('marketLimitClose.invalidSize');
         return '';
     };
 
@@ -455,11 +457,10 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
     }, [positionSize, isProcessingOrder, isOverLimit, close]);
 
     return (
-        <Modal title='Limit Close' close={close}>
+        <Modal title={t('marketLimitClose.limitHeading')} close={close}>
             <div className={styles.container}>
                 <p className={styles.description}>
-                    This will send an order to close your position at the limit
-                    price.
+                    {t('marketLimitClose.limitDescription')}
                 </p>
                 <div className={styles.content}>
                     <PriceInput
@@ -518,10 +519,14 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                                     : styles.estimatedPnlNegative
                             }
                         >
-                            Estimated closed PNL (without fees):{' '}
-                            <span>
-                                {formatNum(estimatedPNL, 2, true, true)}
-                            </span>
+                            {t('marketLimitClose.estimatedClosedPnl', {
+                                estimatedPNL: formatNum(
+                                    estimatedPNL,
+                                    2,
+                                    true,
+                                    true,
+                                ),
+                            })}
                         </p>
                     )}
 
@@ -535,10 +540,17 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                         }
                     >
                         {isLessThanMinValue
-                            ? `${formatNum(MIN_ORDER_VALUE, 2, true, true)} Minimum`
+                            ? t('marketLimitClose.minimumOr100Percent', {
+                                  min: formatNum(
+                                      MIN_ORDER_VALUE,
+                                      2,
+                                      true,
+                                      true,
+                                  ),
+                              })
                             : isProcessingOrder
-                              ? 'Processing...'
-                              : 'Confirm'}
+                              ? t('transactions.processing')
+                              : t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>

@@ -322,5 +322,17 @@
         "balanceTooltip": "Patrimonio total de la cuenta",
         "unrealizedPnl": "PyG no realizado",
         "unrealizedPnlTooltip": "Ganancias y pérdidas no realizadas"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Cierre a Mercado",
+        "marketDescription": "Esto enviará una orden para cerrar tu posición al precio de mercado actual.",
+        "minimumOr100Percent": "{{min}} Mínimo o 100%",
+        "noZeroSize": "La cantidad no puede ser cero",
+        "sizeExceedsPosition": "La cantidad no puede exceder tu posición",
+        "invalidOrderSizeTitle": "Tamaño de Orden Inválido",
+        "invalidSize": "Ingresa un tamaño de orden válido",
+        "limitHeading": "Cierre con Límite",
+        "limitDescription": "Esto enviará una orden para cerrar tu posición al precio límite.",
+        "estimatedClosedPnl": "PnL cerrado estimado (sin comisiones): {{estimatedPNL}}"
     }
 }

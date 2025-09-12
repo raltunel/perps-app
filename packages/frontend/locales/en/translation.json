@@ -323,5 +323,17 @@
         "balanceTooltip": "Total account equity",
         "unrealizedPnl": "Unrealized PnL",
         "unrealizedPnlTooltip": "Unrealized profits and losses"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Market Close",
+        "marketDescription": "This will send an order to close your position at the current market price.",
+        "minimumOr100Percent": "{{min}} Minimum or 100%",
+        "noZeroSize": "Size cannot be zero",
+        "sizeExceedsPosition": "Size cannot exceed your position",
+        "invalidOrderSizeTitle": "Invalid Order Size",
+        "invalidSize": "Enter a valid order size",
+        "limitHeading": "Limit Close",
+        "limitDescription": "This will send an order to close your position at the limit price.",
+        "estimatedClosedPnl": "Estimated closed PnL (without fees): {{estimatedPNL}}"
     }
 }

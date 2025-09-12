@@ -308,5 +308,17 @@
         "balanceTooltip": "Toplam hesap değeri",
         "unrealizedPnl": "Gerçekleşmemiş K/Z",
         "unrealizedPnlTooltip": "Gerçekleşmeyen kâr ve zararlar"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Piyasadan Kapat",
+        "marketDescription": "Bu, pozisyonunuzu mevcut piyasa fiyatından kapatmak için bir emir gönderir.",
+        "minimumOr100Percent": "{{min}} Minimum veya %100",
+        "noZeroSize": "Miktar sıfır olamaz",
+        "sizeExceedsPosition": "Miktar pozisyonunuzu aşamaz",
+        "invalidOrderSizeTitle": "Geçersiz Emir Miktarı",
+        "invalidSize": "Geçerli bir emir miktarı giriniz",
+        "limitHeading": "Limitten Kapat",
+        "limitDescription": "Bu, pozisyonunuzu limit fiyattan kapatmak için bir emir gönderir.",
+        "estimatedClosedPnl": "Tahmini kapalı K/Z (ücretler hariç): {{estimatedPNL}}"
     }
 }

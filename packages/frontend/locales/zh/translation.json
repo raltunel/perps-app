@@ -308,5 +308,17 @@
         "balanceTooltip": "账户总资产",
         "unrealizedPnl": "未实现盈亏",
         "unrealizedPnlTooltip": "未实现的利润与亏损"
+    },
+    "marketLimitClose": {
+        "marketHeading": "市价平仓",
+        "marketDescription": "这将发送一个订单，以当前市价平掉您的仓位。",
+        "minimumOr100Percent": "{{min}} 最低或100%",
+        "noZeroSize": "数量不能为零",
+        "sizeExceedsPosition": "数量不能超过您的仓位",
+        "invalidOrderSizeTitle": "订单数量无效",
+        "invalidSize": "请输入有效的订单数量",
+        "limitHeading": "限价平仓",
+        "limitDescription": "这将发送一个订单，以限价平掉您的仓位。",
+        "estimatedClosedPnl": "预估平仓盈亏（不含手续费）：{{estimatedPNL}}"
     }
 }

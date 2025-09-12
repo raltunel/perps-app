@@ -308,5 +308,17 @@
         "balanceTooltip": "Valeur totale du compte",
         "unrealizedPnl": "P&L non réalisé",
         "unrealizedPnlTooltip": "Profits et pertes non réalisés"
+    },
+    "marketLimitClose": {
+        "marketHeading": "Clôture au marché",
+        "marketDescription": "Cela enverra un ordre pour clôturer votre position au prix du marché actuel.",
+        "minimumOr100Percent": "{{min}} Minimum ou 100%",
+        "noZeroSize": "La taille ne peut pas être zéro",
+        "sizeExceedsPosition": "La taille ne peut pas dépasser votre position",
+        "invalidOrderSizeTitle": "Taille d'ordre invalide",
+        "invalidSize": "Entrez une taille d'ordre valide",
+        "limitHeading": "Clôture à limite",
+        "limitDescription": "Cela enverra un ordre pour clôturer votre position au prix limite.",
+        "estimatedClosedPnl": "P&L clôturé estimé (hors frais) : {{estimatedPNL}}"
     }
 }
