@@ -86,20 +86,17 @@
 }
 
 .options_dropdown {
-    position: absolute; /* add */
-    min-width: 100%; /* add */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* nice but optional */
-    /* keep your existing padding, bg, radius, z-index */
+    position: absolute;
+    min-width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .drop_down {
-    /* add */
     top: calc(100% + var(--gap-xs));
     left: 0;
 }
 
 .drop_up {
-    /* add */
     bottom: calc(100% + var(--gap-xs));
     left: 0;
 }
