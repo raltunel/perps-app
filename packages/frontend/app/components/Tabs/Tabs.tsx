@@ -128,8 +128,8 @@ export default function Tabs(props: TabsProps) {
         tab: string | { id: string; label: string },
     ): string => {
         let label = typeof tab === 'string' ? t(tab) : t(tab.label);
-        if (label === 'Balances' && webDataFetched && balancesCount > 0) {
-            label = `Balances (${balancesCount})`;
+        if (tab === 'common.balances' && webDataFetched && balancesCount > 0) {
+            label = `${t(tab)} (${balancesCount})`;
         } else if (
             tab === 'common.positions' &&
             webDataFetched &&
@@ -137,29 +137,29 @@ export default function Tabs(props: TabsProps) {
         ) {
             label = `${t(tab)} (${positionsCount})`;
         } else if (
-            label === 'Open Orders' &&
+            tab === 'common.openOrders' &&
             webDataFetched &&
             openOrdersCount > 0
         ) {
-            label = `Open Orders (${openOrdersCount})`;
+            label = `${t(tab)} (${openOrdersCount})`;
         } else if (
-            label === 'Trade History' &&
+            tab === 'common.tradeHistory' &&
             webDataFetched &&
             userFills.length > 0
         ) {
-            label = `Trade History (${userFills.length})`;
+            label = `${t(tab)} (${userFills.length})`;
         } else if (
-            label === 'Funding' &&
+            tab === 'common.fundingHistory' &&
             webDataFetched &&
             userFundings.length > 0
         ) {
-            label = `Funding (${userFundings.length})`;
+            label = `${t(tab)} (${userFundings.length})`;
         } else if (
-            label === 'Order History' &&
+            tab === 'common.orderHistory' &&
             webDataFetched &&
             orderHistory.length > 0
         ) {
-            label = `Order History (${orderHistory.length})`;
+            label = `${t(tab)} (${orderHistory.length})`;
         }
         return label;
     };

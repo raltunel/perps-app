@@ -83,14 +83,14 @@ export default function TradeTable(props: TradeTableProps) {
         if (!page) return [];
 
         const availableTabs = [
-            'Balances',
+            'common.balances',
             'common.positions',
-            'Open Orders',
-            // 'TWAP',
-            'Trade History',
-            'Funding History',
-            'Order History',
-            'Deposits and Withdrawals',
+            'common.openOrders',
+            // 'common.twap',
+            'common.tradeHistory',
+            // 'common.fundingHistory',
+            'common.orderHistory',
+            // 'common.depositsAndWithdrawals',
         ];
 
         if (vaultPage) {
@@ -189,7 +189,7 @@ export default function TradeTable(props: TradeTableProps) {
 
     const renderTabContent = () => {
         switch (selectedTradeTab) {
-            case 'Balances':
+            case 'common.balances':
                 return <BalancesTable />;
             case 'common.positions':
                 return (
@@ -202,7 +202,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                     />
                 );
-            case 'Open Orders':
+            case 'common.openOrders':
                 return (
                     <OpenOrdersTable
                         selectedFilter={selectedFilter}
@@ -212,14 +212,14 @@ export default function TradeTable(props: TradeTableProps) {
                 );
             // case 'TWAP':
             //     return <TwapTable selectedFilter={selectedFilter} />;
-            case 'Trade History':
+            case 'common.tradeHistory':
                 return (
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
                     />
                 );
-            case 'Funding History':
+            case 'common.fundingHistory':
                 return (
                     <FundingHistoryTable
                         userFundings={userFundings}
@@ -227,7 +227,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                     />
                 );
-            case 'Order History':
+            case 'common.orderHistory':
                 return (
                     <OrderHistoryTable
                         selectedFilter={selectedFilter}
@@ -235,11 +235,11 @@ export default function TradeTable(props: TradeTableProps) {
                         isFetched={orderHistoryFetched}
                     />
                 );
-            case 'Deposits and Withdrawals':
+            case 'common.depositsAndWithdrawals':
                 return (
                     <DepositsWithdrawalsTable isFetched={tradeHistoryFetched} />
                 );
-            case 'Depositors':
+            case 'common.depositors':
                 return (
                     <VaultDepositorsTable
                         isFetched={vaultFetched ?? false}

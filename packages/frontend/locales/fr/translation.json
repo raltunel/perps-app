@@ -17,7 +17,15 @@
         "transfer": "Transfert",
         "amount": "Montant",
         "max": "Max",
-        "min": "Min"
+        "min": "Min",
+        "positions": "Positions",
+        "balances": "Solde",
+        "openOrders": "Commandes ouvertes",
+        "tradeHistory": "Historique des trades",
+        "fundingHistory": "Historique des fondings",
+        "orderHistory": "Historique des commandes",
+        "depositsAndWithdrawals": "Dépôts et retraits",
+        "twap": "TWAP"
     },
     "navigation": {
         "home": "Accueil",

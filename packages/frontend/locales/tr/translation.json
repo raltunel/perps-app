@@ -17,7 +17,15 @@
         "transfer": "Transfer etmek",
         "amount": "Miktar",
         "max": "Maksimum",
-        "min": "Minimum"
+        "min": "Minimum",
+        "positions": "Pozisyonlar",
+        "balances": "Bakiyeler",
+        "openOrders": "Açık Siparişler",
+        "tradeHistory": "Tarihçe",
+        "fundingHistory": "Funding Tarihçe",
+        "orderHistory": "Sipariş Tarihçe",
+        "depositsAndWithdrawals": "Yatırımlar ve Çekimler",
+        "twap": "TWAP"
     },
     "navigation": {
         "home": "Ana Sayfa",

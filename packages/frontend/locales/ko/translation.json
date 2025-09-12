@@ -17,7 +17,15 @@
         "transfer": "송금",
         "amount": "금액",
         "max": "최대",
-        "min": "최소"
+        "min": "최소",
+        "positions": "포지션",
+        "balances": "밸런스",
+        "openOrders": "오픈오더",
+        "tradeHistory": "트레이드 히스토리",
+        "fundingHistory": "펀딩 히스토리",
+        "orderHistory": "오더 히스토리",
+        "depositsAndWithdrawals": "입출금",
+        "twap": "TWAP"
     },
     "navigation": {
         "home": "홈",

@@ -17,7 +17,15 @@
         "transfer": "转账",
         "amount": "金额",
         "max": "最大",
-        "min": "最小"
+        "min": "最小",
+        "positions": "持仓",
+        "balances": "余额",
+        "openOrders": "未完成订单",
+        "tradeHistory": "交易历史",
+        "fundingHistory": "资金历史",
+        "orderHistory": "订单历史",
+        "depositsAndWithdrawals": "存款和取款",
+        "twap": "TWAP"
     },
     "navigation": {
         "home": "首页",

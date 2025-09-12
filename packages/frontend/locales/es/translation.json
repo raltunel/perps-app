@@ -21,7 +21,14 @@
         "amount": "Monto",
         "max": "Máx",
         "min": "Mín",
-        "positions": "Posiciones"
+        "positions": "Posiciones",
+        "balances": "Saldos",
+        "openOrders": "Órdenes Abiertas",
+        "tradeHistory": "Historial de Operaciones",
+        "fundingHistory": "Historial de Fondos",
+        "orderHistory": "Historial de Órdenes",
+        "depositsAndWithdrawals": "Depósitos y Retiros",
+        "twap": "TWAP"
     },
     "transactions": {
         "orderTypes": "Tipos de Orden",

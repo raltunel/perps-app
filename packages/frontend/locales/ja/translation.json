@@ -17,7 +17,15 @@
         "transfer": "送金",
         "amount": "金額",
         "max": "最大",
-        "min": "最小"
+        "min": "最小",
+        "positions": "ポジション",
+        "balances": "バランス",
+        "openOrders": "オープンオーダー",
+        "tradeHistory": "取引履歴",
+        "fundingHistory": "ファンドング履歴",
+        "orderHistory": "注文履歴",
+        "depositsAndWithdrawals": "入出金履歴",
+        "twap": "TWAP"
     },
     "navigation": {
         "home": "ホーム",
