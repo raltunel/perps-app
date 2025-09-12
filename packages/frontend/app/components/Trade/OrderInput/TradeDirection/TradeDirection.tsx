@@ -3,6 +3,7 @@ import React, { memo } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './TradeDirection.module.css';
 import type { OrderSide } from '../OrderInput';
+import { t } from 'i18next';
 
 interface propsIF {
     tradeDirection: OrderSide;
@@ -59,7 +60,7 @@ function TradeDirection(props: propsIF) {
                     onClick={handleBuyClick}
                     disabled={disableButtons}
                 >
-                    Buy / Long
+                    {t('transactions.buyLong')}
                 </button>
 
                 {/* Sell Button */}
@@ -70,7 +71,7 @@ function TradeDirection(props: propsIF) {
                     onClick={handleSellClick}
                     disabled={disableButtons}
                 >
-                    Sell / Short
+                    {t('transactions.sellShort')}
                 </button>
             </div>
         </div>
