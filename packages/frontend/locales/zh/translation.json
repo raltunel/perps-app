@@ -138,7 +138,7 @@
         "enterSize": "输入数量",
         "totalSize": "总数量",
         "cancelling": "取消中...",
-        "midButton": "中间价",
+        "midButton": "MID",
         "positionClosed": "持仓已平仓",
         "successfullyClosedPosition": "成功平仓{{symbol}}持仓{{usdValueOfOrderStr}}",
         "failedToClosePosition": "平仓失败",
