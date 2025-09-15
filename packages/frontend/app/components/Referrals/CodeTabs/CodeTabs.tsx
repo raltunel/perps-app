@@ -38,6 +38,7 @@ export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const [referralCode, setReferralCode] = useState('');
+    const [temporaryReferralCode, setTemporaryReferralCode] = useState('');
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState(true);
@@ -55,21 +56,100 @@ export default function CodeTabs(props: Props) {
         [sessionState],
     );
 
+    useEffect(() => {
+        if (userDataStore.referralCode) {
+            setReferralCode(userDataStore.referralCode);
+        }
+    }, [userDataStore.referralCode]);
+
     const affiliateAddress = userDataStore.userAddress;
 
     const enterCodeContent = isSessionEstablished ? (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>Enter a referral code</h6>
-                <input
-                    type='text'
-                    value={referralCode}
-                    onChange={(e) => setReferralCode(e.target.value)}
-                />
-                <h6>You will receive a 4% discount on your fees</h6>
-            </div>
-            <SimpleButton bg='accent1'>Enter</SimpleButton>
-        </section>
+        referralCode ? (
+            !isEditing ? (
+                <section className={styles.sectionWithButton}>
+                    <div className={styles.enterCodeContent}>
+                        <h6>Current Affiliate Code</h6>
+                        <p>{referralCode}</p>
+                    </div>
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => {
+                            console.log('Update');
+                            setIsEditing(true);
+                        }}
+                    >
+                        Edit
+                    </SimpleButton>
+                </section>
+            ) : (
+                <section className={styles.sectionWithButton}>
+                    <div className={styles.enterCodeContent}>
+                        <h6>Overwrite current referrer code: {referralCode}</h6>
+                        <input
+                            type='text'
+                            value={temporaryReferralCode}
+                            onChange={(e) =>
+                                setTemporaryReferralCode(e.target.value)
+                            }
+                        />
+                    </div>
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => {
+                            setIsEditing(false);
+                            setTemporaryReferralCode('');
+                            if (temporaryReferralCode) {
+                                setReferralCode(temporaryReferralCode);
+                            }
+                        }}
+                    >
+                        Update
+                    </SimpleButton>
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => {
+                            setIsEditing(false);
+                            setTemporaryReferralCode('');
+                        }}
+                    >
+                        Cancel
+                    </SimpleButton>
+                </section>
+            )
+        ) : (
+            <section className={styles.sectionWithButton}>
+                <div className={styles.enterCodeContent}>
+                    <h6>Enter a referral code</h6>
+                    <input
+                        type='text'
+                        value={temporaryReferralCode}
+                        onChange={(e) =>
+                            setTemporaryReferralCode(e.target.value)
+                        }
+                    />
+                </div>
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() => {
+                        setIsEditing(false);
+                        setTemporaryReferralCode('');
+                        setReferralCode(temporaryReferralCode);
+                    }}
+                >
+                    Update
+                </SimpleButton>
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() => {
+                        setIsEditing(false);
+                        setTemporaryReferralCode('');
+                    }}
+                >
+                    Cancel
+                </SimpleButton>
+            </section>
+        )
     ) : (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
