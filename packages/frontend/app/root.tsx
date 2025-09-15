@@ -24,6 +24,7 @@ import { TutorialProvider } from './hooks/useTutorial';
 import { useDebugStore } from './stores/DebugStore';
 
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 import {
     FUUL_API_KEY,
     MARKET_WS_ENDPOINT,
@@ -305,6 +306,9 @@ export default function App() {
                                         <WsConnectionChecker />
                                         <WebSocketDebug />
                                         <div className='root-container'>
+                                            {/* Track page views */}
+                                            <PageViewTracker />
+
                                             {/* Added error boundary for header */}
                                             <ComponentErrorBoundary>
                                                 <PageHeader />
