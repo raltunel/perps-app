@@ -34,9 +34,13 @@ export default function CodeTabs(props: Props) {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [referralCode, setReferralCode] = useState('');
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
+    const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
+        useState(true);
     const [affiliateCode, setAffiliateCode] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
 
+    console.log({ temporaryAffiliateCode });
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
@@ -75,6 +79,17 @@ export default function CodeTabs(props: Props) {
             }
         })();
     }, [sessionState]);
+
+    useEffect(() => {
+        (async () => {
+            if (temporaryAffiliateCode) {
+                const codeIsFree = await Fuul.isAffiliateCodeFree(
+                    temporaryAffiliateCode,
+                );
+                setIsTemporaryAffiliateCodeValid(codeIsFree);
+            }
+        })();
+    }, [temporaryAffiliateCode]);
 
     /**
      * Creates an affiliate code for the user
@@ -140,55 +155,131 @@ export default function CodeTabs(props: Props) {
         }
     };
 
-    const createCodeContent = affiliateCode ? (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.createCodeContent}>
-                <p>Your code is {affiliateCode}</p>
-                <div className={styles.walletLink}>
-                    <a href={`/join/${affiliateCode}`}>
-                        linktocode.com/join/{affiliateCode}
-                    </a>
+    const updateAffiliateCode = async () => {
+        try {
+            if (isEstablished(sessionState)) {
+                const userWalletKey =
+                    sessionState.walletPublicKey ||
+                    sessionState.sessionPublicKey;
+
+                if (!userWalletKey) {
+                    console.error('No wallet connected');
+                    return;
+                }
+
+                // Create the message to sign
+                const message = `I confirm that I am updating my code to ${temporaryAffiliateCode}`;
+                console.log('Message:', message);
+
+                // Convert message to Uint8Array
+                const messageBytes = new TextEncoder().encode(message);
+                // Get the signature from the session
+                const signatureBytes =
+                    await sessionState.signMessage(messageBytes);
+
+                // Convert the signature to base64
+                const signatureArray = Array.from(
+                    new Uint8Array(signatureBytes),
+                );
+                const binaryString = String.fromCharCode.apply(
+                    null,
+                    signatureArray,
+                );
+                const signature = btoa(binaryString);
+
+                const result = await Fuul.updateAffiliateCode({
+                    userIdentifier: userWalletKey.toString(), // the address of the user
+                    identifierType: UserIdentifierType.SolanaAddress, // evm_address | solana_address | xrpl_address
+                    signature,
+                    signaturePublicKey: userWalletKey.toString(), // Only for XRPL type signatures
+                    code: temporaryAffiliateCode,
+                });
+
+                console.log('API Response:', result);
+                setAffiliateCode(temporaryAffiliateCode);
+                setIsEditing(false);
+            }
+        } catch (error) {
+            console.error('Error updating affiliate code:', error);
+            // Handle error (e.g., show error message to user)
+        }
+    };
+
+    const createCodeContent =
+        affiliateCode && !isEditing ? (
+            <section className={styles.sectionWithButton}>
+                <div className={styles.createCodeContent}>
+                    <p>Your code is {affiliateCode}</p>
+                    <div className={styles.walletLink}>
+                        <a href={`/join/${affiliateCode}`}>
+                            linktocode.com/join/{affiliateCode}
+                        </a>
+                    </div>
+                    <p>
+                        You will receive <span>10%</span> of referred users fees
+                        and they will receive a <span>4%</span> discount. See
+                        the Docs for more.
+                    </p>
                 </div>
-                <p>
-                    You will receive <span>10%</span> of referred users fees and
-                    they will receive a <span>4%</span> discount. See the Docs
-                    for more.
-                </p>
-            </div>
-            <SimpleButton bg='accent1' onClick={() => setAffiliateCode('')}>
-                Update
-            </SimpleButton>
-        </section>
-    ) : (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>Create an affiliate code</h6>
-                <input
-                    type='text'
-                    value={temporaryAffiliateCode}
-                    onChange={(e) => setTemporaryAffiliateCode(e.target.value)}
-                    onKeyDown={async (e) => {
-                        if (
-                            e.key === 'Enter' &&
-                            temporaryAffiliateCode.trim()
-                        ) {
-                            await createAffiliateCode();
+                <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
+                    Edit
+                </SimpleButton>
+            </section>
+        ) : (
+            <section className={styles.sectionWithButton}>
+                <div className={styles.enterCodeContent}>
+                    <h6>Create an affiliate code</h6>
+                    <input
+                        type='text'
+                        value={temporaryAffiliateCode}
+                        onChange={(e) =>
+                            setTemporaryAffiliateCode(e.target.value)
                         }
-                    }}
-                />
-                <h6>
-                    Create a unique code to earn 10% of referred users' fees
-                </h6>
-            </div>
-            <SimpleButton
-                bg='accent1'
-                onClick={createAffiliateCode}
-                disabled={!temporaryAffiliateCode.trim()}
-            >
-                Create
-            </SimpleButton>
-        </section>
-    );
+                        onKeyDown={async (e) => {
+                            if (
+                                e.key === 'Enter' &&
+                                temporaryAffiliateCode.trim()
+                            ) {
+                                isEditing
+                                    ? updateAffiliateCode()
+                                    : createAffiliateCode();
+                            }
+                        }}
+                    />
+                    <h6>
+                        Create a unique code to earn 10% of referred users' fees
+                    </h6>
+                </div>
+                <SimpleButton
+                    bg='accent1'
+                    onClick={
+                        isEditing ? updateAffiliateCode : createAffiliateCode
+                    }
+                    disabled={
+                        !temporaryAffiliateCode.trim() ||
+                        !isTemporaryAffiliateCodeValid
+                    }
+                >
+                    {!isTemporaryAffiliateCodeValid
+                        ? 'Code Already In Use'
+                        : isEditing
+                          ? 'Update'
+                          : 'Create'}
+                </SimpleButton>
+                {isEditing && (
+                    <SimpleButton
+                        bg='dark4'
+                        hoverBg='accent1'
+                        onClick={() => {
+                            setIsEditing(false);
+                            setTemporaryAffiliateCode('');
+                        }}
+                    >
+                        Cancel
+                    </SimpleButton>
+                )}
+            </section>
+        );
 
     const claimContent = (
         <section className={styles.sectionWithButton}>
