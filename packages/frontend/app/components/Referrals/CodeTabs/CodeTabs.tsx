@@ -1,11 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useSession, isEstablished } from '@fogo/sessions-sdk-react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+    useSession,
+    isEstablished,
+    SessionButton,
+} from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { Fuul } from '@fuul/sdk';
+import { useUserDataStore } from '~/stores/UserDataStore';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -39,12 +44,20 @@ export default function CodeTabs(props: Props) {
     const [affiliateCode, setAffiliateCode] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
+    const userDataStore = useUserDataStore();
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
 
-    const enterCodeContent = (
+    const isSessionEstablished = useMemo(
+        () => isEstablished(sessionState),
+        [sessionState],
+    );
+
+    const affiliateAddress = userDataStore.userAddress;
+
+    const enterCodeContent = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Enter a referral code</h6>
@@ -56,6 +69,13 @@ export default function CodeTabs(props: Props) {
                 <h6>You will receive a 4% discount on your fees</h6>
             </div>
             <SimpleButton bg='accent1'>Enter</SimpleButton>
+        </section>
+    ) : (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Connect your wallet to enter a referral code</h6>
+            </div>
+            <SessionButton />
         </section>
     );
 
@@ -71,7 +91,6 @@ export default function CodeTabs(props: Props) {
                     UserIdentifierType.SolanaAddress,
                 );
 
-                console.log('Affiliate Code:', affiliateCode);
                 if (affiliateCode) {
                     setAffiliateCode(affiliateCode);
                 }
@@ -91,7 +110,7 @@ export default function CodeTabs(props: Props) {
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
             }
         })();
-    }, [temporaryAffiliateCode]);
+    }, [temporaryAffiliateCode, sessionState]);
 
     /**
      * Creates an affiliate code for the user
@@ -207,16 +226,33 @@ export default function CodeTabs(props: Props) {
         }
     };
 
-    const createCodeContent =
+    const [trackingLink, setTrackingLink] = useState('');
+
+    useEffect(() => {
+        (async () => {
+            if (!affiliateCode || !affiliateAddress) return '';
+            const trackingLinkUrl = await Fuul.generateTrackingLink(
+                'https://perps.ambient.finance',
+                affiliateAddress.toString(),
+                UserIdentifierType.SolanaAddress,
+            );
+            setTrackingLink(trackingLinkUrl);
+        })();
+    }, [affiliateCode]);
+
+    const createCodeContent = isSessionEstablished ? (
         affiliateCode && !isEditing ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>Your code is {affiliateCode}</p>
-                    <div className={styles.walletLink}>
-                        <a href={`/join/${affiliateCode}`}>
-                            linktocode.com/join/{affiliateCode}
-                        </a>
-                    </div>
+
+                    {trackingLink && (
+                        <div className={styles.walletLink}>
+                            <a href={trackingLink} target='_blank'>
+                                {trackingLink}
+                            </a>
+                        </div>
+                    )}
                     <p>
                         You will receive <span>10%</span> of referred users fees
                         and they will receive a <span>4%</span> discount. See
@@ -281,14 +317,29 @@ export default function CodeTabs(props: Props) {
                     </SimpleButton>
                 )}
             </section>
-        );
+        )
+    ) : (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Connect your wallet to create an affiliate code</h6>
+            </div>
+            <SessionButton />
+        </section>
+    );
 
-    const claimContent = (
+    const claimContent = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
                 <p>Claim $0.00 in rewards</p>
             </div>
             <SimpleButton bg='accent1'>Claim</SimpleButton>
+        </section>
+    ) : (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Connect your wallet to claim rewards</h6>
+            </div>
+            <SessionButton />
         </section>
     );
 
