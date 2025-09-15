@@ -167,6 +167,13 @@
         },
         "failedToUpdatedOrder": {
             "title": "Failed to update order"
+        },
+        "orderUpdated": {
+            "title": "Order updated",
+            "message": "Successfully updated order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}"
+        },
+        "errorUpdatingOrder": {
+            "title": "Error updating order"
         }
     },
     "margin": {

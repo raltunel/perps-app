@@ -708,8 +708,17 @@ const LabelComponent = ({
                         });
                     }
                     notifications.add({
-                        title: 'Order updated',
-                        message: `Successfully updated order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                        title: t('transactions.orderUpdated.title'),
+                        message: t('transactions.orderUpdated.message', {
+                            usdValueOfOrderStr,
+                            symbol: symbolInfo?.coin,
+                            limitPrice: formatNum(
+                                roundDownToTenth(newPrice),
+                                newPrice > 10_000 ? 0 : 2,
+                                true,
+                                true,
+                            ),
+                        }),
                         icon: 'check',
                         removeAfter: 10000,
                         txLink: limitOrderResult.signature
@@ -722,11 +731,11 @@ const LabelComponent = ({
                 console.error('Error updating order:', error);
                 notifications.remove(slug);
                 notifications.add({
-                    title: 'Error updating order',
+                    title: t('transactions.errorUpdatingOrder.title'),
                     message:
                         error instanceof Error
                             ? error.message
-                            : 'Unknown error occurred',
+                            : t('transactions.unknownErrorOccurred'),
                     icon: 'error',
                 });
                 if (typeof plausible === 'function') {
