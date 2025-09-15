@@ -224,7 +224,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [selectedResolution, symbol]);
 
     useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
         // if (!subKey || !info) return;
         if (!subKey) return;
         setOrderBookState(TableState.LOADING);

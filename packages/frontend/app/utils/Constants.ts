@@ -170,6 +170,9 @@ export const POLLING_API_URL =
 // import.meta.env.VITE_POLLING_API_URL || 'http://localhost:8080';
 // 'https://throbbing-disk-07bc.doug-fa5.workers.dev';
 
+export const ALTERNATE_POLLING_API_URL =
+    import.meta.env.VITE_ALTERNATE_PROXY_URL || 'https://api.hyperliquid.xyz';
+
 export const POLLING_API_INFO_ENDPOINT =
     import.meta.env.POLLING_API_INFO_ENDPOINT || `${POLLING_API_URL}/info`;
 
@@ -235,3 +238,20 @@ export const SPLIT_TEST_VERSION =
 export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
+
+export const WHITELISTED_COINS_FOR_MAIN_PROXY = new Set<string>(['BTC']);
+
+export const getPollingApiUrl = (payload: any) => {
+    if (payload.coin) {
+        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.coin)) {
+            return POLLING_API_URL;
+        }
+        return ALTERNATE_POLLING_API_URL;
+    } else if (payload.req && payload.req.coin) {
+        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.req.coin)) {
+            return POLLING_API_URL;
+        }
+        return ALTERNATE_POLLING_API_URL;
+    }
+    return POLLING_API_URL;
+};
