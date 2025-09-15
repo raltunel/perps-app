@@ -155,6 +155,14 @@
         "txFailedTryAgain": "Transaction failed. Please try again.",
         "minDepositAmountIs": "Minimum deposit amount is ${{amount}}",
         "enterAmountMin10": "Enter amount (min $10)",
+        "cancelOrderPending": {
+            "title": "Cancel Order Pending",
+            "message": "Canceling orderfor {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "cancelOrderConfirmed": {
+            "title": "Order Canceled",
+            "message": "Successfully canceled order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
         "cancelFailed": {
             "title": "Cancel Failed",
             "message": "Order ID not found",
@@ -181,7 +189,20 @@
         },
         "errorUpdatingOrder": {
             "title": "Error updating order"
-        }
+        },
+        "cancelAllFailed": {
+            "title": "Cancel All Failed",
+            "message": "Failed to cancel any orders."
+        },
+        "cancelAllConfirmed": {
+            "title": "All Orders Cancelled",
+            "message": "Successfully cancelled all {{count}} orders"
+        },
+        "cancelAllPartialSuccess": {
+            "title": "Partial Success",
+            "message": "Cancelled {{successCount}} orders, {{failedCount}} failed"
+        },
+        "noOpenOrders": "No open orders"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",

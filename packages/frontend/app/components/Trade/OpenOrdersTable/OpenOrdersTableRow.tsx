@@ -47,8 +47,8 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
     const handleCancel = async () => {
         if (!order.oid) {
             notifications.add({
-                title: 'Cancel Failed',
-                message: 'Order ID not found',
+                title: t('transactions.cancelFailed.title'),
+                message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
             return;
@@ -66,8 +66,12 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             );
             // Show pending notification
             notifications.add({
-                title: 'Cancel Order Pending',
-                message: `Cancelling order for ${usdValueOfOrderStr} of ${order.coin}`,
+                title: t('transactions.cancelPending.title'),
+                message: t('transactions.cancelPending.message', {
+                    side: order.side,
+                    usdValueOfOrderStr,
+                    symbol: order.coin,
+                }),
                 icon: 'spinner',
                 slug,
                 removeAfter: 60000,
@@ -102,8 +106,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 }
                 // Show success notification
                 notifications.add({
-                    title: 'Order Cancelled',
-                    message: `Successfully cancelled order for ${usdValueOfOrderStr} of ${order.coin}`,
+                    title: t('transactions.cancelOrderConfirmed.title'),
+                    message: t('transactions.cancelOrderConfirmed.message', {
+                        usdValueOfOrderStr,
+                        symbol: order.coin,
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -138,8 +145,10 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 }
                 // Show error notification
                 notifications.add({
-                    title: 'Cancel Failed',
-                    message: String(result.error || 'Failed to cancel order'),
+                    title: t('transactions.cancelFailed.title'),
+                    message: String(
+                        result.error || t('transactions.cancelFailed.message2'),
+                    ),
                     icon: 'error',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
@@ -151,11 +160,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             console.error('❌ Error cancelling order:', error);
             notifications.remove(slug);
             notifications.add({
-                title: 'Cancel Failed',
+                title: t('transactions.cancelFailed.title'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
             });
         } finally {
