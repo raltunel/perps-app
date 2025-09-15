@@ -225,8 +225,17 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: 'Position Closed',
-                        message: `Successfully closed ${Math.abs(position.szi)} ${position.coin} position`,
+                        title: t('trade.positionClosed'),
+                        message: t('trade.successfullyClosedPosition', {
+                            usdValueOfOrderStr: formatNum(
+                                position.szi,
+                                2,
+                                true,
+                                true,
+                                true,
+                            ),
+                            symbol: position.coin,
+                        }),
                         icon: 'check',
                         txLink: result.signature
                             ? blockExplorer + result.signature
@@ -256,9 +265,9 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: 'Close Failed',
+                        title: t('trade.closeFailed'),
                         message: String(
-                            result.error || 'Failed to close position',
+                            result.error || t('trade.failedToClosePosition'),
                         ),
                         txLink: result.signature
                             ? blockExplorer + result.signature
@@ -269,11 +278,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             } catch (error) {
                 console.error('❌ Error closing position:', error);
                 notifications.add({
-                    title: 'Close Failed',
+                    title: t('trade.closeFailed'),
                     message: String(
                         error instanceof Error
                             ? error.message
-                            : 'Unknown error occurred',
+                            : t('trade.unknownErrorOccurred'),
                     ),
                     icon: 'error',
                 });

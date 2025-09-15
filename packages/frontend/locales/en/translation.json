@@ -135,7 +135,21 @@
         "totalSize": "Total Size",
         "cancelling": "Cancelling...",
         "midButton": "MID",
-        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} of {{symbol}} position"
+        "positionClosed": "Position Closed",
+        "successfullyClosedPosition": "Successfully closed {{usdValueOfOrderStr}} of {{symbol}} position",
+        "failedToClosePosition": "Failed to close position",
+        "transactionTimedOut": "Transaction timed out after {{timeInSeconds}} seconds",
+        "txFailedOrNotConfirmed": "Transaction failed or was not confirmed",
+        "walletBalance": "Wallet balance",
+        "walletBalanceTooltip": "Your current wallet balance",
+        "depositSuccessful": "Deposit Successful",
+        "successfullyDeposited": "Successfully deposited {{amount}} {{unit}}",
+        "availableToDeposit": "Available to Deposit",
+        "availableToDepositTooltip": "Available to deposit based on vault capacity and wallet balance",
+        "invalidAmount": "Invalid Amount",
+        "depositToVault": "Deposit {{unitValue}} to {{vaultName}}",
+        "depositToVaultMsg": "Deposit {{unitValue}} to earn yield from the {{vaultName}}. Deposits will be available for withdrawal after the next epoch.",
+        "txFailedTryAgain": "Transaction failed. Please try again."
     },
     "margin": {
         "cross": {

@@ -6,6 +6,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import styles from './DepositModal.module.css';
+import { t } from 'i18next';
 
 interface DepositModalProps {
     vault: {
@@ -108,7 +109,11 @@ export default function DepositModal({
                 setTimeout(
                     () =>
                         reject(
-                            new Error('Transaction timed out after 15 seconds'),
+                            new Error(
+                                t('trade.transactionTimedOut', {
+                                    timeInSeconds: 15,
+                                }),
+                            ),
                         ),
                     15000,
                 );
@@ -129,8 +134,11 @@ export default function DepositModal({
 
                 // Show success notification
                 notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositAmount, 2, true, false)} fUSD`,
+                    title: t('transactions.depositSuccessful'),
+                    message: t('transactions.successfullyDeposited', {
+                        amount: formatNum(depositAmount, 2, true, false),
+                        unit: unitValue,
+                    }),
                     icon: 'check',
                 });
 
@@ -139,7 +147,7 @@ export default function DepositModal({
             } else {
                 setTransactionStatus('failed');
                 setError(
-                    result.error || 'Transaction failed or was not confirmed',
+                    result.error || t('transactions.txFailedOrNotConfirmed'),
                 );
             }
         } catch (error) {
@@ -159,15 +167,14 @@ export default function DepositModal({
 
     const infoItems = [
         {
-            label: 'Available to deposit',
+            label: t('transactions.availableToDeposit'),
             value: formatCurrency(maxAvailableAmount, unitValue),
-            tooltip:
-                'The maximum amount you can deposit based on vault capacity and wallet balance',
+            tooltip: t('trade.availableToDepositTooltip'),
         },
         {
-            label: 'Wallet balance',
+            label: t('trade.walletBalance'),
             value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
-            tooltip: 'Your current wallet balance',
+            tooltip: t('trade.walletBalanceTooltip'),
         },
     ];
 
@@ -229,12 +236,14 @@ export default function DepositModal({
                 console.log('Validation result:', depositValidation);
 
                 if (!depositValidation.isValid) {
-                    return depositValidation.message || 'Invalid Amount';
+                    return (
+                        depositValidation.message || t('trade.invalidAmount')
+                    );
                 }
             }
         }
 
-        return 'Deposit';
+        return t('common.deposit');
     }, [
         amount,
         isProcessing,
@@ -252,12 +261,16 @@ export default function DepositModal({
             </header> */}
             <div className={styles.textContent}>
                 <h4>
-                    Deposit {unitValue} to {vault.name}
+                    {t('transactions.depositToVault', {
+                        unitValue,
+                        vaultName: vault.name,
+                    })}
                 </h4>
                 <p>
-                    Deposit {unitValue} to earn yield from the {vault.name}.
-                    Deposits will be available for withdrawal after the next
-                    epoch.
+                    {t('transactions.depositToVaultMsg', {
+                        unitValue,
+                        vaultName: vault.name,
+                    })}
                 </p>
             </div>
 
@@ -291,7 +304,7 @@ export default function DepositModal({
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
                     <div className={styles.error}>
-                        Transaction failed. Please try again.
+                        {t('transactions.txFailedTryAgain')}
                     </div>
                 )}
             </div>
