@@ -2453,6 +2453,10 @@ function OrderInput({
                                                 tradeDirection === 'buy'
                                                     ? buyColor
                                                     : sellColor,
+                                            fontSize:
+                                                submitButtonText.length > 20
+                                                    ? 'var(--font-size-s)'
+                                                    : 'var(--font-size-m)',
                                         }}
                                         onClick={handleSubmitOrder}
                                         disabled={isDisabled}
