@@ -203,6 +203,7 @@
             "message": "Cancelled {{successCount}} orders, {{failedCount}} failed"
         },
         "noOpenOrders": "No open orders",
+        "transactionError": "Transaction Error",
         "invalidLimitPrice": {
             "title": "Invalid Price",
             "message": "Please enter a valid limit price"
@@ -210,6 +211,14 @@
         "invalidOrderSize": {
             "title": "Invalid Order Size",
             "message": "Please enter a valid order size"
+        },
+        "leverageUpdated": {
+            "title": "Leverage Updated",
+            "message": "Successfully updated leverage to {{leverage}}x"
+        },
+        "leverageUpdateFailed": {
+            "title": "Transaction Failed",
+            "message": "Failed to update leverage"
         }
     },
     "subaccounts": {

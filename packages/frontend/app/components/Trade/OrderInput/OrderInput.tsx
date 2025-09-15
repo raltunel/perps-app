@@ -2322,7 +2322,7 @@ function OrderInput({
                                     bg='dark3'
                                     hoverBg='accent1'
                                 >
-                                    {t('margin.' + marginMode + '.title')}
+                                    {t(marginMode)}
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}
