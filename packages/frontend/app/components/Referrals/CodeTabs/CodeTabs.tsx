@@ -40,7 +40,6 @@ export default function CodeTabs(props: Props) {
     const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
 
-    console.log({ temporaryAffiliateCode });
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
@@ -76,6 +75,9 @@ export default function CodeTabs(props: Props) {
                 if (affiliateCode) {
                     setAffiliateCode(affiliateCode);
                 }
+            } else {
+                console.error('No wallet connected');
+                setAffiliateCode('');
             }
         })();
     }, [sessionState]);
