@@ -1175,7 +1175,7 @@ function OrderInput({
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
-                title: t('transactions.invalidOrderSize'),
+                title: t('transactions.invalidOrderSize.title'),
                 message: t('transactions.enterValidOrderSize'),
                 icon: 'error',
             });
@@ -1343,7 +1343,7 @@ function OrderInput({
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
-                title: t('transactions.invalidOrderSize'),
+                title: t('transactions.invalidOrderSize.title'),
                 message: t('transactions.enterValidOrderSize'),
                 icon: 'error',
             });
@@ -1511,7 +1511,7 @@ function OrderInput({
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
-                title: t('transactions.invalidOrderSize'),
+                title: t('transactions.invalidOrderSize.title'),
                 message: t('transactions.enterValidOrderSize'),
                 icon: 'error',
             });
@@ -1688,7 +1688,7 @@ function OrderInput({
         // Validate position size
         if (!notionalQtyNum || notionalQtyNum <= 0) {
             notifications.add({
-                title: t('transactions.invalidOrderSize'),
+                title: t('transactions.invalidOrderSize.title'),
                 message: t('transactions.enterValidOrderSize'),
                 icon: 'error',
             });

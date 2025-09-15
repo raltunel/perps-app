@@ -71,7 +71,6 @@
         "successfullyPlacedSellOrderFor": "Sell order placed for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
         "placingSellShortLimitOrderFor": "Placing limit sell order for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
         "enterValidLimitPrice": "Enter a valid limit price",
-        "invalidOrderSize": "Invalid Order Size",
         "enterValidOrderSize": "Enter a valid order size",
         "buyLongLimitOrderPlaced": "Buy/Long Limit Order Placed",
         "successfullyPlacedBuyOrderFor": "Buy order placed for {{usdValueOfOrderStr}} {{symbol}} at {{limitPrice}}",
@@ -203,7 +202,15 @@
             "title": "Partial Success",
             "message": "Cancelled {{successCount}} orders, {{failedCount}} failed"
         },
-        "noOpenOrders": "No open orders"
+        "noOpenOrders": "No open orders",
+        "invalidLimitPrice": {
+            "title": "Invalid Price",
+            "message": "Please enter a valid limit price"
+        },
+        "invalidOrderSize": {
+            "title": "Invalid Order Size",
+            "message": "Please enter a valid order size"
+        }
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",

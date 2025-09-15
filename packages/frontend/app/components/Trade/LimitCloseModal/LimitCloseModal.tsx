@@ -272,8 +272,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         // Validate position size
         if (!notionalSymbolQtyNum || notionalSymbolQtyNum <= 0) {
             notifications.add({
-                title: 'Invalid Order Size',
-                message: 'Please enter a valid order size',
+                title: t('transactions.invalidOrderSize.title'),
+                message: t('transactions.invalidOrderSize.message'),
                 icon: 'error',
             });
             close();
@@ -283,8 +283,8 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
         // Validate price
         if (!limitPrice || limitPrice <= 0) {
             notifications.add({
-                title: 'Invalid Price',
-                message: 'Please enter a valid limit price',
+                title: t('transactions.invalidLimitPrice.title'),
+                message: t('transactions.invalidLimitPrice.message'),
                 icon: 'error',
             });
             close();
@@ -378,11 +378,11 @@ export default function LimitCloseModal({ close, position }: PropsIF) {
                 });
             }
             notifications.add({
-                title: 'Limit Order Failed',
+                title: t('transactions.limitOrderFailed'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
                 removeAfter: 10000,
             });
