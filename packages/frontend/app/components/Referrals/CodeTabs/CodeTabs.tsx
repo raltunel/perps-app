@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession, isEstablished } from '@fogo/sessions-sdk-react';
 import { UserIdentifierType } from '@fuul/sdk';
 import styles from './CodeTabs.module.css';
@@ -55,6 +55,26 @@ export default function CodeTabs(props: Props) {
             <SimpleButton bg='accent1'>Enter</SimpleButton>
         </section>
     );
+
+    useEffect(() => {
+        (async () => {
+            if (isEstablished(sessionState)) {
+                const userWalletKey =
+                    sessionState.walletPublicKey ||
+                    sessionState.sessionPublicKey;
+
+                const affiliateCode = await Fuul.getAffiliateCode(
+                    userWalletKey.toString(),
+                    UserIdentifierType.SolanaAddress,
+                );
+
+                console.log('Affiliate Code:', affiliateCode);
+                if (affiliateCode) {
+                    setAffiliateCode(affiliateCode);
+                }
+            }
+        })();
+    }, [sessionState]);
 
     /**
      * Creates an affiliate code for the user
