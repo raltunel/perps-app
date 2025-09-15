@@ -234,6 +234,7 @@ function OrderInput({
 
     const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
         useTradeDataStore();
+    console.log(t(marginMode.toString().toLowerCase() + '.title'));
 
     const { buys, sells } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
@@ -2322,7 +2323,7 @@ function OrderInput({
                                     bg='dark3'
                                     hoverBg='accent1'
                                 >
-                                    {t(marginMode)}
+                                    {t('margin.' + marginMode + '.title')}
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}
