@@ -35,7 +35,8 @@
         "short": "Short",
         "create": "Create",
         "update": "Update",
-        "reset": "Reset"
+        "reset": "Reset",
+        "announcements": "Announcements"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -441,5 +442,13 @@
         "estimatedClosedPnl": "Estimated closed PnL (without fees): {{estimatedPNL}}",
         "positionClosed": "Position Closed",
         "percentOfPositionClosed": "{{sizePercentageValue}}% of Position Closed"
+    },
+    "newVersion": {
+        "title": "New Version Available",
+        "message": {
+            "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
+            "noVersionNumber": "A new version is ready to install with new features and improvements."
+        },
+        "updateButton": "Update Now"
     }
 }
