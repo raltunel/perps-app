@@ -234,7 +234,6 @@ function OrderInput({
 
     const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
         useTradeDataStore();
-    console.log(t(marginMode.toString().toLowerCase() + '.title'));
 
     const { buys, sells } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
