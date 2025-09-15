@@ -138,7 +138,7 @@
         "enterSize": "Boyut girin",
         "totalSize": "Toplam Boyut",
         "cancelling": "İptal ediliyor...",
-        "midButton": "ORTA",
+        "midButton": "MID",
         "positionClosed": "Pozisyon kapatıldı",
         "successfullyClosedPosition": "{{symbol}} pozisyonu {{usdValueOfOrderStr}} ile kapatıldı",
         "failedToClosePosition": "Pozisyon kapatılamadı",

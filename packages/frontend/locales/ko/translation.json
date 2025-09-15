@@ -138,7 +138,7 @@
         "enterSize": "크기 입력",
         "totalSize": "총 크기",
         "cancelling": "취소 중...",
-        "midButton": "중간",
+        "midButton": "MID",
         "positionClosed": "포지션 종료됨",
         "successfullyClosedPosition": "{{symbol}} 포지션 {{usdValueOfOrderStr}} 성공적으로 종료됨",
         "failedToClosePosition": "포지션 종료 실패",
