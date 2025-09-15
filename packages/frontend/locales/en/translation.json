@@ -175,14 +175,21 @@
             "title": "Order updated",
             "message": "Successfully updated order for {{usdValueOfOrderStr}} of {{symbol}} at {{limitPrice}}"
         },
+        "orderFilled": {
+            "title": "{{side}} Order Filled",
+            "message": "Successfully filled {{side}} order for {{usdValueOfFillStr}} of {{symbol}} at {{fillPrice}}"
+        },
         "errorUpdatingOrder": {
             "title": "Error updating order"
         }
     },
     "subaccounts": {
+        "createSubAccount": "Create Sub-Account",
+        "createSubAccountPH": "eg: My Sub-Account 1",
         "created": {
             "title": "Sub Account Created",
-            "message": "Made new strategy Sub-Account {{name}}"
+            "message": "Made new strategy Sub-Account {{name}}",
+            "message2": "Made new discretionary sub-account {{name}}"
         }
     },
     "strategies": {
