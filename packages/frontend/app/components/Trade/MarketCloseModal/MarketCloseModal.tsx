@@ -305,8 +305,10 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                 notifications.add({
                     title:
                         sizePercentageValue < 100
-                            ? `${sizePercentageValue}% of Position Closed`
-                            : 'Position Closed',
+                            ? t('marketLimitClose.percentOfPositionClosed', {
+                                  sizePercentageValue,
+                              })
+                            : t('marketLimitClose.positionClosed'),
                     message: `${t('transactions.successfullyClosedPosition', { usdValueOfOrderStr, symbol: symbolInfo?.coin })}`,
                     icon: 'check',
                     txLink: result.signature
@@ -336,7 +338,7 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
                     });
                 }
                 notifications.add({
-                    title: 'Close Failed',
+                    title: t('transactions.closeFailedTitle'),
                     message: result.error || t('transactions.closeFailed'),
                     icon: 'error',
                     removeAfter: 10000,
@@ -348,11 +350,11 @@ export default function MarketCloseModal({ close, position }: PropsIF) {
         } catch (error) {
             console.error('❌ Error closing position:', error);
             notifications.add({
-                title: 'Close Failed',
+                title: t('transactions.closeFailedTitle'),
                 message:
                     error instanceof Error
                         ? error.message
-                        : 'Unknown error occurred',
+                        : t('transactions.unknownErrorOccurred'),
                 icon: 'error',
                 removeAfter: 10000,
             });
