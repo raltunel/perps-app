@@ -183,8 +183,11 @@ function PortfolioDeposit(props: propsIF) {
                 }
                 // Show success notification
                 notificationStore.add({
-                    title: 'Deposit Successful',
-                    message: `Successfully deposited ${formatNum(depositInputNum, 2, true, false)} fUSD`,
+                    title: t('transactions.depositSuccessful'),
+                    message: t('transactions.successfullyDeposited', {
+                        amount: formatNum(depositInputNum, 2, true, false),
+                        unit: 'fUSD',
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`

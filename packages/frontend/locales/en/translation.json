@@ -148,6 +148,8 @@
         "walletBalanceTooltip": "Your current wallet balance",
         "depositSuccessful": "Deposit Successful",
         "successfullyDeposited": "Successfully deposited {{amount}} {{unit}}",
+        "withdrawalSuccessful": "Withdrawal Successful",
+        "successfullyWithdrawn": "Successfully withdrew {{amount}} {{unit}}",
         "availableToDeposit": "Available to Deposit",
         "availableToDepositTooltip": "Available to deposit based on vault capacity and wallet balance",
         "invalidAmount": "Invalid Amount",
@@ -220,7 +222,8 @@
         "leverageUpdateFailed": {
             "title": "Transaction Failed",
             "message": "Failed to update leverage"
-        }
+        },
+        "viewOnExplorer": "View on explorer"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",

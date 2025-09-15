@@ -244,8 +244,11 @@ function PortfolioWithdraw({
                 }
                 // Show success notification
                 notificationStore.add({
-                    title: 'Withdrawal Successful',
-                    message: `Successfully withdrew ${formatNum(withdrawInputNum, 2, true, false)} fUSD`,
+                    title: t('transactions.withdrawalSuccessful'),
+                    message: t('transactions.successfullyWithdrawn', {
+                        amount: formatNum(withdrawInputNum, 2, true, false),
+                        unit: 'fUSD',
+                    }),
                     icon: 'check',
                     txLink: result.signature
                         ? `${blockExplorer}/tx/${result.signature}`
