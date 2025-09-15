@@ -32,7 +32,10 @@
         "all": "All",
         "active": "Active",
         "long": "Long",
-        "short": "Short"
+        "short": "Short",
+        "create": "Create",
+        "update": "Update",
+        "reset": "Reset"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -175,6 +178,16 @@
         "errorUpdatingOrder": {
             "title": "Error updating order"
         }
+    },
+    "subaccounts": {
+        "created": {
+            "title": "Sub Account Created",
+            "message": "Made new strategy Sub-Account {{name}}"
+        }
+    },
+    "strategies": {
+        "newStrategy": "New Strategy",
+        "editStrategy": "Edit Strategy"
     },
     "margin": {
         "cross": {
