@@ -149,7 +149,25 @@
         "invalidAmount": "Invalid Amount",
         "depositToVault": "Deposit {{unitValue}} to {{vaultName}}",
         "depositToVaultMsg": "Deposit {{unitValue}} to earn yield from the {{vaultName}}. Deposits will be available for withdrawal after the next epoch.",
-        "txFailedTryAgain": "Transaction failed. Please try again."
+        "txFailedTryAgain": "Transaction failed. Please try again.",
+        "minDepositAmountIs": "Minimum deposit amount is ${{amount}}",
+        "enterAmountMin10": "Enter amount (min $10)",
+        "cancelFailed": {
+            "title": "Cancel Failed",
+            "message": "Order ID not found",
+            "message2": "Failed to cancel order"
+        },
+        "cancelLimitPending": {
+            "title": "Cancel Limit Pending",
+            "message": "Canceling {{side}} limit order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "cancelLimitConfirmed": {
+            "title": "Order Canceled",
+            "message": "Successfully canceled {{side}} limit order for {{usdValueOfOrderStr}} of {{symbol}}"
+        },
+        "failedToUpdatedOrder": {
+            "title": "Failed to update order"
+        }
     },
     "margin": {
         "cross": {

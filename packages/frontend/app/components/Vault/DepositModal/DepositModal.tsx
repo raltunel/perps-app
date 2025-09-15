@@ -281,7 +281,7 @@ export default function DepositModal({
 
             <div className={styles.inputContainer}>
                 <h6>
-                    Amount{' '}
+                    {t('common.amount') + ' '}
                     {isBelowMinimum && (
                         <span className={styles.minWarning}>(Min: $10)</span>
                     )}
@@ -293,7 +293,7 @@ export default function DepositModal({
                     aria-label='deposit input'
                     inputMode='numeric'
                     pattern='[0-9]*'
-                    placeholder='Enter amount (min $10)'
+                    placeholder={t('transactions.enterAmountMin10')}
                     min='0'
                     step='any'
                     className={isBelowMinimum ? styles.inputBelowMin : ''}
@@ -332,7 +332,9 @@ export default function DepositModal({
                 onClick={(e) => {
                     if (isBelowMinimum) {
                         e.preventDefault();
-                        setError('Minimum deposit amount is $5.00');
+                        setError(
+                            t('trade.minDepositAmountIs', { amount: '$5.00' }),
+                        );
                         // Clear error after 3 seconds
                         setTimeout(() => setError(null), 3000);
                         return;
