@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "Adjust Leverage"
+    },
+    "share": {
+        "prompt": "Customize your text",
+        "xCTA": "Share on 𝕏",
+        "copyLinkCTA": "Copy Link",
+        "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now"
     }
 }

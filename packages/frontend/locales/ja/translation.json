@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "レバレッジを調整"
+    },
+    "share": {
+        "prompt": "テキストをカスタマイズ",
+        "xCTA": "𝕏で共有",
+        "copyLinkCTA": "リンクをコピー",
+        "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
     }
 }

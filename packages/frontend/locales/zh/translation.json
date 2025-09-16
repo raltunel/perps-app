@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "调整杠杆"
+    },
+    "share": {
+        "prompt": "自定义您的文本",
+        "xCTA": "在𝕏分享",
+        "copyLinkCTA": "复制链接",
+        "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约"
     }
 }

@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "Ajuster l'effet de levier"
+    },
+    "share": {
+        "prompt": "Personnalisez votre texte",
+        "xCTA": "Partager sur 𝕏",
+        "copyLinkCTA": "Copier le lien",
+        "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant"
     }
 }

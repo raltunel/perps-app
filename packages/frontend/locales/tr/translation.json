@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "Kaldıraç ayarla"
+    },
+    "share": {
+        "prompt": "Metninizi özelleştirin",
+        "xCTA": "𝕏'te paylaş",
+        "copyLinkCTA": "Bağlantıyı kopyala",
+        "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap"
     }
 }

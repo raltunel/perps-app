@@ -137,14 +137,18 @@ export default function ShareModal(props: propsIF) {
                     </div> */}
                     <div className={styles.custom_text}>
                         <label htmlFor={TEXTAREA_ID_FOR_DOM}>
-                            Customize your text
+                            {t('share.prompt')}
                         </label>
                         <textarea
                             id={TEXTAREA_ID_FOR_DOM}
                             ref={inputRef}
                             maxLength={TWITTER_CHARACTER_LIMIT}
                             autoComplete='false'
-                            defaultValue={`Trade $${memPosition.coin} perps at ${PERPS_TWITTER} on ${FOGO_TWITTER} Testnet now`}
+                            defaultValue={t('share.textPlaceholder', {
+                                coin: memPosition.coin,
+                                twitter: PERPS_TWITTER,
+                                fogo: FOGO_TWITTER,
+                            })}
                         />
                     </div>
                     <div className={styles.button_bank}>
@@ -177,7 +181,7 @@ export default function ShareModal(props: propsIF) {
                                     );
                             }}
                         >
-                            Share on 𝕏 <RiTwitterFill />
+                            {t('share.xCTA')} <RiTwitterFill />
                         </button>
                     </div>
                 </div>

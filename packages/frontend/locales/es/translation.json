@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "Ajustar apalancamiento"
+    },
+    "share": {
+        "prompt": "Personaliza tu texto",
+        "xCTA": "Compartir en 𝕏",
+        "copyLinkCTA": "Copiar enlace",
+        "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora"
     }
 }

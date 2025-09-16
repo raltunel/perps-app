@@ -461,5 +461,11 @@
     },
     "leverage": {
         "title": "레버리지를 조정"
+    },
+    "share": {
+        "prompt": "텍스트를 사용자 지정하세요",
+        "xCTA": "𝕏에서 공유",
+        "copyLinkCTA": "링크 복사",
+        "textPlaceholder": "지금 {{fogo}} 테스트넷에서 {{twitter}}로 {{coin}} 퍼프 거래를 하세요"
     }
 }
