@@ -229,7 +229,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, tradesMaxHeight],
+        [orderCount, tradesMaxHeight, i18n.language],
     );
 
     const largeOrderBook = useMemo(
@@ -268,7 +268,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount],
+        [orderCount, tradesMaxHeight, i18n.language],
     );
 
     const orderBookTabsComponent = (
