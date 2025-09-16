@@ -245,22 +245,29 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [subKey, info]);
 
     const midHeader = useCallback(
-        (id: string) => (
-            <div id={id} className={styles.orderBookBlockMid}>
-                <div>Spread</div>
-                <div>{selectedResolution?.val}</div>
-                <div>
-                    {symbolInfo?.markPx &&
-                        selectedResolution?.val &&
-                        (
-                            (selectedResolution?.val / symbolInfo?.markPx) *
-                            100
-                        ).toFixed(3)}
-                    %
+        (id: string) => {
+            let diff = 0;
+            if (
+                buys.length > 0 &&
+                sells.length > 0 &&
+                orderBookState === TableState.FILLED
+            ) {
+                diff = sells[0].px - buys[0].px;
+            }
+            return (
+                <div id={id} className={styles.orderBookBlockMid}>
+                    <div>Spread</div>
+                    <div>{diff > 0 ? diff : ''}</div>
+                    <div>
+                        {symbolInfo?.markPx &&
+                            diff > 0 &&
+                            ((diff / symbolInfo?.markPx) * 100).toFixed(3)}
+                        %
+                    </div>
                 </div>
-            </div>
-        ),
-        [selectedResolution, symbolInfo],
+            );
+        },
+        [buys, sells, symbolInfo, orderBookState],
     );
 
     const rowClickHandler = useCallback(
