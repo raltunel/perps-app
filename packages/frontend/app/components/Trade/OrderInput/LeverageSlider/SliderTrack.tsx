@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './LeverageSlider.module.css';
+import { t } from 'i18next';
 
 interface SliderTrackProps {
     sliderRef: React.RefObject<HTMLDivElement | null>;
@@ -148,7 +149,7 @@ export default function SliderTrack({
                                     setSliderBelowMinimumLeverage?.(false)
                                 }
                             >
-                                Min:{' '}
+                                {t('common.min')}:{' '}
                                 {minimumValue < 3
                                     ? `${minimumValue.toFixed(1)}x`
                                     : `${Math.trunc(minimumValue)}x`}{' '}

@@ -38,7 +38,8 @@
         "create": "Oluştur",
         "update": "Güncelle",
         "reset": "Sıfırla",
-        "announcements": "Duyurular"
+        "announcements": "Duyurular",
+        "leverage": "Kaldıraç"
     },
     "transactions": {
         "orderTypes": "Emir Tipleri",
@@ -460,7 +461,8 @@
         "updateButton": "Şimdi güncelle"
     },
     "leverage": {
-        "title": "Kaldıraç ayarla"
+        "title": "Kaldıraç ayarla",
+        "closePositionPrompt": "Minimum kaldıraç için pozisyonu kapat"
     },
     "share": {
         "prompt": "Metninizi özelleştirin",

@@ -38,7 +38,8 @@
         "create": "创建",
         "update": "更新",
         "reset": "重置",
-        "announcements": "公告"
+        "announcements": "公告",
+        "leverage": "杠杆"
     },
     "transactions": {
         "orderTypes": "订单类型",
@@ -460,7 +461,8 @@
         "updateButton": "立即更新"
     },
     "leverage": {
-        "title": "调整杠杆"
+        "title": "调整杠杆",
+        "closePositionPrompt": "关闭持仓以降低最低杠杆"
     },
     "share": {
         "prompt": "自定义您的文本",

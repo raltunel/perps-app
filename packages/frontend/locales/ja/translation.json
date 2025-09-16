@@ -38,7 +38,8 @@
         "create": "作成",
         "update": "更新",
         "reset": "リセット",
-        "announcements": "お知らせ"
+        "announcements": "お知らせ",
+        "leverage": "レバレッジ"
     },
     "transactions": {
         "orderTypes": "注文タイプ",
@@ -460,7 +461,8 @@
         "updateButton": "今すぐアップデート"
     },
     "leverage": {
-        "title": "レバレッジを調整"
+        "title": "レバレッジを調整",
+        "closePositionPrompt": "レバレッジ調整はポジションを閉じてください"
     },
     "share": {
         "prompt": "テキストをカスタマイズ",

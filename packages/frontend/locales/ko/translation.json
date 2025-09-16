@@ -38,7 +38,8 @@
         "create": "생성",
         "update": "업데이트",
         "reset": "초기화",
-        "announcements": "공지사항"
+        "announcements": "공지사항",
+        "leverage": "레버리지"
     },
     "transactions": {
         "orderTypes": "주문유형",
@@ -460,7 +461,8 @@
         "updateButton": "지금 업데이트"
     },
     "leverage": {
-        "title": "레버리지를 조정"
+        "title": "레버리지를 조정",
+        "closePositionPrompt": "최소 레버리지를 위해 포지션을 종료하세요"
     },
     "share": {
         "prompt": "텍스트를 사용자 지정하세요",

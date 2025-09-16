@@ -38,7 +38,8 @@
         "create": "Crear",
         "update": "Actualizar",
         "reset": "Reiniciar",
-        "announcements": "Anuncios"
+        "announcements": "Anuncios",
+        "leverage": "Apalancamiento"
     },
     "transactions": {
         "orderTypes": "Tipos de órdenes",
@@ -460,7 +461,8 @@
         "updateButton": "Actualizar ahora"
     },
     "leverage": {
-        "title": "Ajustar apalancamiento"
+        "title": "Ajustar apalancamiento",
+        "closePositionPrompt": "Cierra la posición para reducir el apalancamiento"
     },
     "share": {
         "prompt": "Personaliza tu texto",

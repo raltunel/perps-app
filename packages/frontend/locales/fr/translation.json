@@ -38,7 +38,8 @@
         "create": "Créer",
         "update": "Mettre à jour",
         "reset": "Réinitialiser",
-        "announcements": "Annonces"
+        "announcements": "Annonces",
+        "leverage": "Apalancement"
     },
     "transactions": {
         "orderTypes": "Types d'ordres",
@@ -460,7 +461,8 @@
         "updateButton": "Mettre à jour maintenant"
     },
     "leverage": {
-        "title": "Ajuster l'effet de levier"
+        "title": "Ajuster l'effet de levier",
+        "closePositionPrompt": "Clôturez la position pour réduire le levier"
     },
     "share": {
         "prompt": "Personnalisez votre texte",

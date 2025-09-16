@@ -38,7 +38,8 @@
         "create": "Create",
         "update": "Update",
         "reset": "Reset",
-        "announcements": "Announcements"
+        "announcements": "Announcements",
+        "leverage": "Leverage"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -460,7 +461,8 @@
         "updateButton": "Update Now"
     },
     "leverage": {
-        "title": "Adjust Leverage"
+        "title": "Adjust Leverage",
+        "closePositionPrompt": "Close position to reduce minimum leverage"
     },
     "share": {
         "prompt": "Customize your text",
