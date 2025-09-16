@@ -3,6 +3,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OrderHistoryTable.module.css';
+import { t } from 'i18next';
 
 interface OrderHistoryTableRowProps {
     order: OrderDataIF;
@@ -24,7 +25,11 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 {formatTimestamp(order.timestamp)}
             </div>
             <div className={`${styles.cell} ${styles.typeCell}`}>
-                {order.orderType}
+                {order.orderType.toLowerCase() === 'market'
+                    ? t('transactions.market')
+                    : order.orderType.toLowerCase() === 'limit'
+                      ? t('transactions.limit')
+                      : order.orderType}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {order.coin}
@@ -38,7 +43,7 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                             : getBsColor().sell,
                 }}
             >
-                {order.side === 'buy' ? 'Long' : 'Short'}
+                {order.side === 'buy' ? t('common.long') : t('common.short')}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
                 {order.origSz ? formatNum(order.origSz) : '--'}
@@ -48,20 +53,20 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
                 {order.limitPx === 0
-                    ? 'Market'
+                    ? t('transactions.market')
                     : order.sz
                       ? formatNum(order.sz * order.limitPx, null, true, true)
                       : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
                 {order.limitPx === 0
-                    ? 'Market'
+                    ? t('transactions.market')
                     : order.limitPx
                       ? formatNum(order.limitPx)
                       : '--'}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {order.reduceOnly === false ? 'No' : 'Yes'}
+                {order.reduceOnly === false ? t('common.no') : t('common.yes')}
             </div>
             <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>
                 {order.triggerCondition}
