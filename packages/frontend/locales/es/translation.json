@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Actualización de orden limitada pendiente",
             "message": "Actualizando orden {{side}} por {{value}} de {{coin}} a {{limitPrice}}"
-        }
+        },
+        "filled": "Completada",
+        "open": "Abierta",
+        "partiallyFilled": "Parcialmente completada",
+        "canceled": "Cancelada",
+        "pending": "Pendiente"
     },
     "subaccounts": {
         "createSubAccount": "Crear subcuenta",

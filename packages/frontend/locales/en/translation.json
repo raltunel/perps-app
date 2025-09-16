@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Limit Order Update Pending",
             "message": "Updating {{side}} order for {{value}} of {{coin}} at {{limitPrice}}"
-        }
+        },
+        "filled": "Filled",
+        "open": "Open",
+        "partiallyFilled": "Partially Filled",
+        "canceled": "Canceled",
+        "pending": "Pending"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",

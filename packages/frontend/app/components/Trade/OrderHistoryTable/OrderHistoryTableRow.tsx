@@ -3,7 +3,8 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import { formatTimestamp } from '~/utils/orderbook/OrderBookUtils';
 import styles from './OrderHistoryTable.module.css';
-import { t } from 'i18next';
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface OrderHistoryTableRowProps {
     order: OrderDataIF;
@@ -12,10 +13,31 @@ interface OrderHistoryTableRowProps {
 export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
     const { order } = props;
 
+    const { t, i18n } = useTranslation();
+
     const { formatNum } = useNumFormatter();
     const { getBsColor } = useAppSettings();
 
     const showTpSl = false;
+
+    const status = useMemo(() => {
+        switch (order.status.toLowerCase()) {
+            case 'filled':
+                return t('transactions.filled');
+            case 'open':
+                return t('transactions.open');
+            case 'partially filled':
+                return t('transactions.partiallyFilled');
+            case 'partial':
+                return t('transactions.partiallyFilled');
+            case 'canceled':
+                return t('transactions.canceled');
+            case 'pending':
+                return t('transactions.pending');
+            default:
+                return order.status;
+        }
+    }, [order.status, i18n.language]);
 
     return (
         <div
@@ -77,10 +99,7 @@ export default function OrderHistoryTableRow(props: OrderHistoryTableRowProps) {
                 </div>
             )}
             <div className={`${styles.cell} ${styles.statusCell}`}>
-                {order.status
-                    ? order.status.charAt(0).toUpperCase() +
-                      order.status.slice(1)
-                    : ''}
+                {status}
             </div>
             <div className={`${styles.cell} ${styles.orderIdCell}`}>
                 {order.oid}

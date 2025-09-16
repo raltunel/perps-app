@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "지정가 주문 업데이트 대기중",
             "message": "{{coin}}에서 {{value}}의 {{side}} 주문을 {{limitPrice}}로 업데이트 중"
-        }
+        },
+        "filled": "체결",
+        "open": "미체결",
+        "partiallyFilled": "부분 체결",
+        "canceled": "취소됨",
+        "pending": "대기중"
     },
     "subaccounts": {
         "createSubAccount": "서브계정 생성",

@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Limitli Emir Güncellemesi Bekleniyor",
             "message": "{{coin}} için {{value}}'de {{side}} limitli emir {{limitPrice}} ile güncelleniyor"
-        }
+        },
+        "filled": "Gerçekleşti",
+        "open": "Açık",
+        "partiallyFilled": "Kısmen gerçekleşti",
+        "canceled": "İptal edildi",
+        "pending": "Beklemede"
     },
     "subaccounts": {
         "createSubAccount": "Alt Hesap Oluştur",

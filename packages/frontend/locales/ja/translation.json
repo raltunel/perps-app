@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "指値注文更新保留中",
             "message": "{{coin}}の{{value}} {{side}}注文を{{limitPrice}}で更新中"
-        }
+        },
+        "filled": "約定済み",
+        "open": "有効",
+        "partiallyFilled": "一部約定",
+        "canceled": "取消済み",
+        "pending": "保留中"
     },
     "subaccounts": {
         "createSubAccount": "サブアカウント作成",

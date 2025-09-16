@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "限价订单更新待处理",
             "message": "正在以{{limitPrice}}更新{{coin}}的{{value}}{{side}}订单"
-        }
+        },
+        "filled": "已成交",
+        "open": "未成交",
+        "partiallyFilled": "部分成交",
+        "canceled": "已取消",
+        "pending": "待处理"
     },
     "subaccounts": {
         "createSubAccount": "创建子账户",
