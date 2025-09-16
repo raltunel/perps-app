@@ -286,7 +286,10 @@
         "funding": "Financement",
         "close": "Fermer la position",
         "originalSize": "Taille d'origine",
-        "cancelAll": "Tout annuler"
+        "cancelAll": "Tout annuler",
+        "noTradeHistory": "Aucun historique de transactions",
+        "noOrderHistory": "Aucun historique des ordres",
+        "noFundingHistory": "Aucun historique de financement"
     },
     "time": {
         "second": "seconde",

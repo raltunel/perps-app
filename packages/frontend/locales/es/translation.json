@@ -286,7 +286,10 @@
         "funding": "Fondeo",
         "close": "Cerrar posición",
         "originalSize": "Tamaño original",
-        "cancelAll": "Cancelar todas"
+        "cancelAll": "Cancelar todas",
+        "noTradeHistory": "Sin historial de operaciones",
+        "noOrderHistory": "Sin historial de órdenes",
+        "noFundingHistory": "Sin historial de financiamiento"
     },
     "time": {
         "second": "segundo",

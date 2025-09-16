@@ -286,7 +286,10 @@
         "funding": "资金费用",
         "close": "平仓",
         "originalSize": "初始数量",
-        "cancelAll": "全部取消"
+        "cancelAll": "全部取消",
+        "noTradeHistory": "暂无交易记录",
+        "noOrderHistory": "暂无订单记录",
+        "noFundingHistory": "暂无资金记录"
     },
     "time": {
         "second": "秒",

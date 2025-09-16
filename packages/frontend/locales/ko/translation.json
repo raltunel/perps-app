@@ -286,7 +286,10 @@
         "funding": "펀딩",
         "close": "포지션 닫기",
         "originalSize": "원래 크기",
-        "cancelAll": "전체 취소"
+        "cancelAll": "전체 취소",
+        "noTradeHistory": "거래 내역 없음",
+        "noOrderHistory": "주문 내역 없음",
+        "noFundingHistory": "펀딩 내역 없음"
     },
     "time": {
         "second": "초",

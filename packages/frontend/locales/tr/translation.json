@@ -286,7 +286,10 @@
         "funding": "Finansman",
         "close": "Pozisyonu Kapat",
         "originalSize": "Orijinal Boyut",
-        "cancelAll": "Tümünü İptal Et"
+        "cancelAll": "Tümünü İptal Et",
+        "noTradeHistory": "Aucun historique de transactions",
+        "noOrderHistory": "Aucun historique des ordres",
+        "noFundingHistory": "Aucun historique de financement"
     },
     "time": {
         "second": "saniye",

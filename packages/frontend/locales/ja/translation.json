@@ -286,7 +286,10 @@
         "funding": "ファンディング",
         "close": "ポジションを閉じる",
         "originalSize": "元サイズ",
-        "cancelAll": "すべてキャンセル"
+        "cancelAll": "すべてキャンセル",
+        "noTradeHistory": "取引履歴なし",
+        "noOrderHistory": "注文履歴なし",
+        "noFundingHistory": "ファンディング履歴なし"
     },
     "time": {
         "second": "秒",

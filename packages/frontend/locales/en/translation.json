@@ -286,7 +286,10 @@
         "funding": "Funding",
         "close": "Close Position",
         "originalSize": "Original Size",
-        "cancelAll": "Cancel All"
+        "cancelAll": "Cancel All",
+        "noTradeHistory": "No trade history",
+        "noOrderHistory": "No order history",
+        "noFundingHistory": "No funding history"
     },
     "time": {
         "second": "second",

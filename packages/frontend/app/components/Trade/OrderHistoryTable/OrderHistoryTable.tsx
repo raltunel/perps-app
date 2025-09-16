@@ -11,6 +11,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import { OrderHistoryTableHeader } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
+import { t } from 'i18next';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
@@ -69,7 +70,7 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
-                noDataMessage='No order history'
+                noDataMessage={t('tradeTable.noOrderHistory')}
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
             />
