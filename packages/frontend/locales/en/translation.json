@@ -490,5 +490,26 @@
         "deuteranopia": "Deuteranopia",
         "tritanopia": "Tritanopia",
         "protanopia": "Protanopia"
+    },
+    "aria": {
+        "closeAnnouncement": "Close announcement",
+        "closeFeedbackForm": "Close feedback form",
+        "depositInput": "Deposit input",
+        "addressInput": "Address input",
+        "amountInput": "Amount input",
+        "withdrawInput": "Withdraw input",
+        "scrollTabsLeft": "Scroll tabs left",
+        "scrollTabsRight": "Scroll tabs right",
+        "leverageValue": "Leverage value",
+        "leverageAmount": "Leverage amount",
+        "setLeverageTo": "Set leverage to {{value}}x",
+        "positionSizePercentage": "Position size percentage",
+        "positionSizeValue": "Position size value",
+        "totalOrders": "Total orders",
+        "runningPriceInput": {
+            "minutes": "running price hours minutes field",
+            "hours": "running price hours minutes field"
+        },
+        "yourDepositAmount": "Your deposit amount"
     }
 }

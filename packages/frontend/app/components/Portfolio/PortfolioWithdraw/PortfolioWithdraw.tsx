@@ -345,7 +345,7 @@ function PortfolioWithdraw({
                         }
                     }}
                     autoFocus
-                    aria-label='withdraw input'
+                    aria-label={t('aria.withdrawInput')}
                     onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (e.key === 'Enter' && !isButtonDisabled) {
                             handleWithdraw();

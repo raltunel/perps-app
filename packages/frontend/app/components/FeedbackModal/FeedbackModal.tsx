@@ -113,7 +113,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
                 <button
                     className={styles.closeIcon}
                     onClick={handleClose}
-                    aria-label='Close feedback form'
+                    aria-label={t('aria.closeFeedbackForm')}
                 >
                     <FaTimes />
                 </button>

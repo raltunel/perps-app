@@ -87,7 +87,7 @@ export default function SliderTrack({
                 className={styles.sliderTrack}
                 role='slider'
                 tabIndex={0}
-                aria-label='Leverage amount'
+                aria-label={t('aria.leverageAmount')}
                 aria-valuemin={minimumInputValue}
                 aria-valuemax={maximumInputValue}
                 aria-valuenow={Math.round(currentValue * 10) / 10}
@@ -190,7 +190,9 @@ export default function SliderTrack({
                             key={index}
                             role='button'
                             tabIndex={0}
-                            aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                            aria-label={t('aria.setLeverageTo', {
+                                value: formatLabelValue(tickValue),
+                            })}
                             className={`${styles.sliderMarker} ${
                                 isActive ? styles.active : ''
                             } ${isCurrent ? styles.sliderMarkerCurrent : ''} ${
@@ -263,7 +265,9 @@ export default function SliderTrack({
                             key={index}
                             role='button'
                             tabIndex={0}
-                            aria-label={`Set leverage to ${formatLabelValue(tickValue)}x`}
+                            aria-label={t('aria.setLeverageTo', {
+                                value: formatLabelValue(tickValue),
+                            })}
                             className={`${styles.valueLabel} ${
                                 isHovered ? styles.valueLabelHovered : ''
                             }`}

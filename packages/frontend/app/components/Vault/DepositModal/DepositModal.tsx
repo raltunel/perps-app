@@ -294,7 +294,7 @@ export default function DepositModal({
                     type='text'
                     value={amount}
                     onChange={handleInputChange}
-                    aria-label='deposit input'
+                    aria-label={t('aria.depositInput')}
                     inputMode='numeric'
                     pattern='[0-9]*'
                     placeholder={t('transactions.enterAmountMin10')}
