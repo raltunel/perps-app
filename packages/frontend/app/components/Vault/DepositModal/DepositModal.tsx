@@ -6,7 +6,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 import { useVaultManager } from '~/routes/vaults/useVaultManager';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import styles from './DepositModal.module.css';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface DepositModalProps {
     vault: {
@@ -25,6 +25,7 @@ export default function DepositModal({
     onDeposit,
     onClose,
 }: DepositModalProps) {
+    const { t, i18n } = useTranslation();
     const notificationStore = useNotificationStore();
     const [amount, setAmount] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -163,6 +164,7 @@ export default function DepositModal({
         validateVaultAmount,
         executeDeposit,
         onDeposit,
+        i18n.language,
     ]);
 
     const infoItems = [
