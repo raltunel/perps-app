@@ -218,9 +218,10 @@ export default function DepositModal({
 
     // Enhanced button text logic
     const buttonText = useMemo(() => {
-        if (transactionStatus === 'pending') return 'Confirming Transaction...';
-        if (isProcessing) return 'Processing...';
-        if (isDepositLoading) return 'Loading...';
+        if (transactionStatus === 'pending')
+            return t('transactions.confirmingTransaction');
+        if (isProcessing) return t('common.processing');
+        if (isDepositLoading) return t('common.loading');
 
         if (amount) {
             const depositAmount = parseFloat(amount);
@@ -237,7 +238,8 @@ export default function DepositModal({
 
                 if (!depositValidation.isValid) {
                     return (
-                        depositValidation.message || t('trade.invalidAmount')
+                        depositValidation.message ||
+                        t('transactions.invalidAmount')
                     );
                 }
             }
