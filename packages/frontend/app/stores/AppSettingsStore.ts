@@ -10,17 +10,17 @@ export interface colorSetIF {
 }
 
 export const bsColorSets: { [x: string]: colorSetIF } = {
-    default: { buy: '#26A69A', sell: '#EF5350' },
-    opposite: { buy: '#EF5350', sell: '#26A69A' },
-    deuteranopia: {
+    'colors.default': { buy: '#26A69A', sell: '#EF5350' },
+    'colors.opposite': { buy: '#EF5350', sell: '#26A69A' },
+    'colors.deuteranopia': {
         buy: '#8C6AFF',
         sell: '#FF796D',
     },
-    tritanopia: {
+    'colors.tritanopia': {
         buy: '#29B6F6',
         sell: '#EC407A',
     },
-    protanopia: {
+    'colors.protanopia': {
         buy: '#4DBE71',
         sell: '#7F8E9E',
     },
@@ -59,7 +59,7 @@ export const useAppSettings = create<AppSettingsStore>()(
             setNumFormat: (numFormat) => set({ numFormat }),
             getNumFormat: () => get().numFormat,
 
-            bsColor: 'default',
+            bsColor: 'colors.default',
             setBsColor: (c) => set({ bsColor: c }),
             getBsColor: () => bsColorSets[get().bsColor],
 
@@ -71,7 +71,16 @@ export const useAppSettings = create<AppSettingsStore>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(() => localStorage),
-            version: 1,
+            version: 2,
+            migrate: (persistedState: unknown, version: number) => {
+                if (version < 2) {
+                    return {
+                        ...(persistedState as AppSettingsStore),
+                        bsColor: 'colors.default',
+                    };
+                }
+                return persistedState;
+            },
             partialize: (state) => ({
                 bsColor: state.bsColor,
                 numFormat: state.numFormat,

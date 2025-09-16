@@ -470,5 +470,12 @@
         "xCTA": "Share on 𝕏",
         "copyLinkCTA": "Copy Link",
         "textPlaceholder": "Trade {{coin}} perps at {{twitter}} on {{fogo}} Testnet now"
+    },
+    "colors": {
+        "default": "Default",
+        "opposite": "Opposite",
+        "deuteranopia": "Deuteranopia",
+        "tritanopia": "Tritanopia",
+        "protanopia": "Protanopia"
     }
 }

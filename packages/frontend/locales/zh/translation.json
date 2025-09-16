@@ -470,5 +470,12 @@
         "xCTA": "在𝕏分享",
         "copyLinkCTA": "复制链接",
         "textPlaceholder": "立即在{{fogo}} Testnet通过{{twitter}}交易{{coin}}合约"
+    },
+    "colors": {
+        "default": "默认",
+        "opposite": "相反",
+        "deuteranopia": "红绿色盲",
+        "tritanopia": "蓝黄色盲",
+        "protanopia": "红色盲"
     }
 }

@@ -470,5 +470,12 @@
         "xCTA": "𝕏'te paylaş",
         "copyLinkCTA": "Bağlantıyı kopyala",
         "textPlaceholder": "{{fogo}} Testnet'te {{twitter}} üzerinden {{coin}} perps işlemi yap"
+    },
+    "colors": {
+        "default": "Varsayılan",
+        "opposite": "Zıt",
+        "deuteranopia": "Deuteranopi",
+        "tritanopia": "Tritanopi",
+        "protanopia": "Protanopi"
     }
 }

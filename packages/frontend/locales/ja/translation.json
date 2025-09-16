@@ -470,5 +470,12 @@
         "xCTA": "𝕏で共有",
         "copyLinkCTA": "リンクをコピー",
         "textPlaceholder": "{{fogo}}テストネットで{{twitter}}を使って{{coin}}パーペチュアルを取引しよう"
+    },
+    "colors": {
+        "default": "デフォルト",
+        "opposite": "反転",
+        "deuteranopia": "色覚異常（緑）",
+        "tritanopia": "色覚異常（青）",
+        "protanopia": "色覚異常（赤）"
     }
 }

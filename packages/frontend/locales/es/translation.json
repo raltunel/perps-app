@@ -470,5 +470,12 @@
         "xCTA": "Compartir en 𝕏",
         "copyLinkCTA": "Copiar enlace",
         "textPlaceholder": "Opera perps de {{coin}} en {{twitter}} en {{fogo}} Testnet ahora"
+    },
+    "colors": {
+        "default": "Predeterminado",
+        "opposite": "Opuesto",
+        "deuteranopia": "Deuteranopía",
+        "tritanopia": "Tritanopía",
+        "protanopia": "Protanopía"
     }
 }

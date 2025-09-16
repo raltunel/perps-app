@@ -144,10 +144,7 @@ export default function AppOptions() {
                     text={t('appSettings.color')}
                     active={
                         <div style={{ gap: '10px' }}>
-                            <div>
-                                {(bsColor as string)[0].toUpperCase() +
-                                    (bsColor as string).slice(1)}
-                            </div>
+                            <div>{t(bsColor.toString())}</div>
                             <div style={{ gap: CIRCLE_GAP }}>
                                 <FaCircle color={getBsColor().buy} />
                                 <FaCircle color={getBsColor().sell} />
@@ -160,10 +157,7 @@ export default function AppOptions() {
                             return {
                                 readable: (
                                     <>
-                                        <div>
-                                            {text[0].toUpperCase() +
-                                                text.slice(1)}
-                                        </div>
+                                        <div>{t(text)}</div>
                                         <div style={{ gap: CIRCLE_GAP }}>
                                             <FaCircle color={colors.buy} />
                                             <FaCircle color={colors.sell} />

@@ -470,5 +470,12 @@
         "xCTA": "𝕏에서 공유",
         "copyLinkCTA": "링크 복사",
         "textPlaceholder": "지금 {{fogo}} 테스트넷에서 {{twitter}}로 {{coin}} 퍼프 거래를 하세요"
+    },
+    "colors": {
+        "default": "기본값",
+        "opposite": "반대",
+        "deuteranopia": "적록색맹",
+        "tritanopia": "청황색맹",
+        "protanopia": "적색맹"
     }
 }

@@ -470,5 +470,12 @@
         "xCTA": "Partager sur 𝕏",
         "copyLinkCTA": "Copier le lien",
         "textPlaceholder": "Tradez les perps {{coin}} sur {{twitter}} sur {{fogo}} Testnet dès maintenant"
+    },
+    "colors": {
+        "default": "Par défaut",
+        "opposite": "Opposé",
+        "deuteranopia": "Deutéranopie",
+        "tritanopia": "Tritanopie",
+        "protanopia": "Protanopie"
     }
 }
