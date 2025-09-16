@@ -89,16 +89,13 @@ export default function Hero() {
                     {/* Mobile Hero Content */}
                     <div className={styles.mobile_hero_heading}>
                         <h2>
-                            Zero-to-<span>One</span>{' '}
+                            {t('home.hero.heading1')}
+                            <span>{t('home.hero.one')}</span>
                         </h2>
-                        <h2>Decentralized Trading Protocol</h2>
+                        <h2>{t('home.hero.heading2')}</h2>
                     </div>
 
-                    <p>
-                        Ambient is an entirely new kind of decentralized perp
-                        DEX combining unique DeFi native products with a user
-                        experience rivaling CEXes
-                    </p>
+                    <p>{t('home.hero.description')}</p>
                 </div>
 
                 {/* Bottom section */}

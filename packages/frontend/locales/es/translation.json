@@ -26,10 +26,10 @@
         "positions": "Posiciones",
         "balances": "Saldos",
         "openOrders": "Órdenes abiertas",
-        "tradeHistory": "Historial de trading",
+        "tradeHistory": "Historial de operaciones",
         "fundingHistory": "Historial de fondeo",
         "orderHistory": "Historial de órdenes",
-        "depositsAndWithdrawals": "Depósitos y Retiros",
+        "depositsAndWithdrawals": "Depósitos y retiros",
         "twap": "TWAP",
         "all": "Todos",
         "active": "Activo",
@@ -66,20 +66,20 @@
         "orderSizeExceedsPositionLimits": "El tamaño de la orden supera los límites de posición",
         "insufficientCollateral": "Colateral insuficiente",
         "reduceOnlyExceedsPositionSize": "El monto de 'solo reducir' supera el tamaño de la posición",
-        "processingOrder": "Procesando orden...",
+        "processingOrder": "Procesando la orden...",
         "positionLimitReached": "Límite de posición alcanzado",
         "limitOrderFailed": "Orden limitada fallida",
         "unknownErrorOccurred": "Ocurrió un error desconocido",
         "failedToPlaceLimitOrder": "No se pudo colocar la orden limitada",
-        "sellShortLimitOrderPlaced": "Sell/Short Limit Order Placed",
-        "sellShortLimitOrderPending": "Sell/Short Limit Order Pending",
+        "sellShortLimitOrderPlaced": "Vender/Short orden limitada colocada",
+        "sellShortLimitOrderPending": "Vender/Short orden limitada pendiente",
         "successfullyPlacedSellOrderFor": "Orden de venta colocada por {{usdValueOfOrderStr}} {{symbol}} a {{limitPrice}}",
         "placingSellShortLimitOrderFor": "Colocando orden limitada de venta por {{usdValueOfOrderStr}} {{symbol}} a {{limitPrice}}",
         "enterValidLimitPrice": "Ingrese un precio límite válido",
         "enterValidOrderSize": "Ingrese un tamaño de orden válido",
-        "buyLongLimitOrderPlaced": "Buy/Long Limit Order Placed",
+        "buyLongLimitOrderPlaced": "Comprar/Long orden limitada colocada",
         "successfullyPlacedBuyOrderFor": "Orden de compra colocada por {{usdValueOfOrderStr}} {{symbol}} a {{limitPrice}}",
-        "buyLongLimitOrderPending": "Buy/Long Limit Order Pending",
+        "buyLongLimitOrderPending": "Comprar/Long orden limitada pendiente",
         "placingBuyLongLimitOrderFor": "Colocando orden limitada de compra por {{usdValueOfOrderStr}} {{symbol}} a {{limitPrice}}",
         "priceDistribution": "Distribución de precios",
         "flat": "Plano",
@@ -94,8 +94,8 @@
         "total": "Total",
         "action": "Acción",
         "ratio": "Proporción",
-        "buyLong": "Buy/Long",
-        "sellShort": "Sell/Short",
+        "buyLong": "Comprar/Long",
+        "sellShort": "Vender/Short",
         "confirmingTransaction": "Confirmando transacción...",
         "processing": "Procesando...",
         "dontShowThisAgain": "No mostrar esto de nuevo",
@@ -107,8 +107,8 @@
         "decreasing": "En disminución",
         "totalOrders": "Órdenes totales",
         "orderRatioSumMustBe100": "La suma de proporciones debe ser 100%",
-        "collapseDetails": "Colapsar detalles",
-        "expandDetails": "Expandir detalles",
+        "collapseDetails": "Ocultar detalles",
+        "expandDetails": "Mostrar detalles",
         "frequency": "Frecuencia",
         "runTime": "Tiempo de ejecución",
         "numberOfOrders": "Número de órdenes",
@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Actualización de orden limitada pendiente",
             "message": "Actualizando orden {{side}} por {{value}} de {{coin}} a {{limitPrice}}"
-        }
+        },
+        "filled": "Completada",
+        "open": "Abierta",
+        "partiallyFilled": "Parcialmente completada",
+        "canceled": "Cancelada",
+        "pending": "Pendiente"
     },
     "subaccounts": {
         "createSubAccount": "Crear subcuenta",
@@ -278,7 +283,7 @@
         "price": "Precio",
         "tradeValue": "Valor de la operación",
         "fee": "Comisión",
-        "closedPnl": "PnL cerrado",
+        "closedPnl": "PnL realizado",
         "reduceOnly": "Solo reducir",
         "triggerConditions": "Condiciones de activación",
         "tpsl": "TP/SL",
@@ -287,8 +292,8 @@
         "long": "Long",
         "short": "Short",
         "noOpenPositions": "No hay posiciones abiertas",
-        "markPrice": "Precio de marcado",
-        "orderId": "ID de la orden",
+        "markPrice": "Precio de referencia",
+        "orderId": "ID de orden",
         "totalBalance": "Saldo total",
         "availableBalance": "Saldo disponible",
         "currencyValue": "Valor de {{currency}}",
@@ -306,7 +311,11 @@
         "noTradeHistory": "Sin historial de operaciones",
         "noOrderHistory": "Sin historial de órdenes",
         "noFundingHistory": "Sin historial de financiamiento",
-        "fundingHistory": "Todos los tiempos: {{allTime}} Desde el cambio: {{sinceChange}}"
+        "fundingHistory": "Todos los tiempos: {{allTime}} Desde el cambio: {{sinceChange}}",
+        "openLong": "Abrir Long",
+        "openShort": "Abrir Short",
+        "closeLong": "Cerrar Long",
+        "closeShort": "Cerrar Short"
     },
     "time": {
         "second": "segundo",
@@ -472,11 +481,12 @@
             "withVersionNumber": "La versión {{version}} está lista para instalar con mejoras y nuevas funciones.",
             "noVersionNumber": "Hay una nueva versión lista para instalar con mejoras y nuevas funciones."
         },
-        "updateButton": "Actualizar ahora"
+        "updateButton": "Actualizar ahora",
+        "version": "Versión"
     },
     "leverage": {
         "title": "Ajustar apalancamiento",
-        "closePositionPrompt": "Cierra la posición para reducir el apalancamiento"
+        "closePositionPrompt": "Reduce apalancamiento cerrando"
     },
     "share": {
         "prompt": "Personaliza tu texto",
@@ -490,5 +500,8 @@
         "deuteranopia": "Deuteranopía",
         "tritanopia": "Tritanopía",
         "protanopia": "Protanopía"
+    },
+    "chart": {
+        "liqPrice": "Precio liq."
     }
 }

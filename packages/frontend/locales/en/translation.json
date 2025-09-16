@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Limit Order Update Pending",
             "message": "Updating {{side}} order for {{value}} of {{coin}} at {{limitPrice}}"
-        }
+        },
+        "filled": "Filled",
+        "open": "Open",
+        "partiallyFilled": "Partially Filled",
+        "canceled": "Canceled",
+        "pending": "Pending"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",
@@ -306,7 +311,11 @@
         "noTradeHistory": "No trade history",
         "noOrderHistory": "No order history",
         "noFundingHistory": "No funding history",
-        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}"
+        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
+        "openLong": "Open Long",
+        "openShort": "Open Short",
+        "closeLong": "Close Long",
+        "closeShort": "Close Short"
     },
     "time": {
         "second": "second",
@@ -330,7 +339,7 @@
         "contact": "Contact",
         "settings": "Settings",
         "profile": "Profile",
-        "logout": "Logout",
+        "logout": "Log out",
         "trade": "Trade",
         "chart": "Chart",
         "book": "Order Book",
@@ -472,7 +481,8 @@
             "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
             "noVersionNumber": "A new version is ready to install with new features and improvements."
         },
-        "updateButton": "Update Now"
+        "updateButton": "Update Now",
+        "version": "Version"
     },
     "leverage": {
         "title": "Adjust Leverage",
@@ -511,5 +521,8 @@
             "hours": "running price hours minutes field"
         },
         "yourDepositAmount": "Your deposit amount"
+    },
+    "chart": {
+        "liqPrice": "Liq. Price"
     }
 }

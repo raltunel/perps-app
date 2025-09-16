@@ -180,7 +180,11 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                 {formatTimestamp(order.timestamp)}
             </div>
             <div className={`${styles.cell} ${styles.typeCell}`}>
-                {order.orderType}
+                {order.orderType.toLowerCase() === 'market'
+                    ? t('transactions.market')
+                    : order.orderType.toLowerCase() === 'limit'
+                      ? t('transactions.limit')
+                      : order.orderType}
             </div>
             <div className={`${styles.cell} ${styles.coinCell}`}>
                 {order.coin}

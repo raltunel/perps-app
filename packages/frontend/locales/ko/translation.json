@@ -71,15 +71,15 @@
         "limitOrderFailed": "지정가 주문 실패",
         "unknownErrorOccurred": "알 수 없는 오류 발생",
         "failedToPlaceLimitOrder": "지정가 주문 제출 실패",
-        "sellShortLimitOrderPlaced": "Sell/Short 지정가 주문 제출됨",
-        "sellShortLimitOrderPending": "Sell/Short 지정가 주문 대기중",
+        "sellShortLimitOrderPlaced": "매도 / Short 지정가 주문 제출됨",
+        "sellShortLimitOrderPending": "매도 / Short 지정가 주문 대기중",
         "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 매도 주문 제출됨",
         "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 지정가 매도 주문 제출 중",
         "enterValidLimitPrice": "유효한 지정가 입력",
         "enterValidOrderSize": "유효한 주문 수량 입력",
-        "buyLongLimitOrderPlaced": "Buy/Long 지정가 주문 제출됨",
+        "buyLongLimitOrderPlaced": "매수 / Long 지정가 주문 제출됨",
         "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 매수 주문 제출됨",
-        "buyLongLimitOrderPending": "Buy/Long 지정가 주문 대기중",
+        "buyLongLimitOrderPending": "매수 / Long 지정가 주문 대기중",
         "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} (가격: {{limitPrice}}) 지정가 매수 주문 제출 중",
         "priceDistribution": "가격 분포",
         "flat": "플랫",
@@ -94,8 +94,8 @@
         "total": "총액",
         "action": "작업",
         "ratio": "비율",
-        "buyLong": "Buy/Long",
-        "sellShort": "Sell/Short",
+        "buyLong": "매수 / Long",
+        "sellShort": "매도 / Short",
         "confirmingTransaction": "거래 확인 중...",
         "processing": "처리 중...",
         "dontShowThisAgain": "다시 표시하지 않기",
@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "지정가 주문 업데이트 대기중",
             "message": "{{coin}}에서 {{value}}의 {{side}} 주문을 {{limitPrice}}로 업데이트 중"
-        }
+        },
+        "filled": "체결",
+        "open": "미체결",
+        "partiallyFilled": "부분 체결",
+        "canceled": "취소됨",
+        "pending": "대기중"
     },
     "subaccounts": {
         "createSubAccount": "서브계정 생성",
@@ -299,14 +304,18 @@
         "pnl": "PnL (ROE%)",
         "liqPrice": "청산 가격",
         "margin": "마진",
-        "funding": "펀딩",
+        "funding": "펀딩/자금",
         "close": "포지션 닫기",
         "originalSize": "원래 수량",
         "cancelAll": "전체 취소",
         "noTradeHistory": "거래 내역 없음",
         "noOrderHistory": "주문 내역 없음",
         "noFundingHistory": "펀딩 내역 없음",
-        "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}"
+        "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}",
+        "openLong": "Long 오픈",
+        "openShort": "Short 오픈",
+        "closeLong": "Long 청산",
+        "closeShort": "Short 청산"
     },
     "time": {
         "second": "초",
@@ -472,7 +481,8 @@
             "withVersionNumber": "{{version}} 버전이 새 기능과 개선 사항으로 준비되었습니다.",
             "noVersionNumber": "새 버전이 새 기능과 개선 사항으로 준비되었습니다."
         },
-        "updateButton": "지금 업데이트"
+        "updateButton": "지금 업데이트",
+        "version": "버전"
     },
     "leverage": {
         "title": "레버리지를 조정",
@@ -490,5 +500,8 @@
         "deuteranopia": "적록색맹",
         "tritanopia": "청황색맹",
         "protanopia": "적색맹"
+    },
+    "chart": {
+        "liqPrice": "청산 가격"
     }
 }

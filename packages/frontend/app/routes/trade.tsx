@@ -8,7 +8,6 @@ import {
     useLayoutEffect,
 } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { t } from 'i18next';
 import { Resizable } from 're-resizable';
 import type { NumberSize } from 're-resizable';
 import DepositDropdown from '~/components/PageHeader/DepositDropdown/DepositDropdown';
@@ -32,6 +31,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
+import { useTranslation } from 'react-i18next';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -43,6 +43,7 @@ export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 export default function Trade() {
     const { symbol } = useTradeDataStore();
     const { marginBucket } = useUnifiedMarginData();
+    const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     // add refs near the other refs

@@ -70,17 +70,17 @@
         "positionLimitReached": "Pozisyon limiti aşıldı",
         "limitOrderFailed": "Limitli Emir Başarısız",
         "unknownErrorOccurred": "Bilinmeyen bir hata oluştu",
-        "failedToPlaceLimitOrder": "Limitli emir yerleştirilemedi",
-        "sellShortLimitOrderPlaced": "Sell/Short Limitli Emir Yerleştirildi",
-        "sellShortLimitOrderPending": "Sell/Short Limitli Emir Bekliyor",
-        "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için satış emri {{limitPrice}} fiyatında yerleştirildi",
-        "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için limitli satış emri {{limitPrice}} fiyatında yerleştiriliyor",
+        "failedToPlaceLimitOrder": "Limit emri verilemedi",
+        "sellShortLimitOrderPlaced": "Sat / Short limit emri verildi",
+        "sellShortLimitOrderPending": "Sat / Short limit emri beklemede",
+        "successfullyPlacedSellOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için satış emri verildi ({{limitPrice}})",
+        "placingSellShortLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} limitli satış emri veriliyor ({{limitPrice}})",
         "enterValidLimitPrice": "Geçerli bir limit fiyatı girin",
-        "enterValidOrderSize": "Geçerli bir emir büyüklüğü girin",
-        "buyLongLimitOrderPlaced": "Buy/Long Limitli Emir Yerleştirildi",
-        "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için alım emri {{limitPrice}} fiyatında yerleştirildi",
-        "buyLongLimitOrderPending": "Buy/Long Limitli Emir Bekliyor",
-        "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için limitli alım emri {{limitPrice}} fiyatında yerleştiriliyor",
+        "enterValidOrderSize": "Geçerli bir emir boyutu girin",
+        "buyLongLimitOrderPlaced": "Al / Long limit emri verildi",
+        "successfullyPlacedBuyOrderFor": "{{usdValueOfOrderStr}} {{symbol}} için alış emri verildi ({{limitPrice}})",
+        "buyLongLimitOrderPending": "Al / Long limit emri beklemede",
+        "placingBuyLongLimitOrderFor": "{{usdValueOfOrderStr}} {{symbol}} limitli alış emri veriliyor ({{limitPrice}})",
         "priceDistribution": "Fiyat Dağılımı",
         "flat": "Düz",
         "flatPriceDistribution": "Düz Fiyat Dağılımı",
@@ -94,8 +94,8 @@
         "total": "Toplam",
         "action": "Aksiyon",
         "ratio": "Oran",
-        "buyLong": "Buy/Long",
-        "sellShort": "Sell/Short",
+        "buyLong": "Al / Long",
+        "sellShort": "Sat / Short",
         "confirmingTransaction": "İşlem onaylanıyor...",
         "processing": "İşleniyor...",
         "dontShowThisAgain": "Bunu tekrar gösterme",
@@ -142,7 +142,7 @@
         "enterSize": "Büyüklük Girin",
         "totalSize": "Toplam Büyüklük",
         "cancelling": "İptal ediliyor...",
-        "midButton": "ORTA",
+        "midButton": "MID",
         "positionClosed": "Pozisyon Kapandı",
         "successfullyClosedPosition": "{{usdValueOfOrderStr}} {{symbol}} pozisyonu başarılı şekilde kapandı",
         "failedToClosePosition": "Pozisyon kapatma başarısız",
@@ -239,7 +239,12 @@
         "limitOrderUpdatePending": {
             "title": "Limitli Emir Güncellemesi Bekleniyor",
             "message": "{{coin}} için {{value}}'de {{side}} limitli emir {{limitPrice}} ile güncelleniyor"
-        }
+        },
+        "filled": "Gerçekleşti",
+        "open": "Açık",
+        "partiallyFilled": "Kısmen gerçekleşti",
+        "canceled": "İptal edildi",
+        "pending": "Beklemede"
     },
     "subaccounts": {
         "createSubAccount": "Alt Hesap Oluştur",
@@ -279,7 +284,7 @@
         "tradeValue": "İşlem Değeri",
         "fee": "Komisyon",
         "closedPnl": "Kapanan PnL",
-        "reduceOnly": "Sadece Azalt",
+        "reduceOnly": "Sadece Kapat",
         "triggerConditions": "Tetikleme Koşulları",
         "tpsl": "TP/SL",
         "status": "Durum",
@@ -303,10 +308,14 @@
         "close": "Pozisyonu Kapat",
         "originalSize": "Orijinal Büyüklük",
         "cancelAll": "Hepsini İptal Et",
-        "noTradeHistory": "İşlem geçmişi yok",
-        "noOrderHistory": "Emir geçmişi yok",
-        "noFundingHistory": "Fonlama geçmişi yok",
-        "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}"
+        "noTradeHistory": "İşlem geçmişiniz yok",
+        "noOrderHistory": "Emir geçmişiniz yok",
+        "noFundingHistory": "Fonlama geçmişiniz yok",
+        "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}",
+        "openLong": "Long Aç",
+        "openShort": "Short Aç",
+        "closeLong": "Long Kapat",
+        "closeShort": "Short Kapat"
     },
     "time": {
         "second": "saniye",
@@ -472,7 +481,8 @@
             "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
             "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
         },
-        "updateButton": "Şimdi güncelle"
+        "updateButton": "Şimdi güncelle",
+        "version": "Sürüm"
     },
     "leverage": {
         "title": "Kaldıraç ayarla",
@@ -490,5 +500,8 @@
         "deuteranopia": "Deuteranopi",
         "tritanopia": "Tritanopi",
         "protanopia": "Protanopi"
+    },
+    "chart": {
+        "liqPrice": "Lik. fiyatı"
     }
 }
