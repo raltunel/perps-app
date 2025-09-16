@@ -66,8 +66,8 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             );
             // Show pending notification
             notifications.add({
-                title: t('transactions.cancelPending.title'),
-                message: t('transactions.cancelPending.message', {
+                title: t('transactions.cancelOrderPending.title'),
+                message: t('transactions.cancelOrderPending.message', {
                     side: order.side,
                     usdValueOfOrderStr,
                     symbol: order.coin,
