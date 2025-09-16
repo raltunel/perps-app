@@ -213,8 +213,9 @@ function PortfolioWithdraw({
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
-                    title: 'Withdrawal Failed',
-                    message: result.error || 'Transaction failed',
+                    title: t('transactions.withdrawFailed'),
+                    message:
+                        result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
@@ -293,12 +294,11 @@ function PortfolioWithdraw({
     const infoItems = useMemo(
         () => [
             {
-                label: t('withdraw.availableToWithdraw'),
+                label: t('transactions.availableToWithdraw'),
                 value: !isNaN(portfolio.availableBalance)
                     ? formatNum(portfolio.availableBalance, 2, true, true)
                     : '-',
-                tooltip:
-                    'The total amount you have available to withdraw from your portfolio',
+                tooltip: t('transactions.availableToWithdrawTooltip'),
             },
         ],
         [portfolio.availableBalance, formatNum],

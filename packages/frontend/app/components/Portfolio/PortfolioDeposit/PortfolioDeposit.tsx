@@ -152,8 +152,9 @@ function PortfolioDeposit(props: propsIF) {
                 setTransactionStatus('failed');
                 setError(result.error || 'Transaction failed');
                 notificationStore.add({
-                    title: 'Deposit Failed',
-                    message: result.error || 'Transaction failed',
+                    title: t('transactions.depositFailed'),
+                    message:
+                        result.error || t('transactions.transactionFailed'),
                     icon: 'error',
                     removeAfter: 10000,
                     txLink: result.signature
