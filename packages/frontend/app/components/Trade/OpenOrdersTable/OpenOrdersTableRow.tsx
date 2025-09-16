@@ -194,7 +194,7 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
                             : getBsColor().sell,
                 }}
             >
-                {order.side === 'buy' ? 'Long' : 'Short'}
+                {order.side === 'buy' ? t('common.long') : t('common.short')}
             </div>
             <div className={`${styles.cell} ${styles.sizeCell}`}>
                 {order.sz ? formatNum(order.sz) : '--'}
@@ -204,16 +204,18 @@ export default function OpenOrdersTableRow(props: OpenOrdersTableRowProps) {
             </div>
             <div className={`${styles.cell} ${styles.orderValueCell}`}>
                 {order.limitPx === 0
-                    ? 'Market'
+                    ? t('transactions.market')
                     : order.orderValue
                       ? `${formatNum(order.orderValue, 2, true, true)}`
                       : '--'}
             </div>
             <div className={`${styles.cell} ${styles.priceCell}`}>
-                {order.limitPx === 0 ? 'Market' : formatNum(order.limitPx)}
+                {order.limitPx === 0
+                    ? t('transactions.market')
+                    : formatNum(order.limitPx)}
             </div>
             <div className={`${styles.cell} ${styles.reduceOnlyCell}`}>
-                {order.reduceOnly ? 'Yes' : 'No'}
+                {order.reduceOnly ? t('common.yes') : t('common.no')}
             </div>
             <div className={`${styles.cell} ${styles.triggerConditionsCell}`}>
                 {order.triggerCondition}
