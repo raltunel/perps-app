@@ -203,25 +203,6 @@ export default function PageHeader() {
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected]);
 
-    // this is temporary to help develop and test translations
-    const { i18n } = useTranslation();
-    useEffect(() => {
-        const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.metaKey && event.key === '7') {
-                event.preventDefault();
-                const currentLang = i18n.language;
-                const newLang = currentLang === 'en' ? 'es' : 'en';
-                i18n.changeLanguage(newLang);
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyPress);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyPress);
-        };
-    }, []);
-
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
