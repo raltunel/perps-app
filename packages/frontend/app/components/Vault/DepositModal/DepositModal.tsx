@@ -110,7 +110,7 @@ export default function DepositModal({
                     () =>
                         reject(
                             new Error(
-                                t('trade.transactionTimedOut', {
+                                t('transactions.transactionTimedOut', {
                                     timeInSeconds: 15,
                                 }),
                             ),
@@ -335,7 +335,9 @@ export default function DepositModal({
                     if (isBelowMinimum) {
                         e.preventDefault();
                         setError(
-                            t('trade.minDepositAmountIs', { amount: '$5.00' }),
+                            t('transactions.minDepositAmountIs', {
+                                amount: '$5.00',
+                            }),
                         );
                         // Clear error after 3 seconds
                         setTimeout(() => setError(null), 3000);
