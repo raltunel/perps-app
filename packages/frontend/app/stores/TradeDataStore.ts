@@ -148,7 +148,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
-            version: 1, // Bump version for migration!
+            version: 2, // Bump version for migration!
             migrate: (persistedState: unknown, version: number) => {
                 if (version < 1) {
                     const currentFavKeys =
@@ -166,6 +166,13 @@ const useTradeDataStore = create<TradeDataStore>()(
                         favKeys: currentFavKeys,
                     };
                 }
+                if (version < 2) {
+                    return {
+                        ...(persistedState as TradeDataStore),
+                        selectedTradeTab: 'common.positions',
+                        marginMode: 'margin.cross.title',
+                    };
+                }
                 return persistedState ?? {};
             },
             partialize: (state) => ({
@@ -173,8 +180,8 @@ const useTradeDataStore = create<TradeDataStore>()(
                 favKeys: state.favKeys,
                 symbol: state.symbol,
                 selectedTradeTab:
-                    state.selectedTradeTab === 'Balances'
-                        ? 'Positions'
+                    state.selectedTradeTab === 'common.balances'
+                        ? 'common.positions'
                         : state.selectedTradeTab,
                 userNonFundingLedgerUpdates: state.userNonFundingLedgerUpdates,
                 isTradeInfoExpanded: state.isTradeInfoExpanded,
