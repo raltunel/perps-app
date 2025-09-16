@@ -169,12 +169,12 @@ export default function DepositModal({
         {
             label: t('transactions.availableToDeposit'),
             value: formatCurrency(maxAvailableAmount, unitValue),
-            tooltip: t('trade.availableToDepositTooltip'),
+            tooltip: t('transactions.availableToDepositTooltip'),
         },
         {
-            label: t('trade.walletBalance'),
+            label: t('transactions.walletBalance'),
             value: formatCurrency(walletBalance?.decimalized || 0, unitValue),
-            tooltip: t('trade.walletBalanceTooltip'),
+            tooltip: t('transactions.walletBalanceTooltip'),
         },
     ];
 
