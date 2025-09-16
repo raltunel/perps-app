@@ -299,7 +299,7 @@
         "pnl": "PnL (ROE%)",
         "liqPrice": "청산 가격",
         "margin": "마진",
-        "funding": "펀딩",
+        "funding": "펀딩/자금",
         "close": "포지션 닫기",
         "originalSize": "원래 수량",
         "cancelAll": "전체 취소",
