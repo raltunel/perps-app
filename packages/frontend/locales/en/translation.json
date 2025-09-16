@@ -235,7 +235,11 @@
             "title": "Transaction Failed",
             "message": "Failed to update leverage"
         },
-        "viewOnExplorer": "View on explorer"
+        "viewOnExplorer": "View on explorer",
+        "limitOrderUpdatePending": {
+            "title": "Limit Order Update Pending",
+            "message": "Updating {{side}} order for {{value}} of {{coin}} at {{limitPrice}}"
+        }
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",

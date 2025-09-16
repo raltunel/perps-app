@@ -337,8 +337,8 @@ const LabelComponent = ({
     const handleCancel = async (order: LineData) => {
         if (!order.oid) {
             notifications.add({
-                title: t('cancelFailed.title'),
-                message: t('cancelFailed.message'),
+                title: t('transactions.cancelFailed.title'),
+                message: t('transactions.cancelFailed.message'),
                 icon: 'error',
             });
             return;
@@ -622,8 +622,18 @@ const LabelComponent = ({
                 );
                 // Show pending notification
                 notifications.add({
-                    title: 'Limit Order Update Pending',
-                    message: `Updating ${side} order for ${usdValueOfOrderStr} of ${symbolInfo?.coin} at ${formatNum(roundDownToTenth(newPrice), newPrice > 10_000 ? 0 : 2, true, true)}`,
+                    title: t('transactions.limitOrderUpdatePending.title'),
+                    message: t('transactions.limitOrderUpdatePending.message', {
+                        side,
+                        value: usdValueOfOrderStr,
+                        coin: symbolInfo?.coin,
+                        limitPrice: formatNum(
+                            roundDownToTenth(newPrice),
+                            newPrice > 10_000 ? 0 : 2,
+                            true,
+                            true,
+                        ),
+                    }),
                     icon: 'spinner',
                     slug,
                     removeAfter: 60000,
