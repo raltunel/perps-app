@@ -225,8 +225,8 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: t('trade.positionClosed'),
-                        message: t('trade.successfullyClosedPosition', {
+                        title: t('transactions.positionClosed'),
+                        message: t('transactions.successfullyClosedPosition', {
                             usdValueOfOrderStr: formatNum(
                                 position.szi,
                                 2,
@@ -265,9 +265,10 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                         });
                     }
                     notifications.add({
-                        title: t('trade.closeFailed'),
+                        title: t('transactions.closeFailedTitle'),
                         message: String(
-                            result.error || t('trade.failedToClosePosition'),
+                            result.error ||
+                                t('transactions.failedToClosePosition'),
                         ),
                         txLink: result.signature
                             ? blockExplorer + result.signature
@@ -278,11 +279,11 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
             } catch (error) {
                 console.error('❌ Error closing position:', error);
                 notifications.add({
-                    title: t('trade.closeFailed'),
+                    title: t('transactions.closeFailed'),
                     message: String(
                         error instanceof Error
                             ? error.message
-                            : t('trade.unknownErrorOccurred'),
+                            : t('transactions.unknownErrorOccurred'),
                     ),
                     icon: 'error',
                 });
