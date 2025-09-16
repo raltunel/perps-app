@@ -477,7 +477,8 @@
             "withVersionNumber": "La version {{version}} est prête à installer avec de nouvelles fonctionnalités et améliorations.",
             "noVersionNumber": "Une nouvelle version est prête à installer avec de nouvelles fonctionnalités et améliorations."
         },
-        "updateButton": "Mettre à jour maintenant"
+        "updateButton": "Mettre à jour maintenant",
+        "version": "Version"
     },
     "leverage": {
         "title": "Ajuster l'effet de levier",

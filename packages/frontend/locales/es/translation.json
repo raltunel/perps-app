@@ -477,7 +477,8 @@
             "withVersionNumber": "La versión {{version}} está lista para instalar con mejoras y nuevas funciones.",
             "noVersionNumber": "Hay una nueva versión lista para instalar con mejoras y nuevas funciones."
         },
-        "updateButton": "Actualizar ahora"
+        "updateButton": "Actualizar ahora",
+        "version": "Versión"
     },
     "leverage": {
         "title": "Ajustar apalancamiento",

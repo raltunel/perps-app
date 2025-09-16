@@ -335,7 +335,7 @@
         "contact": "Contact",
         "settings": "Settings",
         "profile": "Profile",
-        "logout": "Logout",
+        "logout": "Log out",
         "trade": "Trade",
         "chart": "Chart",
         "book": "Order Book",
@@ -477,7 +477,8 @@
             "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
             "noVersionNumber": "A new version is ready to install with new features and improvements."
         },
-        "updateButton": "Update Now"
+        "updateButton": "Update Now",
+        "version": "Version"
     },
     "leverage": {
         "title": "Adjust Leverage",

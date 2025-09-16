@@ -477,7 +477,8 @@
             "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
             "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
         },
-        "updateButton": "Şimdi güncelle"
+        "updateButton": "Şimdi güncelle",
+        "version": "Sürüm"
     },
     "leverage": {
         "title": "Kaldıraç ayarla",
