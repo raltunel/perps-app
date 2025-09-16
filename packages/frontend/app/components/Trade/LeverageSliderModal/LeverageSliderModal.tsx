@@ -113,8 +113,8 @@ export default function LeverageSliderModal({
 
                 // Show success notification
                 notificationStore.add({
-                    title: t('leverageUpdated.title'),
-                    message: t('leverageUpdated.message', {
+                    title: t('transactions.leverageUpdated.title'),
+                    message: t('transactions.leverageUpdated.message', {
                         leverage: value.toFixed(1),
                     }),
                     icon: 'check',
@@ -170,7 +170,7 @@ export default function LeverageSliderModal({
         useState<boolean>(false);
 
     return (
-        <Modal title='Adjust Leverage' close={onClose}>
+        <Modal title={t('leverage.title')} close={onClose}>
             <div className={styles.leverageSliderContainer}>
                 {/* Use the enhanced LeverageSlider component in modal mode */}
                 <div className={styles.sliderSection}>
@@ -219,12 +219,12 @@ export default function LeverageSliderModal({
                         disabled={isProcessing || isLoading}
                     >
                         {transactionStatus === 'pending'
-                            ? 'Confirming...'
+                            ? t('common.confirming')
                             : isProcessing
-                              ? 'Processing...'
+                              ? t('common.processing')
                               : isLoading
-                                ? 'Loading...'
-                                : 'Confirm'}
+                                ? t('common.loading')
+                                : t('common.confirm')}
                     </SimpleButton>
                 </div>
             </div>

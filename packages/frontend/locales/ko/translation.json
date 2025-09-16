@@ -8,6 +8,8 @@
         "edit": "편집",
         "close": "닫기",
         "loading": "로딩 중...",
+        "confirming": "확인 중...",
+        "processing": "처리 중...",
         "error": "오류",
         "success": "성공",
         "applyDefaults": "기본값 적용",
@@ -456,5 +458,8 @@
             "noVersionNumber": "새 버전이 새 기능과 개선 사항으로 준비되었습니다."
         },
         "updateButton": "지금 업데이트"
+    },
+    "leverage": {
+        "title": "레버리지를 조정"
     }
 }

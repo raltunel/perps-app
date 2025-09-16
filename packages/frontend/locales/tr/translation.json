@@ -8,6 +8,8 @@
         "edit": "Düzenle",
         "close": "Kapat",
         "loading": "Yükleniyor...",
+        "confirming": "Onaylanıyor...",
+        "processing": "İşleniyor...",
         "error": "Hata",
         "success": "Başarılı",
         "applyDefaults": "Varsayılanları uygula",
@@ -456,5 +458,8 @@
             "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
         },
         "updateButton": "Şimdi güncelle"
+    },
+    "leverage": {
+        "title": "Kaldıraç ayarla"
     }
 }

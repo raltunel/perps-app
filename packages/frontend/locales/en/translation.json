@@ -8,6 +8,8 @@
         "edit": "Edit",
         "close": "Close",
         "loading": "Loading...",
+        "confirming": "Confirming...",
+        "processing": "Processing...",
         "error": "Error",
         "success": "Success",
         "applyDefaults": "Apply Defaults",
@@ -456,5 +458,8 @@
             "noVersionNumber": "A new version is ready to install with new features and improvements."
         },
         "updateButton": "Update Now"
+    },
+    "leverage": {
+        "title": "Adjust Leverage"
     }
 }

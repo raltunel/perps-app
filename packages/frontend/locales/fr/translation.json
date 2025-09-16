@@ -8,6 +8,8 @@
         "edit": "Modifier",
         "close": "Fermer",
         "loading": "Chargement...",
+        "confirming": "Confirmation...",
+        "processing": "Traitement...",
         "error": "Erreur",
         "success": "Succès",
         "applyDefaults": "Appliquer les paramètres par défaut",
@@ -456,5 +458,8 @@
             "noVersionNumber": "Une nouvelle version est prête à installer avec de nouvelles fonctionnalités et améliorations."
         },
         "updateButton": "Mettre à jour maintenant"
+    },
+    "leverage": {
+        "title": "Ajuster l'effet de levier"
     }
 }

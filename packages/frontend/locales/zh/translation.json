@@ -8,6 +8,8 @@
         "edit": "编辑",
         "close": "关闭",
         "loading": "加载中...",
+        "confirming": "确认中...",
+        "processing": "处理中...",
         "error": "错误",
         "success": "成功",
         "applyDefaults": "应用默认值",
@@ -456,5 +458,8 @@
             "noVersionNumber": "新版本已准备好，新增功能与优化。"
         },
         "updateButton": "立即更新"
+    },
+    "leverage": {
+        "title": "调整杠杆"
     }
 }

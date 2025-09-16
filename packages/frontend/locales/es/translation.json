@@ -8,6 +8,8 @@
         "edit": "Editar",
         "close": "Cerrar",
         "loading": "Cargando...",
+        "confirming": "Confirmando...",
+        "processing": "Procesando...",
         "error": "Error",
         "success": "Éxito",
         "applyDefaults": "Aplicar predeterminados",
@@ -456,5 +458,8 @@
             "noVersionNumber": "Hay una nueva versión lista para instalar con mejoras y nuevas funciones."
         },
         "updateButton": "Actualizar ahora"
+    },
+    "leverage": {
+        "title": "Ajustar apalancamiento"
     }
 }
