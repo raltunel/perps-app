@@ -311,7 +311,11 @@
         "noTradeHistory": "거래 내역 없음",
         "noOrderHistory": "주문 내역 없음",
         "noFundingHistory": "펀딩 내역 없음",
-        "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}"
+        "fundingHistory": "전체: {{allTime}} 변경 후: {{sinceChange}}",
+        "openLong": "Long 오픈",
+        "openShort": "Short 오픈",
+        "closeLong": "Long 청산",
+        "closeShort": "Short 청산"
     },
     "time": {
         "second": "초",

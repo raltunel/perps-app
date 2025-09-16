@@ -311,7 +311,11 @@
         "noTradeHistory": "取引履歴なし",
         "noOrderHistory": "注文履歴なし",
         "noFundingHistory": "資金調達履歴なし",
-        "fundingHistory": "通算: {{allTime}} 変更後: {{sinceChange}}"
+        "fundingHistory": "通算: {{allTime}} 変更後: {{sinceChange}}",
+        "openLong": "Long新規",
+        "openShort": "Short新規",
+        "closeLong": "Long決済",
+        "closeShort": "Short決済"
     },
     "time": {
         "second": "秒",

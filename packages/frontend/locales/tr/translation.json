@@ -311,7 +311,11 @@
         "noTradeHistory": "İşlem geçmişiniz yok",
         "noOrderHistory": "Emir geçmişiniz yok",
         "noFundingHistory": "Fonlama geçmişiniz yok",
-        "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}"
+        "fundingHistory": "Tüm zamanlar: {{allTime}} Değişim sonrası: {{sinceChange}}",
+        "openLong": "Long Aç",
+        "openShort": "Short Aç",
+        "closeLong": "Long Kapat",
+        "closeShort": "Short Kapat"
     },
     "time": {
         "second": "saniye",

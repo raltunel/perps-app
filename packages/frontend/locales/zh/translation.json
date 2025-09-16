@@ -311,7 +311,11 @@
         "noTradeHistory": "无交易历史",
         "noOrderHistory": "无订单历史",
         "noFundingHistory": "无资金费率历史",
-        "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}"
+        "fundingHistory": "总计: {{allTime}} 变化后: {{sinceChange}}",
+        "openLong": "开 Long",
+        "openShort": "开 Short",
+        "closeLong": "平 Long",
+        "closeShort": "平 Short"
     },
     "time": {
         "second": "秒",

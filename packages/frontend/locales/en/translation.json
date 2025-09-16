@@ -311,7 +311,11 @@
         "noTradeHistory": "No trade history",
         "noOrderHistory": "No order history",
         "noFundingHistory": "No funding history",
-        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}"
+        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
+        "openLong": "Open Long",
+        "openShort": "Open Short",
+        "closeLong": "Close Long",
+        "closeShort": "Close Short"
     },
     "time": {
         "second": "second",
