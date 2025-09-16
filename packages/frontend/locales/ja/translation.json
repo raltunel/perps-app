@@ -501,6 +501,28 @@
         "tritanopia": "色覚異常（青）",
         "protanopia": "色覚異常（赤）"
     },
+    "aria": {
+        "closeAnnouncement": "お知らせを閉じる",
+        "closeFeedbackForm": "フィードバックフォームを閉じる",
+        "depositInput": "入金入力欄",
+        "addressInput": "住所入力欄",
+        "amountInput": "金額入力欄",
+        "withdrawInput": "出金入力欄",
+        "scrollTabsLeft": "タブを左へスクロール",
+        "scrollTabsRight": "タブを右へスクロール",
+        "leverageValue": "レバレッジ値",
+        "leverageAmount": "レバレッジ金額",
+        "setLeverageTo": "レバレッジを{{value}}倍に設定",
+        "positionSizePercentage": "ポジションサイズの割合",
+        "positionSizeValue": "ポジションサイズ値",
+        "totalOrders": "注文総数",
+        "runningPriceInput": {
+            "minutes": "稼働価格（分）入力欄",
+            "hours": "稼働価格（時間）入力欄"
+        },
+        "yourDepositAmount": "あなたの入金金額"
+    },
+
     "chart": {
         "liqPrice": "清算価格"
     }

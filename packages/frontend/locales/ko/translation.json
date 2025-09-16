@@ -501,6 +501,28 @@
         "tritanopia": "청황색맹",
         "protanopia": "적색맹"
     },
+    "aria": {
+        "closeAnnouncement": "공지 닫기",
+        "closeFeedbackForm": "피드백 폼 닫기",
+        "depositInput": "입금 입력란",
+        "addressInput": "주소 입력란",
+        "amountInput": "금액 입력란",
+        "withdrawInput": "출금 입력란",
+        "scrollTabsLeft": "탭 왼쪽으로 스크롤",
+        "scrollTabsRight": "탭 오른쪽으로 스크롤",
+        "leverageValue": "레버리지 값",
+        "leverageAmount": "레버리지 금액",
+        "setLeverageTo": "레버리지를 {{value}}배로 설정",
+        "positionSizePercentage": "포지션 크기 비율",
+        "positionSizeValue": "포지션 크기 값",
+        "totalOrders": "총 주문 수",
+        "runningPriceInput": {
+            "minutes": "시장가(분) 입력란",
+            "hours": "시장가(시) 입력란"
+        },
+        "yourDepositAmount": "내 입금 금액"
+    },
+
     "chart": {
         "liqPrice": "청산 가격"
     }

@@ -501,6 +501,27 @@
         "tritanopia": "Tritanopía",
         "protanopia": "Protanopía"
     },
+    "aria": {
+        "closeAnnouncement": "Cerrar anuncio",
+        "closeFeedbackForm": "Cerrar formulario de comentarios",
+        "depositInput": "Campo de depósito",
+        "addressInput": "Campo de dirección",
+        "amountInput": "Campo de importe",
+        "withdrawInput": "Campo de retiro",
+        "scrollTabsLeft": "Desplazar pestañas a la izquierda",
+        "scrollTabsRight": "Desplazar pestañas a la derecha",
+        "leverageValue": "Valor de apalancamiento",
+        "leverageAmount": "Importe de apalancamiento",
+        "setLeverageTo": "Establecer apalancamiento en {{value}}x",
+        "positionSizePercentage": "Porcentaje del tamaño de la posición",
+        "positionSizeValue": "Valor del tamaño de la posición",
+        "totalOrders": "Órdenes totales",
+        "runningPriceInput": {
+            "minutes": "campo de precio activo horas minutos",
+            "hours": "campo de precio activo horas minutos"
+        },
+        "yourDepositAmount": "Tu importe de depósito"
+    },
     "chart": {
         "liqPrice": "Precio liq."
     }

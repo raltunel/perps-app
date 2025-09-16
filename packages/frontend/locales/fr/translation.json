@@ -501,6 +501,27 @@
         "tritanopia": "Tritanopie",
         "protanopia": "Protanopie"
     },
+    "aria": {
+        "closeAnnouncement": "Fermer l'annonce",
+        "closeFeedbackForm": "Fermer le formulaire de commentaire",
+        "depositInput": "Champ de dépôt",
+        "addressInput": "Champ d'adresse",
+        "amountInput": "Champ de montant",
+        "withdrawInput": "Champ de retrait",
+        "scrollTabsLeft": "Faire défiler les onglets vers la gauche",
+        "scrollTabsRight": "Faire défiler les onglets vers la droite",
+        "leverageValue": "Valeur d'effet de levier",
+        "leverageAmount": "Montant d'effet de levier",
+        "setLeverageTo": "Définir l'effet de levier à {{value}}x",
+        "positionSizePercentage": "Pourcentage de taille de position",
+        "positionSizeValue": "Valeur de taille de position",
+        "totalOrders": "Nombre total d'ordres",
+        "runningPriceInput": {
+            "minutes": "champ de temps cours (minutes)",
+            "hours": "champ de temps cours (heures)"
+        },
+        "yourDepositAmount": "Votre montant de dépôt"
+    },
     "chart": {
         "liqPrice": "Prix de liq."
     }

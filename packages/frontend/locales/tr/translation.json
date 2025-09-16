@@ -501,6 +501,27 @@
         "tritanopia": "Tritanopi",
         "protanopia": "Protanopi"
     },
+    "aria": {
+        "closeAnnouncement": "Duyuruyu kapat",
+        "closeFeedbackForm": "Geri bildirim formunu kapat",
+        "depositInput": "Yatırma alanı",
+        "addressInput": "Adres alanı",
+        "amountInput": "Tutar alanı",
+        "withdrawInput": "Çekme alanı",
+        "scrollTabsLeft": "Sekmeleri sola kaydır",
+        "scrollTabsRight": "Sekmeleri sağa kaydır",
+        "leverageValue": "Kaldıraç değeri",
+        "leverageAmount": "Kaldıraç tutarı",
+        "setLeverageTo": "{{value}}x kaldıraç ayarla",
+        "positionSizePercentage": "Pozisyon büyüklük yüzdesi",
+        "positionSizeValue": "Pozisyon büyüklük değeri",
+        "totalOrders": "Toplam emir",
+        "runningPriceInput": {
+            "minutes": "anlık fiyat dakika alanı",
+            "hours": "anlık fiyat saat alanı"
+        },
+        "yourDepositAmount": "Yatırma tutarınız"
+    },
     "chart": {
         "liqPrice": "Lik. fiyatı"
     }

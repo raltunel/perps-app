@@ -501,6 +501,28 @@
         "tritanopia": "蓝黄色盲",
         "protanopia": "红色盲"
     },
+    "aria": {
+        "closeAnnouncement": "关闭公告",
+        "closeFeedbackForm": "关闭反馈表",
+        "depositInput": "充值输入框",
+        "addressInput": "地址输入框",
+        "amountInput": "金额输入框",
+        "withdrawInput": "提现输入框",
+        "scrollTabsLeft": "向左滚动标签",
+        "scrollTabsRight": "向右滚动标签",
+        "leverageValue": "杠杆数值",
+        "leverageAmount": "杠杆金额",
+        "setLeverageTo": "将杠杆设为{{value}}倍",
+        "positionSizePercentage": "持仓比例",
+        "positionSizeValue": "持仓数值",
+        "totalOrders": "总订单数",
+        "runningPriceInput": {
+            "minutes": "运行价格分钟输入框",
+            "hours": "运行价格小时输入框"
+        },
+        "yourDepositAmount": "您的充值金额"
+    },
+
     "chart": {
         "liqPrice": "清算价格"
     }
