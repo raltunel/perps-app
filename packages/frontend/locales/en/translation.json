@@ -166,6 +166,10 @@
         "txFailedTryAgain": "Transaction failed. Please try again.",
         "minDepositAmountIs": "Minimum deposit amount is ${{amount}}",
         "enterAmountMin10": "Enter amount (min $10)",
+        "cancellingAllOrders": {
+            "title": "Cancelling All Orders",
+            "message": "Attempting to cancel {{count}} {{noun}}..."
+        },
         "cancelOrderPending": {
             "title": "Cancel Order Pending",
             "message": "Canceling orderfor {{usdValueOfOrderStr}} of {{symbol}}"

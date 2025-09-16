@@ -365,7 +365,7 @@ function PortfolioWithdraw({
                 {error && <div className={styles.error}>{error}</div>}
                 {transactionStatus === 'failed' && !error && (
                     <div className={styles.error}>
-                        Transaction failed. Please try again.
+                        {t('transactions.txFailedTryAgain')}
                     </div>
                 )}
             </div>

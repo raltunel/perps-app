@@ -50,8 +50,13 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         try {
             // Show initial notification
             notifications.add({
-                title: 'Cancelling All Orders',
-                message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
+                // title: 'Cancelling All Orders',
+                title: t('transactions.cancellingAllOrders.title'),
+                // message: `Attempting to cancel ${filteredOrders.length} ${filteredOrders.length === 1 ? 'order' : 'orders'}...`,
+                message: t('transactions.cancellingAllOrders.message', {
+                    count: filteredOrders.length,
+                    noun: filteredOrders.length === 1 ? 'order' : 'orders',
+                }),
                 icon: 'spinner',
                 slug,
                 removeAfter: 60000,
