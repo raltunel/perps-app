@@ -476,7 +476,7 @@
     },
     "leverage": {
         "title": "Ajustar apalancamiento",
-        "closePositionPrompt": "Cierra la posición para reducir el apalancamiento"
+        "closePositionPrompt": "Reduce apalancamiento cerrando"
     },
     "share": {
         "prompt": "Personaliza tu texto",

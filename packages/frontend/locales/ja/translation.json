@@ -476,7 +476,7 @@
     },
     "leverage": {
         "title": "レバレッジを調整",
-        "closePositionPrompt": "レバレッジ調整はポジションを閉じてください"
+        "closePositionPrompt": "レバレッジを下げるにはポジション終了"
     },
     "share": {
         "prompt": "テキストをカスタマイズ",
