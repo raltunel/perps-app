@@ -490,5 +490,8 @@
         "deuteranopia": "色覚異常（緑）",
         "tritanopia": "色覚異常（青）",
         "protanopia": "色覚異常（赤）"
+    },
+    "chart": {
+        "liqPrice": "清算価格"
     }
 }

@@ -490,5 +490,8 @@
         "deuteranopia": "적록색맹",
         "tritanopia": "청황색맹",
         "protanopia": "적색맹"
+    },
+    "chart": {
+        "liqPrice": "청산 가격"
     }
 }

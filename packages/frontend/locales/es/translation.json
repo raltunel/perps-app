@@ -490,5 +490,8 @@
         "deuteranopia": "Deuteranopía",
         "tritanopia": "Tritanopía",
         "protanopia": "Protanopía"
+    },
+    "chart": {
+        "liqPrice": "Precio liq."
     }
 }

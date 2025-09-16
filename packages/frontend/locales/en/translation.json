@@ -490,5 +490,8 @@
         "deuteranopia": "Deuteranopia",
         "tritanopia": "Tritanopia",
         "protanopia": "Protanopia"
+    },
+    "chart": {
+        "liqPrice": "Liq. Price"
     }
 }

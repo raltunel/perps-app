@@ -490,5 +490,8 @@
         "deuteranopia": "红绿色盲",
         "tritanopia": "蓝黄色盲",
         "protanopia": "红色盲"
+    },
+    "chart": {
+        "liqPrice": "清算价格"
     }
 }
