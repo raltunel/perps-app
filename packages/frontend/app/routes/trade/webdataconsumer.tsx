@@ -601,10 +601,10 @@ export default function WebDataConsumer() {
                             notifiedOrdersRef.current.add(fill.oid);
 
                             notificationStore.add({
-                                title: t('orderFilled.title', {
+                                title: t('transactions.orderFilled.title', {
                                     side: fill.side,
                                 }),
-                                message: t('orderFilled.message', {
+                                message: t('transactions.orderFilled.message', {
                                     side: fill.side,
                                     usdValueOfFillStr,
                                     symbol: fill.coin,
