@@ -301,7 +301,8 @@
         "cancelAll": "Cancel All",
         "noTradeHistory": "No trade history",
         "noOrderHistory": "No order history",
-        "noFundingHistory": "No funding history"
+        "noFundingHistory": "No funding history",
+        "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}"
     },
     "time": {
         "second": "second",

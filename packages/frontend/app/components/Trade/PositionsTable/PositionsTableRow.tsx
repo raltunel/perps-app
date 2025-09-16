@@ -21,7 +21,7 @@ import LimitCloseModal from '../LimitCloseModal/LimitCloseModal';
 import MarketCloseModal from '../MarketCloseModal/MarketCloseModal';
 import TakeProfitsModal from '../TakeProfitsModal/TakeProfitsModal';
 import styles from './PositionsTable.module.css';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface PositionsTableRowProps {
     position: PositionIF;
@@ -32,6 +32,8 @@ interface PositionsTableRowProps {
 const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
     (props) => {
         const navigate = useNavigate();
+
+        const { t, i18n } = useTranslation();
 
         const { position } = props;
         const { coinPriceMap } = useTradeDataStore();
@@ -306,11 +308,27 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
         );
         const fundingTooltipMsg = useMemo(
             () =>
-                `All-time: ${formatNum(position.cumFunding.allTime * -1, 2, true, true, true)} Since change: ${formatNum(position.cumFunding.sinceChange * -1, 2, true, true, true)}`,
+                t('tradeTable.fundingHistory', {
+                    allTime: formatNum(
+                        position.cumFunding.allTime * -1,
+                        2,
+                        true,
+                        true,
+                        true,
+                    ),
+                    sinceChange: formatNum(
+                        position.cumFunding.sinceChange * -1,
+                        2,
+                        true,
+                        true,
+                        true,
+                    ),
+                }),
             [
                 position.cumFunding.allTime,
                 position.cumFunding.sinceChange,
                 formatNum,
+                i18n.language,
             ],
         );
 
