@@ -39,7 +39,8 @@
         "update": "Mettre à jour",
         "reset": "Réinitialiser",
         "announcements": "Annonces",
-        "leverage": "Apalancement"
+        "leverage": "Apalancement",
+        "comingSoon": "Bientôt disponible"
     },
     "transactions": {
         "orderTypes": "Types d'ordres",

@@ -39,7 +39,8 @@
         "update": "更新",
         "reset": "リセット",
         "announcements": "お知らせ",
-        "leverage": "レバレッジ"
+        "leverage": "レバレッジ",
+        "comingSoon": "近日公開"
     },
     "transactions": {
         "orderTypes": "注文タイプ",

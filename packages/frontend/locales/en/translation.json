@@ -39,7 +39,8 @@
         "update": "Update",
         "reset": "Reset",
         "announcements": "Announcements",
-        "leverage": "Leverage"
+        "leverage": "Leverage",
+        "comingSoon": "Coming Soon"
     },
     "transactions": {
         "orderTypes": "Order Types",

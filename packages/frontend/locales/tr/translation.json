@@ -39,7 +39,8 @@
         "update": "Güncelle",
         "reset": "Sıfırla",
         "announcements": "Duyurular",
-        "leverage": "Kaldıraç"
+        "leverage": "Kaldıraç",
+        "comingSoon": "Yakında"
     },
     "transactions": {
         "orderTypes": "Emir Tipleri",
