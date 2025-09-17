@@ -26,7 +26,8 @@ export default function OrderBookSection(props: propsIF) {
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
-    const { orderCount, setOrderCount } = useOrderBookStore();
+    const { orderCount, setOrderCount, setActiveOrderTab } =
+        useOrderBookStore();
     const orderBookModeRef = useRef(orderBookMode);
 
     const { liquidationsActive } = useAppStateStore();
@@ -72,7 +73,9 @@ export default function OrderBookSection(props: propsIF) {
     const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
     const [activeTab, setActiveTab] = useState(orderBookTabs[0]);
 
-    const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+    const handleTabChange = useCallback((tab: string) => {
+        (setActiveTab(tab), setActiveOrderTab(tab));
+    }, []);
 
     const renderTabContent = useCallback(() => {
         if (activeTab === 'Trades')
