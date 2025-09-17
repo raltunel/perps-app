@@ -26,7 +26,18 @@ export default function CodeTabs(props: Props) {
                     value={referralCode}
                     onChange={(e) => setReferralCode(e.target.value)}
                 />
-                <h6>You will receive a discount on your fees</h6>
+                {referralCode ? (
+                    <p>
+                        You are currently using <span>{referralCode}</span> as a
+                        referral code for a fee reduction. Entering a new code
+                        will replace the current code.
+                    </p>
+                ) : (
+                    <p>
+                        You are not using a referral code. Enter a referral code
+                        for a discount on fees.
+                    </p>
+                )}
             </div>
             <SimpleButton bg='accent1'>Enter</SimpleButton>
         </section>

@@ -75,6 +75,14 @@
     margin: 0;
 }
 
+.enterCodeContent > p {
+    font-size: var(--font-size-xs);
+}
+
+.enterCodeContent > p > span {
+    color: var(--accent3);
+}
+
 .enterCodeContent input {
     height: 36px;
     padding: 0 var(--padding-s, 10px);
