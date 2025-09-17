@@ -239,16 +239,20 @@ export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
 
-export const WHITELISTED_COINS_FOR_MAIN_PROXY = new Set<string>(['BTC']);
+export const WHITELISTED_COINS_FOR_MAIN_PROXY = new Set<string>(
+    ['BTC'].map((coin) => coin.toUpperCase()),
+);
 
 export const getPollingApiUrl = (payload: any) => {
     if (payload.coin) {
-        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.coin)) {
+        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.coin.toUpperCase())) {
             return POLLING_API_URL;
         }
         return ALTERNATE_POLLING_API_URL;
     } else if (payload.req && payload.req.coin) {
-        if (WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.req.coin)) {
+        if (
+            WHITELISTED_COINS_FOR_MAIN_PROXY.has(payload.req.coin.toUpperCase())
+        ) {
             return POLLING_API_URL;
         }
         return ALTERNATE_POLLING_API_URL;
