@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './CodeTabs.module.css';
 import Tabs from '~/components/Tabs/Tabs';
 import { motion } from 'framer-motion';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
+import { useUserDataStore } from '~/stores/UserDataStore';
 
 interface Props {
     initialTab?: string;
@@ -12,25 +13,29 @@ export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
 
-    const [referralCode, setReferralCode] = useState('');
+    const userData = useUserDataStore();
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
     };
+
+    const referralCodeInputRef = useRef<HTMLInputElement>(null);
+
     const enterCodeContent = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Enter a referral code</h6>
                 <input
                     type='text'
-                    value={referralCode}
-                    onChange={(e) => setReferralCode(e.target.value)}
+                    defaultValue={userData.referralCode}
+                    ref={referralCodeInputRef}
                 />
-                {referralCode ? (
+                {userData.referralCode ? (
                     <p>
-                        You are currently using <span>{referralCode}</span> as a
-                        referral code for a fee reduction. Entering a new code
-                        will replace the current code.
+                        You are currently using{' '}
+                        <span>{userData.referralCode}</span> as a referral code
+                        for a fee reduction. Entering a new code will replace
+                        the current code.
                     </p>
                 ) : (
                     <p>
@@ -39,7 +44,18 @@ export default function CodeTabs(props: Props) {
                     </p>
                 )}
             </div>
-            <SimpleButton bg='accent1'>Enter</SimpleButton>
+            <SimpleButton
+                bg='accent1'
+                onClick={() => {
+                    const value: string | undefined =
+                        referralCodeInputRef.current?.value;
+                    if (value) {
+                        userData.setReferralCode(value);
+                    }
+                }}
+            >
+                Enter
+            </SimpleButton>
         </section>
     );
 
