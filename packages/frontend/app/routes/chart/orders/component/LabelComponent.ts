@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { useEffect, useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import { useLimitOrderService } from '~/hooks/useLimitOrderService';
@@ -22,10 +22,12 @@ import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import * as d3fc from 'd3fc';
+import orderLinesLabelTooltip from '../../overlayCanvas/OrderLinesOverlayTooltip';
 
 interface LabelProps {
     lines: LineData[];
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     zoomChanged: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
@@ -47,6 +49,7 @@ interface LabelProps {
 const LabelComponent = ({
     lines,
     overlayCanvasRef,
+    canvasWrapperRef,
     zoomChanged,
     canvasSize,
     drawnLabelsRef,
@@ -74,6 +77,9 @@ const LabelComponent = ({
     const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
 
     const [isDrag, setIsDrag] = useState(false);
+
+    const dragLabelTooltipRef = useRef<any>(null);
+    const showLabelTooltip = useRef<boolean>(true);
 
     const isLiqPriceLineDraggable = false;
 
@@ -142,6 +148,19 @@ const LabelComponent = ({
             });
         }
     }, [scaleData, canvasSize === undefined, isChartReady]);
+
+    useEffect(() => {
+        if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
+
+        if (dragLabelTooltipRef.current) return;
+
+        const labelTooltip = orderLinesLabelTooltip({
+            overlayCanvasRef,
+            canvasWrapperRef,
+        });
+
+        dragLabelTooltipRef.current = labelTooltip;
+    }, [overlayCanvasRef, canvasWrapperRef]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !ctx || !canvasSize) return;
@@ -306,8 +325,24 @@ const LabelComponent = ({
                 isLabel.matchType === 'onLabel' &&
                 isLabel.label.type !== 'Cancel'
             ) {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
+                    if (
+                        dragLabelTooltipRef.current &&
+                        showLabelTooltip.current
+                    ) {
+                        dragLabelTooltipRef.current
+                            .style('visibility', 'visible')
+                            .style('top', isLabel.label.y - 30 + 'px')
+                            .style(
+                                'left',
+                                isLabel.label.x +
+                                    isLabel.label.width / 2 +
+                                    'px',
+                            );
+                    }
+
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
+                }
             } else {
                 if (overlayCanvasRef.current)
                     overlayCanvasRef.current.style.pointerEvents = 'none';
@@ -385,6 +420,13 @@ const LabelComponent = ({
                                                 ).style.cursor = 'crosshair';
                                             }
                                         }
+                                    }
+                                } else {
+                                    if (dragLabelTooltipRef.current) {
+                                        dragLabelTooltipRef.current.style(
+                                            'visibility',
+                                            'hidden',
+                                        );
                                     }
                                 }
                             }
@@ -594,6 +636,11 @@ const LabelComponent = ({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
+            if (dragLabelTooltipRef.current) {
+                showLabelTooltip.current = false;
+                dragLabelTooltipRef.current.style('visibility', 'hidden');
+            }
+
             const rect = canvas.getBoundingClientRect();
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
@@ -823,6 +870,8 @@ const LabelComponent = ({
                     overlayCanvasRef.current.style.cursor = 'pointer';
 
                     overlayCanvasRef.current.style.pointerEvents = 'none';
+
+                    showLabelTooltip.current = true;
                 }
             }, 300);
         };

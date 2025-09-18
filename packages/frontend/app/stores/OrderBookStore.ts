@@ -30,6 +30,8 @@ interface OrderBookStore {
     setLiqSells: (liqSells: OrderBookLiqIF[]) => void;
     orderCount: number;
     setOrderCount: (orderCount: number) => void;
+    activeOrderTab: string;
+    setActiveOrderTab: (activeOrderTab: string) => void;
 }
 
 export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
@@ -61,4 +63,6 @@ export const useOrderBookStore = create<OrderBookStore>((set, get) => ({
     setHighResSells: (highResSells: OrderBookRowIF[]) => set({ highResSells }),
     orderCount: 9,
     setOrderCount: (orderCount: number) => set({ orderCount }),
+    activeOrderTab: 'Book',
+    setActiveOrderTab: (activeOrderTab: string) => set({ activeOrderTab }),
 }));

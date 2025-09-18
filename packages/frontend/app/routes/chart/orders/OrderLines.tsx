@@ -10,6 +10,7 @@ import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     canvasSize: any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,6 +24,7 @@ export type OrderLinesProps = {
 
 export default function OrderLines({
     overlayCanvasRef,
+    canvasWrapperRef,
     canvasSize,
     scaleData,
     overlayCanvasMousePositionRef,
@@ -124,6 +126,7 @@ export default function OrderLines({
                     key='labels'
                     lines={visibleLines}
                     overlayCanvasRef={overlayCanvasRef}
+                    canvasWrapperRef={canvasWrapperRef}
                     zoomChanged={zoomChanged}
                     canvasSize={canvasSize}
                     drawnLabelsRef={drawnLabelsRef}

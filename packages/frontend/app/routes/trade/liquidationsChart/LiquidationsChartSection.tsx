@@ -46,6 +46,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         setLiqBuys,
         setLiqSells,
         orderCount,
+        activeOrderTab,
     } = useOrderBookStore();
     const { symbolInfo } = useTradeDataStore();
 
@@ -135,7 +136,10 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         const midHeaderHeight =
                             midHeader.getBoundingClientRect().height;
                         height =
-                            buyBlockHeight + sellBlockHeight + midHeaderHeight;
+                            buyBlockHeight +
+                            sellBlockHeight +
+                            midHeaderHeight +
+                            15;
                     }
 
                     setDimensions({ width: rect.width, height: height });
@@ -283,7 +287,9 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 />
             </div>
             <div ref={tabContentRef} className={styles.tabContent}>
-                <div className={styles.startGap}>Liquidation Chart</div>
+                {activeOrderTab === 'Book' && (
+                    <div className={styles.startGap}>Liquidation Chart</div>
+                )}
                 {renderTabContent()}
             </div>
         </div>
