@@ -10,9 +10,11 @@ const OrderLinesOverlayCanvas: React.FC = () => {
                 scaleData,
                 mousePositionRef,
                 zoomChanged,
+                canvasWrapperRef,
             }) => (
                 <OrderLines
                     overlayCanvasRef={canvasRef}
+                    canvasWrapperRef={canvasWrapperRef}
                     canvasSize={canvasSize}
                     scaleData={scaleData}
                     overlayCanvasMousePositionRef={mousePositionRef}
