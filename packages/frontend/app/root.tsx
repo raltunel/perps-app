@@ -7,129 +7,64 @@ import {
     Scripts,
     ScrollRestoration,
     useLocation,
+    useRouteError,
 } from 'react-router';
+
+// Components
 import Notifications from '~/components/Notifications/Notifications';
-import type { Route } from './+types/root';
-import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
 import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
-// import MobileFooter from './components/MobileFooter/MobileFooter';
 import PageHeader from './components/PageHeader/PageHeader';
+import MobileFooter from './components/MobileFooter/MobileFooter';
 import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
+import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+
+// Providers
 import { AppProvider } from './contexts/AppContext';
-import './css/app.css';
-import './css/index.css';
+import { MarketDataProvider } from './contexts/MarketDataContext';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
-import { useDebugStore } from './stores/DebugStore';
-
+import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+
+// Config
 import {
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
+    USER_WS_ENDPOINT,
     SHOULD_LOG_ANALYTICS,
     SPLIT_TEST_VERSION,
-    USER_WS_ENDPOINT,
 } from './utils/Constants';
-import { MarketDataProvider } from './contexts/MarketDataContext';
-import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
-import { getResolutionSegment } from './utils/functions/getSegment';
-import MobileFooter from './components/MobileFooter/MobileFooter';
-// import { NATIVE_MINT } from '@solana/spl-token';
+import { useDebugStore } from './stores/DebugStore';
 
-// Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
-class ComponentErrorBoundary extends React.Component<
+// Styles
+import './css/app.css';
+import './css/index.css';
+import { getResolutionSegment } from './utils/functions/getSegment';
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
     { children: React.ReactNode },
     { hasError: boolean }
 > {
-    constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false };
-    }
+    state = { hasError: false };
 
     static getDerivedStateFromError() {
         return { hasError: true };
     }
 
-    componentDidCatch(error: Error, info: React.ErrorInfo) {
-        console.error('Component error:', error, info);
-
-        // Log error to Plausible
-        if (
-            typeof window !== 'undefined' &&
-            typeof window.plausible === 'function'
-        ) {
-            // Truncate componentStack to be less than 2000 bytes
-            const maxBytes = 2000;
-            let componentStack = info.componentStack || '';
-
-            // Convert to Buffer to handle multi-byte characters correctly
-            const encoder = new TextEncoder();
-            const encoded = encoder.encode(componentStack);
-
-            if (encoded.length > maxBytes) {
-                // Create a new Uint8Array with maxBytes length
-                const truncated = new Uint8Array(maxBytes);
-                // Copy the first maxBytes - 3 bytes (for '...')
-                truncated.set(encoded.subarray(0, maxBytes - 3));
-                // Add ellipsis
-                truncated.set([0x2e, 0x2e, 0x2e], maxBytes - 3);
-                // Convert back to string
-                componentStack = new TextDecoder('utf-8', {
-                    fatal: false,
-                }).decode(truncated);
-            }
-
-            window.plausible('Component Error', {
-                props: {
-                    errorMessage: error.message,
-                    componentStack: componentStack,
-                    errorName: error.name,
-                },
-            });
-        }
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.error('Error caught by boundary:', error, errorInfo);
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        textAlign: 'center',
-                        padding: '20px',
-                        boxSizing: 'border-box',
-                        overflow: 'hidden',
-                        backgroundColor: 'var(--dark2)',
-                    }}
-                >
-                    <h3 style={{ marginBottom: '16px' }}>
-                        Something went wrong
-                    </h3>
-                    <button
-                        onClick={() => this.setState({ hasError: false })}
-                        style={{
-                            background: 'none',
-                            border: 'none',
-                            color: 'var(--accent1)',
-                            cursor: 'pointer',
-                            padding: '0',
-                            font: 'inherit',
-                            textDecoration: 'underline',
-                            display: 'inline',
-                            marginTop: '8px',
-                        }}
-                    >
-                        Try Again
+                <div className='error-fallback'>
+                    <h2>Something went wrong</h2>
+                    <button onClick={() => this.setState({ hasError: false })}>
+                        Try again
                     </button>
                 </div>
             );
@@ -138,32 +73,40 @@ class ComponentErrorBoundary extends React.Component<
     }
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = '../tv/datafeeds/udf/dist/bundle.js';
-        script.async = true;
-        script.onerror = (error) => {
-            console.error('Failed to load TradingView script:', error);
-        };
-        document.head.appendChild(script);
-
-        return () => {
-            // Cleanup script when component unmounts
-            if (document.head.contains(script)) {
-                document.head.removeChild(script);
-            }
-        };
-    }, []);
-
+// Document Shell Component
+export function Document({ children }: { children: React.ReactNode }) {
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
+        // Client-side only
+        if (typeof window === 'undefined') return;
+
+        // Load TradingView script
+        const script = document.createElement('script');
+        script.src = '../tv/datafeeds/udf/dist/bundle.js';
+        script.async = true;
+        script.onerror = (error) =>
+            console.error('Failed to load TradingView script:', error);
+        document.head.appendChild(script);
+
+        // Set viewport dimensions
+        const handleResize = () => {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
-        }
+        };
+
+        // Initial set
+        handleResize();
+
+        // Add event listener
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            // Don't remove the script to prevent errors
+        };
     }, []);
 
     return (
@@ -187,6 +130,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 />
                 <link rel='manifest' href='/manifest.webmanifest' />
                 <Meta />
+                <Links />
                 {/* Preconnect to Google Fonts domains */}
                 <link
                     rel='preconnect'
@@ -228,7 +172,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
                     crossOrigin='anonymous'
                 />
-                <Links />
                 {SHOULD_LOG_ANALYTICS && (
                     <script
                         defer
@@ -253,124 +196,96 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {children}
                 <ScrollRestoration />
                 <Scripts />
-                {/* Removed inline script - now loading dynamically in useEffect */}
             </body>
         </html>
     );
 }
 
+// Main App Component
 export default function App() {
-    // Use memoized value to prevent unnecessary re-renders
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
 
     return (
-        <>
-            <Layout>
-                <FogoSessionProvider
-                    endpoint={RPC_ENDPOINT}
-                    domain='https://perps.ambient.finance'
-                    tokens={[
-                        // NATIVE_MINT.toBase58(),
-                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
-                    ]}
-                    defaultRequestedLimits={{
-                        // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
-                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
-                            1_000_000_000n,
-                    }}
-                    enableUnlimited={true}
-                >
-                    <AppProvider>
-                        <UnifiedMarginDataProvider>
-                            <MarketDataProvider>
-                                <SdkProvider
-                                    environment={wsEnvironment}
-                                    marketEndpoint={MARKET_WS_ENDPOINT}
-                                    userEndpoint={USER_WS_ENDPOINT}
-                                >
-                                    <TutorialProvider>
+        <Document>
+            <FogoSessionProvider
+                endpoint={RPC_ENDPOINT}
+                domain='https://perps.ambient.finance'
+                tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
+                defaultRequestedLimits={{
+                    fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry: 1_000_000_000n,
+                }}
+                enableUnlimited={true}
+            >
+                <AppProvider>
+                    <UnifiedMarginDataProvider>
+                        <MarketDataProvider>
+                            <SdkProvider
+                                environment={wsEnvironment}
+                                marketEndpoint={MARKET_WS_ENDPOINT}
+                                userEndpoint={USER_WS_ENDPOINT}
+                            >
+                                <TutorialProvider>
+                                    <ErrorBoundary>
                                         <WsConnectionChecker />
                                         <WebSocketDebug />
                                         <div className='root-container'>
-                                            {/* Added error boundary for header */}
-                                            <ComponentErrorBoundary>
-                                                <PageHeader />
-                                            </ComponentErrorBoundary>
+                                            <PageHeader />
                                             <main
                                                 className={`content ${isHomePage ? 'home-page' : ''}`}
                                             >
-                                                {/*  Added Suspense for async content loading */}
                                                 <Suspense
                                                     fallback={
                                                         <LoadingIndicator />
                                                     }
                                                 >
-                                                    <ComponentErrorBoundary>
-                                                        <Outlet />
-                                                    </ComponentErrorBoundary>
+                                                    <Outlet />
                                                 </Suspense>
                                             </main>
-                                            <ComponentErrorBoundary>
-                                                <footer className='mobile-footer'>
-                                                    <MobileFooter />
-                                                </footer>
-                                            </ComponentErrorBoundary>
-
-                                            {/* Added error boundary for notifications */}
-                                            <ComponentErrorBoundary>
-                                                <Notifications />
-                                            </ComponentErrorBoundary>
+                                            <MobileFooter />
+                                            <Notifications />
                                         </div>
-                                    </TutorialProvider>
-                                    <RuntimeDomManipulation />
-                                </SdkProvider>
-                            </MarketDataProvider>
-                        </UnifiedMarginDataProvider>
-                    </AppProvider>
-                </FogoSessionProvider>
-            </Layout>
-        </>
+                                        <RuntimeDomManipulation />
+                                    </ErrorBoundary>
+                                </TutorialProvider>
+                            </SdkProvider>
+                        </MarketDataProvider>
+                    </UnifiedMarginDataProvider>
+                </AppProvider>
+            </FogoSessionProvider>
+        </Document>
     );
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-    let message = 'Oops!';
-    let details = 'An unexpected error occurred.';
-    let stack: string | undefined;
+// Error Page Component
+export function ErrorPage() {
+    const error = useRouteError();
+    console.error(error);
 
     if (isRouteErrorResponse(error)) {
-        message = error.status === 404 ? '404' : 'Error';
-        details =
-            error.status === 404
-                ? 'The requested page could not be found.'
-                : error.statusText || details;
-    } else if (import.meta.env.DEV && error && error instanceof Error) {
-        details = error.message;
-        stack = error.stack;
+        return (
+            <div className='error-page'>
+                <h1>
+                    {error.status} {error.statusText}
+                </h1>
+                <p>{error.data?.message || 'An error occurred'}</p>
+            </div>
+        );
     }
 
     return (
-        <main className='content error-boundary'>
-            <h1>{message}</h1>
-            <p>{details}</p>
-            {stack ? (
-                <pre>
-                    <code>{stack}</code>
-                </pre>
-            ) : error ? (
-                <pre>
-                    <code>{error.toString()}</code>
-                </pre>
-            ) : null}
-            {/*  Added refresh button for better user experience */}
-            <button
-                onClick={() => window.location.reload()}
-                className='retry-button'
-            >
+        <div className='error-page'>
+            <h1>Oops!</h1>
+            <p>Sorry, an unexpected error has occurred.</p>
+            <p>
+                <i>
+                    {error instanceof Error ? error.message : 'Unknown error'}
+                </i>
+            </p>
+            <button onClick={() => window.location.reload()}>
                 Reload Page
             </button>
-        </main>
+        </div>
     );
 }
