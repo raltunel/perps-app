@@ -13,14 +13,6 @@ export default defineConfig({
         outDir: 'build',
         emptyOutDir: true,
         ssr: true,
-        rollupOptions: {
-            input: 'app/root.tsx',
-            output: {
-                entryFileNames: 'assets/[name].js',
-                chunkFileNames: 'assets/[name].js',
-                assetFileNames: 'assets/[name].[ext]',
-            },
-        },
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
