@@ -3,17 +3,19 @@ import { defineConfig, type PluginOption } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import netlifyPlugin from '@netlify/vite-plugin-react-router';
 
 const appName = 'Ambient Perps';
 const appDescription = 'A modern, performant app for perpetual contracts.';
 
 export default defineConfig({
     build: {
-        ssr: false, // Explicitly disable SSR
+        ssr: true,
         outDir: 'build/client',
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
+        target: 'node',
     },
     resolve: {
         alias: [
@@ -22,6 +24,7 @@ export default defineConfig({
         ],
     },
     plugins: [
+        netlifyPlugin(),
         nodePolyfills({
             include: ['buffer'],
             globals: {
