@@ -253,7 +253,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                         }
                         event-splittestversion={SPLIT_TEST_VERSION}
                         event-defaultlanguage={defaultLanguage}
-                        event-preferredlanguage={navigator.language}
+                        event-preferredlanguage={navigatorLanguage}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>
