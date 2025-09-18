@@ -37,6 +37,7 @@ import {
 } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import { useUrlParams } from '~/hooks/useURLParams';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -50,6 +51,7 @@ export default function PageHeader() {
     const userDataStore = useUserDataStore();
     useEffect(() => {
         const referralCode: string | null = handleReferralCodeParam();
+        console.log({ referralCode });
         if (referralCode) {
             userDataStore.setReferralCode(referralCode);
             // const newSearchParams = new URLSearchParams(
@@ -60,6 +62,8 @@ export default function PageHeader() {
             // window.history.replaceState({}, '', newUrl); // remove referral code from URL
         }
     }, [searchParams]);
+
+    useUrlParams('af');
 
     const sessionState = useSession();
 
