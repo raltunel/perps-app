@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -48,7 +48,6 @@ export default function PageHeader() {
     const referralCodeURL = useUrlParams(FUUL_REFERRAL_CODE_FROM_URL_PARAM);
 
     // logic to read a URL referral code and set in state + local storage
-    const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
     useEffect(() => {
         if (referralCodeURL.value) {
@@ -60,7 +59,7 @@ export default function PageHeader() {
             // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
             // window.history.replaceState({}, '', newUrl); // remove referral code from URL
         }
-    }, [searchParams]);
+    }, [referralCodeURL]);
 
     const sessionState = useSession();
 
