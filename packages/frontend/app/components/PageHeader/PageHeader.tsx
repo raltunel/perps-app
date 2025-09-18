@@ -34,7 +34,7 @@ import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
-import { useUrlParams } from '~/hooks/useURLParams';
+import { useUrlParams, type UrlParamMethodsIF } from '~/hooks/useURLParams';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -45,21 +45,25 @@ export default function PageHeader() {
     };
 
     const FUUL_REFERRAL_CODE_FROM_URL_PARAM = 'af';
-    const referralCodeURL = useUrlParams(FUUL_REFERRAL_CODE_FROM_URL_PARAM);
+    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
+        FUUL_REFERRAL_CODE_FROM_URL_PARAM,
+    );
 
     // logic to read a URL referral code and set in state + local storage
     const userDataStore = useUserDataStore();
-    useEffect(() => {
-        if (referralCodeURL.value) {
-            userDataStore.setReferralCode(referralCodeURL.value);
-            // const newSearchParams = new URLSearchParams(
-            //     searchParams.toString(),
-            // );
-            // newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            // window.history.replaceState({}, '', newUrl); // remove referral code from URL
-        }
-    }, [referralCodeURL]);
+    referralCodeFromURL.value &&
+        userDataStore.initializeRefCode(referralCodeFromURL.value);
+    // useEffect(() => {
+    //     if (referralCodeURL.value) {
+    //         userDataStore.setReferralCode(referralCodeURL.value);
+    //         // const newSearchParams = new URLSearchParams(
+    //         //     searchParams.toString(),
+    //         // );
+    //         // newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
+    //         // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
+    //         // window.history.replaceState({}, '', newUrl); // remove referral code from URL
+    //     }
+    // }, [referralCodeURL.value]);
 
     const sessionState = useSession();
 
