@@ -1,8 +1,8 @@
-
 [build]
   base = "packages/frontend"
-  publish = "build/client"
   command = "node scripts/generate-announcements.js && node scripts/write-version.js && pnpm build"
+  publish = "build/client"
+  functions = "netlify/functions"
 
 [context.production.environment]
   VITE_CONTEXT = "production"
@@ -15,7 +15,11 @@ VITE_CONTEXT = "branch-deploy"
 
 [dev]
   command = "npm run dev"
+  port = 3002
+  targetPort = 3002
   framework = "vite"
+  publish = "build/client"
+  autoLaunch = true
 
 # Set immutable caching for static files, because they have fingerprinted filenames
 [[headers]]

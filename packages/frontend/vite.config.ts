@@ -1,8 +1,8 @@
-import { reactRouter } from '@react-router/dev/vite';
-import { defineConfig, type PluginOption } from 'vite';
+import { defineConfig } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { VitePWA } from 'vite-plugin-pwa';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { reactRouter } from '@react-router/dev/vite';
 import netlifyPlugin from '@netlify/vite-plugin-react-router';
 
 const appName = 'Ambient Perps';
@@ -10,8 +10,9 @@ const appDescription = 'A modern, performant app for perpetual contracts.';
 
 export default defineConfig({
     build: {
+        outDir: 'build',
+        emptyOutDir: true,
         ssr: true,
-        outDir: 'build/client',
     },
     ssr: {
         noExternal: ['@fogo/sessions-sdk-react'],
@@ -24,15 +25,15 @@ export default defineConfig({
         ],
     },
     plugins: [
-        netlifyPlugin(),
         nodePolyfills({
             include: ['buffer'],
             globals: {
                 Buffer: true,
             },
         }),
-        tsconfigPaths() as PluginOption,
+        tsconfigPaths(),
         reactRouter(),
+        netlifyPlugin(),
         VitePWA({
             registerType: 'autoUpdate',
             workbox: {
