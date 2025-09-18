@@ -7,13 +7,18 @@ export interface UserDataStore {
     referralCode: string;
     setReferralCode: (r: string) => void;
     clearReferralCode: () => void;
+    refCode: {
+        value: string;
+        isValidated: boolean;
+    };
+    setRefCode: (r: string) => void;
 }
 
 const LS_KEY = 'USER_DATA';
 
 export const useUserDataStore = create<UserDataStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             userAddress: '',
             setUserAddress: (userAddress: string) => {
                 set({ userAddress });
@@ -21,6 +26,17 @@ export const useUserDataStore = create<UserDataStore>()(
             referralCode: '',
             setReferralCode: (r: string) => set({ referralCode: r }),
             clearReferralCode: () => set({ referralCode: '' }),
+            refCode: {
+                value: '',
+                isValidated: false,
+            },
+            setRefCode: (r: string) =>
+                set({
+                    refCode: {
+                        value: r,
+                        isValidated: get().refCode.isValidated || false,
+                    },
+                }),
         }),
         {
             name: LS_KEY,
@@ -28,6 +44,7 @@ export const useUserDataStore = create<UserDataStore>()(
             version: 1,
             partialize: (state: UserDataStore) => ({
                 referralCode: state.referralCode,
+                refCode: state.refCode,
             }),
         },
     ),
