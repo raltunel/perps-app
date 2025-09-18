@@ -31,10 +31,7 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
-import {
-    handleReferralCodeParam,
-    useUserDataStore,
-} from '~/stores/UserDataStore';
+import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
 import { useUrlParams } from '~/hooks/useURLParams';
