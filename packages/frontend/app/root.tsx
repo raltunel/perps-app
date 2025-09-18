@@ -160,17 +160,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
+    const [navigatorLanguage, setNavigatorLanguage] = useState<string>();
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
+            setNavigatorLanguage(navigator.language);
         }
     }, []);
 
     const defaultLanguage = useMemo(() => {
         return getDefaultLanguage();
-    }, [navigator.language]);
+    }, [navigatorLanguage]);
 
     return (
         <html lang='en'>
