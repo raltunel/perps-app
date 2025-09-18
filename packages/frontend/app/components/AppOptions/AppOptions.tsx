@@ -10,23 +10,17 @@ import {
     type colorSetIF,
     type colorSetNames,
 } from '~/stores/AppSettingsStore';
-import { NumFormatTypes, type NumFormat } from '~/utils/Constants';
+import {
+    languageOptions,
+    NumFormatTypes,
+    type NumFormat,
+} from '~/utils/Constants';
 import styles from './AppOptions.module.css';
 import OptionLine from './OptionLine';
 import OptionLineSelect from './OptionLineSelect';
 import { useTranslation } from 'react-i18next';
 import useMediaQuery from '~/hooks/useMediaQuery';
-import { useMemo } from 'react';
-
-const languageOptions = {
-    en: 'English 🇬🇧',
-    es: 'Español 🇪🇸',
-    fr: 'Français 🇫🇷',
-    tr: 'Türkçe 🇹🇷',
-    ja: '日本語 🇯🇵',
-    ko: '한국어 🇰🇷',
-    zh: '中文 (简体) 🇨🇳',
-};
+import { getDefaultLanguage } from '~/utils/functions/getDefaultLanguage';
 
 export interface appOptionDataIF {
     slug: appOptions;
@@ -48,21 +42,6 @@ export default function AppOptions() {
 
     // gap between colored circles in the color pair dropdown
     const CIRCLE_GAP = '1px';
-
-    const defaultLanguage = useMemo(() => {
-        const supportedLanguages = Object.keys(languageOptions);
-
-        const navLang = navigator.language;
-        const isNavLangSupported = supportedLanguages.includes(
-            navLang.split('-')[0],
-        );
-        const defaultLanguage = isNavLangSupported
-            ? navLang.split('-')[0]
-            : navigator.languages
-                  .map((lang) => lang.split('-')[0]) // Convert 'en-US' to 'en'
-                  .find((lang) => supportedLanguages.includes(lang)) || 'en';
-        return defaultLanguage;
-    }, [navigator.language]);
 
     return (
         <section className={styles.app_options}>
@@ -263,8 +242,6 @@ export default function AppOptions() {
                                             props: {
                                                 setting: 'language',
                                                 value: lang[1].split(' ')[0],
-                                                default: defaultLanguage,
-                                                navLang: navigator.language,
                                             },
                                         });
                                     }
@@ -283,7 +260,7 @@ export default function AppOptions() {
                     useAppSettings.getState().resetLayoutHeights();
 
                     // reset language to browser default or English if unsupported
-
+                    const defaultLanguage = getDefaultLanguage();
                     i18n.changeLanguage(defaultLanguage);
 
                     if (typeof plausible === 'function') {

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import './i18n'; // i18n MUST be imported before any components
 import {
     isRouteErrorResponse,
@@ -37,6 +37,7 @@ import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -167,6 +168,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         }
     }, []);
 
+    const defaultLanguage = useMemo(() => {
+        return getDefaultLanguage();
+    }, [navigator.language]);
+
     return (
         <html lang='en'>
             <head>
@@ -245,6 +250,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                                 : undefined
                         }
                         event-splittestversion={SPLIT_TEST_VERSION}
+                        event-defaultlanguage={defaultLanguage}
+                        event-preferredlanguage={navigator.language}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>

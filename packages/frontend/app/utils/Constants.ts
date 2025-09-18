@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type { DebugWallet } from '~/stores/DebugStore';
 
 export * from './externalResources';
@@ -208,3 +209,13 @@ export const SPLIT_TEST_VERSION =
 export const SHOULD_LOG_ANALYTICS =
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS &&
     import.meta.env.VITE_SHOULD_LOG_ANALYTICS.toLowerCase() === 'true';
+
+export const languageOptions = {
+    en: 'English 🇬🇧',
+    es: 'Español 🇪🇸',
+    fr: 'Français 🇫🇷',
+    tr: 'Türkçe 🇹🇷',
+    ja: '日本語 🇯🇵',
+    ko: '한국어 🇰🇷',
+    zh: '中文 (简体) 🇨🇳',
+};
