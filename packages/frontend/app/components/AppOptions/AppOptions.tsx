@@ -54,7 +54,19 @@ export default function AppOptions() {
                 <OptionLine
                     text={t('appSettings.skipOpenOrderConfirm')}
                     isChecked={activeOptions['skipOpenOrderConfirm']}
-                    toggle={() => activeOptions.toggle('skipOpenOrderConfirm')}
+                    toggle={() => {
+                        activeOptions.toggle('skipOpenOrderConfirm');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'skipOpenOrderConfirm',
+                                    value: !activeOptions[
+                                        'skipOpenOrderConfirm'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 {/* <OptionLine
                     text='Skip Close Position Confirmations'
@@ -88,14 +100,36 @@ export default function AppOptions() {
                 <OptionLine
                     text={t('appSettings.enableTxNotifications')}
                     isChecked={activeOptions['enableTxNotifications']}
-                    toggle={() => activeOptions.toggle('enableTxNotifications')}
+                    toggle={() => {
+                        activeOptions.toggle('enableTxNotifications');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'enableTxNotifications',
+                                    value: !activeOptions[
+                                        'enableTxNotifications'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 <OptionLine
                     text={t('appSettings.enableBackgroundFillNotif')}
                     isChecked={activeOptions['enableBackgroundFillNotif']}
-                    toggle={() =>
-                        activeOptions.toggle('enableBackgroundFillNotif')
-                    }
+                    toggle={() => {
+                        activeOptions.toggle('enableBackgroundFillNotif');
+                        if (typeof plausible === 'function') {
+                            plausible('Settings Change', {
+                                props: {
+                                    setting: 'enableBackgroundFillNotif',
+                                    value: !activeOptions[
+                                        'enableBackgroundFillNotif'
+                                    ],
+                                },
+                            });
+                        }
+                    }}
                 />
                 {/* <OptionLine
                     text='Play Sound for Fills'
@@ -137,7 +171,17 @@ export default function AppOptions() {
                     active={numFormat.label}
                     options={NumFormatTypes.map((n: NumFormat) => ({
                         readable: n.label,
-                        set: () => setNumFormat(n),
+                        set: () => {
+                            setNumFormat(n);
+                            if (typeof plausible === 'function') {
+                                plausible('Settings Change', {
+                                    props: {
+                                        setting: 'numberFormat',
+                                        value: n.label,
+                                    },
+                                });
+                            }
+                        },
                     }))}
                 />
                 <OptionLineSelect
@@ -164,7 +208,17 @@ export default function AppOptions() {
                                         </div>
                                     </>
                                 ),
-                                set: () => setBsColor(text as colorSetNames),
+                                set: () => {
+                                    setBsColor(text as colorSetNames);
+                                    if (typeof plausible === 'function') {
+                                        plausible('Settings Change', {
+                                            props: {
+                                                setting: 'colorScheme',
+                                                value: text,
+                                            },
+                                        });
+                                    }
+                                },
                             };
                         },
                     )}
@@ -186,7 +240,17 @@ export default function AppOptions() {
                         (lang: [string, string]) => {
                             return {
                                 readable: <div>{lang[1]}</div>,
-                                set: () => i18n.changeLanguage(lang[0]),
+                                set: () => {
+                                    i18n.changeLanguage(lang[0]);
+                                    if (typeof plausible === 'function') {
+                                        plausible('Settings Change', {
+                                            props: {
+                                                setting: 'language',
+                                                value: lang[1].split(' ')[0],
+                                            },
+                                        });
+                                    }
+                                },
                             };
                         },
                     )}
@@ -215,9 +279,10 @@ export default function AppOptions() {
                     i18n.changeLanguage(defaultLanguage);
 
                     if (typeof plausible === 'function') {
-                        plausible('Trade Table Resize', {
+                        plausible('Settings Change', {
                             props: {
-                                tradeTablePercentOfWindowHeight: 'default',
+                                setting: 'applyDefaults',
+                                value: 'default',
                             },
                         });
                     }
