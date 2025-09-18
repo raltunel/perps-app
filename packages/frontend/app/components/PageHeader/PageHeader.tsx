@@ -46,14 +46,16 @@ export default function PageHeader() {
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
+
+    const FUUL_REFERRAL_CODE_FROM_URL_PARAM = 'af';
+    const referralCodeURL = useUrlParams(FUUL_REFERRAL_CODE_FROM_URL_PARAM);
+
     // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
     useEffect(() => {
-        const referralCode: string | null = handleReferralCodeParam();
-        console.log({ referralCode });
-        if (referralCode) {
-            userDataStore.setReferralCode(referralCode);
+        if (referralCodeURL.value) {
+            userDataStore.setReferralCode(referralCodeURL.value);
             // const newSearchParams = new URLSearchParams(
             //     searchParams.toString(),
             // );
@@ -62,8 +64,6 @@ export default function PageHeader() {
             // window.history.replaceState({}, '', newUrl); // remove referral code from URL
         }
     }, [searchParams]);
-
-    useUrlParams('af');
 
     const sessionState = useSession();
 
