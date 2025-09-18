@@ -38,6 +38,8 @@ function Modal(props: ModalProps) {
     const bottomSheetRef = useRef<HTMLDivElement>(null);
     const handleRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
     const contentRef = useRef<HTMLDivElement>(null);
 
     // State to track drag
@@ -57,10 +59,12 @@ function Modal(props: ModalProps) {
         if (actualPosition === 'bottomSheet') {
             setAnimation(styles.slideDown);
             setTimeout(() => {
-                if (close) close();
+                dialogRef.current?.close();
+                close?.();
             }, 300);
         } else {
-            if (close) close();
+            dialogRef.current?.close();
+            close?.();
         }
     }, [actualPosition, close]);
 
@@ -197,7 +201,7 @@ function Modal(props: ModalProps) {
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         const preventDefaultTouchMove = (e: TouchEvent) => {
-            if (modalRef.current?.contains(e.target as Node)) {
+            if (dialogRef.current?.contains(e.target as Node)) {
                 e.preventDefault();
             }
         };
@@ -212,31 +216,22 @@ function Modal(props: ModalProps) {
 
     // Escape key close
     useEffect(() => {
-        let animationTimeout: number;
-        const handleEscape = (evt: KeyboardEvent): void => {
-            if (evt.key === 'Escape' && close) {
-                if (
-                    isKeyboardVisible &&
-                    document.activeElement instanceof HTMLElement
-                ) {
-                    document.activeElement.blur();
-                    return;
-                }
-                handleClose();
-            }
-        };
+        let animationTimeout: number | undefined;
         if (actualPosition === 'bottomSheet') {
             animationTimeout = window.setTimeout(
                 () => setAnimation(styles.slideUp),
                 10,
             );
         }
-        document.addEventListener('keydown', handleEscape);
         return () => {
-            document.removeEventListener('keydown', handleEscape);
             if (animationTimeout) window.clearTimeout(animationTimeout);
         };
-    }, [actualPosition, close, handleClose, isKeyboardVisible]);
+    }, [actualPosition]);
+
+    useEffect(() => {
+        document.documentElement.classList.add('modal-open');
+        return () => document.documentElement.classList.remove('modal-open');
+    }, []);
 
     const pointerDownOnBackdrop = useRef(false);
     const pointerDownPos = useRef<{ x: number; y: number } | null>(null);

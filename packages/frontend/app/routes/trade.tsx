@@ -330,7 +330,7 @@ export default function Trade() {
 
     const MobileTabNavigation = useMemo(
         () => (
-            <div className={styles.mobileTabNav}>
+            <div className={styles.mobileTabNav} id='mobileTradeTabs'>
                 <div className={styles.mobileTabBtns}>
                     {tabList.map(({ key, label }) => (
                         <button
@@ -454,7 +454,7 @@ export default function Trade() {
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                <div className={styles.containerNew}>
+                <div className={styles.containerNew} id='tradePageRoot'>
                     {/* LEFT COLUMN */}
                     <div
                         className={styles.leftCol}

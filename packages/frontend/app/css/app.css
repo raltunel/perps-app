@@ -74,3 +74,86 @@
         padding-right: var(--padding-s, 8px);
     }
 }
+
+/* =========================
+   EVERYTHING BELOW THIS IS RELATED TO MODAL STACKING, MAKING SURE NOTHING SITS ABOVE THE MODAL
+   ========================= */
+
+/* Stop background scroll when a modal is open */
+html.modal-open,
+html.modal-open body {
+    overflow: hidden !important;
+}
+
+/* =========================
+   Header / PageHeader
+   ========================= */
+
+/* Demote the header and anything inside it while a modal is open */
+html.modal-open #pageHeader,
+html.modal-open #pageHeader * {
+    z-index: auto !important;
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    mix-blend-mode: normal !important;
+    opacity: 1 !important;
+    isolation: auto !important;
+    contain: none !important;
+    will-change: auto !important;
+
+    /* prevent click-throughs while modal is up */
+    pointer-events: none !important;
+}
+
+/* Header popovers/dropdowns/tooltips */
+html.modal-open #pageHeader [class*='Dropdown'],
+html.modal-open #pageHeader [class*='Tooltip'],
+html.modal-open #pageHeader [class*='Menu'],
+html.modal-open #pageHeader [class*='Popover'] {
+    z-index: auto !important;
+    transform: none !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+}
+
+@media (max-width: 768px) {
+    html.modal-open #pageHeader .nav {
+        position: static !important;
+        right: auto !important;
+        top: auto !important;
+        z-index: auto !important;
+        box-shadow: none !important;
+        transform: none !important;
+    }
+}
+
+/* Demote Trade page stacking contexts  */
+html.modal-open #tradePageRoot {
+    transform: none !important;
+    filter: none !important;
+    perspective: none !important;
+    contain: none !important;
+    isolation: auto !important;
+    will-change: auto !important;
+}
+
+/* Hide/neutralize the mobile tab bar  */
+html.modal-open #mobileTradeTabs {
+    position: static !important;
+    z-index: auto !important;
+    transform: none !important;
+    box-shadow: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
+
+/* Hide/neutralize the mobile bottom nav if present */
+html.modal-open #mobileBottomBar,
+html.modal-open .mobile-footer {
+    position: static !important;
+    z-index: auto !important;
+    transform: none !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+}
