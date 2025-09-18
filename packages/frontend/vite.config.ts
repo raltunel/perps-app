@@ -14,7 +14,7 @@ export default defineConfig({
         emptyOutDir: true,
         ssr: true,
         rollupOptions: {
-            input: 'app/entry.client.tsx',
+            input: 'app/root.tsx',
             output: {
                 entryFileNames: 'assets/[name].js',
                 chunkFileNames: 'assets/[name].js',
