@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import type { PublicKey } from '@solana/web3.js';
 
 export interface UserDataStore {
     userAddress: string;
@@ -13,7 +15,10 @@ export interface UserDataStore {
     };
     setRefCode: (r: string) => void;
     initializeRefCode: (r: string) => void;
-    validateRefCode: () => void;
+    confirmRefCode: (
+        walletKey: PublicKey,
+        signMessage: (message: Uint8Array) => Promise<Uint8Array>,
+    ) => Promise<void>;
 }
 
 const LS_KEY = 'USER_DATA';
@@ -56,8 +61,72 @@ export const useUserDataStore = create<UserDataStore>()(
                     }
                 },
                 // mark the referral code as validated
-                validateRefCode(): void {
-                    _setRefCode(get().refCode.value, true);
+                async confirmRefCode(
+                    walletKey: PublicKey,
+                    signMessage: (message: Uint8Array) => Promise<Uint8Array>,
+                ): Promise<void> {
+                    const code: string | null = get().refCode.value;
+                    if (!code) return;
+                    try {
+                        // Create a dynamic message with current date
+                        const currentDate = new Date()
+                            .toISOString()
+                            .split('T')[0];
+                        const message = `Accept affiliate code ${code} on ${currentDate}`;
+
+                        // Convert message to Uint8Array
+                        const messageBytes = new TextEncoder().encode(message);
+
+                        // Get the signature from the session
+                        const signatureBytes = await signMessage(messageBytes);
+
+                        // Convert the signature to base64
+                        const signatureArray = Array.from(
+                            new Uint8Array(signatureBytes),
+                        );
+                        const binaryString = String.fromCharCode.apply(
+                            null,
+                            signatureArray,
+                        );
+                        const signature = btoa(binaryString);
+
+                        // Call the Fuul SDK to identify the user
+
+                        try {
+                            const response = await Fuul.identifyUser({
+                                identifier: walletKey.toString(),
+                                identifierType:
+                                    UserIdentifierType.SolanaAddress,
+                                signature,
+                                signaturePublicKey: walletKey.toString(),
+                                message,
+                            });
+                            console.log(
+                                'Fuul.identifyUser successful:',
+                                response,
+                            );
+                            // TODO: @emily this step needs to be gatekept until a successful response
+                            _setRefCode(get().refCode.value, true);
+                        } catch (error: any) {
+                            console.error('Detailed error in identifyUser:', {
+                                message: error.message,
+                                status: error.response?.status,
+                                statusText: error.response?.statusText,
+                                data: error.response?.data,
+                                config: {
+                                    url: error.config?.url,
+                                    method: error.config?.method,
+                                    headers: error.config?.headers,
+                                },
+                            });
+                            throw error; // Re-throw to be caught by the outer catch
+                        }
+                    } catch (error) {
+                        console.error('Error in identifyUser:', error);
+                        // Optionally show a user-friendly error message
+                        // You might want to implement this based on your UI framework
+                        // showErrorToast('Failed to identify user. Please try again.');
+                    }
                 },
             };
         },
