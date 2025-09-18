@@ -166,11 +166,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         if (typeof window !== 'undefined') {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
+        }
+        if (typeof navigator !== 'undefined') {
             setNavigatorLanguage(navigator.language);
         }
     }, []);
 
     const defaultLanguage = useMemo(() => {
+        if (!navigatorLanguage) return;
         return getDefaultLanguage();
     }, [navigatorLanguage]);
 
