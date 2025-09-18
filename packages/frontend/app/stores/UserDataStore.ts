@@ -32,3 +32,24 @@ export const useUserDataStore = create<UserDataStore>()(
         },
     ),
 );
+
+export function handleReferralCodeParam(): string | null {
+    const REFERRAL_CODE_URL_PARAM = 'referral';
+    const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
+    const urlParams: URLSearchParams = new URLSearchParams(
+        window.location.search,
+    );
+
+    let referralCode: string | null = null;
+    for (const [key, value] of urlParams) {
+        if (
+            key.toLowerCase() === REFERRAL_CODE_URL_PARAM ||
+            key.toLowerCase() === ALTERNATE_REFERRAL_CODE_URL_PARAM
+        ) {
+            referralCode = value;
+            break;
+        }
+    }
+
+    return referralCode;
+}

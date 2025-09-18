@@ -31,7 +31,10 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 // import WalletDropdown from './WalletDropdown/WalletDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
-import { useUserDataStore } from '~/stores/UserDataStore';
+import {
+    handleReferralCodeParam,
+    useUserDataStore,
+} from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 
 export default function PageHeader() {
@@ -47,9 +50,7 @@ export default function PageHeader() {
     useEffect(() => {
         const REFERRAL_CODE_URL_PARAM = 'referral';
         const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
-        const referralCode =
-            searchParams.get(REFERRAL_CODE_URL_PARAM) ||
-            searchParams.get(ALTERNATE_REFERRAL_CODE_URL_PARAM);
+        const referralCode: string | null = handleReferralCodeParam();
         if (referralCode) {
             userDataStore.setReferralCode(referralCode);
             const newSearchParams = new URLSearchParams(
