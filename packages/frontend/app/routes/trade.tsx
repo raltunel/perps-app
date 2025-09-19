@@ -575,12 +575,10 @@ export default function Trade() {
                                 marginBucket={marginBucket}
                                 openDepositModal={openDepositModal}
                                 openWithdrawModal={openWithdrawModal}
-                                PortfolioModalsRenderer={
-                                    PortfolioModalsRenderer
-                                }
                             />
                         </section>
                     </div>
+                    {PortfolioModalsRenderer}
                 </div>
             )}
             <AdvancedTutorialController
