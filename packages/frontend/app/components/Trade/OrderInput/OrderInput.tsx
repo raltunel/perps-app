@@ -18,7 +18,6 @@ import React, {
 } from 'react';
 import { GoZap } from 'react-icons/go';
 import { LuCircleHelp } from 'react-icons/lu';
-import { MdKeyboardArrowLeft } from 'react-icons/md';
 import { PiArrowLineDown, PiSquaresFour } from 'react-icons/pi';
 import Modal from '~/components/Modal/Modal';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
@@ -74,6 +73,7 @@ import type {
     OrderSide,
     OrderTypeOption,
 } from '~/utils/CommonIFs';
+import { MdKeyboardArrowLeft } from 'react-icons/md';
 
 const useOnlyMarket = false;
 
@@ -986,23 +986,23 @@ function OrderInput({
                             className={styles.toggleSwitch}
                             role='switch'
                             aria-checked='false'
-                            aria-label='Toggle order type'
+                            aria-label='Flat price distribution'
                             tabIndex={0}
                             onClick={() => confirmOrderModal.open('scale')}
                         >
-                            <img src={flatSvg} alt='flat price distribution' />
-                            Flat
+                            <img src={flatSvg} alt='' aria-hidden='true' />
+                            <span>Flat</span>
                         </button>
                         <button
                             className={styles.toggleSwitch}
                             role='switch'
                             aria-checked='false'
-                            aria-label='Toggle order type'
+                            aria-label='Evenly split price distribution'
                             tabIndex={0}
                             onClick={() => confirmOrderModal.open('scale')}
                         >
-                            <img src={evenSvg} alt='even price distribution' />
-                            Evenly Split
+                            <img src={evenSvg} alt='' aria-hidden='true' />
+                            <span>Evenly Split</span>
                         </button>
                     </div>
                 </div>
@@ -2217,7 +2217,7 @@ function OrderInput({
                                 className={styles.exit_launchpad}
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <MdKeyboardArrowLeft />
+                                <MdKeyboardArrowLeft aria-label='Close Order Types' />
                             </div>
                             <h3>Order Types</h3>
                             <button
@@ -2225,7 +2225,7 @@ function OrderInput({
                                 aria-label='Trade type'
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <PiSquaresFour />
+                                <PiSquaresFour aria-label='Close Order Types' />
                             </button>
                         </header>
                         <ul className={styles.launchpad_clickables}>

@@ -90,9 +90,17 @@ export default function SliderTrack({
                 aria-valuemin={minimumInputValue}
                 aria-valuemax={maximumInputValue}
                 aria-valuenow={
-                    isNaN(currentValue)
+                    isNaN(currentValue) ||
+                    currentValue === null ||
+                    currentValue === undefined
                         ? minimumInputValue
-                        : Math.round(currentValue * 10) / 10
+                        : Math.max(
+                              minimumInputValue,
+                              Math.min(
+                                  maximumInputValue,
+                                  Math.round(currentValue * 10) / 10,
+                              ),
+                          )
                 }
                 aria-orientation='horizontal'
                 onKeyDown={onKeyDown}
@@ -100,11 +108,23 @@ export default function SliderTrack({
                 onTouchStart={onTrackTouchStart}
                 onMouseMove={onTrackMouseMove}
                 onMouseLeave={onTrackMouseLeave}
-                aria-valuetext={`${isNaN(currentValue) ? minimumInputValue : Math.round(currentValue * 10) / 10}x leverage`}
+                aria-valuetext={`${
+                    isNaN(currentValue) ||
+                    currentValue === null ||
+                    currentValue === undefined
+                        ? minimumInputValue
+                        : Math.max(
+                              minimumInputValue,
+                              Math.min(
+                                  maximumInputValue,
+                                  Math.round(currentValue * 10) / 10,
+                              ),
+                          )
+                }x leverage`}
             >
                 <div
                     className={styles.sliderBackground}
-                    role='presentation'
+                    role='none'
                     aria-hidden='true'
                 ></div>
 
