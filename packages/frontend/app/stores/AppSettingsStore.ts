@@ -61,7 +61,7 @@ export const useAppSettings = create<AppSettingsStore>()(
 
             bsColor: 'colors.default',
             setBsColor: (c) => set({ bsColor: c }),
-            getBsColor: () => bsColorSets[get().bsColor],
+            getBsColor: () => bsColorSets[get().bsColor] ?? 'colors.default',
 
             chartTopHeight: DEFAULT_CHART_TOP_HEIGHT,
             setChartTopHeight: (h) => set({ chartTopHeight: h }),
