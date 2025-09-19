@@ -56,21 +56,15 @@ export default function CodeTabs(props: Props) {
         [sessionState],
     );
 
-    useEffect(() => {
-        if (userDataStore.referralCode) {
-            setReferralCode(userDataStore.referralCode);
-        }
-    }, [userDataStore.referralCode]);
-
     const affiliateAddress = userDataStore.userAddress;
 
     const enterCodeContent = isSessionEstablished ? (
-        referralCode ? (
+        userDataStore.refCode.value ? (
             !isEditing ? (
                 <section className={styles.sectionWithButton}>
                     <div className={styles.enterCodeContent}>
                         <h6>Current Affiliate Code</h6>
-                        <p>{referralCode}</p>
+                        <p>{userDataStore.refCode.value}</p>
                     </div>
                     <div className={styles.refferal_code_buttons}>
                         <SimpleButton
@@ -95,7 +89,10 @@ export default function CodeTabs(props: Props) {
             ) : (
                 <section className={styles.sectionWithButton}>
                     <div className={styles.enterCodeContent}>
-                        <h6>Overwrite current referrer code: {referralCode}</h6>
+                        <h6>
+                            Overwrite current referrer code:{' '}
+                            {userDataStore.refCode.value}
+                        </h6>
                         <input
                             type='text'
                             value={temporaryReferralCode}

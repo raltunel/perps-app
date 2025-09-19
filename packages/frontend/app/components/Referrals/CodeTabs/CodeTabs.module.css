@@ -108,6 +108,7 @@
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
 }
 
+/* wrapper around CONFIRM and EDIT buttons */
 .refferal_code_buttons {
     display: flex;
     flex-direction: row;
