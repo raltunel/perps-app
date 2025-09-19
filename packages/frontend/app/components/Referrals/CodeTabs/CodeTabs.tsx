@@ -37,8 +37,6 @@ const availableTabs = ['Enter Code', 'Create Code', 'Claim'];
 export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
-    const [referralCode, setReferralCode] = useState('');
-    const [temporaryReferralCode, setTemporaryReferralCode] = useState('');
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState(true);
@@ -69,6 +67,9 @@ export default function CodeTabs(props: Props) {
 
     const affiliateAddress = userDataStore.userAddress;
 
+    const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
+    const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
+
     const enterCodeContent = isSessionEstablished ? (
         userDataStore.refCode.value ? (
             !isEditing ? (
@@ -83,10 +84,7 @@ export default function CodeTabs(props: Props) {
                         </SimpleButton>
                         <SimpleButton
                             bg='accent1'
-                            onClick={() => {
-                                console.log('Update');
-                                setIsEditing(true);
-                            }}
+                            onClick={() => setIsEditing(true)}
                         >
                             Edit
                         </SimpleButton>
@@ -100,11 +98,9 @@ export default function CodeTabs(props: Props) {
                             {userDataStore.refCode.value}
                         </h6>
                         <input
+                            ref={updateReferralCodeInputRef}
                             type='text'
-                            value={temporaryReferralCode}
-                            onChange={(e) =>
-                                setTemporaryReferralCode(e.target.value)
-                            }
+                            defaultValue={userDataStore.refCode.value}
                         />
                     </div>
                     <div className={styles.refferal_code_buttons}>
@@ -112,20 +108,17 @@ export default function CodeTabs(props: Props) {
                             bg='accent1'
                             onClick={() => {
                                 setIsEditing(false);
-                                setTemporaryReferralCode('');
-                                if (temporaryReferralCode) {
-                                    setReferralCode(temporaryReferralCode);
-                                }
+                                userDataStore.setRefCode(
+                                    updateReferralCodeInputRef.current?.value ||
+                                        '',
+                                );
                             }}
                         >
                             Update
                         </SimpleButton>
                         <SimpleButton
                             bg='accent1'
-                            onClick={() => {
-                                setIsEditing(false);
-                                setTemporaryReferralCode('');
-                            }}
+                            onClick={() => setIsEditing(false)}
                         >
                             Cancel
                         </SimpleButton>
@@ -137,30 +130,23 @@ export default function CodeTabs(props: Props) {
                 <div className={styles.enterCodeContent}>
                     <h6>Enter a referral code</h6>
                     <input
+                        ref={updateReferralCodeInputRef2}
                         type='text'
-                        value={temporaryReferralCode}
-                        onChange={(e) =>
-                            setTemporaryReferralCode(e.target.value)
-                        }
+                        defaultValue={userDataStore.refCode.value}
                     />
                 </div>
                 <SimpleButton
                     bg='accent1'
                     onClick={() => {
                         setIsEditing(false);
-                        setTemporaryReferralCode('');
-                        setReferralCode(temporaryReferralCode);
+                        userDataStore.setRefCode(
+                            updateReferralCodeInputRef2.current?.value || '',
+                        );
                     }}
                 >
                     Update
                 </SimpleButton>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => {
-                        setIsEditing(false);
-                        setTemporaryReferralCode('');
-                    }}
-                >
+                <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
                     Cancel
                 </SimpleButton>
             </section>
