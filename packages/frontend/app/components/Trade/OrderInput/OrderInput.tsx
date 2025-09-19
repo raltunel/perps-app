@@ -1128,7 +1128,7 @@ function OrderInput({
                 el?.focus();
             }
         }, 850);
-    }, [tradeDirection]);
+    }, [tradeDirection, marketOrderType]);
 
     const sizeSliderPercentageValueProps = useMemo(
         () => ({
