@@ -74,86 +74,53 @@
         padding-right: var(--padding-s, 8px);
     }
 }
-
-/* =========================
-   EVERYTHING BELOW THIS IS RELATED TO MODAL STACKING, MAKING SURE NOTHING SITS ABOVE THE MODAL
-   ========================= */
-
 /* Stop background scroll when a modal is open */
 html.modal-open,
 html.modal-open body {
     overflow: hidden !important;
 }
 
-/* =========================
-   Header / PageHeader
-   ========================= */
-
-/* Demote the header and anything inside it while a modal is open */
+/* Demote header & trade page stacking, but DO NOT hide them */
 html.modal-open #pageHeader,
-html.modal-open #pageHeader * {
-    z-index: auto !important;
+html.modal-open #tradePageRoot,
+html.modal-open .root-container {
+    /* remove stacking-context creators so the overlay sits above */
     transform: none !important;
     filter: none !important;
     perspective: none !important;
-    mix-blend-mode: normal !important;
-    opacity: 1 !important;
-    isolation: auto !important;
     contain: none !important;
+    isolation: auto !important;
     will-change: auto !important;
-
-    /* prevent click-throughs while modal is up */
-    pointer-events: none !important;
 }
 
-/* Header popovers/dropdowns/tooltips */
-html.modal-open #pageHeader [class*='Dropdown'],
-html.modal-open #pageHeader [class*='Tooltip'],
-html.modal-open #pageHeader [class*='Menu'],
-html.modal-open #pageHeader [class*='Popover'] {
+/* Keep background visible, just non-interactive under the modal */
+html.modal-open #pageHeader,
+html.modal-open #mobileTradeTabs,
+html.modal-open #mobileBottomBar,
+html.modal-open .mobile-footer {
+    pointer-events: none !important; /* can't be clicked through modal */
     z-index: auto !important;
     transform: none !important;
-    box-shadow: none !important;
-    pointer-events: none !important;
+    box-shadow: none !important; /* avoid glowing edges over blur */
 }
 
+/* If your header nav becomes fixed on mobile, lower its “stickiness”
+   (still visible; just not floating above the overlay) */
 @media (max-width: 768px) {
     html.modal-open #pageHeader .nav {
-        position: static !important;
+        position: static !important; /* was: fixed */
         right: auto !important;
         top: auto !important;
         z-index: auto !important;
-        box-shadow: none !important;
         transform: none !important;
+        box-shadow: none !important;
     }
 }
 
-/* Demote Trade page stacking contexts  */
-html.modal-open #tradePageRoot {
-    transform: none !important;
-    filter: none !important;
-    perspective: none !important;
-    contain: none !important;
-    isolation: auto !important;
-    will-change: auto !important;
-}
-
-/* Hide/neutralize the mobile tab bar  */
-html.modal-open #mobileTradeTabs {
-    position: static !important;
-    z-index: auto !important;
-    transform: none !important;
-    box-shadow: none !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-}
-
-/* Hide/neutralize the mobile bottom nav if present */
-html.modal-open #mobileBottomBar,
-html.modal-open .mobile-footer {
-    position: static !important;
-    z-index: auto !important;
-    transform: none !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
+/* iOS Safari: disable momentum scrolling so it doesn't relayer content above the overlay */
+@supports (-webkit-touch-callout: none) {
+    html.modal-open .content,
+    html.modal-open #tradePageRoot {
+        -webkit-overflow-scrolling: auto !important;
+    }
 }
