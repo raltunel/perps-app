@@ -37,8 +37,6 @@ const availableTabs = ['Enter Code', 'Create Code', 'Claim'];
 export default function CodeTabs(props: Props) {
     const { initialTab = 'Enter Code' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
-
-    const userData = useUserDataStore();
     const [referralCode, setReferralCode] = useState('');
     const [temporaryReferralCode, setTemporaryReferralCode] = useState('');
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
@@ -74,15 +72,26 @@ export default function CodeTabs(props: Props) {
                         <h6>Current Affiliate Code</h6>
                         <p>{referralCode}</p>
                     </div>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => {
-                            console.log('Update');
-                            setIsEditing(true);
-                        }}
-                    >
-                        Edit
-                    </SimpleButton>
+                    <div>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => {
+                                console.log('Update');
+                                setIsEditing(true);
+                            }}
+                        >
+                            Submit
+                        </SimpleButton>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => {
+                                console.log('Update');
+                                setIsEditing(true);
+                            }}
+                        >
+                            Edit
+                        </SimpleButton>
+                    </div>
                 </section>
             ) : (
                 <section className={styles.sectionWithButton}>
