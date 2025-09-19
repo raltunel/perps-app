@@ -23,6 +23,18 @@ export interface UserDataStore {
 
 const LS_KEY = 'USER_DATA';
 
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: (_key: string) => null,
+              setItem: (_key: string, _value: string) => {},
+              removeItem: (_key: string) => {},
+              clear: () => {},
+              key: (_index: number) => null,
+              length: 0,
+          }) as Storage;
+
 export const useUserDataStore = create<UserDataStore>()(
     persist(
         (set, get) => {
@@ -133,9 +145,7 @@ export const useUserDataStore = create<UserDataStore>()(
         {
             // local storage key for persisted data
             name: LS_KEY,
-            // storage engine
-            storage: createJSONStorage(() => localStorage),
-            // version number (needed for migrations)
+            storage: createJSONStorage(ssrSafeStorage),
             version: 1,
             // data object to persist in local storage
             partialize: (state: UserDataStore) => ({

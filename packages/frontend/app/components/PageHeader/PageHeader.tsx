@@ -290,6 +290,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
+                        aria-label='Close navigation menu'
                     >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
@@ -347,40 +348,45 @@ export default function PageHeader() {
                     </Tooltip>
                 </nav>
                 <div className={styles.rightSide}>
-                    {isUserConnected && (
-                        <section
-                            style={{
-                                position: 'relative',
-                            }}
-                            ref={depositMenuRef}
-                        >
-                            <button
-                                className={styles.depositButton}
-                                onClick={() => {
-                                    if (isShortScreen) {
-                                        setIsDepositDropdownOpen(
-                                            !isDepositDropdownOpen,
-                                        );
-                                    } else {
-                                        openDepositModal();
-                                    }
-                                }}
+                    <span className={styles.depositSlot}>
+                        {isUserConnected ? (
+                            <section
+                                style={{ position: 'relative' }}
+                                ref={depositMenuRef}
                             >
-                                {isShortScreen ? 'Transfer' : 'Deposit'}
-                            </button>
-                            {isDepositDropdownOpen && (
-                                <DepositDropdown
-                                    isDropdown
-                                    marginBucket={marginBucket}
-                                    openDepositModal={openDepositModal}
-                                    openWithdrawModal={openWithdrawModal}
-                                    PortfolioModalsRenderer={
-                                        PortfolioModalsRenderer
-                                    }
-                                />
-                            )}
-                        </section>
-                    )}
+                                <button
+                                    className={styles.depositButton}
+                                    onClick={() => {
+                                        if (isShortScreen) {
+                                            setIsDepositDropdownOpen(
+                                                !isDepositDropdownOpen,
+                                            );
+                                        } else {
+                                            openDepositModal();
+                                        }
+                                    }}
+                                >
+                                    {isShortScreen ? 'Transfer' : 'Deposit'}
+                                </button>
+                                {isDepositDropdownOpen && (
+                                    <DepositDropdown
+                                        isDropdown
+                                        marginBucket={marginBucket}
+                                        openDepositModal={openDepositModal}
+                                        openWithdrawModal={openWithdrawModal}
+                                        PortfolioModalsRenderer={
+                                            PortfolioModalsRenderer
+                                        }
+                                    />
+                                )}
+                            </section>
+                        ) : (
+                            <div
+                                className={styles.depositButtonPlaceholder}
+                                aria-hidden
+                            />
+                        )}
+                    </span>
 
                     {isUserConnected && showRPCButton && (
                         <section
@@ -478,6 +484,7 @@ export default function PageHeader() {
                     <button
                         className={styles.internationalButton}
                         onClick={() => appSettingsModal.open()}
+                        aria-label='Open settings'
                     >
                         <LuSettings size={20} />
                     </button>
@@ -490,6 +497,7 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsDropdownMenuOpen(!isDropdownMenuOpen)
                             }
+                            aria-label='Open more options menu'
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
