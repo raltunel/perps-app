@@ -72,15 +72,14 @@ export default function CodeTabs(props: Props) {
                         <h6>Current Affiliate Code</h6>
                         <p>{referralCode}</p>
                     </div>
-                    <div>
+                    <div className={styles.refferal_code_buttons}>
                         <SimpleButton
                             bg='accent1'
                             onClick={() => {
-                                console.log('Update');
-                                setIsEditing(true);
+                                null;
                             }}
                         >
-                            Submit
+                            Confirm
                         </SimpleButton>
                         <SimpleButton
                             bg='accent1'

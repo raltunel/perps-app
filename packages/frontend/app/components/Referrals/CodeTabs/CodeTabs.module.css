@@ -108,6 +108,12 @@
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
 }
 
+.refferal_code_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-m);
+}
+
 .createCodeContent {
     width: 100%;
     height: 100%;
