@@ -1119,13 +1119,16 @@ function OrderInput({
         if (typeof window === 'undefined' || typeof document === 'undefined')
             return;
         if (window.innerWidth <= 768) return; // do not autofocus on mobile
+        const el = document.getElementById(
+            'trade-module-size-input',
+        ) as HTMLInputElement | null;
+
         setTimeout(() => {
-            const el = document.getElementById(
-                'trade-module-size-input',
-            ) as HTMLInputElement | null;
-            el?.focus();
-        }, 750);
-    }, []);
+            if (!notionalQtyNum) {
+                el?.focus();
+            }
+        }, 850);
+    }, [tradeDirection]);
 
     const sizeSliderPercentageValueProps = useMemo(
         () => ({
