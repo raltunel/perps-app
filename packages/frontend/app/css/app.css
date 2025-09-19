@@ -80,32 +80,30 @@ html.modal-open body {
     overflow: hidden !important;
 }
 
-/* Demote header & trade page stacking, but DO NOT hide them */
-html.modal-open #pageHeader,
-html.modal-open #tradePageRoot,
-html.modal-open .root-container {
-    /* remove stacking-context creators so the overlay sits above */
-    transform: none !important;
-    filter: none !important;
-    perspective: none !important;
-    contain: none !important;
-    isolation: auto !important;
-    will-change: auto !important;
+/* KEY FIX for iPhone:
+   make the main scroll container behave like the viewport while modal is open.
+   This prevents the 'fixed inside a scroller' layering bug. */
+html.modal-open .content {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden !important;
+    -webkit-overflow-scrolling: auto !important; /* disable momentum layer */
 }
 
-/* Keep background visible, just non-interactive under the modal */
+/* Keep background visible but unclickable under the modal */
 html.modal-open #pageHeader,
 html.modal-open #mobileTradeTabs,
 html.modal-open #mobileBottomBar,
 html.modal-open .mobile-footer {
-    pointer-events: none !important; /* can't be clicked through modal */
+    pointer-events: none !important;
     z-index: auto !important;
     transform: none !important;
-    box-shadow: none !important; /* avoid glowing edges over blur */
+    box-shadow: none !important;
 }
 
-/* If your header nav becomes fixed on mobile, lower its “stickiness”
-   (still visible; just not floating above the overlay) */
+/* If your header nav becomes fixed on mobile, neutralize that while open */
 @media (max-width: 768px) {
     html.modal-open #pageHeader .nav {
         position: static !important; /* was: fixed */
@@ -117,9 +115,8 @@ html.modal-open .mobile-footer {
     }
 }
 
-/* iOS Safari: disable momentum scrolling so it doesn't relayer content above the overlay */
+/* iOS-only guard for any remaining momentum scrollers */
 @supports (-webkit-touch-callout: none) {
-    html.modal-open .content,
     html.modal-open #tradePageRoot {
         -webkit-overflow-scrolling: auto !important;
     }

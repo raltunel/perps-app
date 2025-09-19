@@ -1,19 +1,23 @@
 .outside_modal {
     position: fixed;
-    top: 0px;
-    left: 0px;
+    inset: 0; /* shorthand for top/left/right/bottom:0 */
     width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic viewport height that adjusts to browser UI */
+    height: 100dvh;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+
     backdrop-filter: blur(10px);
-    z-index: 100000;
-    /* Prevent scrolling of background content */
+    -webkit-backdrop-filter: blur(10px); /* iOS needs this */
+
+    z-index: 2147483647; /* max practical */
+    transform: translateZ(0); /* force its own layer */
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+
     overflow: hidden;
-    /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
 }
 
