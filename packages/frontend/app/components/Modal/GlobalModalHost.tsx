@@ -114,6 +114,24 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         [present, update, dismiss, open],
     );
 
+    // Close on ESC while open
+    useEffect(() => {
+        if (!open) return;
+
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.defaultPrevented) return;
+            // 'Esc' for older browsers, 'Escape' standard
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                e.preventDefault();
+                e.stopPropagation();
+                dismiss('internal');
+            }
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [open, dismiss]);
+
     return (
         <ModalCtx.Provider value={ctxValue}>
             {children}
