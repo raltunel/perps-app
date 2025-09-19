@@ -74,50 +74,21 @@
         padding-right: var(--padding-s, 8px);
     }
 }
-/* Stop background scroll when a modal is open */
+/* Show a top-layer blur when any modal is open */
+html.modal-open body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 2147483646; /* just under .outside_modal */
+    pointer-events: auto; /* blocks taps to background */
+    /* tiny alpha is required for iOS to render the blur */
+    background: rgba(0, 0, 0, 0.01);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Optional: prevent background scroll while modal is open */
 html.modal-open,
 html.modal-open body {
     overflow: hidden !important;
-}
-
-/* KEY FIX for iPhone:
-   make the main scroll container behave like the viewport while modal is open.
-   This prevents the 'fixed inside a scroller' layering bug. */
-html.modal-open .content {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw;
-    height: 100dvh;
-    overflow: hidden !important;
-    -webkit-overflow-scrolling: auto !important; /* disable momentum layer */
-}
-
-/* Keep background visible but unclickable under the modal */
-html.modal-open #pageHeader,
-html.modal-open #mobileTradeTabs,
-html.modal-open #mobileBottomBar,
-html.modal-open .mobile-footer {
-    pointer-events: none !important;
-    z-index: auto !important;
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-/* If your header nav becomes fixed on mobile, neutralize that while open */
-@media (max-width: 768px) {
-    html.modal-open #pageHeader .nav {
-        position: static !important; /* was: fixed */
-        right: auto !important;
-        top: auto !important;
-        z-index: auto !important;
-        transform: none !important;
-        box-shadow: none !important;
-    }
-}
-
-/* iOS-only guard for any remaining momentum scrollers */
-@supports (-webkit-touch-callout: none) {
-    html.modal-open #tradePageRoot {
-        -webkit-overflow-scrolling: auto !important;
-    }
 }

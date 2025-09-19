@@ -36,6 +36,7 @@ import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import MobileFooter from './components/MobileFooter/MobileFooter';
+import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 // import { NATIVE_MINT } from '@solana/spl-token';
 
 // Added ComponentErrorBoundary to prevent entire app from crashing when a component fails
@@ -291,38 +292,40 @@ export default function App() {
                                     userEndpoint={USER_WS_ENDPOINT}
                                 >
                                     <TutorialProvider>
-                                        <WsConnectionChecker />
-                                        <WebSocketDebug />
-                                        <div className='root-container'>
-                                            {/* Added error boundary for header */}
-                                            <ComponentErrorBoundary>
-                                                <PageHeader />
-                                            </ComponentErrorBoundary>
-                                            <main
-                                                className={`content ${isHomePage ? 'home-page' : ''}`}
-                                            >
-                                                {/*  Added Suspense for async content loading */}
-                                                <Suspense
-                                                    fallback={
-                                                        <LoadingIndicator />
-                                                    }
+                                        <GlobalModalHost>
+                                            <WsConnectionChecker />
+                                            <WebSocketDebug />
+                                            <div className='root-container'>
+                                                {/* Added error boundary for header */}
+                                                <ComponentErrorBoundary>
+                                                    <PageHeader />
+                                                </ComponentErrorBoundary>
+                                                <main
+                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
                                                 >
-                                                    <ComponentErrorBoundary>
-                                                        <Outlet />
-                                                    </ComponentErrorBoundary>
-                                                </Suspense>
-                                            </main>
-                                            <ComponentErrorBoundary>
-                                                <footer className='mobile-footer'>
-                                                    <MobileFooter />
-                                                </footer>
-                                            </ComponentErrorBoundary>
+                                                    {/*  Added Suspense for async content loading */}
+                                                    <Suspense
+                                                        fallback={
+                                                            <LoadingIndicator />
+                                                        }
+                                                    >
+                                                        <ComponentErrorBoundary>
+                                                            <Outlet />
+                                                        </ComponentErrorBoundary>
+                                                    </Suspense>
+                                                </main>
+                                                <ComponentErrorBoundary>
+                                                    <footer className='mobile-footer'>
+                                                        <MobileFooter />
+                                                    </footer>
+                                                </ComponentErrorBoundary>
 
-                                            {/* Added error boundary for notifications */}
-                                            <ComponentErrorBoundary>
-                                                <Notifications />
-                                            </ComponentErrorBoundary>
-                                        </div>
+                                                {/* Added error boundary for notifications */}
+                                                <ComponentErrorBoundary>
+                                                    <Notifications />
+                                                </ComponentErrorBoundary>
+                                            </div>
+                                        </GlobalModalHost>
                                     </TutorialProvider>
                                     <RuntimeDomManipulation />
                                 </SdkProvider>
