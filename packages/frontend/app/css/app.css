@@ -74,20 +74,7 @@
         padding-right: var(--padding-s, 8px);
     }
 }
-/* Show a top-layer blur when any modal is open */
-html.modal-open body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 2147483646; /* just under .outside_modal */
-    pointer-events: auto; /* blocks taps to background */
-    /* tiny alpha is required for iOS to render the blur */
-    background: rgba(0, 0, 0, 0.01);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
 
-/* Optional: prevent background scroll while modal is open */
 html.modal-open,
 html.modal-open body {
     overflow: hidden !important;

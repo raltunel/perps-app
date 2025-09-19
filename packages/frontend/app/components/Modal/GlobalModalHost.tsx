@@ -62,7 +62,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         [payload],
     );
 
-    // html class for scroll lock (keeps your existing behavior)
+    // html class for scroll lock
     useEffect(() => {
         if (open) document.documentElement.classList.add('modal-open');
         else document.documentElement.classList.remove('modal-open');

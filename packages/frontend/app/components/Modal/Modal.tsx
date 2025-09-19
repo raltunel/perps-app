@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useMobile } from '~/hooks/useMediaQuery';
 import { useGlobalModal } from './GlobalModalHost';
-import styles from './Modal.module.css';
 
 type positions = 'center' | 'bottomRight' | 'bottomSheet';
 

@@ -1,37 +1,30 @@
-/* ========= Overlay (fixed to viewport, with blur) ========= */
 .outside_modal {
     position: fixed;
-    inset: 0;
+    top: 0px;
+    left: 0px;
     width: 100vw;
-    height: 100dvh;
-
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height that adjusts to browser UI */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-    /* Blur the whole app behind */
-    background: rgba(0, 0, 0, 0.01); /* tiny alpha helps iOS render the blur */
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-
-    z-index: 2147483647; /* above everything in the app */
-    transform: translateZ(0); /* force its own layer (iOS) */
-    -webkit-transform: translateZ(0);
-    will-change: transform;
-
+    z-index: 100000;
+    /* Prevent scrolling of background content */
     overflow: hidden;
+    /* Prevent swipe-up navigation gestures on iOS */
     overscroll-behavior: none;
     color: var(--text1);
 }
 
-/* Special styling when keyboard is visible (if you use it via className) */
+/* Special styling when keyboard is visible */
 .keyboardVisible {
+    /* Override height to use viewport rather than fixed value */
     height: auto !important;
     bottom: 0;
 }
 
-/* ------- Header row used inside center & bottom sheet ------- */
 .outside_modal header {
     width: 100%;
     display: flex;
@@ -39,9 +32,11 @@
     align-items: center;
     padding: var(--padding-s) var(--padding-m) var(--padding-m) var(--padding-m);
 }
+
 .outside_modal header h3 {
     font-size: var(--font-size-l, 24px);
 }
+
 .outside_modal header svg {
     cursor: pointer;
 }
@@ -49,43 +44,67 @@
     fill: var(--text1);
 }
 
-/* ============= Bottom Sheet container modifier ============= */
+/* Bottom sheet specific container style */
 .bottomSheetContainer {
+    /* Override the default modal container styles */
     justify-content: flex-end !important;
+
+    /* Remove any padding that might create empty space */
     padding: 0 !important;
     background: transparent !important;
 }
 
-/* The actual bottom sheet */
 .bottomSheet {
-    border-radius: var(--radius-m) 16px 0 0;
+    /* Style the actual content container */
+    border-radius: var(--radius-m) 16px 0 0; /* Rounded corners only at the top */
     background: var(--bg-dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     width: 100%;
-    max-height: 85dvh;
+
+    /* Key fixes for mobile browsers */
+    max-height: 85dvh; /* Dynamic viewport height - adapts to browser UI */
+
+    /* This is important: extend the background color all the way to the bottom */
     padding-bottom: env(safe-area-inset-bottom, 16px);
+
+    /* Ensure content is scrollable but modal itself doesn't scroll with page */
     overflow-y: auto;
     transform: translateY(100%);
     transition: transform 0.3s ease-out;
+
+    /* Prevent iOS safari bounce effect */
     overscroll-behavior: contain;
+
+    /* Add negative margin to avoid gap at bottom */
     margin-bottom: -1px;
 }
 
+/* Special handling when keyboard is active */
 .keyboardActive {
+    /* Adjust max-height to prevent overflow when keyboard is visible */
     max-height: 70dvh;
+
+    /* Enhance scroll experience when keyboard is open */
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+
+    /* Prevent animating when keyboard appears */
     transition: none !important;
+
+    /* Keep in place when keyboard is open */
     transform: translateY(0) !important;
+
+    /* Disable border-radius to maximize space when keyboard is visible */
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+
+    /* For older iOS Safari versions */
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
 }
 
-/* Grippy handle */
 .bottomSheetHandle {
     width: 100%;
     display: flex;
@@ -94,16 +113,19 @@
     cursor: grab;
     touch-action: none;
 }
+
 .bottomSheetHandle:active {
     cursor: grabbing;
 }
+
 .dragging {
     cursor: grabbing;
 }
+
 .handle {
     width: 36px;
     height: 4px;
-    background-color: #666;
+    background-color: #666; /* Darker handle to match dark theme */
     border-radius: 2px;
 }
 
@@ -111,64 +133,88 @@
 .slideUp {
     transform: translateY(0);
 }
+
 .slideDown {
     transform: translateY(100%);
 }
 
-/* ============= Centered modal content ============= */
+/* Center modal (non-bottom sheet) */
 .centerModal {
     flex-shrink: 0;
     border-radius: var(--radius-m);
     background: var(--bg-dark3, #1c1c22);
     box-shadow: 0px 0px 40px 0px rgba(6, 6, 12, 0.5);
     max-width: 90vw;
-    max-height: 90dvh;
+    max-height: 90dvh; /* Dynamic viewport height */
+    /* overflow-y: auto; */
 }
 
-/* Shared content area */
+/* Input element styling inside modal */
 .modalContent input,
 .modalContent textarea {
-    font-size: 16px !important; /* prevent iOS zoom */
+    /* Prevent iOS zoom on focus */
+    font-size: 16px !important;
+
+    /* Improve appearance when focused */
     outline: none;
 }
 
-/* iOS tweaks */
+/* Special styling for iOS keyboard */
 @supports (-webkit-touch-callout: none) {
+    /* iOS devices */
     .keyboardActive {
+        /* Fix for iOS keyboard positioning issues */
         position: absolute;
         top: auto;
         bottom: 0;
+
+        /* Fix height for iOS */
         max-height: unset;
+
+        /* Prevent scroll bounce */
         overscroll-behavior: none;
     }
+
     .keyboardVisible .bottomSheet {
+        /* Make sure the bottom sheet doesn't get hidden under keyboard */
         max-height: 50vh !important;
     }
 }
 
 @media (max-width: 768px) {
+    /* Add a spacer at the bottom to ensure content isn't hidden */
     .safeAreaSpacer {
+        height: env(safe-area-inset-bottom, 16px);
+
+        /* Add extra space for keyboard */
         height: calc(env(safe-area-inset-bottom, 16px) + 16px);
     }
+
+    /* For the keyboard-active case, increase the spacer */
     .keyboardActive .safeAreaSpacer {
         height: calc(env(safe-area-inset-bottom, 16px) + 36px);
     }
+
+    /* Fallback for browsers that don't support env() */
     @supports not (padding-bottom: env(safe-area-inset-bottom)) {
         .bottomSheet {
             padding-bottom: var(--padding-m);
         }
+
         .safeAreaSpacer {
-            height: 32px;
+            height: 32px; /* Extra padding when env() not supported */
         }
+
         .keyboardActive .safeAreaSpacer {
             height: 48px;
         }
     }
 }
 
-/* Optional: bottom-right variant keeps your spacing */
 .bottomRightContainer {
+    /* Override the default centering */
     justify-content: flex-end !important;
     align-items: flex-end !important;
+    /* Add some padding so modal isn't flush against edges */
     padding: var(--padding-m) !important;
 }
