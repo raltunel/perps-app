@@ -256,7 +256,7 @@ export default function AppOptions() {
                 onClick={() => {
                     activeOptions.applyDefaults();
                     setNumFormat(NumFormatTypes[0]);
-                    setBsColor('default');
+                    setBsColor('colors.default');
                     useAppSettings.getState().resetLayoutHeights();
 
                     // reset language to browser default or English if unsupported
