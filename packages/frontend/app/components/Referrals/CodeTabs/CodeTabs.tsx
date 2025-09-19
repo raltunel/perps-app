@@ -51,10 +51,21 @@ export default function CodeTabs(props: Props) {
         setActiveTab(tab);
     };
 
-    const isSessionEstablished = useMemo(
+    const isSessionEstablished = useMemo<boolean>(
         () => isEstablished(sessionState),
         [sessionState],
     );
+
+    // fn to confirm a referral code with FUUL and link to user's wallet address
+    async function confirmRefCode(): Promise<void> {
+        const isUserConnected = isEstablished(sessionState);
+        if (isUserConnected) {
+            await userDataStore.confirmRefCode(
+                sessionState.walletPublicKey || sessionState.sessionPublicKey,
+                sessionState.signMessage,
+            );
+        }
+    }
 
     const affiliateAddress = userDataStore.userAddress;
 
@@ -67,12 +78,7 @@ export default function CodeTabs(props: Props) {
                         <p>{userDataStore.refCode.value}</p>
                     </div>
                     <div className={styles.refferal_code_buttons}>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => {
-                                null;
-                            }}
-                        >
+                        <SimpleButton bg='accent1' onClick={confirmRefCode}>
                             Confirm
                         </SimpleButton>
                         <SimpleButton
