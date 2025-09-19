@@ -66,15 +66,13 @@ export default function CodeTabs(props: Props) {
     }
 
     // fn to update a referral code and trigger FUUL confirmation workflow
-    async function handleUpdateReferralCode(): Promise<void> {
+    async function handleUpdateReferralCode(r: string): Promise<void> {
         // toggle DOM to default view
         setIsEditing(false);
         // update referral code in store
-        userDataStore.setRefCode(
-            updateReferralCodeInputRef.current?.value || '',
-        );
+        userDataStore.setRefCode(r);
         // trigger FUUL confirmation workflow
-        confirmRefCode();
+        await confirmRefCode();
     }
 
     const affiliateAddress = userDataStore.userAddress;
@@ -118,7 +116,12 @@ export default function CodeTabs(props: Props) {
                     <div className={styles.refferal_code_buttons}>
                         <SimpleButton
                             bg='accent1'
-                            onClick={handleUpdateReferralCode}
+                            onClick={() =>
+                                handleUpdateReferralCode(
+                                    updateReferralCodeInputRef.current?.value ||
+                                        '',
+                                )
+                            }
                         >
                             Update
                         </SimpleButton>
@@ -141,7 +144,14 @@ export default function CodeTabs(props: Props) {
                         defaultValue={userDataStore.refCode.value}
                     />
                 </div>
-                <SimpleButton bg='accent1' onClick={handleUpdateReferralCode}>
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() =>
+                        handleUpdateReferralCode(
+                            updateReferralCodeInputRef2.current?.value || '',
+                        )
+                    }
+                >
                     Update
                 </SimpleButton>
                 <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
