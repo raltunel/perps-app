@@ -130,47 +130,30 @@ export function Document({ children }: { children: React.ReactNode }) {
                     href='/images/apple-touch-icon-180x180.png'
                 />
                 <link rel='manifest' href='/manifest.webmanifest' />
+                {/* Self-hosted fonts stylesheet (will take effect once /public/fonts/*.woff2 exist) */}
+                <link rel='stylesheet' href='/css/fonts.css' />
                 <Meta />
                 <Links />
-                {/* Preconnect to Google Fonts domains */}
-                <link
-                    rel='preconnect'
-                    href='https://fonts.googleapis.com'
-                    crossOrigin='anonymous'
-                />
-                <link
-                    rel='preconnect'
-                    href='https://fonts.gstatic.com'
-                    crossOrigin='anonymous'
-                />
-
-                {/* Single consolidated font request with all needed weights and families */}
-                <link
-                    rel='preload'
-                    as='style'
-                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Funnel+Display:wght@300..800&family=Inconsolata:wght@500&family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&display=swap&display=swap'
-                />
-                <link
-                    rel='stylesheet'
-                    href='https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Funnel+Display:wght@300..800&family=Inconsolata:wght@500&family=Lexend+Deca:wght@100;300&family=Roboto+Mono:wght@400&display=swap&display=swap'
-                    media='print'
-                    onLoad={(e) => {
-                        const target = e.target as HTMLLinkElement;
-                        target.media = 'all';
-                    }}
-                />
+                {/* Preload self-hosted fonts */}
                 <link
                     rel='preload'
                     as='font'
                     type='font/woff2'
-                    href='https://fonts.gstatic.com/s/lexenddeca/v24/K2F1fZFYk-dHSE0UPPuwQ5qnJy8.woff2'
+                    href='/fonts/lexenddeca-100.woff2'
                     crossOrigin='anonymous'
                 />
                 <link
                     rel='preload'
                     as='font'
                     type='font/woff2'
-                    href='https://fonts.gstatic.com/s/funneldisplay/v2/B50WF7FGv37QNVWgE0ga--4Pbb6dDYs.woff2'
+                    href='/fonts/lexenddeca-300.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/robotomono-400.woff2'
                     crossOrigin='anonymous'
                 />
                 {SHOULD_LOG_ANALYTICS && (
