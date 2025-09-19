@@ -65,6 +65,18 @@ export default function CodeTabs(props: Props) {
         }
     }
 
+    // fn to update a referral code and trigger FUUL confirmation workflow
+    async function handleUpdateReferralCode(): Promise<void> {
+        // toggle DOM to default view
+        setIsEditing(false);
+        // update referral code in store
+        userDataStore.setRefCode(
+            updateReferralCodeInputRef.current?.value || '',
+        );
+        // trigger FUUL confirmation workflow
+        confirmRefCode();
+    }
+
     const affiliateAddress = userDataStore.userAddress;
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
@@ -106,14 +118,7 @@ export default function CodeTabs(props: Props) {
                     <div className={styles.refferal_code_buttons}>
                         <SimpleButton
                             bg='accent1'
-                            onClick={() => {
-                                setIsEditing(false);
-                                userDataStore.setRefCode(
-                                    updateReferralCodeInputRef.current?.value ||
-                                        '',
-                                );
-                                confirmRefCode();
-                            }}
+                            onClick={handleUpdateReferralCode}
                         >
                             Update
                         </SimpleButton>
@@ -136,16 +141,7 @@ export default function CodeTabs(props: Props) {
                         defaultValue={userDataStore.refCode.value}
                     />
                 </div>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => {
-                        setIsEditing(false);
-                        userDataStore.setRefCode(
-                            updateReferralCodeInputRef2.current?.value || '',
-                        );
-                        confirmRefCode();
-                    }}
-                >
+                <SimpleButton bg='accent1' onClick={handleUpdateReferralCode}>
                     Update
                 </SimpleButton>
                 <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
