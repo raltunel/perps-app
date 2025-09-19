@@ -83,9 +83,9 @@ export const useAppSettings = create<AppSettingsStore>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
-            version: 2,
+            version: 3,
             migrate: (persistedState: unknown, version: number) => {
-                if (version < 2) {
+                if (version < 3) {
                     return {
                         ...(persistedState as AppSettingsStore),
                         bsColor: 'colors.default',
