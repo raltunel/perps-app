@@ -6,9 +6,8 @@ import React, {
     useMemo,
     useRef,
     useState,
+    type MouseEvent,
     type ReactNode,
-    MouseEvent,
-    TouchEvent,
 } from 'react';
 import { MdClose } from 'react-icons/md';
 import styles from './Modal.module.css';

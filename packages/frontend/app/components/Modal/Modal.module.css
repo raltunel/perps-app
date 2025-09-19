@@ -22,6 +22,7 @@
 
     overflow: hidden;
     overscroll-behavior: none;
+    color: var(--text1);
 }
 
 /* Special styling when keyboard is visible (if you use it via className) */

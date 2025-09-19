@@ -268,72 +268,71 @@ export default function App() {
 
     return (
         <>
-            <Layout>
-                <FogoSessionProvider
-                    endpoint={RPC_ENDPOINT}
-                    domain='https://perps.ambient.finance'
-                    tokens={[
-                        // NATIVE_MINT.toBase58(),
-                        'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
-                    ]}
-                    defaultRequestedLimits={{
-                        // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
-                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
-                            1_000_000_000n,
-                    }}
-                    enableUnlimited={true}
-                >
-                    <AppProvider>
-                        <UnifiedMarginDataProvider>
-                            <MarketDataProvider>
-                                <SdkProvider
-                                    environment={wsEnvironment}
-                                    marketEndpoint={MARKET_WS_ENDPOINT}
-                                    userEndpoint={USER_WS_ENDPOINT}
-                                >
-                                    <TutorialProvider>
-                                        <GlobalModalHost>
-                                            <WsConnectionChecker />
-                                            <WebSocketDebug />
-                                            <div className='root-container'>
-                                                {/* Added error boundary for header */}
-                                                <ComponentErrorBoundary>
-                                                    <PageHeader />
-                                                </ComponentErrorBoundary>
-                                                <main
-                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
+            {/* <Layout> */}
+            <FogoSessionProvider
+                endpoint={RPC_ENDPOINT}
+                domain='https://perps.ambient.finance'
+                tokens={[
+                    // NATIVE_MINT.toBase58(),
+                    'fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry',
+                ]}
+                defaultRequestedLimits={{
+                    // [NATIVE_MINT.toBase58()]: 1_500_000_000n,
+                    fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry: 1_000_000_000n,
+                }}
+                enableUnlimited={true}
+            >
+                <AppProvider>
+                    <UnifiedMarginDataProvider>
+                        <MarketDataProvider>
+                            <SdkProvider
+                                environment={wsEnvironment}
+                                marketEndpoint={MARKET_WS_ENDPOINT}
+                                userEndpoint={USER_WS_ENDPOINT}
+                            >
+                                <TutorialProvider>
+                                    <GlobalModalHost>
+                                        <WsConnectionChecker />
+                                        <WebSocketDebug />
+                                        <div className='root-container'>
+                                            {/* Added error boundary for header */}
+                                            <ComponentErrorBoundary>
+                                                <PageHeader />
+                                            </ComponentErrorBoundary>
+                                            <main
+                                                className={`content ${isHomePage ? 'home-page' : ''}`}
+                                            >
+                                                {/*  Added Suspense for async content loading */}
+                                                <Suspense
+                                                    fallback={
+                                                        <LoadingIndicator />
+                                                    }
                                                 >
-                                                    {/*  Added Suspense for async content loading */}
-                                                    <Suspense
-                                                        fallback={
-                                                            <LoadingIndicator />
-                                                        }
-                                                    >
-                                                        <ComponentErrorBoundary>
-                                                            <Outlet />
-                                                        </ComponentErrorBoundary>
-                                                    </Suspense>
-                                                </main>
-                                                <ComponentErrorBoundary>
-                                                    <footer className='mobile-footer'>
-                                                        <MobileFooter />
-                                                    </footer>
-                                                </ComponentErrorBoundary>
+                                                    <ComponentErrorBoundary>
+                                                        <Outlet />
+                                                    </ComponentErrorBoundary>
+                                                </Suspense>
+                                            </main>
+                                            <ComponentErrorBoundary>
+                                                <footer className='mobile-footer'>
+                                                    <MobileFooter />
+                                                </footer>
+                                            </ComponentErrorBoundary>
 
-                                                {/* Added error boundary for notifications */}
-                                                <ComponentErrorBoundary>
-                                                    <Notifications />
-                                                </ComponentErrorBoundary>
-                                            </div>
-                                        </GlobalModalHost>
-                                    </TutorialProvider>
-                                    <RuntimeDomManipulation />
-                                </SdkProvider>
-                            </MarketDataProvider>
-                        </UnifiedMarginDataProvider>
-                    </AppProvider>
-                </FogoSessionProvider>
-            </Layout>
+                                            {/* Added error boundary for notifications */}
+                                            <ComponentErrorBoundary>
+                                                <Notifications />
+                                            </ComponentErrorBoundary>
+                                        </div>
+                                    </GlobalModalHost>
+                                </TutorialProvider>
+                                <RuntimeDomManipulation />
+                            </SdkProvider>
+                        </MarketDataProvider>
+                    </UnifiedMarginDataProvider>
+                </AppProvider>
+            </FogoSessionProvider>
+            {/* </Layout> */}
         </>
     );
 }
