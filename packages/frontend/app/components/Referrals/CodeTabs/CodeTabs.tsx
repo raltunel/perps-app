@@ -112,6 +112,7 @@ export default function CodeTabs(props: Props) {
                                     updateReferralCodeInputRef.current?.value ||
                                         '',
                                 );
+                                confirmRefCode();
                             }}
                         >
                             Update
@@ -142,6 +143,7 @@ export default function CodeTabs(props: Props) {
                         userDataStore.setRefCode(
                             updateReferralCodeInputRef2.current?.value || '',
                         );
+                        confirmRefCode();
                     }}
                 >
                     Update
