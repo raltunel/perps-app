@@ -982,11 +982,25 @@ function OrderInput({
                         </Tooltip>
                     </div>
                     <div className={styles.actionButtonsContainer}>
-                        <button onClick={() => confirmOrderModal.open('scale')}>
+                        <button
+                            className={styles.toggleSwitch}
+                            role='switch'
+                            aria-checked='false'
+                            aria-label='Toggle order type'
+                            tabIndex={0}
+                            onClick={() => confirmOrderModal.open('scale')}
+                        >
                             <img src={flatSvg} alt='flat price distribution' />
                             Flat
                         </button>
-                        <button onClick={() => confirmOrderModal.open('scale')}>
+                        <button
+                            className={styles.toggleSwitch}
+                            role='switch'
+                            aria-checked='false'
+                            aria-label='Toggle order type'
+                            tabIndex={0}
+                            onClick={() => confirmOrderModal.open('scale')}
+                        >
                             <img src={evenSvg} alt='even price distribution' />
                             Evenly Split
                         </button>
@@ -2208,6 +2222,7 @@ function OrderInput({
                             <h3>Order Types</h3>
                             <button
                                 className={styles.trade_type_toggle}
+                                aria-label='Trade type'
                                 onClick={() => setShowLaunchpad(false)}
                             >
                                 <PiSquaresFour />
@@ -2264,6 +2279,7 @@ function OrderInput({
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}
+                                    aria-label='Trade type'
                                     onClick={() => setShowLaunchpad(true)}
                                 >
                                     <PiSquaresFour />
