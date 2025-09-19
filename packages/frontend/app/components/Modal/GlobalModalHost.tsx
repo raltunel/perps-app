@@ -11,7 +11,6 @@ import React, {
 } from 'react';
 import { MdClose } from 'react-icons/md';
 import styles from './Modal.module.css';
-import { createPortal } from 'react-dom';
 
 export type ModalPosition = 'center' | 'bottomRight' | 'bottomSheet';
 
@@ -43,9 +42,6 @@ export function useGlobalModal() {
 }
 
 export function GlobalModalHost({ children }: { children?: ReactNode }) {
-    const [mounted, setMounted] = React.useState(false);
-    React.useEffect(() => setMounted(true), []);
-
     const [open, setOpen] = useState(false);
     const [payload, setPayload] = useState<Payload | null>(null);
 
@@ -121,87 +117,76 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
     return (
         <ModalCtx.Provider value={ctxValue}>
             {children}
-            {mounted && open && payload
-                ? createPortal(
-                      <div
-                          className={`${styles.outside_modal} ${
-                              payload.position === 'bottomSheet'
-                                  ? styles.bottomSheetContainer
-                                  : payload.position === 'bottomRight'
-                                    ? styles.bottomRightContainer
-                                    : ''
-                          }`}
-                          role='dialog'
-                          aria-modal='true'
-                          aria-labelledby='global-modal-title'
-                          onClick={onBackdropClick}
-                      >
-                          {payload.position === 'bottomSheet' ? (
-                              <div
-                                  ref={sheetRef}
-                                  className={`${styles.bottomSheet} ${styles.slideUp}`}
-                                  onMouseMove={
-                                      drag.current.active
-                                          ? handleMouseMove
-                                          : undefined
-                                  }
-                                  onMouseUp={
-                                      drag.current.active
-                                          ? handleMouseUp
-                                          : undefined
-                                  }
-                                  onMouseLeave={
-                                      drag.current.active
-                                          ? handleMouseUp
-                                          : undefined
-                                  }
-                                  onTouchMove={handleTouchMove}
-                                  onTouchEnd={handleTouchEnd}
-                              >
-                                  <div
-                                      className={styles.bottomSheetHandle}
-                                      onMouseDown={handleMouseDown}
-                                      onTouchStart={handleTouchStart}
-                                  >
-                                      <div className={styles.handle} />
-                                  </div>
-                                  <header>
-                                      <span />
-                                      <h3 id='global-modal-title'>
-                                          {payload.title}
-                                      </h3>
-                                      <MdClose
-                                          onClick={() => dismiss('internal')}
-                                          color='var(--text2)'
-                                      />
-                                  </header>
-                                  <div className={styles.modalContent}>
-                                      {payload.content}
-                                      <div className={styles.safeAreaSpacer} />
-                                  </div>
-                              </div>
-                          ) : (
-                              <div className={styles.centerModal}>
-                                  <header>
-                                      <span />
-                                      <h3 id='global-modal-title'>
-                                          {payload.title}
-                                      </h3>
-                                      <MdClose
-                                          onClick={() => dismiss('internal')}
-                                          color='var(--text2)'
-                                      />
-                                  </header>
-                                  <div className={styles.modalContent}>
-                                      {payload.content}
-                                      <div className={styles.safeAreaSpacer} />
-                                  </div>
-                              </div>
-                          )}
-                      </div>,
-                      document.body,
-                  )
-                : null}
+            {open && payload && (
+                <div
+                    className={`${styles.outside_modal} ${
+                        payload.position === 'bottomSheet'
+                            ? styles.bottomSheetContainer
+                            : payload.position === 'bottomRight'
+                              ? styles.bottomRightContainer
+                              : ''
+                    }`}
+                    role='dialog'
+                    aria-modal='true'
+                    aria-labelledby='global-modal-title'
+                    onClick={onBackdropClick}
+                >
+                    {payload.position === 'bottomSheet' ? (
+                        <div
+                            ref={sheetRef}
+                            className={`${styles.bottomSheet} ${styles.slideUp}`}
+                            onMouseMove={
+                                drag.current.active
+                                    ? handleMouseMove
+                                    : undefined
+                            }
+                            onMouseUp={
+                                drag.current.active ? handleMouseUp : undefined
+                            }
+                            onMouseLeave={
+                                drag.current.active ? handleMouseUp : undefined
+                            }
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
+                        >
+                            <div
+                                className={styles.bottomSheetHandle}
+                                onMouseDown={handleMouseDown}
+                                onTouchStart={handleTouchStart}
+                            >
+                                <div className={styles.handle} />
+                            </div>
+                            <header>
+                                <span />
+                                <h3 id='global-modal-title'>{payload.title}</h3>
+                                <MdClose
+                                    onClick={() => dismiss('internal')}
+                                    color='var(--text2)'
+                                />
+                            </header>
+                            <div className={styles.modalContent}>
+                                {payload.content}
+                                <div className={styles.safeAreaSpacer} />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className={styles.centerModal}>
+                            <header>
+                                <span />
+                                <h3 id='global-modal-title'>{payload.title}</h3>
+                                <MdClose
+                                    onClick={() => dismiss('internal')}
+                                    color='var(--text2)'
+                                />
+                            </header>
+                            <div className={styles.modalContent}>
+                                {payload.content}
+                                <div className={styles.safeAreaSpacer} />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
         </ModalCtx.Provider>
     );
 }
