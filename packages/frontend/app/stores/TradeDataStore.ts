@@ -148,7 +148,7 @@ const useTradeDataStore = create<TradeDataStore>()(
         }),
         {
             name: 'TRADE_DATA',
-            version: 2, // Bump version for migration!
+            version: 3, // Bump version for migration!
             migrate: (persistedState: unknown, version: number) => {
                 if (version < 1) {
                     const currentFavKeys =
@@ -166,7 +166,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                         favKeys: currentFavKeys,
                     };
                 }
-                if (version < 2) {
+                if (version < 3) {
                     return {
                         ...(persistedState as TradeDataStore),
                         selectedTradeTab: 'common.positions',
