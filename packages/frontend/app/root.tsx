@@ -12,7 +12,7 @@ import {
 
 // Components
 import Notifications from '~/components/Notifications/Notifications';
-import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator';
+// import LoadingIndicator from './components/LoadingIndicator/LoadingIndicator'; // temporarily disabled
 import PageHeader from './components/PageHeader/PageHeader';
 import MobileFooter from './components/MobileFooter/MobileFooter';
 import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
@@ -42,6 +42,7 @@ import { useDebugStore } from './stores/DebugStore';
 import './css/app.css';
 import './css/index.css';
 import { getResolutionSegment } from './utils/functions/getSegment';
+import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -237,7 +238,7 @@ export default function App() {
                                             >
                                                 <Suspense
                                                     fallback={
-                                                        <LoadingIndicator />
+                                                        <LogoLoadingIndicator />
                                                     }
                                                 >
                                                     <Outlet />
