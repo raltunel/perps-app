@@ -114,6 +114,11 @@ export function Document({ children }: { children: React.ReactNode }) {
         <html lang='en'>
             <head>
                 <meta charSet='utf-8' />
+                {/* Restrict styles and fonts to self-hosted only so package @import to Google Fonts is blocked */}
+                <meta
+                    httpEquiv='Content-Security-Policy'
+                    content="style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:;"
+                />
                 <meta
                     name='viewport'
                     content='width=device-width, initial-scale=1'
@@ -154,6 +159,71 @@ export function Document({ children }: { children: React.ReactNode }) {
                     as='font'
                     type='font/woff2'
                     href='/fonts/robotomono-400.woff2'
+                    crossOrigin='anonymous'
+                />
+                {/* Preload DM Sans weights used across UI */}
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/dmsans-400.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/dmsans-500.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/dmsans-700.woff2'
+                    crossOrigin='anonymous'
+                />
+                {/* Preload Funnel Display weights used by sessions-sdk */}
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-300.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-400.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-500.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-600.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-700.woff2'
+                    crossOrigin='anonymous'
+                />
+                <link
+                    rel='preload'
+                    as='font'
+                    type='font/woff2'
+                    href='/fonts/funneldisplay-800.woff2'
                     crossOrigin='anonymous'
                 />
                 {SHOULD_LOG_ANALYTICS && (
