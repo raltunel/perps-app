@@ -49,6 +49,18 @@ type AppSettingsStore = {
 const LS_KEY = 'VISUAL_SETTINGS';
 const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 
+const ssrSafeStorage = () =>
+    (typeof window !== 'undefined'
+        ? window.localStorage
+        : {
+              getItem: (_key: string) => null,
+              setItem: (_key: string, _value: string) => {},
+              removeItem: (_key: string) => {},
+              clear: () => {},
+              key: (_index: number) => null,
+              length: 0,
+          }) as Storage;
+
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
         (set, get) => ({
@@ -70,7 +82,7 @@ export const useAppSettings = create<AppSettingsStore>()(
         }),
         {
             name: LS_KEY,
-            storage: createJSONStorage(() => localStorage),
+            storage: createJSONStorage(ssrSafeStorage),
             version: 2,
             migrate: (persistedState: unknown, version: number) => {
                 if (version < 2) {

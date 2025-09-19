@@ -45,6 +45,8 @@ export default function InputField({
                     color: isDragging ? knobColor : 'inherit',
                 }}
                 placeholder=''
+                autoComplete='off'
+                spellCheck={false}
             />
             {!modalMode && <span className={styles.valueSuffix}>x</span>}
         </div>
