@@ -128,7 +128,7 @@ export default function CodeTabs(props: Props) {
                         />
                         {codeLength > CODE_CHARACTER_LIMIT ? (
                             <div className={styles.max_character_count}>
-                                <GiCancel />
+                                <GiCancel size={10} color='var(--red)' />
                                 <p>
                                     Please delete{' '}
                                     {codeLength - CODE_CHARACTER_LIMIT}{' '}
@@ -137,7 +137,7 @@ export default function CodeTabs(props: Props) {
                             </div>
                         ) : (
                             <div className={styles.max_character_count}>
-                                <FaCheck size={8} color='var(--green)' />
+                                <FaCheck size={10} color='var(--green)' />
                                 <p>Max 30 characters.</p>
                             </div>
                         )}
