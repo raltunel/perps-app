@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { Fuul } from '@fuul/sdk';
+import { useUrlParams } from '~/hooks/useURLParams';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -54,6 +55,8 @@ export default function CodeTabs(props: Props) {
         [sessionState],
     );
 
+    const handleReferralURLParam = useUrlParams('af');
+
     // fn to confirm a referral code with FUUL and link to user's wallet address
     async function confirmRefCode(): Promise<void> {
         const isUserConnected = isEstablished(sessionState);
@@ -67,6 +70,7 @@ export default function CodeTabs(props: Props) {
 
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
+        handleReferralURLParam.set(r);
         // toggle DOM to default view
         setIsEditing(false);
         // update referral code in store
@@ -471,4 +475,7 @@ export default function CodeTabs(props: Props) {
             </motion.div>
         </div>
     );
+}
+function useURLParams(arg0: string) {
+    throw new Error('Function not implemented.');
 }
