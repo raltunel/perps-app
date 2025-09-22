@@ -308,9 +308,6 @@ export default function PageHeader() {
                                         marginBucket={marginBucket}
                                         openDepositModal={openDepositModal}
                                         openWithdrawModal={openWithdrawModal}
-                                        PortfolioModalsRenderer={
-                                            PortfolioModalsRenderer
-                                        }
                                     />
                                 )}
                             </section>
