@@ -67,6 +67,7 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         if (open) document.documentElement.classList.add('modal-open');
         else document.documentElement.classList.remove('modal-open');
     }, [open]);
+    const backdropPointerDownOnSelf = useRef(false);
 
     // ---- bottom sheet drag (simple & robust) ----
     const sheetRef = useRef<HTMLDivElement | null>(null);
@@ -103,11 +104,6 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
         onDragStart(e.touches[0].clientY);
     const handleTouchMove = (e: TouchEvent) => onDragMove(e.touches[0].clientY);
     const handleTouchEnd = () => onDragEnd();
-
-    // backdrop click (clicking overlay closes)
-    const onBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.target === e.currentTarget) dismiss('internal');
-    };
 
     const ctxValue = useMemo<Ctx>(
         () => ({ present, update, dismiss, isOpen: open }),
@@ -147,7 +143,22 @@ export function GlobalModalHost({ children }: { children?: ReactNode }) {
                     role='dialog'
                     aria-modal='true'
                     aria-labelledby='global-modal-title'
-                    onClick={onBackdropClick}
+                    onPointerDown={(e) => {
+                        backdropPointerDownOnSelf.current =
+                            e.target === e.currentTarget;
+                    }}
+                    onPointerUp={(e) => {
+                        if (
+                            backdropPointerDownOnSelf.current &&
+                            e.target === e.currentTarget
+                        ) {
+                            dismiss('internal');
+                        }
+                        backdropPointerDownOnSelf.current = false;
+                    }}
+                    onPointerCancel={() => {
+                        backdropPointerDownOnSelf.current = false;
+                    }}
                 >
                     {payload.position === 'bottomSheet' ? (
                         <div
