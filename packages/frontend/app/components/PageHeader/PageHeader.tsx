@@ -34,7 +34,11 @@ import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
-import { useUrlParams, type UrlParamMethodsIF } from '~/hooks/useURLParams';
+import {
+    URL_PARAMS,
+    useUrlParams,
+    type UrlParamMethodsIF,
+} from '~/hooks/useURLParams';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -44,9 +48,8 @@ export default function PageHeader() {
         setIsFeedbackOpen(false);
     };
 
-    const FUUL_REFERRAL_CODE_FROM_URL_PARAM = 'af';
     const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
-        FUUL_REFERRAL_CODE_FROM_URL_PARAM,
+        URL_PARAMS.referralCode,
     );
 
     // logic to read a URL referral code and set in state + local storage
