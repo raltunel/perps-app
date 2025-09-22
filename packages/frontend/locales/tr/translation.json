@@ -51,7 +51,7 @@
         "confirmLimitBuyOrder": "Limitli Alım Emrini Onayla",
         "confirmLimitSellOrder": "Limitli Satış Emrini Onayla",
         "availableToTrade": "İşlem Yapılabilir Tutar",
-        "availableToTradeTooltip": "{{symbol}} yatırıldı",
+        "availableToTradeTooltip": "Yatırılan {{symbol}}",
         "currentPosition": "Mevcut Pozisyon",
         "currentPositionTooltip": "Mevcut {{symbol}} pozisyon büyüklüğü",
         "maxOpenInterestReached": "Maksimum Açık Pozisyon Limiti Ulaşıldı",
