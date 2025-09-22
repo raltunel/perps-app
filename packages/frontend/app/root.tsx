@@ -46,6 +46,7 @@ import { useDebugStore } from './stores/DebugStore';
 import './css/app.css';
 import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
+import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -296,27 +297,29 @@ export default function App() {
                                 userEndpoint={USER_WS_ENDPOINT}
                             >
                                 <TutorialProvider>
-                                    <ErrorBoundary>
-                                        <WsConnectionChecker />
-                                        <WebSocketDebug />
-                                        <div className='root-container'>
-                                            <PageHeader />
-                                            <main
-                                                className={`content ${isHomePage ? 'home-page' : ''}`}
-                                            >
-                                                <Suspense
-                                                    fallback={
-                                                        <LogoLoadingIndicator />
-                                                    }
+                                    <GlobalModalHost>
+                                        <ErrorBoundary>
+                                            <WsConnectionChecker />
+                                            <WebSocketDebug />
+                                            <div className='root-container'>
+                                                <PageHeader />
+                                                <main
+                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
                                                 >
-                                                    <Outlet />
-                                                </Suspense>
-                                            </main>
-                                            <MobileFooter />
-                                            <Notifications />
-                                        </div>
-                                        <RuntimeDomManipulation />
-                                    </ErrorBoundary>
+                                                    <Suspense
+                                                        fallback={
+                                                            <LogoLoadingIndicator />
+                                                        }
+                                                    >
+                                                        <Outlet />
+                                                    </Suspense>
+                                                </main>
+                                                <MobileFooter />
+                                                <Notifications />
+                                            </div>
+                                            <RuntimeDomManipulation />
+                                        </ErrorBoundary>
+                                    </GlobalModalHost>
                                 </TutorialProvider>
                             </SdkProvider>
                         </MarketDataProvider>
