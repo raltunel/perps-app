@@ -114,14 +114,6 @@ export function Document({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    useEffect(() => {
-        if (FUUL_API_KEY) {
-            Fuul.init({
-                apiKey: FUUL_API_KEY,
-            });
-        }
-    }, [FUUL_API_KEY]);
-
     return (
         <html lang='en'>
             <head>
