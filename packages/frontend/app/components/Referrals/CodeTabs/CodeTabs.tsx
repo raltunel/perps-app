@@ -12,6 +12,8 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { Fuul } from '@fuul/sdk';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
+import { FaCheck } from 'react-icons/fa';
+import { GiCancel } from 'react-icons/gi';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -79,6 +81,11 @@ export default function CodeTabs(props: Props) {
         await confirmRefCode();
     }
 
+    const CODE_CHARACTER_LIMIT = 30;
+    const [codeLength, setCodeLength] = useState<number>(
+        userDataStore.refCode.value?.length || 0,
+    );
+
     const affiliateAddress = userDataStore.userAddress;
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
@@ -115,7 +122,25 @@ export default function CodeTabs(props: Props) {
                             ref={updateReferralCodeInputRef}
                             type='text'
                             defaultValue={userDataStore.refCode.value}
+                            onChange={(e) =>
+                                setCodeLength(e.target.value.length)
+                            }
                         />
+                        {codeLength > CODE_CHARACTER_LIMIT ? (
+                            <div className={styles.max_character_count}>
+                                <GiCancel />
+                                <p>
+                                    Please delete{' '}
+                                    {codeLength - CODE_CHARACTER_LIMIT}{' '}
+                                    characters.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className={styles.max_character_count}>
+                                <FaCheck size={8} color='var(--green)' />
+                                <p>Max 30 characters.</p>
+                            </div>
+                        )}
                     </div>
                     <div className={styles.refferal_code_buttons}>
                         <SimpleButton
@@ -346,7 +371,7 @@ export default function CodeTabs(props: Props) {
                             </a>
                         </div>
                     )}
-                    <p>
+                    <p className={styles.trackingLinkExplanation}>
                         You will receive <span>10%</span> of referred users fees
                         and they will receive a <span>4%</span> discount. See
                         the Docs for more.

@@ -79,10 +79,6 @@
     font-size: var(--font-size-xs);
 }
 
-.enterCodeContent > p > span {
-    color: var(--accent3);
-}
-
 .enterCodeContent input {
     height: 36px;
     padding: 0 var(--padding-s, 10px);
@@ -106,6 +102,14 @@
     border-color: color-mix(in oklab, var(--accent1, #7371fc) 70%, #ffffff 30%);
     box-shadow: 0 0 0 2px
         color-mix(in oklab, var(--accent1, #7371fc) 55%, transparent);
+}
+
+.max_character_count {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s, 10px);
+    align-items: center;
+    font-size: var(--font-size-xs);
 }
 
 /* wrapper around CONFIRM and EDIT buttons */
@@ -138,7 +142,7 @@
     text-decoration: underline;
 }
 
-.createCodeContent p span {
+.trackingLinkExplanation > span {
     color: var(--accent2, #75f0d3);
 }
 
