@@ -26,7 +26,6 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
-import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 
 // Config
 import {
@@ -46,6 +45,8 @@ import { useDebugStore } from './stores/DebugStore';
 import './css/app.css';
 import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
+import { GlobalModalHost } from './components/Modal/GlobalModalHost';
+import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -292,27 +293,31 @@ export default function App() {
                                 userEndpoint={USER_WS_ENDPOINT}
                             >
                                 <TutorialProvider>
-                                    <ErrorBoundary>
-                                        <WsConnectionChecker />
-                                        <WebSocketDebug />
-                                        <div className='root-container'>
-                                            <PageHeader />
-                                            <main
-                                                className={`content ${isHomePage ? 'home-page' : ''}`}
-                                            >
-                                                <Suspense
-                                                    fallback={
-                                                        <LogoLoadingIndicator />
-                                                    }
+                                    <GlobalModalHost>
+                                        <ErrorBoundary>
+                                            <WsConnectionChecker />
+                                            <WebSocketDebug />
+                                            <div className='root-container'>
+                                                {/* Track page views */}
+                                                <PageViewTracker />
+                                                <PageHeader />
+                                                <main
+                                                    className={`content ${isHomePage ? 'home-page' : ''}`}
                                                 >
-                                                    <Outlet />
-                                                </Suspense>
-                                            </main>
-                                            <MobileFooter />
-                                            <Notifications />
-                                        </div>
-                                        <RuntimeDomManipulation />
-                                    </ErrorBoundary>
+                                                    <Suspense
+                                                        fallback={
+                                                            <LogoLoadingIndicator />
+                                                        }
+                                                    >
+                                                        <Outlet />
+                                                    </Suspense>
+                                                </main>
+                                                <MobileFooter />
+                                                <Notifications />
+                                            </div>
+                                            <RuntimeDomManipulation />
+                                        </ErrorBoundary>
+                                    </GlobalModalHost>
                                 </TutorialProvider>
                             </SdkProvider>
                         </MarketDataProvider>
