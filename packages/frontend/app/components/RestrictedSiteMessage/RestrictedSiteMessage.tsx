@@ -1269,8 +1269,10 @@ export function RestrictedSiteMessage({ onClose }: RestrictedSiteMessageProps) {
             .then((data) => {
                 const countryISOCode = data.country;
                 const countryName = getCountryName(countryISOCode);
-                console.log({ countryName });
-                setCountryName(countryName);
+                const prefix = ['US', 'GB'].includes(countryISOCode)
+                    ? 'the '
+                    : '';
+                setCountryName(`${prefix}${countryName}`);
             })
             .catch((error) => {
                 console.error('Error fetching country:', error);
