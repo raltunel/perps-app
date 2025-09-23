@@ -65,10 +65,16 @@ export default function CodeTabs(props: Props) {
     async function confirmRefCode(): Promise<void> {
         const isUserConnected = isEstablished(sessionState);
         if (isUserConnected) {
-            await userDataStore.confirmRefCode(
-                sessionState.walletPublicKey || sessionState.sessionPublicKey,
-                sessionState.signMessage,
-            );
+            // await userDataStore.confirmRefCode(
+            //     sessionState.walletPublicKey || sessionState.sessionPublicKey,
+            //     sessionState.signMessage,
+            // );
+            referralStore.confirm({
+                walletKey:
+                    sessionState.walletPublicKey ||
+                    sessionState.sessionPublicKey,
+                signMessage: sessionState.signMessage,
+            });
         }
     }
 
