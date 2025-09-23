@@ -27,7 +27,7 @@ const ssrSafeStorage = () =>
               length: 0,
           }) as Storage;
 
-export const useUserDataStore = create<ReferralStore>()(
+export const useReferralStore = create<ReferralStore>()(
     persist(
         (set, get) => {
             // obj returned to app when store is instantiated
