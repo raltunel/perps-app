@@ -1303,7 +1303,7 @@ export function RestrictedSiteMessage({ onClose }: RestrictedSiteMessageProps) {
                     lineHeight: 1.5,
                 }}
             >
-                {`We're sorry, but this website is not available in ${countryName || 'your region'} due to local regulations.`}
+                {`We're sorry, but this website is currently restricted in ${countryName || 'your region'} due to local regulations.`}
             </p>
             <p
                 style={{
