@@ -12,6 +12,7 @@ export interface ReferralStore {
     all: RefCode[];
     add(rc: RefCode): void;
     enable(addr: string): void;
+    disable(): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
@@ -65,6 +66,9 @@ export const useReferralStore = create<ReferralStore>()(
                     } catch (e) {
                         console.error(e);
                     }
+                },
+                disable(): void {
+                    set({ active: null });
                 },
             };
         },
