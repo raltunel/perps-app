@@ -11,6 +11,7 @@ export interface ReferralStore {
     active: RefCode | null;
     all: RefCode[];
     add(rc: RefCode): void;
+    enable(addr: string): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
@@ -47,6 +48,23 @@ export const useReferralStore = create<ReferralStore>()(
                             ),
                         ],
                     });
+                },
+                enable(addr: string): void {
+                    try {
+                        const persisted: RefCode | undefined = get().all.find(
+                            (rc: RefCode) =>
+                                rc.wallet.toLowerCase() === addr.toLowerCase(),
+                        );
+                        if (!persisted) {
+                            throw new Error(
+                                'Referral code not found for address: ' + addr,
+                            );
+                        } else {
+                            set({ active: persisted });
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                 },
             };
         },
