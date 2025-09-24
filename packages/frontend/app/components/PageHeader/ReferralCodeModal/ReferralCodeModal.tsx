@@ -1,7 +1,15 @@
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import styles from './ReferralCodeModal.module.css';
+import { useNavigate } from 'react-router';
 
-export default function ReferralCodeModal() {
+interface PropsIF {
+    close: () => void;
+}
+
+export default function ReferralCodeModal(props: PropsIF) {
+    const { close } = props;
+
+    const navigate = useNavigate();
     return (
         <section className={styles.referral_code_modal}>
             <p>
@@ -10,7 +18,14 @@ export default function ReferralCodeModal() {
             </p>
             <div className={styles.button_container}>
                 <SimpleButton>Confirm</SimpleButton>
-                <SimpleButton>Details</SimpleButton>
+                <SimpleButton
+                    onClick={(): void => {
+                        close();
+                        navigate('/v2/referrals');
+                    }}
+                >
+                    Details
+                </SimpleButton>
             </div>
         </section>
     );

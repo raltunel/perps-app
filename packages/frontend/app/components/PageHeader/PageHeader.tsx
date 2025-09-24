@@ -539,11 +539,11 @@ export default function PageHeader() {
             )}
             {referralCodeModal.isOpen && (
                 <Modal
-                    close={() => referralCodeModal.close()}
+                    close={referralCodeModal.close}
                     position='center'
                     title='Referral Code'
                 >
-                    <ReferralCodeModal />
+                    <ReferralCodeModal close={referralCodeModal.close} />
                 </Modal>
             )}
             {PortfolioModalsRenderer}
