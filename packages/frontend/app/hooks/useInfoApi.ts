@@ -369,8 +369,6 @@ export function useInfoApi() {
             }),
         });
 
-        console.log('>>>> fetchObSnapshot response', response);
-
         const data = await response.json();
         const { buys, sells } = processOrderBookMessage(data);
         return { buys, sells };
