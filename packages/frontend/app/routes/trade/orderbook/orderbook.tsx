@@ -83,6 +83,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
     const [canSubscribe, setCanSubscribe] = useState(false);
 
+    const canSubscribeRef = useRef(false);
+    canSubscribeRef.current = canSubscribe;
+
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
@@ -184,6 +187,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setOrderBook(buys, sells);
         setOrderBookState(TableState.FILLED);
         setCanSubscribe(true);
+        canSubscribeRef.current = true;
     }, [fetchObSnapshot, symbol, setOrderBook]);
 
     useEffect(() => {
@@ -290,15 +294,17 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [selectedResolution, symbol]);
 
     useEffect(() => {
+        console.log('>>>> useEffect fetchob', symbol);
         setCanSubscribe(false);
+        canSubscribeRef.current = false;
         setOrderBookState(TableState.LOADING);
         fetchOb();
-    }, [subKey, info, symbol]);
+    }, [symbol]);
 
     useEffect(() => {
-        if (!subKey || !info || !canSubscribe) return;
+        if (!subKey || !info || !canSubscribeRef.current) return;
 
-        console.log('>>>> subscribe', subKey);
+        console.log('>>>> subscribe', subKey, canSubscribeRef.current);
         const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
         return () => {
