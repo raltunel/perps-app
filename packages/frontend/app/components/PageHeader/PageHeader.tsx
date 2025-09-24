@@ -39,6 +39,7 @@ import {
     useUrlParams,
     type UrlParamMethodsIF,
 } from '~/hooks/useURLParams';
+import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -153,8 +154,14 @@ export default function PageHeader() {
         setIsHelpDropdownOpen(false);
     }, isHelpDropdownOpen);
 
-    // logic to open and close the app settings modal
+    // logic to open and close modals
     const appSettingsModal = useModal('closed');
+    const referralCodeModal = useModal('closed');
+
+    // temp handler to manually toggle referral code modal
+    useKeydown('m', referralCodeModal.toggle, [
+        JSON.stringify(referralCodeModal),
+    ]);
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -267,6 +274,8 @@ export default function PageHeader() {
                 //         // showErrorToast('Failed to identify user. Please try again.');
                 //     }
                 // })();
+
+                referralCodeModal.open();
             }
             localStorage.removeItem('loginButtonClickTime');
         } else if (
@@ -526,6 +535,15 @@ export default function PageHeader() {
                     title='Options'
                 >
                     <AppOptions />
+                </Modal>
+            )}
+            {referralCodeModal.isOpen && (
+                <Modal
+                    close={() => referralCodeModal.close()}
+                    position='center'
+                    title='Referral Code'
+                >
+                    <ReferralCodeModal />
                 </Modal>
             )}
             {PortfolioModalsRenderer}
