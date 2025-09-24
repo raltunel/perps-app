@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import './i18n'; // i18n MUST be imported before any components
+import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
 import {
     isRouteErrorResponse,
     Links,
@@ -35,6 +36,7 @@ import {
     USER_WS_ENDPOINT,
     SHOULD_LOG_ANALYTICS,
     SPLIT_TEST_VERSION,
+    IS_RESTRICTED_SITE,
 } from './utils/Constants';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
@@ -47,6 +49,8 @@ import './css/app.css';
 import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
+import { useModal } from './hooks/useModal';
+import Modal from './components/Modal/Modal';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -277,6 +281,8 @@ export default function App() {
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
 
+    const restrictedSiteModal = useModal('closed');
+
     return (
         <Document>
             <FogoSessionProvider
@@ -287,6 +293,12 @@ export default function App() {
                     fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry: 1_000_000_000n,
                 }}
                 enableUnlimited={true}
+                onStartSessionInit={() => {
+                    if (IS_RESTRICTED_SITE) {
+                        restrictedSiteModal.open();
+                    }
+                    return !IS_RESTRICTED_SITE;
+                }}
             >
                 <AppProvider>
                     <UnifiedMarginDataProvider>
@@ -316,6 +328,21 @@ export default function App() {
                                                 </main>
                                                 <MobileFooter />
                                                 <Notifications />
+                                                {restrictedSiteModal.isOpen && (
+                                                    <Modal
+                                                        close={() =>
+                                                            restrictedSiteModal.close()
+                                                        }
+                                                        position={'center'}
+                                                        title=''
+                                                    >
+                                                        <RestrictedSiteMessage
+                                                            onClose={
+                                                                restrictedSiteModal.close
+                                                            }
+                                                        />
+                                                    </Modal>
+                                                )}
                                             </div>
                                             <RuntimeDomManipulation />
                                         </ErrorBoundary>

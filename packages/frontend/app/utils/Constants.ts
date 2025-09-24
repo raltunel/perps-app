@@ -220,3 +220,6 @@ export const languageOptions = {
     ko: '한국어 🇰🇷',
     zh: '中文 (简体) 🇨🇳',
 };
+export const IS_RESTRICTED_SITE =
+    import.meta.env.VITE_IS_RESTRICTED_SITE &&
+    import.meta.env.VITE_IS_RESTRICTED_SITE.toLowerCase() === 'true';
