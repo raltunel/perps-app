@@ -502,8 +502,13 @@ export default function Trade() {
                                 }
 
                                 const tableHeight = available - next;
+                                const startHeight =
+                                    available - startHeightRef.current;
 
-                                if (tableHeight <= TABLE_COLLAPSE_TRIGGER) {
+                                if (
+                                    tableHeight <= TABLE_COLLAPSE_TRIGGER &&
+                                    !(startHeight <= TABLE_COLLAPSED)
+                                ) {
                                     // SNAP DOWN: collapse the table to a thin bar
                                     const snapTo = available - TABLE_COLLAPSED;
                                     setHeightBoth(snapTo);
