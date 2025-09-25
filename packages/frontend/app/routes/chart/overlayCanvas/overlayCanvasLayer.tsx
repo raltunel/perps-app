@@ -164,7 +164,6 @@ const OverlayCanvasLayer: React.FC<OverlayCanvasLayerProps> = ({
             canvasWrapperRef.current = wrapper;
         }
 
-        const dpr = window.devicePixelRatio || 1;
         const canvas = canvasRef.current;
 
         const handleMouseMove = (e: MouseEvent) => {
