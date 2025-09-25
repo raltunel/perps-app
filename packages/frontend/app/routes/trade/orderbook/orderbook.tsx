@@ -92,8 +92,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setSelectedMode,
         setOrderBookState,
     } = useOrderBookStore();
-    const rowLockTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
