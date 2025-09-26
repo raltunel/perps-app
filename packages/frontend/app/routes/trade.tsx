@@ -149,7 +149,8 @@ export default function Trade() {
         storedHeight ?? 570,
     );
     const startHeightRef = useRef(chartTopHeight);
-    const [maxTop, setMaxTop] = useState<number>(Infinity);
+    // Using a large but finite number instead of Infinity for CSS compatibility
+    const [maxTop, setMaxTop] = useState<number>(10000);
     const userRatioRef = useRef<number | null>(null);
     const hasUserOverrideRef = useRef<boolean>(false);
 
