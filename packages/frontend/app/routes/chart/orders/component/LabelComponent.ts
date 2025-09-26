@@ -21,8 +21,8 @@ import {
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
 import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
-import * as d3fc from 'd3fc';
 import orderLinesLabelTooltip from '../../overlayCanvas/OrderLinesOverlayTooltip';
+import { useLazyD3 } from '../../hooks/useLazyD3';
 
 interface LabelProps {
     lines: LineData[];
@@ -78,15 +78,23 @@ const LabelComponent = ({
 
     const [isDrag, setIsDrag] = useState(false);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dragLabelTooltipRef = useRef<any>(null);
     const showLabelTooltip = useRef<boolean>(true);
 
     const isLiqPriceLineDraggable = false;
+    const { d3, d3fc } = useLazyD3() ?? {};
 
     useEffect(() => {
         const dpr = Math.round(window.devicePixelRatio) || 1;
 
-        if (scaleData !== undefined && canvasSize && isChartReady) {
+        if (
+            scaleData !== undefined &&
+            canvasSize &&
+            isChartReady &&
+            d3 &&
+            d3fc
+        ) {
             const dummyXScale = d3
                 .scaleLinear()
                 .domain([0, 1])
@@ -641,7 +649,7 @@ const LabelComponent = ({
     }
 
     useEffect(() => {
-        if (!overlayCanvasRef.current) return;
+        if (!overlayCanvasRef.current || !d3 || !d3fc) return;
         let tempSelectedLine: LabelLocationData | undefined = undefined;
         const canvas = overlayCanvasRef.current;
         let originalPrice: number | undefined = undefined;
