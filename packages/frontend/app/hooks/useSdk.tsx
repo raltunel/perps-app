@@ -17,6 +17,7 @@ import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
 import { useIsClient } from './useIsClient';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
 
 type SdkContextType = {
     info: Info | null;
@@ -41,6 +42,7 @@ export const SdkProvider: React.FC<{
     const stashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [lastSleepMs, setLastSleepMs] = useState<number>(0);
     const [lastAwakeMs, setLastAwakeMs] = useState<number>(0);
+    const { symbol } = useTradeDataStore();
 
     const stashedSubs = useRef<Record<string, ActiveSubscription[]>>({});
 
@@ -55,7 +57,9 @@ export const SdkProvider: React.FC<{
 
     useEffect(() => {
         if (!isClient) return;
+        if (!symbol) return;
         if (!info) {
+            console.log('>>>> new Info');
             const newInfo = new Info({
                 environment,
                 skipWs: false,
@@ -67,6 +71,7 @@ export const SdkProvider: React.FC<{
                               user: userEndpoint || API_URLS[environment],
                           }
                         : undefined,
+                symbol,
                 // isDebug: true, // TODO: remove in prod
             });
 
@@ -91,13 +96,18 @@ export const SdkProvider: React.FC<{
                         environment,
                         accountAddress: DEMO_USER,
                         // isDebug: true, // TODO: remove in prod
+                        symbol,
                     },
                 ),
             );
         } else {
             exchange.setEnvironment(environment);
         }
-    }, [isClient, environment, marketEndpoint, userEndpoint]);
+    }, [isClient, environment, marketEndpoint, userEndpoint, symbol]);
+
+    useEffect(() => {
+        console.log('>>>> useSdk | symbol', symbol);
+    }, [symbol]);
 
     useEffect(() => {
         if (info) {

@@ -31,6 +31,7 @@ interface InfoOptions {
     workers?: number;
     useMultiSocket?: boolean;
     wsEndpoints?: WebSocketEndpoints;
+    symbol?: string;
 }
 
 export class Info extends API {
@@ -48,6 +49,7 @@ export class Info extends API {
         super(options.environment);
         this.environment = options.environment;
         this.baseUrl = API_URLS[this.environment];
+        console.log('>>>> options.symbol', options.symbol);
         const {
             skipWs = false,
             isDebug = false,

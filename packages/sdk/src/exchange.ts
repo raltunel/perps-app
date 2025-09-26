@@ -20,6 +20,7 @@ export interface ExchangeOptions {
     vaultAddress?: string;
     accountAddress?: string;
     isDebug?: boolean;
+    symbol?: string;
 }
 
 export class Exchange extends API {
@@ -40,6 +41,7 @@ export class Exchange extends API {
             skipWs: true,
             meta: options.meta,
             isDebug: options.isDebug,
+            symbol: options.symbol,
         });
     }
 

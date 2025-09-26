@@ -34,6 +34,7 @@ import type { TabType } from '~/routes/trade';
 import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
+import type { Info } from '@perps-app/sdk';
 
 interface OrderBookProps {
     orderCount: number;
@@ -64,6 +65,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // TODO: Can be uncommented if we want to use the rest poller
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
     const { info } = useSdk();
+    const infoRef = useRef<Info | null>(null);
+    infoRef.current = info;
 
     const orderClickDisabled = false;
 
@@ -76,17 +79,20 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, []);
 
     const [resolutions, setResolutions] = useState<OrderRowResolutionIF[]>([]);
-    const [selectedResolution, setSelectedResolution] =
-        useState<OrderRowResolutionIF | null>(null);
-
-    const [orderBookState, setOrderBookState] = useState(TableState.LOADING);
 
     const filledResolution = useRef<OrderRowResolutionIF | null>(null);
     const [selectedMode, setSelectedMode] = useState<OrderBookMode>('symbol');
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook } = useOrderBookStore();
+    const {
+        buys,
+        sells,
+        selectedResolution,
+        setSelectedResolution,
+        orderBookState,
+        setOrderBookState,
+    } = useOrderBookStore();
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
@@ -242,20 +248,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot, formatNum]);
 
-    const handleOrderBookWorkerResult = useCallback(
-        ({ data }: { data: OrderBookOutput }) => {
-            setOrderBook(data.buys, data.sells);
-            setOrderBookState(TableState.FILLED);
-            filledResolution.current = selectedResolution;
-        },
-        [selectedResolution, setOrderBook],
-    );
-
-    const postOrderBookRaw = useWorker<OrderBookOutput>(
-        'orderbook',
-        handleOrderBookWorkerResult,
-    );
-
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
             const resolutionList = getResolutionListForSymbol(symbolInfo);
@@ -263,42 +255,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
             setSelectedResolution(resolutionList[0]);
         }
     }, [symbol, symbolInfo?.coin]);
-
-    const subKey = useMemo(() => {
-        if (!selectedResolution) return undefined;
-        return {
-            type: 'l2Book' as const,
-            coin: symbol,
-            ...(selectedResolution.nsigfigs
-                ? { nSigFigs: selectedResolution.nsigfigs }
-                : {}),
-            ...(selectedResolution.mantissa
-                ? { mantissa: selectedResolution.mantissa }
-                : {}),
-        };
-    }, [selectedResolution, symbol]);
-
-    useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
-        if (!subKey || !info) return;
-        setOrderBookState(TableState.LOADING);
-        if (subKey) {
-            // subscribeToPoller(
-            //     'info',
-            //     subKey,
-            //     postOrderBookRaw,
-            //     TIMEOUT_OB_POLLING,
-            //     true,
-            // );
-
-            const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
-
-            return () => {
-                // unsubscribeFromPoller('info', subKey);
-                unsubscribe();
-            };
-        }
-    }, [subKey, info]);
 
     const midHeader = useCallback(
         (id: string) => {

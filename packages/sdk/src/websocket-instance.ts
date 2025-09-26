@@ -617,10 +617,13 @@ export class WebSocketInstance {
             return;
         }
         if (msg.channel === 'error') {
+            console.log('>>>> error [in sdk]', msg);
+
             if (!msg.data) {
                 return;
             }
             const jsonMatch = msg.data.match(/\{.*\}$/);
+            console.log('>>>> jsonMatch', jsonMatch);
 
             if (jsonMatch) {
                 const str = jsonMatch[0];
@@ -628,6 +631,12 @@ export class WebSocketInstance {
                 if (jsonObject.subscription) {
                     const sub = subscriptionToIdentifier(
                         jsonObject.subscription,
+                    );
+
+                    console.log('>>>> sub', sub);
+                    console.log(
+                        '>>>> activeSubscriptions',
+                        this.activeSubscriptions,
                     );
 
                     const activeSubscriptions = this.activeSubscriptions[sub];
@@ -678,7 +687,15 @@ export class WebSocketInstance {
             this.connect();
         }
 
+        if (subscription.coin) {
+            console.log(subscription.type, ' | ', subscription.coin);
+        }
+
         const identifier = subscriptionToIdentifier(subscription);
+
+        if (subscription.type === 'l2Book') {
+            console.log('>>>> subscribe l2Book', subscription, errorCallback);
+        }
 
         if (this.socketName === 'market') {
             console.log('>>> subscribe', subscription, callback, existingId);

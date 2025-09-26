@@ -287,12 +287,12 @@ export default function App() {
             >
                 <AppProvider>
                     <UnifiedMarginDataProvider>
-                        <MarketDataProvider>
-                            <SdkProvider
-                                environment={wsEnvironment}
-                                marketEndpoint={MARKET_WS_ENDPOINT}
-                                userEndpoint={USER_WS_ENDPOINT}
-                            >
+                        <SdkProvider
+                            environment={wsEnvironment}
+                            marketEndpoint={MARKET_WS_ENDPOINT}
+                            userEndpoint={USER_WS_ENDPOINT}
+                        >
+                            <MarketDataProvider>
                                 <TutorialProvider>
                                     <GlobalModalHost>
                                         <ErrorBoundary>
@@ -333,8 +333,8 @@ export default function App() {
                                         </ErrorBoundary>
                                     </GlobalModalHost>
                                 </TutorialProvider>
-                            </SdkProvider>
-                        </MarketDataProvider>
+                            </MarketDataProvider>
+                        </SdkProvider>
                     </UnifiedMarginDataProvider>
                 </AppProvider>
             </FogoSessionProvider>
