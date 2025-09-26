@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import type { LiqProps } from './LiqComponent';
-import * as d3fc from 'd3fc';
-import * as d3 from 'd3';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
 import type { IPaneApi } from '~/tv/charting_library';
 import {
@@ -9,6 +7,7 @@ import {
     updateOverlayCanvasSize,
 } from '../overlayCanvas/overlayCanvasUtils';
 import { useTradingView } from '~/contexts/TradingviewContext';
+import { useLazyD3 } from '../hooks/useLazyD3';
 
 export type HorizontalLineData = {
     yPrice: number;
@@ -25,6 +24,8 @@ const LiqudationLines = ({
     scaleData,
     zoomChanged,
 }: LiqProps) => {
+    const { d3, d3fc } = useLazyD3() ?? {};
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLine, setHorizontalLine] = useState<any>();
 
@@ -35,7 +36,7 @@ const LiqudationLines = ({
     const { chart } = useTradingView();
 
     useEffect(() => {
-        if (scaleData !== undefined && canvasSize) {
+        if (scaleData !== undefined && canvasSize && d3 && d3fc) {
             const dummyXScale = d3
                 .scaleLinear()
                 .domain([0, 1])
@@ -106,7 +107,7 @@ const LiqudationLines = ({
 
     // Update scale range on canvas size change
     useEffect(() => {
-        if (scaleData !== undefined && canvasSize && horizontalLine) {
+        if (scaleData !== undefined && canvasSize && horizontalLine && d3) {
             const dummyXScale = d3
                 .scaleLinear()
                 .domain([0, 1])

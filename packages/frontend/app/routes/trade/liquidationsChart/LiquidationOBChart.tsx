@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import * as d3 from 'd3';
-import * as d3fc from 'd3fc';
 import type {
     OrderBookLiqIF,
     OrderBookRowIF,
@@ -9,6 +7,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useLazyD3 } from '~/routes/chart/hooks/useLazyD3';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -40,6 +39,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const d3CanvasLiqLines = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqContianer = useRef<HTMLDivElement | null>(null);
     const gap = 4;
+    const { d3, d3fc } = useLazyD3() ?? {};
 
     // All refs instead of state
     const xScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
@@ -268,7 +268,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             !currentBuyData ||
             !currentSellData ||
             currentBuyData.length === 0 ||
-            currentSellData.length === 0
+            currentSellData.length === 0 ||
+            !d3 ||
+            !d3fc
         )
             return;
 
@@ -421,6 +423,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, [width, height]);
 
     useEffect(() => {
+        if (!d3 || !d3fc) return;
         const canvas = d3
             .select(d3CanvasLiqLines.current)
             .select('canvas')
@@ -446,7 +449,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             !currentBuyData ||
             !currentSellData ||
             currentBuyData.length === 0 ||
-            currentSellData.length === 0
+            currentSellData.length === 0 ||
+            !d3 ||
+            !d3fc
         )
             return;
 
@@ -607,6 +612,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const startTs = performance.now();
 
             const anim = (time: number) => {
+                if (!d3 || !d3fc) return;
                 const elapsed = time - startTs;
                 const progress = Math.min(elapsed / animDuration, 1);
 
@@ -674,7 +680,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         if (
             !xScaleRef.current ||
             !pageYScaleRef.current ||
-            !buyYScaleRef.current
+            !buyYScaleRef.current ||
+            !d3 ||
+            !d3fc
         )
             return;
 
@@ -828,6 +836,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     // Cleanup on unmount
     useEffect(() => {
         return () => {
+            if (!d3 || !d3fc) return;
+
             if (animFrameRef.current) {
                 cancelAnimationFrame(animFrameRef.current);
                 animFrameRef.current = null;
@@ -874,6 +884,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, []);
 
     useEffect(() => {
+        if (!d3 || !d3fc) return;
+
         d3.select(d3CanvasLiqContianer.current).on(
             'mousemove',
             function (event: React.MouseEvent<HTMLDivElement>) {
@@ -916,6 +928,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, []);
 
     useEffect(() => {
+        if (!d3 || !d3fc) return;
+
         const curve = d3.curveLinear;
 
         if (

@@ -95,9 +95,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
-    const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-        null,
-    );
+    // const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    //     null,
+    // );
 
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
