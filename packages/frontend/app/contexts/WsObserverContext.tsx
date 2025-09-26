@@ -6,6 +6,7 @@ import React, {
     useState,
 } from 'react';
 import { useIsClient } from '~/hooks/useIsClient';
+import { useDebugStore } from '~/stores/DebugStore';
 
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
@@ -57,6 +58,10 @@ export const WsObserverProvider: React.FC<{
         new Map(),
     );
 
+    const { isWsSleepMode } = useDebugStore();
+    const sleepModeRef = useRef(isWsSleepMode);
+    sleepModeRef.current = isWsSleepMode;
+
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
         return match ? match[1] : '';
@@ -81,6 +86,10 @@ export const WsObserverProvider: React.FC<{
         };
 
         socket.onmessage = (event) => {
+            if (sleepModeRef.current) {
+                return;
+            }
+
             if (event.data) {
                 const channel = extractChannelFromPayload(event.data);
                 const worker = getWorker(channel);
