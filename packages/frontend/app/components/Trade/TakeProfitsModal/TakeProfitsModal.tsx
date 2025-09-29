@@ -3,6 +3,7 @@ import styles from './TakeProfitsModal.module.css';
 import { BsChevronDown } from 'react-icons/bs';
 import ToggleSwitch from '../ToggleSwitch/ToggleSwitch';
 import type { PositionIF } from '~/utils/UserDataIFs';
+import { t } from 'i18next';
 
 interface TPSLFormData {
     tpPrice: string;
@@ -167,7 +168,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Configure Amount'
                     reverse
-                    aria-label='Configure Amount toggle'
+                    aria-label={t('toggleConfigureAmount')}
                 />
                 <ToggleSwitch
                     isOn={formData.limitPrice}
@@ -179,7 +180,7 @@ export default function TakeProfitsModal(props: PropIF) {
                     }
                     label='Limit Price'
                     reverse
-                    aria-label='Limit Price toggle'
+                    aria-label={t('toggleLimitPrice')}
                 />
             </section>
             <button
