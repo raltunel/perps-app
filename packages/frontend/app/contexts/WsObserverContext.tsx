@@ -8,8 +8,8 @@ import React, {
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
 
-import jsonParserWorker from '~/processors/workers/jsonParser.worker.ts?worker';
-import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
+// import jsonParserWorker from '~/processors/workers/jsonParser.worker.ts?worker';
+// import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
 
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
@@ -240,37 +240,37 @@ export const WsObserverProvider: React.FC<{
         }
 
         switch (type) {
-            case WsChannels.WEB_DATA2:
-                // const w1 = new Worker(
-                //     new URL(
-                //         './../hooks/workers/webdata2.worker.ts',
-                //         import.meta.url,
-                //     ),
-                //     { type: 'module' },
-                // );
+            // case WsChannels.WEB_DATA2:
+            //     // const w1 = new Worker(
+            //     //     new URL(
+            //     //         './../hooks/workers/webdata2.worker.ts',
+            //     //         import.meta.url,
+            //     //     ),
+            //     //     { type: 'module' },
+            //     // );
 
-                const w1 = new webData2Worker();
+            //     const w1 = new webData2Worker();
 
-                w1.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-                workers.current.set(type, w1);
-                return w1;
+            //     w1.onmessage = (event) => {
+            //         const subs = subscriptions.current.get(event.data.channel);
+            //         if (subs) {
+            //             subs.forEach((config) => {
+            //                 config.handler(event.data);
+            //             });
+            //         }
+            //     };
+            //     workers.current.set(type, w1);
+            //     return w1;
             default:
-                // const w2 = new Worker(
-                //     new URL(
-                //         './../processors/workers/jsonParser.worker.ts',
-                //         import.meta.url,
-                //     ),
-                //     { type: 'module' },
-                // );
+                const w2 = new Worker(
+                    new URL(
+                        './../processors/workers/default.worker.ts',
+                        import.meta.url,
+                    ),
+                    { type: 'module' },
+                );
 
-                const w2 = new jsonParserWorker();
+                // const w2 = new jsonParserWorker();
 
                 w2.onmessage = (event) => {
                     const subs = subscriptions.current.get(event.data.channel);
