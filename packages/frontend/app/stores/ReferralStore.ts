@@ -1,9 +1,14 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+export interface RefCodeIF {
+    value: string;
+    isConfirmed: boolean;
+}
+
 export interface ReferralStoreIF {
-    codes: Map<string, { value: string; isConfirmed: boolean }>;
-    get(address: string): { value: string; isConfirmed: boolean } | undefined;
+    codes: Map<string, RefCodeIF>;
+    getCode(address: string): RefCodeIF | undefined;
     set(address: string, refCode: string, isConfirmed: boolean): void;
 }
 
@@ -24,13 +29,13 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            codes: new Map<string, { value: string; isConfirmed: boolean }>(),
-            get(address: string) {
+            codes: new Map<string, RefCodeIF>(),
+            getCode(address: string): RefCodeIF | undefined {
                 return get().codes.get(address.toLowerCase());
             },
             set(address: string, refCode: string, isConfirmed: boolean) {
                 set((state) => {
-                    const newCodes = new Map(state.codes);
+                    const newCodes = new Map<string, RefCodeIF>(state.codes);
                     newCodes.set(address.toLowerCase(), {
                         value: refCode,
                         isConfirmed,
