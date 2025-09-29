@@ -33,7 +33,6 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
 import {
     URL_PARAMS,
     useUrlParams,
@@ -80,14 +79,14 @@ export default function PageHeader() {
     const referralStore = useReferralStore();
     const { t } = useTranslation();
     useEffect(() => {
-        if (referralCodeFromURL.value) {
+        if (referralCodeFromURL.value && userDataStore.userAddress) {
             referralStore.set(
-                referralCodeFromURL.value,
+                userDataStore.userAddress,
                 referralCodeFromURL.value,
                 false,
             );
         }
-    }, []);
+    }, [referralCodeFromURL.value, userDataStore.userAddress]);
 
     const sessionState = useSession();
 
@@ -130,8 +129,6 @@ export default function PageHeader() {
     const { marginBucket } = useUnifiedMarginData();
 
     const landingTime = useRef<number>(Date.now());
-
-    const userData = useUserDataStore();
 
     // data to generate nav links in page header
     const navLinks = [
@@ -563,7 +560,7 @@ export default function PageHeader() {
                 >
                     <ReferralCodeModal
                         close={referralCodeModal.close}
-                        refCode={userData.refCode.value}
+                        refCode={userDataStore.refCode.value}
                     />
                 </Modal>
             )}

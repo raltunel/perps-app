@@ -31,7 +31,6 @@ export const useReferralStore = create<ReferralStoreIF>()(
         (set, get) => ({
             codes: new Map<string, RefCodeIF>(),
             getCode(address: string): RefCodeIF | undefined {
-                console.log(get().codes);
                 return get().codes.get(address.toLowerCase());
             },
             set(address: string, refCode: string, isConfirmed: boolean) {
