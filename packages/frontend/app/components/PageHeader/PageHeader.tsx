@@ -226,7 +226,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
-                        aria-label='Close navigation menu'
+                        aria-label={t('aria.closeNav')}
                     >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
@@ -419,7 +419,7 @@ export default function PageHeader() {
                     <button
                         className={styles.internationalButton}
                         onClick={() => appSettingsModal.open()}
-                        aria-label='Open settings'
+                        aria-label={t('aria.openSettings')}
                     >
                         <LuSettings size={20} />
                     </button>
@@ -432,7 +432,7 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsDropdownMenuOpen(!isDropdownMenuOpen)
                             }
-                            aria-label='Open more options menu'
+                            aria-label={t('aria.openMoreOptionsMenu')}
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>

@@ -510,19 +510,36 @@
         "withdrawInput": "출금 입력란",
         "scrollTabsLeft": "탭 왼쪽으로 스크롤",
         "scrollTabsRight": "탭 오른쪽으로 스크롤",
-        "leverageValue": "레버리지 배수",
+        "leverageValue": "레버리지 값",
         "leverageAmount": "레버리지 금액",
         "setLeverageTo": "레버리지를 {{value}}배로 설정",
         "positionSizePercentage": "포지션 수량 비율",
-        "positionSizeValue": "포지션 수량 가치",
+        "positionSizeValue": "포지션 수량 값",
         "totalOrders": "총 주문 수",
         "runningPriceInput": {
-            "minutes": "실행 시간(분) 입력란",
-            "hours": "실행 시간(시) 입력란"
+            "minutes": "실행 가격(분) 입력란",
+            "hours": "실행 가격(시간) 입력란"
         },
-        "yourDepositAmount": "내 입금 금액"
+        "yourDepositAmount": "내 입금 금액",
+        "flatPriceDistribution": "평탄한 가격 분포",
+        "evenPriceDistribution": "균등 분배 가격 분포",
+        "thumbsUp": "좋아요",
+        "thumbsDown": "싫어요",
+        "closeNav": "내비게이션 메뉴 닫기",
+        "openSettings": "설정 열기",
+        "openMoreOptionsMenu": "더보기 옵션 메뉴 열기",
+        "previousPage": "이전 페이지",
+        "nextPage": "다음 페이지",
+        "tradeType": "거래 유형",
+        "closeTradeTypeMenu": "거래 유형 메뉴 닫기",
+        "toggleChasingInterval": "추적 간격 전환",
+        "toggleRandomize": "랜덤 설정 전환",
+        "toggleReduceOnly": "Reduce Only 전환",
+        "toggleTPSL": "TP/SL 전환",
+        "editTPSL": "TP/SL 편집",
+        "toggleConfigureAmount": "금액 설정 전환",
+        "toggleLimitPrice": "지정가 전환"
     },
-
     "chart": {
         "liqPrice": "청산 가격"
     },

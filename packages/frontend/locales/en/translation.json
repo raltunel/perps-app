@@ -520,7 +520,25 @@
             "minutes": "running price hours minutes field",
             "hours": "running price hours minutes field"
         },
-        "yourDepositAmount": "Your deposit amount"
+        "yourDepositAmount": "Your deposit amount",
+        "flatPriceDistribution": "Flat price distribution",
+        "evenPriceDistribution": "Evenly split price distribution",
+        "thumbsUp": "Thumbs up",
+        "thumbsDown": "Thumbs down",
+        "closeNav": "Close navigation menu",
+        "openSettings": "Open settings",
+        "openMoreOptionsMenu": "Open more options menu",
+        "previousPage": "Previous page",
+        "nextPage": "Next page",
+        "tradeType": "Trade type",
+        "closeTradeTypeMenu": "Close Trade Type Menu",
+        "toggleChasingInterval": "Toggle Chasing Interval",
+        "toggleRandomize": "Toggle Randomize",
+        "toggleReduceOnly": "Toggle Reduce Only",
+        "toggleTPSL": "Toggle Take Profit / Stop Loss",
+        "editTPSL": "Edit Take Profit / Stop Loss",
+        "toggleConfigureAmount": "Toggle Configure Amount",
+        "toggleLimitPrice": "Toggle Limit Price"
     },
     "chart": {
         "liqPrice": "Liq. Price"

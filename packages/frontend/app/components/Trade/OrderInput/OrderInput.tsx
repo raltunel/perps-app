@@ -979,7 +979,7 @@ function OrderInput({
                     <div className={styles.inputDetailsLabel}>
                         <span>{t('transactions.priceDistribution')}</span>
                         <Tooltip
-                            content={'price distribution'}
+                            content={t('transactions.flatPriceDistribution')}
                             position='right'
                         >
                             <LuCircleHelp size={12} />
@@ -990,7 +990,7 @@ function OrderInput({
                             <img
                                 src={flatSvg}
                                 alt={t('transactions.flatPriceDistribution')}
-                                aria-label='Flat price distribution'
+                                aria-label={t('aria.flatPriceDistribution')}
                             />
                             {t('transactions.flat')}
                         </button>
@@ -998,7 +998,7 @@ function OrderInput({
                             <img
                                 src={evenSvg}
                                 alt={t('transactions.evenPriceDistribution')}
-                                aria-label='Evenly split price distribution'
+                                aria-label={t('aria.evenPriceDistribution')}
                             />
                             {t('transactions.evenlySplit')}
                         </button>
@@ -2288,15 +2288,19 @@ function OrderInput({
                                 className={styles.exit_launchpad}
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <MdKeyboardArrowLeft aria-label='Close Order Types' />
+                                <MdKeyboardArrowLeft
+                                    aria-label={t('aria.closeTradeTypeMenu')}
+                                />
                             </div>
                             <h3>{t('transactions.orderTypes')}</h3>
                             <button
                                 className={styles.trade_type_toggle}
-                                aria-label='Trade type'
+                                aria-label={t('aria.tradeType')}
                                 onClick={() => setShowLaunchpad(false)}
                             >
-                                <PiSquaresFour aria-label='Close Order Types' />
+                                <PiSquaresFour
+                                    aria-label={t('aria.closeTradeTypeMenu')}
+                                />
                             </button>
                         </header>
                         <ul className={styles.launchpad_clickables}>
