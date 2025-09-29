@@ -114,19 +114,23 @@ export default function CodeTabs(props: Props) {
                         </p>
                     </div>
                     <div className={styles.refferal_code_buttons}>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() =>
-                                referralStore.confirmCode(
-                                    userDataStore.userAddress,
-                                    referralStore.getCode(
+                        {referralStore.getCode(userDataStore.userAddress)
+                            ?.isConfirmed && (
+                            <SimpleButton
+                                bg='accent1'
+                                onClick={() =>
+                                    referralStore.confirmCode(
                                         userDataStore.userAddress,
-                                    )?.value || '',
-                                )
-                            }
-                        >
-                            Confirm
-                        </SimpleButton>
+                                        referralStore.getCode(
+                                            userDataStore.userAddress,
+                                        )?.value || '',
+                                    )
+                                }
+                            >
+                                Confirm
+                            </SimpleButton>
+                        )}
+
                         <SimpleButton
                             bg='accent1'
                             onClick={() => setIsEditing(true)}
