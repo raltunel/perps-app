@@ -307,11 +307,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
             // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            subscribe('l2Book', {
-                payload: subKey,
-                handler: handleOrderBookResult,
-                single: true,
-            });
+            subscribe(
+                'l2Book',
+                //     {
+                //     payload: subKey,
+                //     handler: handleOrderBookResult,
+                //     single: true,
+                // }
+            );
 
             return () => {
                 // unsubscribeFromPoller('info', subKey);
