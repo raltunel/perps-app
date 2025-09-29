@@ -215,6 +215,7 @@ export const languageOptions = {
     en: 'English 🇬🇧',
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
+    de: 'Deutsch 🇩🇪',
     tr: 'Türkçe 🇹🇷',
     vi: 'Tiếng Việt 🇻🇳',
     ko: '한국어 🇰🇷',
