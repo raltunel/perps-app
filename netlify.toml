@@ -36,12 +36,6 @@ VITE_CONTEXT = "branch-deploy"
   [headers.values]
     Cache-Control = "public, max-age=31560000, immutable"
 
-# Ensure worker files are served with correct MIME type
-[[headers]]
-  for = "/assets/*.js"
-  [headers.values]
-    Content-Type = "application/javascript"
-
 # Cache favicon aggressively
 [[headers]]
   for = "/images/favicon.svg"

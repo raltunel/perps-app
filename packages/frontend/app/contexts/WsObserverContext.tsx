@@ -235,7 +235,7 @@ export const WsObserverProvider: React.FC<{
     };
 
     const initWorker = (type: string) => {
-        if (workers.current.has(type)) {
+        if (!isClient || workers.current.has(type)) {
             return;
         }
 
