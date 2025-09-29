@@ -34,7 +34,8 @@ import type { TabType } from '~/routes/trade';
 // import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useWsObserver } from '~/contexts/useWsObserver';
+// import { useWsObserver } from '~/contexts/useWsObserver';
+import { useApp } from '~/contexts/AppContext';
 
 interface OrderBookProps {
     orderCount: number;
@@ -65,7 +66,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // TODO: Can be uncommented if we want to use the rest poller
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    // const { subscribe, unsubscribeAllByChannel } = useWsObserver();
 
     const orderClickDisabled = false;
 
@@ -98,6 +99,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
     );
 
     const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
+
+    const { isUserConnected } = useApp();
+
+    console.log('>>> isUserConnected', isUserConnected);
 
     // No useMemo for simple arithmetic
     const buyPlaceHolderCount = Math.max(orderCount - buys?.length || 0, 0);
@@ -307,11 +312,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
             // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            subscribe('l2Book', {
-                payload: subKey,
-                handler: handleOrderBookResult,
-                single: true,
-            });
+            // subscribe('l2Book', {
+            //     payload: subKey,
+            //     handler: handleOrderBookResult,
+            //     single: true,
+            // });
 
             return () => {
                 // unsubscribeFromPoller('info', subKey);
