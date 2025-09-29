@@ -57,15 +57,33 @@ export const useReferralStore = create<ReferralStoreIF>()(
         }),
         {
             name: LS_KEY,
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: {
+                getItem: (name) => {
+                    const str = ssrSafeStorage().getItem(name);
+                    if (!str) return null;
+                    const parsed = JSON.parse(str);
+                    return {
+                        state: {
+                            codes: new Map(parsed.state?.codes || []),
+                        },
+                    };
+                },
+                setItem: (name, value) => {
+                    const codes = value.state?.codes;
+                    const codesArray =
+                        codes instanceof Map
+                            ? Array.from(codes.entries())
+                            : codes || [];
+                    const str = JSON.stringify({
+                        state: {
+                            codes: codesArray,
+                        },
+                    });
+                    ssrSafeStorage().setItem(name, str);
+                },
+                removeItem: (name) => ssrSafeStorage().removeItem(name),
+            },
             version: 1,
-            partialize: (state) => ({
-                codes: Array.from(state.codes.entries()),
-            }),
-            merge: (persistedState, currentState) => ({
-                ...currentState,
-                codes: new Map((persistedState as any)?.codes || []),
-            }),
         },
     ),
 );

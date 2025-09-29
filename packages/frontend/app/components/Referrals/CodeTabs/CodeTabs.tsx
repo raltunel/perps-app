@@ -100,6 +100,8 @@ export default function CodeTabs(props: Props) {
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
     const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
 
+    console.log('this one', referralStore.getCode(userDataStore.userAddress));
+
     const enterCodeContent = isSessionEstablished ? (
         referralStore.getCode(userDataStore.userAddress) ? (
             !isEditing ? (
@@ -115,7 +117,7 @@ export default function CodeTabs(props: Props) {
                     </div>
                     <div className={styles.refferal_code_buttons}>
                         {referralStore.getCode(userDataStore.userAddress)
-                            ?.isConfirmed && (
+                            ?.isConfirmed || (
                             <SimpleButton
                                 bg='accent1'
                                 onClick={() =>
