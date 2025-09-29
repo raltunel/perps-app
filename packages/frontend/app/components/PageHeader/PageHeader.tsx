@@ -230,18 +230,16 @@ export default function PageHeader() {
                 userDataStore.userAddress,
             )?.isConfirmed;
             isConfirmed ||
-                referralStore.set(
+                referralStore.activateCode(
                     userDataStore.userAddress,
                     referralCodeFromURL.value,
                     false,
                 );
         }
 
-        console.log(userDataStore.userAddress);
         const refCode: RefCodeIF | undefined = referralStore.getCode(
             userDataStore.userAddress,
         );
-        console.log(refCode);
         if (refCode?.isConfirmed === false) {
             referralCodeModal.open();
         }
