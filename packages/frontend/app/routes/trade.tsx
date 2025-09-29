@@ -31,6 +31,7 @@ import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
+import { useTranslation } from 'react-i18next';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -42,6 +43,7 @@ export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 export default function Trade() {
     const { symbol } = useTradeDataStore();
     const { marginBucket } = useUnifiedMarginData();
+    const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
     // add refs near the other refs
@@ -140,6 +142,9 @@ export default function Trade() {
     const TABLE_MIN = 195;
     const CHART_MIN = 200;
 
+    const TABLE_COLLAPSED = 38; // table height when collapsed (a small bar)
+    const TABLE_COLLAPSE_TRIGGER = 160; // when table gets smaller than this, snap down
+
     const leftColRef = useRef<HTMLDivElement | null>(null);
 
     // local state used while dragging for immediate feedback
@@ -147,7 +152,8 @@ export default function Trade() {
         storedHeight ?? 570,
     );
     const startHeightRef = useRef(chartTopHeight);
-    const [maxTop, setMaxTop] = useState<number>(Infinity);
+    // Using a large but finite number instead of Infinity for CSS compatibility
+    const [maxTop, setMaxTop] = useState<number>(10000);
     const userRatioRef = useRef<number | null>(null);
     const hasUserOverrideRef = useRef<boolean>(false);
 
@@ -202,7 +208,7 @@ export default function Trade() {
         // LOCAL update only
         setChartTopHeightLocal(top);
 
-        const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+        const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
     }, [setChartTopHeightLocal]);
 
@@ -215,7 +221,7 @@ export default function Trade() {
         const gap = getGap();
         const total = col.clientHeight;
         const available = Math.max(0, total - gap);
-        const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+        const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
 
         if (storedHeight == null) {
@@ -247,7 +253,7 @@ export default function Trade() {
             const gap = getGap();
             const total = col.clientHeight;
             const available = Math.max(0, total - gap);
-            const max = Math.max(CHART_MIN, total - TABLE_MIN - gap);
+            const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
             setMaxTop(max);
 
             if (
@@ -316,13 +322,13 @@ export default function Trade() {
     const tabList = useMemo(
         () =>
             [
-                { key: 'order', label: 'Order' },
-                { key: 'chart', label: 'Chart' },
-                { key: 'book', label: 'Book' },
-                { key: 'recent', label: 'Recent' },
-                { key: 'positions', label: 'Positions' },
+                { key: 'order', label: t('navigation.trade') },
+                { key: 'chart', label: t('navigation.chart') },
+                { key: 'book', label: t('navigation.book') },
+                { key: 'recent', label: t('navigation.recent') },
+                { key: 'positions', label: t('navigation.positions') },
             ] as const,
-        [],
+        [t],
     );
 
     const handleTabClick = useCallback(
@@ -490,15 +496,35 @@ export default function Trade() {
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
-
                                 hasUserOverrideRef.current = true;
 
-                                // Persist px to store
-                                setHeightBoth(next);
+                                const available = getAvailable(); // total height available for chart + table
+                                if (!available || available <= 0) {
+                                    setHeightBoth(next);
+                                    return;
+                                }
 
-                                // Capture the user's chosen ratio for future container resizes
-                                const available = getAvailable();
-                                if (available && available > 0) {
+                                const tableHeight = available - next;
+                                const startHeight =
+                                    available - startHeightRef.current;
+
+                                if (
+                                    tableHeight <= TABLE_COLLAPSE_TRIGGER &&
+                                    (!(startHeight <= TABLE_COLLAPSED) ||
+                                        tableHeight === TABLE_COLLAPSED)
+                                ) {
+                                    // SNAP DOWN: collapse the table to a thin bar
+                                    const snapTo = available - TABLE_COLLAPSED;
+                                    setHeightBoth(snapTo);
+                                    userRatioRef.current = snapTo / available;
+                                } else if (tableHeight < TABLE_MIN) {
+                                    // too small but not past the collapse trigger → snap back up to min
+                                    const snapTo = available - TABLE_MIN;
+                                    setHeightBoth(snapTo);
+                                    userRatioRef.current = snapTo / available;
+                                } else {
+                                    // normal persisted height
+                                    setHeightBoth(next);
                                     userRatioRef.current = next / available;
                                 }
                             }}

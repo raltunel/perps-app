@@ -14,7 +14,7 @@ import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
 import { Link, useLocation, useSearchParams } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
-import { useShortScreen } from '~/hooks/useMediaQuery';
+import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import { useUnifiedMarginData } from '~/hooks/useUnifiedMarginData';
@@ -34,6 +34,7 @@ import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import { useTranslation } from 'react-i18next';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -45,6 +46,7 @@ export default function PageHeader() {
     // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
+    const { t } = useTranslation();
     useEffect(() => {
         const REFERRAL_CODE_URL_PARAM = 'af';
         const referralCode = searchParams.get(REFERRAL_CODE_URL_PARAM);
@@ -103,7 +105,7 @@ export default function PageHeader() {
 
     // data to generate nav links in page header
     const navLinks = [
-        { name: 'Trade', path: `/v2/trade/${symbol}` },
+        { name: t('navigation.trade'), path: `/v2/trade/${symbol}` },
         // { name: 'Vaults', path: '/v2/vaults' },
         // { name: 'Portfolio', path: '/v2/portfolio' },
         { name: 'Referrals', path: '/v2/referrals' },
@@ -155,7 +157,9 @@ export default function PageHeader() {
         [],
     );
 
-    const isShortScreen: boolean = useShortScreen();
+    const shortA = useShortScreen();
+    const shortB = useMediaQuery('(max-width: 600px)');
+    const isShortScreen: boolean = shortA || shortB;
 
     const { openDepositModal, openWithdrawModal, PortfolioModalsRenderer } =
         usePortfolioModals();
@@ -284,7 +288,7 @@ export default function PageHeader() {
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className={styles.mobileNavCloseButton}
-                        aria-label='Close navigation menu'
+                        aria-label={t('aria.closeNav')}
                     >
                         <MdOutlineClose size={20} color='var(--text1)' />
                     </button>
@@ -360,7 +364,9 @@ export default function PageHeader() {
                                         }
                                     }}
                                 >
-                                    {isShortScreen ? 'Transfer' : 'Deposit'}
+                                    {isShortScreen
+                                        ? t('common.transfer')
+                                        : t('common.deposit')}
                                 </button>
                                 {isDepositDropdownOpen && (
                                     <DepositDropdown
@@ -475,7 +481,7 @@ export default function PageHeader() {
                     <button
                         className={styles.internationalButton}
                         onClick={() => appSettingsModal.open()}
-                        aria-label='Open settings'
+                        aria-label={t('aria.openSettings')}
                     >
                         <LuSettings size={20} />
                     </button>
@@ -488,7 +494,7 @@ export default function PageHeader() {
                             onClick={() =>
                                 setIsDropdownMenuOpen(!isDropdownMenuOpen)
                             }
-                            aria-label='Open more options menu'
+                            aria-label={t('aria.openMoreOptionsMenu')}
                         >
                             <MdOutlineMoreHoriz size={20} />
                         </button>
@@ -506,7 +512,7 @@ export default function PageHeader() {
                 <Modal
                     close={() => appSettingsModal.close()}
                     position={'center'}
-                    title='Options'
+                    title={t('appSettings.title')}
                 >
                     <AppOptions />
                 </Modal>
