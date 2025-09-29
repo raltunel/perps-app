@@ -27,6 +27,7 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { WsProvider } from './contexts/WsContext';
 
 // Config
 import {
@@ -48,7 +49,6 @@ import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndic
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
-import { WsObserverProvider } from './contexts/WsObserverContext';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -287,11 +287,9 @@ export default function App() {
                 }}
             >
                 <AppProvider>
-                    <UnifiedMarginDataProvider>
-                        <MarketDataProvider>
-                            <WsObserverProvider
-                                url={`${MARKET_WS_ENDPOINT}/ws`}
-                            >
+                    <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
+                        <UnifiedMarginDataProvider>
+                            <MarketDataProvider>
                                 <SdkProvider
                                     environment={wsEnvironment}
                                     marketEndpoint={MARKET_WS_ENDPOINT}
@@ -338,9 +336,9 @@ export default function App() {
                                         </GlobalModalHost>
                                     </TutorialProvider>
                                 </SdkProvider>
-                            </WsObserverProvider>
-                        </MarketDataProvider>
-                    </UnifiedMarginDataProvider>
+                            </MarketDataProvider>
+                        </UnifiedMarginDataProvider>
+                    </WsProvider>
                 </AppProvider>
             </FogoSessionProvider>
         </Document>

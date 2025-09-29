@@ -7,50 +7,37 @@ import React, {
 } from 'react';
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
+import { useWorker, WORKERS } from '~/hooks/useWorker';
 
-export type WsSubscriptionConfig = {
-    handler: (payload: any) => void;
-    payload?: any;
-    single?: boolean;
-};
-
-enum WebSocketReadyState {
-    CONNECTING = 0,
-    OPEN = 1,
-    CLOSING = 2,
-    CLOSED = 3,
-}
-
-type WsObserverContextType = {
+interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
-};
-
-export enum WsChannels {
-    ORDERBOOK = 'l2Book',
-    ORDERBOOK_TRADES = 'trades',
-    USER_FILLS = 'userFills',
-    USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
-    WEB_DATA2 = 'webData2',
-    ACTIVE_COIN_DATA = 'activeAssetCtx',
-    NOTIFICATION = 'notification',
-    CANDLE = 'candle',
 }
 
-const WsObserverContext = createContext<WsObserverContextType | undefined>(
-    undefined,
-);
+export const WsContext = createContext<WsContextType>({
+    subscribe: () => {},
+    unsubscribe: () => {},
+    unsubscribeAllByChannel: () => {},
+});
 
-export const WsObserverProvider: React.FC<{
-    url: string;
+export interface WsProviderProps {
     children: React.ReactNode;
-}> = ({ url, children }) => {
+    url: string;
+}
+
+interface WsSubscriptionConfig {
+    handler: (payload: any) => void;
+    payload?: any;
+    single?: boolean;
+}
+
+export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
+    //----------------------------------- ws context
+
     const isClient = useIsClient();
-    const [readyState, setReadyState] = useState<number>(
-        WebSocketReadyState.CLOSED,
-    );
-    const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
+    const [readyState, setReadyState] = useState<number>(3);
+    const readyStateRef = useRef<number>(3);
     readyStateRef.current = readyState;
     const workers = useRef<Map<string, Worker>>(new Map());
     const socketRef = useRef<WebSocket | null>(null);
@@ -82,7 +69,7 @@ export const WsObserverProvider: React.FC<{
         socketRef.current = socket;
 
         socket.onopen = () => {
-            setReadyState(WebSocketReadyState.OPEN);
+            setReadyState(1);
         };
 
         socket.onmessage = (event) => {
@@ -92,31 +79,32 @@ export const WsObserverProvider: React.FC<{
 
             if (event.data) {
                 const channel = extractChannelFromPayload(event.data);
-                const worker = getWorker(channel);
-                if (worker) {
-                    worker.postMessage(event.data);
-                }
+                // const worker = getWorker(channel);
+                // if (worker) {
+                //     worker.postMessage(event.data);
+                // }
 
                 // const sub = subscriptions.current.get(channel);
                 // if(sub){
-                //   if()
                 //   subscriptions.current.get(channel)?.forEach(config => {
                 //     config.handler(event.data);
                 //   });
                 // }
 
-                // const msg = JSON.parse(event.data);
+                const msg = JSON.parse(event.data);
 
-                // if (subscriptions.current.has(msg.channel)) {
-                //   subscriptions.current.get(msg.channel)?.forEach(config => {
-                //     config.handler(msg.data);
-                //   });
-                // }
+                if (subscriptions.current.has(msg.channel)) {
+                    subscriptions.current
+                        .get(msg.channel)
+                        ?.forEach((config) => {
+                            config.handler(msg.data);
+                        });
+                }
             }
         };
 
         socket.onclose = () => {
-            setReadyState(WebSocketReadyState.CLOSED);
+            setReadyState(3);
         };
 
         socket.onerror = (error) => {
@@ -136,7 +124,7 @@ export const WsObserverProvider: React.FC<{
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
     const sendMessage = (msg: string) => {
-        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
+        if (socketRef.current?.readyState === 1) {
             socketRef.current.send(msg);
         }
     };
@@ -157,10 +145,8 @@ export const WsObserverProvider: React.FC<{
         );
     };
 
-    const [, forceUpdate] = useState(0); // Used to force re-render when needed
-
     useEffect(() => {
-        if (readyStateRef.current === WebSocketReadyState.OPEN) {
+        if (readyStateRef.current === 1) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
                     registerWsSubscription(key, config.payload || {});
@@ -170,7 +156,7 @@ export const WsObserverProvider: React.FC<{
     }, [readyState]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
-        initWorker(key);
+        // initWorker(key);
 
         // add subscripton in hook
         if (!subscriptions.current.has(key)) {
@@ -229,73 +215,76 @@ export const WsObserverProvider: React.FC<{
         }
     };
 
-    const initWorker = (type: string) => {
-        if (workers.current.has(type)) {
-            return;
-        }
+    // const initWorker = (type: string) => {
+    //     if (!isClient || workers.current.has(type)) {
+    //         return;
+    //     }
 
-        switch (type) {
-            case WsChannels.WEB_DATA2:
-                const w1 = new Worker(
-                    new URL(
-                        './../hooks/workers/webdata2.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
+    //     switch (type) {
+    //         // case WsChannels.WEB_DATA2:
+    //         //     // const w1 = new Worker(
+    //         //     //     new URL(
+    //         //     //         './../hooks/workers/webdata2.worker.ts',
+    //         //     //         import.meta.url,
+    //         //     //     ),
+    //         //     //     { type: 'module' },
+    //         //     // );
 
-                w1.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data);
-                        });
-                    }
-                };
-                workers.current.set(type, w1);
-                return w1;
-            default:
-                const w2 = new Worker(
-                    new URL(
-                        './../processors/workers/jsonParser.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
+    //         //     const w1 = new webData2Worker();
 
-                w2.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data.data);
-                        });
-                    }
-                };
+    //         //     w1.onmessage = (event) => {
+    //         //         const subs = subscriptions.current.get(event.data.channel);
+    //         //         if (subs) {
+    //         //             subs.forEach((config) => {
+    //         //                 config.handler(event.data);
+    //         //             });
+    //         //         }
+    //         //     };
+    //         //     workers.current.set(type, w1);
+    //         //     return w1;
+    //         default:
+    //             console.log('>>>>> default worker');
+    //             // const w2 = new defaultWorker();
 
-                workers.current.set(type, w2);
-                return w2;
-        }
-    };
+    //             const w2 = new Worker(
+    //                 new URL(
+    //                     '~/processors/workers/default.worker.ts',
+    //                     import.meta.url,
+    //                 ),
+    //                 // { type: 'module' },
+    //             );
+
+    //             // const w2 = new jsonParserWorker();
+
+    //             w2.onmessage = (event) => {
+    //                 const subs = subscriptions.current.get(event.data.channel);
+    //                 if (subs) {
+    //                     subs.forEach((config) => {
+    //                         config.handler(event.data.data);
+    //                     });
+    //                 }
+    //             };
+
+    //             workers.current.set(type, w2);
+    //             return w2;
+    //     }
+    // };
 
     const getWorker = (type: string) => {
         return workers.current.get(type);
     };
 
     return (
-        <WsObserverContext.Provider
-            value={{ subscribe, unsubscribe, unsubscribeAllByChannel }}
+        <WsContext.Provider
+            value={{
+                subscribe,
+                unsubscribe,
+                unsubscribeAllByChannel,
+            }}
         >
             {children}
-        </WsObserverContext.Provider>
+        </WsContext.Provider>
     );
 };
 
-export const useWsObserver = () => {
-    const context = useContext(WsObserverContext);
-    if (!context) {
-        throw new Error(
-            'useWsObserver must be used within a WsObserverProvider',
-        );
-    }
-    return context;
-};
+export const useWs = () => useContext(WsContext);
