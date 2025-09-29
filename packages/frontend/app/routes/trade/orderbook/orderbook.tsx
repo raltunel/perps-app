@@ -34,7 +34,7 @@ import type { TabType } from '~/routes/trade';
 // import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useWsObserver, WsChannels } from '~/contexts/WsObserverContext';
+import { useWsObserver } from '~/contexts/WsObserverContext';
 
 interface OrderBookProps {
     orderCount: number;
@@ -307,7 +307,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
             // const { unsubscribe } = info.subscribe(subKey, postOrderBookRaw);
 
-            subscribe(WsChannels.ORDERBOOK, {
+            subscribe('l2Book', {
                 payload: subKey,
                 handler: handleOrderBookResult,
                 single: true,

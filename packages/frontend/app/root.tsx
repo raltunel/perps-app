@@ -27,6 +27,7 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { WsObserverProvider } from './contexts/WsObserverContext';
 
 // Config
 import {
@@ -48,7 +49,6 @@ import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndic
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
 import Modal from './components/Modal/Modal';
-import { WsObserverProvider } from './contexts/WsObserverContext';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
