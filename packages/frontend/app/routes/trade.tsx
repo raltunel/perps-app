@@ -144,6 +144,8 @@ export default function Trade() {
     const TABLE_COLLAPSE_TRIGGER = 160; // when table gets smaller than this, snap down
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
+    const tableSectionRef = useRef<HTMLElement | null>(null);
+    const HEADER_HIT_HEIGHT = 72; // bump to 80/96 if your header is taller
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
@@ -391,13 +393,12 @@ export default function Trade() {
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
 
-    // Consider the table "collapsed" when its height == TABLE_COLLAPSED (± a pixel)
     const isTableCollapsed = () => {
-        const available = getAvailable(); // total px for (chart + table)
+        const available = getAvailable();
         if (!available || available <= 0) return false;
-        const currentTop = chartTopHeightRef.current ?? chartTopHeight; // px for chart
-        const tableHeight = available - currentTop; // px for table
-        return tableHeight <= TABLE_COLLAPSED + 0.5; // small epsilon
+        const currentTop = chartTopHeightRef.current ?? chartTopHeight;
+        const tableHeight = available - currentTop;
+        return tableHeight <= TABLE_COLLAPSED + 0.5;
     };
 
     const openTableToDefault = () => {
@@ -409,6 +410,20 @@ export default function Trade() {
         userRatioRef.current = targetTop / available;
         setHeightBoth(targetTop);
     };
+
+    const collapseTableToBar = () => {
+        const available = getAvailable();
+        if (!available || available <= 0) return;
+        const snapTo = clamp(available - TABLE_COLLAPSED);
+        hasUserOverrideRef.current = true;
+        userRatioRef.current = snapTo / available;
+        setHeightBoth(snapTo);
+    };
+
+    const isInteractiveEl = (el: HTMLElement | null) =>
+        !!el?.closest(
+            'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [contenteditable="true"], [data-ensure-open]',
+        );
 
     // Mobile view
     if (isMobile && symbol) {
@@ -600,19 +615,43 @@ export default function Trade() {
                         <section
                             className={styles.table}
                             id='tutorial-trade-table'
+                            ref={tableSectionRef}
                             onClick={(e) => {
                                 const el = e.target as HTMLElement | null;
                                 if (!el) return;
 
-                                const isInteractive = el.closest(
-                                    'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [data-ensure-open]',
-                                );
+                                const isInteractive = isInteractiveEl(el);
 
                                 if (isInteractive && isTableCollapsed()) {
                                     // defer opening until after the child click finishes
                                     requestAnimationFrame(() => {
                                         openTableToDefault();
                                     });
+                                }
+                            }}
+                            onDoubleClick={(e) => {
+                                if (isMobile) return;
+
+                                const target = e.target as HTMLElement | null;
+                                if (!target) return;
+
+                                // Ignore interactive controls
+                                if (isInteractiveEl(target)) return;
+
+                                // Collapsed → open anywhere
+                                if (isTableCollapsed()) {
+                                    openTableToDefault();
+                                    return;
+                                }
+
+                                const section = tableSectionRef.current;
+                                if (!section) return;
+
+                                const rect = section.getBoundingClientRect();
+                                const yFromTop = e.clientY - rect.top;
+
+                                if (yFromTop <= HEADER_HIT_HEIGHT) {
+                                    collapseTableToBar();
                                 }
                             }}
                         >
