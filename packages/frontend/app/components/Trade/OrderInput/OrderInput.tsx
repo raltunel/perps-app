@@ -2354,7 +2354,7 @@ function OrderInput({
                                 </SimpleButton>
                                 <button
                                     className={styles.trade_type_toggle}
-                                    aria-label='Trade type'
+                                    aria-label={t('aria.tradeType')}
                                     onClick={() => setShowLaunchpad(true)}
                                 >
                                     <PiSquaresFour />
