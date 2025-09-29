@@ -411,6 +411,13 @@ export default function Trade() {
         hasUserOverrideRef.current = true;
         userRatioRef.current = targetTop / available;
         setHeightBoth(targetTop);
+        if (typeof plausible === 'function') {
+            plausible('Trade Table Resize', {
+                props: {
+                    tradeTablePercentOfWindowHeight: 'default',
+                },
+            });
+        }
     };
 
     const collapseTableToBar = () => {
@@ -420,6 +427,13 @@ export default function Trade() {
         hasUserOverrideRef.current = true;
         userRatioRef.current = snapTo / available;
         setHeightBoth(snapTo);
+        if (typeof plausible === 'function') {
+            plausible('Trade Table Resize', {
+                props: {
+                    tradeTablePercentOfWindowHeight: 'minimum',
+                },
+            });
+        }
     };
 
     const isInteractiveEl = (el: HTMLElement | null) =>
