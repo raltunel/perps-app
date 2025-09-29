@@ -34,7 +34,7 @@ import type { TabType } from '~/routes/trade';
 // import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useWsObserver } from '~/contexts/WsObserverContext';
+import { useWs } from '~/contexts/WsContext';
 
 interface OrderBookProps {
     orderCount: number;
@@ -65,7 +65,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     // TODO: Can be uncommented if we want to use the rest poller
     // const { subscribeToPoller, unsubscribeFromPoller } = useRestPoller();
 
-    const { subscribe, unsubscribeAllByChannel } = useWsObserver();
+    const { subscribe, unsubscribeAllByChannel } = useWs();
 
     const orderClickDisabled = false;
 
