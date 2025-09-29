@@ -78,16 +78,6 @@ export default function PageHeader() {
 
     const referralStore = useReferralStore();
     const { t } = useTranslation();
-    useEffect(() => {
-        if (referralCodeFromURL.value && userDataStore.userAddress) {
-            console.log('this one', userDataStore.userAddress);
-            referralStore.set(
-                userDataStore.userAddress,
-                referralCodeFromURL.value,
-                false,
-            );
-        }
-    }, [referralCodeFromURL.value, userDataStore.userAddress]);
 
     const sessionState = useSession();
 
@@ -233,6 +223,18 @@ export default function PageHeader() {
             if (typeof plausible === 'function') {
                 plausible('Session Ended');
             }
+        }
+
+        if (referralCodeFromURL.value && userDataStore.userAddress) {
+            const isConfirmed = referralStore.getCode(
+                userDataStore.userAddress,
+            )?.isConfirmed;
+            isConfirmed ||
+                referralStore.set(
+                    userDataStore.userAddress,
+                    referralCodeFromURL.value,
+                    false,
+                );
         }
 
         console.log(userDataStore.userAddress);
