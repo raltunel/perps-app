@@ -12,7 +12,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 // import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
 // import defaultWorker from '~/processors/workers/default.worker.ts?worker';
 
-export type WsSubscriptionConfig = {
+type WsSubscriptionConfig = {
     handler: (payload: any) => void;
     payload?: any;
     single?: boolean;
@@ -24,20 +24,9 @@ interface WsObserverContextType {
     unsubscribeAllByChannel: (channel: string) => void;
 }
 
-export interface WsObserverProviderProps {
+interface WsObserverProviderProps {
     children: React.ReactNode;
     url: string;
-}
-
-export enum WsChannels {
-    ORDERBOOK = 'l2Book',
-    ORDERBOOK_TRADES = 'trades',
-    USER_FILLS = 'userFills',
-    USER_HISTORICAL_ORDERS = 'userHistoricalOrders',
-    WEB_DATA2 = 'webData2',
-    ACTIVE_COIN_DATA = 'activeAssetCtx',
-    NOTIFICATION = 'notification',
-    CANDLE = 'candle',
 }
 
 export const WsObserverContext = createContext<WsObserverContextType>({
