@@ -5,6 +5,7 @@ import Tooltip from '~/components/Tooltip/Tooltip';
 import ToggleSwitch from '../../ToggleSwitch/ToggleSwitch';
 import ChaseDistance from '../ChaseDistance/ChaseDistance';
 import styles from './ReduceAndProfitToggle.module.css';
+import { t } from 'i18next';
 
 interface PropsIF {
     isReduceOnlyEnabled: boolean;
@@ -169,7 +170,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isChasingIntervalEnabled}
                         onToggle={handleToggleIsChasingInterval}
                         label=''
-                        aria-label='Chasing interval toggle'
+                        aria-label={t('aria.toggleChasingInterval')}
                     />
 
                     <h3 className={styles.toggleLabel}>Max Chase Distance</h3>
@@ -200,7 +201,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isRandomizeEnabled}
                         onToggle={handleToggleRandomize}
                         label=''
-                        aria-label='Randomize toggle'
+                        aria-label={t('aria.toggleRandomize')}
                     />
                     <h3 className={styles.toggleLabel}>Randomize</h3>
                 </div>
@@ -214,9 +215,11 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isReduceOnlyEnabled}
                         onToggle={handleToggleReduceOnly}
                         label=''
-                        aria-label='Reduce Only toggle'
+                        aria-label={t('aria.toggleReduceOnly')}
                     />
-                    <h3 className={styles.toggleLabel}>Reduce Only</h3>
+                    <h3 className={styles.toggleLabel}>
+                        {t('tradeTable.reduceOnly')}
+                    </h3>
                 </div>
             )}
             {showTakeProfitToggle && (
@@ -228,7 +231,7 @@ export default function ReduceAndProfitToggle(props: PropsIF) {
                         isOn={isTakeProfitEnabled}
                         onToggle={handleToggleProfitOnly}
                         label=''
-                        aria-label='Take Profit / Stop Loss toggle'
+                        aria-label={t('aria.toggleTPSL')}
                     />
                     <h3 className={styles.toggleLabel}>
                         Take Profit / Stop Loss
