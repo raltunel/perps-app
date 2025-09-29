@@ -3,13 +3,12 @@ import styles from './ReferralCodeModal.module.css';
 import { useNavigate } from 'react-router';
 
 interface PropsIF {
-    close: () => void;
     refCode: string;
     handleConfirm: () => void;
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
-    const { close, refCode, handleConfirm } = props;
+    const { refCode, handleConfirm } = props;
 
     const navigate = useNavigate();
     return (
@@ -28,7 +27,6 @@ export default function ReferralCodeModal(props: PropsIF) {
                 <SimpleButton
                     bg='dark4'
                     onClick={(): void => {
-                        close();
                         navigate('/v2/referrals');
                     }}
                 >

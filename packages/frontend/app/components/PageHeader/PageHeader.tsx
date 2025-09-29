@@ -507,7 +507,6 @@ export default function PageHeader() {
                     title='Referral Code'
                 >
                     <ReferralCodeModal
-                        close={referralCodeModal.close}
                         refCode={userDataStore.refCode.value}
                         handleConfirm={(): void => {
                             const refCode = referralStore.getCode(
@@ -519,6 +518,7 @@ export default function PageHeader() {
                                     refCode.value,
                                 );
                             }
+                            referralCodeModal.close();
                         }}
                     />
                 </Modal>
