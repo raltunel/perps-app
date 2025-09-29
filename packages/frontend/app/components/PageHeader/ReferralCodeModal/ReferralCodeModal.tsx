@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router';
 interface PropsIF {
     close: () => void;
     refCode: string;
+    handleConfirm: () => void;
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
-    const { close, refCode } = props;
+    const { close, refCode, handleConfirm } = props;
 
     const navigate = useNavigate();
     return (
@@ -23,7 +24,7 @@ export default function ReferralCodeModal(props: PropsIF) {
                 referrer.
             </p>
             <div className={styles.button_container}>
-                <SimpleButton>Confirm</SimpleButton>
+                <SimpleButton onClick={handleConfirm}>Confirm</SimpleButton>
                 <SimpleButton
                     bg='dark4'
                     onClick={(): void => {

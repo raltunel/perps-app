@@ -57,13 +57,13 @@ export default function PageHeader() {
     // logic to read a URL referral code and set in state + local storage
     const userDataStore = useUserDataStore();
     // ref to ensure that the intialization only happens once
-    const isRefCodeInitialized = useRef<boolean>(!!userDataStore.refCode.value);
+    // const isRefCodeInitialized = useRef<boolean>(!!userDataStore.refCode.value);
     // initialize ref code if relevant
-    if (!isRefCodeInitialized.current) {
-        isRefCodeInitialized.current = true;
-        referralCodeFromURL.value &&
-            userDataStore.initializeRefCode(referralCodeFromURL.value);
-    }
+    // if (!isRefCodeInitialized.current) {
+    //     isRefCodeInitialized.current = true;
+    //     referralCodeFromURL.value &&
+    //         userDataStore.initializeRefCode(referralCodeFromURL.value);
+    // }
     // useEffect(() => {
     //     if (referralCodeURL.value) {
     //         userDataStore.setReferralCode(referralCodeURL.value);
@@ -511,6 +511,17 @@ export default function PageHeader() {
                     <ReferralCodeModal
                         close={referralCodeModal.close}
                         refCode={userDataStore.refCode.value}
+                        handleConfirm={(): void => {
+                            const refCode = referralStore.getCode(
+                                userDataStore.userAddress,
+                            );
+                            if (refCode) {
+                                referralStore.confirmCode(
+                                    userDataStore.userAddress,
+                                    refCode.value,
+                                );
+                            }
+                        }}
                     />
                 </Modal>
             )}
