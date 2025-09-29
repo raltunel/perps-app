@@ -373,7 +373,7 @@
         "connectWalletForTrading": "지갑을 연결하고 가스비 없이 거래해 보세요."
     },
     "home": {
-        "title": "앰비언트 - 탈중앙화 선물거래소",
+        "title": "Ambient - 탈중앙화 선물거래소",
         "subtitle": "빠른 체결. 테이커 수수료 없음. 최대 100x 레버리지",
         "startTrading": "거래 시작하기",
         "learnMore": "자세히 알아보기",
@@ -527,7 +527,7 @@
         "liqPrice": "청산 가격"
     },
     "meta": {
-        "title": "홈 | 앰비언트",
+        "title": "홈 | Ambient",
         "content": "앰비언트에서 페페츄얼 거래"
     }
 }
