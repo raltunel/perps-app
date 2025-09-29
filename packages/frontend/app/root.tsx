@@ -286,7 +286,7 @@ export default function App() {
                     return !IS_RESTRICTED_SITE;
                 }}
             >
-                <AppProvider>
+                <AppProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
                     <UnifiedMarginDataProvider>
                         <MarketDataProvider>
                             <WsObserverProvider
