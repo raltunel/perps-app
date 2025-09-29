@@ -1,4 +1,5 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import './i18n'; // i18n MUST be imported before any components
 import { RestrictedSiteMessage } from '~/components/RestrictedSiteMessage/RestrictedSiteMessage';
 import {
     isRouteErrorResponse,
@@ -41,6 +42,8 @@ import {
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
 import { Fuul } from '@fuul/sdk';
+import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
+// import { NATIVE_MINT } from '@solana/spl-token';
 import { useDebugStore } from './stores/DebugStore';
 
 // Styles
@@ -86,6 +89,7 @@ class ErrorBoundary extends React.Component<
 export function Document({ children }: { children: React.ReactNode }) {
     const [innerHeight, setInnerHeight] = useState<number>();
     const [innerWidth, setInnerWidth] = useState<number>();
+    const [navigatorLanguage, setNavigatorLanguage] = useState<string>();
 
     useEffect(() => {
         // Client-side only
@@ -104,6 +108,10 @@ export function Document({ children }: { children: React.ReactNode }) {
             setInnerHeight(window.innerHeight);
             setInnerWidth(window.innerWidth);
         };
+
+        if (typeof navigator !== 'undefined') {
+            setNavigatorLanguage(navigator.language);
+        }
 
         // Initial set
         handleResize();
@@ -125,6 +133,10 @@ export function Document({ children }: { children: React.ReactNode }) {
             });
         }
     }, [FUUL_API_KEY]);
+    const defaultLanguage = useMemo(() => {
+        if (!navigatorLanguage) return;
+        return getDefaultLanguage();
+    }, [navigatorLanguage]);
 
     return (
         <html lang='en'>
@@ -257,6 +269,8 @@ export function Document({ children }: { children: React.ReactNode }) {
                                 : undefined
                         }
                         event-splittestversion={SPLIT_TEST_VERSION}
+                        event-defaultlanguage={defaultLanguage}
+                        event-preferredlanguage={navigatorLanguage}
                         data-domain='perps.ambient.finance'
                         src='https://plausible.io/js/script.pageview-props.tagged-events.js'
                     ></script>
