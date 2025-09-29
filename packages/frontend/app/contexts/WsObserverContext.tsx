@@ -10,6 +10,7 @@ import { useDebugStore } from '~/stores/DebugStore';
 
 // import jsonParserWorker from '~/processors/workers/jsonParser.worker.ts?worker';
 // import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
+import defaultWorker from '~/processors/workers/default.worker.ts?worker';
 
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
@@ -262,13 +263,7 @@ export const WsObserverProvider: React.FC<{
             //     workers.current.set(type, w1);
             //     return w1;
             default:
-                const w2 = new Worker(
-                    new URL(
-                        './../processors/workers/default.worker.ts',
-                        import.meta.url,
-                    ),
-                    { type: 'module' },
-                );
+                const w2 = new defaultWorker();
 
                 // const w2 = new jsonParserWorker();
 
