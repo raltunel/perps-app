@@ -244,11 +244,7 @@ export default function PageHeader() {
             referralCodeModal.open();
         }
         prevIsUserConnected.current = isUserConnected;
-    }, [
-        isUserConnected,
-        userDataStore.referralCode,
-        userDataStore.userAddress,
-    ]);
+    }, [isUserConnected, referralStore.active, userDataStore.userAddress]);
 
     return (
         <>
@@ -500,14 +496,14 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {referralCodeModal.isOpen && (
+            {referralCodeModal.isOpen && referralStore.active && (
                 <Modal
                     close={referralCodeModal.close}
                     position='center'
                     title='Referral Code'
                 >
                     <ReferralCodeModal
-                        refCode={userDataStore.refCode.value}
+                        refCode={referralStore.active.value}
                         handleConfirm={(): void => {
                             const refCode = referralStore.getCode(
                                 userDataStore.userAddress,

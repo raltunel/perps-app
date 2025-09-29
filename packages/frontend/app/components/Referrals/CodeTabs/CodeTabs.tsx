@@ -61,8 +61,8 @@ export default function CodeTabs(props: Props) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
-    // fn to confirm a referral code with FUUL and link to user's wallet address
-    async function confirmRefCode(): Promise<void> {
+    // fn to confirm a referral code and link to user's wallet address
+    function confirmRefCode(): void {
         const isUserConnected = isEstablished(sessionState);
         if (isUserConnected) {
             // await userDataStore.confirmRefCode(
@@ -75,6 +75,10 @@ export default function CodeTabs(props: Props) {
             //         sessionState.sessionPublicKey,
             //     signMessage: sessionState.signMessage,
             // });
+            referralStore.confirmCode(
+                userDataStore.userAddress,
+                referralStore.active?.value || '',
+            );
         }
     }
 
@@ -85,14 +89,8 @@ export default function CodeTabs(props: Props) {
         // toggle DOM to default view
         setIsEditing(false);
         // update referral code in store
-        // referralStore.add({
-        //     value: r,
-        //     isConfirmed: false,
-        //     wallet: userDataStore.userAddress,
-        // });
-        userDataStore.setRefCode(r);
-        // trigger FUUL confirmation workflow
-        await confirmRefCode();
+        console.log('running');
+        referralStore.activateCode(userDataStore.userAddress, r, false);
     }
 
     const affiliateAddress = userDataStore.userAddress;
@@ -101,36 +99,19 @@ export default function CodeTabs(props: Props) {
     const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
 
     const enterCodeContent = isSessionEstablished ? (
-        referralStore.active ? (
+        referralStore.active?.isConfirmed ? (
             !isEditing ? (
                 <section className={styles.sectionWithButton}>
                     <div className={styles.enterCodeContent}>
                         <h6>Current Affiliate Code</h6>
-                        <p>
-                            {
-                                referralStore.getCode(userDataStore.userAddress)
-                                    ?.value
-                            }
-                        </p>
+                        <p>{referralStore.active?.value}</p>
                     </div>
                     <div className={styles.refferal_code_buttons}>
-                        {referralStore.getCode(userDataStore.userAddress)
-                            ?.isConfirmed || (
-                            <SimpleButton
-                                bg='accent1'
-                                onClick={() =>
-                                    referralStore.confirmCode(
-                                        userDataStore.userAddress,
-                                        referralStore.getCode(
-                                            userDataStore.userAddress,
-                                        )?.value || '',
-                                    )
-                                }
-                            >
+                        {referralStore.active?.isConfirmed || (
+                            <SimpleButton bg='accent1' onClick={confirmRefCode}>
                                 Confirm
                             </SimpleButton>
                         )}
-
                         <SimpleButton
                             bg='accent1'
                             onClick={() => setIsEditing(true)}
@@ -144,18 +125,12 @@ export default function CodeTabs(props: Props) {
                     <div className={styles.enterCodeContent}>
                         <h6>
                             Overwrite current referrer code:{' '}
-                            {
-                                referralStore.getCode(userDataStore.userAddress)
-                                    ?.value
-                            }
+                            {referralStore.active?.value}
                         </h6>
                         <input
                             ref={updateReferralCodeInputRef}
                             type='text'
-                            defaultValue={
-                                referralStore.getCode(userDataStore.userAddress)
-                                    ?.value || ''
-                            }
+                            defaultValue={referralStore.active?.value || ''}
                         />
                     </div>
                     <div className={styles.refferal_code_buttons}>
@@ -186,10 +161,7 @@ export default function CodeTabs(props: Props) {
                     <input
                         ref={updateReferralCodeInputRef2}
                         type='text'
-                        defaultValue={
-                            referralStore.getCode(userDataStore.userAddress)
-                                ?.value || ''
-                        }
+                        defaultValue={referralStore.active?.value || ''}
                     />
                 </div>
                 <SimpleButton
