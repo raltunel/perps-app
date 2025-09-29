@@ -524,5 +524,9 @@
     },
     "chart": {
         "liqPrice": "Precio liq."
+    },
+    "meta": {
+        "title": "Inicio | Ambient",
+        "content": "Opera Perps con Ambient"
     }
 }

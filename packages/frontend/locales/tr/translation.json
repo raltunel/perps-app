@@ -524,5 +524,9 @@
     },
     "chart": {
         "liqPrice": "Lik. fiyatı"
+    },
+    "meta": {
+        "title": "Ana Sayfa | Ambient",
+        "content": "Ambient ile vadeli işlemleri alıp satın"
     }
 }

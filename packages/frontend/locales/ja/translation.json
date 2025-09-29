@@ -525,5 +525,9 @@
 
     "chart": {
         "liqPrice": "清算価格"
+    },
+    "meta": {
+        "title": "ホーム | Ambient",
+        "content": "Ambientでパーペチュアル取引"
     }
 }

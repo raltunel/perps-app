@@ -525,5 +525,9 @@
 
     "chart": {
         "liqPrice": "清算价格"
+    },
+    "meta": {
+        "title": "首页 | Ambient",
+        "content": "在Ambient进行永续合约交易"
     }
 }

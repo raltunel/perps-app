@@ -116,9 +116,10 @@ const tokenData: TokenData[] = [
 ];
 
 export function meta() {
+    const { t } = useTranslation();
     return [
-        { title: 'Home | Ambient' },
-        { name: 'description', content: 'Trade Perps with Ambient' },
+        { title: t('meta.title') },
+        { name: 'description', content: t('meta.content') },
     ];
 }
 

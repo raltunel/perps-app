@@ -524,5 +524,9 @@
     },
     "chart": {
         "liqPrice": "Liq. Price"
+    },
+    "meta": {
+        "title": "Home | Ambient",
+        "content": "Trade Perps With Ambient"
     }
 }
