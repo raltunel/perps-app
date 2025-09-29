@@ -25,11 +25,16 @@ enum WebSocketReadyState {
     CLOSED = 3,
 }
 
-type WsObserverContextType = {
+interface WsObserverContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
-};
+}
+
+export interface WsObserverProviderProps {
+    children: React.ReactNode;
+    url: string;
+}
 
 export enum WsChannels {
     ORDERBOOK = 'l2Book',
@@ -48,10 +53,10 @@ export const WsObserverContext = createContext<WsObserverContextType>({
     unsubscribeAllByChannel: () => {},
 });
 
-export const WsObserverProvider: React.FC<{
-    url: string;
-    children: React.ReactNode;
-}> = ({ url, children }) => {
+export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
+    children,
+    url,
+}) => {
     const isClient = useIsClient();
     const [readyState, setReadyState] = useState<number>(
         WebSocketReadyState.CLOSED,
@@ -297,7 +302,11 @@ export const WsObserverProvider: React.FC<{
 
     return (
         <WsObserverContext.Provider
-            value={{ subscribe, unsubscribe, unsubscribeAllByChannel }}
+            value={{
+                subscribe,
+                unsubscribe,
+                unsubscribeAllByChannel,
+            }}
         >
             {children}
         </WsObserverContext.Provider>
