@@ -10,7 +10,7 @@ import daiImage from '../../assets/tokens/dai.svg';
 import ethImage from '../../assets/tokens/eth.svg';
 import usdtImage from '../../assets/tokens/usdt.svg';
 import Hero from '~/components/Home/Hero/Hero';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface FloatingTokenProps {
     src: string;
@@ -139,6 +139,8 @@ export default function Home(): JSX.Element {
     // }, []);
 
     const navigation = useNavigation();
+
+    const { t } = useTranslation();
 
     const { symbol } = useTradeDataStore();
 

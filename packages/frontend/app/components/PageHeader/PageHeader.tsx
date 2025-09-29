@@ -32,7 +32,6 @@ import RpcDropdown from './RpcDropdown/RpcDropdown';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { t } from 'i18next';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { useTranslation } from 'react-i18next';
 
@@ -46,6 +45,7 @@ export default function PageHeader() {
     // logic to read a URL referral code and set in state + local storage
     const [searchParams] = useSearchParams();
     const userDataStore = useUserDataStore();
+    const { t } = useTranslation();
     useEffect(() => {
         const REFERRAL_CODE_URL_PARAM = 'referral';
         const ALTERNATE_REFERRAL_CODE_URL_PARAM = 'ref';
