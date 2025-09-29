@@ -486,7 +486,7 @@
     },
     "leverage": {
         "title": "Hebel anpassen",
-        "closePositionPrompt": "Position schließen, um den Mindesthebel zu reduzieren"
+        "closePositionPrompt": "Position schließen zur Hebel-Reduzierung"
     },
     "share": {
         "prompt": "Bearbeiten Sie Ihren Text",
