@@ -263,6 +263,7 @@ export const WsObserverProvider: React.FC<{
             //     workers.current.set(type, w1);
             //     return w1;
             default:
+                console.log('>>>>> default worker');
                 const w2 = new defaultWorker();
 
                 // const w2 = new jsonParserWorker();
