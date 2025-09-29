@@ -10,6 +10,7 @@ import koTranslation from '../locales/ko/translation.json';
 import zhTranslation from '../locales/zh/translation.json';
 import trTranslation from '../locales/tr/translation.json';
 import viTranslation from '../locales/vi/translation.json';
+import deTranslation from '../locales/de/translation.json';
 
 const resources = {
     en: {
@@ -35,6 +36,9 @@ const resources = {
     },
     vi: {
         translation: viTranslation,
+    },
+    de: {
+        translation: deTranslation,
     },
 };
 
