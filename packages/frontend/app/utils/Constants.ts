@@ -219,9 +219,11 @@ export const languageOptions = {
     en: 'English 🇬🇧',
     es: 'Español 🇪🇸',
     fr: 'Français 🇫🇷',
+    // de: 'Deutsch 🇩🇪',
     tr: 'Türkçe 🇹🇷',
-    ja: '日本語 🇯🇵',
+    // vi: 'Tiếng Việt 🇻🇳',
     ko: '한국어 🇰🇷',
+    ja: '日本語 🇯🇵',
     zh: '中文 (简体) 🇨🇳',
 };
 export const IS_RESTRICTED_SITE =
