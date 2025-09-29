@@ -169,8 +169,6 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
         );
     };
 
-    const [, forceUpdate] = useState(0); // Used to force re-render when needed
-
     useEffect(() => {
         if (readyStateRef.current === WebSocketReadyState.OPEN) {
             subscriptions.current.forEach((configs, key) => {
