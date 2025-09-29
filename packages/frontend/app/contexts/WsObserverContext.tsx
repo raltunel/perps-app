@@ -98,26 +98,27 @@ export const WsObserverProvider: React.FC<{
 
             if (event.data) {
                 const channel = extractChannelFromPayload(event.data);
-                const worker = getWorker(channel);
-                if (worker) {
-                    worker.postMessage(event.data);
-                }
+                // const worker = getWorker(channel);
+                // if (worker) {
+                //     worker.postMessage(event.data);
+                // }
 
                 // const sub = subscriptions.current.get(channel);
                 // if(sub){
-                //   if()
                 //   subscriptions.current.get(channel)?.forEach(config => {
                 //     config.handler(event.data);
                 //   });
                 // }
 
-                // const msg = JSON.parse(event.data);
+                const msg = JSON.parse(event.data);
 
-                // if (subscriptions.current.has(msg.channel)) {
-                //   subscriptions.current.get(msg.channel)?.forEach(config => {
-                //     config.handler(msg.data);
-                //   });
-                // }
+                if (subscriptions.current.has(msg.channel)) {
+                    subscriptions.current
+                        .get(msg.channel)
+                        ?.forEach((config) => {
+                            config.handler(msg.data);
+                        });
+                }
             }
         };
 
@@ -176,7 +177,7 @@ export const WsObserverProvider: React.FC<{
     }, [readyState]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
-        initWorker(key);
+        // initWorker(key);
 
         // add subscripton in hook
         if (!subscriptions.current.has(key)) {
@@ -235,60 +236,60 @@ export const WsObserverProvider: React.FC<{
         }
     };
 
-    const initWorker = (type: string) => {
-        if (!isClient || workers.current.has(type)) {
-            return;
-        }
+    // const initWorker = (type: string) => {
+    //     if (!isClient || workers.current.has(type)) {
+    //         return;
+    //     }
 
-        switch (type) {
-            // case WsChannels.WEB_DATA2:
-            //     // const w1 = new Worker(
-            //     //     new URL(
-            //     //         './../hooks/workers/webdata2.worker.ts',
-            //     //         import.meta.url,
-            //     //     ),
-            //     //     { type: 'module' },
-            //     // );
+    //     switch (type) {
+    //         // case WsChannels.WEB_DATA2:
+    //         //     // const w1 = new Worker(
+    //         //     //     new URL(
+    //         //     //         './../hooks/workers/webdata2.worker.ts',
+    //         //     //         import.meta.url,
+    //         //     //     ),
+    //         //     //     { type: 'module' },
+    //         //     // );
 
-            //     const w1 = new webData2Worker();
+    //         //     const w1 = new webData2Worker();
 
-            //     w1.onmessage = (event) => {
-            //         const subs = subscriptions.current.get(event.data.channel);
-            //         if (subs) {
-            //             subs.forEach((config) => {
-            //                 config.handler(event.data);
-            //             });
-            //         }
-            //     };
-            //     workers.current.set(type, w1);
-            //     return w1;
-            default:
-                console.log('>>>>> default worker');
-                // const w2 = new defaultWorker();
+    //         //     w1.onmessage = (event) => {
+    //         //         const subs = subscriptions.current.get(event.data.channel);
+    //         //         if (subs) {
+    //         //             subs.forEach((config) => {
+    //         //                 config.handler(event.data);
+    //         //             });
+    //         //         }
+    //         //     };
+    //         //     workers.current.set(type, w1);
+    //         //     return w1;
+    //         default:
+    //             console.log('>>>>> default worker');
+    //             // const w2 = new defaultWorker();
 
-                const w2 = new Worker(
-                    new URL(
-                        '~/processors/workers/default.worker.ts',
-                        import.meta.url,
-                    ),
-                    // { type: 'module' },
-                );
+    //             const w2 = new Worker(
+    //                 new URL(
+    //                     '~/processors/workers/default.worker.ts',
+    //                     import.meta.url,
+    //                 ),
+    //                 // { type: 'module' },
+    //             );
 
-                // const w2 = new jsonParserWorker();
+    //             // const w2 = new jsonParserWorker();
 
-                w2.onmessage = (event) => {
-                    const subs = subscriptions.current.get(event.data.channel);
-                    if (subs) {
-                        subs.forEach((config) => {
-                            config.handler(event.data.data);
-                        });
-                    }
-                };
+    //             w2.onmessage = (event) => {
+    //                 const subs = subscriptions.current.get(event.data.channel);
+    //                 if (subs) {
+    //                     subs.forEach((config) => {
+    //                         config.handler(event.data.data);
+    //                     });
+    //                 }
+    //             };
 
-                workers.current.set(type, w2);
-                return w2;
-        }
-    };
+    //             workers.current.set(type, w2);
+    //             return w2;
+    //     }
+    // };
 
     const getWorker = (type: string) => {
         return workers.current.get(type);
