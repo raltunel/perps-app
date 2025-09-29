@@ -290,12 +290,4 @@ export const WsObserverProvider: React.FC<{
     );
 };
 
-export const useWsObserver = () => {
-    const context = useContext(WsObserverContext);
-    if (!context) {
-        throw new Error(
-            'useWsObserver must be used within a WsObserverProvider',
-        );
-    }
-    return context;
-};
+export const useWsObserver = () => useContext(WsObserverContext);
