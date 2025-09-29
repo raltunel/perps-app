@@ -1,20 +1,12 @@
-import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import React, {
     createContext,
     useContext,
     useEffect,
     useRef,
     useState,
-    type Dispatch,
-    type SetStateAction,
 } from 'react';
-import { useCallback } from 'react';
-import { useDebugStore } from '~/stores/DebugStore';
-import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { useUserDataStore } from '~/stores/UserDataStore';
-import { initializePythPriceService } from '~/stores/PythPriceStore';
-import { debugWallets } from '~/utils/Constants';
 import { useIsClient } from '~/hooks/useIsClient';
+import { useDebugStore } from '~/stores/DebugStore';
 
 interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
