@@ -39,7 +39,7 @@ import {
     type UrlParamMethodsIF,
 } from '~/hooks/useURLParams';
 import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
-import { useReferralStore } from '~/stores/ReferralStore';
+import { useReferralStore, type RefCodeIF } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 
 export default function PageHeader() {
@@ -80,6 +80,7 @@ export default function PageHeader() {
     const { t } = useTranslation();
     useEffect(() => {
         if (referralCodeFromURL.value && userDataStore.userAddress) {
+            console.log('this one', userDataStore.userAddress);
             referralStore.set(
                 userDataStore.userAddress,
                 referralCodeFromURL.value,
@@ -222,73 +223,7 @@ export default function PageHeader() {
                             : 'login button clicked',
                     },
                 });
-                const userWalletKey =
-                    sessionState.walletPublicKey ||
-                    sessionState.sessionPublicKey;
-
-                // (async () => {
-                //     try {
-                //         // Create a dynamic message with current date
-                //         const currentDate = new Date()
-                //             .toISOString()
-                //             .split('T')[0];
-                //         const message = `Accept affiliate code ${userDataStore.referralCode} on ${currentDate}`;
-
-                //         // Convert message to Uint8Array
-                //         const messageBytes = new TextEncoder().encode(message);
-
-                //         // Get the signature from the session
-                //         const signatureBytes =
-                //             await sessionState.signMessage(messageBytes);
-
-                //         // Convert the signature to base64
-                //         const signatureArray = Array.from(
-                //             new Uint8Array(signatureBytes),
-                //         );
-                //         const binaryString = String.fromCharCode.apply(
-                //             null,
-                //             signatureArray,
-                //         );
-                //         const signature = btoa(binaryString);
-
-                //         // Call the Fuul SDK to identify the user
-
-                //         try {
-                //             const response = await Fuul.identifyUser({
-                //                 identifier: userWalletKey.toString(),
-                //                 identifierType:
-                //                     UserIdentifierType.SolanaAddress,
-                //                 signature,
-                //                 signaturePublicKey: userWalletKey.toString(),
-                //                 message,
-                //             });
-                //             console.log(
-                //                 'Fuul.identifyUser successful:',
-                //                 response,
-                //             );
-                //         } catch (error: any) {
-                //             console.error('Detailed error in identifyUser:', {
-                //                 message: error.message,
-                //                 status: error.response?.status,
-                //                 statusText: error.response?.statusText,
-                //                 data: error.response?.data,
-                //                 config: {
-                //                     url: error.config?.url,
-                //                     method: error.config?.method,
-                //                     headers: error.config?.headers,
-                //                 },
-                //             });
-                //             throw error; // Re-throw to be caught by the outer catch
-                //         }
-                //     } catch (error) {
-                //         console.error('Error in identifyUser:', error);
-                //         // Optionally show a user-friendly error message
-                //         // You might want to implement this based on your UI framework
-                //         // showErrorToast('Failed to identify user. Please try again.');
-                //     }
-                // })();
-
-                referralCodeModal.open();
+                // referralCodeModal.open();
             }
             localStorage.removeItem('loginButtonClickTime');
         } else if (
@@ -299,8 +234,21 @@ export default function PageHeader() {
                 plausible('Session Ended');
             }
         }
+
+        console.log(userDataStore.userAddress);
+        const refCode: RefCodeIF | undefined = referralStore.getCode(
+            userDataStore.userAddress,
+        );
+        console.log(refCode);
+        if (refCode?.isConfirmed === false) {
+            referralCodeModal.open();
+        }
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected, userDataStore.referralCode]);
+    }, [
+        isUserConnected,
+        userDataStore.referralCode,
+        userDataStore.userAddress,
+    ]);
 
     return (
         <>
