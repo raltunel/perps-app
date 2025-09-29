@@ -34,7 +34,7 @@ import type { TabType } from '~/routes/trade';
 // import { useSdk } from '~/hooks/useSdk';
 import type { L2BookData } from '@perps-app/sdk/src/utils/types';
 import { processOrderBookMessage } from '~/processors/processOrderBook';
-import { useWsObserver } from '~/contexts/WsObserverContext';
+import { useWsObserver } from '~/contexts/useWsObserver';
 
 interface OrderBookProps {
     orderCount: number;

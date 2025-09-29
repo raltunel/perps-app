@@ -27,7 +27,7 @@ import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
 import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
-import { WsObserverProvider } from './contexts/WsObserverContext';
+import { WsObserverProvider } from './contexts/useWsObserver';
 
 // Config
 import {
