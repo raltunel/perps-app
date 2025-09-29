@@ -1,0 +1,7 @@
+{
+    "permissions": {
+        "allow": ["Read(//d/aa_proven/perps-app/**)"],
+        "deny": [],
+        "ask": []
+    }
+}
