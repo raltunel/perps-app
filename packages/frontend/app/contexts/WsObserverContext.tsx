@@ -8,9 +8,6 @@ import React, {
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
 
-import jsonParserWorker from '~/processors/workers/jsonParser.worker.ts?worker';
-import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
-
 export type WsSubscriptionConfig = {
     handler: (payload: any) => void;
     payload?: any;
@@ -249,7 +246,13 @@ export const WsObserverProvider: React.FC<{
                 //     { type: 'module' },
                 // );
 
-                const w1 = new webData2Worker();
+                const w1 = new Worker(
+                    new URL(
+                        '~/hooks/workers/webdata2.worker.ts',
+                        import.meta.url,
+                    ),
+                    { type: 'module' },
+                );
 
                 w1.onmessage = (event) => {
                     const subs = subscriptions.current.get(event.data.channel);
@@ -270,7 +273,13 @@ export const WsObserverProvider: React.FC<{
                 //     { type: 'module' },
                 // );
 
-                const w2 = new jsonParserWorker();
+                const w2 = new Worker(
+                    new URL(
+                        '~/processors/workers/jsonParser.worker.ts',
+                        import.meta.url,
+                    ),
+                    { type: 'module' },
+                );
 
                 w2.onmessage = (event) => {
                     const subs = subscriptions.current.get(event.data.channel);
