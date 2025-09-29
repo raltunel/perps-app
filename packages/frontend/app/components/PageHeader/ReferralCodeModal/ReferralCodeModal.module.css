@@ -21,7 +21,12 @@
 }
 
 .referral_code_modal > p {
+    text-align: center;
     font-size: var(--font-size-s);
+}
+
+.referral_code_inline {
+    color: var(--accent3);
 }
 
 .button_container {

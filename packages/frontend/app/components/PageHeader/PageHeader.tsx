@@ -40,6 +40,7 @@ import {
     type UrlParamMethodsIF,
 } from '~/hooks/useURLParams';
 import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
+import { useReferralStore } from '~/stores/ReferralStore';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -74,6 +75,17 @@ export default function PageHeader() {
     //         // window.history.replaceState({}, '', newUrl); // remove referral code from URL
     //     }
     // }, [referralCodeURL.value]);
+
+    const referralStore = useReferralStore();
+    useEffect(() => {
+        if (referralCodeFromURL.value) {
+            referralStore.set(
+                referralCodeFromURL.value,
+                referralCodeFromURL.value,
+                false,
+            );
+        }
+    }, []);
 
     const sessionState = useSession();
 
@@ -116,6 +128,8 @@ export default function PageHeader() {
     const { marginBucket } = useUnifiedMarginData();
 
     const landingTime = useRef<number>(Date.now());
+
+    const userData = useUserDataStore();
 
     // data to generate nav links in page header
     const navLinks = [
@@ -543,7 +557,10 @@ export default function PageHeader() {
                     position='center'
                     title='Referral Code'
                 >
-                    <ReferralCodeModal close={referralCodeModal.close} />
+                    <ReferralCodeModal
+                        close={referralCodeModal.close}
+                        refCode={userData.refCode.value}
+                    />
                 </Modal>
             )}
             {PortfolioModalsRenderer}

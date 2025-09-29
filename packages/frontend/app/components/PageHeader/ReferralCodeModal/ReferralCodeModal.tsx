@@ -4,27 +4,34 @@ import { useNavigate } from 'react-router';
 
 interface PropsIF {
     close: () => void;
+    refCode: string;
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
-    const { close } = props;
+    const { close, refCode } = props;
 
     const navigate = useNavigate();
     return (
         <section className={styles.referral_code_modal}>
             <p>
-                Your referral code is REF_CODE_HERE for this wallet address. Do
-                you wish to confirm?
+                You have been referred by{' '}
+                <span className={styles.referral_code_inline}>{refCode}</span>{' '}
+                to Ambient Perps.
+            </p>
+            <p>
+                Using a referral code will grant incentives to both you and the
+                referrer.
             </p>
             <div className={styles.button_container}>
                 <SimpleButton>Confirm</SimpleButton>
                 <SimpleButton
+                    bg='dark4'
                     onClick={(): void => {
                         close();
                         navigate('/v2/referrals');
                     }}
                 >
-                    Details
+                    Edit
                 </SimpleButton>
             </div>
         </section>
