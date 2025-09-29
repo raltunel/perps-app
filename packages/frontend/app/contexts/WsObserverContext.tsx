@@ -12,11 +12,11 @@ import { useDebugStore } from '~/stores/DebugStore';
 // import webData2Worker from '~/hooks/workers/webdata2.worker.ts?worker';
 // import defaultWorker from '~/processors/workers/default.worker.ts?worker';
 
-type WsSubscriptionConfig = {
+interface WsSubscriptionConfig {
     handler: (payload: any) => void;
     payload?: any;
     single?: boolean;
-};
+}
 
 interface WsObserverContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
