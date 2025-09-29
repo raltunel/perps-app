@@ -390,6 +390,25 @@ export default function Trade() {
         isAnyPortfolioModalOpen,
     } = usePortfolioModals();
 
+    // Consider the table "collapsed" when its height == TABLE_COLLAPSED (± a pixel)
+    const isTableCollapsed = () => {
+        const available = getAvailable(); // total px for (chart + table)
+        if (!available || available <= 0) return false;
+        const currentTop = chartTopHeightRef.current ?? chartTopHeight; // px for chart
+        const tableHeight = available - currentTop; // px for table
+        return tableHeight <= TABLE_COLLAPSED + 0.5; // small epsilon
+    };
+
+    const openTableToDefault = () => {
+        const available = getAvailable();
+        if (!available || available <= 0) return;
+        const desiredTable = Math.max(TABLE_MIN, TABLE_DEFAULT);
+        const targetTop = clamp(available - desiredTable);
+        hasUserOverrideRef.current = true;
+        userRatioRef.current = targetTop / available;
+        setHeightBoth(targetTop);
+    };
+
     // Mobile view
     if (isMobile && symbol) {
         return (
@@ -580,6 +599,21 @@ export default function Trade() {
                         <section
                             className={styles.table}
                             id='tutorial-trade-table'
+                            onClick={(e) => {
+                                const el = e.target as HTMLElement | null;
+                                if (!el) return;
+
+                                const isInteractive = el.closest(
+                                    'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [data-ensure-open]',
+                                );
+
+                                if (isInteractive && isTableCollapsed()) {
+                                    // defer opening until after the child click finishes
+                                    requestAnimationFrame(() => {
+                                        openTableToDefault();
+                                    });
+                                }
+                            }}
                         >
                             <MemoizedTradeTable />
                         </section>
