@@ -261,7 +261,7 @@
     },
     "margin": {
         "cross": {
-            "title": "Crucero",
+            "title": "Cruzado",
             "heading": "Margen cruzado",
             "blurb": "Todas las posiciones cruzadas comparten el mismo margen cruzado como garantía. Si es liquidada, se pierde el saldo de margen y cualquier posición abierta restante en este modo."
         },
@@ -441,17 +441,17 @@
         "fundingCountdownTooltip": "Tiempo restante hasta próximo fondeo"
     },
     "feedback": {
-        "menuLabel": "Feedback",
-        "title": "Envía tu feedback",
+        "menuLabel": "Comentarios",
+        "title": "Envía tu comentario",
         "ratingPrompt": "¿Cómo calificarías la experiencia?",
-        "sendFeedback": "Enviar feedback",
+        "sendFeedback": "Enviar comentario",
         "positivePrompt": "¿Qué te gustó más?",
         "negativePrompt": "¿En qué podemos mejorar?",
-        "placeholder": "Tu feedback anónimo nos ayuda a mejorar.",
-        "warningText": "Tu feedback es demasiado largo y será recortado.",
-        "submitButtonText": "Enviar feedback",
+        "placeholder": "Tu comentario anónimo nos ayuda a mejorar.",
+        "warningText": "Tu comentario es demasiado largo y será recortado.",
+        "submitButtonText": "Enviar comentario",
         "submittingButtonText": "Enviando...",
-        "appreciateText": "¡Gracias por tu feedback!",
+        "appreciateText": "¡Gracias por tu comentario!",
         "thanksText": "¡Gracias!"
     },
     "accountOverview": {

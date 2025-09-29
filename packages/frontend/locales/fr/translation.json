@@ -441,17 +441,17 @@
         "fundingCountdownTooltip": "Temps restant jusqu'au prochain financement"
     },
     "feedback": {
-        "menuLabel": "Feedback",
-        "title": "Envoyez votre feedback",
+        "menuLabel": "Commentaires",
+        "title": "Envoyez votre commentaire",
         "ratingPrompt": "Comment évalueriez-vous votre expérience ?",
-        "sendFeedback": "Envoyer le feedback",
+        "sendFeedback": "Envoyer le commentaire",
         "positivePrompt": "Qu'avez-vous le plus aimé ?",
         "negativePrompt": "Qu'est-ce que nous pouvons améliorer ?",
-        "placeholder": "Votre feedback anonyme nous aide à améliorer.",
-        "warningText": "Votre feedback est trop long et sera tronqué.",
-        "submitButtonText": "Envoyer le feedback",
+        "placeholder": "Votre commentaire anonyme nous aide à améliorer.",
+        "warningText": "Votre commentaire est trop long et sera tronqué.",
+        "submitButtonText": "Envoyer le commentaire",
         "submittingButtonText": "Envoi en cours...",
-        "appreciateText": "Merci pour votre feedback.",
+        "appreciateText": "Merci pour votre commentaire.",
         "thanksText": "Merci !"
     },
     "accountOverview": {
