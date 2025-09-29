@@ -172,7 +172,7 @@
         },
         "cancelOrderPending": {
             "title": "Cancel Order Pending",
-            "message": "Canceling orderfor {{usdValueOfOrderStr}} of {{symbol}}"
+            "message": "Canceling order for {{usdValueOfOrderStr}} of {{symbol}}"
         },
         "cancelOrderConfirmed": {
             "title": "Order Canceled",
