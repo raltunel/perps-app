@@ -38,9 +38,11 @@ export enum WsChannels {
     CANDLE = 'candle',
 }
 
-const WsObserverContext = createContext<WsObserverContextType | undefined>(
-    undefined,
-);
+export const WsObserverContext = createContext<WsObserverContextType>({
+    subscribe: () => {},
+    unsubscribe: () => {},
+    unsubscribeAllByChannel: () => {},
+});
 
 export const WsObserverProvider: React.FC<{
     url: string;
