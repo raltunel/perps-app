@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "Votre solde actuel du portefeuille",
         "depositSuccessful": "Dépôt réussi",
         "successfullyDeposited": "Dépôt réussi de {{amount}} {{unit}}",
-        "despositFailed": "Échec du dépôt",
+        "depositFailed": "Échec du dépôt",
         "withdrawalSuccessful": "Retrait réussi",
         "successfullyWithdrawn": "Retrait réussi de {{amount}} {{unit}}",
         "withdrawFailed": "Échec du retrait",

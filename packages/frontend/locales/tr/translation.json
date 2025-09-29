@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "Geçerli cüzdan bakiyeniz",
         "depositSuccessful": "Yatırma Başarılı",
         "successfullyDeposited": "{{amount}} {{unit}} başarılı şekilde yatırıldı",
-        "despositFailed": "Yatırma Başarısız",
+        "depositFailed": "Yatırma Başarısız",
         "withdrawalSuccessful": "Çekim Başarılı",
         "successfullyWithdrawn": "{{amount}} {{unit}} başarılı şekilde çekildi",
         "withdrawFailed": "Çekim Başarısız",

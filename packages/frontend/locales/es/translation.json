@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "Su saldo actual de la cartera",
         "depositSuccessful": "Depósito exitoso",
         "successfullyDeposited": "Depósito exitoso de {{amount}} {{unit}}",
-        "despositFailed": "Depósito fallido",
+        "depositFailed": "Depósito fallido",
         "withdrawalSuccessful": "Retiro exitoso",
         "successfullyWithdrawn": "Retiro exitoso de {{amount}} {{unit}}",
         "withdrawFailed": "Retiro fallido",

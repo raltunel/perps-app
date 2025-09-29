@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "Your current wallet balance",
         "depositSuccessful": "Deposit Successful",
         "successfullyDeposited": "Successfully deposited {{amount}} {{unit}}",
-        "despositFailed": "Deposit Failed",
+        "depositFailed": "Deposit Failed",
         "withdrawalSuccessful": "Withdrawal Successful",
         "successfullyWithdrawn": "Successfully withdrew {{amount}} {{unit}}",
         "withdrawFailed": "Withdrawal Failed",
@@ -210,12 +210,12 @@
             "message": "Failed to cancel any orders."
         },
         "cancelAllConfirmed": {
-            "title": "All Orders Cancelled",
-            "message": "Successfully cancelled all {{count}} orders"
+            "title": "All Orders Canceled",
+            "message": "Successfully canceled all {{count}} orders"
         },
         "cancelAllPartialSuccess": {
             "title": "Partial Success",
-            "message": "Cancelled {{successCount}} orders, {{failedCount}} failed"
+            "message": "Canceled {{successCount}} orders, {{failedCount}} failed"
         },
         "noOpenOrders": "No open orders",
         "transactionError": "Transaction Error",

@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "現在のウォレット残高",
         "depositSuccessful": "入金成功",
         "successfullyDeposited": "{{amount}} {{unit}}入金完了",
-        "despositFailed": "入金失敗",
+        "depositFailed": "入金失敗",
         "withdrawalSuccessful": "出金成功",
         "successfullyWithdrawn": "{{amount}} {{unit}}出金完了",
         "withdrawFailed": "出金失敗",

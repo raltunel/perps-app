@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "현재 지갑 잔고",
         "depositSuccessful": "입금 성공",
         "successfullyDeposited": "{{amount}} {{unit}} 입금 성공",
-        "despositFailed": "입금 실패",
+        "depositFailed": "입금 실패",
         "withdrawalSuccessful": "출금 성공",
         "successfullyWithdrawn": "{{amount}} {{unit}} 출금 성공",
         "withdrawFailed": "출금 실패",

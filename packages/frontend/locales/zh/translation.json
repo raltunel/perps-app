@@ -152,7 +152,7 @@
         "walletBalanceTooltip": "当前钱包余额",
         "depositSuccessful": "充值成功",
         "successfullyDeposited": "成功充值{{amount}} {{unit}}",
-        "despositFailed": "充值失败",
+        "depositFailed": "充值失败",
         "withdrawalSuccessful": "提现成功",
         "successfullyWithdrawn": "成功提现{{amount}} {{unit}}",
         "withdrawFailed": "提现失败",
