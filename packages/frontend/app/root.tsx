@@ -269,8 +269,6 @@ export default function App() {
 
     const restrictedSiteModal = useModal('closed');
 
-    console.log('>>>>>>', WsObserverProvider);
-
     return (
         <Document>
             <FogoSessionProvider

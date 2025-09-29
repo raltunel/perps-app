@@ -18,13 +18,6 @@ export type WsSubscriptionConfig = {
     single?: boolean;
 };
 
-enum WebSocketReadyState {
-    CONNECTING = 0,
-    OPEN = 1,
-    CLOSING = 2,
-    CLOSED = 3,
-}
-
 interface WsObserverContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
@@ -58,10 +51,8 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
     url,
 }) => {
     const isClient = useIsClient();
-    const [readyState, setReadyState] = useState<number>(
-        WebSocketReadyState.CLOSED,
-    );
-    const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
+    const [readyState, setReadyState] = useState<number>(3);
+    const readyStateRef = useRef<number>(3);
     readyStateRef.current = readyState;
     const workers = useRef<Map<string, Worker>>(new Map());
     const socketRef = useRef<WebSocket | null>(null);
@@ -93,7 +84,7 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
         socketRef.current = socket;
 
         socket.onopen = () => {
-            setReadyState(WebSocketReadyState.OPEN);
+            setReadyState(1);
         };
 
         socket.onmessage = (event) => {
@@ -128,7 +119,7 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
         };
 
         socket.onclose = () => {
-            setReadyState(WebSocketReadyState.CLOSED);
+            setReadyState(3);
         };
 
         socket.onerror = (error) => {
@@ -148,7 +139,7 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
     const sendMessage = (msg: string) => {
-        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
+        if (socketRef.current?.readyState === 1) {
             socketRef.current.send(msg);
         }
     };
@@ -170,7 +161,7 @@ export const WsObserverProvider: React.FC<WsObserverProviderProps> = ({
     };
 
     useEffect(() => {
-        if (readyStateRef.current === WebSocketReadyState.OPEN) {
+        if (readyStateRef.current === 1) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
                     registerWsSubscription(key, config.payload || {});
