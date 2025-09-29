@@ -114,7 +114,17 @@ export default function CodeTabs(props: Props) {
                         </p>
                     </div>
                     <div className={styles.refferal_code_buttons}>
-                        <SimpleButton bg='accent1' onClick={confirmRefCode}>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() =>
+                                referralStore.confirmCode(
+                                    userDataStore.userAddress,
+                                    referralStore.getCode(
+                                        userDataStore.userAddress,
+                                    )?.value || '',
+                                )
+                            }
+                        >
                             Confirm
                         </SimpleButton>
                         <SimpleButton

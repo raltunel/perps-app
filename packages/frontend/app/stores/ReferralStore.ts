@@ -9,6 +9,7 @@ export interface RefCodeIF {
 export interface ReferralStoreIF {
     codes: Map<string, RefCodeIF>;
     getCode(address: string): RefCodeIF | undefined;
+    confirmCode(address: string, refCode: string): void;
     set(address: string, refCode: string, isConfirmed: boolean): void;
 }
 
@@ -32,6 +33,16 @@ export const useReferralStore = create<ReferralStoreIF>()(
             codes: new Map<string, RefCodeIF>(),
             getCode(address: string): RefCodeIF | undefined {
                 return get().codes.get(address.toLowerCase());
+            },
+            confirmCode(address: string, refCode: string): void {
+                set((state) => {
+                    const newCodes = new Map<string, RefCodeIF>(state.codes);
+                    newCodes.set(address.toLowerCase(), {
+                        value: refCode,
+                        isConfirmed: true,
+                    });
+                    return { codes: newCodes };
+                });
             },
             set(address: string, refCode: string, isConfirmed: boolean) {
                 set((state) => {
