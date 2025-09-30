@@ -12,8 +12,6 @@ import SimpleButton from '~/components/SimpleButton/SimpleButton';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import { Fuul } from '@fuul/sdk';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
-import { FaCheck } from 'react-icons/fa';
-import { GiCancel } from 'react-icons/gi';
 import { useReferralStore } from '~/stores/ReferralStore';
 
 // Add Buffer type definition for TypeScript
@@ -65,16 +63,6 @@ export default function CodeTabs(props: Props) {
     function confirmRefCode(): void {
         const isUserConnected = isEstablished(sessionState);
         if (isUserConnected) {
-            // await userDataStore.confirmRefCode(
-            //     sessionState.walletPublicKey || sessionState.sessionPublicKey,
-            //     sessionState.signMessage,
-            // );
-            // referralStore.confirm({
-            //     walletKey:
-            //         sessionState.walletPublicKey ||
-            //         sessionState.sessionPublicKey,
-            //     signMessage: sessionState.signMessage,
-            // });
             referralStore.confirmCode(
                 userDataStore.userAddress,
                 referralStore.active?.value || '',
@@ -83,13 +71,13 @@ export default function CodeTabs(props: Props) {
     }
 
     // fn to update a referral code and trigger FUUL confirmation workflow
-    async function handleUpdateReferralCode(r: string): Promise<void> {
+    function handleUpdateReferralCode(r: string): void {
         // update referral code param in the URL
         handleReferralURLParam.set(r);
         // toggle DOM to default view
         setIsEditing(false);
         // update referral code in store
-        console.log('running');
+        console.log(userDataStore.userAddress);
         referralStore.activateCode(userDataStore.userAddress, r, false);
     }
 
@@ -491,7 +479,4 @@ export default function CodeTabs(props: Props) {
             </motion.div>
         </div>
     );
-}
-function useURLParams(arg0: string) {
-    throw new Error('Function not implemented.');
 }
