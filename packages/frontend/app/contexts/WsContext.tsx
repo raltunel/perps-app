@@ -56,7 +56,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     );
 
     const { isWsSleepMode } = useDebugStore();
-    const { isTabActive } = useAppStateStore();
+    const { isTabActive, setWsReconnecting } = useAppStateStore();
     const sleepModeRef = useRef(isWsSleepMode);
     sleepModeRef.current = isWsSleepMode;
 
@@ -85,6 +85,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
 
         socket.onopen = () => {
             setReadyState(WebSocketReadyState.OPEN);
+            setWsReconnecting(false);
         };
 
         socket.onmessage = (event) => {
@@ -201,6 +202,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             console.log('>>>> tab active', new Date().toISOString());
             if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
                 console.log('>>>> reconnect socket after istabactive');
+                setWsReconnecting(true);
                 connectWebSocket();
             } else {
                 console.log('>>>> socket already open after istabactive');
