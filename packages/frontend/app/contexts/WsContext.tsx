@@ -132,7 +132,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         }
 
         return () => {
-            // console.log('>>> socket closed!!!!!!!!!!!!!');
+            // console.log('>>>> socket closed!!!!!!!!!!!!!');
             // socketRef.current?.close();
         };
     }, [url, isClient]); // ✅ Only runs when client-side is ready
@@ -164,7 +164,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
                     console.log(
-                        '>>> registerWsSubscription',
+                        '>>>> registerWsSubscription',
                         key,
                         config.payload,
                     );
@@ -177,23 +177,39 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     useEffect(() => {
         if (!internetConnected) {
             if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
-                console.log('>>> close socket');
+                console.log('>>>> close socket');
                 socketRef.current?.close();
                 shouldReconnect.current = true;
             }
         } else {
-            console.log('>>> internetConnected', internetConnected);
+            console.log('>>>> internetConnected', internetConnected);
             console.log(
-                '>>> socketRef.current?.readyState',
+                '>>>> socketRef.current?.readyState',
                 socketRef.current?.readyState,
             );
             if (shouldReconnect.current) {
-                console.log('>>> connect socket');
+                console.log('>>>> connect socket');
                 connectWebSocket();
                 shouldReconnect.current = false;
             }
         }
     }, [internetConnected]);
+
+    useEffect(() => {
+        if (isWsSleepMode) {
+            console.log('>>>> sleep mode', new Date().toISOString());
+            shouldReconnect.current = true;
+        } else {
+            if (
+                shouldReconnect.current &&
+                socketRef.current?.readyState !== WebSocketReadyState.OPEN
+            ) {
+                console.log('>>>> reconnect socket after sleep mode');
+                connectWebSocket();
+                shouldReconnect.current = false;
+            }
+        }
+    }, [isWsSleepMode]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
         // initWorker(key);
@@ -283,7 +299,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //         //     workers.current.set(type, w1);
     //         //     return w1;
     //         default:
-    //             console.log('>>>>> default worker');
+    //             console.log('>>>>>> default worker');
     //             // const w2 = new defaultWorker();
 
     //             const w2 = new Worker(
