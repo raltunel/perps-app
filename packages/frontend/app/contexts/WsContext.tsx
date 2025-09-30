@@ -166,11 +166,6 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         if (readyStateRef.current === WebSocketReadyState.OPEN) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
-                    console.log(
-                        '>>>> registerWsSubscription',
-                        key,
-                        config.payload,
-                    );
                     registerWsSubscription(key, config.payload || {});
                 });
             });
@@ -180,18 +175,11 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     useEffect(() => {
         if (!internetConnected) {
             if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
-                console.log('>>>> close socket');
                 socketRef.current?.close();
                 shouldReconnect.current = true;
             }
         } else {
-            console.log('>>>> internetConnected', internetConnected);
-            console.log(
-                '>>>> socketRef.current?.readyState',
-                socketRef.current?.readyState,
-            );
             if (shouldReconnect.current) {
-                console.log('>>>> connect socket');
                 connectWebSocket();
                 shouldReconnect.current = false;
             }
