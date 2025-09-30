@@ -8,11 +8,19 @@ import React, {
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useWorker, WORKERS } from '~/hooks/useWorker';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
+}
+
+enum WebSocketReadyState {
+    CONNECTING = 0,
+    OPEN = 1,
+    CLOSING = 2,
+    CLOSED = 3,
 }
 
 export const WsContext = createContext<WsContextType>({
@@ -36,8 +44,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //----------------------------------- ws context
 
     const isClient = useIsClient();
-    const [readyState, setReadyState] = useState<number>(3);
-    const readyStateRef = useRef<number>(3);
+    const [readyState, setReadyState] = useState<number>(
+        WebSocketReadyState.CLOSED,
+    );
+    const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
     readyStateRef.current = readyState;
     const workers = useRef<Map<string, Worker>>(new Map());
     const socketRef = useRef<WebSocket | null>(null);
@@ -48,6 +58,8 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     const { isWsSleepMode } = useDebugStore();
     const sleepModeRef = useRef(isWsSleepMode);
     sleepModeRef.current = isWsSleepMode;
+
+    const { internetConnected } = useAppStateStore();
 
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
@@ -69,7 +81,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         socketRef.current = socket;
 
         socket.onopen = () => {
-            setReadyState(1);
+            setReadyState(WebSocketReadyState.OPEN);
         };
 
         socket.onmessage = (event) => {
@@ -104,7 +116,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         };
 
         socket.onclose = () => {
-            setReadyState(3);
+            setReadyState(WebSocketReadyState.CLOSED);
         };
 
         socket.onerror = (error) => {
@@ -124,7 +136,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
     const sendMessage = (msg: string) => {
-        if (socketRef.current?.readyState === 1) {
+        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
             socketRef.current.send(msg);
         }
     };
@@ -146,14 +158,38 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     };
 
     useEffect(() => {
-        if (readyStateRef.current === 1) {
+        if (readyStateRef.current === WebSocketReadyState.OPEN) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
+                    console.log(
+                        '>>> registerWsSubscription',
+                        key,
+                        config.payload,
+                    );
                     registerWsSubscription(key, config.payload || {});
                 });
             });
         }
     }, [readyState]);
+
+    useEffect(() => {
+        if (!internetConnected) {
+            if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
+                console.log('>>> close socket');
+                socketRef.current?.close();
+            }
+        } else {
+            console.log('>>> internetConnected', internetConnected);
+            console.log(
+                '>>> socketRef.current?.readyState',
+                socketRef.current?.readyState,
+            );
+            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
+                console.log('>>> connect socket');
+                connectWebSocket();
+            }
+        }
+    }, [internetConnected]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
         // initWorker(key);
