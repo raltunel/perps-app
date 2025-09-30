@@ -63,6 +63,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     const { internetConnected } = useAppStateStore();
 
     const shouldReconnect = useRef(false);
+    const shouldReconnectForTabActive = useRef(false);
 
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
@@ -199,16 +200,16 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
 
     useEffect(() => {
         if (isTabActive) {
-            console.log('>>>> tab active', new Date().toISOString());
-            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
-                console.log('>>>> reconnect socket after istabactive');
+            if (
+                socketRef.current?.readyState !== WebSocketReadyState.OPEN &&
+                shouldReconnectForTabActive.current
+            ) {
                 setWsReconnecting(true);
                 connectWebSocket();
-            } else {
-                console.log('>>>> socket already open after istabactive');
             }
+            shouldReconnectForTabActive.current = false;
         } else {
-            console.log('>>>> tab inactive', new Date().toISOString());
+            shouldReconnectForTabActive.current = true;
         }
     }, [isTabActive]);
 
