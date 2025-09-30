@@ -8,11 +8,19 @@ import React, {
 import { useIsClient } from '~/hooks/useIsClient';
 import { useDebugStore } from '~/stores/DebugStore';
 import { useWorker, WORKERS } from '~/hooks/useWorker';
+import { useAppStateStore } from '~/stores/AppStateStore';
 
 interface WsContextType {
     subscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribe: (key: string, config: WsSubscriptionConfig) => void;
     unsubscribeAllByChannel: (channel: string) => void;
+}
+
+enum WebSocketReadyState {
+    CONNECTING = 0,
+    OPEN = 1,
+    CLOSING = 2,
+    CLOSED = 3,
 }
 
 export const WsContext = createContext<WsContextType>({
@@ -36,8 +44,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //----------------------------------- ws context
 
     const isClient = useIsClient();
-    const [readyState, setReadyState] = useState<number>(3);
-    const readyStateRef = useRef<number>(3);
+    const [readyState, setReadyState] = useState<number>(
+        WebSocketReadyState.CLOSED,
+    );
+    const readyStateRef = useRef<number>(WebSocketReadyState.CLOSED);
     readyStateRef.current = readyState;
     const workers = useRef<Map<string, Worker>>(new Map());
     const socketRef = useRef<WebSocket | null>(null);
@@ -46,8 +56,14 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     );
 
     const { isWsSleepMode } = useDebugStore();
+    const { isTabActive, setWsReconnecting } = useAppStateStore();
     const sleepModeRef = useRef(isWsSleepMode);
     sleepModeRef.current = isWsSleepMode;
+
+    const { internetConnected } = useAppStateStore();
+
+    const shouldReconnect = useRef(false);
+    const shouldReconnectForTabActive = useRef(false);
 
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
@@ -69,7 +85,8 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         socketRef.current = socket;
 
         socket.onopen = () => {
-            setReadyState(1);
+            setReadyState(WebSocketReadyState.OPEN);
+            setWsReconnecting(false);
         };
 
         socket.onmessage = (event) => {
@@ -104,7 +121,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         };
 
         socket.onclose = () => {
-            setReadyState(3);
+            setReadyState(WebSocketReadyState.CLOSED);
         };
 
         socket.onerror = (error) => {
@@ -118,13 +135,13 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
         }
 
         return () => {
-            // console.log('>>> socket closed!!!!!!!!!!!!!');
+            // console.log('>>>> socket closed!!!!!!!!!!!!!');
             // socketRef.current?.close();
         };
     }, [url, isClient]); // ✅ Only runs when client-side is ready
 
     const sendMessage = (msg: string) => {
-        if (socketRef.current?.readyState === 1) {
+        if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
             socketRef.current.send(msg);
         }
     };
@@ -146,7 +163,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     };
 
     useEffect(() => {
-        if (readyStateRef.current === 1) {
+        if (readyStateRef.current === WebSocketReadyState.OPEN) {
             subscriptions.current.forEach((configs, key) => {
                 configs.forEach((config) => {
                     registerWsSubscription(key, config.payload || {});
@@ -154,6 +171,35 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             });
         }
     }, [readyState]);
+
+    useEffect(() => {
+        if (!internetConnected) {
+            if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
+                socketRef.current?.close();
+                shouldReconnect.current = true;
+            }
+        } else {
+            if (shouldReconnect.current) {
+                connectWebSocket();
+                shouldReconnect.current = false;
+            }
+        }
+    }, [internetConnected]);
+
+    useEffect(() => {
+        if (isTabActive) {
+            if (
+                socketRef.current?.readyState !== WebSocketReadyState.OPEN &&
+                shouldReconnectForTabActive.current
+            ) {
+                setWsReconnecting(true);
+                connectWebSocket();
+            }
+            shouldReconnectForTabActive.current = false;
+        } else {
+            shouldReconnectForTabActive.current = true;
+        }
+    }, [isTabActive]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
         // initWorker(key);
@@ -243,7 +289,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     //         //     workers.current.set(type, w1);
     //         //     return w1;
     //         default:
-    //             console.log('>>>>> default worker');
+    //             console.log('>>>>>> default worker');
     //             // const w2 = new defaultWorker();
 
     //             const w2 = new Worker(
