@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 interface PropsIF {
     refCode: string;
     handleConfirm: () => void;
+    close: () => void;
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
@@ -28,6 +29,7 @@ export default function ReferralCodeModal(props: PropsIF) {
                     bg='dark4'
                     onClick={(): void => {
                         navigate('/v2/referrals');
+                        close();
                     }}
                 >
                     Edit
