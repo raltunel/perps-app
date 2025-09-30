@@ -61,6 +61,8 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
 
     const { internetConnected } = useAppStateStore();
 
+    const shouldReconnect = useRef(false);
+
     function extractChannelFromPayload(raw: string): string {
         const match = raw.match(/"channel"\s*:\s*"([^"]+)"/);
         return match ? match[1] : '';
@@ -177,6 +179,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
             if (socketRef.current?.readyState === WebSocketReadyState.OPEN) {
                 console.log('>>> close socket');
                 socketRef.current?.close();
+                shouldReconnect.current = true;
             }
         } else {
             console.log('>>> internetConnected', internetConnected);
@@ -184,9 +187,10 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
                 '>>> socketRef.current?.readyState',
                 socketRef.current?.readyState,
             );
-            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
+            if (shouldReconnect.current) {
                 console.log('>>> connect socket');
                 connectWebSocket();
+                shouldReconnect.current = false;
             }
         }
     }, [internetConnected]);
