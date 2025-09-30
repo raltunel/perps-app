@@ -8,6 +8,7 @@ import OrderBook from './orderbook';
 import styles from './orderbooksection.module.css';
 import OrderBookTrades from './orderbooktrades';
 import type { TabType } from '~/routes/trade';
+import { useTranslation } from 'react-i18next';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useAppStateStore } from '~/stores/AppStateStore';
 
@@ -24,6 +25,8 @@ const ORDER_ROW_GAP = 4;
 export default function OrderBookSection(props: propsIF) {
     const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
+
+    const { t, i18n } = useTranslation();
 
     const { orderBookMode, setOrderBookMode } = useAppSettings();
     const { orderCount, setOrderCount, setActiveOrderTab } =
@@ -46,15 +49,23 @@ export default function OrderBookSection(props: propsIF) {
 
     const menuItems = useMemo(
         () => [
-            { label: 'Tab', listener: () => setOrderBookMode('tab') },
             {
-                label: 'Stacked',
+                label: t('orderBook.tab'),
+                listener: () => setOrderBookMode('tab'),
+            },
+            {
+                label: t('orderBook.stacked'),
+
                 listener: () => setOrderBookMode('stacked'),
+
                 exclude: liquidationsActive,
             },
-            { label: 'Large', listener: () => setOrderBookMode('large') },
+            {
+                label: t('orderBook.large'),
+                listener: () => setOrderBookMode('large'),
+            },
         ],
-        [setOrderBookMode, liquidationsActive],
+        [setOrderBookMode, i18n.language, liquidationsActive],
     );
 
     const orderBookComponent = useMemo(
@@ -70,7 +81,10 @@ export default function OrderBookSection(props: propsIF) {
         [tradesMaxHeight],
     );
 
-    const orderBookTabs = useMemo(() => ['Book', 'Trades'], []);
+    const orderBookTabs = useMemo(
+        () => ['orderBook.book', 'orderBook.trades'],
+        [],
+    );
     const [activeTab, setActiveTab] = useState(orderBookTabs[0]);
 
     const handleTabChange = useCallback((tab: string) => {
@@ -78,7 +92,7 @@ export default function OrderBookSection(props: propsIF) {
     }, []);
 
     const renderTabContent = useCallback(() => {
-        if (activeTab === 'Trades')
+        if (activeTab === 'orderBook.trades')
             return orderBookTradesComponent(tradesMaxHeight);
         return orderBookComponent;
     }, [
@@ -207,7 +221,9 @@ export default function OrderBookSection(props: propsIF) {
                         id='orderBookHeaderStackedMode'
                         className={styles.sectionHeader}
                     >
-                        <div className={styles.sectionHeaderTitle}>Book</div>
+                        <div className={styles.sectionHeaderTitle}>
+                            {t('orderBook.book')}
+                        </div>
                         <BasicMenu
                             items={menuItems}
                             icon={<BsThreeDots size={14} />}
@@ -218,7 +234,9 @@ export default function OrderBookSection(props: propsIF) {
                         id={'orderTradesHeaderStackedMode'}
                         className={styles.sectionHeader}
                     >
-                        <div className={styles.sectionHeaderTitle}>Trades</div>
+                        <div className={styles.sectionHeaderTitle}>
+                            {t('orderBook.trades')}
+                        </div>
                         <BasicMenu
                             items={menuItems}
                             icon={<BsThreeDots size={14} />}
@@ -228,7 +246,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, tradesMaxHeight, liquidationsActive],
+        [orderCount, tradesMaxHeight, i18n.language, liquidationsActive],
     );
 
     const largeOrderBook = useMemo(
@@ -241,7 +259,7 @@ export default function OrderBookSection(props: propsIF) {
                             className={styles.sectionHeader}
                         >
                             <div className={styles.sectionHeaderTitle}>
-                                Book
+                                {t('orderBook.book')}
                             </div>
                         </div>
                         <OrderBook
@@ -255,7 +273,7 @@ export default function OrderBookSection(props: propsIF) {
                             className={styles.sectionHeader}
                         >
                             <div className={styles.sectionHeaderTitle}>
-                                Trades
+                                {t('orderBook.trades')}
                             </div>
                             <BasicMenu
                                 items={menuItems}
@@ -267,7 +285,7 @@ export default function OrderBookSection(props: propsIF) {
                 </div>
             </div>
         ),
-        [orderCount, liquidationsActive],
+        [orderCount, tradesMaxHeight, i18n.language, liquidationsActive],
     );
 
     const orderBookTabsComponent = (
