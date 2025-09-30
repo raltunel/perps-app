@@ -56,6 +56,7 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     );
 
     const { isWsSleepMode } = useDebugStore();
+    const { isTabActive } = useAppStateStore();
     const sleepModeRef = useRef(isWsSleepMode);
     sleepModeRef.current = isWsSleepMode;
 
@@ -196,20 +197,18 @@ export const WsProvider: React.FC<WsProviderProps> = ({ children, url }) => {
     }, [internetConnected]);
 
     useEffect(() => {
-        if (isWsSleepMode) {
-            console.log('>>>> sleep mode', new Date().toISOString());
-            shouldReconnect.current = true;
-        } else {
-            if (
-                shouldReconnect.current &&
-                socketRef.current?.readyState !== WebSocketReadyState.OPEN
-            ) {
-                console.log('>>>> reconnect socket after sleep mode');
+        if (isTabActive) {
+            console.log('>>>> tab active', new Date().toISOString());
+            if (socketRef.current?.readyState !== WebSocketReadyState.OPEN) {
+                console.log('>>>> reconnect socket after istabactive');
                 connectWebSocket();
-                shouldReconnect.current = false;
+            } else {
+                console.log('>>>> socket already open after istabactive');
             }
+        } else {
+            console.log('>>>> tab inactive', new Date().toISOString());
         }
-    }, [isWsSleepMode]);
+    }, [isTabActive]);
 
     const subscribe = (key: string, config: WsSubscriptionConfig) => {
         // initWorker(key);
