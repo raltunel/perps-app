@@ -264,7 +264,7 @@ export class DepositService {
                 const errorMessage =
                     typeof transactionResult?.error === 'string'
                         ? transactionResult.error
-                        : t('transactionError.depositTxFailedFallbackMessage');
+                        : t('transactions.depositTxFailedFallbackMessage');
                 console.error('❌ Deposit order failed:', errorMessage);
                 return {
                     success: false,
