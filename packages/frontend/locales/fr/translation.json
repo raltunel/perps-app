@@ -244,7 +244,11 @@
         "open": "Ouverte",
         "partiallyFilled": "Partiellement exécutée",
         "canceled": "Annulée",
-        "pending": "En attente"
+        "pending": "En attente",
+        "limitTxFailedFallbackMessage": "La transaction d'ordre limité a échoué",
+        "marketTxFailedFallbackMessage": "La transaction d'ordre au marché a échoué",
+        "depositTxFailedFallbackMessage": "La transaction de dépôt a échoué",
+        "withdrawTxFailedFallbackMessage": "La transaction de retrait a échoué"
     },
     "subaccounts": {
         "createSubAccount": "Créer un sous-compte",
