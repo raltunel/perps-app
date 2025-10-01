@@ -471,7 +471,7 @@
         "invalidSize": "유효한 주문 수량을 입력하세요",
         "limitHeading": "지정가 종료",
         "limitDescription": "지정가로 포지션을 종료하는 주문을 제출합니다.",
-        "estimatedClosedPnl": "예상 실현 PnL (수수료 제외): {{estimatedPNL}}",
+        "estimatedClosedPnl": "예상 실현 PnL: {{estimatedPNL}}",
         "positionClosed": "포지션이 종료되었습니다",
         "percentOfPositionClosed": "포지션의 {{sizePercentageValue}}% 종료되었습니다"
     },
@@ -479,7 +479,7 @@
         "title": "새 버전 사용 가능",
         "message": {
             "withVersionNumber": "{{version}} 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다.",
-            "noVersionNumber": "새 버전이 새로운 기능과 개선 사항으로 업데이트되었습니다."
+            "noVersionNumber": "최신 기능과 개선 사항을 받으려면 페이지를 새로 고침하세요."
         },
         "updateButton": "지금 업데이트",
         "version": "버전"

@@ -471,7 +471,7 @@
         "invalidSize": "Geçerli emir boyutu girin",
         "limitHeading": "Limitli Kapatma",
         "limitDescription": "Belirlediğiniz limitte pozisyonunuzu kapatacak emir gönderir.",
-        "estimatedClosedPnl": "Tahmini kapalı PnL (komisyonsuz): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Tahmini kapalı PnL: {{estimatedPNL}}",
         "positionClosed": "Pozisyon kapatıldı",
         "percentOfPositionClosed": "Pozisyonun %{{sizePercentageValue}} kapatıldı"
     },
@@ -479,7 +479,7 @@
         "title": "Yeni Sürüm Mevcut",
         "message": {
             "withVersionNumber": "{{version}} sürümü yeni özellikler ve iyileştirmeleriyle kurulmaya hazır.",
-            "noVersionNumber": "Yeni özellikler ve iyileştirmelerle yeni sürüm kurulmaya hazır."
+            "noVersionNumber": "Lütfen en yeni özellikler ve iyileştirmeler için sayfayı yeniden yükleyin."
         },
         "updateButton": "Şimdi güncelle",
         "version": "Sürüm"

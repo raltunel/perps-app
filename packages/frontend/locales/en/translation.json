@@ -94,8 +94,8 @@
         "total": "Total",
         "action": "Action",
         "ratio": "Ratio",
-        "buyLong": "Buy/Long",
-        "sellShort": "Sell/Short",
+        "buyLong": "Buy / Long",
+        "sellShort": "Sell / Short",
         "confirmingTransaction": "Confirming transaction...",
         "processing": "Processing...",
         "dontShowThisAgain": "Don't show this again",
@@ -471,7 +471,7 @@
         "invalidSize": "Enter a valid order size",
         "limitHeading": "Limit Close",
         "limitDescription": "This will send an order to close your position at the limit price.",
-        "estimatedClosedPnl": "Estimated closed PnL (without fees): {{estimatedPNL}}",
+        "estimatedClosedPnl": "Estimated closed PnL: {{estimatedPNL}}",
         "positionClosed": "Position Closed",
         "percentOfPositionClosed": "{{sizePercentageValue}}% of Position Closed"
     },
@@ -479,7 +479,7 @@
         "title": "New Version Available",
         "message": {
             "withVersionNumber": "Version {{version}} is ready to install with new features and improvements.",
-            "noVersionNumber": "A new version is ready to install with new features and improvements."
+            "noVersionNumber": "Please reload the page to get the latest features and improvements."
         },
         "updateButton": "Update Now",
         "version": "Version"
