@@ -244,7 +244,11 @@
         "open": "Open",
         "partiallyFilled": "Partially Filled",
         "canceled": "Canceled",
-        "pending": "Pending"
+        "pending": "Pending",
+        "limitTxFailedFallbackMessage": "Limit order transaction failed",
+        "marketTxFailedFallbackMessage": "Market order transaction failed",
+        "depositTxFailedFallbackMessage": "Deposit transaction failed",
+        "withdrawTxFailedFallbackMessage": "Withdraw transaction failed"
     },
     "subaccounts": {
         "createSubAccount": "Create Sub-Account",
