@@ -267,15 +267,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [symbol, resolutions, resolutionPairs]);
 
     useEffect(() => {
-        console.log('>>>> resolutionPairs', resolutionPairs);
-    }, [resolutionPairs]);
-
-    useEffect(() => {
         if (symbol === symbolInfo?.coin) {
             const resolutionList = getResolutionListForSymbol(symbolInfo);
             setResolutions(resolutionList);
             setSelectedResolution(usualResolution);
-            console.log('>>>> usualResolution', usualResolution);
         }
     }, [symbol, symbolInfo?.coin, JSON.stringify(usualResolution)]);
 
@@ -304,7 +299,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     );
 
     useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
         if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
