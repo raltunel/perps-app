@@ -161,6 +161,9 @@ export default function Tabs(props: TabsProps) {
         ) {
             label = `${t(tab)} (${orderHistory.length})`;
         }
+        // else if (tab === 'referrals.enterCode') {
+        //     label = t(tab);
+        // }
         return label;
     };
 

@@ -47,20 +47,27 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     const persistedRefCode: RefCodeIF | undefined =
                         get().getCode(address.toLowerCase());
                     // if no ref code exists, create one
-                    const refCodeObj: RefCodeIF = persistedRefCode || {
+                    const refCodeObj: RefCodeIF = {
                         value: refCode,
-                        isConfirmed,
+                        isConfirmed:
+                            (persistedRefCode?.isConfirmed &&
+                                persistedRefCode.value.toLowerCase() ===
+                                    refCode.toLowerCase()) ||
+                            false,
                     };
                     // initialize an output variable with the active ref code
                     const output = { active: refCodeObj };
                     // if a persisted ref code was not found, add to map
-                    persistedRefCode ??
-                        Object.assign(output, {
-                            codes: newCodes.set(
-                                address.toLowerCase(),
-                                refCodeObj,
-                            ),
-                        });
+                    // this only happens if there is a wallet is connected
+                    if (address.length) {
+                        persistedRefCode ??
+                            Object.assign(output, {
+                                codes: newCodes.set(
+                                    address.toLowerCase(),
+                                    refCodeObj,
+                                ),
+                            });
+                    }
                     // return the updated state
                     return output;
                 });
@@ -99,6 +106,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     return {
                         state: {
                             codes: new Map(parsed.state?.codes || []),
+                            active: parsed.state?.active || null,
                         },
                     };
                 },
@@ -111,6 +119,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     const str = JSON.stringify({
                         state: {
                             codes: codesArray,
+                            active: value.state?.active,
                         },
                     });
                     ssrSafeStorage().setItem(name, str);

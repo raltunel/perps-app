@@ -86,77 +86,50 @@ export default function CodeTabs(props: Props) {
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
     const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
 
-    const enterCodeContent = isSessionEstablished ? (
-        referralStore.active?.isConfirmed ? (
-            !isEditing ? (
-                <section className={styles.sectionWithButton}>
-                    <div className={styles.enterCodeContent}>
-                        <h6>Current Affiliate Code</h6>
-                        <p>{referralStore.active?.value}</p>
-                    </div>
-                    <div className={styles.refferal_code_buttons}>
-                        {referralStore.active?.isConfirmed || (
-                            <SimpleButton bg='accent1' onClick={confirmRefCode}>
-                                Confirm
-                            </SimpleButton>
-                        )}
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => setIsEditing(true)}
-                        >
-                            Edit
-                        </SimpleButton>
-                    </div>
-                </section>
-            ) : (
-                <section className={styles.sectionWithButton}>
-                    <div className={styles.enterCodeContent}>
-                        <h6>
-                            Overwrite current referrer code:{' '}
-                            {referralStore.active?.value}
-                        </h6>
-                        <input
-                            ref={updateReferralCodeInputRef}
-                            type='text'
-                            defaultValue={referralStore.active?.value || ''}
-                        />
-                    </div>
-                    <div className={styles.refferal_code_buttons}>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() =>
-                                handleUpdateReferralCode(
-                                    updateReferralCodeInputRef.current?.value ||
-                                        '',
-                                )
-                            }
-                        >
-                            Update
-                        </SimpleButton>
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => setIsEditing(false)}
-                        >
-                            Cancel
-                        </SimpleButton>
-                    </div>
-                </section>
-            )
-        ) : (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.enterCodeContent}>
-                    <h6>Enter a referral code</h6>
-                    <input
-                        ref={updateReferralCodeInputRef2}
-                        type='text'
-                        defaultValue={referralStore.active?.value || ''}
-                    />
-                </div>
+    console.log({
+        isSessionEstablished,
+        referralStore,
+        isEditing,
+    });
+
+    const confirmOrEditCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Current Affiliate Code</h6>
+                <p>{referralStore.active?.value}</p>
+            </div>
+            <div className={styles.refferal_code_buttons}>
+                {referralStore.active?.isConfirmed || (
+                    <SimpleButton bg='accent1' onClick={confirmRefCode}>
+                        Confirm
+                    </SimpleButton>
+                )}
+                <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
+                    Edit
+                </SimpleButton>
+            </div>
+        </section>
+    );
+
+    const overwriteCurrentReferralCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>
+                    Overwrite current referrer code:{' '}
+                    {referralStore.active?.value}
+                </h6>
+                <input
+                    ref={updateReferralCodeInputRef}
+                    type='text'
+                    defaultValue={referralStore.active?.value || ''}
+                />
+            </div>
+            <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
                     onClick={() =>
                         handleUpdateReferralCode(
-                            updateReferralCodeInputRef2.current?.value || '',
+                            updateReferralCodeInputRef.current?.value || '',
                         )
                     }
                 >
@@ -165,9 +138,37 @@ export default function CodeTabs(props: Props) {
                 <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
                     Cancel
                 </SimpleButton>
-            </section>
-        )
-    ) : (
+            </div>
+        </section>
+    );
+
+    const updateReferralCodeElem = (
+        <section className={styles.sectionWithButton}>
+            <div className={styles.enterCodeContent}>
+                <h6>Enter a referral code</h6>
+                <input
+                    ref={updateReferralCodeInputRef2}
+                    type='text'
+                    defaultValue={referralStore.active?.value || ''}
+                />
+            </div>
+            <SimpleButton
+                bg='accent1'
+                onClick={() =>
+                    handleUpdateReferralCode(
+                        updateReferralCodeInputRef2.current?.value || '',
+                    )
+                }
+            >
+                Update
+            </SimpleButton>
+            <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
+                Cancel
+            </SimpleButton>
+        </section>
+    );
+
+    const connectYourWalletElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Connect your wallet to enter a referral code</h6>
@@ -175,6 +176,26 @@ export default function CodeTabs(props: Props) {
             <SessionButton />
         </section>
     );
+
+    const enterCodeContent = isSessionEstablished
+        ? referralStore.active
+            ? !isEditing
+                ? // this code block:
+                  //  - session is established
+                  //  - active referral code
+                  //  - user is not in 'edit' mode
+                  confirmOrEditCodeElem
+                : // this code block:
+                  //  - session is established
+                  //  - active referral code
+                  //  - user is in 'edit' mode
+                  overwriteCurrentReferralCodeElem
+            : // this code block:
+              //  - session is established
+              //  - no active referral code
+              updateReferralCodeElem
+        : // this code block: session is not established
+          connectYourWalletElem;
 
     useEffect(() => {
         (async () => {

@@ -41,6 +41,7 @@ import {
 import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
 import { useReferralStore, type RefCodeIF } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
+import useBackgroundCounter from '~/hooks/useBackgroundCounter';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -191,7 +192,11 @@ export default function PageHeader() {
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
+    const counter = useBackgroundCounter();
+
     useEffect(() => {
+        counter.increment();
+        counter.log();
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
                 const loginButtonClickTime = Number(
@@ -225,8 +230,10 @@ export default function PageHeader() {
             }
         }
 
+        /*
+        // if a referral code is in the URL and user is connected
         if (referralCodeFromURL.value && userDataStore.userAddress) {
-            const isConfirmed = referralStore.getCode(
+            const isConfirmed: boolean | undefined = referralStore.getCode(
                 userDataStore.userAddress,
             )?.isConfirmed;
             isConfirmed ||
@@ -236,15 +243,47 @@ export default function PageHeader() {
                     false,
                 );
         }
+        */
+
+        if (referralCodeFromURL.value) {
+            // check zustand for an active code
+            const currentActiveCode: RefCodeIF | null = referralStore.active;
+            if (userDataStore.userAddress) {
+                // const addressHasConfirmedCode
+                // first check for a persisted ref code for user address
+                // if found, check to see if user address has been converted
+                // yes => no further changes allowed
+                // no => load modal to confirm referral code from URL
+                //  yes => update `active` value and set `isConfirmed` to true
+                //  yes => option 2, show both codes and force a choice
+                //  no  => ignore ref code from URL, consume value from local storage
+                // need two modals, one for overwrite (old code is confirmed)
+                // second modal, if old code is NOT confirmed, record new as active and prompt for confirmation
+            } else {
+                referralStore.activateCode(
+                    '',
+                    referralCodeFromURL.value,
+                    false,
+                );
+            }
+        }
 
         const refCode: RefCodeIF | undefined = referralStore.getCode(
             userDataStore.userAddress,
         );
+        console.log({
+            address: userDataStore.userAddress,
+            refCode,
+        });
         if (refCode?.isConfirmed === false) {
             referralCodeModal.open();
         }
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected, referralStore.active, userDataStore.userAddress]);
+    }, [
+        isUserConnected,
+        // referralStore.active,
+        userDataStore.userAddress,
+    ]);
 
     return (
         <>
@@ -496,30 +535,32 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {referralCodeModal.isOpen && referralStore.active && (
-                <Modal
-                    close={referralCodeModal.close}
-                    position='center'
-                    title='Referral Code'
-                >
-                    <ReferralCodeModal
-                        refCode={referralStore.active.value}
+            {referralCodeModal.isOpen &&
+                referralStore.active &&
+                !referralStore.active.isConfirmed && (
+                    <Modal
                         close={referralCodeModal.close}
-                        handleConfirm={(): void => {
-                            const refCode = referralStore.getCode(
-                                userDataStore.userAddress,
-                            );
-                            if (refCode) {
-                                referralStore.confirmCode(
+                        position='center'
+                        title='Referral Code'
+                    >
+                        <ReferralCodeModal
+                            refCode={referralStore.active.value}
+                            close={referralCodeModal.close}
+                            handleConfirm={(): void => {
+                                const refCode = referralStore.getCode(
                                     userDataStore.userAddress,
-                                    refCode.value,
                                 );
-                            }
-                            referralCodeModal.close();
-                        }}
-                    />
-                </Modal>
-            )}
+                                if (refCode) {
+                                    referralStore.confirmCode(
+                                        userDataStore.userAddress,
+                                        refCode.value,
+                                    );
+                                }
+                                referralCodeModal.close();
+                            }}
+                        />
+                    </Modal>
+                )}
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}
