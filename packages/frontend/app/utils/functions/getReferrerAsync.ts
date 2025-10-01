@@ -1,5 +1,5 @@
-export default async function getReferrerAsync() {
-    const options = {
+export default async function getReferrerAsync(userAddress: string) {
+    const OPTIONS = {
         method: 'GET',
         headers: {
             accept: 'application/json',
@@ -8,10 +8,9 @@ export default async function getReferrerAsync() {
         },
     };
 
-    const FUUL_ENDPOINT =
-        'https://api.fuul.xyz/api/v1/user/referrer?user_identifier=4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy&user_identifier_type=solana_address';
+    const FUUL_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${userAddress}&user_identifier_type=solana_address`;
 
-    const response = fetch(FUUL_ENDPOINT, options)
+    const response = fetch(FUUL_ENDPOINT, OPTIONS)
         .then((res) => res.json())
         .then((res) => {
             console.log(res);
