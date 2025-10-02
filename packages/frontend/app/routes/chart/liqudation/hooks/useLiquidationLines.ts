@@ -8,10 +8,10 @@ export const useLiqudationLines = (): HorizontalLineData[] => {
     const [lines, setLines] = useState<HorizontalLineData[]>([]);
 
     const getLineWidth = (ratio: number) => {
-        if (ratio >= 1) return 8;
-        if (ratio > 0.05) return 4;
-        if (ratio > 0.01) return 3;
-        return 2;
+        // if (ratio >= 1) return 8;
+        // if (ratio > 0.05) return 4;
+        // if (ratio > 0.01) return 3;
+        return 10;
     };
 
     const getColor = (ratio: number) => {
