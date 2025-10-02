@@ -8,11 +8,10 @@ export default function testpage() {
     const sessionState = useSession();
     const isUserConnected = isEstablished(sessionState);
 
-    const userDataStore = useUserDataStore();
-
     const referralStore = useReferralStore();
 
     async function convert() {
+        if (!isUserConnected) return;
         try {
             // Create a dynamic message with current date
             const currentDate = new Date().toISOString().split('T')[0];
@@ -70,7 +69,7 @@ export default function testpage() {
 
     return (
         <div className={styles.testpage}>
-            <button>Convert FULL Address</button>
+            <button onClick={convert}>Convert FULL Address</button>
         </div>
     );
 }
