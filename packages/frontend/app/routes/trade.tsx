@@ -41,7 +41,40 @@ const MemoizedSymbolInfo = memo(SymbolInfo);
 export type TabType = 'order' | 'chart' | 'book' | 'recent' | 'positions';
 
 export default function Trade() {
-    const { symbol } = useTradeDataStore();
+    const { symbol, selectedTradeTab, setSelectedTradeTab } =
+        useTradeDataStore();
+    // Mobile-only dropdown state
+    type PortfolioViewKey =
+        | 'common.positions'
+        | 'common.balances'
+        | 'common.openOrders'
+        | 'common.tradeHistory'
+        | 'common.orderHistory';
+
+    const [mobilePortfolioMenuOpen, setMobilePortfolioMenuOpen] =
+        useState(false);
+
+    // Label map (swap to i18n if you want)
+    const MOBILE_VIEW_LABELS: Record<PortfolioViewKey, string> = {
+        'common.positions': 'Positions',
+        'common.balances': 'Balances',
+        'common.openOrders': 'Unfulfilled Orders',
+        'common.tradeHistory': 'Transaction Records',
+        'common.orderHistory': 'Order History',
+    };
+
+    // In case selectedTradeTab is something not in our mobile list, default the button label:
+    const currentMobileLabel =
+        MOBILE_VIEW_LABELS[selectedTradeTab as PortfolioViewKey] ?? 'Positions';
+
+    // The list of mobile options (order = how the menu shows)
+    const MOBILE_OPTIONS: PortfolioViewKey[] = [
+        'common.positions',
+        'common.balances',
+        'common.openOrders',
+        'common.tradeHistory',
+        'common.orderHistory',
+    ];
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
@@ -496,9 +529,64 @@ export default function Trade() {
                         display: activeTab === 'positions' ? 'block' : 'none',
                     }}
                 >
+                    {/* Sticky dropdown header inside the scrollable section */}
+                    <div className={styles.mobilePositionsSwitcher}>
+                        <button
+                            type='button'
+                            aria-haspopup='listbox'
+                            aria-expanded={mobilePortfolioMenuOpen}
+                            className={styles.mobilePositionsSwitcherBtn}
+                            onClick={() =>
+                                setMobilePortfolioMenuOpen((v) => !v)
+                            }
+                        >
+                            <span
+                                className={styles.mobilePositionsSwitcherDot}
+                                aria-hidden
+                            />
+                            {currentMobileLabel}
+                            <svg
+                                className={styles.mobilePositionsSwitcherChev}
+                                width='14'
+                                height='14'
+                                viewBox='0 0 24 24'
+                            >
+                                <path
+                                    d='M7 10l5 5 5-5'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2'
+                                />
+                            </svg>
+                        </button>
+
+                        {mobilePortfolioMenuOpen && (
+                            <div
+                                role='listbox'
+                                className={styles.mobilePositionsSwitcherMenu}
+                            >
+                                {MOBILE_OPTIONS.map((opt) => (
+                                    <button
+                                        key={opt}
+                                        role='option'
+                                        aria-selected={selectedTradeTab === opt}
+                                        className={`${styles.mobilePositionsSwitcherItem} ${selectedTradeTab === opt ? styles.active : ''}`}
+                                        onClick={() => {
+                                            setSelectedTradeTab(opt); // 👈 drive the same store TradeTable uses
+                                            setMobilePortfolioMenuOpen(false);
+                                        }}
+                                    >
+                                        {MOBILE_VIEW_LABELS[opt]}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
                     {(activeTab === 'positions' ||
                         visibilityRefs.current.positions) && (
-                        <MemoizedTradeTable />
+                        <MemoizedTradeTable mobileExternalSwitcher />
                     )}
                 </div>
             </>
