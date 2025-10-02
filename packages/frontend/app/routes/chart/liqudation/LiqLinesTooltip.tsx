@@ -9,6 +9,7 @@ import { useAppSettings } from '~/stores/AppSettingsStore';
 import type {
     CrossHairMovedEventParams,
     ISubscription,
+    MouseEventParams,
 } from '~/tv/charting_library';
 
 const LiqLineTooltip = ({
@@ -26,6 +27,8 @@ const LiqLineTooltip = ({
     const lines = useLiqudationLines();
 
     const linesRef = useRef(lines);
+
+    const shouldOpenTooltip = useRef(true);
 
     const { getBsColor } = useAppSettings();
 
@@ -116,27 +119,47 @@ const LiqLineTooltip = ({
         [scaleData, linesRef],
     );
 
+    const callbackCrosshair = (params: CrossHairMovedEventParams) => {
+        const { offsetX, offsetY } = params;
+        if (offsetX && offsetY) {
+            mousemove(offsetX, offsetY);
+        }
+    };
+
+    const callbackMouseDown = (event: MouseEventParams) => {
+        setTimeout(() => {
+            shouldOpenTooltip.current = false;
+            if (liqLineTooltipRef)
+                liqLineTooltipRef.current.style('visibility', 'hidden');
+        }, 300);
+    };
+
+    const callbackMouseUp = (event: MouseEventParams) => {
+        setTimeout(() => {
+            shouldOpenTooltip.current = true;
+            if (liqLineTooltipRef)
+                liqLineTooltipRef.current.style('visibility', 'visible');
+        }, 100);
+    };
+
     useEffect(() => {
         if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
 
-        let subscription: ISubscription<
+        let crosshairSubscription: ISubscription<
             (params: CrossHairMovedEventParams) => void
         > | null = null;
 
         const context = { name: 'crosshair-handler' };
 
-        const callbackCrosshair = (params: CrossHairMovedEventParams) => {
-            const { offsetX, offsetY } = params;
-            if (offsetX && offsetY) {
-                mousemove(offsetX, offsetY);
-            }
-        };
-
         if (chart) {
             chart.onChartReady(() => {
-                subscription = chart.activeChart().crossHairMoved();
+                crosshairSubscription = chart.activeChart().crossHairMoved();
 
-                subscription.subscribe(context, callbackCrosshair);
+                chart.subscribe('mouse_down', callbackMouseDown);
+                chart.subscribe('mouse_up', callbackMouseUp);
+
+                if (crosshairSubscription)
+                    crosshairSubscription.subscribe(context, callbackCrosshair);
             });
         }
 
@@ -150,7 +173,7 @@ const LiqLineTooltip = ({
                 .select(canvasWrapperRef.current)
                 .append('div')
                 .attr('class', 'liqLineTooltip')
-                .style('z-index', '10')
+                .style('z-index', '30')
                 .style('position', 'absolute')
                 .style('text-align', 'start')
                 .style('align-items', 'start')
@@ -175,10 +198,16 @@ const LiqLineTooltip = ({
 
             if (chart) {
                 try {
-                    if (subscription) {
-                        subscription.unsubscribe(context, callbackCrosshair);
-                        subscription = null;
+                    if (crosshairSubscription) {
+                        crosshairSubscription.unsubscribe(
+                            context,
+                            callbackCrosshair,
+                        );
+                        crosshairSubscription = null;
                     }
+
+                    chart.unsubscribe('mouse_down', callbackMouseDown);
+                    chart.unsubscribe('mouse_up', callbackMouseUp);
 
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error: unknown) {
