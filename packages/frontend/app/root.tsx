@@ -326,6 +326,8 @@ export default function App() {
                                                 <WsConnectionChecker />
                                                 <WebSocketDebug />
                                                 <div className='root-container'>
+                                                    {/* Track page views */}
+                                                    <PageViewTracker />
                                                     <PageHeader />
                                                     <main
                                                         className={`content ${isHomePage ? 'home-page' : ''}`}
