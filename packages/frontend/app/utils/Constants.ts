@@ -157,7 +157,7 @@ export const MARKET_WS_ENDPOINT =
 
 export const FUUL_API_KEY =
     import.meta.env.VITE_FUUL_API_KEY ||
-    '7010050cc4b7274037a80fd9119bce3567ce7443d163c097c787a39dac341870';
+    'ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6';
 
 export const USER_WS_ENDPOINT =
     import.meta.env.VITE_USER_WS_ENDPOINT ||

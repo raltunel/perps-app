@@ -52,8 +52,8 @@ import './css/app.css';
 import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
-import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 import { useModal } from './hooks/useModal';
+import { FuulProvider } from './contexts/FuulContext';
 import Modal from './components/Modal/Modal';
 
 // Error Boundary Component
@@ -127,13 +127,6 @@ export function Document({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    useEffect(() => {
-        if (FUUL_API_KEY) {
-            Fuul.init({
-                apiKey: FUUL_API_KEY,
-            });
-        }
-    }, [FUUL_API_KEY]);
     const defaultLanguage = useMemo(() => {
         if (!navigatorLanguage) return;
         return getDefaultLanguage();
@@ -295,80 +288,84 @@ export default function App() {
     const restrictedSiteModal = useModal('closed');
 
     return (
-        <Document>
-            <FogoSessionProvider
-                endpoint={RPC_ENDPOINT}
-                domain='https://perps.ambient.finance'
-                tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
-                defaultRequestedLimits={{
-                    fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry: 1_000_000_000n,
-                }}
-                enableUnlimited={true}
-                onStartSessionInit={() => {
-                    if (IS_RESTRICTED_SITE) {
-                        restrictedSiteModal.open();
-                    }
-                    return !IS_RESTRICTED_SITE;
-                }}
-            >
-                <AppProvider>
-                    <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
-                        <UnifiedMarginDataProvider>
-                            <MarketDataProvider>
-                                <SdkProvider
-                                    environment={wsEnvironment}
-                                    marketEndpoint={MARKET_WS_ENDPOINT}
-                                    userEndpoint={USER_WS_ENDPOINT}
-                                >
-                                    <TutorialProvider>
-                                        <GlobalModalHost>
-                                            <ErrorBoundary>
-                                                <WsConnectionChecker />
-                                                <WebSocketDebug />
-                                                <div className='root-container'>
-                                                    {/* Track page views */}
-                                                    <PageViewTracker />
-                                                    <PageHeader />
-                                                    <main
-                                                        className={`content ${isHomePage ? 'home-page' : ''}`}
-                                                    >
-                                                        <Suspense
-                                                            fallback={
-                                                                <LogoLoadingIndicator />
-                                                            }
+        <FuulProvider>
+            <Document>
+                <FogoSessionProvider
+                    endpoint={RPC_ENDPOINT}
+                    domain='https://perps.ambient.finance'
+                    tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
+                    defaultRequestedLimits={{
+                        fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry:
+                            1_000_000_000n,
+                    }}
+                    enableUnlimited={true}
+                    onStartSessionInit={() => {
+                        if (IS_RESTRICTED_SITE) {
+                            restrictedSiteModal.open();
+                        }
+                        return !IS_RESTRICTED_SITE;
+                    }}
+                >
+                    <AppProvider>
+                        <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
+                            <UnifiedMarginDataProvider>
+                                <MarketDataProvider>
+                                    <SdkProvider
+                                        environment={wsEnvironment}
+                                        marketEndpoint={MARKET_WS_ENDPOINT}
+                                        userEndpoint={USER_WS_ENDPOINT}
+                                    >
+                                        <TutorialProvider>
+                                            <GlobalModalHost>
+                                                <ErrorBoundary>
+                                                    <WsConnectionChecker />
+                                                    <WebSocketDebug />
+                                                    <div className='root-container'>
+                                                        {/* Track page views */}
+                                                        <PageHeader />
+                                                        <main
+                                                            className={`content ${isHomePage ? 'home-page' : ''}`}
                                                         >
-                                                            <Outlet />
-                                                        </Suspense>
-                                                    </main>
-                                                    <MobileFooter />
-                                                    <Notifications />
-                                                    {restrictedSiteModal.isOpen && (
-                                                        <Modal
-                                                            close={() =>
-                                                                restrictedSiteModal.close()
-                                                            }
-                                                            position={'center'}
-                                                            title=''
-                                                        >
-                                                            <RestrictedSiteMessage
-                                                                onClose={
-                                                                    restrictedSiteModal.close
+                                                            <Suspense
+                                                                fallback={
+                                                                    <LogoLoadingIndicator />
                                                                 }
-                                                            />
-                                                        </Modal>
-                                                    )}
-                                                </div>
-                                                <RuntimeDomManipulation />
-                                            </ErrorBoundary>
-                                        </GlobalModalHost>
-                                    </TutorialProvider>
-                                </SdkProvider>
-                            </MarketDataProvider>
-                        </UnifiedMarginDataProvider>
-                    </WsProvider>
-                </AppProvider>
-            </FogoSessionProvider>
-        </Document>
+                                                            >
+                                                                <Outlet />
+                                                            </Suspense>
+                                                        </main>
+                                                        <MobileFooter />
+                                                        <Notifications />
+                                                        {restrictedSiteModal.isOpen && (
+                                                            <Modal
+                                                                close={() =>
+                                                                    restrictedSiteModal.close()
+                                                                }
+                                                                position={
+                                                                    'center'
+                                                                }
+                                                                title=''
+                                                            >
+                                                                <RestrictedSiteMessage
+                                                                    onClose={
+                                                                        restrictedSiteModal.close
+                                                                    }
+                                                                />
+                                                            </Modal>
+                                                        )}
+                                                    </div>
+                                                    <RuntimeDomManipulation />
+                                                </ErrorBoundary>
+                                            </GlobalModalHost>
+                                        </TutorialProvider>
+                                    </SdkProvider>
+                                </MarketDataProvider>
+                            </UnifiedMarginDataProvider>
+                        </WsProvider>
+                    </AppProvider>
+                </FogoSessionProvider>
+            </Document>
+        </FuulProvider>
     );
 }
 
