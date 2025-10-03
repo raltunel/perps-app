@@ -24,6 +24,7 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
+        console.log('fuul', { isInitialized });
         if (FUUL_API_KEY && !isInitialized) {
             try {
                 Fuul.init({
