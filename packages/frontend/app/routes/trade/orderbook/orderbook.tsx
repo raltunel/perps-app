@@ -94,6 +94,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setSelectedResolution,
         setSelectedMode,
         setOrderBookState,
+        addToResolutionPair,
+        resolutionPairs,
     } = useOrderBookStore();
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
@@ -263,6 +265,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         },
         [selectedResolution, setOrderBook, setOrderBookState],
     );
+    // code blocks were being used in sdk approach
 
     // const handleOrderBookWorkerResult = useCallback(
     //     ({ data }: { data: OrderBookOutput }) => {
@@ -278,15 +281,17 @@ const OrderBook: React.FC<OrderBookProps> = ({
     //     handleOrderBookWorkerResult,
     // );
 
+    const usualResolution = useMemo(() => {
+        return resolutionPairs[symbol] || resolutions[0];
+    }, [symbol, resolutions, resolutionPairs]);
+
     useEffect(() => {
         if (symbol === symbolInfo?.coin) {
             const resolutionList = getResolutionListForSymbol(symbolInfo);
             setResolutions(resolutionList);
-            if (!selectedResolution) {
-                setSelectedResolution(resolutionList[0]);
-            }
+            setSelectedResolution(usualResolution);
         }
-    }, [symbol, symbolInfo?.coin, selectedResolution, setSelectedResolution]);
+    }, [symbol, symbolInfo?.coin, JSON.stringify(usualResolution)]);
 
     const subKey = useMemo(() => {
         if (!selectedResolution) return undefined;
@@ -313,7 +318,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
     );
 
     useEffect(() => {
-        console.log('>>> orderbook subKey', subKey);
         if (!subKey) return;
         setOrderBookState(TableState.LOADING);
         if (subKey) {
@@ -462,6 +466,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
         [orderCount, seededRandom],
     );
 
+    const assignSelectedResolution = useCallback(
+        (resolution: OrderRowResolutionIF) => {
+            setSelectedResolution(resolution);
+            addToResolutionPair(symbol, resolution);
+        },
+        [symbol, addToResolutionPair],
+    );
+
     return (
         <div
             id='orderBookContainer'
@@ -490,7 +502,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     },
                                 });
                             }
-                            setSelectedResolution(resolution);
+                            assignSelectedResolution(resolution);
                         }
                     }}
                 />
