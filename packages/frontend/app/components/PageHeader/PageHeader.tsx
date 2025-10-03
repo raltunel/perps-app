@@ -245,21 +245,42 @@ export default function PageHeader() {
         }
         */
 
+        function checkForConversion(addr: string, b: boolean): boolean {
+            console.log(addr);
+            return b;
+        }
+
         if (referralCodeFromURL.value) {
             // check zustand for an active code
+
+            // IMPORTANT    this may run multiple times if the user is not logged in on the first render
             const currentActiveCode: RefCodeIF | null = referralStore.active;
             if (userDataStore.userAddress) {
                 // const addressHasConfirmedCode
                 // first check for a persisted ref code for user address
+                let persistedRefCode: RefCodeIF | undefined =
+                    referralStore.getCode(userDataStore.userAddress);
                 // if found, check to see if user address has been converted
+                let isConverted: boolean = false;
+                if (persistedRefCode) {
+                    isConverted = checkForConversion(
+                        userDataStore.userAddress,
+                        false,
+                    );
+                }
                 // yes => no further changes allowed
+                if (isConverted) return;
+
                 // no => load modal to confirm referral code from URL
+                referralCodeModal.open();
                 //  yes => update `active` value and set `isConfirmed` to true
+
                 //  yes => option 2, show both codes and force a choice
                 //  no  => ignore ref code from URL, consume value from local storage
                 // need two modals, one for overwrite (old code is confirmed)
                 // second modal, if old code is NOT confirmed, record new as active and prompt for confirmation
             } else {
+                console.log('this one');
                 referralStore.activateCode(
                     '',
                     referralCodeFromURL.value,
@@ -268,16 +289,16 @@ export default function PageHeader() {
             }
         }
 
-        const refCode: RefCodeIF | undefined = referralStore.getCode(
-            userDataStore.userAddress,
-        );
-        console.log({
-            address: userDataStore.userAddress,
-            refCode,
-        });
-        if (refCode?.isConfirmed === false) {
-            referralCodeModal.open();
-        }
+        // const refCode: RefCodeIF | undefined = referralStore.getCode(
+        //     userDataStore.userAddress,
+        // );
+        // console.log({
+        //     address: userDataStore.userAddress,
+        //     refCode,
+        // });
+        // if (refCode?.isConfirmed === false) {
+        //     referralCodeModal.open();
+        // }
         prevIsUserConnected.current = isUserConnected;
     }, [
         isUserConnected,

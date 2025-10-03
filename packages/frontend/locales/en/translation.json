@@ -396,7 +396,10 @@
         "title": "Referrals",
         "description": "Refer users to earn rewards. Affiliates earn higher rewards.",
         "tradersReferred": "Traders Referred",
-        "rewardsEarned": "Rewards Earned"
+        "rewardsEarned": "Rewards Earned",
+        "rewardHistory": "Reward History",
+        "enterCode": "Enter Code",
+        "claim": "Claim"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
