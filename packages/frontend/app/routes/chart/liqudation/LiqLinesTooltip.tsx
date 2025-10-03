@@ -32,7 +32,8 @@ const LiqLineTooltip = ({
 
     const { getBsColor } = useAppSettings();
 
-    const { formatNum } = useNumFormatter();
+    const { formatNum, activeDecimalSeparator, activeGroupSeparator } =
+        useNumFormatter();
 
     useEffect(() => {
         linesRef.current = lines;
@@ -90,7 +91,7 @@ const LiqLineTooltip = ({
                     placedLine.type === 'buy' ? 'Long ' : 'Short '
                 } Liquidations </p>` +
                     `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
-                    `<p style="color: var(--text2, #bcbcc4)"> Volume: 1,23 TKN </p>`,
+                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(1.25, null, true)} TKN </p>`,
             );
 
             const width = liqLineTooltipRef.current
@@ -116,15 +117,32 @@ const LiqLineTooltip = ({
                 .style('top', vertical + 'px')
                 .style('left', horizontal + 'px');
         },
-        [scaleData, linesRef],
+        [
+            scaleData,
+            linesRef,
+            chart,
+            liqLineTooltipRef.current === null,
+            formatNum,
+        ],
     );
 
-    const callbackCrosshair = (params: CrossHairMovedEventParams) => {
-        const { offsetX, offsetY } = params;
-        if (offsetX && offsetY) {
-            mousemove(offsetX, offsetY);
-        }
-    };
+    const callbackCrosshair = useCallback(
+        (params: CrossHairMovedEventParams) => {
+            const { offsetX, offsetY } = params;
+            if (offsetX && offsetY) {
+                mousemove(offsetX, offsetY);
+            }
+        },
+        [
+            scaleData,
+            linesRef,
+            chart,
+            liqLineTooltipRef.current === null,
+            activeDecimalSeparator,
+            activeGroupSeparator,
+            formatNum,
+        ],
+    );
 
     const callbackMouseDown = (event: MouseEventParams) => {
         setTimeout(() => {
@@ -219,6 +237,9 @@ const LiqLineTooltip = ({
         chart,
         overlayCanvasRef.current === null,
         canvasWrapperRef.current === null,
+        activeDecimalSeparator,
+        activeGroupSeparator,
+        formatNum,
     ]);
 
     return null;
