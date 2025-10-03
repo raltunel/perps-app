@@ -52,7 +52,6 @@ import './css/app.css';
 import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
-import PageViewTracker from './components/PageViewTracker/PageViewTracker';
 import { useModal } from './hooks/useModal';
 import { FuulProvider } from './contexts/FuulContext';
 import Modal from './components/Modal/Modal';
@@ -323,7 +322,6 @@ export default function App() {
                                                     <WebSocketDebug />
                                                     <div className='root-container'>
                                                         {/* Track page views */}
-                                                        <PageViewTracker />
                                                         <PageHeader />
                                                         <main
                                                             className={`content ${isHomePage ? 'home-page' : ''}`}
