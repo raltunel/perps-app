@@ -256,6 +256,10 @@ export default function PageHeader() {
             }
         }
 
+        // cache the referral value from the URL if one is present
+        referralCodeFromURL.value &&
+            referralStore.cache(referralCodeFromURL.value);
+
         if (userDataStore.userAddress) {
             console.log(userDataStore.userAddress);
             // const isConverted = true;
@@ -559,7 +563,6 @@ export default function PageHeader() {
                     title='Referral Code'
                 >
                     <ReferralCodeModal
-                        refCodeUrl={referralCodeFromURL.value}
                         refCode={referralStore.cached}
                         close={(): void => {
                             referralCodeModal.close();
