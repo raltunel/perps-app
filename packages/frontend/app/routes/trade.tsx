@@ -32,6 +32,7 @@ import { useAppStateStore } from '~/stores/AppStateStore';
 import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
+import useOutsideClick from '~/hooks/useOutsideClick';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -51,16 +52,29 @@ export default function Trade() {
         | 'common.tradeHistory'
         | 'common.orderHistory';
 
-    const [mobilePortfolioMenuOpen, setMobilePortfolioMenuOpen] =
-        useState(false);
+    // mobile Positions tab dropdown
+    const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
+
+    // close when clicking outside Positions tab + menu
+    const posWrapRef = useOutsideClick<HTMLDivElement>(
+        () => setPositionsMenuOpen(false),
+        positionsMenuOpen,
+    );
+    useEffect(() => {
+        if (!positionsMenuOpen) return;
+        const onKey = (e: KeyboardEvent) =>
+            e.key === 'Escape' && setPositionsMenuOpen(false);
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [positionsMenuOpen]);
 
     // Label map (swap to i18n if you want)
     const MOBILE_VIEW_LABELS: Record<PortfolioViewKey, string> = {
         'common.positions': 'Positions',
         'common.balances': 'Balances',
-        'common.openOrders': 'Unfulfilled Orders',
-        'common.tradeHistory': 'Transaction Records',
-        'common.orderHistory': 'Order History',
+        'common.openOrders': ' Orders',
+        'common.tradeHistory': 'Transactions',
+        'common.orderHistory': 'History',
     };
 
     // In case selectedTradeTab is something not in our mobile list, default the button label:
@@ -180,7 +194,7 @@ export default function Trade() {
 
     const leftColRef = useRef<HTMLDivElement | null>(null);
     const tableSectionRef = useRef<HTMLElement | null>(null);
-    const HEADER_HIT_HEIGHT = 72; // bump to 80/96 if your header is taller
+    const HEADER_HIT_HEIGHT = 10;
 
     // local state used while dragging for immediate feedback
     const [chartTopHeight, setChartTopHeightLocal] = useState<number>(
@@ -370,25 +384,106 @@ export default function Trade() {
         (tab: TabType) => () => switchTab(tab),
         [switchTab],
     );
+    useEffect(() => {
+        if (activeTab !== 'positions' && positionsMenuOpen) {
+            setPositionsMenuOpen(false);
+        }
+    }, [activeTab, positionsMenuOpen]);
 
-    const MobileTabNavigation = useMemo(
-        () => (
+    const MobileTabNavigation = useMemo(() => {
+        return (
             <div className={styles.mobileTabNav} id='mobileTradeTabs'>
                 <div className={styles.mobileTabBtns}>
-                    {tabList.map(({ key, label }) => (
-                        <button
-                            key={key}
-                            className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
-                            onClick={handleTabClick(key)}
-                        >
-                            {label}
-                        </button>
-                    ))}
+                    {tabList.map(({ key, label }) => {
+                        if (key !== 'positions') {
+                            return (
+                                <button
+                                    key={key}
+                                    className={`${styles.mobileTabBtn} ${activeTab === key ? styles.active : ''}`}
+                                    onClick={handleTabClick(key)}
+                                >
+                                    {label}
+                                </button>
+                            );
+                        }
+
+                        // POSITIONS becomes dropdown
+                        return (
+                            <div
+                                key='positions'
+                                ref={posWrapRef}
+                                className={styles.posTabWrap}
+                            >
+                                <button
+                                    aria-haspopup='listbox'
+                                    aria-expanded={positionsMenuOpen}
+                                    className={`${styles.mobileTabBtn} ${activeTab === 'positions' ? styles.active : ''} ${styles.posTabBtn}`}
+                                    onClick={() => {
+                                        if (activeTab !== 'positions')
+                                            switchTab('positions');
+                                        setPositionsMenuOpen((v) => !v);
+                                    }}
+                                >
+                                    {currentMobileLabel}
+                                    <svg
+                                        className={styles.posCaret}
+                                        width='14'
+                                        height='14'
+                                        viewBox='0 0 24 24'
+                                    >
+                                        <path
+                                            d='M7 10l5 5 5-5'
+                                            fill='none'
+                                            stroke='currentColor'
+                                            strokeWidth='2'
+                                        />
+                                    </svg>
+                                </button>
+
+                                {positionsMenuOpen && (
+                                    <div
+                                        role='listbox'
+                                        className={styles.posMenu}
+                                    >
+                                        {MOBILE_OPTIONS.map((opt) => (
+                                            <button
+                                                key={opt}
+                                                role='option'
+                                                aria-selected={
+                                                    selectedTradeTab === opt
+                                                }
+                                                className={`${styles.posItem} ${selectedTradeTab === opt ? styles.activeItem : ''}`}
+                                                onClick={() => {
+                                                    setSelectedTradeTab(opt);
+                                                    setPositionsMenuOpen(false);
+                                                    if (
+                                                        activeTab !==
+                                                        'positions'
+                                                    )
+                                                        switchTab('positions');
+                                                }}
+                                            >
+                                                {MOBILE_VIEW_LABELS[opt]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
-        ),
-        [activeTab, handleTabClick, tabList],
-    );
+        );
+    }, [
+        activeTab,
+        handleTabClick,
+        tabList,
+        positionsMenuOpen,
+        selectedTradeTab,
+        currentMobileLabel,
+        switchTab,
+        setSelectedTradeTab,
+    ]);
 
     const mobileOrderBookView = useMemo(
         () => (
@@ -530,7 +625,7 @@ export default function Trade() {
                     }}
                 >
                     {/* Sticky dropdown header inside the scrollable section */}
-                    <div className={styles.mobilePositionsSwitcher}>
+                    {/* <div className={styles.mobilePositionsSwitcher}>
                         <button
                             type='button'
                             aria-haspopup='listbox'
@@ -581,7 +676,7 @@ export default function Trade() {
                                 ))}
                             </div>
                         )}
-                    </div>
+                    </div> */}
 
                     {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
                     {(activeTab === 'positions' ||
@@ -739,22 +834,38 @@ export default function Trade() {
                                 const target = e.target as HTMLElement | null;
                                 if (!target) return;
 
-                                // Ignore interactive controls
+                                // Never react to generic interactives anywhere in the section
                                 if (isInteractiveEl(target)) return;
 
-                                // Collapsed → open anywhere
-                                if (isTableCollapsed()) {
-                                    openTableToDefault();
+                                // Find the tabs header (<Tabs ... data-tabs>)
+                                const headerEl =
+                                    tableSectionRef.current?.querySelector(
+                                        '[data-tabs]',
+                                    ) as HTMLElement | null;
+                                if (!headerEl) return;
+
+                                // Is the dblclick point inside the header rect?
+                                const r = headerEl.getBoundingClientRect();
+                                const insideHeader =
+                                    e.clientY >= r.top &&
+                                    e.clientY <= r.bottom &&
+                                    e.clientX >= r.left &&
+                                    e.clientX <= r.right;
+
+                                if (!insideHeader) return;
+
+                                // Block only direct interactives in the header: tab buttons, right actions, and arrows.
+                                if (
+                                    target.closest(
+                                        'button, [role="tab"], [data-tabs-right], [data-tabs-arrow]',
+                                    )
+                                ) {
                                     return;
                                 }
 
-                                const section = tableSectionRef.current;
-                                if (!section) return;
-
-                                const rect = section.getBoundingClientRect();
-                                const yFromTop = e.clientY - rect.top;
-
-                                if (yFromTop <= HEADER_HIT_HEIGHT) {
+                                if (isTableCollapsed()) {
+                                    openTableToDefault();
+                                } else {
                                     collapseTableToBar();
                                 }
                             }}
