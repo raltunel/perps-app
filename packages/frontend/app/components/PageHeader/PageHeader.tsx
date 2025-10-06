@@ -196,6 +196,8 @@ export default function PageHeader() {
 
     const hasDismissedRef = useRef<boolean>(false);
 
+    const onHomePage: boolean = !location.pathname.includes('v2');
+
     useEffect(() => {
         counter.increment();
         counter.log();
@@ -281,12 +283,14 @@ export default function PageHeader() {
                     console.log('url', referralCodeFromURL.value);
                     const isConverted: boolean =
                         response?.referrer_identifier !== null;
-                    if (isConverted) {
-                        const confirmedRefCode: RefCodeIF | undefined =
-                            referralStore.getCode(userDataStore.userAddress);
-                        console.log(confirmedRefCode);
-                    } else {
-                        referralCodeModal.open();
+                    const isConfirmed: boolean = !!referralStore.getCode(
+                        userDataStore.userAddress,
+                    )?.isConfirmed;
+                    if (isConverted && !isConfirmed) {
+                        // this is that workflow where we might know they're converted but not have the refCode
+                        // what should we record to local storage?
+                    } else if (!hasDismissedRef.current) {
+                        onHomePage || referralCodeModal.open();
                     }
                 },
             );
@@ -301,7 +305,7 @@ export default function PageHeader() {
         }
 
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected, userDataStore.userAddress]);
+    }, [isUserConnected, userDataStore.userAddress, onHomePage]);
 
     return (
         <>
