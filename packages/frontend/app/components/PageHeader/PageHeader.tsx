@@ -274,14 +274,13 @@ export default function PageHeader() {
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response) => {
                     console.log('res', response);
+                    console.log('url', referralCodeFromURL.value);
                     const isConverted: boolean =
                         response?.referrer_identifier !== null;
                     if (isConverted) {
-                        alert('converted!');
-                        const refCode = referralStore.getCode(
-                            userDataStore.userAddress,
-                        );
-                        console.log(refCode);
+                        const confirmedRefCode: RefCodeIF | undefined =
+                            referralStore.getCode(userDataStore.userAddress);
+                        console.log(confirmedRefCode);
                     } else {
                         referralCodeModal.open();
                     }
@@ -560,16 +559,17 @@ export default function PageHeader() {
                     title='Referral Code'
                 >
                     <ReferralCodeModal
+                        refCodeUrl={referralCodeFromURL.value}
                         refCode={referralStore.cached}
                         close={(): void => {
                             referralCodeModal.close();
                             hasDismissedRef.current = true;
                         }}
-                        handleConfirm={(): void => {
+                        handleConfirm={(rc: string): void => {
                             if (userDataStore.userAddress) {
                                 referralStore.confirmCode(
                                     userDataStore.userAddress,
-                                    referralStore.cached,
+                                    rc,
                                 );
                             }
                             referralCodeModal.close();

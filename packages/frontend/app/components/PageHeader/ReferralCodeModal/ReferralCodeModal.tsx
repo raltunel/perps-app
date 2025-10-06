@@ -4,19 +4,24 @@ import { useNavigate } from 'react-router';
 
 interface PropsIF {
     refCode: string;
-    handleConfirm: () => void;
+    refCodeUrl: string | null;
+    handleConfirm: (rc: string) => void;
     close: () => void;
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
-    const { refCode, handleConfirm, close } = props;
+    const { refCode, refCodeUrl, handleConfirm, close } = props;
+
+    const refCodeToConsume: string = refCodeUrl ?? refCode;
 
     const navigate = useNavigate();
     return (
         <section className={styles.referral_code_modal}>
             <p>
                 You have been referred by{' '}
-                <span className={styles.referral_code_inline}>{refCode}</span>{' '}
+                <span className={styles.referral_code_inline}>
+                    {refCodeToConsume}
+                </span>{' '}
                 to Ambient Perps.
             </p>
             <p>
@@ -24,7 +29,9 @@ export default function ReferralCodeModal(props: PropsIF) {
                 referrer.
             </p>
             <div className={styles.button_container}>
-                <SimpleButton onClick={handleConfirm}>Confirm</SimpleButton>
+                <SimpleButton onClick={() => handleConfirm(refCodeToConsume)}>
+                    Confirm
+                </SimpleButton>
                 <SimpleButton
                     bg='dark4'
                     onClick={(): void => {
