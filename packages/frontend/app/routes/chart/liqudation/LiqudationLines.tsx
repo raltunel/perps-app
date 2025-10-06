@@ -11,6 +11,7 @@ import { useLazyD3 } from '../hooks/useLazyD3';
 
 export type HorizontalLineData = {
     yPrice: number;
+    liqValue: number;
     color: string;
     strokeStyle: string;
     lineWidth: number;

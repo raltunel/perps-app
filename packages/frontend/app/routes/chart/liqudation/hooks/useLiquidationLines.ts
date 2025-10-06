@@ -73,6 +73,7 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
 
             return {
                 yPrice: b.yPrice,
+                liqValue: avgValue,
                 color: color,
                 strokeStyle: color,
                 lineWidth,
