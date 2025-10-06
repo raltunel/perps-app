@@ -194,6 +194,8 @@ export default function PageHeader() {
 
     const counter = useBackgroundCounter();
 
+    const hasDismissedRef = useRef<boolean>(false);
+
     useEffect(() => {
         counter.increment();
         counter.log();
@@ -218,7 +220,6 @@ export default function PageHeader() {
                             : 'login button clicked',
                     },
                 });
-                // referralCodeModal.open();
             }
             localStorage.removeItem('loginButtonClickTime');
         } else if (
@@ -230,81 +231,74 @@ export default function PageHeader() {
             }
         }
 
-        /*
-        // if a referral code is in the URL and user is connected
-        if (referralCodeFromURL.value && userDataStore.userAddress) {
-            const isConfirmed: boolean | undefined = referralStore.getCode(
-                userDataStore.userAddress,
-            )?.isConfirmed;
-            isConfirmed ||
-                referralStore.activateCode(
-                    userDataStore.userAddress,
-                    referralCodeFromURL.value,
-                    false,
+        async function checkForFuulConversion(address: string) {
+            console.log('address', address);
+            const options = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    authorization:
+                        'Bearer ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6',
+                },
+            };
+
+            try {
+                const res = await fetch(
+                    `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
+                    options,
                 );
-        }
-        */
-
-        function checkForConversion(addr: string, b: boolean): boolean {
-            console.log(addr);
-            return b;
-        }
-
-        if (referralCodeFromURL.value) {
-            // check zustand for an active code
-
-            // IMPORTANT    this may run multiple times if the user is not logged in on the first render
-            const currentActiveCode: RefCodeIF | null = referralStore.active;
-            if (userDataStore.userAddress) {
-                // const addressHasConfirmedCode
-                // first check for a persisted ref code for user address
-                let persistedRefCode: RefCodeIF | undefined =
-                    referralStore.getCode(userDataStore.userAddress);
-                // if found, check to see if user address has been converted
-                let isConverted: boolean = false;
-                if (persistedRefCode) {
-                    isConverted = checkForConversion(
-                        userDataStore.userAddress,
-                        false,
-                    );
-                }
-                // yes => no further changes allowed
-                if (isConverted) return;
-
-                // no => load modal to confirm referral code from URL
-                referralCodeModal.open();
-                //  yes => update `active` value and set `isConfirmed` to true
-
-                //  yes => option 2, show both codes and force a choice
-                //  no  => ignore ref code from URL, consume value from local storage
-                // need two modals, one for overwrite (old code is confirmed)
-                // second modal, if old code is NOT confirmed, record new as active and prompt for confirmation
-            } else {
-                console.log('this one');
-                referralStore.activateCode(
-                    '',
-                    referralCodeFromURL.value,
-                    false,
-                );
+                const data = await res.json();
+                console.log(data);
+                return data;
+            } catch (err) {
+                console.error(err);
+                return null;
             }
         }
 
-        // const refCode: RefCodeIF | undefined = referralStore.getCode(
-        //     userDataStore.userAddress,
-        // );
-        // console.log({
-        //     address: userDataStore.userAddress,
-        //     refCode,
-        // });
-        // if (refCode?.isConfirmed === false) {
-        //     referralCodeModal.open();
-        // }
+        if (userDataStore.userAddress) {
+            console.log(userDataStore.userAddress);
+            // const isConverted = true;
+            // // check FUUL for conversion
+            // if (isConverted) {
+            //     // if converted => nothing, get rid of temp val from LS, record ref code to LS under address
+            //     // add affiliate code param to URL (if local storage does not have the ref code saved for address already)
+            //     const refCode = referralStore.getCode(userDataStore.userAddress);
+            // } else {
+            //     // if not converted => open modal to let user confirm ref code (if not homepage AND `hasDismissed` === false)
+            //     //      user confirms: record ref code to LS under address
+            //     //      user declines: set `hasDismissed` to true (refCode was recorded in first render)
+            //     referralCodeModal.open();
+            // }
+
+            checkForFuulConversion(userDataStore.userAddress).then(
+                (response) => {
+                    console.log('res', response);
+                    const isConverted: boolean =
+                        response?.referrer_identifier !== null;
+                    if (isConverted) {
+                        alert('converted!');
+                        const refCode = referralStore.getCode(
+                            userDataStore.userAddress,
+                        );
+                        console.log(refCode);
+                    } else {
+                        referralCodeModal.open();
+                    }
+                },
+            );
+
+            // IF REF CODE IS RECORDED UNDER A USER ADDRESS, ASSUME IT WAS CONFIRMED, GATEKEEP AT USER FUNCTIONAL LEVEL
+            // later: prevent modal from opening on home page (should open once user hits a different page)
+
+            // `identifyUser` => connects refCode to address
+            // incentived event => triggers permanent attribution by FUUL
+        } else if (referralCodeFromURL.value) {
+            referralStore.activateCode(referralCodeFromURL.value);
+        }
+
         prevIsUserConnected.current = isUserConnected;
-    }, [
-        isUserConnected,
-        // referralStore.active,
-        userDataStore.userAddress,
-    ]);
+    }, [isUserConnected, userDataStore.userAddress]);
 
     return (
         <>
@@ -556,32 +550,33 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {referralCodeModal.isOpen &&
-                referralStore.active &&
-                !referralStore.active.isConfirmed && (
-                    <Modal
-                        close={referralCodeModal.close}
-                        position='center'
-                        title='Referral Code'
-                    >
-                        <ReferralCodeModal
-                            refCode={referralStore.active.value}
-                            close={referralCodeModal.close}
-                            handleConfirm={(): void => {
-                                const refCode = referralStore.getCode(
+            {referralCodeModal.isOpen && referralStore.cached && (
+                <Modal
+                    close={(): void => {
+                        referralCodeModal.close();
+                        hasDismissedRef.current = true;
+                    }}
+                    position='center'
+                    title='Referral Code'
+                >
+                    <ReferralCodeModal
+                        refCode={referralStore.cached}
+                        close={(): void => {
+                            referralCodeModal.close();
+                            hasDismissedRef.current = true;
+                        }}
+                        handleConfirm={(): void => {
+                            if (userDataStore.userAddress) {
+                                referralStore.confirmCode(
                                     userDataStore.userAddress,
+                                    referralStore.cached,
                                 );
-                                if (refCode) {
-                                    referralStore.confirmCode(
-                                        userDataStore.userAddress,
-                                        refCode.value,
-                                    );
-                                }
-                                referralCodeModal.close();
-                            }}
-                        />
-                    </Modal>
-                )}
+                            }
+                            referralCodeModal.close();
+                        }}
+                    />
+                </Modal>
+            )}
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}

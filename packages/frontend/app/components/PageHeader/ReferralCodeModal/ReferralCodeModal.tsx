@@ -9,7 +9,7 @@ interface PropsIF {
 }
 
 export default function ReferralCodeModal(props: PropsIF) {
-    const { refCode, handleConfirm } = props;
+    const { refCode, handleConfirm, close } = props;
 
     const navigate = useNavigate();
     return (

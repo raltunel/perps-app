@@ -78,7 +78,7 @@ export default function CodeTabs(props: Props) {
         setIsEditing(false);
         // update referral code in store
         console.log(userDataStore.userAddress);
-        referralStore.activateCode(userDataStore.userAddress, r, false);
+        // referralStore.activateCode(userDataStore.userAddress, r, false);
     }
 
     const affiliateAddress = userDataStore.userAddress;

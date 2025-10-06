@@ -9,7 +9,9 @@ export interface RefCodeIF {
 export interface ReferralStoreIF {
     codes: Map<string, RefCodeIF>;
     active: RefCodeIF | null;
-    activateCode(address: string, refCode: string, isConfirmed: boolean): void;
+    cached: string;
+    cache(refCode: string): void;
+    activateCode(refCode: string): void;
     getCode(address: string): RefCodeIF | undefined;
     confirmCode(address: string, refCode: string): void;
     set(address: string, refCode: string, isConfirmed: boolean): void;
@@ -34,43 +36,12 @@ export const useReferralStore = create<ReferralStoreIF>()(
         (set, get) => ({
             codes: new Map<string, RefCodeIF>(),
             active: null,
-            // add a ref code to the persisted map and update `active` val
-            activateCode(
-                address: string,
-                refCode: string,
-                isConfirmed: boolean,
-            ): void {
-                set((state) => {
-                    // get map of persisted codes from state
-                    const newCodes = new Map<string, RefCodeIF>(state.codes);
-                    // check existing state for a ref code on this address
-                    const persistedRefCode: RefCodeIF | undefined =
-                        get().getCode(address.toLowerCase());
-                    // if no ref code exists, create one
-                    const refCodeObj: RefCodeIF = {
-                        value: refCode,
-                        isConfirmed:
-                            (persistedRefCode?.isConfirmed &&
-                                persistedRefCode.value.toLowerCase() ===
-                                    refCode.toLowerCase()) ||
-                            false,
-                    };
-                    // initialize an output variable with the active ref code
-                    const output = { active: refCodeObj };
-                    // if a persisted ref code was not found, add to map
-                    // this only happens if there is a wallet is connected
-                    if (address.length) {
-                        persistedRefCode ??
-                            Object.assign(output, {
-                                codes: newCodes.set(
-                                    address.toLowerCase(),
-                                    refCodeObj,
-                                ),
-                            });
-                    }
-                    // return the updated state
-                    return output;
-                });
+            cached: '',
+            cache(refCode: string): void {
+                set({ cached: refCode });
+            },
+            activateCode(refCode: string): void {
+                set({ active: { value: refCode, isConfirmed: false } });
             },
             getCode(address: string): RefCodeIF | undefined {
                 return get().codes.get(address.toLowerCase());
