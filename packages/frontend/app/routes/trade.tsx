@@ -651,22 +651,39 @@ export default function Trade() {
                                 const target = e.target as HTMLElement | null;
                                 if (!target) return;
 
-                                // Ignore interactive controls
+                                // Never react to generic interactives anywhere in the section
                                 if (isInteractiveEl(target)) return;
 
-                                // Collapsed → open anywhere
-                                if (isTableCollapsed()) {
-                                    openTableToDefault();
+                                // Find the tabs header (<Tabs ... data-tabs>)
+                                const headerEl =
+                                    tableSectionRef.current?.querySelector(
+                                        '[data-tabs]',
+                                    ) as HTMLElement | null;
+                                if (!headerEl) return;
+
+                                // Is the dblclick point inside the header rect?
+                                const r = headerEl.getBoundingClientRect();
+                                const insideHeader =
+                                    e.clientY >= r.top &&
+                                    e.clientY <= r.bottom &&
+                                    e.clientX >= r.left &&
+                                    e.clientX <= r.right;
+
+                                if (!insideHeader) return;
+
+                                // Block only direct interactives in the header: tab buttons, right actions, and arrows.
+                                if (
+                                    target.closest(
+                                        'button, [role="tab"], [data-tabs-right], [data-tabs-arrow]',
+                                    )
+                                ) {
                                     return;
                                 }
 
-                                const section = tableSectionRef.current;
-                                if (!section) return;
-
-                                const rect = section.getBoundingClientRect();
-                                const yFromTop = e.clientY - rect.top;
-
-                                if (yFromTop <= HEADER_HIT_HEIGHT) {
+                                // Toggle: collapsed → open; otherwise collapse
+                                if (isTableCollapsed()) {
+                                    openTableToDefault();
+                                } else {
                                     collapseTableToBar();
                                 }
                             }}
