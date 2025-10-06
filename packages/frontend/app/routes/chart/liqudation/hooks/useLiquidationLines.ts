@@ -23,7 +23,7 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
         return '#461668';
     };
 
-    const getDash = (ratio: number) => (ratio >= 80 ? undefined : [1, 2]);
+    // const getDash = (ratio: number) => (ratio >= 80 ? undefined : [1, 2]);
 
     function simulateData(markyPrice: number, n = 5000) {
         const min = markyPrice * 0.1;
@@ -68,7 +68,7 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
         return Object.values(bins).map((b) => {
             const avgValue =
                 b.values.reduce((a, c) => a + c, 0) / b.values.length;
-            const dash = getDash(avgValue);
+            const dash = undefined;
             const color = getColor(avgValue);
             const lineWidth = 8;
 
@@ -79,7 +79,7 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
                 lineWidth,
                 type: '',
                 dash,
-                globalAlpha: 0.6,
+                globalAlpha: 0.4,
             };
         });
     }
