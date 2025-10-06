@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useOrderBookStore } from '~/stores/OrderBookStore';
 import type { HorizontalLineData } from '../LiqudationLines';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 
