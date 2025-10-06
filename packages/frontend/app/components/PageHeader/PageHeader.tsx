@@ -574,10 +574,13 @@ export default function PageHeader() {
                         }}
                         handleConfirm={(rc: string): void => {
                             if (userDataStore.userAddress) {
+                                // register ref code for address in data store
                                 referralStore.confirmCode(
                                     userDataStore.userAddress,
                                     rc,
                                 );
+                                // populate ref code in URL to create pageview event
+                                referralCodeFromURL.set(rc);
                             }
                             referralCodeModal.close();
                         }}
