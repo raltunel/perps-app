@@ -116,13 +116,6 @@ body {
 }
 
 .orderBook {
-    max-height: calc(
-        100vh - var(--trade-tables-height-desktop) -
-            var(--header-height-desktop) - var(--gap-m)
-    );
-}
-
-.orderBook {
     position: relative;
     align-items: flex-start;
     overflow: hidden;
