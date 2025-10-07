@@ -11,6 +11,7 @@ import { useLazyD3 } from '../hooks/useLazyD3';
 
 export type HorizontalLineData = {
     yPrice: number;
+    liqValue: number;
     color: string;
     strokeStyle: string;
     lineWidth: number;
@@ -32,7 +33,7 @@ const LiqudationLines = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
 
-    const lines = useLiqudationLines();
+    const lines = useLiqudationLines(scaleData);
     const { chart } = useTradingView();
 
     useEffect(() => {

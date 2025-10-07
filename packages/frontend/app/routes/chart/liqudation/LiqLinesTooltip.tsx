@@ -23,7 +23,7 @@ const LiqLineTooltip = ({
 
     const { chart } = useTradingView();
 
-    const lines = useLiqudationLines();
+    const lines = useLiqudationLines(scaleData);
 
     const linesRef = useRef(lines);
 
