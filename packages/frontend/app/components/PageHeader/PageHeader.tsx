@@ -272,6 +272,7 @@ export default function PageHeader() {
                             UserIdentifierType.SolanaAddress,
                         );
 
+                    // format return obj with relevant addresses and the referrer code
                     const output: FuulConversionIF = {
                         user_identifier: data.user_identifier,
                         referrer_identifier: data.referrer_identifier,
@@ -282,6 +283,7 @@ export default function PageHeader() {
                     return output;
                 }
 
+                // return `null` if API response indicates no conversion
                 return null;
             } catch (err) {
                 console.error(err);
