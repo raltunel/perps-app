@@ -106,8 +106,6 @@ export default function Trade() {
         resetLayoutHeights,
     } = useAppSettings();
 
-    const resizeRafId = useRef<number | null>(null);
-
     const { marketId } = useParams<{ marketId: string }>();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TabType>('order');
@@ -863,6 +861,7 @@ export default function Trade() {
                                     return;
                                 }
 
+                                // Toggle: collapsed → open; otherwise collapse
                                 if (isTableCollapsed()) {
                                     openTableToDefault();
                                 } else {
