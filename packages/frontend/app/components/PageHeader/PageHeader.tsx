@@ -39,7 +39,7 @@ import {
     type UrlParamMethodsIF,
 } from '~/hooks/useURLParams';
 import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
-import { useReferralStore, type RefCodeIF } from '~/stores/ReferralStore';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
 

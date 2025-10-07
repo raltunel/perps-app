@@ -32,7 +32,6 @@ import { WsProvider } from './contexts/WsContext';
 
 // Config
 import {
-    FUUL_API_KEY,
     MARKET_WS_ENDPOINT,
     RPC_ENDPOINT,
     USER_WS_ENDPOINT,
@@ -42,7 +41,6 @@ import {
 } from './utils/Constants';
 import packageJson from '../package.json';
 import { getResolutionSegment } from './utils/functions/getSegment';
-import { Fuul } from '@fuul/sdk';
 import { getDefaultLanguage } from './utils/functions/getDefaultLanguage';
 // import { NATIVE_MINT } from '@solana/spl-token';
 import { useDebugStore } from './stores/DebugStore';
