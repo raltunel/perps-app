@@ -41,7 +41,13 @@ import {
 import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
 import { useReferralStore, type RefCodeIF } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
-import useBackgroundCounter from '~/hooks/useBackgroundCounter';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
+
+interface FuulConversionIF {
+    user_identifier: string;
+    referrer_identifier: string;
+    referrer_code: string | null;
+}
 
 export default function PageHeader() {
     // Feedback modal state
@@ -192,15 +198,13 @@ export default function PageHeader() {
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
-    const counter = useBackgroundCounter();
-
+    // boolean to prevent the confirmation modal from opening multiple times
     const hasDismissedRef = useRef<boolean>(false);
 
+    // determine if user is on the home page (all other perps pages are v2)
     const onHomePage: boolean = !location.pathname.includes('v2');
 
     useEffect(() => {
-        counter.increment();
-        counter.log();
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
                 const loginButtonClickTime = Number(
@@ -233,9 +237,12 @@ export default function PageHeader() {
             }
         }
 
-        async function checkForFuulConversion(address: string) {
-            console.log('address', address);
-            const options = {
+        // fn to check FUUL for conversion data on a given wallet address
+        async function checkForFuulConversion(
+            address: string,
+        ): Promise<FuulConversionIF | null> {
+            // options config for FUUL API call
+            const OPTIONS = {
                 method: 'GET',
                 headers: {
                     accept: 'application/json',
@@ -244,14 +251,38 @@ export default function PageHeader() {
                 },
             };
 
+            // attempt to check for conversion and resolve referrer address and code
             try {
-                const res = await fetch(
-                    `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`,
-                    options,
-                );
+                // const affiliates = await Fuul.getConversions({ user_identifier: address,
+                //     identifier_type: UserIdentifierType.SolanaAddress });
+                // console.log('affiliates', affiliates);
+                // conversion endpoint
+                const USER_ID_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`;
+                // fetch raw data from FUUL API
+                const res = await fetch(USER_ID_ENDPOINT, OPTIONS);
+                // format response as a JSON object
                 const data = await res.json();
-                console.log(data);
-                return data;
+                console.log('data', data);
+
+                // if user has converted, ask FUUL for readable ref code associated with address
+                if (data.referrer_identifier) {
+                    const affiliateCode: string | null =
+                        await Fuul.getAffiliateCode(
+                            data.referrer_identifier,
+                            UserIdentifierType.SolanaAddress,
+                        );
+
+                    const output: FuulConversionIF = {
+                        user_identifier: data.user_identifier,
+                        referrer_identifier: data.referrer_identifier,
+                        referrer_code: affiliateCode,
+                    };
+                    console.log('output', output);
+
+                    return output;
+                }
+
+                return null;
             } catch (err) {
                 console.error(err);
                 return null;
@@ -263,7 +294,6 @@ export default function PageHeader() {
             referralStore.cache(referralCodeFromURL.value);
 
         if (userDataStore.userAddress) {
-            console.log(userDataStore.userAddress);
             // const isConverted = true;
             // // check FUUL for conversion
             // if (isConverted) {
@@ -279,16 +309,8 @@ export default function PageHeader() {
 
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response) => {
-                    console.log('res', response);
-                    console.log('url', referralCodeFromURL.value);
-                    const isConverted: boolean =
-                        response?.referrer_identifier !== null;
-                    const isConfirmed: boolean = !!referralStore.getCode(
-                        userDataStore.userAddress,
-                    )?.isConfirmed;
-                    if (isConverted && !isConfirmed) {
-                        // this is that workflow where we might know they're converted but not have the refCode
-                        // what should we record to local storage?
+                    if (response?.referrer_code) {
+                        referralCodeFromURL.set(response.referrer_code);
                     } else if (!hasDismissedRef.current) {
                         onHomePage || referralCodeModal.open();
                     }
