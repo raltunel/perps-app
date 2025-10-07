@@ -310,7 +310,7 @@ export default function PageHeader() {
             // }
 
             checkForFuulConversion(userDataStore.userAddress).then(
-                (response) => {
+                (response: FuulConversionIF | null) => {
                     if (response?.referrer_code) {
                         referralCodeFromURL.set(response.referrer_code);
                     } else if (!hasDismissedRef.current) {
