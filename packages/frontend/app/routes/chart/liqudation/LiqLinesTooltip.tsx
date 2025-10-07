@@ -65,6 +65,7 @@ const LiqLineTooltip = ({
             if (!liqLineTooltipRef.current) return;
             if (!scaleData || !scaleData.yScale) return;
             if (chart === null) return;
+            if (!shouldOpenTooltip.current) return;
 
             const { paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
 
@@ -155,8 +156,7 @@ const LiqLineTooltip = ({
     const callbackMouseUp = (event: MouseEventParams) => {
         setTimeout(() => {
             shouldOpenTooltip.current = true;
-            if (liqLineTooltipRef)
-                liqLineTooltipRef.current.style('visibility', 'visible');
+            if (liqLineTooltipRef) mousemove(event.clientX, event.clientY);
         }, 100);
     };
 
