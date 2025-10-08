@@ -55,7 +55,20 @@ const LiqudationLines = ({
             horizontalLine.decorate(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (context: CanvasRenderingContext2D, d: any) => {
-                    context.strokeStyle = d.strokeStyle;
+                    const strokeStyle = d.strokeStyle;
+                    const { width } = context.canvas;
+
+                    const gradient = context.createLinearGradient(
+                        0,
+                        0,
+                        width,
+                        0,
+                    );
+                    gradient.addColorStop(0, `${strokeStyle}00`); // fully transparent on the left
+                    gradient.addColorStop(0.6, `${strokeStyle}AA`); // mid transition
+                    gradient.addColorStop(1, `${strokeStyle}FF`); // fully opaque on the right
+
+                    context.strokeStyle = gradient;
                     context.fillStyle = d.strokeStyle;
                     context.lineWidth = d.lineWidth;
                     if (d.dash) context.setLineDash(d.dash);
@@ -75,7 +88,20 @@ const LiqudationLines = ({
             horizontalLineLogScale.decorate(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (context: CanvasRenderingContext2D, d: any) => {
-                    context.strokeStyle = d.strokeStyle;
+                    const { width } = context.canvas;
+                    const strokeStyle = d.strokeStyle;
+
+                    const gradient = context.createLinearGradient(
+                        0,
+                        0,
+                        width,
+                        0,
+                    );
+                    gradient.addColorStop(0, `${strokeStyle}00`); // fully transparent on the left
+                    gradient.addColorStop(0.6, `${strokeStyle}AA`); // mid transition
+                    gradient.addColorStop(1, `${strokeStyle}FF`); // fully opaque on the right
+
+                    context.strokeStyle = gradient;
                     context.fillStyle = d.strokeStyle;
                     context.lineWidth = d.lineWidth;
                     if (d.dash) context.setLineDash(d.dash);
