@@ -24,6 +24,7 @@ const LiqudationLines = ({
     canvasSize,
     scaleData,
     zoomChanged,
+    lines,
 }: LiqProps) => {
     const { d3, d3fc } = useLazyD3() ?? {};
 
@@ -33,7 +34,6 @@ const LiqudationLines = ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [horizontalLineLogScale, setHorizontalLineLogScale] = useState<any>();
 
-    const lines = useLiqudationLines(scaleData);
     const { chart } = useTradingView();
 
     useEffect(() => {

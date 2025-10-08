@@ -18,13 +18,14 @@ const LiqLineTooltip = ({
     canvasSize,
     scaleData,
     zoomChanged,
+    lines,
 }: LiqProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const liqLineTooltipRef = useRef<any>(null);
 
     const { chart } = useTradingView();
 
-    const lines = useLiqudationLines(scaleData);
+    // const lines = useLiqudationLines(scaleData);
 
     const linesRef = useRef(lines);
 
@@ -37,7 +38,7 @@ const LiqLineTooltip = ({
 
     useEffect(() => {
         linesRef.current = lines;
-    }, [lines]);
+    }, [JSON.stringify(lines), lines]);
 
     const checkLines = useCallback(
         (offsetX: number, offsetY: number) => {
@@ -240,6 +241,7 @@ const LiqLineTooltip = ({
         activeDecimalSeparator,
         activeGroupSeparator,
         formatNum,
+        scaleData,
     ]);
 
     return null;

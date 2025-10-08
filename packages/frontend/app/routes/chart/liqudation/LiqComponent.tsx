@@ -1,5 +1,6 @@
+import { useLiqudationLines } from './hooks/useLiquidationLines';
 import LiqLineTooltip from './LiqLinesTooltip';
-import LiqudationLines from './LiqudationLines';
+import LiqudationLines, { type HorizontalLineData } from './LiqudationLines';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -9,6 +10,7 @@ export interface LiqProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
     zoomChanged: boolean;
+    lines: HorizontalLineData[];
 }
 
 const LiqComponent = ({
@@ -18,6 +20,8 @@ const LiqComponent = ({
     scaleData,
     zoomChanged,
 }: LiqProps) => {
+    const lines = useLiqudationLines(scaleData);
+
     return (
         <>
             <LiqLineTooltip
@@ -26,6 +30,7 @@ const LiqComponent = ({
                 overlayCanvasRef={overlayCanvasRef}
                 scaleData={scaleData}
                 zoomChanged={zoomChanged}
+                lines={lines}
             />
             <LiqudationLines
                 canvasSize={canvasSize}
@@ -33,6 +38,7 @@ const LiqComponent = ({
                 canvasWrapperRef={canvasWrapperRef}
                 scaleData={scaleData}
                 zoomChanged={zoomChanged}
+                lines={lines}
             />
         </>
     );
