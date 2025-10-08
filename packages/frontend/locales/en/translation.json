@@ -399,7 +399,8 @@
         "rewardsEarned": "Rewards Earned",
         "rewardHistory": "Reward History",
         "enterCode": "Enter Code",
-        "claim": "Claim"
+        "claim": "Claim",
+        "createCode": "Create Code"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
