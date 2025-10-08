@@ -65,7 +65,7 @@ export default function CodeTabs(props: Props) {
         if (isUserConnected) {
             referralStore.confirmCode(
                 userDataStore.userAddress,
-                referralStore.cached,
+                referralStore.cached.value,
             );
         }
     }
@@ -101,7 +101,7 @@ export default function CodeTabs(props: Props) {
                 <h6>Current Affiliate Code</h6>
                 <p>
                     {referralStore.getCode(affiliateAddress) ||
-                        referralStore.cached}
+                        referralStore.cached.value}
                 </p>
             </div>
             {isConverted || (
@@ -128,14 +128,14 @@ export default function CodeTabs(props: Props) {
                 <h6>
                     Overwrite current referrer code:{' '}
                     {referralStore.getCode(affiliateAddress) ||
-                        referralStore.cached}
+                        referralStore.cached.value}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={
                         referralStore.getCode(affiliateAddress) ||
-                        referralStore.cached
+                        referralStore.cached.value
                     }
                 />
             </div>
@@ -164,7 +164,7 @@ export default function CodeTabs(props: Props) {
                 <input
                     ref={updateReferralCodeInputRef2}
                     type='text'
-                    defaultValue={referralStore.cached || ''}
+                    defaultValue={referralStore.cached.value || ''}
                 />
             </div>
             <SimpleButton

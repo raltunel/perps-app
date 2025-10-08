@@ -311,10 +311,12 @@ export default function PageHeader() {
 
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response: FuulConversionIF | null): void => {
-                    if (response?.referrer_code) {
-                        null;
-                    } else if (!hasDismissedRef.current) {
-                        onHomePage || referralCodeModal.open();
+                    if (
+                        !response?.referrer_code &&
+                        !referralStore.cached.hasDismissed &&
+                        !onHomePage
+                    ) {
+                        referralCodeModal.open();
                     }
                 },
             );
@@ -583,21 +585,22 @@ export default function PageHeader() {
                 </Modal>
             )}
             {referralCodeModal.isOpen &&
-                referralStore.cached &&
+                referralStore.cached.value &&
+                !referralStore.cached.hasDismissed &&
                 !referralStore.getCode(userDataStore.userAddress) && (
                     <Modal
                         close={(): void => {
                             referralCodeModal.close();
-                            hasDismissedRef.current = true;
+                            referralStore.dismiss();
                         }}
                         position='center'
                         title='Referral Code'
                     >
                         <ReferralCodeModal
-                            refCode={referralStore.cached}
+                            refCode={referralStore.cached.value}
                             close={(): void => {
                                 referralCodeModal.close();
-                                hasDismissedRef.current = true;
+                                referralStore.dismiss();
                             }}
                             handleConfirm={(rc: string): void => {
                                 if (userDataStore.userAddress) {

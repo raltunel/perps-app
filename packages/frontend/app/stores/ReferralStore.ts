@@ -3,7 +3,11 @@ import { persist } from 'zustand/middleware';
 
 export interface ReferralStoreIF {
     codes: Map<string, string>;
-    cached: string;
+    cached: {
+        value: string;
+        hasDismissed: boolean;
+    };
+    dismiss(): void;
     cache(refCode: string): void;
     getCode(address: string): string | undefined;
     confirmCode(address: string, refCode: string): void;
@@ -28,9 +32,20 @@ export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
             codes: new Map<string, string>(),
-            cached: '',
+            cached: {
+                value: '',
+                hasDismissed: false,
+            },
             cache(refCode: string): void {
-                set({ cached: refCode });
+                set({ cached: { value: refCode, hasDismissed: false } });
+            },
+            dismiss(): void {
+                set({
+                    cached: {
+                        value: get().cached.value,
+                        hasDismissed: true,
+                    },
+                });
             },
             getCode(address: string): string | undefined {
                 return get().codes.get(address.toLowerCase());
