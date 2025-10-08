@@ -34,6 +34,36 @@
     font-size: var(--font-size-m, 18px);
     white-space: nowrap;
 }
+.logo {
+    flex: 0 0 auto;
+}
+.nav {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.sessionWrap {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-inline-size: 200px;
+    overflow: hidden;
+}
+
+.sessionWrap :global(button) {
+    inline-size: auto;
+    max-inline-size: 100%;
+    height: 32px;
+    padding: 0 10px;
+    font-size: 13px;
+    line-height: 1;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 .ambientmm {
     display: flex;
@@ -86,6 +116,7 @@
     gap: var(--gap-s);
     flex-shrink: 0;
     white-space: nowrap; /* prevent wrapping-induced height changes */
+    flex: 0 0 auto;
 }
 
 /* Reserve space for the Deposit button to avoid layout shift when it mounts */
@@ -346,6 +377,17 @@
     .walletButton {
         font-size: var(--font-size-xs, 10px);
     }
+    .logo img {
+        height: 30px;
+    }
+    .sessionWrap {
+        max-inline-size: 160px;
+    }
+    .sessionWrap :global(button) {
+        height: 28px;
+        padding: 0 8px;
+        font-size: 12px;
+    }
 }
 
 @media (max-width: 1024px) {
@@ -429,5 +471,9 @@
 
     .ambientmm {
         display: flex !important;
+    }
+
+    .depositButtonPlaceholder {
+        display: none;
     }
 }
