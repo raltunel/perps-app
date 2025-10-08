@@ -149,6 +149,33 @@ body {
     padding: var(--gap-s);
 }
 
+.rightCol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-s);
+    height: 100%;
+    min-height: 0;
+}
+
+.order_input {
+    flex: 1 1 auto;
+    min-height: 300px;
+}
+
+.wallet {
+    flex: 0 0 auto;
+    max-height: 195px;
+    height: 100%;
+}
+
+.table {
+    overflow: auto;
+    scrollbar-width: none;
+}
+.table::-webkit-scrollbar {
+    display: none;
+}
+
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {
