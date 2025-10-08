@@ -92,22 +92,29 @@ export default function CodeTabs(props: Props) {
         isEditing,
     });
 
+    const isConverted = false;
+
     const confirmOrEditCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Current Affiliate Code</h6>
                 <p>{referralStore.cached}</p>
             </div>
-            <div className={styles.refferal_code_buttons}>
-                {referralStore.cached || (
-                    <SimpleButton bg='accent1' onClick={confirmRefCode}>
-                        Confirm
+            {isConverted || (
+                <div className={styles.refferal_code_buttons}>
+                    {referralStore.cached && (
+                        <SimpleButton bg='accent1' onClick={confirmRefCode}>
+                            Confirm
+                        </SimpleButton>
+                    )}
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => setIsEditing(true)}
+                    >
+                        Edit2
                     </SimpleButton>
-                )}
-                <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
-                    Edit
-                </SimpleButton>
-            </div>
+                </div>
+            )}
         </section>
     );
 
@@ -375,7 +382,7 @@ export default function CodeTabs(props: Props) {
                     </p>
                 </div>
                 <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
-                    Edit
+                    Edit1
                 </SimpleButton>
             </section>
         ) : (
