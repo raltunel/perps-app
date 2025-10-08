@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}} Emir Gerçekleşti",
-            "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emir {{fillPrice}} fiyatında başarıyla gerçekleşti"
+            "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emir {{fillPrice}} fiyatında başarıyla gerçekleşti",
+            "buySide": "Al",
+            "sellSide": "Sat"
         },
         "errorUpdatingOrder": {
             "title": "Emir Güncelleme Hatası"
