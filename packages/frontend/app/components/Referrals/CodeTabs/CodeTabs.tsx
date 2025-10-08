@@ -65,7 +65,7 @@ export default function CodeTabs(props: Props) {
         if (isUserConnected) {
             referralStore.confirmCode(
                 userDataStore.userAddress,
-                referralStore.active?.value || '',
+                referralStore.cached,
             );
         }
     }
@@ -96,10 +96,10 @@ export default function CodeTabs(props: Props) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Current Affiliate Code</h6>
-                <p>{referralStore.active?.value}</p>
+                <p>{referralStore.cached}</p>
             </div>
             <div className={styles.refferal_code_buttons}>
-                {referralStore.active?.isConfirmed || (
+                {referralStore.cached || (
                     <SimpleButton bg='accent1' onClick={confirmRefCode}>
                         Confirm
                     </SimpleButton>
@@ -114,14 +114,11 @@ export default function CodeTabs(props: Props) {
     const overwriteCurrentReferralCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>
-                    Overwrite current referrer code:{' '}
-                    {referralStore.active?.value}
-                </h6>
+                <h6>Overwrite current referrer code: {referralStore.cached}</h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
-                    defaultValue={referralStore.active?.value || ''}
+                    defaultValue={referralStore.cached || ''}
                 />
             </div>
             <div className={styles.refferal_code_buttons}>
@@ -149,7 +146,7 @@ export default function CodeTabs(props: Props) {
                 <input
                     ref={updateReferralCodeInputRef2}
                     type='text'
-                    defaultValue={referralStore.active?.value || ''}
+                    defaultValue={referralStore.cached || ''}
                 />
             </div>
             <SimpleButton
@@ -178,7 +175,7 @@ export default function CodeTabs(props: Props) {
     );
 
     const enterCodeContent = isSessionEstablished
-        ? referralStore.active
+        ? referralStore.cached
             ? !isEditing
                 ? // this code block:
                   //  - session is established

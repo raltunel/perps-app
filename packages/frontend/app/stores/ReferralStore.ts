@@ -1,20 +1,13 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-
-export interface RefCodeIF {
-    value: string;
-    isConfirmed: boolean;
-}
+import { persist } from 'zustand/middleware';
 
 export interface ReferralStoreIF {
-    codes: Map<string, RefCodeIF>;
-    active: RefCodeIF | null;
+    codes: Map<string, string>;
     cached: string;
     cache(refCode: string): void;
-    activateCode(refCode: string): void;
-    getCode(address: string): RefCodeIF | undefined;
+    getCode(address: string): string | undefined;
     confirmCode(address: string, refCode: string): void;
-    set(address: string, refCode: string, isConfirmed: boolean): void;
+    set(address: string, refCode: string): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
@@ -34,35 +27,25 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            codes: new Map<string, RefCodeIF>(),
-            active: null,
+            codes: new Map<string, string>(),
             cached: '',
             cache(refCode: string): void {
                 set({ cached: refCode });
             },
-            activateCode(refCode: string): void {
-                set({ active: { value: refCode, isConfirmed: false } });
-            },
-            getCode(address: string): RefCodeIF | undefined {
+            getCode(address: string): string | undefined {
                 return get().codes.get(address.toLowerCase());
             },
             confirmCode(address: string, refCode: string): void {
                 set((state) => {
-                    const newCodes = new Map<string, RefCodeIF>(state.codes);
-                    newCodes.set(address.toLowerCase(), {
-                        value: refCode,
-                        isConfirmed: true,
-                    });
+                    const newCodes = new Map<string, string>(state.codes);
+                    newCodes.set(address.toLowerCase(), refCode);
                     return { codes: newCodes };
                 });
             },
-            set(address: string, refCode: string, isConfirmed: boolean): void {
+            set(address: string, refCode: string): void {
                 set((state) => {
-                    const newCodes = new Map<string, RefCodeIF>(state.codes);
-                    newCodes.set(address.toLowerCase(), {
-                        value: refCode,
-                        isConfirmed,
-                    });
+                    const newCodes = new Map<string, string>(state.codes);
+                    newCodes.set(address.toLowerCase(), refCode);
                     return { codes: newCodes };
                 });
             },

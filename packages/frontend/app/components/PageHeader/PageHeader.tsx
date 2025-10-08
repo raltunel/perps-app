@@ -582,36 +582,38 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {referralCodeModal.isOpen && referralStore.cached && (
-                <Modal
-                    close={(): void => {
-                        referralCodeModal.close();
-                        hasDismissedRef.current = true;
-                    }}
-                    position='center'
-                    title='Referral Code'
-                >
-                    <ReferralCodeModal
-                        refCode={referralStore.cached}
+            {referralCodeModal.isOpen &&
+                referralStore.cached &&
+                !referralStore.getCode(userDataStore.userAddress) && (
+                    <Modal
                         close={(): void => {
                             referralCodeModal.close();
                             hasDismissedRef.current = true;
                         }}
-                        handleConfirm={(rc: string): void => {
-                            if (userDataStore.userAddress) {
-                                // register ref code for address in data store
-                                referralStore.confirmCode(
-                                    userDataStore.userAddress,
-                                    rc,
-                                );
-                                // populate ref code in URL to create pageview event
-                                referralCodeFromURL.set(rc);
-                            }
-                            referralCodeModal.close();
-                        }}
-                    />
-                </Modal>
-            )}
+                        position='center'
+                        title='Referral Code'
+                    >
+                        <ReferralCodeModal
+                            refCode={referralStore.cached}
+                            close={(): void => {
+                                referralCodeModal.close();
+                                hasDismissedRef.current = true;
+                            }}
+                            handleConfirm={(rc: string): void => {
+                                if (userDataStore.userAddress) {
+                                    // register ref code for address in data store
+                                    referralStore.confirmCode(
+                                        userDataStore.userAddress,
+                                        rc,
+                                    );
+                                    // populate ref code in URL to create pageview event
+                                    referralCodeFromURL.set(rc);
+                                }
+                                referralCodeModal.close();
+                            }}
+                        />
+                    </Modal>
+                )}
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}
