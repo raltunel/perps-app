@@ -325,7 +325,8 @@ export default function PageHeader() {
             // `identifyUser` => connects refCode to address
             // incentived event => triggers permanent attribution by FUUL
         } else if (referralCodeFromURL.value) {
-            referralStore.activateCode(referralCodeFromURL.value);
+            // referralStore.activateCode(referralCodeFromURL.value);
+            referralStore.cache(referralCodeFromURL.value);
         }
 
         prevIsUserConnected.current = isUserConnected;

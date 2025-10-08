@@ -78,6 +78,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         state: {
                             codes: new Map(parsed.state?.codes || []),
                             active: parsed.state?.active || null,
+                            cached: parsed.state?.cached || '',
                         },
                     };
                 },
@@ -91,6 +92,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                         state: {
                             codes: codesArray,
                             active: value.state?.active,
+                            cached: value.state?.cached,
                         },
                     });
                     ssrSafeStorage().setItem(name, str);
