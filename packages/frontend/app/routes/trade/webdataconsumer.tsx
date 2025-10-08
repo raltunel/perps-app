@@ -612,7 +612,14 @@ export default function WebDataConsumer() {
                                               ),
                                 }),
                                 message: t('transactions.orderFilled.message', {
-                                    side: fill.side,
+                                    side:
+                                        fill.side === 'buy' || fill.side === 'B'
+                                            ? t(
+                                                  'transactions.orderFilled.buySide',
+                                              ).toLowerCase()
+                                            : t(
+                                                  'transactions.orderFilled.sellSide',
+                                              ).toLowerCase(),
                                     usdValueOfFillStr,
                                     symbol: fill.coin,
                                     fillPrice: formatNum(
