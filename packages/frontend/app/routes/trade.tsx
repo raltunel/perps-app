@@ -371,7 +371,7 @@ export default function Trade() {
             [
                 { key: 'order', label: t('navigation.trade') },
                 { key: 'chart', label: t('navigation.chart') },
-                { key: 'book', label: t('navigation.book') },
+                { key: 'book', label: t('orderBook.book') },
                 { key: 'recent', label: t('navigation.recent') },
                 { key: 'positions', label: t('navigation.positions') },
             ] as const,
