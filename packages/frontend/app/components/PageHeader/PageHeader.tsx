@@ -312,7 +312,7 @@ export default function PageHeader() {
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response: FuulConversionIF | null): void => {
                     if (response?.referrer_code) {
-                        referralCodeFromURL.set(response.referrer_code);
+                        null;
                     } else if (!hasDismissedRef.current) {
                         onHomePage || referralCodeModal.open();
                     }

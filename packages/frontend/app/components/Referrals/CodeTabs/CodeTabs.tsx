@@ -99,7 +99,10 @@ export default function CodeTabs(props: Props) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Current Affiliate Code</h6>
-                <p>{referralStore.cached}</p>
+                <p>
+                    {referralStore.getCode(affiliateAddress) ||
+                        referralStore.cached}
+                </p>
             </div>
             {isConverted || (
                 <div className={styles.refferal_code_buttons}>
@@ -109,7 +112,7 @@ export default function CodeTabs(props: Props) {
                         </SimpleButton>
                     )}
                     <SimpleButton
-                        bg='accent1'
+                        bg='accent3'
                         onClick={() => setIsEditing(true)}
                     >
                         Edit2
@@ -122,11 +125,18 @@ export default function CodeTabs(props: Props) {
     const overwriteCurrentReferralCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>Overwrite current referrer code: {referralStore.cached}</h6>
+                <h6>
+                    Overwrite current referrer code:{' '}
+                    {referralStore.getCode(affiliateAddress) ||
+                        referralStore.cached}
+                </h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
-                    defaultValue={referralStore.cached || ''}
+                    defaultValue={
+                        referralStore.getCode(affiliateAddress) ||
+                        referralStore.cached
+                    }
                 />
             </div>
             <div className={styles.refferal_code_buttons}>
@@ -392,7 +402,7 @@ export default function CodeTabs(props: Props) {
                     <h6>Create an affiliate code</h6>
                     <input
                         type='text'
-                        value={temporaryAffiliateCode}
+                        value={referralStore.getCode(affiliateAddress) || ''}
                         onChange={(e) =>
                             setTemporaryAffiliateCode(e.target.value)
                         }
