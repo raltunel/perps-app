@@ -10,7 +10,6 @@ export interface LiqProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scaleData: any;
     zoomChanged: boolean;
-    lines: HorizontalLineData[];
 }
 
 const LiqComponent = ({
@@ -25,11 +24,9 @@ const LiqComponent = ({
     return (
         <>
             <LiqLineTooltip
-                canvasSize={canvasSize}
                 canvasWrapperRef={canvasWrapperRef}
                 overlayCanvasRef={overlayCanvasRef}
                 scaleData={scaleData}
-                zoomChanged={zoomChanged}
                 lines={lines}
             />
             <LiqudationLines

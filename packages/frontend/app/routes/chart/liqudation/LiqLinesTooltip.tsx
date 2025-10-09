@@ -11,15 +11,22 @@ import type {
     ISubscription,
     MouseEventParams,
 } from '~/tv/charting_library';
+import type { HorizontalLineData } from './LiqudationLines';
+
+interface LiqTooltipProps {
+    overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData: any;
+    lines: HorizontalLineData[];
+}
 
 const LiqLineTooltip = ({
     overlayCanvasRef,
     canvasWrapperRef,
-    canvasSize,
     scaleData,
-    zoomChanged,
     lines,
-}: LiqProps) => {
+}: LiqTooltipProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const liqLineTooltipRef = useRef<any>(null);
 
@@ -180,33 +187,49 @@ const LiqLineTooltip = ({
                 if (crosshairSubscription)
                     crosshairSubscription.subscribe(context, callbackCrosshair);
             });
-        }
 
-        if (
-            d3
-                .select(canvasWrapperRef.current)
-                .select('.liqLineTooltip')
-                .empty()
-        ) {
-            const liqLineTooltip = d3
-                .select(canvasWrapperRef.current)
-                .append('div')
-                .attr('class', 'liqLineTooltip')
-                .style('z-index', '30')
-                .style('position', 'absolute')
-                .style('text-align', 'start')
-                .style('align-items', 'start')
-                .style('padding', '10px 14px')
-                .style('line-height', '1.4')
-                .style('font-size', '16px')
-                .style('pointer-events', 'none')
-                .style('background', 'var(--bg-dark2, #111117)')
-                .style('border-radius', 'var(--radius-s, 6px)')
-                .style('border', '1px solid var(--bg-dark6, #3e3e42)')
-                .style('min-width', '150px')
-                .style('visibility', 'hidden');
+            if (!document.getElementById('iqLine-tooltip-wrapper')) {
+                const { iframeDoc, paneCanvas } =
+                    getPaneCanvasAndIFrameDoc(chart);
 
-            liqLineTooltipRef.current = liqLineTooltip;
+                const dpr = window.devicePixelRatio || 1;
+
+                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
+
+                const wrapper = iframeDoc.createElement('div');
+                wrapper.style.position = 'absolute';
+                wrapper.style.width = paneCanvas.width / dpr + 'px';
+                wrapper.style.height = paneCanvas.height / dpr + 'px';
+                wrapper.style.pointerEvents = 'none';
+                wrapper.style.zIndex = '5';
+                wrapper.style.top = '0';
+                wrapper.style.left = '0';
+                wrapper.id = 'liqLine-tooltip-wrapper';
+
+                paneCanvas.parentNode.appendChild(wrapper);
+
+                if (d3.select(wrapper).select('.liqLineTooltip').empty()) {
+                    const liqLineTooltip = d3
+                        .select(wrapper)
+                        .append('div')
+                        .attr('class', 'liqLineTooltip')
+                        .style('z-index', '999999')
+                        .style('position', 'fixed')
+                        .style('text-align', 'start')
+                        .style('align-items', 'start')
+                        .style('padding', '10px 14px')
+                        .style('line-height', '1.4')
+                        .style('font-size', '16px')
+                        .style('pointer-events', 'none')
+                        .style('background', 'var(--bg-dark2, #111117)')
+                        .style('border-radius', 'var(--radius-s, 6px)')
+                        .style('border', '1px solid var(--bg-dark6, #3e3e42)')
+                        .style('min-width', '150px')
+                        .style('visibility', 'hidden');
+
+                    liqLineTooltipRef.current = liqLineTooltip;
+                }
+            }
         }
 
         return () => {
