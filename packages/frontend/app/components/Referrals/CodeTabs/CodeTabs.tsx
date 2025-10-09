@@ -93,8 +93,6 @@ export default function CodeTabs(props: Props) {
         isEditing,
     });
 
-    const isConverted = false;
-
     const confirmOrEditCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -104,7 +102,7 @@ export default function CodeTabs(props: Props) {
                         referralStore.cached.value}
                 </p>
             </div>
-            {isConverted || (
+            {referralStore.isConverted || (
                 <div className={styles.refferal_code_buttons}>
                     {referralStore.cached && (
                         <SimpleButton bg='accent1' onClick={confirmRefCode}>

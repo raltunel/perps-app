@@ -240,6 +240,9 @@ export default function PageHeader() {
 
                 // if user has converted, ask FUUL for readable ref code associated with address
                 if (data.referrer_identifier) {
+                    // record conversion in local storage (not persisted)
+                    referralStore.setIsConverted(true);
+                    referralStore.setIsConverted(true);
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
                             data.referrer_identifier,
@@ -257,10 +260,13 @@ export default function PageHeader() {
                     return output;
                 }
 
+                referralStore.setIsConverted(false);
+
                 // return `null` if API response indicates no conversion
                 return null;
             } catch (err) {
                 console.error(err);
+                referralStore.setIsConverted(false);
                 return null;
             }
         }

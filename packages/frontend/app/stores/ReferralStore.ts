@@ -11,6 +11,8 @@ export interface ReferralStoreIF {
     cache(refCode: string): void;
     getCode(address: string): string | undefined;
     confirmCode(address: string, refCode: string): void;
+    isConverted: boolean;
+    setIsConverted(value: boolean): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
@@ -34,6 +36,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
             cached: {
                 value: '',
                 hasDismissed: false,
+            },
+            isConverted: false,
+            setIsConverted(value: boolean): void {
+                set({ isConverted: value });
             },
             cache(refCode: string): void {
                 set({ cached: { value: refCode, hasDismissed: false } });
@@ -59,6 +65,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
         }),
         {
             name: LS_KEY,
+            partialize: (state) => ({
+                codes: state.codes,
+                cached: state.cached,
+            }),
             storage: {
                 getItem: (name) => {
                     const str = ssrSafeStorage().getItem(name);
@@ -67,8 +77,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     return {
                         state: {
                             codes: new Map(parsed.state?.codes || []),
-                            active: parsed.state?.active || null,
-                            cached: parsed.state?.cached || '',
+                            cached: parsed.state?.cached || {
+                                value: '',
+                                hasDismissed: false,
+                            },
                         },
                     };
                 },
@@ -81,7 +93,6 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     const str = JSON.stringify({
                         state: {
                             codes: codesArray,
-                            active: value.state?.active,
                             cached: value.state?.cached,
                         },
                     });
@@ -89,6 +100,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 },
                 removeItem: (name) => ssrSafeStorage().removeItem(name),
             },
+
             version: 1,
         },
     ),
