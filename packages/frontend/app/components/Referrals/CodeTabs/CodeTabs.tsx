@@ -113,7 +113,7 @@ export default function CodeTabs(props: Props) {
                         bg='accent3'
                         onClick={() => setIsEditing(true)}
                     >
-                        Edit2
+                        Edit
                     </SimpleButton>
                 </div>
             )}
@@ -391,7 +391,7 @@ export default function CodeTabs(props: Props) {
                     </p>
                 </div>
                 <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
-                    Edit1
+                    Edit
                 </SimpleButton>
             </section>
         ) : (
