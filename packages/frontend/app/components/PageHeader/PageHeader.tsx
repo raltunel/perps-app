@@ -242,7 +242,6 @@ export default function PageHeader() {
                 if (data.referrer_identifier) {
                     // record conversion in local storage (not persisted)
                     referralStore.setIsConverted(true);
-                    referralStore.setIsConverted(true);
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
                             data.referrer_identifier,
