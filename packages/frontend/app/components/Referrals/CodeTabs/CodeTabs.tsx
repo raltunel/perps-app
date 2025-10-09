@@ -104,11 +104,12 @@ export default function CodeTabs(props: Props) {
             </div>
             {referralStore.isConverted || (
                 <div className={styles.refferal_code_buttons}>
-                    {referralStore.cached && (
-                        <SimpleButton bg='accent1' onClick={confirmRefCode}>
-                            Confirm
-                        </SimpleButton>
-                    )}
+                    {referralStore.cached &&
+                        !referralStore.getCode(affiliateAddress) && (
+                            <SimpleButton bg='accent1' onClick={confirmRefCode}>
+                                Confirm
+                            </SimpleButton>
+                        )}
                     <SimpleButton
                         bg='accent3'
                         onClick={() => setIsEditing(true)}
