@@ -202,7 +202,6 @@ export const sortOrderData = (
                 );
 
             case 'filledSz':
-            case 'filledSz':
                 return [...orderData].sort((a, b) => {
                     const va = a.filledSz ?? -Infinity;
                     const vb = b.filledSz ?? -Infinity;
