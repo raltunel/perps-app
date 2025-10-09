@@ -56,13 +56,6 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     return { codes: newCodes };
                 });
             },
-            set(address: string, refCode: string): void {
-                set((state) => {
-                    const newCodes = new Map<string, string>(state.codes);
-                    newCodes.set(address.toLowerCase(), refCode);
-                    return { codes: newCodes };
-                });
-            },
         }),
         {
             name: LS_KEY,
