@@ -125,6 +125,34 @@ export function Document({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        // Console warning for production
+        if (SHOULD_LOG_ANALYTICS) {
+            // This will be called when the console is opened
+            const originalConsoleLog = console.log;
+            console.log = function () {
+                // Only show the warning once
+                if (!(window as any).__CONSOLE_WARNING_SHOWN) {
+                    (window as any).__CONSOLE_WARNING_SHOWN = true;
+
+                    // The actual warning message
+                    const warningMessage = `%c[INFO]: Warning!\n%c[INFO]: This is a browser feature intended for developers. You are reading this message because you opened the browser console, a developer tool.\n\n1. Never share your tokens or sensitive information with anyone.\n2. Do not paste any code you do not fully understand.\n3. If someone instructed you to do this, it is likely a scam.\n\nInjecting code into your browser could result in loss of tokens or control of your account that cannot be recovered or protected.`;
+
+                    // Apply some styling to the warning
+                    console.log(
+                        warningMessage,
+                        'color: #f0ad4e; font-weight: bold;',
+                        'color: #f0ad4e;',
+                    );
+                }
+
+                // Call the original console.log
+                originalConsoleLog.apply(console, arguments as any);
+            };
+        }
+    }, []);
+
     const defaultLanguage = useMemo(() => {
         if (!navigatorLanguage) return;
         return getDefaultLanguage();
