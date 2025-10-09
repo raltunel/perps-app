@@ -19,13 +19,24 @@ export type HorizontalLineData = {
     dash?: number[];
 };
 
+interface LiqTooltipProps {
+    overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
+    canvasWrapperRef: React.MutableRefObject<HTMLDivElement | null>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    canvasSize: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData: any;
+    zoomChanged: boolean;
+    lines: HorizontalLineData[];
+}
+
 const LiqudationLines = ({
     overlayCanvasRef,
     canvasSize,
     scaleData,
     zoomChanged,
     lines,
-}: LiqProps) => {
+}: LiqTooltipProps) => {
     const { d3, d3fc } = useLazyD3() ?? {};
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
