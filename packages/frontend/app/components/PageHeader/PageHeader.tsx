@@ -61,27 +61,7 @@ export default function PageHeader() {
         URL_PARAMS.referralCode,
     );
 
-    // logic to read a URL referral code and set in state + local storage
     const userDataStore = useUserDataStore();
-    // ref to ensure that the intialization only happens once
-    // const isRefCodeInitialized = useRef<boolean>(!!userDataStore.refCode.value);
-    // initialize ref code if relevant
-    // if (!isRefCodeInitialized.current) {
-    //     isRefCodeInitialized.current = true;
-    //     referralCodeFromURL.value &&
-    //         userDataStore.initializeRefCode(referralCodeFromURL.value);
-    // }
-    // useEffect(() => {
-    //     if (referralCodeURL.value) {
-    //         userDataStore.setReferralCode(referralCodeURL.value);
-    //         // const newSearchParams = new URLSearchParams(
-    //         //     searchParams.toString(),
-    //         // );
-    //         // newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-    //         // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-    //         // window.history.replaceState({}, '', newUrl); // remove referral code from URL
-    //     }
-    // }, [referralCodeURL.value]);
 
     const referralStore = useReferralStore();
     const { t } = useTranslation();
@@ -198,9 +178,6 @@ export default function PageHeader() {
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
-    // boolean to prevent the confirmation modal from opening multiple times
-    const hasDismissedRef = useRef<boolean>(false);
-
     // determine if user is on the home page (all other perps pages are v2)
     const onHomePage: boolean = !location.pathname.includes('v2');
 
@@ -253,9 +230,6 @@ export default function PageHeader() {
 
             // attempt to check for conversion and resolve referrer address and code
             try {
-                // const affiliates = await Fuul.getConversions({ user_identifier: address,
-                //     identifier_type: UserIdentifierType.SolanaAddress });
-                // console.log('affiliates', affiliates);
                 // conversion endpoint
                 const USER_ID_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`;
                 // fetch raw data from FUUL API
@@ -296,19 +270,6 @@ export default function PageHeader() {
             referralStore.cache(referralCodeFromURL.value);
 
         if (userDataStore.userAddress) {
-            // const isConverted = true;
-            // // check FUUL for conversion
-            // if (isConverted) {
-            //     // if converted => nothing, get rid of temp val from LS, record ref code to LS under address
-            //     // add affiliate code param to URL (if local storage does not have the ref code saved for address already)
-            //     const refCode = referralStore.getCode(userDataStore.userAddress);
-            // } else {
-            //     // if not converted => open modal to let user confirm ref code (if not homepage AND `hasDismissed` === false)
-            //     //      user confirms: record ref code to LS under address
-            //     //      user declines: set `hasDismissed` to true (refCode was recorded in first render)
-            //     referralCodeModal.open();
-            // }
-
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response: FuulConversionIF | null): void => {
                     if (
@@ -320,14 +281,7 @@ export default function PageHeader() {
                     }
                 },
             );
-
-            // IF REF CODE IS RECORDED UNDER A USER ADDRESS, ASSUME IT WAS CONFIRMED, GATEKEEP AT USER FUNCTIONAL LEVEL
-            // later: prevent modal from opening on home page (should open once user hits a different page)
-
-            // `identifyUser` => connects refCode to address
-            // incentived event => triggers permanent attribution by FUUL
         } else if (referralCodeFromURL.value) {
-            // referralStore.activateCode(referralCodeFromURL.value);
             referralStore.cache(referralCodeFromURL.value);
         }
 
