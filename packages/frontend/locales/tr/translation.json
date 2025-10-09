@@ -199,7 +199,7 @@
             "message": "{{usdValueOfOrderStr}} {{symbol}} için emir {{limitPrice}} ile başarıyla güncellendi"
         },
         "orderFilled": {
-            "title": "{{side}} Emir Gerçekleşti",
+            "title": "{{side}} Emri Gerçekleşti",
             "message": "{{usdValueOfFillStr}} {{symbol}} için {{side}} emri {{fillPrice}} fiyatında başarıyla gerçekleşti",
             "buySide": "Al",
             "sellSide": "Sat"
