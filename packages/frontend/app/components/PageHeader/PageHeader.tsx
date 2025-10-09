@@ -368,7 +368,7 @@ export default function PageHeader() {
                     )}
                     <span
                         ref={sessionButtonRef}
-                        className={styles.sessionWrap}
+                        className={`${styles.sessionWrap} ${isUserConnected ? styles.activeSessionWrap : ''}`}
                         data-plausible-event-name={
                             !isUserConnected ? 'Login Button Click' : undefined
                         }
