@@ -242,6 +242,14 @@ export default function PageHeader() {
                 if (data.referrer_identifier) {
                     // record conversion in local storage (not persisted)
                     referralStore.setIsConverted(true);
+
+                    // record conversion information if not in local storage
+                    referralStore.getCode(address) ||
+                        referralStore.confirmCode(address, {
+                            value: data.referrer_identifier,
+                            isConverted: true,
+                        });
+
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
                             data.referrer_identifier,
@@ -566,7 +574,7 @@ export default function PageHeader() {
                                     // register ref code for address in data store
                                     referralStore.confirmCode(
                                         userDataStore.userAddress,
-                                        rc,
+                                        { value: rc, isConverted: false },
                                     );
                                     // populate ref code in URL to create pageview event
                                     referralCodeFromURL.set(rc);

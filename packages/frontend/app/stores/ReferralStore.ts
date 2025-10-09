@@ -1,16 +1,21 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export interface RefCodeIF {
+    value: string;
+    isConverted: boolean;
+}
+
 export interface ReferralStoreIF {
-    codes: Map<string, string>;
+    codes: Map<string, RefCodeIF>;
     cached: {
         value: string;
         hasDismissed: boolean;
     };
     dismiss(): void;
     cache(refCode: string): void;
-    getCode(address: string): string | undefined;
-    confirmCode(address: string, refCode: string): void;
+    getCode(address: string): RefCodeIF | undefined;
+    confirmCode(address: string, refCode: RefCodeIF): void;
     isConverted: boolean;
     setIsConverted(value: boolean): void;
 }
@@ -32,7 +37,7 @@ const ssrSafeStorage = () =>
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
-            codes: new Map<string, string>(),
+            codes: new Map<string, RefCodeIF>(),
             cached: {
                 value: '',
                 hasDismissed: false,
@@ -52,12 +57,12 @@ export const useReferralStore = create<ReferralStoreIF>()(
                     },
                 });
             },
-            getCode(address: string): string | undefined {
+            getCode(address: string): RefCodeIF | undefined {
                 return get().codes.get(address.toLowerCase());
             },
-            confirmCode(address: string, refCode: string): void {
+            confirmCode(address: string, refCode: RefCodeIF): void {
                 set((state) => {
-                    const newCodes = new Map<string, string>(state.codes);
+                    const newCodes = new Map<string, RefCodeIF>(state.codes);
                     newCodes.set(address.toLowerCase(), refCode);
                     return { codes: newCodes };
                 });

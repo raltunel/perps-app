@@ -63,10 +63,10 @@ export default function CodeTabs(props: Props) {
     function confirmRefCode(): void {
         const isUserConnected = isEstablished(sessionState);
         if (isUserConnected) {
-            referralStore.confirmCode(
-                userDataStore.userAddress,
-                referralStore.cached.value,
-            );
+            referralStore.confirmCode(userDataStore.userAddress, {
+                value: referralStore.cached.value,
+                isConverted: false,
+            });
         }
     }
 
@@ -78,7 +78,10 @@ export default function CodeTabs(props: Props) {
         setIsEditing(false);
         // update referral code in store
         userDataStore.userAddress
-            ? referralStore.confirmCode(userDataStore.userAddress, r)
+            ? referralStore.confirmCode(userDataStore.userAddress, {
+                  value: r,
+                  isConverted: false,
+              })
             : referralStore.cache(r);
     }
 
@@ -98,7 +101,7 @@ export default function CodeTabs(props: Props) {
             <div className={styles.enterCodeContent}>
                 <h6>Current Affiliate Code</h6>
                 <p>
-                    {referralStore.getCode(affiliateAddress) ||
+                    {referralStore.getCode(affiliateAddress)?.value ||
                         referralStore.cached.value}
                 </p>
             </div>
@@ -126,14 +129,14 @@ export default function CodeTabs(props: Props) {
             <div className={styles.enterCodeContent}>
                 <h6>
                     Overwrite current referrer code:{' '}
-                    {referralStore.getCode(affiliateAddress) ||
+                    {referralStore.getCode(affiliateAddress)?.value ||
                         referralStore.cached.value}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={
-                        referralStore.getCode(affiliateAddress) ||
+                        referralStore.getCode(affiliateAddress)?.value ||
                         referralStore.cached.value
                     }
                 />
@@ -401,7 +404,7 @@ export default function CodeTabs(props: Props) {
                     <h6>Create an affiliate code</h6>
                     <input
                         type='text'
-                        value={referralStore.getCode(affiliateAddress) || ''}
+                        value={temporaryAffiliateCode}
                         onChange={(e) =>
                             setTemporaryAffiliateCode(e.target.value)
                         }
