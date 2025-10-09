@@ -11,7 +11,6 @@ export interface ReferralStoreIF {
     cache(refCode: string): void;
     getCode(address: string): string | undefined;
     confirmCode(address: string, refCode: string): void;
-    set(address: string, refCode: string): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
