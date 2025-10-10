@@ -8,9 +8,13 @@ export async function loadTradingView() {
     }
 
     try {
-        const tv = await import(/* @vite-ignore */ 'app/tv/charting_library');
+        const modulePath = '/app/tv/charting_library/charting_library.js';
+        await import(/* @vite-ignore */ modulePath);
 
-        return { widget: tv.widget };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const widget = (window as any).TradingView?.widget;
+
+        return { widget: widget };
     } catch {
         console.warn(
             '[loadTradingView] TradingView library not found — skipping chart initialization.',
