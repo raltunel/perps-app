@@ -153,11 +153,15 @@ const LiqLineTooltip = ({
         ],
     );
 
+    const onMouseLeave = useCallback(() => {
+        shouldOpenTooltip.current = false;
+        if (liqLineTooltipRef)
+            liqLineTooltipRef.current.style('visibility', 'hidden');
+    }, [liqLineTooltipRef]);
+
     const callbackMouseDown = (event: MouseEventParams) => {
         setTimeout(() => {
-            shouldOpenTooltip.current = false;
-            if (liqLineTooltipRef)
-                liqLineTooltipRef.current.style('visibility', 'hidden');
+            onMouseLeave();
         }, 300);
     };
 
@@ -170,6 +174,7 @@ const LiqLineTooltip = ({
 
     useEffect(() => {
         if (!overlayCanvasRef.current || !canvasWrapperRef.current) return;
+        if (!chart) return;
 
         let crosshairSubscription: ISubscription<
             (params: CrossHairMovedEventParams) => void
@@ -177,58 +182,63 @@ const LiqLineTooltip = ({
 
         const context = { name: 'crosshair-handler' };
 
-        if (chart) {
-            chart.onChartReady(() => {
-                crosshairSubscription = chart.activeChart().crossHairMoved();
+        chart.onChartReady(() => {
+            crosshairSubscription = chart.activeChart().crossHairMoved();
 
-                chart.subscribe('mouse_down', callbackMouseDown);
-                chart.subscribe('mouse_up', callbackMouseUp);
+            chart.subscribe('mouse_down', callbackMouseDown);
+            chart.subscribe('mouse_up', callbackMouseUp);
 
-                if (crosshairSubscription)
-                    crosshairSubscription.subscribe(context, callbackCrosshair);
+            if (crosshairSubscription)
+                crosshairSubscription.subscribe(context, callbackCrosshair);
+        });
+
+        const { iframeDoc, paneCanvas } = getPaneCanvasAndIFrameDoc(chart);
+
+        const dpr = window.devicePixelRatio || 1;
+
+        if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
+
+        if (!document.getElementById('iqLine-tooltip-wrapper')) {
+            const wrapper = iframeDoc.createElement('div');
+            wrapper.style.position = 'absolute';
+            wrapper.style.width = paneCanvas.width / dpr + 'px';
+            wrapper.style.height = paneCanvas.height / dpr + 'px';
+            wrapper.style.pointerEvents = 'none';
+            wrapper.style.zIndex = '5';
+            wrapper.style.top = '0';
+            wrapper.style.left = '0';
+            wrapper.id = 'liqLine-tooltip-wrapper';
+
+            paneCanvas.parentNode.appendChild(wrapper);
+
+            iframeDoc.addEventListener('mouseleave', () => {
+                onMouseLeave();
             });
 
-            if (!document.getElementById('iqLine-tooltip-wrapper')) {
-                const { iframeDoc, paneCanvas } =
-                    getPaneCanvasAndIFrameDoc(chart);
+            iframeDoc.addEventListener('mouseenter', () => {
+                shouldOpenTooltip.current = true;
+            });
 
-                const dpr = window.devicePixelRatio || 1;
+            if (d3.select(wrapper).select('.liqLineTooltip').empty()) {
+                const liqLineTooltip = d3
+                    .select(wrapper)
+                    .append('div')
+                    .attr('class', 'liqLineTooltip')
+                    .style('z-index', '999999')
+                    .style('position', 'fixed')
+                    .style('text-align', 'start')
+                    .style('align-items', 'start')
+                    .style('padding', '10px 14px')
+                    .style('line-height', '1.4')
+                    .style('font-size', '16px')
+                    .style('pointer-events', 'none')
+                    .style('background', 'var(--bg-dark2, #111117)')
+                    .style('border-radius', 'var(--radius-s, 6px)')
+                    .style('border', '1px solid var(--bg-dark6, #3e3e42)')
+                    .style('min-width', '150px')
+                    .style('visibility', 'hidden');
 
-                if (!iframeDoc || !paneCanvas || !paneCanvas.parentNode) return;
-
-                const wrapper = iframeDoc.createElement('div');
-                wrapper.style.position = 'absolute';
-                wrapper.style.width = paneCanvas.width / dpr + 'px';
-                wrapper.style.height = paneCanvas.height / dpr + 'px';
-                wrapper.style.pointerEvents = 'none';
-                wrapper.style.zIndex = '5';
-                wrapper.style.top = '0';
-                wrapper.style.left = '0';
-                wrapper.id = 'liqLine-tooltip-wrapper';
-
-                paneCanvas.parentNode.appendChild(wrapper);
-
-                if (d3.select(wrapper).select('.liqLineTooltip').empty()) {
-                    const liqLineTooltip = d3
-                        .select(wrapper)
-                        .append('div')
-                        .attr('class', 'liqLineTooltip')
-                        .style('z-index', '999999')
-                        .style('position', 'fixed')
-                        .style('text-align', 'start')
-                        .style('align-items', 'start')
-                        .style('padding', '10px 14px')
-                        .style('line-height', '1.4')
-                        .style('font-size', '16px')
-                        .style('pointer-events', 'none')
-                        .style('background', 'var(--bg-dark2, #111117)')
-                        .style('border-radius', 'var(--radius-s, 6px)')
-                        .style('border', '1px solid var(--bg-dark6, #3e3e42)')
-                        .style('min-width', '150px')
-                        .style('visibility', 'hidden');
-
-                    liqLineTooltipRef.current = liqLineTooltip;
-                }
+                liqLineTooltipRef.current = liqLineTooltip;
             }
         }
 
@@ -252,6 +262,11 @@ const LiqLineTooltip = ({
                     chart.unsubscribe('mouse_up', callbackMouseUp);
 
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+                    iframeDoc.removeEventListener('mouseleave', onMouseLeave);
+                    iframeDoc.removeEventListener('mouseenter', () => {
+                        shouldOpenTooltip.current = true;
+                    });
                 } catch (error: unknown) {
                     // console.error({ error });
                 }
