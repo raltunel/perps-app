@@ -195,18 +195,20 @@ body {
 }
 
 /* Tablet styles */
+/* UPDATED tablet block */
 @media only screen and (max-width: 1080px) and (min-width: 769px) {
+    /* Keep two columns: left = chart area takes remaining space,
+     right = fits the collapsible panel's width (30px collapsed, ~320px expanded) */
     .containerTop,
     .containerTop.orderBookLarge {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr max-content; /* <- key change */
     }
 
-    .containerTopLeft {
-        grid-template-columns: 1fr;
-    }
-
+    /* Make sure the order book cell actually participates in the layout */
     .orderBook {
-        display: none;
+        display: flex; /* was none */
+        min-width: 30px; /* guarantees the collapsed strip stays visible */
+        overflow: hidden; /* your child handles its own overflow */
     }
 }
 
@@ -427,5 +429,10 @@ body {
     .orderBook,
     .containerBottom {
         display: none;
+    }
+}
+@media (min-width: 768px) and (max-width: 1080px) {
+    #orderBookSection {
+        min-width: 30px;
     }
 }
