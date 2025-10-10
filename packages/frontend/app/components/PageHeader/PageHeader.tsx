@@ -236,6 +236,7 @@ export default function PageHeader() {
                 const res = await fetch(USER_ID_ENDPOINT, OPTIONS);
                 // format response as a JSON object
                 const data = await res.json();
+                console.log('data', data);
 
                 // if user has converted, ask FUUL for readable ref code associated with address
                 if (data.referrer_identifier) {
@@ -243,12 +244,11 @@ export default function PageHeader() {
                     referralStore.setIsConverted(true);
 
                     // record conversion information if not in local storage
-                    if (!referralStore.getCode(address)) {
+                    referralStore.getCode(address) ||
                         referralStore.confirmCode(address, {
                             value: data.referrer_identifier,
                             isConverted: true,
                         });
-                    }
 
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
@@ -262,6 +262,7 @@ export default function PageHeader() {
                         referrer_identifier: data.referrer_identifier,
                         referrer_code: affiliateCode,
                     };
+                    console.log('output', output);
 
                     return output;
                 }
@@ -281,15 +282,13 @@ export default function PageHeader() {
         referralCodeFromURL.value &&
             referralStore.cache(referralCodeFromURL.value);
 
-        if (userDataStore.userAddress && isUserConnected) {
+        if (userDataStore.userAddress) {
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response: FuulConversionIF | null): void => {
-                    // Only open modal if user is still connected
                     if (
                         !response?.referrer_code &&
                         !referralStore.cached.hasDismissed &&
-                        !onHomePage &&
-                        isUserConnected
+                        !onHomePage
                     ) {
                         referralCodeModal.open();
                     }
@@ -553,7 +552,6 @@ export default function PageHeader() {
                 </Modal>
             )}
             {referralCodeModal.isOpen &&
-                isUserConnected &&
                 referralStore.cached.value &&
                 !referralStore.cached.hasDismissed &&
                 !referralStore.getCode(userDataStore.userAddress) && (
