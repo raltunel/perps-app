@@ -817,7 +817,7 @@ export default function Trade() {
                                     {isTablet ? (
                                         <ExpandableOrderBook
                                             // collapsed={30}
-                                            expanded={250}
+                                            expanded={400}
                                         >
                                             <MemoizedOrderBookSection
                                                 chartTopHeight={chartTopHeight}
