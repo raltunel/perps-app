@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import styles from './CollapsibleOrderbook.module.css';
+import styles from './CollapsibleOrderBook.module.css';
 import { HiTableCells } from 'react-icons/hi2';
 import { FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
 
