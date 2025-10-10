@@ -33,6 +33,7 @@ import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import CollapsibleOrderBook from './trade/orderbook/CollapsibleOrderBook';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -387,6 +388,18 @@ export default function Trade() {
             setPositionsMenuOpen(false);
         }
     }, [activeTab, positionsMenuOpen]);
+
+    const [isTablet, setIsTablet] = useState(false);
+
+    useLayoutEffect(() => {
+        const mqTablet = window.matchMedia(
+            '(min-width: 768px) and (max-width: 1080px)',
+        );
+        const updateTablet = () => setIsTablet(mqTablet.matches);
+        updateTablet();
+        mqTablet.addEventListener('change', updateTablet);
+        return () => mqTablet.removeEventListener('change', updateTablet);
+    }, []);
 
     const MobileTabNavigation = useMemo(() => {
         return (
@@ -801,9 +814,20 @@ export default function Trade() {
                                     id='orderBookSection'
                                     className={styles.orderBook}
                                 >
-                                    <MemoizedOrderBookSection
-                                        chartTopHeight={chartTopHeight}
-                                    />
+                                    {isTablet ? (
+                                        <CollapsibleOrderBook
+                                            // collapsed={30}
+                                            expanded={250}
+                                        >
+                                            <MemoizedOrderBookSection
+                                                chartTopHeight={chartTopHeight}
+                                            />
+                                        </CollapsibleOrderBook>
+                                    ) : (
+                                        <MemoizedOrderBookSection
+                                            chartTopHeight={chartTopHeight}
+                                        />
+                                    )}
                                 </div>
                             </section>
                         </Resizable>
