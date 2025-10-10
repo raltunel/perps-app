@@ -78,30 +78,46 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 getItem: (name) => {
                     const str = ssrSafeStorage().getItem(name);
                     if (!str) return null;
-                    const parsed = JSON.parse(str);
-                    return {
-                        state: {
-                            codes: new Map(parsed.state?.codes || []),
-                            cached: parsed.state?.cached || {
-                                value: '',
-                                hasDismissed: false,
+                    try {
+                        const parsed = JSON.parse(str);
+                        const codesData = parsed.state?.codes;
+                        // Handle both array format (serialized) and object format
+                        const codesMap = Array.isArray(codesData)
+                            ? new Map(codesData)
+                            : new Map();
+                        return {
+                            state: {
+                                codes: codesMap,
+                                cached: parsed.state?.cached || {
+                                    value: '',
+                                    hasDismissed: false,
+                                },
                             },
-                        },
-                    };
+                        };
+                    } catch (error) {
+                        console.error('Error parsing AFFILIATE_DATA:', error);
+                        return null;
+                    }
                 },
                 setItem: (name, value) => {
-                    const codes = value.state?.codes;
-                    const codesArray =
-                        codes instanceof Map
-                            ? Array.from(codes.entries())
-                            : codes || [];
-                    const str = JSON.stringify({
-                        state: {
-                            codes: codesArray,
-                            cached: value.state?.cached,
-                        },
-                    });
-                    ssrSafeStorage().setItem(name, str);
+                    try {
+                        const codes = value.state?.codes;
+                        const codesArray =
+                            codes instanceof Map
+                                ? Array.from(codes.entries())
+                                : Array.isArray(codes)
+                                  ? codes
+                                  : [];
+                        const str = JSON.stringify({
+                            state: {
+                                codes: codesArray,
+                                cached: value.state?.cached,
+                            },
+                        });
+                        ssrSafeStorage().setItem(name, str);
+                    } catch (error) {
+                        console.error('Error saving AFFILIATE_DATA:', error);
+                    }
                 },
                 removeItem: (name) => ssrSafeStorage().removeItem(name),
             },

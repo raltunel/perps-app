@@ -236,7 +236,6 @@ export default function PageHeader() {
                 const res = await fetch(USER_ID_ENDPOINT, OPTIONS);
                 // format response as a JSON object
                 const data = await res.json();
-                console.log('data', data);
 
                 // if user has converted, ask FUUL for readable ref code associated with address
                 if (data.referrer_identifier) {
@@ -244,11 +243,12 @@ export default function PageHeader() {
                     referralStore.setIsConverted(true);
 
                     // record conversion information if not in local storage
-                    referralStore.getCode(address) ||
+                    if (!referralStore.getCode(address)) {
                         referralStore.confirmCode(address, {
                             value: data.referrer_identifier,
                             isConverted: true,
                         });
+                    }
 
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
@@ -262,7 +262,6 @@ export default function PageHeader() {
                         referrer_identifier: data.referrer_identifier,
                         referrer_code: affiliateCode,
                     };
-                    console.log('output', output);
 
                     return output;
                 }
