@@ -281,13 +281,15 @@ export default function PageHeader() {
         referralCodeFromURL.value &&
             referralStore.cache(referralCodeFromURL.value);
 
-        if (userDataStore.userAddress) {
+        if (userDataStore.userAddress && isUserConnected) {
             checkForFuulConversion(userDataStore.userAddress).then(
                 (response: FuulConversionIF | null): void => {
+                    // Only open modal if user is still connected
                     if (
                         !response?.referrer_code &&
                         !referralStore.cached.hasDismissed &&
-                        !onHomePage
+                        !onHomePage &&
+                        isUserConnected
                     ) {
                         referralCodeModal.open();
                     }
@@ -551,6 +553,7 @@ export default function PageHeader() {
                 </Modal>
             )}
             {referralCodeModal.isOpen &&
+                isUserConnected &&
                 referralStore.cached.value &&
                 !referralStore.cached.hasDismissed &&
                 !referralStore.getCode(userDataStore.userAddress) && (
