@@ -34,14 +34,18 @@ const ssrSafeStorage = () =>
               length: 0,
           }) as Storage;
 
+const DEFAULTS = {
+    cached: {
+        value: '',
+        hasDismissed: false,
+    },
+};
+
 export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set, get) => ({
             codes: new Map<string, RefCodeIF>(),
-            cached: {
-                value: '',
-                hasDismissed: false,
-            },
+            cached: DEFAULTS.cached,
             isConverted: false,
             setIsConverted(value: boolean): void {
                 set({ isConverted: value });
@@ -64,7 +68,10 @@ export const useReferralStore = create<ReferralStoreIF>()(
                 set((state) => {
                     const newCodes = new Map<string, RefCodeIF>(state.codes);
                     newCodes.set(address.toLowerCase(), refCode);
-                    return { codes: newCodes };
+                    return {
+                        codes: newCodes,
+                        cached: DEFAULTS.cached,
+                    };
                 });
             },
         }),
