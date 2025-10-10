@@ -19,8 +19,15 @@
     background: var(--bg-dark2);
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+.handle svg {
+    color: var(--text2);
+}
+.handle:hover svg {
+    color: var(--text1) !important;
 }
 
 .handle:focus-visible {

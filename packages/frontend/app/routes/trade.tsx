@@ -33,7 +33,7 @@ import { usePortfolioModals } from './portfolio/usePortfolioModals';
 import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
-import CollapsibleOrderBook from './trade/orderbook/CollapsibleOrderBook';
+import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -815,14 +815,14 @@ export default function Trade() {
                                     className={styles.orderBook}
                                 >
                                     {isTablet ? (
-                                        <CollapsibleOrderBook
+                                        <ExpandableOrderBook
                                             // collapsed={30}
                                             expanded={250}
                                         >
                                             <MemoizedOrderBookSection
                                                 chartTopHeight={chartTopHeight}
                                             />
-                                        </CollapsibleOrderBook>
+                                        </ExpandableOrderBook>
                                     ) : (
                                         <MemoizedOrderBookSection
                                             chartTopHeight={chartTopHeight}
