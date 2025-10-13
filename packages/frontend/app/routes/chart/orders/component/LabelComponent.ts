@@ -671,6 +671,8 @@ const LabelComponent = ({
                 dragLabelTooltipRef.current.style('visibility', 'hidden');
             }
 
+            window.dispatchEvent(new CustomEvent('orderLineDragStart'));
+
             const rect = canvas.getBoundingClientRect();
             const offsetY = (event.sourceEvent.clientY - rect?.top) * dpr;
             const offsetX = (event.sourceEvent.clientX - rect?.left) * dpr;
@@ -908,6 +910,8 @@ const LabelComponent = ({
                 return;
             }
 
+            window.dispatchEvent(new CustomEvent('orderLineDragEnd'));
+
             if (tempSelectedLine.parentLine.type === 'LIMIT') {
                 limitOrderDragEnd(tempSelectedLine);
             }
@@ -929,15 +933,13 @@ const LabelComponent = ({
         };
 
         const dragLines = d3
-            .drag<d3.DraggedElementBaseType, unknown, d3.SubjectPosition>()
+            .drag()
             .on('start', handleDragStart)
             .on('drag', handleDragging)
             .on('end', handleDragEnd);
 
         if (dragLines && canvas) {
-            d3.select<d3.DraggedElementBaseType, unknown>(canvas).call(
-                dragLines,
-            );
+            d3.select(canvas).call(dragLines);
         }
         return () => {
             d3.select(canvas).on('.drag', null);

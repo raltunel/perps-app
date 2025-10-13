@@ -219,6 +219,14 @@ const LiqLineTooltip = ({
                 shouldOpenTooltip.current = true;
             });
 
+            window.addEventListener('orderLineDragStart', () => {
+                onMouseLeave();
+            });
+
+            window.addEventListener('orderLineDragEnd', () => {
+                shouldOpenTooltip.current = true;
+            });
+
             if (d3.select(wrapper).select('.liqLineTooltip').empty()) {
                 const liqLineTooltip = d3
                     .select(wrapper)
@@ -265,6 +273,13 @@ const LiqLineTooltip = ({
 
                     iframeDoc.removeEventListener('mouseleave', onMouseLeave);
                     iframeDoc.removeEventListener('mouseenter', () => {
+                        shouldOpenTooltip.current = true;
+                    });
+                    window.removeEventListener(
+                        'orderLineDragStart',
+                        onMouseLeave,
+                    );
+                    window.removeEventListener('orderLineDragEnd', () => {
                         shouldOpenTooltip.current = true;
                     });
                 } catch (error: unknown) {
