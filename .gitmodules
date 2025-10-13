@@ -1,3 +1,0 @@
-[submodule "app/tv"]
-	path = packages/frontend/app/tv
-	url = git@github.com:benwolski/charting_library.git
