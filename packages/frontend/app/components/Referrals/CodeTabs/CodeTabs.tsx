@@ -71,7 +71,15 @@ export default function CodeTabs(props: Props) {
     }
 
     // fn to update a referral code and trigger FUUL confirmation workflow
-    function handleUpdateReferralCode(r: string): void {
+    async function handleUpdateReferralCode(r: string): Promise<void> {
+        // Check if the code exists (not free) before proceeding
+        const codeIsFree = await Fuul.isAffiliateCodeFree(r);
+
+        if (codeIsFree) {
+            console.log('Referral code is not valid (free/unused):', r);
+            return;
+        }
+
         // update referral code param in the URL
         handleReferralURLParam.set(r);
         // toggle DOM to default view
@@ -124,6 +132,15 @@ export default function CodeTabs(props: Props) {
         </section>
     );
 
+    console.log(
+        referralStore.getCode(userDataStore.userAddress)?.value,
+        referralStore.cached.value,
+    );
+    console.log(
+        !!referralStore.getCode(userDataStore.userAddress)?.value ||
+            !!referralStore.cached.value,
+    );
+
     const overwriteCurrentReferralCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -150,11 +167,17 @@ export default function CodeTabs(props: Props) {
                         )
                     }
                 >
-                    Update
+                    Confirm
                 </SimpleButton>
-                <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
-                    Cancel
-                </SimpleButton>
+                {(!referralStore.getCode(userDataStore.userAddress)?.value &&
+                    !referralStore.cached?.value) || (
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => setIsEditing(false)}
+                    >
+                        Cancel
+                    </SimpleButton>
+                )}
             </div>
         </section>
     );

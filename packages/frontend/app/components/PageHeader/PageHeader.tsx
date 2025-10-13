@@ -243,18 +243,18 @@ export default function PageHeader() {
                     // record conversion in local storage (not persisted)
                     referralStore.setIsConverted(true);
 
-                    // record conversion information if not in local storage
-                    referralStore.getCode(address) ||
-                        referralStore.confirmCode(address, {
-                            value: data.referrer_identifier,
-                            isConverted: true,
-                        });
-
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
                             data.referrer_identifier,
                             UserIdentifierType.SolanaAddress,
                         );
+
+                    // record conversion information if not in local storage
+                    referralStore.getCode(address) ||
+                        referralStore.confirmCode(address, {
+                            value: affiliateCode ?? data.referrer_identifier,
+                            isConverted: true,
+                        });
 
                     // format return obj with relevant addresses and the referrer code
                     const output: FuulConversionIF = {
@@ -278,9 +278,17 @@ export default function PageHeader() {
             }
         }
 
-        // cache the referral value from the URL if one is present
-        referralCodeFromURL.value &&
-            referralStore.cache(referralCodeFromURL.value);
+        // cache the referral value from the URL if present after verifying it exists
+        const refCodeValue: string | null = referralCodeFromURL.value;
+        if (refCodeValue) {
+            (async () => {
+                const codeIsFree = await Fuul.isAffiliateCodeFree(refCodeValue);
+                // Only cache if the code is NOT free (meaning it exists and is taken)
+                if (!codeIsFree) {
+                    referralStore.cache(refCodeValue);
+                }
+            })();
+        }
 
         if (userDataStore.userAddress) {
             checkForFuulConversion(userDataStore.userAddress).then(
@@ -294,8 +302,6 @@ export default function PageHeader() {
                     }
                 },
             );
-        } else if (referralCodeFromURL.value) {
-            referralStore.cache(referralCodeFromURL.value);
         }
 
         prevIsUserConnected.current = isUserConnected;
