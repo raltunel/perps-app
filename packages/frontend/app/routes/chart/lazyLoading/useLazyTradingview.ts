@@ -1,23 +1,25 @@
 export async function loadTradingView() {
-    // If running in SSR or there is no window, skip loading
     if (typeof window === 'undefined') {
-        console.warn(
-            '[loadTradingView] TradingView is not loaded in SSR environment.',
-        );
+        console.warn('[loadTradingView] TradingView not available in SSR.');
         return { widget: null };
     }
 
     try {
-        const modulePath = '/app/tv/charting_library/charting_library.js';
-        await import(/* @vite-ignore */ modulePath);
+        if (!(window as any).TradingView) {
+            await new Promise<void>((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = '/tv/charting_library/charting_library.js';
+                script.onload = () => resolve();
+                script.onerror = (err) => reject(err);
+                document.head.appendChild(script);
+            });
+        }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const widget = (window as any).TradingView?.widget;
-
-        return { widget: widget };
-    } catch {
-        console.warn(
-            '[loadTradingView] TradingView library not found — skipping chart initialization.',
+        return { widget: (window as any).TradingView?.widget };
+    } catch (err) {
+        console.error(
+            '[loadTradingView] Failed to load TradingView library:',
+            err,
         );
         return { widget: null };
     }
