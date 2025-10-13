@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -33,8 +33,21 @@ import { getDurationSegment } from '~/utils/functions/getSegment';
 import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
+import {
+    URL_PARAMS,
+    useUrlParams,
+    type UrlParamMethodsIF,
+} from '~/hooks/useURLParams';
+import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
+import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
+
+interface FuulConversionIF {
+    user_identifier: string;
+    referrer_identifier: string;
+    referrer_code: string | null;
+}
 
 export default function PageHeader() {
     // Feedback modal state
@@ -43,23 +56,15 @@ export default function PageHeader() {
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
-    // logic to read a URL referral code and set in state + local storage
-    const [searchParams] = useSearchParams();
+
+    const referralCodeFromURL: UrlParamMethodsIF = useUrlParams(
+        URL_PARAMS.referralCode,
+    );
+
     const userDataStore = useUserDataStore();
+
+    const referralStore = useReferralStore();
     const { t } = useTranslation();
-    useEffect(() => {
-        const REFERRAL_CODE_URL_PARAM = 'af';
-        const referralCode = searchParams.get(REFERRAL_CODE_URL_PARAM);
-        if (referralCode) {
-            userDataStore.setReferralCode(referralCode);
-            // const newSearchParams = new URLSearchParams(
-            //     searchParams.toString(),
-            // );
-            // newSearchParams.delete(REFERRAL_CODE_URL_PARAM);
-            // const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`;
-            // window.history.replaceState({}, '', newUrl); // remove referral code from URL
-        }
-    }, [searchParams]);
 
     const sessionState = useSession();
 
@@ -140,8 +145,14 @@ export default function PageHeader() {
         setIsHelpDropdownOpen(false);
     }, isHelpDropdownOpen);
 
-    // logic to open and close the app settings modal
+    // logic to open and close modals
     const appSettingsModal = useModal('closed');
+    const referralCodeModal = useModal('closed');
+
+    // temp handler to manually toggle referral code modal
+    useKeydown('m', referralCodeModal.toggle, [
+        JSON.stringify(referralCodeModal),
+    ]);
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -167,6 +178,9 @@ export default function PageHeader() {
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
+    // determine if user is on the home page (all other perps pages are v2)
+    const onHomePage: boolean = !location.pathname.includes('v2');
+
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
@@ -189,71 +203,6 @@ export default function PageHeader() {
                             : 'login button clicked',
                     },
                 });
-                const userWalletKey =
-                    sessionState.walletPublicKey ||
-                    sessionState.sessionPublicKey;
-
-                (async () => {
-                    try {
-                        // Create a dynamic message with current date
-                        const currentDate = new Date()
-                            .toISOString()
-                            .split('T')[0];
-                        const message = `Accept affiliate code ${userDataStore.referralCode} on ${currentDate}`;
-
-                        // Convert message to Uint8Array
-                        const messageBytes = new TextEncoder().encode(message);
-
-                        // Get the signature from the session
-                        const signatureBytes =
-                            await sessionState.signMessage(messageBytes);
-
-                        // Convert the signature to base64
-                        const signatureArray = Array.from(
-                            new Uint8Array(signatureBytes),
-                        );
-                        const binaryString = String.fromCharCode.apply(
-                            null,
-                            signatureArray,
-                        );
-                        const signature = btoa(binaryString);
-
-                        // Call the Fuul SDK to identify the user
-
-                        try {
-                            const response = await Fuul.identifyUser({
-                                identifier: userWalletKey.toString(),
-                                identifierType:
-                                    UserIdentifierType.SolanaAddress,
-                                signature,
-                                signaturePublicKey: userWalletKey.toString(),
-                                message,
-                            });
-                            console.log(
-                                'Fuul.identifyUser successful:',
-                                response,
-                            );
-                        } catch (error: any) {
-                            console.error('Detailed error in identifyUser:', {
-                                message: error.message,
-                                status: error.response?.status,
-                                statusText: error.response?.statusText,
-                                data: error.response?.data,
-                                config: {
-                                    url: error.config?.url,
-                                    method: error.config?.method,
-                                    headers: error.config?.headers,
-                                },
-                            });
-                            throw error; // Re-throw to be caught by the outer catch
-                        }
-                    } catch (error) {
-                        console.error('Error in identifyUser:', error);
-                        // Optionally show a user-friendly error message
-                        // You might want to implement this based on your UI framework
-                        // showErrorToast('Failed to identify user. Please try again.');
-                    }
-                })();
             }
             localStorage.removeItem('loginButtonClickTime');
         } else if (
@@ -264,13 +213,106 @@ export default function PageHeader() {
                 plausible('Session Ended');
             }
         }
+
+        // fn to check FUUL for conversion data on a given wallet address
+        async function checkForFuulConversion(
+            address: string,
+        ): Promise<FuulConversionIF | null> {
+            // options config for FUUL API call
+            const OPTIONS = {
+                method: 'GET',
+                headers: {
+                    accept: 'application/json',
+                    authorization:
+                        'Bearer ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6',
+                },
+            };
+
+            // attempt to check for conversion and resolve referrer address and code
+            try {
+                // conversion endpoint
+                const USER_ID_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`;
+                // fetch raw data from FUUL API
+                const res = await fetch(USER_ID_ENDPOINT, OPTIONS);
+                // format response as a JSON object
+                const data = await res.json();
+                console.log('data', data);
+
+                // if user has converted, ask FUUL for readable ref code associated with address
+                if (data.referrer_identifier) {
+                    // record conversion in local storage (not persisted)
+                    referralStore.setIsConverted(true);
+
+                    const affiliateCode: string | null =
+                        await Fuul.getAffiliateCode(
+                            data.referrer_identifier,
+                            UserIdentifierType.SolanaAddress,
+                        );
+
+                    // record conversion information if not in local storage
+                    referralStore.getCode(address) ||
+                        referralStore.confirmCode(address, {
+                            value: affiliateCode ?? data.referrer_identifier,
+                            isConverted: true,
+                        });
+
+                    // format return obj with relevant addresses and the referrer code
+                    const output: FuulConversionIF = {
+                        user_identifier: data.user_identifier,
+                        referrer_identifier: data.referrer_identifier,
+                        referrer_code: affiliateCode,
+                    };
+                    console.log('output', output);
+
+                    return output;
+                }
+
+                referralStore.setIsConverted(false);
+
+                // return `null` if API response indicates no conversion
+                return null;
+            } catch (err) {
+                console.error(err);
+                referralStore.setIsConverted(false);
+                return null;
+            }
+        }
+
+        // cache the referral value from the URL if present after verifying it exists
+        const refCodeValue: string | null = referralCodeFromURL.value;
+        if (refCodeValue) {
+            (async () => {
+                const codeIsFree = await Fuul.isAffiliateCodeFree(refCodeValue);
+                // Only cache if the code is NOT free (meaning it exists and is taken)
+                if (!codeIsFree) {
+                    referralStore.cache(refCodeValue);
+                }
+            })();
+        }
+
+        if (userDataStore.userAddress) {
+            checkForFuulConversion(userDataStore.userAddress).then(
+                (response: FuulConversionIF | null): void => {
+                    if (
+                        !response?.referrer_code &&
+                        !referralStore.cached.hasDismissed &&
+                        !onHomePage
+                    ) {
+                        referralCodeModal.open();
+                    }
+                },
+            );
+        }
+
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected, userDataStore.referralCode]);
+    }, [isUserConnected, userDataStore.userAddress, onHomePage]);
+
+    const showDepositSlot = isUserConnected || !isShortScreen;
 
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' style={{ marginLeft: '10px' }} viewTransition>
+                <Link to='/' className={styles.logo} viewTransition>
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -346,44 +388,50 @@ export default function PageHeader() {
                     </Tooltip>
                 </nav>
                 <div className={styles.rightSide}>
-                    <span className={styles.depositSlot}>
-                        {isUserConnected ? (
-                            <section
-                                style={{ position: 'relative' }}
-                                ref={depositMenuRef}
-                            >
-                                <button
-                                    className={styles.depositButton}
-                                    onClick={() => {
-                                        if (isShortScreen) {
-                                            setIsDepositDropdownOpen(
-                                                !isDepositDropdownOpen,
-                                            );
-                                        } else {
-                                            openDepositModal();
-                                        }
-                                    }}
+                    {showDepositSlot && (
+                        <span className={styles.depositSlot}>
+                            {isUserConnected ? (
+                                <section
+                                    style={{ position: 'relative' }}
+                                    ref={depositMenuRef}
                                 >
-                                    {isShortScreen
-                                        ? t('common.transfer')
-                                        : t('common.deposit')}
-                                </button>
-                                {isDepositDropdownOpen && (
-                                    <DepositDropdown
-                                        isDropdown
-                                        marginBucket={marginBucket}
-                                        openDepositModal={openDepositModal}
-                                        openWithdrawModal={openWithdrawModal}
-                                    />
-                                )}
-                            </section>
-                        ) : (
-                            <div
-                                className={styles.depositButtonPlaceholder}
-                                aria-hidden
-                            />
-                        )}
-                    </span>
+                                    <button
+                                        className={styles.depositButton}
+                                        onClick={() => {
+                                            if (isShortScreen) {
+                                                setIsDepositDropdownOpen(
+                                                    !isDepositDropdownOpen,
+                                                );
+                                            } else {
+                                                openDepositModal();
+                                            }
+                                        }}
+                                    >
+                                        {isShortScreen
+                                            ? t('common.transfer')
+                                            : t('common.deposit')}
+                                    </button>
+
+                                    {isDepositDropdownOpen && (
+                                        <DepositDropdown
+                                            isDropdown
+                                            marginBucket={marginBucket}
+                                            openDepositModal={openDepositModal}
+                                            openWithdrawModal={
+                                                openWithdrawModal
+                                            }
+                                        />
+                                    )}
+                                </section>
+                            ) : (
+                                // desktop/tablet placeholder only (prevents layout shift on connect)
+                                <div
+                                    className={styles.depositButtonPlaceholder}
+                                    aria-hidden
+                                />
+                            )}
+                        </span>
+                    )}
 
                     {isUserConnected && showRPCButton && (
                         <section
@@ -421,8 +469,14 @@ export default function PageHeader() {
                         </section>
                     )}
                     <span
-                        className={`${!isUserConnected ? `plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Page+Header` : ''}`}
                         ref={sessionButtonRef}
+                        className={`${styles.sessionWrap} ${isUserConnected ? styles.activeSessionWrap : ''}`}
+                        data-plausible-event-name={
+                            !isUserConnected ? 'Login Button Click' : undefined
+                        }
+                        data-plausible-event-buttonlocation={
+                            !isUserConnected ? 'Page Header' : undefined
+                        }
                     >
                         <SessionButton />
                     </span>
@@ -517,6 +571,39 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
+            {referralCodeModal.isOpen &&
+                referralStore.cached.value &&
+                !referralStore.cached.hasDismissed &&
+                !referralStore.getCode(userDataStore.userAddress) && (
+                    <Modal
+                        close={(): void => {
+                            referralCodeModal.close();
+                            referralStore.dismiss();
+                        }}
+                        position='center'
+                        title='Referral Code'
+                    >
+                        <ReferralCodeModal
+                            refCode={referralStore.cached.value}
+                            close={(): void => {
+                                referralCodeModal.close();
+                                referralStore.dismiss();
+                            }}
+                            handleConfirm={(rc: string): void => {
+                                if (userDataStore.userAddress) {
+                                    // register ref code for address in data store
+                                    referralStore.confirmCode(
+                                        userDataStore.userAddress,
+                                        { value: rc, isConverted: false },
+                                    );
+                                    // populate ref code in URL to create pageview event
+                                    referralCodeFromURL.set(rc);
+                                }
+                                referralCodeModal.close();
+                            }}
+                        />
+                    </Modal>
+                )}
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}
