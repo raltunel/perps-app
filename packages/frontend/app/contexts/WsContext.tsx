@@ -34,7 +34,7 @@ export interface WsProviderProps {
     url: string;
 }
 
-interface WsSubscriptionConfig {
+export interface WsSubscriptionConfig {
     handler: (payload: any) => void;
     payload?: any;
     single?: boolean;
