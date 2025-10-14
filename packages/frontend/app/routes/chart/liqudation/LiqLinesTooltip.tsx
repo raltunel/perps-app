@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import type { LiqProps } from './LiqComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import { useLiqudationLines } from './hooks/useLiquidationLines';
 import { getPaneCanvasAndIFrameDoc } from '../overlayCanvas/overlayCanvasUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';
@@ -49,20 +47,26 @@ const LiqLineTooltip = ({
 
     const checkLines = useCallback(
         (offsetX: number, offsetY: number) => {
-            if (!linesRef.current?.length || !scaleData?.yScale) return null;
+            const lines = linesRef.current;
+            const yScale = scaleData?.yScale;
+            if (!lines?.length || !yScale) return null;
+
             const dpr = window.devicePixelRatio || 1;
+            const cursorY = offsetY * dpr;
 
-            const tolerance = 10; // pixels
+            const nearest = lines.reduce(
+                (acc, line) => {
+                    const dist = Math.abs(yScale(line.yPrice) - cursorY);
+                    return dist < acc.minDist ? { line, minDist: dist } : acc;
+                },
+                {
+                    line: null as (typeof lines)[number] | null,
+                    minDist: Infinity,
+                },
+            );
 
-            for (const line of linesRef.current) {
-                const y = scaleData.yScale(line.yPrice);
-                const localOffsetY = offsetY * dpr;
-                if (Math.abs(y - localOffsetY) <= tolerance) {
-                    return line;
-                }
-            }
-
-            return null;
+            const threshold = 8;
+            return nearest.minDist < threshold ? nearest.line : null;
         },
         [scaleData, linesRef],
     );
@@ -97,10 +101,10 @@ const LiqLineTooltip = ({
             // formatNum(percentage) +
             liqLineTooltipRef.current.html(
                 `<p style="color:var(--text3, #88888f)"> ${
-                    placedLine.type === 'buy' ? 'Long ' : 'Short '
+                    placedLine.type
                 } Liquidations </p>` +
-                    `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
-                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(1.25, null, true)} TKN </p>`,
+                    `<p style="color:${placedLine.type === 'Short' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
+                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(placedLine.liqValue, null, true)} TKN </p>`,
             );
 
             const width = liqLineTooltipRef.current

@@ -54,34 +54,38 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
         binSize: number,
         min: number,
     ): HorizontalLineData[] {
-        const bins: Record<string, { yPrice: number; values: number[] }> = {};
+        if (markPx) {
+            const bins: Record<string, { yPrice: number; values: number[] }> =
+                {};
 
-        data.forEach((d) => {
-            const binIndex = Math.floor((d.yPrice - min) / binSize);
-            const binKey = (min + binIndex * binSize).toFixed(6);
-            if (!bins[binKey])
-                bins[binKey] = { yPrice: parseFloat(binKey), values: [] };
-            bins[binKey].values.push(d.value);
-        });
+            data.forEach((d) => {
+                const binIndex = Math.floor((d.yPrice - min) / binSize);
+                const binKey = (min + binIndex * binSize).toFixed(6);
+                if (!bins[binKey])
+                    bins[binKey] = { yPrice: parseFloat(binKey), values: [] };
+                bins[binKey].values.push(d.value);
+            });
 
-        return Object.values(bins).map((b) => {
-            const avgValue =
-                b.values.reduce((a, c) => a + c, 0) / b.values.length;
-            const dash = undefined;
-            const color = getColor(avgValue);
-            const lineWidth = 8;
+            return Object.values(bins).map((b) => {
+                const avgValue =
+                    b.values.reduce((a, c) => a + c, 0) / b.values.length;
+                const dash = undefined;
+                const color = getColor(avgValue);
+                const lineWidth = 8;
 
-            return {
-                yPrice: b.yPrice,
-                liqValue: avgValue,
-                color: color,
-                strokeStyle: color,
-                lineWidth,
-                type: '',
-                dash,
-                globalAlpha: 0.4,
-            };
-        });
+                return {
+                    yPrice: b.yPrice,
+                    liqValue: avgValue,
+                    color: color,
+                    strokeStyle: color,
+                    lineWidth,
+                    type: b.yPrice > markPx ? 'Short' : 'Long',
+                    dash,
+                    globalAlpha: 0.4,
+                };
+            });
+        }
+        return [];
     }
 
     useEffect(() => {
