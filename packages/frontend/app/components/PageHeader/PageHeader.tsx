@@ -181,6 +181,10 @@ export default function PageHeader() {
     // determine if user is on the home page (all other perps pages are v2)
     const onHomePage: boolean = !location.pathname.includes('v2');
 
+    const [isRefCodeValidated, setIsRefCodeValidated] = useState<
+        boolean | null
+    >(null);
+
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
@@ -282,13 +286,18 @@ export default function PageHeader() {
         const refCodeValue: string | null = referralCodeFromURL.value;
         if (refCodeValue) {
             (async () => {
-                const codeIsFree = await Fuul.isAffiliateCodeFree(refCodeValue);
+                const codeIsFree: boolean =
+                    await Fuul.isAffiliateCodeFree(refCodeValue);
                 // Only cache if the code is NOT free (meaning it exists and is taken)
-                if (!codeIsFree) {
-                    referralStore.cache(refCodeValue);
-                }
+                // if (!codeIsFree) {
+                //     referralStore.cache(refCodeValue);
+                // }
+                setIsRefCodeValidated(!codeIsFree);
             })();
         }
+
+        referralCodeFromURL.value &&
+            referralStore.cache(referralCodeFromURL.value);
 
         if (userDataStore.userAddress) {
             checkForFuulConversion(userDataStore.userAddress).then(
@@ -574,7 +583,8 @@ export default function PageHeader() {
             {referralCodeModal.isOpen &&
                 referralStore.cached.value &&
                 !referralStore.cached.hasDismissed &&
-                !referralStore.getCode(userDataStore.userAddress) && (
+                !referralStore.getCode(userDataStore.userAddress) &&
+                isRefCodeValidated !== null && (
                     <Modal
                         close={(): void => {
                             referralCodeModal.close();
@@ -589,6 +599,7 @@ export default function PageHeader() {
                                 referralCodeModal.close();
                                 referralStore.dismiss();
                             }}
+                            isRefCodeValidated={isRefCodeValidated}
                             handleConfirm={(rc: string): void => {
                                 if (userDataStore.userAddress) {
                                     // register ref code for address in data store
@@ -600,6 +611,10 @@ export default function PageHeader() {
                                     referralCodeFromURL.set(rc);
                                 }
                                 referralCodeModal.close();
+                            }}
+                            handleCancel={(): void => {
+                                referralCodeModal.close();
+                                referralStore.cache('');
                             }}
                         />
                     </Modal>
