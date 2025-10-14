@@ -47,20 +47,26 @@ const LiqLineTooltip = ({
 
     const checkLines = useCallback(
         (offsetX: number, offsetY: number) => {
-            if (!linesRef.current?.length || !scaleData?.yScale) return null;
+            const lines = linesRef.current;
+            const yScale = scaleData?.yScale;
+            if (!lines?.length || !yScale) return null;
+
             const dpr = window.devicePixelRatio || 1;
+            const cursorY = offsetY * dpr;
 
-            const tolerance = 10; // pixels
+            const nearest = lines.reduce(
+                (acc, line) => {
+                    const dist = Math.abs(yScale(line.yPrice) - cursorY);
+                    return dist < acc.minDist ? { line, minDist: dist } : acc;
+                },
+                {
+                    line: null as (typeof lines)[number] | null,
+                    minDist: Infinity,
+                },
+            );
 
-            for (const line of linesRef.current) {
-                const y = scaleData.yScale(line.yPrice);
-                const localOffsetY = offsetY * dpr;
-                if (Math.abs(y - localOffsetY) <= tolerance) {
-                    return line;
-                }
-            }
-
-            return null;
+            const threshold = 8;
+            return nearest.minDist < threshold ? nearest.line : null;
         },
         [scaleData, linesRef],
     );
@@ -98,7 +104,7 @@ const LiqLineTooltip = ({
                     placedLine.type === 'buy' ? 'Long ' : 'Short '
                 } Liquidations </p>` +
                     `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
-                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(1.25, null, true)} TKN </p>`,
+                    `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(placedLine.liqValue, null, true)} TKN </p>`,
             );
 
             const width = liqLineTooltipRef.current
