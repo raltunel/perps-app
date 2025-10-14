@@ -457,7 +457,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
     return (
         <div
-            id='orderBookContainer'
+            id='orderBookContainerInner'
             className={styles.orderBookContainer}
             style={{
                 ...(heightOverride && {
