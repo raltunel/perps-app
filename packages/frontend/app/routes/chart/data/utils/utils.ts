@@ -7,7 +7,7 @@ import type {
     CustomThemeColors,
     CustomThemes,
     LibrarySymbolInfo,
-} from '~/tv/charting_library/charting_library';
+} from '~/tv/charting_library';
 
 declare global {
     // eslint-disable-next-line @typescript-eslint/no-namespace
