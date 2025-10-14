@@ -34,10 +34,14 @@ interface Props {
     initialTab?: string;
 }
 
-const availableTabs = ['Enter Code', 'Create Code', 'Claim'];
+const availableTabs = [
+    'referrals.enterCode',
+    'referrals.createCode',
+    'referrals.claim',
+];
 
 export default function CodeTabs(props: Props) {
-    const { initialTab = 'Enter Code' } = props;
+    const { initialTab = 'referrals.enterCode' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
@@ -503,11 +507,11 @@ export default function CodeTabs(props: Props) {
 
     const renderTabContent = () => {
         switch (activeTab) {
-            case 'Enter Code':
+            case 'referrals.enterCode':
                 return enterCodeContent;
-            case 'Create Code':
+            case 'referrals.createCode':
                 return createCodeContent;
-            case 'Claim':
+            case 'referrals.claim':
                 return claimContent;
             default:
                 return (
