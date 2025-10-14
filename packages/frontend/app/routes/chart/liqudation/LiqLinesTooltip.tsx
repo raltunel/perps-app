@@ -101,9 +101,9 @@ const LiqLineTooltip = ({
             // formatNum(percentage) +
             liqLineTooltipRef.current.html(
                 `<p style="color:var(--text3, #88888f)"> ${
-                    placedLine.type === 'buy' ? 'Long ' : 'Short '
+                    placedLine.type
                 } Liquidations </p>` +
-                    `<p style="color:${placedLine.type === 'buy' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
+                    `<p style="color:${placedLine.type === 'Short' ? buyColor : sellColor}"> Price: ${formatNum(placedLine?.yPrice, null, true)} </p>` +
                     `<p style="color: var(--text2, #bcbcc4)"> Volume: ${formatNum(placedLine.liqValue, null, true)} TKN </p>`,
             );
 
