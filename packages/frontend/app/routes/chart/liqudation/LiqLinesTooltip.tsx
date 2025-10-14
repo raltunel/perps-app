@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import type { LiqProps } from './LiqComponent';
 import { useTradingView } from '~/contexts/TradingviewContext';
-import { useLiqudationLines } from './hooks/useLiquidationLines';
 import { getPaneCanvasAndIFrameDoc } from '../overlayCanvas/overlayCanvasUtils';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useAppSettings } from '~/stores/AppSettingsStore';

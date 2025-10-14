@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { LiqProps } from './LiqComponent';
-import { useLiqudationLines } from './hooks/useLiquidationLines';
 import type { IPaneApi } from '~/tv/charting_library';
 import {
     getMainSeriesPaneIndex,
