@@ -286,12 +286,10 @@ export default function PageHeader() {
         const refCodeValue: string | null = referralCodeFromURL.value;
         if (refCodeValue) {
             (async () => {
+                // determine if ref code is free (exists and is taken)
                 const codeIsFree: boolean =
                     await Fuul.isAffiliateCodeFree(refCodeValue);
-                // Only cache if the code is NOT free (meaning it exists and is taken)
-                // if (!codeIsFree) {
-                //     referralStore.cache(refCodeValue);
-                // }
+                // indicate in local state if ref code is validated
                 setIsRefCodeValidated(!codeIsFree);
             })();
         }
