@@ -214,25 +214,22 @@ export default function CodeTabs(props: Props) {
         </section>
     );
 
-    const enterCodeContent = isSessionEstablished
-        ? referralStore.cached
-            ? !editModeReferral
-                ? // this code block:
-                  //  - session is established
-                  //  - active referral code
-                  //  - user is not in 'edit' mode
-                  confirmOrEditCodeElem
-                : // this code block:
-                  //  - session is established
-                  //  - active referral code
-                  //  - user is in 'edit' mode
-                  overwriteCurrentReferralCodeElem
+    const enterCodeContent = referralStore.cached
+        ? !editModeReferral
+            ? // this code block:
+              //  - session is established
+              //  - active referral code
+              //  - user is not in 'edit' mode
+              confirmOrEditCodeElem
             : // this code block:
               //  - session is established
-              //  - no active referral code
-              updateReferralCodeElem
-        : // this code block: session is not established
-          connectYourWalletElem;
+              //  - active referral code
+              //  - user is in 'edit' mode
+              overwriteCurrentReferralCodeElem
+        : // this code block:
+          //  - session is established
+          //  - no active referral code
+          updateReferralCodeElem;
 
     useEffect(() => {
         (async () => {
