@@ -104,30 +104,6 @@ export default function CodeTabs(props: Props) {
         //     : referralStore.cache(r);
     }
 
-    // fn to update a referral code and trigger FUUL confirmation workflow
-    async function handleUpdateAffiliateCode(r: string): Promise<void> {
-        // Check if the code exists (not free) before proceeding
-        const codeIsFree = await Fuul.isAffiliateCodeFree(r);
-
-        if (codeIsFree) {
-            console.log('Referral code is not valid (free/unused):', r);
-            return;
-        }
-
-        // update referral code param in the URL
-        handleReferralURLParam.set(r);
-        // toggle DOM to default view
-        // setIsEditing(false);
-        setEditModeAffiliate(false);
-        // update referral code in store
-        // userDataStore.userAddress
-        //     ? referralStore.confirmCode(userDataStore.userAddress, {
-        //             value: r,
-        //             isConverted: false,
-        //         })
-        //     : referralStore.cache(r);
-    }
-
     const affiliateAddress = userDataStore.userAddress;
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
@@ -136,7 +112,7 @@ export default function CodeTabs(props: Props) {
     const confirmOrEditCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>Current Affiliate Code</h6>
+                <h6>Using Affiliate Code</h6>
                 <p>{referralStore.cached.value}</p>
             </div>
             <div className={styles.refferal_code_buttons}>
