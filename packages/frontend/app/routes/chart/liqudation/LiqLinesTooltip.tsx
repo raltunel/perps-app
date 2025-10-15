@@ -115,15 +115,17 @@ const LiqLineTooltip = ({
                 .node()
                 .getBoundingClientRect().height;
 
+            const tooltipOffsetY = offsetY + 5 - height / 2;
+
             const horizontal =
-                cssOffsetX + width + 10 > rect.right - rect.left
-                    ? cssOffsetX - width - 10
-                    : cssOffsetX + 10;
+                cssOffsetX + width + 5 > rect.right - rect.left
+                    ? cssOffsetX - width - 5
+                    : cssOffsetX + 5;
 
             const vertical =
-                cssOffsetY + height > rect.bottom - rect.top
-                    ? cssOffsetY - height
-                    : cssOffsetY;
+                tooltipOffsetY + height > rect.bottom - rect.top
+                    ? tooltipOffsetY - height - 5
+                    : tooltipOffsetY;
 
             liqLineTooltipRef.current
                 .style('visibility', 'visible')
@@ -208,7 +210,7 @@ const LiqLineTooltip = ({
             wrapper.style.width = paneCanvas.width / dpr + 'px';
             wrapper.style.height = paneCanvas.height / dpr + 'px';
             wrapper.style.pointerEvents = 'none';
-            wrapper.style.zIndex = '5';
+            wrapper.style.zIndex = '6';
             wrapper.style.top = '0';
             wrapper.style.left = '0';
             wrapper.id = 'liqLine-tooltip-wrapper';
