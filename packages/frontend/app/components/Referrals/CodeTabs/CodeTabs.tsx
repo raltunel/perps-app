@@ -134,8 +134,10 @@ export default function CodeTabs(props: Props) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>
-                    Overwrite current referrer code:{' '}
-                    {referralStore.cached.value}
+                    {referralStore.cached.value
+                        ? 'Overwrite current'
+                        : 'Enter a'}{' '}
+                    referral code: {referralStore.cached.value}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
