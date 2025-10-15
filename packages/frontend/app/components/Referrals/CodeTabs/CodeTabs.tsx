@@ -446,36 +446,38 @@ export default function CodeTabs(props: Props) {
                         Create a unique code to earn 10% of referred users' fees
                     </h6>
                 </div>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={
-                        editModeAffiliate
-                            ? updateAffiliateCode
-                            : createAffiliateCode
-                    }
-                    disabled={
-                        !temporaryAffiliateCode.trim() ||
-                        !isTemporaryAffiliateCodeValid
-                    }
-                >
-                    {!isTemporaryAffiliateCodeValid
-                        ? 'Code Already In Use'
-                        : editModeAffiliate
-                          ? 'Update'
-                          : 'Create'}
-                </SimpleButton>
-                {editModeAffiliate && (
+                <div className={styles.refferal_code_buttons}>
                     <SimpleButton
-                        bg='dark4'
-                        hoverBg='accent1'
-                        onClick={() => {
-                            setEditModeAffiliate(false);
-                            setTemporaryAffiliateCode('');
-                        }}
+                        bg='accent1'
+                        onClick={
+                            editModeAffiliate
+                                ? updateAffiliateCode
+                                : createAffiliateCode
+                        }
+                        disabled={
+                            !temporaryAffiliateCode.trim() ||
+                            !isTemporaryAffiliateCodeValid
+                        }
                     >
-                        Cancel2
+                        {!isTemporaryAffiliateCodeValid
+                            ? 'Code Already In Use'
+                            : editModeAffiliate
+                              ? 'Update'
+                              : 'Create'}
                     </SimpleButton>
-                )}
+                    {editModeAffiliate && (
+                        <SimpleButton
+                            bg='dark4'
+                            hoverBg='accent1'
+                            onClick={() => {
+                                setEditModeAffiliate(false);
+                                setTemporaryAffiliateCode('');
+                            }}
+                        >
+                            Cancel2
+                        </SimpleButton>
+                    )}
+                </div>
             </section>
         )
     ) : (
