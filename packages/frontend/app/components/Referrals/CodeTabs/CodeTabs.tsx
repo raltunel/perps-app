@@ -79,8 +79,10 @@ export default function CodeTabs(props: Props) {
 
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
+        console.log(r);
         // Check if the code exists (not free) before proceeding
         const codeIsFree = await Fuul.isAffiliateCodeFree(r);
+        console.log(codeIsFree);
 
         if (codeIsFree) {
             console.log('Referral code is not valid (free/unused):', r);
@@ -91,14 +93,15 @@ export default function CodeTabs(props: Props) {
         handleReferralURLParam.set(r);
         // toggle DOM to default view
         // setIsEditing(false);
+        referralStore.cache(r);
         setEditModeReferral(false);
         // update referral code in store
-        userDataStore.userAddress
-            ? referralStore.confirmCode(userDataStore.userAddress, {
-                  value: r,
-                  isConverted: false,
-              })
-            : referralStore.cache(r);
+        // userDataStore.userAddress
+        //     ? referralStore.confirmCode(userDataStore.userAddress, {
+        //           value: r,
+        //           isConverted: false,
+        //       })
+        //     : referralStore.cache(r);
     }
 
     // fn to update a referral code and trigger FUUL confirmation workflow
@@ -164,10 +167,13 @@ export default function CodeTabs(props: Props) {
                 <SimpleButton
                     bg='accent1'
                     onClick={() => {
-                        referralStore.cache(
+                        handleUpdateReferralCode(
                             updateReferralCodeInputRef.current?.value || '',
                         );
-                        setEditModeReferral(false);
+                        // referralStore.cache(
+                        //     updateReferralCodeInputRef.current?.value || '',
+                        // );
+                        // setEditModeReferral(false);
                     }}
                 >
                     Confirm3
