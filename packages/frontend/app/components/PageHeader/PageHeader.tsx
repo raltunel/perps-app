@@ -298,17 +298,18 @@ export default function PageHeader() {
             referralStore.cache(referralCodeFromURL.value);
 
         if (userDataStore.userAddress) {
-            checkForFuulConversion(userDataStore.userAddress).then(
-                (response: FuulConversionIF | null): void => {
-                    if (
-                        !response?.referrer_code &&
-                        !referralStore.cached.hasDismissed &&
-                        !onHomePage
-                    ) {
-                        referralCodeModal.open();
-                    }
-                },
-            );
+            checkForFuulConversion(userDataStore.userAddress);
+            // .then(
+            //     (response: FuulConversionIF | null): void => {
+            //         if (
+            //             !response?.referrer_code &&
+            //             !referralStore.cached.hasDismissed &&
+            //             !onHomePage
+            //         ) {
+            //             referralCodeModal.open();
+            //         }
+            //     },
+            // );
         }
 
         prevIsUserConnected.current = isUserConnected;

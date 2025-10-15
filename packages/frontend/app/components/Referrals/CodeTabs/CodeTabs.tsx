@@ -47,10 +47,13 @@ export default function CodeTabs(props: Props) {
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState(true);
     const [affiliateCode, setAffiliateCode] = useState('');
-    const [isEditing, setIsEditing] = useState(false);
+    // const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
     const referralStore = useReferralStore();
+
+    const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
+    const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -87,7 +90,8 @@ export default function CodeTabs(props: Props) {
         // update referral code param in the URL
         handleReferralURLParam.set(r);
         // toggle DOM to default view
-        setIsEditing(false);
+        // setIsEditing(false);
+        setEditModeReferral(false);
         // update referral code in store
         userDataStore.userAddress
             ? referralStore.confirmCode(userDataStore.userAddress, {
@@ -97,52 +101,50 @@ export default function CodeTabs(props: Props) {
             : referralStore.cache(r);
     }
 
+    // fn to update a referral code and trigger FUUL confirmation workflow
+    async function handleUpdateAffiliateCode(r: string): Promise<void> {
+        // Check if the code exists (not free) before proceeding
+        const codeIsFree = await Fuul.isAffiliateCodeFree(r);
+
+        if (codeIsFree) {
+            console.log('Referral code is not valid (free/unused):', r);
+            return;
+        }
+
+        // update referral code param in the URL
+        handleReferralURLParam.set(r);
+        // toggle DOM to default view
+        // setIsEditing(false);
+        setEditModeAffiliate(false);
+        // update referral code in store
+        // userDataStore.userAddress
+        //     ? referralStore.confirmCode(userDataStore.userAddress, {
+        //             value: r,
+        //             isConverted: false,
+        //         })
+        //     : referralStore.cache(r);
+    }
+
     const affiliateAddress = userDataStore.userAddress;
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
     const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
 
-    console.log({
-        isSessionEstablished,
-        referralStore,
-        isEditing,
-    });
-
     const confirmOrEditCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Current Affiliate Code</h6>
-                <p>
-                    {referralStore.getCode(affiliateAddress)?.value ||
-                        referralStore.cached.value}
-                </p>
+                <p>{referralStore.cached.value}</p>
             </div>
-            {referralStore.isConverted || (
-                <div className={styles.refferal_code_buttons}>
-                    {referralStore.cached &&
-                        !referralStore.getCode(affiliateAddress) && (
-                            <SimpleButton bg='accent1' onClick={confirmRefCode}>
-                                Confirm
-                            </SimpleButton>
-                        )}
-                    <SimpleButton
-                        bg='accent3'
-                        onClick={() => setIsEditing(true)}
-                    >
-                        Edit
-                    </SimpleButton>
-                </div>
-            )}
+            <div className={styles.refferal_code_buttons}>
+                <SimpleButton
+                    bg='accent3'
+                    onClick={() => setEditModeReferral(true)}
+                >
+                    Edit1
+                </SimpleButton>
+            </div>
         </section>
-    );
-
-    console.log(
-        referralStore.getCode(userDataStore.userAddress)?.value,
-        referralStore.cached.value,
-    );
-    console.log(
-        !!referralStore.getCode(userDataStore.userAddress)?.value ||
-            !!referralStore.cached.value,
     );
 
     const overwriteCurrentReferralCodeElem = (
@@ -150,38 +152,32 @@ export default function CodeTabs(props: Props) {
             <div className={styles.enterCodeContent}>
                 <h6>
                     Overwrite current referrer code:{' '}
-                    {referralStore.getCode(affiliateAddress)?.value ||
-                        referralStore.cached.value}
+                    {referralStore.cached.value}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
-                    defaultValue={
-                        referralStore.getCode(affiliateAddress)?.value ||
-                        referralStore.cached.value
-                    }
+                    defaultValue={referralStore.cached.value}
                 />
             </div>
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
-                    onClick={() =>
-                        handleUpdateReferralCode(
+                    onClick={() => {
+                        referralStore.cache(
                             updateReferralCodeInputRef.current?.value || '',
-                        )
-                    }
+                        );
+                        setEditModeReferral(false);
+                    }}
                 >
-                    Confirm
+                    Confirm3
                 </SimpleButton>
-                {(!referralStore.getCode(userDataStore.userAddress)?.value &&
-                    !referralStore.cached?.value) || (
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => setIsEditing(false)}
-                    >
-                        Cancel
-                    </SimpleButton>
-                )}
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() => setEditModeReferral(false)}
+                >
+                    Cancel3
+                </SimpleButton>
             </div>
         </section>
     );
@@ -206,8 +202,11 @@ export default function CodeTabs(props: Props) {
             >
                 Update
             </SimpleButton>
-            <SimpleButton bg='accent1' onClick={() => setIsEditing(false)}>
-                Cancel
+            <SimpleButton
+                bg='accent1'
+                onClick={() => setEditModeReferral(false)}
+            >
+                Cancel1
             </SimpleButton>
         </section>
     );
@@ -223,7 +222,7 @@ export default function CodeTabs(props: Props) {
 
     const enterCodeContent = isSessionEstablished
         ? referralStore.cached
-            ? !isEditing
+            ? !editModeReferral
                 ? // this code block:
                   //  - session is established
                   //  - active referral code
@@ -380,7 +379,7 @@ export default function CodeTabs(props: Props) {
 
                 console.log('API Response:', result);
                 setAffiliateCode(temporaryAffiliateCode);
-                setIsEditing(false);
+                setEditModeAffiliate(false);
             }
         } catch (error) {
             console.error('Error updating affiliate code:', error);
@@ -403,7 +402,7 @@ export default function CodeTabs(props: Props) {
     }, [affiliateCode]);
 
     const createCodeContent = isSessionEstablished ? (
-        affiliateCode && !isEditing ? (
+        affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>Your code is {affiliateCode}</p>
@@ -421,8 +420,11 @@ export default function CodeTabs(props: Props) {
                         the Docs for more.
                     </p>
                 </div>
-                <SimpleButton bg='accent1' onClick={() => setIsEditing(true)}>
-                    Edit
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() => setEditModeAffiliate(true)}
+                >
+                    Edit2
                 </SimpleButton>
             </section>
         ) : (
@@ -440,7 +442,7 @@ export default function CodeTabs(props: Props) {
                                 e.key === 'Enter' &&
                                 temporaryAffiliateCode.trim()
                             ) {
-                                isEditing
+                                editModeAffiliate
                                     ? updateAffiliateCode()
                                     : createAffiliateCode();
                             }
@@ -453,7 +455,9 @@ export default function CodeTabs(props: Props) {
                 <SimpleButton
                     bg='accent1'
                     onClick={
-                        isEditing ? updateAffiliateCode : createAffiliateCode
+                        editModeAffiliate
+                            ? updateAffiliateCode
+                            : createAffiliateCode
                     }
                     disabled={
                         !temporaryAffiliateCode.trim() ||
@@ -462,20 +466,20 @@ export default function CodeTabs(props: Props) {
                 >
                     {!isTemporaryAffiliateCodeValid
                         ? 'Code Already In Use'
-                        : isEditing
+                        : editModeAffiliate
                           ? 'Update'
                           : 'Create'}
                 </SimpleButton>
-                {isEditing && (
+                {editModeAffiliate && (
                     <SimpleButton
                         bg='dark4'
                         hoverBg='accent1'
                         onClick={() => {
-                            setIsEditing(false);
+                            setEditModeAffiliate(false);
                             setTemporaryAffiliateCode('');
                         }}
                     >
-                        Cancel
+                        Cancel2
                     </SimpleButton>
                 )}
             </section>
