@@ -38,7 +38,6 @@ import {
     useUrlParams,
     type UrlParamMethodsIF,
 } from '~/hooks/useURLParams';
-import ReferralCodeModal from './ReferralCodeModal/ReferralCodeModal';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
 import { Fuul, UserIdentifierType } from '@fuul/sdk';
@@ -147,12 +146,6 @@ export default function PageHeader() {
 
     // logic to open and close modals
     const appSettingsModal = useModal('closed');
-    const referralCodeModal = useModal('closed');
-
-    // temp handler to manually toggle referral code modal
-    useKeydown('m', referralCodeModal.toggle, [
-        JSON.stringify(referralCodeModal),
-    ]);
 
     // event handler to close dropdown menus on `Escape` keydown
     useKeydown(
@@ -180,10 +173,6 @@ export default function PageHeader() {
 
     // determine if user is on the home page (all other perps pages are v2)
     const onHomePage: boolean = !location.pathname.includes('v2');
-
-    const [isRefCodeValidated, setIsRefCodeValidated] = useState<
-        boolean | null
-    >(null);
 
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
@@ -280,18 +269,6 @@ export default function PageHeader() {
                 referralStore.setIsConverted(false);
                 return null;
             }
-        }
-
-        // cache the referral value from the URL if present after verifying it exists
-        const refCodeValue: string | null = referralCodeFromURL.value;
-        if (refCodeValue) {
-            (async () => {
-                // determine if ref code is free (exists and is taken)
-                const codeIsFree: boolean =
-                    await Fuul.isAffiliateCodeFree(refCodeValue);
-                // indicate in local state if ref code is validated
-                setIsRefCodeValidated(!codeIsFree);
-            })();
         }
 
         referralCodeFromURL.value &&
@@ -579,45 +556,6 @@ export default function PageHeader() {
                     <AppOptions />
                 </Modal>
             )}
-            {referralCodeModal.isOpen &&
-                referralStore.cached.value &&
-                !referralStore.cached.hasDismissed &&
-                !referralStore.getCode(userDataStore.userAddress) &&
-                isRefCodeValidated !== null && (
-                    <Modal
-                        close={(): void => {
-                            referralCodeModal.close();
-                            referralStore.dismiss();
-                        }}
-                        position='center'
-                        title='Referral Code'
-                    >
-                        <ReferralCodeModal
-                            refCode={referralStore.cached.value}
-                            close={(): void => {
-                                referralCodeModal.close();
-                                referralStore.dismiss();
-                            }}
-                            isRefCodeValidated={isRefCodeValidated}
-                            handleConfirm={(rc: string): void => {
-                                if (userDataStore.userAddress) {
-                                    // register ref code for address in data store
-                                    referralStore.confirmCode(
-                                        userDataStore.userAddress,
-                                        { value: rc, isConverted: false },
-                                    );
-                                    // populate ref code in URL to create pageview event
-                                    referralCodeFromURL.set(rc);
-                                }
-                                referralCodeModal.close();
-                            }}
-                            handleCancel={(): void => {
-                                referralCodeModal.close();
-                                referralStore.cache('');
-                            }}
-                        />
-                    </Modal>
-                )}
             {PortfolioModalsRenderer}
             <FeedbackModal
                 isOpen={isFeedbackOpen}

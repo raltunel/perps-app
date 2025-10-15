@@ -205,15 +205,6 @@ export default function CodeTabs(props: Props) {
         </section>
     );
 
-    const connectYourWalletElem = (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>Connect your wallet to enter a referral code</h6>
-            </div>
-            <SessionButton />
-        </section>
-    );
-
     const enterCodeContent = referralStore.cached
         ? !editModeReferral
             ? // this code block:
