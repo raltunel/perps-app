@@ -196,10 +196,29 @@ export const sortOrderData = (
                         ? a.side.localeCompare(b.side)
                         : b.side.localeCompare(a.side),
                 );
-            case 'sz':
-                return [...orderData].sort((a, b) =>
-                    sortDirection === 'asc' ? a.sz - b.sz : b.sz - a.sz,
-                );
+
+            case 'sz': {
+                const safeNum = (o: any) =>
+                    Number(
+                        (typeof o.sz === 'string'
+                            ? o.sz.replace(',', '.')
+                            : o.sz) ??
+                            o.origSz ??
+                            0,
+                    ) ||
+                    Number(o.origSz) ||
+                    0;
+
+                return [...orderData].sort((a, b) => {
+                    const va = safeNum(a);
+                    const vb = safeNum(b);
+                    if (va === vb)
+                        return sortDirection === 'asc'
+                            ? (a.timestamp ?? 0) - (b.timestamp ?? 0)
+                            : (b.timestamp ?? 0) - (a.timestamp ?? 0);
+                    return sortDirection === 'asc' ? va - vb : vb - va;
+                });
+            }
 
             case 'filledSz':
                 return [...orderData].sort((a, b) => {
