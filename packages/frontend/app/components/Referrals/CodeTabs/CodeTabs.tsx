@@ -77,6 +77,8 @@ export default function CodeTabs(props: Props) {
         }
     }
 
+    const [invalidCode, setInvalidCode] = useState<string>('');
+
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
         console.log(r);
@@ -86,9 +88,11 @@ export default function CodeTabs(props: Props) {
 
         if (codeIsFree) {
             console.log('Referral code is not valid (free/unused):', r);
+            setInvalidCode(r);
             return;
         }
 
+        invalidCode && setInvalidCode('');
         // update referral code param in the URL
         handleReferralURLParam.set(r);
         // toggle DOM to default view
@@ -138,6 +142,12 @@ export default function CodeTabs(props: Props) {
                     type='text'
                     defaultValue={referralStore.cached.value}
                 />
+                {invalidCode && (
+                    <p>
+                        The referral code {invalidCode} is not claimed in the
+                        referral program. Please confirm the code is correct.
+                    </p>
+                )}
             </div>
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
