@@ -75,16 +75,18 @@ export default function CodeTabs(props: PropsIF) {
         setEditModeReferral(false);
     }
 
+    // pixel-width breakpoint to toggle shorter copy
     const NARROW_SCREEN_COPY_BREAKPOINT = 900;
+    // boolean tracking whether the screen is "narrow"
     const narrowScreenForCopy: boolean = useNarrowScreen(
         NARROW_SCREEN_COPY_BREAKPOINT,
     );
 
-    const avTabs: string[] = useMemo(() => {
-        const tabsForScreenWidth: string[] = Object.values(
-            COPY_PER_SCREEN_WIDTH,
-        ).map((t) => t[narrowScreenForCopy ? 'short' : 'full']);
-        return tabsForScreenWidth;
+    // array of tab name strings based on screen width
+    const avTabs = useMemo<string[]>(() => {
+        return Object.values(COPY_PER_SCREEN_WIDTH).map(
+            (tab) => tab[narrowScreenForCopy ? 'short' : 'full'],
+        );
     }, [narrowScreenForCopy]);
 
     const affiliateAddress = userDataStore.userAddress;
