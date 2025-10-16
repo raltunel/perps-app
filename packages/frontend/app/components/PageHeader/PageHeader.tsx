@@ -207,62 +207,8 @@ export default function PageHeader() {
             }
         }
 
-        // fn to check FUUL for conversion data on a given wallet address
-        async function checkForFuulConversion(
-            address: string,
-        ): Promise<FuulConversionIF | null> {
-            // options config for FUUL API call
-            const OPTIONS = {
-                method: 'GET',
-                headers: {
-                    accept: 'application/json',
-                    authorization:
-                        'Bearer ae8178229c5e89378386e6f6535c12212b12693dab668eb4dc9200600ae698b6',
-                },
-            };
-
-            // attempt to check for conversion and resolve referrer address and code
-            try {
-                // conversion endpoint
-                const USER_ID_ENDPOINT = `https://api.fuul.xyz/api/v1/user/referrer?user_identifier=${address}&user_identifier_type=solana_address`;
-                // fetch raw data from FUUL API
-                const res = await fetch(USER_ID_ENDPOINT, OPTIONS);
-                // format response as a JSON object
-                const data = await res.json();
-                console.log('data', data);
-
-                // if user has converted, ask FUUL for readable ref code associated with address
-                if (data.referrer_identifier) {
-                    const affiliateCode: string | null =
-                        await Fuul.getAffiliateCode(
-                            data.referrer_identifier,
-                            UserIdentifierType.SolanaAddress,
-                        );
-
-                    // format return obj with relevant addresses and the referrer code
-                    const output: FuulConversionIF = {
-                        user_identifier: data.user_identifier,
-                        referrer_identifier: data.referrer_identifier,
-                        referrer_code: affiliateCode,
-                    };
-                    console.log('output', output);
-
-                    return output;
-                }
-
-                // return `null` if API response indicates no conversion
-                return null;
-            } catch (err) {
-                console.error(err);
-                return null;
-            }
-        }
-
         referralCodeFromURL.value &&
             referralStore.cache(referralCodeFromURL.value);
-
-        userDataStore.userAddress &&
-            checkForFuulConversion(userDataStore.userAddress);
 
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress, onHomePage]);

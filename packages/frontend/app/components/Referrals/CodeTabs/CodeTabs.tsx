@@ -84,6 +84,7 @@ export default function CodeTabs(props: PropsIF) {
 
     // array of tab name strings based on screen width
     const avTabs = useMemo<string[]>(() => {
+        // handleTabChange();
         return Object.values(COPY_PER_SCREEN_WIDTH).map(
             (tab) => tab[narrowScreenForCopy ? 'short' : 'full'],
         );
