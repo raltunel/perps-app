@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type JSX } from 'react';
 import {
     isEstablished,
     SessionButton,
@@ -111,13 +111,11 @@ export default function CodeTabs(props: PropsIF) {
     const affiliateAddress = userDataStore.userAddress;
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
-    const updateReferralCodeInputRef2 = useRef<HTMLInputElement>(null);
 
-    const confirmOrEditCodeElem = (
+    const currentCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Using Affiliate Code</h6>
-
                 <p>{referralStore.cached}</p>
             </div>
 
@@ -132,7 +130,7 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
-    const overwriteCurrentReferralCodeElem = (
+    const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>
@@ -171,55 +169,6 @@ export default function CodeTabs(props: PropsIF) {
             </div>
         </section>
     );
-
-    const updateReferralCodeElem = (
-        <section className={styles.sectionWithButton}>
-            <div className={styles.enterCodeContent}>
-                <h6>Enter a referral code</h6>
-                <input
-                    ref={updateReferralCodeInputRef2}
-                    type='text'
-                    defaultValue={referralStore.cached || ''}
-                />
-                {invalidCode && (
-                    <p>
-                        The referral code {invalidCode} is not claimed in the
-                        referral program. Please confirm the code is correct.
-                    </p>
-                )}
-            </div>
-
-            <div className={styles.refferal_code_buttons}>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() =>
-                        handleUpdateReferralCode(
-                            updateReferralCodeInputRef2.current?.value || '',
-                        )
-                    }
-                >
-                    Confirm
-                </SimpleButton>
-            </div>
-        </section>
-    );
-
-    const enterCodeContent = referralStore.cached
-        ? !editModeReferral
-            ? // this code block:
-              //  - session is established
-              //  - active referral code
-              //  - user is not in 'edit' mode
-              confirmOrEditCodeElem
-            : // this code block:
-              //  - session is established
-              //  - active referral code
-              //  - user is in 'edit' mode
-              overwriteCurrentReferralCodeElem
-        : // this code block:
-          //  - session is established
-          //  - no active referral code
-          updateReferralCodeElem;
 
     useEffect(() => {
         (async () => {
@@ -397,7 +346,7 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
-    const createCodeContent = isSessionEstablished ? (
+    const affiliateCodeElem = isSessionEstablished ? (
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
@@ -491,7 +440,7 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
-    const claimContent = isSessionEstablished ? (
+    const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
                 <p>Claim $0.00 in rewards</p>
@@ -507,16 +456,16 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
-    const renderTabContent = () => {
+    const renderTabContent = (): JSX.Element => {
         switch (activeTab) {
             case 'referrals.enterCode':
             case 'common.enter':
-                return enterCodeContent;
+                return editModeReferral ? enterNewCodeElem : currentCodeElem;
             case 'referrals.createCode':
             case 'common.create':
-                return createCodeContent;
+                return affiliateCodeElem;
             case 'referrals.claim':
-                return claimContent;
+                return claimElem;
             default:
                 return (
                     <div className={styles.emptyState}>
