@@ -130,7 +130,7 @@ export default function CodeTabs(props: PropsIF) {
                 <p>{referralStore.cached}</p>
             </div>
 
-            {!userIsConverted && isSessionEstablished && (
+            {!userIsConverted && referralStore.cached && (
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
                         bg='dark3'
@@ -175,12 +175,6 @@ export default function CodeTabs(props: PropsIF) {
                     }}
                 >
                     {t('common.confirm')}
-                </SimpleButton>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => setEditModeReferral(false)}
-                >
-                    {t('common.cancel')}
                 </SimpleButton>
             </div>
         </section>
