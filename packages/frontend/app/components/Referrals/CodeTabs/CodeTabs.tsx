@@ -30,8 +30,8 @@ const COPY_PER_SCREEN_WIDTH = {
         short: 'common.create',
     },
     claim: {
-        full: 'referrals.claim',
-        short: 'referrals.claim',
+        full: 'referrals.claimCode',
+        short: 'common.claim',
     },
 };
 
@@ -478,7 +478,8 @@ export default function CodeTabs(props: PropsIF) {
             case 'referrals.createCode':
             case 'common.create':
                 return affiliateCodeElem;
-            case 'referrals.claim':
+            case 'referrals.claimCode':
+            case 'common.claim':
                 return claimElem;
             default:
                 return (

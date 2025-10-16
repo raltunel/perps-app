@@ -41,7 +41,8 @@
         "announcements": "Announcements",
         "leverage": "Leverage",
         "comingSoon": "Coming Soon",
-        "enter": "Enter"
+        "enter": "Enter",
+        "claim": "Claim"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -402,7 +403,7 @@
         "rewardsEarned": "Rewards Earned",
         "rewardHistory": "Reward History",
         "enterCode": "Enter Code",
-        "claim": "Claim",
+        "claimCode": "Claim Code",
         "createCode": "Create Code",
         "usingAffiliateCode": "Using Affiliate Code",
         "overwriteCurrentReferralCode": "Overwrite current referral code",
