@@ -83,26 +83,30 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     // array of tab name strings based on screen width
-    // also keeps the correct tab highlighted as a side effect
     const avTabs = useMemo<string[]>(() => {
-        // get the copy set for the current tab
-        const currentTabCopySet: {
-            full: string;
-            short: string;
-        } =
-            COPY_PER_SCREEN_WIDTH[
-                activeTab as keyof typeof COPY_PER_SCREEN_WIDTH
-            ];
-        // get the updated tab name based on new screen width type
-        const updatedTabName =
-            currentTabCopySet[narrowScreenForCopy ? 'short' : 'full'];
-        // update the value `activeTab` to the updated tab name
-        setActiveTab(updatedTabName);
-        // return an array of tab names based on the new screen width type
+        // return an array of tab names based on the screen width type
         return Object.values(COPY_PER_SCREEN_WIDTH).map(
             (tab) => tab[narrowScreenForCopy ? 'short' : 'full'],
         );
-    }, [narrowScreenForCopy, activeTab]);
+    }, [narrowScreenForCopy]);
+
+    // keep the correct tab highlighted when screen width changes
+    useEffect(() => {
+        // find which key in COPY_PER_SCREEN_WIDTH matches the current activeTab
+        const currentKey = Object.entries(COPY_PER_SCREEN_WIDTH).find(
+            ([_, value]) =>
+                value.full === activeTab || value.short === activeTab,
+        )?.[0] as keyof typeof COPY_PER_SCREEN_WIDTH | undefined;
+
+        if (currentKey) {
+            const currentTabCopySet = COPY_PER_SCREEN_WIDTH[currentKey];
+            // get the updated tab name based on new screen width type
+            const updatedTabName =
+                currentTabCopySet[narrowScreenForCopy ? 'short' : 'full'];
+            // update the value `activeTab` to the updated tab name
+            setActiveTab(updatedTabName);
+        }
+    }, [narrowScreenForCopy]);
 
     const affiliateAddress = userDataStore.userAddress;
 
@@ -113,6 +117,7 @@ export default function CodeTabs(props: PropsIF) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Using Affiliate Code</h6>
+
                 <p>{referralStore.cached}</p>
             </div>
 
