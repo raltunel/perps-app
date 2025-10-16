@@ -83,12 +83,26 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     // array of tab name strings based on screen width
+    // also keeps the correct tab highlighted as a side effect
     const avTabs = useMemo<string[]>(() => {
-        // handleTabChange();
+        // get the copy set for the current tab
+        const currentTabCopySet: {
+            full: string;
+            short: string;
+        } =
+            COPY_PER_SCREEN_WIDTH[
+                activeTab as keyof typeof COPY_PER_SCREEN_WIDTH
+            ];
+        // get the updated tab name based on new screen width type
+        const updatedTabName =
+            currentTabCopySet[narrowScreenForCopy ? 'short' : 'full'];
+        // update the value `activeTab` to the updated tab name
+        setActiveTab(updatedTabName);
+        // return an array of tab names based on the new screen width type
         return Object.values(COPY_PER_SCREEN_WIDTH).map(
             (tab) => tab[narrowScreenForCopy ? 'short' : 'full'],
         );
-    }, [narrowScreenForCopy]);
+    }, [narrowScreenForCopy, activeTab]);
 
     const affiliateAddress = userDataStore.userAddress;
 
