@@ -15,31 +15,9 @@ import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 
-// Add Buffer type definition for TypeScript
-declare const Buffer: {
-    from(
-        array: ArrayLike<number> | ArrayBufferLike,
-        byteOffset?: number,
-        length?: number,
-    ): Buffer;
-    from(
-        arrayBuffer: ArrayBufferLike,
-        byteOffset?: number,
-        length?: number,
-    ): Buffer;
-    from(str: string, encoding?: 'hex' | 'utf8'): Buffer;
-    toString(encoding?: 'hex' | 'utf8'): string;
-};
-
 interface PropsIF {
     initialTab?: string;
 }
-
-const availableTabs = [
-    'referrals.enterCode',
-    'referrals.createCode',
-    'referrals.claim',
-];
 
 const COPY_PER_SCREEN_WIDTH = {
     enterCode: {
