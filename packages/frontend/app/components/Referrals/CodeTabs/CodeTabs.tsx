@@ -149,7 +149,7 @@ export default function CodeTabs(props: PropsIF) {
                 />
                 {invalidCode && (
                     <p>
-                        {t('referralCodeNotValidPleaseConfirm', {
+                        {t('referrals.referralCodeNotValidPleaseConfirm', {
                             invalidCode,
                         })}
                     </p>
