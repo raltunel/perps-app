@@ -40,13 +40,6 @@ import {
 } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
-import { Fuul, UserIdentifierType } from '@fuul/sdk';
-
-interface FuulConversionIF {
-    user_identifier: string;
-    referrer_identifier: string;
-    referrer_code: string | null;
-}
 
 export default function PageHeader() {
     // Feedback modal state
