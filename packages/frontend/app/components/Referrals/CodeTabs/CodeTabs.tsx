@@ -14,7 +14,7 @@ import { Fuul } from '@fuul/sdk';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 
 interface PropsIF {
     initialTab?: string;
@@ -358,6 +358,9 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
+    const userPercent = '4%';
+    const affiliatePercent = '10%';
+
     const affiliateCodeElem = isSessionEstablished ? (
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
@@ -372,9 +375,11 @@ export default function CodeTabs(props: PropsIF) {
                         </div>
                     )}
                     <p className={styles.trackingLinkExplanation}>
-                        You will receive <span>10%</span> of referred users fees
-                        and they will receive a <span>4%</span> discount. See
-                        the Docs for more.
+                        <Trans
+                            i18nKey='referrals.trackingLinkExplanation'
+                            values={{ userPercent, affiliatePercent }}
+                            components={[<span />, <span />]}
+                        />
                     </p>
                 </div>
                 <SimpleButton
