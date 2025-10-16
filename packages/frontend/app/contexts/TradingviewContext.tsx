@@ -83,7 +83,10 @@ export const TradingViewProvider: React.FC<{
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         widget?: new (opts: any) => IChartingLibraryWidget;
     } | null;
-}> = ({ children, tradingviewLib }) => {
+    setChartLoadingStatus: React.Dispatch<
+        React.SetStateAction<'loading' | 'error' | 'ready'>
+    >;
+}> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
@@ -281,6 +284,9 @@ export const TradingViewProvider: React.FC<{
             },
         });
 
+        tvWidget.headerReady().then(() => {
+            setChartLoadingStatus('ready');
+        });
         // tvWidget.headerReady().then(() => {
         //     const liquidationsButton = tvWidget.createButton();
 
@@ -385,7 +391,7 @@ export const TradingViewProvider: React.FC<{
 
             setChart(tvWidget);
         });
-    }, [chartState, info]);
+    }, [chartState, info, tradingviewLib]);
 
     useEffect(() => {
         setIsChartReady(false);
@@ -407,7 +413,7 @@ export const TradingViewProvider: React.FC<{
                 console.error(error);
             }
         };
-    }, [chartState, info, i18n.language, initChart]);
+    }, [chartState, info, i18n.language, initChart, tradingviewLib]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;

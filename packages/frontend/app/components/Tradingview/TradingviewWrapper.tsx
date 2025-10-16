@@ -3,13 +3,14 @@ import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
 import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
+import styles from './chartLoading.module.css';
 
 const TradingViewWrapper: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [tvLib, setTvLib] = useState<any>(null);
-    const [status, setStatus] = useState<'loading' | 'error' | 'ready'>(
-        'loading',
-    );
+    const [chartLoadingStatus, setChartLoadingStatus] = useState<
+        'loading' | 'error' | 'ready'
+    >('loading');
 
     useEffect(() => {
         let mounted = true;
@@ -17,10 +18,9 @@ const TradingViewWrapper: React.FC = () => {
             const lib = await loadTradingViewLibrary();
             if (!mounted) return;
 
-            if (!lib) setStatus('error');
+            if (!lib) setChartLoadingStatus('error');
             else {
                 setTvLib(lib);
-                setStatus('ready');
             }
         })();
 
@@ -29,9 +29,7 @@ const TradingViewWrapper: React.FC = () => {
         };
     }, []);
 
-    if (status === 'loading')
-        return <div className='tv-loading'>Loading chart...</div>;
-    if (status === 'error')
+    if (chartLoadingStatus === 'error')
         return (
             <div className='tv-error'>
                 TradingView library is currently unavailable
@@ -39,10 +37,29 @@ const TradingViewWrapper: React.FC = () => {
         );
 
     return (
-        <TradingViewProvider tradingviewLib={tvLib}>
-            <TradingViewChart />
-            <OverlayCanvas />
-        </TradingViewProvider>
+        <div
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+            }}
+        >
+            {chartLoadingStatus === 'loading' && (
+                <div className={`${styles.spinner_container}`}>
+                    <div className={`${styles.spinner}`}></div>
+                </div>
+            )}
+
+            {tvLib && (
+                <TradingViewProvider
+                    tradingviewLib={tvLib}
+                    setChartLoadingStatus={setChartLoadingStatus}
+                >
+                    <TradingViewChart />
+                    <OverlayCanvas />
+                </TradingViewProvider>
+            )}
+        </div>
     );
 };
 
