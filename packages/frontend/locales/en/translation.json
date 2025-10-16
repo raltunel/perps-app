@@ -40,7 +40,8 @@
         "reset": "Reset",
         "announcements": "Announcements",
         "leverage": "Leverage",
-        "comingSoon": "Coming Soon"
+        "comingSoon": "Coming Soon",
+        "enter": "Enter"
     },
     "transactions": {
         "orderTypes": "Order Types",

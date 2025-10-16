@@ -13,6 +13,7 @@ import { useUserDataStore } from '~/stores/UserDataStore';
 import { Fuul } from '@fuul/sdk';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
+import { useNarrowScreen } from '~/hooks/useMediaQuery';
 
 // Add Buffer type definition for TypeScript
 declare const Buffer: {
@@ -39,6 +40,21 @@ const availableTabs = [
     'referrals.createCode',
     'referrals.claim',
 ];
+
+const COPY_PER_SCREEN_WIDTH = {
+    enterCode: {
+        full: 'referrals.enterCode',
+        short: 'common.enter',
+    },
+    createCode: {
+        full: 'referrals.createCode',
+        short: 'common.create',
+    },
+    claim: {
+        full: 'referrals.claim',
+        short: 'referrals.claim',
+    },
+};
 
 export default function CodeTabs(props: PropsIF) {
     const { initialTab = 'referrals.enterCode' } = props;
@@ -80,6 +96,18 @@ export default function CodeTabs(props: PropsIF) {
         referralStore.cache(r);
         setEditModeReferral(false);
     }
+
+    const NARROW_SCREEN_COPY_BREAKPOINT = 900;
+    const narrowScreenForCopy: boolean = useNarrowScreen(
+        NARROW_SCREEN_COPY_BREAKPOINT,
+    );
+
+    const avTabs: string[] = useMemo(() => {
+        const tabsForScreenWidth: string[] = Object.values(
+            COPY_PER_SCREEN_WIDTH,
+        ).map((t) => t[narrowScreenForCopy ? 'short' : 'full']);
+        return tabsForScreenWidth;
+    }, [narrowScreenForCopy]);
 
     const affiliateAddress = userDataStore.userAddress;
 
@@ -482,8 +510,10 @@ export default function CodeTabs(props: PropsIF) {
     const renderTabContent = () => {
         switch (activeTab) {
             case 'referrals.enterCode':
+            case 'common.enter':
                 return enterCodeContent;
             case 'referrals.createCode':
+            case 'common.create':
                 return createCodeContent;
             case 'referrals.claim':
                 return claimContent;
@@ -499,7 +529,7 @@ export default function CodeTabs(props: PropsIF) {
     return (
         <div className={styles.tableWrapper}>
             <Tabs
-                tabs={availableTabs}
+                tabs={avTabs}
                 defaultTab={activeTab}
                 onTabChange={handleTabChange}
                 wrapperId='codeTabs'
