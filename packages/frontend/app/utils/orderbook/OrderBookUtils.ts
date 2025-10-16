@@ -197,28 +197,12 @@ export const sortOrderData = (
                         : b.side.localeCompare(a.side),
                 );
 
-            case 'sz': {
-                const safeNum = (o: any) =>
-                    Number(
-                        (typeof o.sz === 'string'
-                            ? o.sz.replace(',', '.')
-                            : o.sz) ??
-                            o.origSz ??
-                            0,
-                    ) ||
-                    Number(o.origSz) ||
-                    0;
-
+            case 'sz':
                 return [...orderData].sort((a, b) => {
-                    const va = safeNum(a);
-                    const vb = safeNum(b);
-                    if (va === vb)
-                        return sortDirection === 'asc'
-                            ? (a.timestamp ?? 0) - (b.timestamp ?? 0)
-                            : (b.timestamp ?? 0) - (a.timestamp ?? 0);
+                    const va = a.sz ?? -Infinity;
+                    const vb = b.sz ?? -Infinity;
                     return sortDirection === 'asc' ? va - vb : vb - va;
                 });
-            }
 
             case 'filledSz':
                 return [...orderData].sort((a, b) => {
