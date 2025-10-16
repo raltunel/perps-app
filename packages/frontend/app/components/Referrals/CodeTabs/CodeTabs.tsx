@@ -30,7 +30,7 @@ declare const Buffer: {
     toString(encoding?: 'hex' | 'utf8'): string;
 };
 
-interface Props {
+interface PropsIF {
     initialTab?: string;
 }
 
@@ -40,14 +40,13 @@ const availableTabs = [
     'referrals.claim',
 ];
 
-export default function CodeTabs(props: Props) {
+export default function CodeTabs(props: PropsIF) {
     const { initialTab = 'referrals.enterCode' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState<boolean | undefined>();
     const [affiliateCode, setAffiliateCode] = useState('');
-    // const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
     const referralStore = useReferralStore();
@@ -66,45 +65,20 @@ export default function CodeTabs(props: Props) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
-    // fn to confirm a referral code and link to user's wallet address
-    function confirmRefCode(): void {
-        const isUserConnected = isEstablished(sessionState);
-        if (isUserConnected) {
-            referralStore.confirmCode(userDataStore.userAddress, {
-                value: referralStore.cached.value,
-                isConverted: false,
-            });
-        }
-    }
-
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
         console.log(r);
-        // Check if the code exists (not free) before proceeding
         const codeIsFree = await Fuul.isAffiliateCodeFree(r);
-        console.log(codeIsFree);
-
         if (codeIsFree) {
             console.log('Referral code is not valid (free/unused):', r);
             setInvalidCode(r);
             return;
         }
-
         invalidCode && setInvalidCode('');
-        // update referral code param in the URL
         handleReferralURLParam.set(r);
-        // toggle DOM to default view
-        // setIsEditing(false);
         referralStore.cache(r);
         setEditModeReferral(false);
-        // update referral code in store
-        // userDataStore.userAddress
-        //     ? referralStore.confirmCode(userDataStore.userAddress, {
-        //           value: r,
-        //           isConverted: false,
-        //       })
-        //     : referralStore.cache(r);
     }
 
     const affiliateAddress = userDataStore.userAddress;
@@ -116,7 +90,7 @@ export default function CodeTabs(props: Props) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>Using Affiliate Code</h6>
-                <p>{referralStore.cached.value}</p>
+                <p>{referralStore.cached}</p>
             </div>
 
             <div className={styles.refferal_code_buttons}>
@@ -134,15 +108,13 @@ export default function CodeTabs(props: Props) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>
-                    {referralStore.cached.value
-                        ? 'Overwrite current'
-                        : 'Enter a'}{' '}
-                    referral code: {referralStore.cached.value}
+                    {referralStore.cached ? 'Overwrite current' : 'Enter a'}{' '}
+                    referral code: {referralStore.cached}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
                     type='text'
-                    defaultValue={referralStore.cached.value}
+                    defaultValue={referralStore.cached}
                 />
                 {invalidCode && (
                     <p>
@@ -158,10 +130,6 @@ export default function CodeTabs(props: Props) {
                         handleUpdateReferralCode(
                             updateReferralCodeInputRef.current?.value || '',
                         );
-                        // referralStore.cache(
-                        //     updateReferralCodeInputRef.current?.value || '',
-                        // );
-                        // setEditModeReferral(false);
                     }}
                 >
                     Confirm
@@ -183,7 +151,7 @@ export default function CodeTabs(props: Props) {
                 <input
                     ref={updateReferralCodeInputRef2}
                     type='text'
-                    defaultValue={referralStore.cached.value || ''}
+                    defaultValue={referralStore.cached || ''}
                 />
                 {invalidCode && (
                     <p>
@@ -208,7 +176,7 @@ export default function CodeTabs(props: Props) {
         </section>
     );
 
-    const enterCodeContent = referralStore.cached?.value
+    const enterCodeContent = referralStore.cached
         ? !editModeReferral
             ? // this code block:
               //  - session is established

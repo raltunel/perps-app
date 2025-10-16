@@ -233,21 +233,11 @@ export default function PageHeader() {
 
                 // if user has converted, ask FUUL for readable ref code associated with address
                 if (data.referrer_identifier) {
-                    // record conversion in local storage (not persisted)
-                    referralStore.setIsConverted(true);
-
                     const affiliateCode: string | null =
                         await Fuul.getAffiliateCode(
                             data.referrer_identifier,
                             UserIdentifierType.SolanaAddress,
                         );
-
-                    // record conversion information if not in local storage
-                    referralStore.getCode(address) ||
-                        referralStore.confirmCode(address, {
-                            value: affiliateCode ?? data.referrer_identifier,
-                            isConverted: true,
-                        });
 
                     // format return obj with relevant addresses and the referrer code
                     const output: FuulConversionIF = {
@@ -260,13 +250,10 @@ export default function PageHeader() {
                     return output;
                 }
 
-                referralStore.setIsConverted(false);
-
                 // return `null` if API response indicates no conversion
                 return null;
             } catch (err) {
                 console.error(err);
-                referralStore.setIsConverted(false);
                 return null;
             }
         }
@@ -274,20 +261,8 @@ export default function PageHeader() {
         referralCodeFromURL.value &&
             referralStore.cache(referralCodeFromURL.value);
 
-        if (userDataStore.userAddress) {
+        userDataStore.userAddress &&
             checkForFuulConversion(userDataStore.userAddress);
-            // .then(
-            //     (response: FuulConversionIF | null): void => {
-            //         if (
-            //             !response?.referrer_code &&
-            //             !referralStore.cached.hasDismissed &&
-            //             !onHomePage
-            //         ) {
-            //             referralCodeModal.open();
-            //         }
-            //     },
-            // );
-        }
 
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress, onHomePage]);
