@@ -14,6 +14,7 @@ import { Fuul } from '@fuul/sdk';
 import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
+import { useTranslation } from 'react-i18next';
 
 interface PropsIF {
     initialTab?: string;
@@ -44,6 +45,8 @@ export default function CodeTabs(props: PropsIF) {
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
     const referralStore = useReferralStore();
+
+    const { t } = useTranslation();
 
     const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
@@ -115,7 +118,7 @@ export default function CodeTabs(props: PropsIF) {
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>Using Affiliate Code</h6>
+                <h6>{t('referrals.usingAffiliateCode')}</h6>
                 <p>{referralStore.cached}</p>
             </div>
 
@@ -124,7 +127,7 @@ export default function CodeTabs(props: PropsIF) {
                     bg='dark3'
                     onClick={() => setEditModeReferral(true)}
                 >
-                    Edit
+                    {t('common.edit')}
                 </SimpleButton>
             </div>
         </section>
@@ -134,8 +137,10 @@ export default function CodeTabs(props: PropsIF) {
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>
-                    {referralStore.cached ? 'Overwrite current' : 'Enter a'}{' '}
-                    referral code: {referralStore.cached}
+                    {referralStore.cached
+                        ? t('referrals.overwriteCurrentReferralCode') +
+                          `: ${referralStore.cached}`
+                        : t('referrals.enterReferralCode') + ':'}
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
@@ -144,8 +149,9 @@ export default function CodeTabs(props: PropsIF) {
                 />
                 {invalidCode && (
                     <p>
-                        The referral code {invalidCode} is not claimed in the
-                        referral program. Please confirm the code is correct.
+                        {t('referralCodeNotValidPleaseConfirm', {
+                            invalidCode,
+                        })}
                     </p>
                 )}
             </div>
@@ -158,13 +164,13 @@ export default function CodeTabs(props: PropsIF) {
                         );
                     }}
                 >
-                    Confirm
+                    {t('common.confirm')}
                 </SimpleButton>
                 <SimpleButton
                     bg='accent1'
                     onClick={() => setEditModeReferral(false)}
                 >
-                    Cancel
+                    {t('common.cancel')}
                 </SimpleButton>
             </div>
         </section>
@@ -236,7 +242,10 @@ export default function CodeTabs(props: PropsIF) {
                 }
 
                 // Create the message to sign
-                const message = `I confirm that I am creating the ${temporaryAffiliateCode} code`;
+                const message: string = t(
+                    'referrals.confirmAffiliateCodeCreation',
+                    { affiliateCode: temporaryAffiliateCode },
+                );
                 console.log('Message:', message);
 
                 // Convert message to Uint8Array
@@ -295,7 +304,10 @@ export default function CodeTabs(props: PropsIF) {
                 }
 
                 // Create the message to sign
-                const message = `I confirm that I am updating my code to ${temporaryAffiliateCode}`;
+                const message: string = t(
+                    'referrals.confirmAffiliateCodeUpdate',
+                    { affiliateCode: temporaryAffiliateCode },
+                );
                 console.log('Message:', message);
 
                 // Convert message to Uint8Array
@@ -350,7 +362,7 @@ export default function CodeTabs(props: PropsIF) {
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
-                    <p>Your code is {affiliateCode}</p>
+                    <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
 
                     {trackingLink && (
                         <div className={styles.walletLink}>
@@ -369,13 +381,13 @@ export default function CodeTabs(props: PropsIF) {
                     bg='accent1'
                     onClick={() => setEditModeAffiliate(true)}
                 >
-                    Edit2
+                    {t('common.edit')}
                 </SimpleButton>
             </section>
         ) : (
             <section className={styles.sectionWithButton}>
                 <div className={styles.enterCodeContent}>
-                    <h6>Create an affiliate code</h6>
+                    <h6>{t('referrals.createAnAffiliateCode')}</h6>
                     <input
                         type='text'
                         value={temporaryAffiliateCode}
@@ -393,9 +405,7 @@ export default function CodeTabs(props: PropsIF) {
                             }
                         }}
                     />
-                    <h6>
-                        Create a unique code to earn 10% of referred users' fees
-                    </h6>
+                    <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
@@ -411,10 +421,12 @@ export default function CodeTabs(props: PropsIF) {
                         }
                     >
                         {isTemporaryAffiliateCodeValid === false
-                            ? 'Code Already In Use'
-                            : editModeAffiliate
-                              ? 'Update'
-                              : 'Create'}
+                            ? t('referrals.codeAlreadyInUse')
+                            : t(
+                                  editModeAffiliate
+                                      ? 'common.update'
+                                      : 'common.create',
+                              )}
                     </SimpleButton>
                     {editModeAffiliate && (
                         <SimpleButton
@@ -425,7 +437,7 @@ export default function CodeTabs(props: PropsIF) {
                                 setTemporaryAffiliateCode('');
                             }}
                         >
-                            Cancel2
+                            {t('common.cancel')}
                         </SimpleButton>
                     )}
                 </div>
@@ -434,7 +446,7 @@ export default function CodeTabs(props: PropsIF) {
     ) : (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>Connect your wallet to create an affiliate code</h6>
+                <h6>{t('referrals.connectYourWallet.affiliate')}</h6>
             </div>
             <SessionButton />
         </section>
@@ -443,14 +455,16 @@ export default function CodeTabs(props: PropsIF) {
     const claimElem = isSessionEstablished ? (
         <section className={styles.sectionWithButton}>
             <div className={styles.claimContent}>
-                <p>Claim $0.00 in rewards</p>
+                <p>
+                    {t('referrals.claimRewardsWithAmount', { amount: '$0.00' })}
+                </p>
             </div>
-            <SimpleButton bg='accent1'>Claim</SimpleButton>
+            <SimpleButton bg='accent1'>{t('common.claim')}</SimpleButton>
         </section>
     ) : (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>Connect your wallet to claim rewards</h6>
+                <h6>{t('referrals.connectYourWallet.claim')}</h6>
             </div>
             <SessionButton />
         </section>
@@ -469,7 +483,7 @@ export default function CodeTabs(props: PropsIF) {
             default:
                 return (
                     <div className={styles.emptyState}>
-                        Select a tab to view data
+                        {t('referrals.selectATabToViewData')}
                     </div>
                 );
         }
