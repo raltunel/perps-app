@@ -45,7 +45,7 @@ export default function CodeTabs(props: Props) {
     const [activeTab, setActiveTab] = useState(initialTab);
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
-        useState(true);
+        useState<boolean | undefined>();
     const [affiliateCode, setAffiliateCode] = useState('');
     // const [isEditing, setIsEditing] = useState(false);
     const sessionState = useSession();
@@ -78,7 +78,6 @@ export default function CodeTabs(props: Props) {
     }
 
     const [invalidCode, setInvalidCode] = useState<string>('');
-
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
         console.log(r);
@@ -119,12 +118,13 @@ export default function CodeTabs(props: Props) {
                 <h6>Using Affiliate Code</h6>
                 <p>{referralStore.cached.value}</p>
             </div>
+
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
-                    bg='accent3'
+                    bg='dark3'
                     onClick={() => setEditModeReferral(true)}
                 >
-                    Edit1
+                    Edit
                 </SimpleButton>
             </div>
         </section>
@@ -164,13 +164,13 @@ export default function CodeTabs(props: Props) {
                         // setEditModeReferral(false);
                     }}
                 >
-                    Confirm3
+                    Confirm
                 </SimpleButton>
                 <SimpleButton
                     bg='accent1'
                     onClick={() => setEditModeReferral(false)}
                 >
-                    Cancel3
+                    Cancel
                 </SimpleButton>
             </div>
         </section>
@@ -185,27 +185,30 @@ export default function CodeTabs(props: Props) {
                     type='text'
                     defaultValue={referralStore.cached.value || ''}
                 />
+                {invalidCode && (
+                    <p>
+                        The referral code {invalidCode} is not claimed in the
+                        referral program. Please confirm the code is correct.
+                    </p>
+                )}
             </div>
-            <SimpleButton
-                bg='accent1'
-                onClick={() =>
-                    handleUpdateReferralCode(
-                        updateReferralCodeInputRef2.current?.value || '',
-                    )
-                }
-            >
-                Update
-            </SimpleButton>
-            <SimpleButton
-                bg='accent1'
-                onClick={() => setEditModeReferral(false)}
-            >
-                Cancel1
-            </SimpleButton>
+
+            <div className={styles.refferal_code_buttons}>
+                <SimpleButton
+                    bg='accent1'
+                    onClick={() =>
+                        handleUpdateReferralCode(
+                            updateReferralCodeInputRef2.current?.value || '',
+                        )
+                    }
+                >
+                    Confirm
+                </SimpleButton>
+            </div>
         </section>
     );
 
-    const enterCodeContent = referralStore.cached
+    const enterCodeContent = referralStore.cached?.value
         ? !editModeReferral
             ? // this code block:
               //  - session is established
@@ -245,15 +248,30 @@ export default function CodeTabs(props: Props) {
     }, [sessionState]);
 
     useEffect(() => {
-        (async () => {
-            if (temporaryAffiliateCode) {
+        // If no temporary code, immediately set as valid
+        if (!temporaryAffiliateCode) {
+            setIsTemporaryAffiliateCodeValid(undefined);
+            return;
+        }
+
+        // Set up debounced validation
+        const timer = setTimeout(async () => {
+            try {
                 const codeIsFree = await Fuul.isAffiliateCodeFree(
                     temporaryAffiliateCode,
                 );
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
+            } catch (error) {
+                console.error(
+                    'Error checking affiliate code availability:',
+                    error,
+                );
+                setIsTemporaryAffiliateCodeValid(false);
             }
-        })();
-    }, [temporaryAffiliateCode, sessionState]);
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [temporaryAffiliateCode]);
 
     /**
      * Creates an affiliate code for the user
@@ -447,7 +465,7 @@ export default function CodeTabs(props: Props) {
                             !isTemporaryAffiliateCodeValid
                         }
                     >
-                        {!isTemporaryAffiliateCodeValid
+                        {isTemporaryAffiliateCodeValid === false
                             ? 'Code Already In Use'
                             : editModeAffiliate
                               ? 'Update'
