@@ -15,6 +15,7 @@ import { URL_PARAMS, useUrlParams } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 import { Trans, useTranslation } from 'react-i18next';
+import getReferrerAsync from '~/utils/functions/getReferrerAsync';
 
 interface PropsIF {
     initialTab?: string;
@@ -50,6 +51,13 @@ export default function CodeTabs(props: PropsIF) {
 
     const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
+    const [userIsConverted, setUserIsConverted] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (!referralStore.cached) {
+            setEditModeReferral(true);
+        }
+    }, [referralStore.cached]);
 
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -122,14 +130,16 @@ export default function CodeTabs(props: PropsIF) {
                 <p>{referralStore.cached}</p>
             </div>
 
-            <div className={styles.refferal_code_buttons}>
-                <SimpleButton
-                    bg='dark3'
-                    onClick={() => setEditModeReferral(true)}
-                >
-                    {t('common.edit')}
-                </SimpleButton>
-            </div>
+            {!userIsConverted && referralStore.cached && (
+                <div className={styles.refferal_code_buttons}>
+                    <SimpleButton
+                        bg='dark3'
+                        onClick={() => setEditModeReferral(true)}
+                    >
+                        {t('common.edit')}
+                    </SimpleButton>
+                </div>
+            )}
         </section>
     );
 
@@ -166,12 +176,6 @@ export default function CodeTabs(props: PropsIF) {
                 >
                     {t('common.confirm')}
                 </SimpleButton>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => setEditModeReferral(false)}
-                >
-                    {t('common.cancel')}
-                </SimpleButton>
             </div>
         </section>
     );
@@ -190,6 +194,23 @@ export default function CodeTabs(props: PropsIF) {
 
                 if (affiliateCode) {
                     setAffiliateCode(affiliateCode);
+                }
+
+                const referrer = await getReferrerAsync(
+                    userWalletKey.toString(),
+                );
+                if (referrer?.referrer_identifier) {
+                    setUserIsConverted(true);
+                    const affiliateCode = await Fuul.getAffiliateCode(
+                        referrer.referrer_identifier as string,
+                        UserIdentifierType.SolanaAddress,
+                    );
+                    if (affiliateCode) {
+                        handleUpdateReferralCode(affiliateCode);
+                    }
+                    // referralStore.cache(referrer.referrer_identifier as string);
+                } else {
+                    setUserIsConverted(false);
                 }
             } else {
                 console.error('No wallet connected');
