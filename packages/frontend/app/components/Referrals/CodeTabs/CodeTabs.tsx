@@ -380,6 +380,9 @@ export default function CodeTabs(props: PropsIF) {
 
     const [trackingLink, setTrackingLink] = useState('');
 
+    // reset affiliate address input when user changes wallet
+    useEffect(() => setTemporaryAffiliateCode(''), [affiliateAddress]);
+
     useEffect(() => {
         (async () => {
             if (!affiliateCode || !affiliateAddress) return '';
