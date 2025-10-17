@@ -73,17 +73,18 @@ export default function CodeTabs(props: PropsIF) {
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
-        console.log(r);
-        const codeIsFree = await Fuul.isAffiliateCodeFree(r);
+        // check FUUL API to see if code is claimed or free
+        const codeIsFree: boolean = await Fuul.isAffiliateCodeFree(r);
+        // if code is unclaimed, record as invalid and exit fn
+        // else, execute workflows for a valid referral code
         if (codeIsFree) {
-            console.log('Referral code is not valid (free/unused):', r);
             setInvalidCode(r);
-            return;
+        } else {
+            invalidCode && setInvalidCode('');
+            handleReferralURLParam.set(r);
+            referralStore.cache(r);
+            setEditModeReferral(false);
         }
-        invalidCode && setInvalidCode('');
-        handleReferralURLParam.set(r);
-        referralStore.cache(r);
-        setEditModeReferral(false);
     }
 
     // pixel-width breakpoint to toggle shorter copy
@@ -218,6 +219,8 @@ export default function CodeTabs(props: PropsIF) {
             }
         })();
     }, [sessionState]);
+
+    const updateAffiliateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
@@ -357,7 +360,6 @@ export default function CodeTabs(props: PropsIF) {
             }
         } catch (error) {
             console.error('Error updating affiliate code:', error);
-            // Handle error (e.g., show error message to user)
         }
     };
 
