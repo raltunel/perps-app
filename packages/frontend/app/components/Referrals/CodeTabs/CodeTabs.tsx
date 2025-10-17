@@ -36,6 +36,10 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
+// fee amounts for affiliate and the referred user
+const AFFILIATE_PERCENT = '10%';
+const USER_PERCENT = '4%';
+
 export default function CodeTabs(props: PropsIF) {
     const { initialTab = 'referrals.enterCode' } = props;
     const [activeTab, setActiveTab] = useState(initialTab);
@@ -220,8 +224,6 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [sessionState]);
 
-    const updateAffiliateReferralCodeInputRef = useRef<HTMLInputElement>(null);
-
     useEffect(() => {
         // If no temporary code, immediately set as valid
         if (!temporaryAffiliateCode) {
@@ -377,9 +379,6 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
-    const userPercent = '4%';
-    const affiliatePercent = '10%';
-
     const affiliateCodeElem = isSessionEstablished ? (
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
@@ -396,7 +395,10 @@ export default function CodeTabs(props: PropsIF) {
                     <p className={styles.trackingLinkExplanation}>
                         <Trans
                             i18nKey='referrals.trackingLinkExplanation'
-                            values={{ userPercent, affiliatePercent }}
+                            values={{
+                                affiliatePercent: AFFILIATE_PERCENT,
+                                userPercent: USER_PERCENT,
+                            }}
                             components={[<span />, <span />]}
                         />
                     </p>
