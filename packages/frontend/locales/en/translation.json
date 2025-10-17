@@ -420,8 +420,7 @@
             "claim": "Connect your wallet to claim rewards"
         },
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
-        "selectATabToViewData": "Select a tab to view data",
-        "trackingLinkExplanation": "You will receive <0>{{affiliatePercent}}</0> of referred users fees and they will receive <1>{{userPercent}}</1> discount. See the Docs for more."
+        "selectATabToViewData": "Select a tab to view data"
     },
     "deposit": {
         "prompt": "Deposit {{token}} from Fogo",
