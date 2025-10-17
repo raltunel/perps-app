@@ -151,6 +151,9 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     const [refCodeLength, setRefCodeLength] = useState<number>(0);
+    const [refCodeCharsValidate, setRefCodeCharsValidate] = useState<boolean>(
+        checkForPermittedCharacters(referralStore.cached),
+    );
 
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -165,7 +168,12 @@ export default function CodeTabs(props: PropsIF) {
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={referralStore.cached}
-                    onChange={(e) => setRefCodeLength(e.target.value.length)}
+                    onChange={(e) => {
+                        setRefCodeLength(e.target.value.length);
+                        setRefCodeCharsValidate(
+                            checkForPermittedCharacters(e.target.value),
+                        );
+                    }}
                 />
                 <div className={styles.validation_item}>
                     {refCodeLength <= 30 ? (
@@ -174,6 +182,14 @@ export default function CodeTabs(props: PropsIF) {
                         <GiCancel size={10} color='var(--red)' />
                     )}
                     <p>Max 30 characters</p>
+                </div>
+                <div className={styles.validation_item}>
+                    {refCodeCharsValidate ? (
+                        <FaCheck size={10} color='var(--green)' />
+                    ) : (
+                        <GiCancel size={10} color='var(--red)' />
+                    )}
+                    <p>Must be alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
                 </div>
                 {invalidCode && (
                     <p>
@@ -236,6 +252,10 @@ export default function CodeTabs(props: PropsIF) {
             }
         })();
     }, [sessionState]);
+
+    const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
+        return checkForPermittedCharacters(temporaryAffiliateCode);
+    }, [temporaryAffiliateCode]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
@@ -395,6 +415,24 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
+    function checkForPermittedCharacters(input: string): boolean {
+        console.log(input.length);
+        if (input.length === 0) return true;
+        for (let i: number = 0; i < input.length; i++) {
+            const char: string = input[i];
+            const isAlphanumeric: boolean =
+                (char >= 'A' && char <= 'Z') ||
+                (char >= 'a' && char <= 'z') ||
+                (char >= '0' && char <= '9');
+            const isHyphen: boolean = char === '-';
+
+            if (!isAlphanumeric && !isHyphen) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     const affiliateCodeElem = isSessionEstablished ? (
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
@@ -454,6 +492,14 @@ export default function CodeTabs(props: PropsIF) {
                             <GiCancel size={10} color='var(--red)' />
                         )}
                         <p>Max 30 characters</p>
+                    </div>
+                    <div className={styles.validation_item}>
+                        {tempAffiliateCodeCharsValidate ? (
+                            <FaCheck size={10} color='var(--green)' />
+                        ) : (
+                            <GiCancel size={10} color='var(--red)' />
+                        )}
+                        <p>Only alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
                     </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
