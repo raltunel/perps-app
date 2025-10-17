@@ -409,8 +409,6 @@
         "overwriteCurrentReferralCode": "Overwrite current referral code",
         "enterReferralCode": "Enter a referral code",
         "referralCodeNotValidPleaseConfirm": "The code {{invalidCode}} is not claimed in the referral program. Please confirm the code is correct.",
-        "confirmAffiliateCodeCreation": "I confirm that I am creating the affiliate code {{affiliateCode}} for referrals.",
-        "confirmAffiliateCodeUpdate": "I confirm that I am updating my affiliate code to {{affiliateCode}} for referrals.",
         "yourCodeIs": "Your code is {{affiliateCode}}",
         "createAnAffiliateCode": "Create an affiliate code",
         "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",

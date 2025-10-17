@@ -263,10 +263,8 @@ export default function CodeTabs(props: PropsIF) {
                 }
 
                 // Create the message to sign
-                const message: string = t(
-                    'referrals.confirmAffiliateCodeCreation',
-                    { affiliateCode: temporaryAffiliateCode },
-                );
+                // this text must match FUUL requirements exactly, coordinate changes with @Ben
+                const message = `I confirm that I am creating the ${temporaryAffiliateCode} code`;
                 console.log('Message:', message);
 
                 // Convert message to Uint8Array
@@ -325,10 +323,8 @@ export default function CodeTabs(props: PropsIF) {
                 }
 
                 // Create the message to sign
-                const message: string = t(
-                    'referrals.confirmAffiliateCodeUpdate',
-                    { affiliateCode: temporaryAffiliateCode },
-                );
+                // this text must match FUUL requirements exactly, coordinate changes with @Ben
+                const message = `I confirm that I am updating my code to ${temporaryAffiliateCode}`;
                 console.log('Message:', message);
 
                 // Convert message to Uint8Array
