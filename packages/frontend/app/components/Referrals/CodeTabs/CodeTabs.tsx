@@ -16,6 +16,8 @@ import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
+import { FaCheck } from 'react-icons/fa';
+import { GiCancel } from 'react-icons/gi';
 
 interface PropsIF {
     initialTab?: string;
@@ -148,6 +150,8 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
+    const [refCodeLength, setRefCodeLength] = useState<number>(0);
+
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -161,7 +165,16 @@ export default function CodeTabs(props: PropsIF) {
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={referralStore.cached}
+                    onChange={(e) => setRefCodeLength(e.target.value.length)}
                 />
+                <div className={styles.validation_item}>
+                    {refCodeLength <= 30 ? (
+                        <FaCheck size={10} color='var(--green)' />
+                    ) : (
+                        <GiCancel size={10} color='var(--red)' />
+                    )}
+                    <p>Max 30 characters</p>
+                </div>
                 {invalidCode && (
                     <p>
                         {t('referrals.referralCodeNotValidPleaseConfirm', {
@@ -431,6 +444,14 @@ export default function CodeTabs(props: PropsIF) {
                             }
                         }}
                     />
+                    <div className={styles.validation_item}>
+                        {temporaryAffiliateCode.length <= 30 ? (
+                            <FaCheck size={10} color='var(--green)' />
+                        ) : (
+                            <GiCancel size={10} color='var(--red)' />
+                        )}
+                        <p>Max 30 characters</p>
+                    </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
                 <div className={styles.refferal_code_buttons}>

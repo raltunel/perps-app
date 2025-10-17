@@ -155,6 +155,18 @@
     text-align: center;
 }
 
+.validation_item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+}
+
+.validation_item > p {
+    font-size: var(--font-size-xs);
+    color: var(--text2);
+}
+
 /* Tablet */
 @media (max-width: 1024px) {
     .sectionWithButton {
