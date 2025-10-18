@@ -481,6 +481,7 @@ body {
     cursor: pointer;
     min-height: 40px !important;
     max-height: 40px !important;
+    margin-top: 7px;
 }
 
 .walletCollapsedHeader {

@@ -207,12 +207,13 @@ export default function Trade() {
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
 
-    const [orderInputHeight, setOrderInputHeight] = useState<number | null>(
-        null,
-    );
     const orderInputStartHeightRef = useRef<number>(450);
     const orderInputHeightRef = useRef<number>(450);
     const rightColRef = useRef<HTMLDivElement | null>(null);
+    const isWalletCollapsedRef = useRef(isWalletCollapsed);
+    useEffect(() => {
+        isWalletCollapsedRef.current = isWalletCollapsed;
+    }, [isWalletCollapsed]);
 
     // Constants for order input resize
     const ORDER_INPUT_DEFAULT = 450;
@@ -222,6 +223,9 @@ export default function Trade() {
     const WALLET_COLLAPSED = 40; // Just shows header
     const WALLET_COLLAPSE_THRESHOLD = 50; // When wallet gets below this, snap to collapsed
     const WALLET_MAX = 187; // Maximum height for wallet section
+    const WALLET_EXPAND_HYSTERESIS = 20;
+    const [orderInputHeight, setOrderInputHeight] =
+        useState<number>(ORDER_INPUT_DEFAULT);
 
     useEffect(() => {
         chartTopHeightRef.current = chartTopHeight;
@@ -339,9 +343,7 @@ export default function Trade() {
         setOrderInputHeightBoth(targetOrderInputHeight);
     };
     // Initialize order input height based on layout
-    useEffect(() => {
-        if (orderInputHeight !== null) return;
-
+    useLayoutEffect(() => {
         const col = rightColRef.current;
         if (!col) return;
 
@@ -361,13 +363,10 @@ export default function Trade() {
 
         setOrderInputHeight(initial);
         orderInputHeightRef.current = initial;
-    }, [orderInputHeight, isWalletCollapsed]);
+    }, []);
 
     // Recalculate when wallet collapsed state changes (important for initial load from storage)
     useEffect(() => {
-        // Skip if not yet initialized
-        if (orderInputHeight === null) return;
-
         const col = rightColRef.current;
         if (!col) return;
 
@@ -829,7 +828,6 @@ export default function Trade() {
             </>
         );
     }
-
     return (
         <>
             <TradeRouteHandler />
@@ -1055,7 +1053,37 @@ export default function Trade() {
                                     orderInputStartHeightRef.current + d.height;
                                 const clamped =
                                     clampOrderInputHeight(tentative);
+
+                                // live height update while dragging
                                 setOrderInputHeight(clamped);
+
+                                // >>> NEW: flip wallet content immediately based on live height
+                                const available = getRightColAvailable();
+                                if (available && available > 0) {
+                                    const walletHeight =
+                                        available - clamped - getGap();
+
+                                    // collapse immediately when below threshold
+                                    if (
+                                        walletHeight <=
+                                            WALLET_COLLAPSE_THRESHOLD &&
+                                        !isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = true;
+                                        setIsWalletCollapsed(true);
+                                    }
+
+                                    // re-expand only after we're clearly above collapsed height (hysteresis)
+                                    if (
+                                        walletHeight >=
+                                            WALLET_COLLAPSED +
+                                                WALLET_EXPAND_HYSTERESIS &&
+                                        isWalletCollapsedRef.current
+                                    ) {
+                                        isWalletCollapsedRef.current = false;
+                                        setIsWalletCollapsed(false);
+                                    }
+                                }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
                                 const next =
