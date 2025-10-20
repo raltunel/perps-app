@@ -131,7 +131,7 @@ export default function CodeTabs(props: PropsIF) {
     }, [narrowScreenForCopy]);
 
     const affiliateAddress = userDataStore.userAddress;
-    const prevAffiliateAddress = useRef<string | undefined>();
+    const prevAffiliateAddress = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         // Only clear when switching between different wallets, not on initial connect
@@ -147,13 +147,30 @@ export default function CodeTabs(props: PropsIF) {
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
+    const [isCachedValueValid, setIsCachedValueValid] = useState<
+        boolean | undefined
+    >(undefined);
+
+    useEffect(() => {
+        if (isCachedValueValid !== undefined) return;
+        (async () => {
+            const isCachedCodeFree: boolean = await Fuul.isAffiliateCodeFree(
+                referralStore.cached,
+            );
+            if (isCachedCodeFree) {
+                referralStore.clear();
+                setEditModeReferral(true);
+            }
+            setIsCachedValueValid(!isCachedCodeFree);
+        })();
+    }, []);
+
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
                 <h6>{t('referrals.usingAffiliateCode')}</h6>
-                <p>{referralStore.cached}</p>
+                {isCachedValueValid && <p>{referralStore.cached}</p>}
             </div>
-
             {!userIsConverted && referralStore.cached && (
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
