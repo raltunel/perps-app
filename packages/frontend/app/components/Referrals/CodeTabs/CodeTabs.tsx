@@ -211,9 +211,13 @@ export default function CodeTabs(props: PropsIF) {
                 />
                 {invalidCode && (
                     <p>
-                        {t('referrals.referralCodeNotValidPleaseConfirm', {
-                            invalidCode,
-                        })}
+                        <Trans
+                            i18nKey='referrals.referralCodeNotValidPleaseConfirm'
+                            values={{ invalidCode }}
+                            components={[
+                                <span style={{ color: 'var(--accent3)' }} />,
+                            ]}
+                        />
                     </p>
                 )}
             </div>
