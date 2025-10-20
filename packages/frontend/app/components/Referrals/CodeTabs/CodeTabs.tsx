@@ -209,22 +209,6 @@ export default function CodeTabs(props: PropsIF) {
                         );
                     }}
                 />
-                <div className={styles.validation_item}>
-                    {refCodeLength <= 30 ? (
-                        <FaCheck size={10} color='var(--green)' />
-                    ) : (
-                        <GiCancel size={10} color='var(--red)' />
-                    )}
-                    <p>Max 30 characters</p>
-                </div>
-                <div className={styles.validation_item}>
-                    {refCodeCharsValidate ? (
-                        <FaCheck size={10} color='var(--green)' />
-                    ) : (
-                        <GiCancel size={10} color='var(--red)' />
-                    )}
-                    <p>Alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
-                </div>
                 {invalidCode && (
                     <p>
                         {t('referrals.referralCodeNotValidPleaseConfirm', {
