@@ -66,6 +66,9 @@ export default function CodeTabs(props: PropsIF) {
     }, [referralStore.cached]);
 
     const handleTabChange = (tab: string) => {
+        if (affiliateCode) {
+            setEditModeAffiliate(false);
+        }
         setTemporaryAffiliateCode(affiliateCode ?? '');
         setActiveTab(tab);
     };
@@ -128,10 +131,18 @@ export default function CodeTabs(props: PropsIF) {
     }, [narrowScreenForCopy]);
 
     const affiliateAddress = userDataStore.userAddress;
+    const prevAffiliateAddress = useRef<string | undefined>();
 
     useEffect(() => {
-        setTemporaryAffiliateCode('');
-        referralStore.clear();
+        // Only clear when switching between different wallets, not on initial connect
+        if (
+            prevAffiliateAddress.current &&
+            prevAffiliateAddress.current !== affiliateAddress?.toString()
+        ) {
+            setTemporaryAffiliateCode('');
+            referralStore.clear();
+        }
+        prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
 
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
