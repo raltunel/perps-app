@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 export interface ReferralStoreIF {
     cached: string;
     cache(refCode: string): void;
+    clear(): void;
 }
 
 const LS_KEY = 'AFFILIATE_DATA';
@@ -26,6 +27,9 @@ export const useReferralStore = create<ReferralStoreIF>()(
             cached: '',
             cache(refCode: string): void {
                 set({ cached: refCode });
+            },
+            clear(): void {
+                set({ cached: '' });
             },
         }),
         {

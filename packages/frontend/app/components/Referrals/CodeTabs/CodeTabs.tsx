@@ -66,6 +66,7 @@ export default function CodeTabs(props: PropsIF) {
     }, [referralStore.cached]);
 
     const handleTabChange = (tab: string) => {
+        setTemporaryAffiliateCode(affiliateCode ?? '');
         setActiveTab(tab);
     };
 
@@ -128,6 +129,11 @@ export default function CodeTabs(props: PropsIF) {
 
     const affiliateAddress = userDataStore.userAddress;
 
+    useEffect(() => {
+        setTemporaryAffiliateCode('');
+        referralStore.clear();
+    }, [affiliateAddress]);
+
     const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
     const currentCodeElem = (
@@ -189,7 +195,7 @@ export default function CodeTabs(props: PropsIF) {
                     ) : (
                         <GiCancel size={10} color='var(--red)' />
                     )}
-                    <p>Must be alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
+                    <p>Alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
                 </div>
                 {invalidCode && (
                     <p>
@@ -333,6 +339,7 @@ export default function CodeTabs(props: PropsIF) {
                     });
 
                     console.log('API Response:', result);
+                    setTemporaryAffiliateCode('');
                     setAffiliateCode(temporaryAffiliateCode);
                 } catch (error) {
                     console.error(
@@ -391,6 +398,7 @@ export default function CodeTabs(props: PropsIF) {
 
                 console.log('API Response:', result);
                 setAffiliateCode(temporaryAffiliateCode);
+                setTemporaryAffiliateCode('');
                 setEditModeAffiliate(false);
             }
         } catch (error) {
@@ -499,7 +507,7 @@ export default function CodeTabs(props: PropsIF) {
                         ) : (
                             <GiCancel size={10} color='var(--red)' />
                         )}
-                        <p>Only alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
+                        <p>Alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
                     </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
@@ -524,7 +532,7 @@ export default function CodeTabs(props: PropsIF) {
                                       : 'common.create',
                               )}
                     </SimpleButton>
-                    {editModeAffiliate && (
+                    {editModeAffiliate && !referralStore.cached && (
                         <SimpleButton
                             bg='dark4'
                             hoverBg='accent1'
