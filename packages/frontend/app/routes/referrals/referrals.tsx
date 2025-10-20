@@ -1,7 +1,7 @@
-import { t } from 'i18next';
 import CodeTabs from '~/components/Referrals/CodeTabs/CodeTabs';
 import ReferralsTabs from '~/components/Referrals/ReferralsTabs/ReferralsTabs';
 import styles from './referrals.module.css';
+import { useTranslation } from 'react-i18next';
 
 export function meta() {
     return [
@@ -11,6 +11,7 @@ export function meta() {
 }
 
 export default function Referrals() {
+    const { t } = useTranslation();
     return (
         <div className={styles.container}>
             <header>
