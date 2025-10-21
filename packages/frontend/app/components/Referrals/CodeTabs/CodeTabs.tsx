@@ -238,6 +238,18 @@ export default function CodeTabs(props: PropsIF) {
                 >
                     {t('common.confirm')}
                 </SimpleButton>
+                {referralStore.cached && isCachedValueValid && (
+                    <SimpleButton
+                        bg='dark4'
+                        hoverBg='accent1'
+                        onClick={() => {
+                            setEditModeReferral(false);
+                            setInvalidCode('');
+                        }}
+                    >
+                        {t('common.cancel')}
+                    </SimpleButton>
+                )}
             </div>
         </section>
     );
