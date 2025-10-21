@@ -83,6 +83,11 @@ export default function CodeTabs(props: PropsIF) {
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
+        // Don't make API calls with empty or whitespace-only codes
+        if (!r || !r.trim()) {
+            return;
+        }
+
         // check FUUL API to see if code is claimed or free
         const codeIsFree: boolean = await Fuul.isAffiliateCodeFree(r);
         // if code is unclaimed, record as invalid and exit fn
