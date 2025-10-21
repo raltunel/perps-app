@@ -152,18 +152,35 @@ export default function CodeTabs(props: PropsIF) {
     >(undefined);
 
     useEffect(() => {
-        if (isCachedValueValid !== undefined) return;
+        if (isCachedValueValid !== undefined) {
+            return;
+        }
+
+        // Don't validate if there's no cached code
+        if (!referralStore.cached) {
+            return;
+        }
+
         (async () => {
-            const isCachedCodeFree: boolean = await Fuul.isAffiliateCodeFree(
-                referralStore.cached,
-            );
-            if (isCachedCodeFree) {
-                referralStore.clear();
-                setEditModeReferral(true);
+            try {
+                const isCachedCodeFree: boolean =
+                    await Fuul.isAffiliateCodeFree(referralStore.cached);
+
+                if (isCachedCodeFree) {
+                    referralStore.clear();
+                    setEditModeReferral(true);
+                }
+                setIsCachedValueValid(!isCachedCodeFree);
+            } catch (error) {
+                console.error(
+                    '[CodeTabs] Error validating cached code:',
+                    error,
+                );
+                // On error, assume invalid to be safe
+                setIsCachedValueValid(false);
             }
-            setIsCachedValueValid(!isCachedCodeFree);
         })();
-    }, []);
+    }, [referralStore.cached]);
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -313,7 +330,6 @@ export default function CodeTabs(props: PropsIF) {
                 // Create the message to sign
                 // this text must match FUUL requirements exactly, coordinate changes with @Ben
                 const message = `I confirm that I am creating the ${temporaryAffiliateCode} code`;
-                console.log('Message:', message);
 
                 // Convert message to Uint8Array
                 const messageBytes = new TextEncoder().encode(message);
@@ -334,7 +350,7 @@ export default function CodeTabs(props: PropsIF) {
                     const signature = btoa(binaryString);
 
                     // Call the Fuul SDK to create the affiliate code
-                    const result = await Fuul.createAffiliateCode({
+                    await Fuul.createAffiliateCode({
                         userIdentifier: userWalletKey.toString(),
                         identifierType: UserIdentifierType.SolanaAddress,
                         signature,
@@ -342,7 +358,6 @@ export default function CodeTabs(props: PropsIF) {
                         code: temporaryAffiliateCode,
                     });
 
-                    console.log('API Response:', result);
                     setTemporaryAffiliateCode('');
                     setAffiliateCode(temporaryAffiliateCode);
                 } catch (error) {
@@ -374,7 +389,6 @@ export default function CodeTabs(props: PropsIF) {
                 // Create the message to sign
                 // this text must match FUUL requirements exactly, coordinate changes with @Ben
                 const message = `I confirm that I am updating my code to ${temporaryAffiliateCode}`;
-                console.log('Message:', message);
 
                 // Convert message to Uint8Array
                 const messageBytes = new TextEncoder().encode(message);
@@ -392,7 +406,7 @@ export default function CodeTabs(props: PropsIF) {
                 );
                 const signature = btoa(binaryString);
 
-                const result = await Fuul.updateAffiliateCode({
+                await Fuul.updateAffiliateCode({
                     userIdentifier: userWalletKey.toString(), // the address of the user
                     identifierType: UserIdentifierType.SolanaAddress, // evm_address | solana_address | xrpl_address
                     signature,
@@ -400,7 +414,6 @@ export default function CodeTabs(props: PropsIF) {
                     code: temporaryAffiliateCode,
                 });
 
-                console.log('API Response:', result);
                 setAffiliateCode(temporaryAffiliateCode);
                 setTemporaryAffiliateCode('');
                 setEditModeAffiliate(false);
@@ -428,7 +441,6 @@ export default function CodeTabs(props: PropsIF) {
     }, [affiliateCode]);
 
     function checkForPermittedCharacters(input: string): boolean {
-        console.log(input.length);
         if (input.length === 0) return true;
         for (let i: number = 0; i < input.length; i++) {
             const char: string = input[i];
@@ -582,7 +594,15 @@ export default function CodeTabs(props: PropsIF) {
         switch (activeTab) {
             case 'referrals.enterCode':
             case 'common.enter':
-                return editModeReferral ? enterNewCodeElem : currentCodeElem;
+                // Show input form when:
+                // - User is in edit mode
+                // - There's no cached code
+                // - Cached code was validated as invalid
+                const shouldShowInput =
+                    editModeReferral ||
+                    !referralStore.cached ||
+                    isCachedValueValid === false;
+                return shouldShowInput ? enterNewCodeElem : currentCodeElem;
             case 'referrals.createCode':
             case 'common.create':
                 return affiliateCodeElem;
