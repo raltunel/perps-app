@@ -66,6 +66,7 @@ export function sortUserFills(
     sortDirection: TableSortDirection,
 ) {
     if (sortDirection && sortBy) {
+        console.log(sortBy);
         switch (sortBy) {
             case 'time':
                 return fills.sort((a, b) => {
@@ -129,6 +130,14 @@ export function sortUserFills(
                         return a.closedPnl - b.closedPnl;
                     } else {
                         return b.closedPnl - a.closedPnl;
+                    }
+                });
+            case 'dir':
+                return fills.sort((a, b) => {
+                    if (sortDirection === 'asc') {
+                        return a.dir.localeCompare(b.dir);
+                    } else {
+                        return b.dir.localeCompare(a.dir);
                     }
                 });
             default:
