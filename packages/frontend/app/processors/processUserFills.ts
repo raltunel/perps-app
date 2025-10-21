@@ -66,7 +66,6 @@ export function sortUserFills(
     sortDirection: TableSortDirection,
 ) {
     if (sortDirection && sortBy) {
-        console.log(sortBy);
         switch (sortBy) {
             case 'time':
                 return fills.sort((a, b) => {
