@@ -211,9 +211,11 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.enterCodeContent}>
                 <h6>
                     {referralStore.cached
-                        ? t('referrals.overwriteCurrentReferralCode') +
-                          `: ${referralStore.cached}`
-                        : t('referrals.enterReferralCode') + ':'}
+                        ? t('referrals.overwriteCurrentReferralCode') + ': '
+                        : t('referrals.enterReferralCode') + ': '}
+                    <span style={{ color: 'var(--accent3)' }}>
+                        {referralStore.cached}
+                    </span>
                 </h6>
                 <input
                     ref={updateReferralCodeInputRef}
