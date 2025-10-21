@@ -184,11 +184,6 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
-    const [refCodeLength, setRefCodeLength] = useState<number>(0);
-    const [refCodeCharsValidate, setRefCodeCharsValidate] = useState<boolean>(
-        checkForPermittedCharacters(referralStore.cached),
-    );
-
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -202,12 +197,6 @@ export default function CodeTabs(props: PropsIF) {
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={referralStore.cached}
-                    onChange={(e) => {
-                        setRefCodeLength(e.target.value.length);
-                        setRefCodeCharsValidate(
-                            checkForPermittedCharacters(e.target.value),
-                        );
-                    }}
                 />
                 {invalidCode && (
                     <p>
@@ -224,7 +213,7 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
-                    onClick={() => {
+                    onClick={(): void => {
                         handleUpdateReferralCode(
                             updateReferralCodeInputRef.current?.value || '',
                         );
@@ -264,7 +253,6 @@ export default function CodeTabs(props: PropsIF) {
                     if (affiliateCode) {
                         handleUpdateReferralCode(affiliateCode);
                     }
-                    // referralStore.cache(referrer.referrer_identifier as string);
                 } else {
                     setUserIsConverted(false);
                 }
