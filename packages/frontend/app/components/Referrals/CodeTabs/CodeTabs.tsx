@@ -94,10 +94,12 @@ export default function CodeTabs(props: PropsIF) {
         // else, execute workflows for a valid referral code
         if (codeIsFree) {
             setInvalidCode(r);
+            setIsCachedValueValid(false);
         } else {
             invalidCode && setInvalidCode('');
             handleReferralURLParam.set(r);
             referralStore.cache(r);
+            setIsCachedValueValid(true);
             setEditModeReferral(false);
         }
     }
