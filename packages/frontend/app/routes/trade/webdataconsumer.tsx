@@ -4,6 +4,7 @@ import type { UserFillsData } from '@perps-app/sdk/src/utils/types';
 import { t } from 'i18next';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { TransactionData } from '~/components/Trade/DepositsWithdrawalsTable/DepositsWithdrawalsTableRow';
+import { useWs } from '~/contexts/WsContext';
 import { useMarketOrderLog } from '~/hooks/useMarketOrderLog';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useSdk } from '~/hooks/useSdk';
@@ -103,6 +104,7 @@ export default function WebDataConsumer() {
     const { formatNum } = useNumFormatter();
 
     const { info } = useSdk();
+    const { subscribe: subscribeWs, unsubscribe: unsubscribeWs } = useWs();
     const accountOverviewRef = useRef<AccountOverviewIF | null>(null);
 
     const acccountOverviewPrevRef = useRef<AccountOverviewIF | null>(null);
@@ -184,7 +186,10 @@ export default function WebDataConsumer() {
         // This ensures market data comes from the market endpoint even when user endpoint is different
         let unsubscribeMarketData: (() => void) | undefined;
         if (info.multiSocketInfo && isDebugWalletActive) {
+            // todo subscribeWs will be used heere
+
             const marketSocket = info.multiSocketInfo.getMarketSocket();
+
             if (marketSocket) {
                 const marketDataCallback = (msg: any) => {
                     // Only process market data from this subscription
