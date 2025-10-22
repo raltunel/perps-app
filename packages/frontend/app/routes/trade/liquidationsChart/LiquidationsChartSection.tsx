@@ -287,7 +287,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 />
             </div>
             <div ref={tabContentRef} className={styles.tabContent}>
-                {activeOrderTab === 'Book' && (
+                {(activeOrderTab.includes('book') ||
+                    activeOrderTab === 'Book') && (
                     <div className={styles.startGap}>Liquidation Chart</div>
                 )}
                 {renderTabContent()}

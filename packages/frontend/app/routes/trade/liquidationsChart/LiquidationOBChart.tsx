@@ -768,9 +768,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const horizontal = offsetX - width / 2;
         const vertical = offsetY - (height + 10);
 
+        const verticalPosition = vertical < 0 ? offsetY + 10 : vertical;
+
         liqTooltipRef.current
             .style('visibility', 'visible')
-            .style('top', vertical + 'px')
+            .style('top', verticalPosition + 'px')
             .style(
                 'left',
                 Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
