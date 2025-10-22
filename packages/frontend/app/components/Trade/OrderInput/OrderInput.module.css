@@ -26,7 +26,8 @@
     overflow-y: scroll;
 }
 
-.mainContent::-webkit-scrollbar {
+.mainContent::-webkit-scrollbar,
+.order_input::-webkit-scrollbar {
     display: none;
 }
 

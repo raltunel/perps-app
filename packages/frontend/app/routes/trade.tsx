@@ -34,6 +34,8 @@ import { getSizePercentageSegment } from '~/utils/functions/getSegment';
 import { useTranslation } from 'react-i18next';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import ExpandableOrderBook from './trade/orderbook/ExpandableOrderBook';
+import { HiOutlineChevronDoubleDown } from 'react-icons/hi2';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 
 const MemoizedTradeTable = memo(TradeTable);
 const MemoizedTradingViewWrapper = memo(TradingViewWrapper);
@@ -90,6 +92,9 @@ export default function Trade() {
         'common.tradeHistory',
         'common.orderHistory',
     ];
+
+    const sessionState = useSession();
+    const isUserConnected = isEstablished(sessionState);
     const { marginBucket } = useUnifiedMarginData();
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
@@ -1153,6 +1158,48 @@ export default function Trade() {
                                 />
                             )}
                         </section>
+                        {/* Toggle under the wallet (inline like OrderDetails) */}
+                        <motion.button
+                            type='button'
+                            className={styles.scroll_button}
+                            onClick={() => {
+                                if (isWalletCollapsed) {
+                                    expandWalletToDefault();
+                                } else {
+                                    collapseWallet();
+                                }
+                            }}
+                            aria-label={
+                                isWalletCollapsed
+                                    ? t?.(
+                                          'portfolio.expandWallet',
+                                          'Expand wallet',
+                                      )
+                                    : t?.(
+                                          'portfolio.collapseWallet',
+                                          'Collapse wallet',
+                                      )
+                            }
+                            whileHover={{ scale: 1.06 }}
+                            whileTap={{ scale: 0.96 }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            <motion.div
+                                animate={{
+                                    rotate: isWalletCollapsed ? 180 : 0,
+                                }}
+                                transition={{
+                                    duration: 0.2,
+                                    ease: [0.4, 0.0, 0.2, 1],
+                                }}
+                            >
+                                {!isWalletCollapsed && isUserConnected && (
+                                    <HiOutlineChevronDoubleDown
+                                        className={styles.scroll_icon}
+                                    />
+                                )}
+                            </motion.div>
+                        </motion.button>
                     </div>
                     {PortfolioModalsRenderer}
                 </div>
