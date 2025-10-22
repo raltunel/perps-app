@@ -90,15 +90,20 @@ export default function CodeTabs(props: PropsIF) {
 
         // check FUUL API to see if code is claimed or free
         const codeIsFree: boolean = await Fuul.isAffiliateCodeFree(r);
-        // if code is unclaimed, record as invalid and exit fn
-        // else, execute workflows for a valid referral code
+
+        // Always cache the code and set URL param
+        handleReferralURLParam.set(r);
+        referralStore.cache(r);
+
+        // if code is unclaimed, show in edit mode with error
         if (codeIsFree) {
             setInvalidCode(r);
             setIsCachedValueValid(false);
+            setEditModeReferral(true);
+            setUserInputRefCode(r);
         } else {
+            // code is valid and claimed
             invalidCode && setInvalidCode('');
-            handleReferralURLParam.set(r);
-            referralStore.cache(r);
             setIsCachedValueValid(true);
             setEditModeReferral(false);
         }
@@ -190,26 +195,41 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
+    // Validate cached referral code when it changes (e.g., from URL)
     useEffect(() => {
-        if (isCachedValueValid !== undefined) {
+        // Don't validate if there's no cached code
+        if (!referralStore.cached) {
+            setIsCachedValueValid(undefined);
             return;
         }
 
-        // Don't validate if there's no cached code
-        if (!referralStore.cached) {
+        // Don't re-validate if we already have a validation result for this code
+        if (isCachedValueValid !== undefined) {
             return;
         }
 
         (async () => {
             try {
+                console.log(
+                    '[CodeTabs] Validating cached referral code:',
+                    referralStore.cached,
+                );
                 const isCachedCodeFree: boolean =
                     await Fuul.isAffiliateCodeFree(referralStore.cached);
 
                 if (isCachedCodeFree) {
-                    referralStore.clear();
+                    // Code is not claimed - show in edit mode with error
+                    console.log('[CodeTabs] Cached code is not claimed');
+                    setInvalidCode(referralStore.cached);
+                    setIsCachedValueValid(false);
                     setEditModeReferral(true);
+                    setUserInputRefCode(referralStore.cached);
+                } else {
+                    // Code is valid and claimed
+                    console.log('[CodeTabs] Cached code is valid');
+                    setIsCachedValueValid(true);
+                    setEditModeReferral(false);
                 }
-                setIsCachedValueValid(!isCachedCodeFree);
             } catch (error) {
                 console.error(
                     '[CodeTabs] Error validating cached code:',
@@ -217,9 +237,11 @@ export default function CodeTabs(props: PropsIF) {
                 );
                 // On error, assume invalid to be safe
                 setIsCachedValueValid(false);
+                setEditModeReferral(true);
+                setUserInputRefCode(referralStore.cached);
             }
         })();
-    }, [referralStore.cached]);
+    }, [referralStore.cached, isCachedValueValid]);
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -297,7 +319,8 @@ export default function CodeTabs(props: PropsIF) {
                     bg='accent1'
                     disabled={
                         userInputRefCode.length < 2 ||
-                        userInputRefCode.length > 30
+                        userInputRefCode.length > 30 ||
+                        !isUserRefCodeClaimed
                     }
                     onClick={(): void => {
                         handleUpdateReferralCode(userInputRefCode);
