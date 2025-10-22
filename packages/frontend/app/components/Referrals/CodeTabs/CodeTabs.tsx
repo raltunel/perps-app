@@ -258,7 +258,7 @@ export default function CodeTabs(props: PropsIF) {
                     //     setInvalidCode(isCachedCodeFree ? e.target.value : '');
                     // }}
                 />
-                <div className={styles.validation_item}>
+                {/* <div className={styles.validation_item}>
                     {userInputRefCode.length <= 30 &&
                     userInputRefCode.length >= 2 ? (
                         <FaCheck size={10} color='var(--green)' />
@@ -274,7 +274,7 @@ export default function CodeTabs(props: PropsIF) {
                         <GiCancel size={10} color='var(--red)' />
                     )}
                     <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
-                </div>
+                </div> */}
                 {!isUserRefCodeClaimed &&
                     userInputRefCode.length <= 30 &&
                     userInputRefCode.length >= 2 && (
