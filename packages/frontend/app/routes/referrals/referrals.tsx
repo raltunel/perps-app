@@ -55,7 +55,9 @@ export default function Referrals() {
                 {t('referrals.title')}
                 <p>
                     {t('referrals.description')}{' '}
-                    <a href='#'>{t('common.learnMore')}</a>
+                    <a href='https://docs.ambient.finance/' target='_blank'>
+                        {t('common.learnMore')}
+                    </a>
                 </p>
             </header>
             <div className={styles.detailsContainer}>

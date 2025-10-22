@@ -69,7 +69,7 @@ export default function CodeTabs(props: PropsIF) {
         if (affiliateCode) {
             setEditModeAffiliate(false);
         }
-        setTemporaryAffiliateCode(affiliateCode ?? '');
+        setTemporaryAffiliateCode('');
         setActiveTab(tab);
     };
 
@@ -208,6 +208,14 @@ export default function CodeTabs(props: PropsIF) {
         </section>
     );
 
+    const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
+        return checkForPermittedCharacters(temporaryAffiliateCode);
+    }, [temporaryAffiliateCode]);
+
+    const [refCodeLength, setRefCodeLength] = useState<number>(
+        referralStore.cached.length,
+    );
+
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -223,7 +231,31 @@ export default function CodeTabs(props: PropsIF) {
                     ref={updateReferralCodeInputRef}
                     type='text'
                     defaultValue={referralStore.cached}
+                    onChange={async (e) => {
+                        // set refCodeLength to length of input
+                        setRefCodeLength(e.target.value.length);
+                        // determine if ref code exists in FUUL system
+                        const isCachedCodeFree: boolean =
+                            await Fuul.isAffiliateCodeFree(e.target.value);
+                        setInvalidCode(isCachedCodeFree ? e.target.value : '');
+                    }}
                 />
+                <div className={styles.validation_item}>
+                    {refCodeLength <= 30 && refCodeLength >= 2 ? (
+                        <FaCheck size={10} color='var(--green)' />
+                    ) : (
+                        <GiCancel size={10} color='var(--red)' />
+                    )}
+                    <p>2 - 30 characters</p>
+                </div>
+                <div className={styles.validation_item}>
+                    {tempAffiliateCodeCharsValidate ? (
+                        <FaCheck size={10} color='var(--green)' />
+                    ) : (
+                        <GiCancel size={10} color='var(--red)' />
+                    )}
+                    <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
+                </div>
                 {invalidCode && (
                     <p>
                         <Trans
@@ -239,6 +271,7 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
+                    disabled={refCodeLength < 2 || refCodeLength > 30}
                     onClick={(): void => {
                         handleUpdateReferralCode(
                             updateReferralCodeInputRef.current?.value || '',
@@ -249,14 +282,14 @@ export default function CodeTabs(props: PropsIF) {
                 </SimpleButton>
                 {referralStore.cached && isCachedValueValid && (
                     <SimpleButton
-                        bg='dark4'
+                        bg='dark3'
                         hoverBg='accent1'
                         onClick={() => {
                             setEditModeReferral(false);
                             setInvalidCode('');
                         }}
                     >
-                        {t('common.cancel')}
+                        {t('common.cancel')}2as
                     </SimpleButton>
                 )}
             </div>
@@ -300,10 +333,6 @@ export default function CodeTabs(props: PropsIF) {
             }
         })();
     }, [sessionState]);
-
-    const tempAffiliateCodeCharsValidate = useMemo<boolean>(() => {
-        return checkForPermittedCharacters(temporaryAffiliateCode);
-    }, [temporaryAffiliateCode]);
 
     useEffect(() => {
         // If no temporary code, immediately set as valid
@@ -531,12 +560,13 @@ export default function CodeTabs(props: PropsIF) {
                         }}
                     />
                     <div className={styles.validation_item}>
-                        {temporaryAffiliateCode.length <= 30 ? (
+                        {temporaryAffiliateCode.length <= 30 &&
+                        temporaryAffiliateCode.length >= 2 ? (
                             <FaCheck size={10} color='var(--green)' />
                         ) : (
                             <GiCancel size={10} color='var(--red)' />
                         )}
-                        <p>Max 30 characters</p>
+                        <p>2 - 30 characters</p>
                     </div>
                     <div className={styles.validation_item}>
                         {tempAffiliateCodeCharsValidate ? (
@@ -544,7 +574,7 @@ export default function CodeTabs(props: PropsIF) {
                         ) : (
                             <GiCancel size={10} color='var(--red)' />
                         )}
-                        <p>Alphanumeric and dashes (A-Z, a-z, 0-9, -)</p>
+                        <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
                     </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
@@ -558,7 +588,10 @@ export default function CodeTabs(props: PropsIF) {
                         }
                         disabled={
                             !temporaryAffiliateCode.trim() ||
-                            !isTemporaryAffiliateCodeValid
+                            !isTemporaryAffiliateCodeValid ||
+                            !tempAffiliateCodeCharsValidate ||
+                            temporaryAffiliateCode.length > 30 ||
+                            temporaryAffiliateCode.length < 2
                         }
                     >
                         {isTemporaryAffiliateCodeValid === false
@@ -578,7 +611,7 @@ export default function CodeTabs(props: PropsIF) {
                                 setTemporaryAffiliateCode('');
                             }}
                         >
-                            {t('common.cancel')}
+                            {t('common.cancel')}1
                         </SimpleButton>
                     )}
                 </div>
