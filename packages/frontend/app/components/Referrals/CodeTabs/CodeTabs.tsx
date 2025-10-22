@@ -162,10 +162,26 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (userInputRefCode.length) {
             (async () => {
-                // check with FUUL to determine if ref code is claimed
-                const isCodeFree: boolean =
-                    await Fuul.isAffiliateCodeFree(userInputRefCode);
-                setIsUserRefCodeClaimed(!isCodeFree);
+                console.log(
+                    '[CodeTabs] Checking referral code:',
+                    userInputRefCode,
+                );
+                try {
+                    // check with FUUL to determine if ref code is claimed
+                    const isCodeFree: boolean =
+                        await Fuul.isAffiliateCodeFree(userInputRefCode);
+                    console.log(
+                        '[CodeTabs] Referral code is free:',
+                        isCodeFree,
+                    );
+                    setIsUserRefCodeClaimed(!isCodeFree);
+                } catch (error) {
+                    console.error(
+                        '[CodeTabs] Error checking referral code:',
+                        error,
+                    );
+                    setIsUserRefCodeClaimed(false);
+                }
             })();
         }
     }, [userInputRefCode]);
@@ -258,23 +274,8 @@ export default function CodeTabs(props: PropsIF) {
                     //     setInvalidCode(isCachedCodeFree ? e.target.value : '');
                     // }}
                 />
-                {/* <div className={styles.validation_item}>
-                    {userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 ? (
-                        <FaCheck size={10} color='var(--green)' />
-                    ) : (
-                        <GiCancel size={10} color='var(--red)' />
-                    )}
-                    <p>2 - 30 characters</p>
-                </div>
-                <div className={styles.validation_item}>
-                    {tempAffiliateCodeCharsValidate ? (
-                        <FaCheck size={10} color='var(--green)' />
-                    ) : (
-                        <GiCancel size={10} color='var(--red)' />
-                    )}
-                    <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
-                </div> */}
+                {/* <div c
+                 */}
                 {!isUserRefCodeClaimed &&
                     userInputRefCode.length <= 30 &&
                     userInputRefCode.length >= 2 && (
@@ -365,16 +366,27 @@ export default function CodeTabs(props: PropsIF) {
             return;
         }
 
+        // Don't check API if characters are invalid
+        if (!tempAffiliateCodeCharsValidate) {
+            setIsTemporaryAffiliateCodeValid(undefined);
+            return;
+        }
+
         // Set up debounced validation
         const timer = setTimeout(async () => {
+            console.log(
+                '[CodeTabs] Checking affiliate code:',
+                temporaryAffiliateCode,
+            );
             try {
                 const codeIsFree = await Fuul.isAffiliateCodeFree(
                     temporaryAffiliateCode,
                 );
+                console.log('[CodeTabs] Code is free:', codeIsFree);
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
             } catch (error) {
                 console.error(
-                    'Error checking affiliate code availability:',
+                    '[CodeTabs] Error checking affiliate code availability:',
                     error,
                 );
                 setIsTemporaryAffiliateCodeValid(false);
@@ -382,7 +394,7 @@ export default function CodeTabs(props: PropsIF) {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [temporaryAffiliateCode]);
+    }, [temporaryAffiliateCode, tempAffiliateCodeCharsValidate]);
 
     /**
      * Creates an affiliate code for the user
@@ -618,13 +630,16 @@ export default function CodeTabs(props: PropsIF) {
                             temporaryAffiliateCode.length < 2
                         }
                     >
-                        {isTemporaryAffiliateCodeValid === false
-                            ? t('referrals.codeAlreadyInUse')
-                            : t(
-                                  editModeAffiliate
-                                      ? 'common.update'
-                                      : 'common.create',
-                              )}
+                        {!tempAffiliateCodeCharsValidate &&
+                        temporaryAffiliateCode.trim()
+                            ? 'Invalid characters'
+                            : isTemporaryAffiliateCodeValid === false
+                              ? t('referrals.codeAlreadyInUse')
+                              : t(
+                                    editModeAffiliate
+                                        ? 'common.update'
+                                        : 'common.create',
+                                )}
                     </SimpleButton>
                     {editModeAffiliate && !referralStore.cached && (
                         <SimpleButton
