@@ -2469,7 +2469,7 @@ function OrderInput({
                             transition={{
                                 duration: 0.25,
                                 ease: 'easeInOut',
-                                delay: 0.2,
+                                delay: 0.3,
                             }}
                         >
                             {isUserLoggedIn && (
