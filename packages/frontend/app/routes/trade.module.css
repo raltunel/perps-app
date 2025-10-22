@@ -1,5 +1,8 @@
 :root {
     --footer-h: 56px; /* mobile footer height */
+    --scroll-icon-width-height: 12px;
+    --scroll-button-width: 24px;
+    --scroll-button-height: 16px;
 }
 
 html,
@@ -157,6 +160,7 @@ body {
     height: 100%;
     min-height: 0;
     overflow: hidden;
+    position: relative;
 }
 
 .order_input {
@@ -182,6 +186,34 @@ body {
     overflow: hidden;
 }
 
+.scroll_button {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: var(--scroll-button-width, 24px);
+    height: var(--scroll-button-height, 16px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-dark2, #1a1a1f);
+    border-radius: var(--radius-xs, 4px);
+    cursor: pointer;
+    color: var(--text2);
+    z-index: 999;
+    flex-shrink: 0;
+}
+
+.scroll_button:hover {
+    color: var(--text1);
+    background: var(--bg-dark2, #0f0f14);
+}
+
+.scroll_icon {
+    width: var(--scroll-icon-width-height);
+    height: var(--scroll-icon-width-height);
+}
 .table {
     overflow: auto;
     scrollbar-width: none;
@@ -209,7 +241,7 @@ body {
 }
 
 /* Tablet styles */
-/* UPDATED tablet block */
+
 @media only screen and (max-width: 1080px) and (min-width: 769px) {
     /* Keep two columns: left = chart area takes remaining space,
      right = fits the collapsible panel's width (30px collapsed, ~320px expanded) */
@@ -218,11 +250,10 @@ body {
         grid-template-columns: 1fr max-content; /* <- key change */
     }
 
-    /* Make sure the order book cell actually participates in the layout */
     .orderBook {
-        display: flex; /* was none */
-        min-width: 30px; /* guarantees the collapsed strip stays visible */
-        overflow: hidden; /* your child handles its own overflow */
+        display: flex;
+        min-width: 30px;
+        overflow: hidden;
     }
 }
 
@@ -233,7 +264,6 @@ body {
         background: var(--bg-dark2, #111117);
     }
 
-    /* Do not clamp to 100dvh; fixed sections will handle height */
     .container {
         grid-template-rows: 1fr;
         gap: 0;
@@ -258,7 +288,7 @@ body {
         justify-content: center;
         align-items: center;
         padding: 0 var(--padding-s);
-        overflow: visible; /* allow dropdown to escape */
+        overflow: visible;
     }
 
     .mobileTabBtns {
@@ -269,10 +299,9 @@ body {
     }
 
     .mobileTabBtn {
-        /* key: let each pill fill its grid cell and NOT grow from text */
         width: 100%;
         min-width: 0;
-        box-sizing: border-box; /* active ring/borders won't change width */
+        box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -307,7 +336,6 @@ body {
         gap: 6px;
     }
 
-    /* Truncate the dynamic label so it never pushes other tabs */
     .posLabel {
         flex: 1 1 auto;
         min-width: 0;
@@ -322,7 +350,6 @@ body {
         flex: 0 0 auto;
     }
 
-    /* Fixed-width dropdown, always left-aligned to the pill */
     .posMenu {
         background-color: red;
         position: absolute;
@@ -348,7 +375,7 @@ body {
         padding: 12px 14px;
         color: var(--text2);
         font-size: 13px;
-        white-space: nowrap; /* one-line menu items */
+        white-space: nowrap;
     }
 
     .posItem:hover {
@@ -360,16 +387,15 @@ body {
         color: var(--text1);
     }
 
-    /* KEY FIX: respect the fixed footer space */
     .mobileSection {
         position: fixed;
         top: 150px;
         left: 0;
         right: 0;
         bottom: calc(var(--footer-h) + env(safe-area-inset-bottom));
-        height: auto; /* top/bottom define the box */
+        height: auto;
         background: var(--bg-dark1);
-        overflow: hidden !important; /* page doesn't scroll */
+        overflow: hidden !important;
         display: none;
         border-radius: 0;
         padding-bottom: 20px !important;
@@ -451,30 +477,28 @@ body {
     }
 }
 
-/* In trade.module.css */
-
 .rightCol {
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
     height: 100%;
     min-height: 0;
-    overflow: hidden; /* Add this */
+    overflow: hidden;
 }
 
 .order_input {
-    flex: 0 0 auto; /* Change from flex: 1 1 auto */
+    flex: 0 0 auto;
     min-height: 300px;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* Add this */
+    overflow: hidden;
 }
 
 .wallet {
-    flex: 1 1 auto; /* Change from flex: 0 0 auto */
-    min-height: 100px; /* Add minimum height for wallet */
-    max-height: none; /* Remove the max-height: 195px constraint */
-    height: auto; /* Change from height: 100% */
+    flex: 1 1 auto;
+    min-height: 100px;
+    max-height: none;
+    height: auto;
 }
 
 .walletCollapsed {
