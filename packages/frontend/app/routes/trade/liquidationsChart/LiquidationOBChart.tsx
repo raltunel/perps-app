@@ -16,6 +16,8 @@ interface LiquidationsChartProps {
     liqSells: OrderBookLiqIF[];
     width?: number;
     height?: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    scaleData?: any;
 }
 
 interface LineData {
@@ -32,6 +34,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         liqSells,
         width = 300,
         height = 400,
+        scaleData,
     } = props;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
@@ -305,9 +308,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .range([heightRef.current, 0]);
 
         xScaleRef.current = xScale;
-        buyYScaleRef.current = buyYScale;
-        sellYScaleRef.current = sellYScale;
-        pageYScaleRef.current = pageYScale;
+        buyYScaleRef.current = scaleData ? scaleData.yScale : buyYScale;
+        sellYScaleRef.current = scaleData ? scaleData.yScale : sellYScale;
+        pageYScaleRef.current = scaleData ? scaleData.yScale : pageYScale;
 
         const canvas = d3
             .select(d3CanvasLiq.current)
@@ -459,7 +462,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range([widthRef.current, 0]);
+            .range([widthRef.current, scaleData ? widthRef.current / 1.1 : 0]);
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
         const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
@@ -486,26 +489,34 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         // Update scales in existing series if they exist
         if (sellAreaSeriesRef.current) {
-            sellAreaSeriesRef.current.xScale(xScale).yScale(sellYScale);
+            sellAreaSeriesRef.current
+                .xScale(xScale)
+                .yScale(scaleData ? scaleData.yScale : sellYScale);
         }
         if (buyAreaSeriesRef.current) {
-            buyAreaSeriesRef.current.xScale(xScale).yScale(buyYScale);
+            buyAreaSeriesRef.current
+                .xScale(xScale)
+                .yScale(scaleData ? scaleData.yScale : buyYScale);
         }
         if (highlightedSellAreaSeriesRef.current) {
             highlightedSellAreaSeriesRef.current
                 .xScale(xScale)
-                .yScale(sellYScale);
+                .yScale(scaleData ? scaleData.yScale : sellYScale);
         }
         if (highlightedBuyAreaSeriesRef.current) {
             highlightedBuyAreaSeriesRef.current
                 .xScale(xScale)
-                .yScale(buyYScale);
+                .yScale(scaleData ? scaleData.yScale : buyYScale);
         }
         if (sellLineSeriesRef.current) {
-            sellLineSeriesRef.current.xScale(xScale).yScale(sellYScale);
+            sellLineSeriesRef.current
+                .xScale(xScale)
+                .yScale(scaleData ? scaleData.yScale : sellYScale);
         }
         if (buyLineSeriesRef.current) {
-            buyLineSeriesRef.current.xScale(xScale).yScale(buyYScale);
+            buyLineSeriesRef.current
+                .xScale(xScale)
+                .yScale(scaleData ? scaleData.yScale : buyYScale);
         }
     }, [width, height]);
 
@@ -955,7 +966,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScaleRef.current)
-            .yScale(buyYScaleRef.current);
+            .yScale(scaleData ? scaleData.yScale : buyYScaleRef.current);
 
         const highlightedSellArea = d3fc
             .seriesCanvasArea()
@@ -967,7 +978,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScaleRef.current)
-            .yScale(sellYScaleRef.current);
+            .yScale(scaleData ? scaleData.yScale : sellYScaleRef.current);
 
         const hoverLine = d3fc
             .seriesCanvasLine()
@@ -976,7 +987,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: LineData) => d.x)
             .crossValue((d: LineData) => d.y)
             .xScale(xScaleRef.current)
-            .yScale(pageYScaleRef.current)
+            .yScale(scaleData ? scaleData.yScale : pageYScaleRef.current)
             .decorate((context: CanvasRenderingContext2D) => {
                 context.strokeStyle = '#8b98a5';
                 context.lineWidth = 1.5;
@@ -1030,6 +1041,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     return (
         <div
             ref={d3CanvasLiqContianer}
+            id='d3CanvasLiqContianer'
             style={{
                 position: 'relative',
                 width: `${widthRef.current}px`,
