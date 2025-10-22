@@ -314,7 +314,7 @@ export default function CodeTabs(props: PropsIF) {
                             setInvalidCode('');
                         }}
                     >
-                        {t('common.cancel')}2as
+                        {t('common.cancel')}
                     </SimpleButton>
                 )}
             </div>
