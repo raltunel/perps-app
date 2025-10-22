@@ -30,7 +30,7 @@
     gap: var(--gap-m, 16px);
 }
 
-.sectionWithButton button {
+.sectionWithButton > button {
     width: 100%;
     height: var(--button-height, 44px);
     padding: var(--button-padding, 0 14px);
