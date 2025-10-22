@@ -25,6 +25,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set) => ({
             cached: '',
+
             cache(refCode: string): void {
                 set({ cached: refCode });
             },

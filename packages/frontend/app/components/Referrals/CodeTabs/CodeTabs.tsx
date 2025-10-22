@@ -152,7 +152,23 @@ export default function CodeTabs(props: PropsIF) {
         prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
 
-    const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
+    // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
+
+    const [userInputRefCode, setUserInputRefCode] = useState<string>('');
+    const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
+        boolean | undefined
+    >(undefined);
+
+    useEffect(() => {
+        if (userInputRefCode.length) {
+            (async () => {
+                // check with FUUL to determine if ref code is claimed
+                const isCodeFree: boolean =
+                    await Fuul.isAffiliateCodeFree(userInputRefCode);
+                setIsUserRefCodeClaimed(!isCodeFree);
+            })();
+        }
+    }, [userInputRefCode]);
 
     const [isCachedValueValid, setIsCachedValueValid] = useState<
         boolean | undefined
@@ -212,9 +228,9 @@ export default function CodeTabs(props: PropsIF) {
         return checkForPermittedCharacters(temporaryAffiliateCode);
     }, [temporaryAffiliateCode]);
 
-    const [refCodeLength, setRefCodeLength] = useState<number>(
-        referralStore.cached.length,
-    );
+    // const [refCodeLength, setRefCodeLength] = useState<number>(
+    //     referralStore.cached.length,
+    // );
 
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -228,20 +244,23 @@ export default function CodeTabs(props: PropsIF) {
                     </span>
                 </h6>
                 <input
-                    ref={updateReferralCodeInputRef}
+                    // ref={updateReferralCodeInputRef}
                     type='text'
-                    defaultValue={referralStore.cached}
-                    onChange={async (e) => {
-                        // set refCodeLength to length of input
-                        setRefCodeLength(e.target.value.length);
-                        // determine if ref code exists in FUUL system
-                        const isCachedCodeFree: boolean =
-                            await Fuul.isAffiliateCodeFree(e.target.value);
-                        setInvalidCode(isCachedCodeFree ? e.target.value : '');
-                    }}
+                    // defaultValue={referralStore.cached}
+                    value={userInputRefCode}
+                    onChange={(e) => setUserInputRefCode(e.target.value)}
+                    // onChange={async (e) => {
+                    //     // set refCodeLength to length of input
+                    //     // setRefCodeLength(e.target.value.length);
+                    //     // determine if ref code exists in FUUL system
+                    //     const isCachedCodeFree: boolean =
+                    //         await Fuul.isAffiliateCodeFree(e.target.value);
+                    //     setInvalidCode(isCachedCodeFree ? e.target.value : '');
+                    // }}
                 />
                 <div className={styles.validation_item}>
-                    {refCodeLength <= 30 && refCodeLength >= 2 ? (
+                    {userInputRefCode.length <= 30 &&
+                    userInputRefCode.length >= 2 ? (
                         <FaCheck size={10} color='var(--green)' />
                     ) : (
                         <GiCancel size={10} color='var(--red)' />
@@ -256,26 +275,31 @@ export default function CodeTabs(props: PropsIF) {
                     )}
                     <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
                 </div>
-                {invalidCode && (
-                    <p>
-                        <Trans
-                            i18nKey='referrals.referralCodeNotValidPleaseConfirm'
-                            values={{ invalidCode }}
-                            components={[
-                                <span style={{ color: 'var(--accent3)' }} />,
-                            ]}
-                        />
-                    </p>
-                )}
+                {!isUserRefCodeClaimed &&
+                    userInputRefCode.length <= 30 &&
+                    userInputRefCode.length >= 2 && (
+                        <p>
+                            <Trans
+                                i18nKey='referrals.referralCodeNotValidPleaseConfirm'
+                                values={{ invalidCode: userInputRefCode }}
+                                components={[
+                                    <span
+                                        style={{ color: 'var(--accent3)' }}
+                                    />,
+                                ]}
+                            />
+                        </p>
+                    )}
             </div>
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
                     bg='accent1'
-                    disabled={refCodeLength < 2 || refCodeLength > 30}
+                    disabled={
+                        userInputRefCode.length < 2 ||
+                        userInputRefCode.length > 30
+                    }
                     onClick={(): void => {
-                        handleUpdateReferralCode(
-                            updateReferralCodeInputRef.current?.value || '',
-                        );
+                        handleUpdateReferralCode(userInputRefCode);
                     }}
                 >
                     {t('common.confirm')}
