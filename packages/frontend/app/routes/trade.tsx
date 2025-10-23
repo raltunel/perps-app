@@ -125,11 +125,7 @@ export default function Trade() {
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    // add refs near the other refs
-    const lastColHeightRef = useRef<number | null>(null);
-    const lastWinInnerHeightRef = useRef<number>(
-        typeof window !== 'undefined' ? window.innerHeight : 0,
-    );
+
     const setHeightLocalOnly = (h: number) => {
         setChartTopHeightLocal(h);
         chartTopHeightRef.current = h;
@@ -421,15 +417,11 @@ export default function Trade() {
 
         // Only update if there's a significant difference
         if (Math.abs(targetOrderInputHeight - orderInputHeight) > 5) {
-            console.log('📦 Adjusting for wallet state:', {
-                isWalletCollapsed,
-                targetWalletHeight,
-                targetOrderInputHeight,
-            });
             setOrderInputHeightBoth(targetOrderInputHeight);
         }
     }, [isWalletCollapsed]);
-    // On mount / when store changes:
+
+    // MOST IMPORTANT EFFECT IN HANDLING TRADE LAYOUT
     // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
         const col = leftColRef.current;
@@ -440,17 +432,34 @@ export default function Trade() {
         const available = Math.max(0, total - gap);
         const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
-        // enable the one-time smoothing
         if (storedHeight == null) {
-            const snapTo = Math.min(
-                Math.max(CHART_MIN, available - TABLE_COLLAPSED),
-                max,
-            );
-            setHeightLocalOnly(snapTo);
+            if (isUserConnected) {
+                // Connected + no saved preference → open to default table height (195px)
+                const desiredTable = Math.max(TABLE_MIN, TABLE_DEFAULT); // 195
+                const targetTop = Math.min(
+                    Math.max(CHART_MIN, available - desiredTable),
+                    max,
+                );
+                // set default height as preference in local storage so we initialize with it and not session
+                setHeightLocalOnly(targetTop);
+                setChartTopHeight(targetTop);
 
-            // keep collapsed through subsequent resizes (no persistence)
-            hasUserOverrideRef.current = true;
-            userRatioRef.current = available > 0 ? snapTo / available : null;
+                // remember ratio so future resizes keep intent
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? targetTop / available : null;
+            } else {
+                //  Not connected + no saved preference → keep your current collapsed behavior
+                const snapTo = Math.min(
+                    Math.max(CHART_MIN, available - TABLE_COLLAPSED),
+                    max,
+                );
+                setHeightLocalOnly(snapTo);
+
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? snapTo / available : null;
+            }
         } else {
             // Return user to their saved preference (collapsed or not)
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
@@ -461,17 +470,14 @@ export default function Trade() {
         }
 
         didInitRef.current = true;
-
-        const t = setTimeout(() => setSmoothInit(false), 260);
-        return () => clearTimeout(t);
-    }, [storedHeight, setChartTopHeight]);
+    }, [storedHeight, setChartTopHeight, isUserConnected]);
 
     // Recompute (or clamp) when the left column resizes
     useEffect(() => {
         let raf = 0;
 
         const apply = () => {
-            if (!didInitRef.current) return; // ← guard
+            if (!didInitRef.current) return;
 
             const col = leftColRef.current;
             if (!col) return;
@@ -578,15 +584,6 @@ export default function Trade() {
         mqTablet.addEventListener('change', updateTablet);
         return () => mqTablet.removeEventListener('change', updateTablet);
     }, []);
-
-    //     useEffect(() => {
-    //     // Only collapse if user has no saved preference
-    //         const { chartTopHeight } = useAppSettings.getState();
-    //         console.log({chartTopHeight})
-    //     if (chartTopHeight === null) {
-    //         collapseTableToBar();
-    //     }
-    // }, []); // Empty dependency array = runs once on mount
 
     const MobileTabNavigation = useMemo(() => {
         return (
@@ -831,60 +828,6 @@ export default function Trade() {
                         display: activeTab === 'positions' ? 'block' : 'none',
                     }}
                 >
-                    {/* Sticky dropdown header inside the scrollable section */}
-                    {/* <div className={styles.mobilePositionsSwitcher}>
-                        <button
-                            type='button'
-                            aria-haspopup='listbox'
-                            aria-expanded={mobilePortfolioMenuOpen}
-                            className={styles.mobilePositionsSwitcherBtn}
-                            onClick={() =>
-                                setMobilePortfolioMenuOpen((v) => !v)
-                            }
-                        >
-                            <span
-                                className={styles.mobilePositionsSwitcherDot}
-                                aria-hidden
-                            />
-                            {currentMobileLabel}
-                            <svg
-                                className={styles.mobilePositionsSwitcherChev}
-                                width='14'
-                                height='14'
-                                viewBox='0 0 24 24'
-                            >
-                                <path
-                                    d='M7 10l5 5 5-5'
-                                    fill='none'
-                                    stroke='currentColor'
-                                    strokeWidth='2'
-                                />
-                            </svg>
-                        </button>
-
-                        {mobilePortfolioMenuOpen && (
-                            <div
-                                role='listbox'
-                                className={styles.mobilePositionsSwitcherMenu}
-                            >
-                                {MOBILE_OPTIONS.map((opt) => (
-                                    <button
-                                        key={opt}
-                                        role='option'
-                                        aria-selected={selectedTradeTab === opt}
-                                        className={`${styles.mobilePositionsSwitcherItem} ${selectedTradeTab === opt ? styles.active : ''}`}
-                                        onClick={() => {
-                                            setSelectedTradeTab(opt); // 👈 drive the same store TradeTable uses
-                                            setMobilePortfolioMenuOpen(false);
-                                        }}
-                                    >
-                                        {MOBILE_VIEW_LABELS[opt]}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div> */}
-
                     {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
                     {(activeTab === 'positions' ||
                         visibilityRefs.current.positions) && (
@@ -1130,7 +1073,6 @@ export default function Trade() {
                                 // live height update while dragging
                                 setOrderInputHeight(clamped);
 
-                                // >>> NEW: flip wallet content immediately based on live height
                                 const available = getRightColAvailable();
                                 if (available && available > 0) {
                                     const walletHeight =
@@ -1146,7 +1088,7 @@ export default function Trade() {
                                         setIsWalletCollapsed(true);
                                     }
 
-                                    // re-expand only after we're clearly above collapsed height (hysteresis)
+                                    // re-expand only after we're clearly above collapsed height
                                     if (
                                         walletHeight >=
                                             WALLET_COLLAPSED +
