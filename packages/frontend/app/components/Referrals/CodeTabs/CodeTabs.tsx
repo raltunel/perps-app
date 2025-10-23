@@ -644,6 +644,14 @@ export default function CodeTabs(props: PropsIF) {
                         )}
                         <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
                     </div>
+                    <div className={styles.validation_item}>
+                        {isTemporaryAffiliateCodeValid === true ? (
+                            <FaCheck size={10} color='var(--green)' />
+                        ) : (
+                            <GiCancel size={10} color='var(--red)' />
+                        )}
+                        <p>Code is currently unclaimed</p>
+                    </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
                 <div className={styles.refferal_code_buttons}>
@@ -662,16 +670,11 @@ export default function CodeTabs(props: PropsIF) {
                             temporaryAffiliateCode.length < 2
                         }
                     >
-                        {!tempAffiliateCodeCharsValidate &&
-                        temporaryAffiliateCode.trim()
-                            ? 'Invalid characters'
-                            : isTemporaryAffiliateCodeValid === false
-                              ? t('referrals.codeAlreadyInUse')
-                              : t(
-                                    editModeAffiliate
-                                        ? 'common.update'
-                                        : 'common.create',
-                                )}
+                        {t(
+                            editModeAffiliate
+                                ? 'common.update'
+                                : 'common.create',
+                        )}
                     </SimpleButton>
                     {editModeAffiliate && affiliateCode && (
                         <SimpleButton
