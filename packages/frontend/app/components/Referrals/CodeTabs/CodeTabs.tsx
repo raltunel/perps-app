@@ -18,7 +18,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
 import { FaCheck } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
-import { LuClipboardCopy } from 'react-icons/lu';
+import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
 
 interface PropsIF {
@@ -60,6 +60,7 @@ export default function CodeTabs(props: PropsIF) {
     const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
     const [userIsConverted, setUserIsConverted] = useState<boolean>(false);
+    const [justCopied, setJustCopied] = useState<boolean>(false);
 
     const [_copiedData, copy] = useClipboard();
 
@@ -68,6 +69,15 @@ export default function CodeTabs(props: PropsIF) {
             setEditModeReferral(true);
         }
     }, [referralStore.cached]);
+
+    useEffect(() => {
+        if (justCopied) {
+            const timer = setTimeout(() => {
+                setJustCopied(false);
+            }, 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [justCopied]);
 
     const handleTabChange = (tab: string) => {
         if (affiliateCode) {
@@ -545,7 +555,7 @@ export default function CodeTabs(props: PropsIF) {
         (async () => {
             if (!affiliateCode || !affiliateAddress) return '';
             const trackingLinkUrl = await Fuul.generateTrackingLink(
-                'https://perps.ambient.finance',
+                'perps.ambient.finance',
                 affiliateAddress.toString(),
                 UserIdentifierType.SolanaAddress,
             );
@@ -575,18 +585,28 @@ export default function CodeTabs(props: PropsIF) {
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
-                    <div className={styles.with_copy_clipboard}>
+                    <div
+                        className={styles.with_copy_clipboard}
+                        style={{
+                            backgroundColor: justCopied
+                                ? 'var(--green)'
+                                : 'transparent',
+                            transition: 'background-color 0.2s',
+                            padding: 'var(--padding-s)',
+                        }}
+                        onClick={() => {
+                            copy('https://' + trackingLink);
+                            setJustCopied(true);
+                        }}
+                    >
                         {trackingLink && (
                             <div className={styles.walletLink}>
-                                <a href={trackingLink} target='_blank'>
-                                    {trackingLink}
-                                </a>
+                                {trackingLink}
                             </div>
                         )}
-                        <LuClipboardCopy
-                            size={22}
-                            onClick={() => copy(trackingLink)}
-                        />
+                        <div className={styles.clipboard_wrapper}>
+                            <LuCopy size={14} />
+                        </div>
                     </div>
                     <p className={styles.trackingLinkExplanation}>
                         <Trans

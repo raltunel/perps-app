@@ -24,17 +24,17 @@
 .with_copy_clipboard {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
+    gap: var(--gap-s);
     align-items: center;
+    border-radius: var(--radius-s, 12px);
+    cursor: pointer;
+    color: var(--text2);
 }
 
 .with_copy_clipboard > svg {
     cursor: pointer;
     color: var(--text3);
-}
-
-.with_copy_clipboard > svg:hover {
-    color: var(--text2);
 }
 
 .sectionWithButton {
