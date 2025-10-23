@@ -57,7 +57,7 @@ const SymbolInfo: React.FC = React.memo(() => {
     }, [symbolInfo, formatNum, getDefaultPrecision]);
 
     const marketIdWithFallback = useMemo(
-        () => `${marketId?.toUpperCase() || 'BTC'}`,
+        () => `${marketId || 'BTC'}`,
         [marketId],
     );
 
@@ -69,14 +69,23 @@ const SymbolInfo: React.FC = React.memo(() => {
         }
     }, [symbolInfo?.markPx, marketId, titleOverride]);
 
-    const ogImage = useMemo(() => {
-        return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
+    const ogImageRectangle = useMemo(() => {
+        // return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
+        return `https://embindexer.net/ember/on-ambient/${marketIdWithFallback}`;
+    }, [marketIdWithFallback]);
+    const ogImageSquare = useMemo(() => {
+        return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
     return (
         <>
             <title>{title}</title>
-            <meta property='og:image' content={ogImage} />
+            <meta property='og:image' content={ogImageRectangle} />
+            <meta property='og:image:width' content='1200' />
+            <meta property='og:image:height' content='630' />
+            <meta property='og:image' content={ogImageSquare} />
+            <meta property='og:image:width' content='1200' />
+            <meta property='og:image:height' content='1200' />
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
