@@ -21,6 +21,22 @@
     gap: var(--gap-m, 16px);
 }
 
+.with_copy_clipboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.with_copy_clipboard > svg {
+    cursor: pointer;
+    color: var(--text3);
+}
+
+.with_copy_clipboard > svg:hover {
+    color: var(--text2);
+}
+
 .sectionWithButton {
     height: 100%;
     display: flex;

@@ -18,6 +18,8 @@ import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
 import { FaCheck } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
+import { LuClipboardCopy } from 'react-icons/lu';
+import useClipboard from '~/hooks/useClipboard';
 
 interface PropsIF {
     initialTab?: string;
@@ -58,6 +60,8 @@ export default function CodeTabs(props: PropsIF) {
     const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
     const [userIsConverted, setUserIsConverted] = useState<boolean>(false);
+
+    const [_copiedData, copy] = useClipboard();
 
     useEffect(() => {
         if (!referralStore.cached) {
@@ -571,14 +575,19 @@ export default function CodeTabs(props: PropsIF) {
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
-
-                    {trackingLink && (
-                        <div className={styles.walletLink}>
-                            <a href={trackingLink} target='_blank'>
-                                {trackingLink}
-                            </a>
-                        </div>
-                    )}
+                    <div className={styles.with_copy_clipboard}>
+                        {trackingLink && (
+                            <div className={styles.walletLink}>
+                                <a href={trackingLink} target='_blank'>
+                                    {trackingLink}
+                                </a>
+                            </div>
+                        )}
+                        <LuClipboardCopy
+                            size={22}
+                            onClick={() => copy(trackingLink)}
+                        />
+                    </div>
                     <p className={styles.trackingLinkExplanation}>
                         <Trans
                             i18nKey='referrals.trackingLinkExplanation'
