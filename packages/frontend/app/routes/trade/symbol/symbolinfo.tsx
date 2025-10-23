@@ -57,7 +57,7 @@ const SymbolInfo: React.FC = React.memo(() => {
     }, [symbolInfo, formatNum, getDefaultPrecision]);
 
     const marketIdWithFallback = useMemo(
-        () => `${marketId?.toUpperCase() || 'BTC'}`,
+        () => `${marketId || 'BTC'}`,
         [marketId],
     );
 
