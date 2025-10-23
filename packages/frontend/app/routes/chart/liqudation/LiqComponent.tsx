@@ -1,7 +1,7 @@
 import LiquidationsChart from '~/routes/trade/liquidationsChart/LiquidationOBChart';
 import { useLiqudationLines } from './hooks/useLiquidationLines';
 import LiqLineTooltip from './LiqLinesTooltip';
-import LiqudationLines, { type HorizontalLineData } from './LiqudationLines';
+import LiqudationLines from './LiqudationLines';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useEffect, useState } from 'react';
 
@@ -29,6 +29,7 @@ const LiqComponent = ({
 
     const [top, setTop] = useState(0);
     const [left, setLeft] = useState(0);
+    const dpr = window.devicePixelRatio || 1;
 
     useEffect(() => {
         const canvasRect = overlayCanvasRef.current?.getBoundingClientRect();
@@ -36,7 +37,6 @@ const LiqComponent = ({
             setTop(canvasRect.top);
             setLeft(canvasRect.left);
         }
-        console.log({ canvasRect });
     }, [canvasSize]);
 
     return (
@@ -49,8 +49,8 @@ const LiqComponent = ({
                         top: top,
                         left: left,
                         pointerEvents: 'none',
-                        width: canvasSize.width,
-                        height: canvasSize.height,
+                        width: canvasSize.width / dpr,
+                        height: canvasSize.height / dpr,
                         overflow: 'hidden',
                     }}
                 >
@@ -59,8 +59,8 @@ const LiqComponent = ({
                         sellData={highResSells}
                         liqBuys={liqBuys}
                         liqSells={liqSells}
-                        width={canvasSize.width}
-                        height={canvasSize.height}
+                        width={canvasSize.width / dpr}
+                        height={canvasSize.height / dpr}
                         scaleData={scaleData}
                         location={'liqMobile'}
                     />
