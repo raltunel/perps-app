@@ -252,7 +252,7 @@ export default function CodeTabs(props: PropsIF) {
             {!userIsConverted && referralStore.cached && (
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
-                        bg='dark3'
+                        bg='accent1'
                         onClick={() => setEditModeReferral(true)}
                     >
                         {t('common.edit')}
@@ -664,7 +664,7 @@ export default function CodeTabs(props: PropsIF) {
                                         : 'common.create',
                                 )}
                     </SimpleButton>
-                    {editModeAffiliate && !referralStore.cached && (
+                    {editModeAffiliate && affiliateCode && (
                         <SimpleButton
                             bg='dark4'
                             hoverBg='accent1'
