@@ -222,6 +222,21 @@ body {
     display: none;
 }
 
+/* Smooth only when we opt-in */
+.smoothInit {
+    transition:
+        height 220ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 220ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: height, opacity;
+}
+
+/* Be respectful of users who prefer no motion */
+@media (prefers-reduced-motion: reduce) {
+    .smoothInit {
+        transition: none;
+    }
+}
+
 /* Desktop styles (1920px and above) */
 @media only screen and (min-width: 1920px) {
     .containerTop {

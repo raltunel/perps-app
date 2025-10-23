@@ -57,6 +57,32 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
+    // --- HYDRATION GATE (add after your other useState hooks) ---
+    const [settingsHydrated, setSettingsHydrated] = useState(() => {
+        const p = (useAppSettings as any).persist;
+        return p?.hasHydrated?.() ?? false;
+    });
+
+    useEffect(() => {
+        const p = (useAppSettings as any).persist;
+        if (!p) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // If already hydrated (e.g., navigated within SPA)
+        if (p.hasHydrated?.()) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // Wait until persist finishes hydration
+        const unsub = p.onFinishHydration?.(() => setSettingsHydrated(true));
+        return () => {
+            unsub && unsub();
+        };
+    }, []);
+    // --- end HYDRATION GATE ---
 
     // close when clicking outside Positions tab + menu
     const posWrapRef = useOutsideClick<HTMLDivElement>(
@@ -104,6 +130,11 @@ export default function Trade() {
     const lastWinInnerHeightRef = useRef<number>(
         typeof window !== 'undefined' ? window.innerHeight : 0,
     );
+    const setHeightLocalOnly = (h: number) => {
+        setChartTopHeightLocal(h);
+        chartTopHeightRef.current = h;
+    };
+    const didInitRef = useRef(false);
 
     const {
         orderBookMode,
@@ -409,27 +440,39 @@ export default function Trade() {
         const available = Math.max(0, total - gap);
         const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
-
+        // enable the one-time smoothing
         if (storedHeight == null) {
-            // DEFAULT MODE: no user override, no persistence, no ratio
-            hasUserOverrideRef.current = false;
-            userRatioRef.current = null;
-            requestAnimationFrame(setDefaultFromLayout);
+            const snapTo = Math.min(
+                Math.max(CHART_MIN, available - TABLE_COLLAPSED),
+                max,
+            );
+            setHeightLocalOnly(snapTo);
+
+            // keep collapsed through subsequent resizes (no persistence)
+            hasUserOverrideRef.current = true;
+            userRatioRef.current = available > 0 ? snapTo / available : null;
         } else {
+            // Return user to their saved preference (collapsed or not)
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
             setChartTopHeightLocal(clamped);
             if (clamped !== storedHeight) setChartTopHeight(clamped);
-
             hasUserOverrideRef.current = true;
             userRatioRef.current = available > 0 ? clamped / available : null;
         }
-    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+        didInitRef.current = true;
+
+        const t = setTimeout(() => setSmoothInit(false), 260);
+        return () => clearTimeout(t);
+    }, [storedHeight, setChartTopHeight]);
 
     // Recompute (or clamp) when the left column resizes
     useEffect(() => {
         let raf = 0;
 
         const apply = () => {
+            if (!didInitRef.current) return; // ← guard
+
             const col = leftColRef.current;
             if (!col) return;
 
@@ -535,6 +578,15 @@ export default function Trade() {
         mqTablet.addEventListener('change', updateTablet);
         return () => mqTablet.removeEventListener('change', updateTablet);
     }, []);
+
+    //     useEffect(() => {
+    //     // Only collapse if user has no saved preference
+    //         const { chartTopHeight } = useAppSettings.getState();
+    //         console.log({chartTopHeight})
+    //     if (chartTopHeight === null) {
+    //         collapseTableToBar();
+    //     }
+    // }, []); // Empty dependency array = runs once on mount
 
     const MobileTabNavigation = useMemo(() => {
         return (
@@ -715,10 +767,19 @@ export default function Trade() {
             'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [contenteditable="true"], [data-ensure-open]',
         );
 
+    // Early return while settings are hydrating to avoid first-paint jump
+    if (!settingsHydrated)
+        return <div style={{ height: '100%', minHeight: '100%' }} />;
+
     // Mobile view
     if (isMobile && symbol) {
         return (
-            <>
+            <motion.div
+                key='trade-hydrated-mobile'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18 }}
+            >
                 <TradeRouteHandler />
                 <WebDataConsumer />
                 <div className={styles.symbolInfoContainer}>
@@ -830,7 +891,7 @@ export default function Trade() {
                         <MemoizedTradeTable mobileExternalSwitcher />
                     )}
                 </div>
-            </>
+            </motion.div>
         );
     }
     return (
@@ -838,7 +899,14 @@ export default function Trade() {
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                <div className={styles.containerNew} id='tradePageRoot'>
+                <motion.div
+                    key='trade-hydrated'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.18 }}
+                    className={styles.containerNew}
+                    id='tradePageRoot'
+                >
                     {/* LEFT COLUMN */}
                     <div
                         className={styles.leftCol}
@@ -1202,7 +1270,7 @@ export default function Trade() {
                         </motion.button>
                     </div>
                     {PortfolioModalsRenderer}
-                </div>
+                </motion.div>
             )}
             <AdvancedTutorialController
                 isEnabled={showTutorial}
