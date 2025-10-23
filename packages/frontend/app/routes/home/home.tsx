@@ -120,12 +120,22 @@ export function meta() {
     return [
         { title: t('meta.title') },
         { name: 'description', content: t('meta.content') },
+
+        // Rectangular OG image (1200x630)
         {
-            name: 'og:image',
-            content:
-                // 'https://perps.ambient.finance/images/og/btc-on-ambient.png',
-                'https://perps-banner-1080663129748.europe-west1.run.app/on-ambient/btc',
+            property: 'og:image',
+            content: 'https://embindexer.net/ember/on-ambient/BTC',
         },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+
+        // Square OG image (1200x1200)
+        {
+            property: 'og:image',
+            content: 'https://embindexer.net/ember/on-ambient-sq/BTC',
+        },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '1200' },
     ];
 }
 

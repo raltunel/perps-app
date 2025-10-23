@@ -68,15 +68,24 @@ const SymbolInfo: React.FC = React.memo(() => {
             return `${symbolInfo?.markPx ? '$' + formatNum(symbolInfo?.markPx) + ' | ' : ''} ${marketId?.toUpperCase() ? marketId?.toUpperCase() + ' | ' : ''}Ambient`;
         }
     }, [symbolInfo?.markPx, marketId, titleOverride]);
-    const ogImage = useMemo(() => {
+
+    const ogImageRectangle = useMemo(() => {
         // return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
-        return `https://perps-banner-1080663129748.europe-west1.run.app/on-ambient/${marketIdWithFallback.toLowerCase()}`;
+        return `https://embindexer.net/ember/on-ambient/${marketIdWithFallback}`;
+    }, [marketIdWithFallback]);
+    const ogImageSquare = useMemo(() => {
+        return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
     return (
         <>
             <title>{title}</title>
-            <meta property='og:image' content={ogImage} />
+            <meta property='og:image' content={ogImageRectangle} />
+            <meta property='og:image:width' content='1200' />
+            <meta property='og:image:height' content='630' />
+            <meta property='og:image' content={ogImageSquare} />
+            <meta property='og:image:width' content='1200' />
+            <meta property='og:image:height' content='1200' />
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
