@@ -349,7 +349,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScale)
-            .yScale(sellYScale);
+            .yScale(scaleData ? scaleData.yScale : sellYScale);
 
         const buyArea = d3fc
             .seriesCanvasArea()
@@ -368,7 +368,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScale)
-            .yScale(buyYScale);
+            .yScale(scaleData ? scaleData.yScale : buyYScale);
 
         const sellLine = d3fc
             .seriesCanvasLine()
@@ -377,7 +377,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScale)
-            .yScale(sellYScale)
+            .yScale(scaleData ? scaleData.yScale : sellYScale)
             .decorate((context: CanvasRenderingContext2D) => {
                 context.save();
                 context.strokeStyle = sellRgbaColor;
@@ -391,7 +391,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
             .xScale(xScale)
-            .yScale(buyYScale)
+            .yScale(scaleData ? scaleData.yScale : buyYScale)
             .decorate((context: CanvasRenderingContext2D) => {
                 context.strokeStyle = buyRgbaColor;
                 context.lineWidth = 1.5;
@@ -403,7 +403,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: any) => d.px)
             .crossValue((d: any) => d.ratio)
             .xScale(xScale)
-            .yScale(sellYScale)
+            .yScale(scaleData ? scaleData.yScale : sellYScale)
             .decorate((context: CanvasRenderingContext2D) => {
                 context.strokeStyle = sellRgbaColor;
                 context.lineWidth = 1.5;
@@ -416,7 +416,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .mainValue((d: any) => d.px)
             .crossValue((d: any) => d.ratio)
             .xScale(xScale)
-            .yScale(buyYScale)
+            .yScale(scaleData ? scaleData.yScale : buyYScale)
             .decorate((context: CanvasRenderingContext2D) => {
                 context.strokeStyle = buyRgbaColor;
                 context.lineWidth = 1.5;
