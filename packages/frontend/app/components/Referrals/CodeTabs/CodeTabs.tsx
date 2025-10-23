@@ -18,7 +18,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
 import { FaCheck } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
-import { LuCopy } from 'react-icons/lu';
+import { LuCopy, LuCopyCheck } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
 
 interface PropsIF {
@@ -605,7 +605,11 @@ export default function CodeTabs(props: PropsIF) {
                             </div>
                         )}
                         <div className={styles.clipboard_wrapper}>
-                            <LuCopy size={14} />
+                            {justCopied ? (
+                                <LuCopyCheck size={14} />
+                            ) : (
+                                <LuCopy size={14} />
+                            )}
                         </div>
                     </div>
                     <p className={styles.trackingLinkExplanation}>
