@@ -62,6 +62,7 @@ const LiqComponent = ({
                         width={canvasSize.width}
                         height={canvasSize.height}
                         scaleData={scaleData}
+                        location={'liqMobile'}
                     />
                 </div>
             )}
