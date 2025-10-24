@@ -64,11 +64,17 @@ export default function CodeTabs(props: PropsIF) {
 
     const [_copiedData, copy] = useClipboard();
 
+    const [totVolume, setTotVolume] = useState<number | undefined>(11111);
+
     useEffect(() => {
-        if (!referralStore.cached) {
+        if (
+            !referralStore.cached &&
+            totVolume !== undefined &&
+            totVolume < 10000
+        ) {
             setEditModeReferral(true);
         }
-    }, [referralStore.cached]);
+    }, [referralStore.cached, totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -171,6 +177,83 @@ export default function CodeTabs(props: PropsIF) {
         prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
 
+    useEffect(() => {
+        if (!affiliateAddress) {
+            console.log(
+                '[CodeTabs] No wallet address available, skipping volume fetch',
+            );
+            return;
+        }
+
+        // Mock data for testing (commenting out slow endpoint)
+        console.log(
+            '[CodeTabs] Using mock data for address:',
+            affiliateAddress.toString(),
+        );
+
+        const isSpecialAddress =
+            affiliateAddress.toString() ===
+            '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+        const volume = isSpecialAddress ? 5000 : 12596092.5695223;
+
+        const data = {
+            count: 1,
+            leaderboard: [
+                {
+                    account_value: 63.2143537767362,
+                    maker_count: 20,
+                    maker_count_24h: 0,
+                    maker_percentage: 0.496862479109711,
+                    maker_percentage_24h: 0,
+                    maker_volume: 62585.2578118827,
+                    maker_volume_24h: 1.73328018604479e-12,
+                    pnl: -6898.47370522326,
+                    rank: 0,
+                    roi: -75.0783850982263,
+                    taker_count: 577,
+                    taker_count_24h: 0,
+                    taker_percentage: 99.5031375208903,
+                    taker_percentage_24h: 0,
+                    taker_volume: 12533507.3117104,
+                    taker_volume_24h: 1.07860387288383e-11,
+                    total_deposits: 9188.361865,
+                    user: affiliateAddress.toString(),
+                    volume: volume,
+                    volume_24h: 0,
+                },
+            ],
+            sort: 'pnl',
+            stale: true,
+            updated_at: 1761330689,
+        };
+
+        if (data.leaderboard && data.leaderboard.length > 0) {
+            const volume = data.leaderboard[0].volume;
+            console.log('[CodeTabs] Setting volume to:', volume);
+            setTotVolume(volume);
+        }
+
+        // Real fetch (commented out due to slow endpoint)
+        // (async () => {
+        //     try {
+        //         console.log('[CodeTabs] Starting volume fetch for address:', affiliateAddress.toString());
+        //         const response = await fetch(`https://ember-leaderboard.liquidity.tools/leaderboard/${affiliateAddress.toString()}`);
+        //         console.log('[CodeTabs] Received response, parsing JSON...');
+        //         const data = await response.json();
+        //         console.log('[CodeTabs] Data parsed:', data);
+        //         if (data.leaderboard && data.leaderboard.length > 0) {
+        //             const volume = data.leaderboard[0].volume;
+        //             console.log('[CodeTabs] Setting volume to:', volume);
+        //             setTotVolume(volume);
+        //         } else {
+        //             console.log('[CodeTabs] No leaderboard data found');
+        //         }
+        //     } catch (error) {
+        //         console.error('[CodeTabs] Error fetching volume:', error);
+        //     }
+        // })();
+    }, [affiliateAddress]);
+
     // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
@@ -260,19 +343,28 @@ export default function CodeTabs(props: PropsIF) {
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
-                <h6>{t('referrals.usingAffiliateCode')}</h6>
-                {isCachedValueValid && <p>{referralStore.cached}</p>}
+                {referralStore.cached ? (
+                    <>
+                        <h6>{t('referrals.usingAffiliateCode')}</h6>
+                        {isCachedValueValid && <p>{referralStore.cached}</p>}
+                    </>
+                ) : (
+                    <h6>{t('referrals.enterCode')}</h6>
+                )}
             </div>
-            {!userIsConverted && referralStore.cached && (
-                <div className={styles.refferal_code_buttons}>
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => setEditModeReferral(true)}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                </div>
-            )}
+            {!userIsConverted &&
+                referralStore.cached &&
+                totVolume !== undefined &&
+                totVolume < 10000 && (
+                    <div className={styles.refferal_code_buttons}>
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => setEditModeReferral(true)}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                    </div>
+                )}
         </section>
     );
 
@@ -581,54 +673,65 @@ export default function CodeTabs(props: PropsIF) {
     }
 
     const affiliateCodeElem = isSessionEstablished ? (
-        affiliateCode && !editModeAffiliate ? (
+        (affiliateCode && !editModeAffiliate) ||
+        (totVolume !== undefined && totVolume < 10000) ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
-                    <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
-                    <div
-                        className={styles.with_copy_clipboard}
-                        style={{
-                            backgroundColor: justCopied
-                                ? 'var(--green)'
-                                : 'transparent',
-                            transition: 'background-color 0.2s',
-                            padding: 'var(--padding-s)',
-                        }}
-                        onClick={() => {
-                            copy('https://' + trackingLink);
-                            setJustCopied(true);
-                        }}
-                    >
-                        {trackingLink && (
-                            <div className={styles.walletLink}>
-                                {trackingLink}
+                    {affiliateCode ? (
+                        <>
+                            <p>
+                                {t('referrals.yourCodeIs', { affiliateCode })}
+                            </p>
+                            <div
+                                className={styles.with_copy_clipboard}
+                                style={{
+                                    backgroundColor: justCopied
+                                        ? 'var(--green)'
+                                        : 'transparent',
+                                    transition: 'background-color 0.2s',
+                                    padding: 'var(--padding-s)',
+                                }}
+                                onClick={() => {
+                                    copy('https://' + trackingLink);
+                                    setJustCopied(true);
+                                }}
+                            >
+                                {trackingLink && (
+                                    <div className={styles.walletLink}>
+                                        {trackingLink}
+                                    </div>
+                                )}
+                                <div className={styles.clipboard_wrapper}>
+                                    {justCopied ? (
+                                        <LuCopyCheck size={14} />
+                                    ) : (
+                                        <LuCopy size={14} />
+                                    )}
+                                </div>
                             </div>
-                        )}
-                        <div className={styles.clipboard_wrapper}>
-                            {justCopied ? (
-                                <LuCopyCheck size={14} />
-                            ) : (
-                                <LuCopy size={14} />
-                            )}
-                        </div>
-                    </div>
-                    <p className={styles.trackingLinkExplanation}>
-                        <Trans
-                            i18nKey='referrals.trackingLinkExplanation'
-                            values={{
-                                affiliatePercent: AFFILIATE_PERCENT,
-                                userPercent: USER_PERCENT,
-                            }}
-                            components={[<span />, <span />]}
-                        />
-                    </p>
+                            <p className={styles.trackingLinkExplanation}>
+                                <Trans
+                                    i18nKey='referrals.trackingLinkExplanation'
+                                    values={{
+                                        affiliatePercent: AFFILIATE_PERCENT,
+                                        userPercent: USER_PERCENT,
+                                    }}
+                                    components={[<span />, <span />]}
+                                />
+                            </p>
+                        </>
+                    ) : (
+                        <h6>{t('referrals.createAnAffiliateCode')}</h6>
+                    )}
                 </div>
-                <SimpleButton
-                    bg='accent1'
-                    onClick={() => setEditModeAffiliate(true)}
-                >
-                    {t('common.edit')}
-                </SimpleButton>
+                {totVolume !== undefined && totVolume >= 10000 && (
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => setEditModeAffiliate(true)}
+                    >
+                        {t('common.edit')}
+                    </SimpleButton>
+                )}
             </section>
         ) : (
             <section className={styles.sectionWithButton}>
@@ -750,10 +853,13 @@ export default function CodeTabs(props: PropsIF) {
                 // - User is in edit mode
                 // - There's no cached code
                 // - Cached code was validated as invalid
+                // AND user has sufficient volume
                 const shouldShowInput =
-                    editModeReferral ||
-                    !referralStore.cached ||
-                    isCachedValueValid === false;
+                    (editModeReferral ||
+                        !referralStore.cached ||
+                        isCachedValueValid === false) &&
+                    totVolume !== undefined &&
+                    totVolume < 10000;
                 return shouldShowInput ? enterNewCodeElem : currentCodeElem;
             case 'referrals.createCode':
             case 'common.create':
