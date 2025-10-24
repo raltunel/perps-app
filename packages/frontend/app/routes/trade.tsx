@@ -238,6 +238,7 @@ export default function Trade() {
     const hasUserOverrideRef = useRef<boolean>(false);
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
+    const wasDraggingRef = useRef(false);
 
     const orderInputStartHeightRef = useRef<number>(450);
     const orderInputHeightRef = useRef<number>(450);
@@ -866,12 +867,16 @@ export default function Trade() {
                             }}
                             onResizeStart={() => {
                                 startHeightRef.current = chartTopHeight;
+                                wasDraggingRef.current = false;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
                                 const tentative = clamp(
                                     startHeightRef.current + d.height,
                                 );
                                 setChartTopHeightLocal(tentative);
+                                // mark as dragging after a tiny threshold to filter out clicks
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRef.current = true;
 
                                 const available = getAvailable();
                                 if (available && available > 0) {
@@ -880,6 +885,12 @@ export default function Trade() {
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                if (
+                                    !wasDraggingRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
+
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
