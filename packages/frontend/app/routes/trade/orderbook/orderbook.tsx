@@ -723,6 +723,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     .reverse()
                                     .map((order, index) => (
                                         <div
+                                            id={`order-sell-srow-${index}`}
                                             key={index}
                                             className={styles.orderRowWrapper}
                                         >
