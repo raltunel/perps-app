@@ -239,6 +239,7 @@ export default function Trade() {
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
     const wasDraggingRef = useRef(false);
+    const wasDraggingRightRef = useRef(false);
 
     const orderInputStartHeightRef = useRef<number>(450);
     const orderInputHeightRef = useRef<number>(450);
@@ -1074,6 +1075,7 @@ export default function Trade() {
                             onResizeStart={() => {
                                 orderInputStartHeightRef.current =
                                     orderInputHeight;
+                                wasDraggingRightRef.current = false;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
                                 const tentative =
@@ -1083,6 +1085,8 @@ export default function Trade() {
 
                                 // live height update while dragging
                                 setOrderInputHeight(clamped);
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRightRef.current = true;
 
                                 const available = getRightColAvailable();
                                 if (available && available > 0) {
@@ -1112,6 +1116,12 @@ export default function Trade() {
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                // ⛔️ ignore click / micro move
+                                if (
+                                    !wasDraggingRightRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
                                 const next =
                                     orderInputStartHeightRef.current + d.height;
                                 const available = getRightColAvailable();
