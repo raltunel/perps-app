@@ -433,61 +433,59 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyAreaSeriesRef.current = buyArea;
         sellLineSeriesRef.current = sellLine;
         buyLineSeriesRef.current = buyLine;
+        const dpr = window.devicePixelRatio || 1;
 
         // Setup drawing
-        const container = d3.select(d3CanvasLiq.current).node() as any;
-        if (container) container.requestRedraw();
+        d3.select(d3CanvasLiq.current).dispatch('draw', { bubbles: false });
+        sellArea?.context(context);
+        sellLine?.context(context);
+        buyArea?.context(context);
+        buyLine?.context(context);
 
-        d3.select(d3CanvasLiq.current)
-            .on('draw', () => {
-                if (hoverLineDataRef.current.length > 0) {
-                    clipCanvas(
-                        hoverLineDataRef.current[0].offsetY,
-                        canvas,
-                        true,
-                    );
-                }
+        if (
+            sellLiqLineSeriesRef.current &&
+            buyLiqLineSeriesRef.current &&
+            location === 'liqMobile'
+        ) {
+            buyLiqLineSeriesRef.current?.context(context);
+            sellLiqLineSeriesRef.current?.context(context);
+        }
 
-                sellArea(currentSellDataRef.current);
-                buyArea(currentBuyDataRef.current);
-                sellLine(currentSellDataRef.current);
-                buyLine(currentBuyDataRef.current);
+        d3.select(d3CanvasLiq.current).on('draw', () => {
+            canvas.width = scaleData ? width * dpr : width;
+            canvas.height = scaleData ? height * dpr : height;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height}px`;
 
-                if (
-                    sellLiqLineSeriesRef.current &&
-                    buyLiqLineSeriesRef.current &&
-                    location === 'liqMobile'
-                ) {
-                    currentLiqBuysRef.current.forEach((liq, index) => {
-                        buyLiqLineSeriesRef.current([
-                            { px: liq.px, ratio: 0 },
-                            { px: liq.px, ratio: liq.ratio },
-                        ]);
-                    });
+            if (hoverLineDataRef.current.length > 0) {
+                clipCanvas(hoverLineDataRef.current[0].offsetY, canvas, true);
+            }
 
-                    currentLiqSellsRef.current.forEach((liq, index) => {
-                        sellLiqLineSeriesRef.current([
-                            { px: liq.px, ratio: 0 },
-                            { px: liq.px, ratio: liq.ratio },
-                        ]);
-                    });
-                }
-            })
-            .on('measure', () => {
-                sellArea?.context(context);
-                sellLine?.context(context);
-                buyArea?.context(context);
-                buyLine?.context(context);
+            sellArea(currentSellDataRef.current);
+            buyArea(currentBuyDataRef.current);
+            sellLine(currentSellDataRef.current);
+            buyLine(currentBuyDataRef.current);
 
-                if (
-                    sellLiqLineSeriesRef.current &&
-                    buyLiqLineSeriesRef.current &&
-                    location === 'liqMobile'
-                ) {
-                    buyLiqLineSeriesRef.current?.context(context);
-                    sellLiqLineSeriesRef.current?.context(context);
-                }
-            });
+            if (
+                sellLiqLineSeriesRef.current &&
+                buyLiqLineSeriesRef.current &&
+                location === 'liqMobile'
+            ) {
+                currentLiqBuysRef.current.forEach((liq, index) => {
+                    buyLiqLineSeriesRef.current([
+                        { px: liq.px, ratio: 0 },
+                        { px: liq.px, ratio: liq.ratio },
+                    ]);
+                });
+
+                currentLiqSellsRef.current.forEach((liq, index) => {
+                    sellLiqLineSeriesRef.current([
+                        { px: liq.px, ratio: 0 },
+                        { px: liq.px, ratio: liq.ratio },
+                    ]);
+                });
+            }
+        });
     }, [width, height]);
 
     useEffect(() => {
@@ -526,11 +524,23 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         )
             return;
 
+        const dpr = window.devicePixelRatio || 1;
+
+        const rangeWidthMin =
+            scaleData && location === 'liqMobile'
+                ? widthRef.current * dpr
+                : widthRef.current;
+        const rangeWidthMax =
+            scaleData && location === 'liqMobile'
+                ? (widthRef.current / 1.1) * dpr
+                : 0;
+
         // Update scales only
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range([widthRef.current, scaleData ? widthRef.current / 1.1 : 0]);
+            .range([rangeWidthMin, rangeWidthMax]);
+
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
         const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
@@ -735,8 +745,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 updateScalesOnly();
 
                 // Trigger redraw
-                const container = d3.select(d3CanvasLiq.current).node() as any;
-                if (container) container.requestRedraw();
+                d3.select(d3CanvasLiq.current).dispatch('draw', {
+                    bubbles: false,
+                });
 
                 const lineContainer = d3
                     .select(d3CanvasLiqLines.current)
@@ -918,9 +929,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         liqBuys,
         liqSells,
         updateScalesAndSeries,
-        width,
-        height,
     ]);
+
+    useEffect(() => {
+        updateScalesAndSeries();
+    }, [width, height]);
 
     // Cleanup on unmount
     useEffect(() => {

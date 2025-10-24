@@ -27,30 +27,36 @@ const LiqComponent = ({
     const { highResBuys, highResSells, liqBuys, liqSells } =
         useOrderBookStore();
 
-    const [top, setTop] = useState(0);
-    const [left, setLeft] = useState(0);
-    const dpr = window.devicePixelRatio || 1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [overlayLiqCanvasAttr, setOverlayLiqCanvasAttr] = useState<any>();
 
     useEffect(() => {
         const canvasRect = overlayCanvasRef.current?.getBoundingClientRect();
+
         if (canvasRect) {
-            setTop(canvasRect.top);
-            setLeft(canvasRect.left);
+            const dpr = window.devicePixelRatio || 1;
+
+            setOverlayLiqCanvasAttr({
+                top: canvasRect.top,
+                left: canvasRect.left,
+                height: canvasSize.height / dpr,
+                width: canvasSize.width / dpr,
+            });
         }
     }, [canvasSize]);
 
     return (
         <>
-            {canvasSize && (
+            {overlayLiqCanvasAttr && (
                 <div
                     id='liq-mobile'
                     style={{
                         position: 'absolute',
-                        top: top,
-                        left: left,
+                        top: overlayLiqCanvasAttr.top,
+                        left: overlayLiqCanvasAttr.left,
                         pointerEvents: 'none',
-                        width: canvasSize.width / dpr,
-                        height: canvasSize.height / dpr,
+                        width: overlayLiqCanvasAttr.width,
+                        height: overlayLiqCanvasAttr.height,
                         overflow: 'hidden',
                     }}
                 >
@@ -59,8 +65,8 @@ const LiqComponent = ({
                         sellData={highResSells}
                         liqBuys={liqBuys}
                         liqSells={liqSells}
-                        width={canvasSize.width / dpr}
-                        height={canvasSize.height / dpr}
+                        width={overlayLiqCanvasAttr.width}
+                        height={overlayLiqCanvasAttr.height}
                         scaleData={scaleData}
                         location={'liqMobile'}
                     />
