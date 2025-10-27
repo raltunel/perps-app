@@ -88,8 +88,12 @@ const SymbolInfo: React.FC = React.memo(() => {
                 property='og:url'
                 content={`https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`}
             />
+            <meta property='og:image:alt' content={title} />
+            {/* 
+                        <meta property='og:image:width' content='1200' />
+                        <meta property='og:image:height' content='630' /> */}
 
-            <meta name='twitter:card' content='summary_large_image' />
+            {/* <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:site' content='@ambient_finance' />
             <meta name='twitter:creator' content='@ambient_finance' />
             <meta name='twitter:title' content={title} />
@@ -99,11 +103,7 @@ const SymbolInfo: React.FC = React.memo(() => {
             <meta
                 name='twitter:url'
                 content={`https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`}
-            />
-
-            <meta property='og:image:alt' content={title} />
-            <meta property='og:image:width' content='1200' />
-            <meta property='og:image:height' content='630' />
+            /> */}
             {/* <meta name='twitter:title' content={title} /> */}
             {/* <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:image' content={ogImageSquare} />
