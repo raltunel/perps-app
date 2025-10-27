@@ -70,22 +70,44 @@ const SymbolInfo: React.FC = React.memo(() => {
     }, [symbolInfo?.markPx, marketId, titleOverride]);
 
     const ogImageRectangle = useMemo(() => {
-        // return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
         return `https://embindexer.net/ember/on-ambient/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
-    const ogImageSquare = useMemo(() => {
-        return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
+
+    const linkUrl = useMemo(() => {
+        return `https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
+
+    const ogTitle = useMemo(() => {
+        return `Trade ${marketIdWithFallback} Futures with Ambient on Fogo`;
+    }, [marketIdWithFallback]);
+
+    const ogDescription = useMemo(() => {
+        return `${marketIdWithFallback} Perpetual Futures | Trade with Ambient on Fogo`;
+    }, [marketIdWithFallback]);
+
+    // const ogImageSquare = useMemo(() => {
+    //     return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
+    // }, [marketIdWithFallback]);
 
     return (
         <>
             <title>{title}</title>
+            <meta property='og:type' content='website' />
+            <meta property='og:title' content={ogTitle} />
+            <meta property='og:description' content={ogDescription} />
             <meta property='og:image' content={ogImageRectangle} />
-            <meta property='og:image:width' content='1200' />
-            <meta property='og:image:height' content='630' />
-            <meta property='og:image' content={ogImageSquare} />
-            <meta property='og:image:width' content='1200' />
-            <meta property='og:image:height' content='1200' />
+            <meta property='og:url' content={linkUrl} />
+            <meta property='og:image:alt' content={ogDescription} />
+
+            <meta name='twitter:card' content='summary_large_image' />
+            <meta name='twitter:site' content='@ambient_finance' />
+            <meta name='twitter:creator' content='@ambient_finance' />
+            <meta name='twitter:title' content={ogTitle} />
+            <meta name='twitter:description' content={ogDescription} />
+            <meta name='twitter:image' content={ogImageRectangle} />
+            <meta name='twitter:image:alt' content={ogDescription} />
+            <meta name='twitter:url' content={linkUrl} />
+
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
