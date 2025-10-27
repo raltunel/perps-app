@@ -128,17 +128,6 @@ export function meta() {
         },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
-
-        {
-            name: 'twitter:card',
-            content: 'summary_large_image',
-        },
-        {
-            name: 'twitter:image',
-            content: 'https://embindexer.net/ember/on-ambient-sq/BTC',
-        },
-        { name: 'twitter:image:width', content: '1200' },
-        { name: 'twitter:image:height', content: '1200' },
     ];
 }
 
