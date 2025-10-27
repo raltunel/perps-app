@@ -64,7 +64,7 @@ export default function CodeTabs(props: PropsIF) {
 
     const [_copiedData, copy] = useClipboard();
 
-    const [totVolume, setTotVolume] = useState<number | undefined>(11111);
+    const [totVolume, setTotVolume] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         if (
@@ -75,6 +75,10 @@ export default function CodeTabs(props: PropsIF) {
             setEditModeReferral(true);
         }
     }, [referralStore.cached, totVolume]);
+
+    useEffect(() => {
+        console.log('[CodeTabs] totVolume changed:', totVolume);
+    }, [totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -179,79 +183,95 @@ export default function CodeTabs(props: PropsIF) {
 
     useEffect(() => {
         if (!affiliateAddress) {
-            console.log(
-                '[CodeTabs] No wallet address available, skipping volume fetch',
-            );
+            //     console.log(
+            //         '[CodeTabs] No wallet address available, skipping volume fetch',
+            //     );
             return;
         }
 
-        // Mock data for testing (commenting out slow endpoint)
-        console.log(
-            '[CodeTabs] Using mock data for address:',
-            affiliateAddress.toString(),
-        );
+        // // Mock data for testing (commenting out slow endpoint)
+        // console.log(
+        //     '[CodeTabs] Using mock data for address:',
+        //     affiliateAddress.toString(),
+        // );
 
-        const isSpecialAddress =
-            affiliateAddress.toString() ===
-            '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-        const volume = isSpecialAddress ? 5000 : 12596092.5695223;
+        // const isSpecialAddress =
+        //     affiliateAddress.toString() ===
+        //     '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
+        // const volume = !isSpecialAddress ? 5000 : 12596092.5695223;
 
-        const data = {
-            count: 1,
-            leaderboard: [
-                {
-                    account_value: 63.2143537767362,
-                    maker_count: 20,
-                    maker_count_24h: 0,
-                    maker_percentage: 0.496862479109711,
-                    maker_percentage_24h: 0,
-                    maker_volume: 62585.2578118827,
-                    maker_volume_24h: 1.73328018604479e-12,
-                    pnl: -6898.47370522326,
-                    rank: 0,
-                    roi: -75.0783850982263,
-                    taker_count: 577,
-                    taker_count_24h: 0,
-                    taker_percentage: 99.5031375208903,
-                    taker_percentage_24h: 0,
-                    taker_volume: 12533507.3117104,
-                    taker_volume_24h: 1.07860387288383e-11,
-                    total_deposits: 9188.361865,
-                    user: affiliateAddress.toString(),
-                    volume: volume,
-                    volume_24h: 0,
-                },
-            ],
-            sort: 'pnl',
-            stale: true,
-            updated_at: 1761330689,
-        };
+        // const data = {
+        //     count: 1,
+        //     leaderboard: [
+        //         {
+        //             account_value: 63.2143537767362,
+        //             maker_count: 20,
+        //             maker_count_24h: 0,
+        //             maker_percentage: 0.496862479109711,
+        //             maker_percentage_24h: 0,
+        //             maker_volume: 62585.2578118827,
+        //             maker_volume_24h: 1.73328018604479e-12,
+        //             pnl: -6898.47370522326,
+        //             rank: 0,
+        //             roi: -75.0783850982263,
+        //             taker_count: 577,
+        //             taker_count_24h: 0,
+        //             taker_percentage: 99.5031375208903,
+        //             taker_percentage_24h: 0,
+        //             taker_volume: 12533507.3117104,
+        //             taker_volume_24h: 1.07860387288383e-11,
+        //             total_deposits: 9188.361865,
+        //             user: affiliateAddress.toString(),
+        //             volume: volume,
+        //             volume_24h: 0,
+        //         },
+        //     ],
+        //     sort: 'pnl',
+        //     stale: true,
+        //     updated_at: 1761330689,
+        // };
 
-        if (data.leaderboard && data.leaderboard.length > 0) {
-            const volume = data.leaderboard[0].volume;
-            console.log('[CodeTabs] Setting volume to:', volume);
-            setTotVolume(volume);
-        }
+        // if (data.leaderboard && data.leaderboard.length > 0) {
+        //     const volume = data.leaderboard[0].volume;
+        //     console.log('[CodeTabs] Setting volume to:', volume);
+        //     setTotVolume(volume);
+        // }
 
         // Real fetch (commented out due to slow endpoint)
-        // (async () => {
-        //     try {
-        //         console.log('[CodeTabs] Starting volume fetch for address:', affiliateAddress.toString());
-        //         const response = await fetch(`https://ember-leaderboard.liquidity.tools/leaderboard/${affiliateAddress.toString()}`);
-        //         console.log('[CodeTabs] Received response, parsing JSON...');
-        //         const data = await response.json();
-        //         console.log('[CodeTabs] Data parsed:', data);
-        //         if (data.leaderboard && data.leaderboard.length > 0) {
-        //             const volume = data.leaderboard[0].volume;
-        //             console.log('[CodeTabs] Setting volume to:', volume);
-        //             setTotVolume(volume);
-        //         } else {
-        //             console.log('[CodeTabs] No leaderboard data found');
-        //         }
-        //     } catch (error) {
-        //         console.error('[CodeTabs] Error fetching volume:', error);
-        //     }
-        // })();
+        (async () => {
+            console.log('running');
+            try {
+                console.log('querying...');
+                const EMBER_EDNPOINT_ALL =
+                    'https://ember-leaderboard.liquidity.tools/leaderboard';
+                const emberEndpointForUser =
+                    EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
+                console.log(
+                    '[CodeTabs] Starting volume fetch for address:',
+                    affiliateAddress.toString(),
+                );
+                const response = await fetch(emberEndpointForUser);
+                console.log('[CodeTabs] Received response, parsing JSON...');
+                const data = await response.json();
+                console.log(
+                    '[CodeTabs] Full data object:',
+                    JSON.stringify(data, null, 2),
+                );
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    const volume = data.leaderboard[0].volume;
+                    console.log(
+                        '[CodeTabs] Full leaderboard entry:',
+                        JSON.stringify(data.leaderboard[0], null, 2),
+                    );
+                    console.log('[CodeTabs] Setting volume to:', volume);
+                    setTotVolume(volume);
+                } else {
+                    console.log('[CodeTabs] No leaderboard data found');
+                }
+            } catch (error) {
+                console.error('[CodeTabs] Error fetching volume:', error);
+            }
+        })();
     }, [affiliateAddress]);
 
     // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
@@ -721,7 +741,13 @@ export default function CodeTabs(props: PropsIF) {
                             </p>
                         </>
                     ) : (
-                        <h6>{t('referrals.createAnAffiliateCode')}</h6>
+                        <>
+                            {totVolume !== undefined && totVolume < 10000 ? (
+                                <p>Must have at least $10,000 in volume</p>
+                            ) : (
+                                <h6>{t('referrals.createAnAffiliateCode')}</h6>
+                            )}
+                        </>
                     )}
                 </div>
                 {totVolume !== undefined && totVolume >= 10000 && (
