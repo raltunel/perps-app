@@ -77,17 +77,13 @@ const SymbolInfo: React.FC = React.memo(() => {
         return `https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
-    const maxLeverage = useMemo(() => {
-        return symbolInfo?.maxLeverage;
-    }, [symbolInfo]);
-
     const ogTitle = useMemo(() => {
-        return `Trade ${marketId || ''} Up To ${maxLeverage || ''}x Leverage`;
-    }, [marketId, maxLeverage]);
+        return `Trade ${marketIdWithFallback} Futures with Ambient on Fogo`;
+    }, [marketIdWithFallback]);
 
     const ogDescription = useMemo(() => {
-        return `${marketId ? marketId + ' | ' : ''} Perpetual Futures | Trade on Ambient`;
-    }, [marketId]);
+        return `${marketIdWithFallback} Perpetual Futures | Trade with Ambient on Fogo`;
+    }, [marketIdWithFallback]);
 
     // const ogImageSquare = useMemo(() => {
     //     return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
