@@ -120,22 +120,26 @@ export function meta() {
 
     const ogImageRectangle = 'https://embindexer.net/ember/on-ambient/BTC';
     const linkUrl = 'https://perps.ambient.finance';
+
+    const ogTitle = 'Trade BTC Futures with Ambient on Fogo';
+    const ogDescription = 'BTC Perpetual Futures | Trade with Ambient on Fogo';
+
     return [
         { title: t('meta.title') },
         { property: 'og:type', content: 'website' },
-        { property: 'og:title', content: t('meta.title') },
-        { property: 'og:description', content: t('meta.content') },
+        { property: 'og:title', content: ogTitle },
+        { property: 'og:description', content: ogDescription },
         { property: 'og:image', content: ogImageRectangle },
         { property: 'og:url', content: linkUrl },
-        { property: 'og:image:alt', content: t('meta.title') },
+        { property: 'og:image:alt', content: ogDescription },
 
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:site', content: '@ambient_finance' },
         { name: 'twitter:creator', content: '@ambient_finance' },
-        { name: 'twitter:title', content: t('meta.title') },
-        { name: 'twitter:description', content: t('meta.content') },
+        { name: 'twitter:title', content: ogTitle },
+        { name: 'twitter:description', content: ogDescription },
         { name: 'twitter:image', content: ogImageRectangle },
-        { name: 'twitter:image:alt', content: t('meta.title') },
+        { name: 'twitter:image:alt', content: ogDescription },
         { name: 'twitter:url', content: linkUrl },
     ];
 }
