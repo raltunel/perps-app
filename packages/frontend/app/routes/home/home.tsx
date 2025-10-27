@@ -129,13 +129,12 @@ export function meta() {
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
 
-        // Square OG image (1200x1200)
         {
-            property: 'og:image',
+            name: 'twitter:image',
             content: 'https://embindexer.net/ember/on-ambient-sq/BTC',
         },
-        { property: 'og:image:width', content: '1200' },
-        { property: 'og:image:height', content: '1200' },
+        { name: 'twitter:image:width', content: '1200' },
+        { name: 'twitter:image:height', content: '1200' },
     ];
 }
 

@@ -70,9 +70,9 @@ const SymbolInfo: React.FC = React.memo(() => {
     }, [symbolInfo?.markPx, marketId, titleOverride]);
 
     const ogImageRectangle = useMemo(() => {
-        // return `https://perps.ambient.finance/images/og/${marketIdWithFallback.toLowerCase()}-on-ambient.png`;
         return `https://embindexer.net/ember/on-ambient/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
+
     const ogImageSquare = useMemo(() => {
         return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
@@ -80,12 +80,14 @@ const SymbolInfo: React.FC = React.memo(() => {
     return (
         <>
             <title>{title}</title>
+            <meta name='twitter:title' content={title} />
+            <meta property='og:title' content={title} />
             <meta property='og:image' content={ogImageRectangle} />
             <meta property='og:image:width' content='1200' />
             <meta property='og:image:height' content='630' />
-            <meta property='og:image' content={ogImageSquare} />
-            <meta property='og:image:width' content='1200' />
-            <meta property='og:image:height' content='1200' />
+            <meta name='twitter:image' content={ogImageSquare} />
+            <meta name='twitter:image:width' content='1200' />
+            <meta name='twitter:image:height' content='1200' />
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
