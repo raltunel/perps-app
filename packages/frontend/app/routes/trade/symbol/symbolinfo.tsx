@@ -80,10 +80,19 @@ const SymbolInfo: React.FC = React.memo(() => {
     return (
         <>
             <title>{title}</title>
+            <meta property='og:type' content='website' />
             <meta property='og:title' content={title} />
             <meta property='og:description' content={title} />
             <meta property='og:image' content={ogImageRectangle} />
             <meta property='og:url' content={'https://perps.ambient.finance'} />
+            <meta name='twitter:card' content='summary_large_image' />
+            <meta name='twitter:site' content='@ambient_finance' />
+            <meta name='twitter:creator' content='@ambient_finance' />
+            <meta name='twitter:title' content={title} />
+            <meta name='twitter:description' content={title} />
+            <meta name='twitter:image' content={ogImageRectangle} />
+            <meta name='twitter:image:alt' content={title} />
+
             {/* <meta property='og:image:alt' content={title} />
             <meta property='og:image:width' content='1200' />
             <meta property='og:image:height' content='630' /> */}
