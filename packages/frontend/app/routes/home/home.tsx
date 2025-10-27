@@ -131,6 +131,7 @@ export function meta() {
 
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:site', content: '@ambient_finance' },
+        { name: 'twitter:creator', content: '@ambient_finance' },
         { name: 'twitter:title', content: t('meta.title') },
         { name: 'twitter:description', content: t('meta.content') },
         { name: 'twitter:image', content: ogImageRectangle },

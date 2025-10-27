@@ -93,6 +93,7 @@ const SymbolInfo: React.FC = React.memo(() => {
 
             <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:site' content='@ambient_finance' />
+            <meta name='twitter:creator' content='@ambient_finance' />
             <meta name='twitter:title' content={title} />
             <meta name='twitter:description' content={title} />
             <meta name='twitter:image' content={ogImageRectangle} />
