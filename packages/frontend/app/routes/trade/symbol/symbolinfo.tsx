@@ -77,6 +77,14 @@ const SymbolInfo: React.FC = React.memo(() => {
         return `https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
+    const ogTitle = useMemo(() => {
+        return `Trade ${marketId ? marketId + ' | ' : ''} Perps on Ambient`;
+    }, [marketId]);
+
+    const ogDescription = useMemo(() => {
+        return `${marketId ? marketId + ' | ' : ''} Perpetual Futures | Trade on Ambient`;
+    }, [marketId]);
+
     // const ogImageSquare = useMemo(() => {
     //     return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
     // }, [marketIdWithFallback]);
@@ -85,19 +93,19 @@ const SymbolInfo: React.FC = React.memo(() => {
         <>
             <title>{title}</title>
             <meta property='og:type' content='website' />
-            <meta property='og:title' content={title} />
-            <meta property='og:description' content={title} />
+            <meta property='og:title' content={ogTitle} />
+            <meta property='og:description' content={ogDescription} />
             <meta property='og:image' content={ogImageRectangle} />
             <meta property='og:url' content={linkUrl} />
-            <meta property='og:image:alt' content={title} />
+            <meta property='og:image:alt' content={ogTitle} />
 
             <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:site' content='@ambient_finance' />
             <meta name='twitter:creator' content='@ambient_finance' />
-            <meta name='twitter:title' content={title} />
-            <meta name='twitter:description' content={title} />
+            <meta name='twitter:title' content={ogTitle} />
+            <meta name='twitter:description' content={ogDescription} />
             <meta name='twitter:image' content={ogImageRectangle} />
-            <meta name='twitter:image:alt' content={title} />
+            <meta name='twitter:image:alt' content={ogTitle} />
             <meta name='twitter:url' content={linkUrl} />
 
             <div className={styles.symbolInfoContainer}>
