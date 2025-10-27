@@ -86,12 +86,12 @@ const SymbolInfo: React.FC = React.memo(() => {
             <meta property='og:image:width' content='1200' />
             <meta property='og:image:height' content='630' />
             <meta name='twitter:card' content='summary_large_image' />
-            <meta name='twitter:image' content={ogImageRectangle} />
+            {/* <meta name='twitter:image' content={ogImageRectangle} />
             <meta name='twitter:image:width' content='1200' />
-            <meta name='twitter:image:height' content='630' />
-            {/* <meta name='twitter:image' content={ogImageSquare} />
+            <meta name='twitter:image:height' content='630' /> */}
+            <meta name='twitter:image' content={ogImageSquare} />
             <meta name='twitter:image:width' content='1200' />
-            <meta name='twitter:image:height' content='1200' /> */}
+            <meta name='twitter:image:height' content='1200' />
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
