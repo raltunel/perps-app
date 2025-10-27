@@ -77,9 +77,13 @@ const SymbolInfo: React.FC = React.memo(() => {
         return `https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
+    const maxLeverage = useMemo(() => {
+        return symbolInfo?.maxLeverage;
+    }, [symbolInfo]);
+
     const ogTitle = useMemo(() => {
-        return `Trade ${marketId ? marketId + ' | ' : ''} Perps on Ambient`;
-    }, [marketId]);
+        return `Trade ${marketId || ''} Up To ${maxLeverage || ''}x Leverage`;
+    }, [marketId, maxLeverage]);
 
     const ogDescription = useMemo(() => {
         return `${marketId ? marketId + ' | ' : ''} Perpetual Futures | Trade on Ambient`;
