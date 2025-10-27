@@ -73,9 +73,13 @@ const SymbolInfo: React.FC = React.memo(() => {
         return `https://embindexer.net/ember/on-ambient/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
 
-    const ogImageSquare = useMemo(() => {
-        return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
+    const linkUrl = useMemo(() => {
+        return `https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`;
     }, [marketIdWithFallback]);
+
+    // const ogImageSquare = useMemo(() => {
+    //     return `https://embindexer.net/ember/on-ambient-sq/${marketIdWithFallback}`;
+    // }, [marketIdWithFallback]);
 
     return (
         <>
@@ -84,40 +88,17 @@ const SymbolInfo: React.FC = React.memo(() => {
             <meta property='og:title' content={title} />
             <meta property='og:description' content={title} />
             <meta property='og:image' content={ogImageRectangle} />
-            <meta
-                property='og:url'
-                content={`https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`}
-            />
+            <meta property='og:url' content={linkUrl} />
             <meta property='og:image:alt' content={title} />
-            {/* 
-                        <meta property='og:image:width' content='1200' />
-                        <meta property='og:image:height' content='630' /> */}
 
             <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:site' content='@ambient_finance' />
-            <meta name='twitter:creator' content='@ambient_finance' />
             <meta name='twitter:title' content={title} />
             <meta name='twitter:description' content={title} />
             <meta name='twitter:image' content={ogImageRectangle} />
             <meta name='twitter:image:alt' content={title} />
-            <meta
-                name='twitter:url'
-                content={`https://perps.ambient.finance/v2/trade/${marketIdWithFallback}`}
-            />
-            {/* <meta name='twitter:title' content={title} /> */}
-            {/* <meta name='twitter:card' content='summary_large_image' />
-            <meta name='twitter:image' content={ogImageSquare} />
-            <meta name='twitter:image:width' content='1200' />
-            <meta name='twitter:image:height' content='1200' />
-            <meta name='twitter:image:alt' content={title} />
-            <meta name='twitter:description' content={title} />
-            <meta name='twitter:site' content='@ambient_finance' />
-            <meta name='twitter:creator' content='@ambient_finance' />
-            <meta
-                name='twitter:url'
-                content={'https://perps.ambient.finance'}
-            />
-            <meta name='twitter:domain' content={'perps.ambient.finance'} /> */}
+            <meta name='twitter:url' content={linkUrl} />
+
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}

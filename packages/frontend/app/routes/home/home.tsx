@@ -117,17 +117,25 @@ const tokenData: TokenData[] = [
 
 export function meta() {
     const { t } = useTranslation();
+
+    const ogImageRectangle = 'https://embindexer.net/ember/on-ambient/BTC';
+    const linkUrl = 'https://perps.ambient.finance';
     return [
         { title: t('meta.title') },
-        { name: 'description', content: t('meta.content') },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:title', content: t('meta.title') },
+        { property: 'og:description', content: t('meta.content') },
+        { property: 'og:image', content: ogImageRectangle },
+        { property: 'og:url', content: linkUrl },
+        { property: 'og:image:alt', content: t('meta.title') },
 
-        // Rectangular OG image (1200x630)
-        {
-            property: 'og:image',
-            content: 'https://embindexer.net/ember/on-ambient/BTC',
-        },
-        { property: 'og:image:width', content: '1200' },
-        { property: 'og:image:height', content: '630' },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:site', content: '@ambient_finance' },
+        { name: 'twitter:title', content: t('meta.title') },
+        { name: 'twitter:description', content: t('meta.content') },
+        { name: 'twitter:image', content: ogImageRectangle },
+        { name: 'twitter:image:alt', content: t('meta.title') },
+        { name: 'twitter:url', content: linkUrl },
     ];
 }
 
