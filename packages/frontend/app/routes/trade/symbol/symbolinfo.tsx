@@ -80,14 +80,15 @@ const SymbolInfo: React.FC = React.memo(() => {
     return (
         <>
             <title>{title}</title>
-            <meta name='twitter:title' content={title} />
             <meta property='og:title' content={title} />
-            <meta property='og:image' content={ogImageRectangle} />
-            <meta property='og:image:width' content='1200' />
-            <meta property='og:image:height' content='630' />
-            <meta property='og:image:alt' content={title} />
             <meta property='og:description' content={title} />
-            <meta name='twitter:card' content='summary_large_image' />
+            <meta property='og:image' content={ogImageRectangle} />
+            <meta property='og:url' content={'https://perps.ambient.finance'} />
+            {/* <meta property='og:image:alt' content={title} />
+            <meta property='og:image:width' content='1200' />
+            <meta property='og:image:height' content='630' /> */}
+            {/* <meta name='twitter:title' content={title} /> */}
+            {/* <meta name='twitter:card' content='summary_large_image' />
             <meta name='twitter:image' content={ogImageSquare} />
             <meta name='twitter:image:width' content='1200' />
             <meta name='twitter:image:height' content='1200' />
@@ -99,7 +100,7 @@ const SymbolInfo: React.FC = React.memo(() => {
                 name='twitter:url'
                 content={'https://perps.ambient.finance'}
             />
-            <meta name='twitter:domain' content={'perps.ambient.finance'} />
+            <meta name='twitter:domain' content={'perps.ambient.finance'} /> */}
             <div className={styles.symbolInfoContainer}>
                 <div
                     className={styles.symbolSelector}
