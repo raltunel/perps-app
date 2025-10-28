@@ -212,31 +212,16 @@ export default function CodeTabs(props: PropsIF) {
                 const data = await response.json();
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     const volume = data.leaderboard[0].volume;
-                    console.log(
-                        '[CodeTabs] Successfully fetched volume:',
-                        data,
-                    );
-                    console.log(
-                        '[CodeTabs] Successfully fetched volume:',
-                        volume,
-                    );
                     setTotVolume(volume);
                 }
             } catch (error) {
                 clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
-                console.error('[CodeTabs] Error fetching volume:', error);
-                console.log(totVolume);
                 setTotVolume(NaN);
             } finally {
                 setIsFetchingVolume(false);
             }
         })();
     }, [affiliateAddress]);
-
-    useEffect(
-        () => console.log('[CodeTabs] totVolume: ', totVolume),
-        [totVolume],
-    );
 
     // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
@@ -254,10 +239,6 @@ export default function CodeTabs(props: PropsIF) {
                         await Fuul.isAffiliateCodeFree(userInputRefCode);
                     setIsUserRefCodeClaimed(!isCodeFree);
                 } catch (error) {
-                    console.error(
-                        '[CodeTabs] Error checking referral code:',
-                        error,
-                    );
                     setIsUserRefCodeClaimed(false);
                 }
             })();
@@ -298,10 +279,6 @@ export default function CodeTabs(props: PropsIF) {
                     setEditModeReferral(false);
                 }
             } catch (error) {
-                console.error(
-                    '[CodeTabs] Error validating cached code:',
-                    error,
-                );
                 // On error, assume invalid to be safe
                 setIsCachedValueValid(false);
                 setEditModeReferral(true);
@@ -322,20 +299,6 @@ export default function CodeTabs(props: PropsIF) {
                     <h6>{t('referrals.enterCode')}</h6>
                 )}
             </div>
-            {(() => {
-                console.log('[CodeTabs] Edit button conditions:', {
-                    userIsConverted,
-                    'referralStore.cached': referralStore.cached,
-                    'totVolume !== undefined': totVolume !== undefined,
-                    'totVolume < 10000': totVolume < 10000,
-                    totVolume,
-                    showButton:
-                        referralStore.cached &&
-                        totVolume !== undefined &&
-                        totVolume < 10000,
-                });
-                return null;
-            })()}
             {referralStore.cached &&
                 totVolume !== undefined &&
                 totVolume < 10000 && (
@@ -355,10 +318,6 @@ export default function CodeTabs(props: PropsIF) {
         return checkForPermittedCharacters(temporaryAffiliateCode);
     }, [temporaryAffiliateCode]);
 
-    // const [refCodeLength, setRefCodeLength] = useState<number>(
-    //     referralStore.cached.length,
-    // );
-
     const enterNewCodeElem = (
         <section className={styles.sectionWithButton}>
             <div className={styles.enterCodeContent}>
@@ -371,22 +330,10 @@ export default function CodeTabs(props: PropsIF) {
                     </span>
                 </h6>
                 <input
-                    // ref={updateReferralCodeInputRef}
                     type='text'
-                    // defaultValue={referralStore.cached}
                     value={userInputRefCode}
                     onChange={(e) => setUserInputRefCode(e.target.value)}
-                    // onChange={async (e) => {
-                    //     // set refCodeLength to length of input
-                    //     // setRefCodeLength(e.target.value.length);
-                    //     // determine if ref code exists in FUUL system
-                    //     const isCachedCodeFree: boolean =
-                    //         await Fuul.isAffiliateCodeFree(e.target.value);
-                    //     setInvalidCode(isCachedCodeFree ? e.target.value : '');
-                    // }}
                 />
-                {/* <div c
-                 */}
                 {!isUserRefCodeClaimed &&
                     userInputRefCode.length <= 30 &&
                     userInputRefCode.length >= 2 && (
@@ -465,7 +412,6 @@ export default function CodeTabs(props: PropsIF) {
                     setUserIsConverted(false);
                 }
             } else {
-                console.error('No wallet connected');
                 setAffiliateCode('');
             }
         })();
@@ -492,10 +438,6 @@ export default function CodeTabs(props: PropsIF) {
                 );
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
             } catch (error) {
-                console.error(
-                    '[CodeTabs] Error checking affiliate code availability:',
-                    error,
-                );
                 setIsTemporaryAffiliateCodeValid(false);
             }
         }, 500);
@@ -516,7 +458,6 @@ export default function CodeTabs(props: PropsIF) {
                     sessionState.sessionPublicKey;
 
                 if (!userWalletKey) {
-                    console.error('No wallet connected');
                     return;
                 }
 
@@ -554,10 +495,6 @@ export default function CodeTabs(props: PropsIF) {
                     setTemporaryAffiliateCode('');
                     setAffiliateCode(temporaryAffiliateCode);
                 } catch (error) {
-                    console.error(
-                        'Error signing message or creating affiliate code:',
-                        error,
-                    );
                     throw error;
                 }
             }
@@ -575,7 +512,6 @@ export default function CodeTabs(props: PropsIF) {
                     sessionState.sessionPublicKey;
 
                 if (!userWalletKey) {
-                    console.error('No wallet connected');
                     return;
                 }
 
@@ -796,7 +732,7 @@ export default function CodeTabs(props: PropsIF) {
                                 setTemporaryAffiliateCode('');
                             }}
                         >
-                            {t('common.cancel')}1
+                            {t('common.cancel')}
                         </SimpleButton>
                     )}
                 </div>
