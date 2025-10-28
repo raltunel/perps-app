@@ -1,14 +1,25 @@
-a {
+/* Ensure this module is imported and applied */
+.styles {
+    display: contents;
+}
+
+:global(p) a,
+:global(li) a,
+:global(span) a {
     color: var(--accent1);
     text-decoration: underline;
     cursor: pointer;
 }
 
-a:hover {
+:global(p) a:hover,
+:global(li) a:hover,
+:global(span) a:hover {
     color: var(--accent1-dark);
     text-decoration: underline;
 }
 
-a:visited {
+:global(p) a:visited,
+:global(li) a:visited,
+:global(span) a:visited {
     color: var(--accent1-dark);
 }
