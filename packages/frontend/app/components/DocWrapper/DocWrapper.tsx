@@ -12,7 +12,7 @@ function DocWrapper(props: DocWrapperProps) {
     return (
         <div className={`${styles.container}`}>
             <div className={styles.innerContainer}>
-                <div>
+                <div className={styles.titleSection}>
                     <header>{title}</header>
                     {lastUpdated && (
                         <p className={styles.lastUpdated}>

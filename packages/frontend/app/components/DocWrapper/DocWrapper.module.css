@@ -5,6 +5,10 @@
     padding: var(--margin-xl) 0;
 }
 
+.titleSection {
+    padding: 0 var(--padding-xl);
+}
+
 .innerContainer header {
     color: #fff;
     font-size: var(--font-size-xl, 36px);
