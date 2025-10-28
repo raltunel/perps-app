@@ -835,13 +835,12 @@ export default function CodeTabs(props: PropsIF) {
             // handlers for entering a referral code
             case 'referrals.enterCode':
             case 'common.enter':
-                if (typeof isFetchingVolume !== 'boolean') {
+                // Show spinner while fetching (undefined or true)
+                if (isFetchingVolume !== false) {
                     return spinner;
-                } else if (
-                    !isFetchingVolume &&
-                    totVolume &&
-                    totVolume > 10000
-                ) {
+                }
+                // Only show content/error when fetch is complete (isFetchingVolume === false)
+                if (totVolume && totVolume > 10000) {
                     return <div>Sorry, too much volume</div>;
                 }
                 const shouldShowInput =
@@ -854,6 +853,10 @@ export default function CodeTabs(props: PropsIF) {
             // handlers for creating an affiliate code
             case 'referrals.createCode':
             case 'common.create':
+                // Show spinner while fetching (undefined or true)
+                if (isSessionEstablished && isFetchingVolume !== false) {
+                    return spinner;
+                }
                 return affiliateCodeElem;
             // handlers for claiming rewards
             case 'common.claim':
