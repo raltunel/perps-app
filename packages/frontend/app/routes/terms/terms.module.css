@@ -1,3 +1,8 @@
+/* Ensure this module is imported and applied */
+.styles {
+    display: contents;
+}
+
 :global(p) a,
 :global(li) a,
 :global(span) a {
