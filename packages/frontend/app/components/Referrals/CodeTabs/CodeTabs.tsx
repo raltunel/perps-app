@@ -617,7 +617,7 @@ export default function CodeTabs(props: PropsIF) {
                                 )}
                                 <div className={styles.clipboard_wrapper}>
                                     {justCopied ? (
-                                        <LuCopyCheck size={14} />
+                                        <FaCheck size={14} />
                                     ) : (
                                         <LuCopy size={14} />
                                     )}
