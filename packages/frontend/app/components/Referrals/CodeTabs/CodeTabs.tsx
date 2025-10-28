@@ -16,7 +16,7 @@ import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
-import { FaCheck } from 'react-icons/fa';
+import { FaCheck, FaSpinner } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
 import { LuCopy, LuCopyCheck } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
@@ -53,6 +53,7 @@ export default function CodeTabs(props: PropsIF) {
     const [affiliateCode, setAffiliateCode] = useState('');
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
+    const affiliateAddress = userDataStore.userAddress;
     const referralStore = useReferralStore();
 
     const { t } = useTranslation();
@@ -75,10 +76,6 @@ export default function CodeTabs(props: PropsIF) {
             setEditModeReferral(true);
         }
     }, [referralStore.cached, totVolume]);
-
-    useEffect(() => {
-        console.log('[CodeTabs] totVolume changed:', totVolume);
-    }, [totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -104,6 +101,7 @@ export default function CodeTabs(props: PropsIF) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
+    // this holds an improperly formatted ref code to provide user feedback
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
@@ -166,7 +164,6 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [narrowScreenForCopy]);
 
-    const affiliateAddress = userDataStore.userAddress;
     const prevAffiliateAddress = useRef<string | undefined>(undefined);
 
     useEffect(() => {
@@ -181,98 +178,65 @@ export default function CodeTabs(props: PropsIF) {
         prevAffiliateAddress.current = affiliateAddress?.toString();
     }, [affiliateAddress]);
 
+    const [isFetchingVolume, setIsFetchingVolume] = useState<
+        boolean | undefined
+    >(undefined);
+
     useEffect(() => {
         if (!affiliateAddress) {
-            //     console.log(
-            //         '[CodeTabs] No wallet address available, skipping volume fetch',
-            //     );
             return;
         }
 
-        // // Mock data for testing (commenting out slow endpoint)
-        // console.log(
-        //     '[CodeTabs] Using mock data for address:',
-        //     affiliateAddress.toString(),
-        // );
-
-        // const isSpecialAddress =
-        //     affiliateAddress.toString() ===
-        //     '4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy';
-        // const volume = !isSpecialAddress ? 5000 : 12596092.5695223;
-
-        // const data = {
-        //     count: 1,
-        //     leaderboard: [
-        //         {
-        //             account_value: 63.2143537767362,
-        //             maker_count: 20,
-        //             maker_count_24h: 0,
-        //             maker_percentage: 0.496862479109711,
-        //             maker_percentage_24h: 0,
-        //             maker_volume: 62585.2578118827,
-        //             maker_volume_24h: 1.73328018604479e-12,
-        //             pnl: -6898.47370522326,
-        //             rank: 0,
-        //             roi: -75.0783850982263,
-        //             taker_count: 577,
-        //             taker_count_24h: 0,
-        //             taker_percentage: 99.5031375208903,
-        //             taker_percentage_24h: 0,
-        //             taker_volume: 12533507.3117104,
-        //             taker_volume_24h: 1.07860387288383e-11,
-        //             total_deposits: 9188.361865,
-        //             user: affiliateAddress.toString(),
-        //             volume: volume,
-        //             volume_24h: 0,
-        //         },
-        //     ],
-        //     sort: 'pnl',
-        //     stale: true,
-        //     updated_at: 1761330689,
-        // };
-
-        // if (data.leaderboard && data.leaderboard.length > 0) {
-        //     const volume = data.leaderboard[0].volume;
-        //     console.log('[CodeTabs] Setting volume to:', volume);
-        //     setTotVolume(volume);
-        // }
-
-        // Real fetch (commented out due to slow endpoint)
         (async () => {
-            console.log('running');
+            setIsFetchingVolume(true);
+            // TEMPORARY: 5 second timeout - remove this block to revert
+            const TIMEOUT_MS = 5000;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+            // END TEMPORARY
+
             try {
-                console.log('querying...');
                 const EMBER_EDNPOINT_ALL =
                     'https://ember-leaderboard.liquidity.tools/leaderboard';
                 const emberEndpointForUser =
                     EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
-                console.log(
-                    '[CodeTabs] Starting volume fetch for address:',
-                    affiliateAddress.toString(),
-                );
-                const response = await fetch(emberEndpointForUser);
-                console.log('[CodeTabs] Received response, parsing JSON...');
+
+                // TEMPORARY: Pass signal to fetch - remove signal parameter to revert
+                const response = await fetch(emberEndpointForUser, {
+                    signal: controller.signal,
+                });
+                // END TEMPORARY
+
+                clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
+
                 const data = await response.json();
-                console.log(
-                    '[CodeTabs] Full data object:',
-                    JSON.stringify(data, null, 2),
-                );
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     const volume = data.leaderboard[0].volume;
                     console.log(
-                        '[CodeTabs] Full leaderboard entry:',
-                        JSON.stringify(data.leaderboard[0], null, 2),
+                        '[CodeTabs] Successfully fetched volume:',
+                        data,
                     );
-                    console.log('[CodeTabs] Setting volume to:', volume);
+                    console.log(
+                        '[CodeTabs] Successfully fetched volume:',
+                        volume,
+                    );
                     setTotVolume(volume);
-                } else {
-                    console.log('[CodeTabs] No leaderboard data found');
                 }
             } catch (error) {
+                clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
                 console.error('[CodeTabs] Error fetching volume:', error);
+                console.log(totVolume);
+                setTotVolume(NaN);
+            } finally {
+                setIsFetchingVolume(false);
             }
         })();
     }, [affiliateAddress]);
+
+    useEffect(
+        () => console.log('[CodeTabs] totVolume: ', totVolume),
+        [totVolume],
+    );
 
     // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
@@ -284,18 +248,10 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (userInputRefCode.length) {
             (async () => {
-                console.log(
-                    '[CodeTabs] Checking referral code:',
-                    userInputRefCode,
-                );
                 try {
                     // check with FUUL to determine if ref code is claimed
                     const isCodeFree: boolean =
                         await Fuul.isAffiliateCodeFree(userInputRefCode);
-                    console.log(
-                        '[CodeTabs] Referral code is free:',
-                        isCodeFree,
-                    );
                     setIsUserRefCodeClaimed(!isCodeFree);
                 } catch (error) {
                     console.error(
@@ -327,23 +283,17 @@ export default function CodeTabs(props: PropsIF) {
 
         (async () => {
             try {
-                console.log(
-                    '[CodeTabs] Validating cached referral code:',
-                    referralStore.cached,
-                );
                 const isCachedCodeFree: boolean =
                     await Fuul.isAffiliateCodeFree(referralStore.cached);
 
                 if (isCachedCodeFree) {
                     // Code is not claimed - show in edit mode with error
-                    console.log('[CodeTabs] Cached code is not claimed');
                     setInvalidCode(referralStore.cached);
                     setIsCachedValueValid(false);
                     setEditModeReferral(true);
                     setUserInputRefCode(referralStore.cached);
                 } else {
                     // Code is valid and claimed
-                    console.log('[CodeTabs] Cached code is valid');
                     setIsCachedValueValid(true);
                     setEditModeReferral(false);
                 }
@@ -372,8 +322,21 @@ export default function CodeTabs(props: PropsIF) {
                     <h6>{t('referrals.enterCode')}</h6>
                 )}
             </div>
-            {!userIsConverted &&
-                referralStore.cached &&
+            {(() => {
+                console.log('[CodeTabs] Edit button conditions:', {
+                    userIsConverted,
+                    'referralStore.cached': referralStore.cached,
+                    'totVolume !== undefined': totVolume !== undefined,
+                    'totVolume < 10000': totVolume < 10000,
+                    totVolume,
+                    showButton:
+                        referralStore.cached &&
+                        totVolume !== undefined &&
+                        totVolume < 10000,
+                });
+                return null;
+            })()}
+            {referralStore.cached &&
                 totVolume !== undefined &&
                 totVolume < 10000 && (
                     <div className={styles.refferal_code_buttons}>
@@ -523,15 +486,10 @@ export default function CodeTabs(props: PropsIF) {
 
         // Set up debounced validation
         const timer = setTimeout(async () => {
-            console.log(
-                '[CodeTabs] Checking affiliate code:',
-                temporaryAffiliateCode,
-            );
             try {
                 const codeIsFree = await Fuul.isAffiliateCodeFree(
                     temporaryAffiliateCode,
                 );
-                console.log('[CodeTabs] Code is free:', codeIsFree);
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
             } catch (error) {
                 console.error(
@@ -872,14 +830,20 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     const renderTabContent = (): JSX.Element => {
+        const spinner = <FaSpinner />;
         switch (activeTab) {
+            // handlers for entering a referral code
             case 'referrals.enterCode':
             case 'common.enter':
-                // Show input form when:
-                // - User is in edit mode
-                // - There's no cached code
-                // - Cached code was validated as invalid
-                // AND user has sufficient volume
+                if (typeof isFetchingVolume !== 'boolean') {
+                    return spinner;
+                } else if (
+                    !isFetchingVolume &&
+                    totVolume &&
+                    totVolume > 10000
+                ) {
+                    return <div>Sorry, too much volume</div>;
+                }
                 const shouldShowInput =
                     (editModeReferral ||
                         !referralStore.cached ||
@@ -887,11 +851,14 @@ export default function CodeTabs(props: PropsIF) {
                     totVolume !== undefined &&
                     totVolume < 10000;
                 return shouldShowInput ? enterNewCodeElem : currentCodeElem;
+            // handlers for creating an affiliate code
             case 'referrals.createCode':
             case 'common.create':
                 return affiliateCodeElem;
+            // handlers for claiming rewards
             case 'common.claim':
                 return claimElem;
+            // default fallback
             default:
                 return (
                     <div className={styles.emptyState}>
