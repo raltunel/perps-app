@@ -18,7 +18,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
 import { FaCheck, FaSpinner } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
-import { LuCopy, LuCopyCheck } from 'react-icons/lu';
+import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
 
 interface PropsIF {
