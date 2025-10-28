@@ -9,9 +9,11 @@ function DocWrapper(props: DocWrapperProps) {
     const { children, title } = props;
 
     return (
-        <div className={`${styles.container} ${styles.fullScreen} `}>
-            <header>{title}</header>
-            <div className={styles.content}>{children}</div>
+        <div className={`${styles.container}`}>
+            <div className={styles.innerContainer}>
+                <header>{title}</header>
+                <div className={styles.docContent}>{children}</div>
+            </div>
         </div>
     );
 }
