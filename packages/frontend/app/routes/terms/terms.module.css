@@ -1,14 +1,17 @@
-a {
+:global(p) a,
+:global(li) a {
     color: var(--accent1);
     text-decoration: underline;
     cursor: pointer;
 }
 
-a:hover {
+:global(p) a:hover,
+:global(li) a:hover {
     color: var(--accent1-dark);
     text-decoration: underline;
 }
 
-a:visited {
+:global(p) a:visited,
+:global(li) a:visited {
     color: var(--accent1-dark);
 }
