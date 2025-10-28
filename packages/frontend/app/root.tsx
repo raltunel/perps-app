@@ -300,8 +300,8 @@ export default function App() {
                     }
                     return !IS_RESTRICTED_SITE;
                 }}
-                termsOfServiceUrl='https://ambient.finance/terms'
-                privacyPolicyUrl='https://ambient.finance/privacy'
+                termsOfServiceUrl='/v2/terms'
+                privacyPolicyUrl='/v2/privacy'
             >
                 <AppProvider>
                     <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>

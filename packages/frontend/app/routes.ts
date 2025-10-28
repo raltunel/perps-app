@@ -72,7 +72,7 @@ export default [
 
     route('*', 'routes/notFound/notFound.tsx'),
 
-    // route('v2/terms', 'routes/terms/terms.tsx'),
+    route('v2/terms', 'routes/terms/terms.tsx'),
 
     route('v2/privacy', 'routes/privacy/privacy.tsx'),
 ] satisfies RouteConfig;

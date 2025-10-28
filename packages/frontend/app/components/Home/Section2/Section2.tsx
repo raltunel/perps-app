@@ -109,8 +109,8 @@ export default function Section2() {
         {
             label: 'Terms of Service',
             text: 'Our rules for using the platform',
-            link: TERMS_OF_SERVICE_LINK,
-            linkLabel: 'ambient.finance/terms',
+            link: 'v2/terms',
+            linkLabel: 'perps.ambient.finance/terms',
             icon: <IoDocumentTextSharp />,
         },
         {

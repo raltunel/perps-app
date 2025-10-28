@@ -3,7 +3,7 @@ import styles from './privacy.module.css';
 
 export default function Privacy() {
     return (
-        <DocWrapper title='Privacy Policy'>
+        <DocWrapper title='Privacy Policy' lastUpdated='May 24, 2023'>
             <p>
                 This Privacy Policy describes how Crocodile Labs Inc. d/b/a
                 Ambient (&quot;
