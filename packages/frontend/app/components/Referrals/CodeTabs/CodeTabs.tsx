@@ -830,7 +830,23 @@ export default function CodeTabs(props: PropsIF) {
     );
 
     const renderTabContent = (): JSX.Element => {
-        const spinner = <FaSpinner />;
+        const spinner = (
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '100%',
+                }}
+            >
+                <FaSpinner
+                    style={{
+                        color: 'var(--accent1)',
+                        animation: 'spin 0.6s linear infinite',
+                    }}
+                />
+            </div>
+        );
         switch (activeTab) {
             // handlers for entering a referral code
             case 'referrals.enterCode':
@@ -841,7 +857,23 @@ export default function CodeTabs(props: PropsIF) {
                 }
                 // Only show content/error when fetch is complete (isFetchingVolume === false)
                 if (totVolume && totVolume > 10000) {
-                    return <div>Sorry, too much volume</div>;
+                    return (
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: '100%',
+                                color: 'var(--text2)',
+                                padding: 'var(--padding-m, 16px)',
+                                textAlign: 'center',
+                                lineHeight: '1.5',
+                            }}
+                        >
+                            Only users with less than $10,000 in trading volume
+                            can enter a referral code.
+                        </div>
+                    );
                 }
                 const shouldShowInput =
                     (editModeReferral ||
