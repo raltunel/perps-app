@@ -1,0 +1,14 @@
+a {
+    color: var(--accent1);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+a:hover {
+    color: var(--accent1-dark);
+    text-decoration: underline;
+}
+
+a:visited {
+    color: var(--accent1-dark);
+}
