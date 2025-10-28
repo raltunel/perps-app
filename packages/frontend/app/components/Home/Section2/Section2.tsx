@@ -116,8 +116,8 @@ export default function Section2() {
         {
             label: 'Privacy Policy',
             text: 'View our policies around data',
-            link: PRIVACY_POLICY_LINK,
-            linkLabel: 'ambient.finance/privacy',
+            link: '/v2/privacy',
+            linkLabel: 'perps.ambient.finance/privacy',
             icon: <IoDocumentTextSharp />,
         },
         // {
