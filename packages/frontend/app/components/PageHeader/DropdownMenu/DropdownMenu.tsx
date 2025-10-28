@@ -1,4 +1,4 @@
-import { FaDiscord, FaCommentAlt } from 'react-icons/fa';
+import { FaDiscord, FaCommentAlt, FaFile, FaUserSecret } from 'react-icons/fa';
 import { RiTwitterXFill } from 'react-icons/ri';
 // import { IoIosInformationCircle } from 'react-icons/io';
 // import { useTutorial } from '~/hooks/useTutorial';
@@ -40,6 +40,16 @@ const DropdownMenu = ({
             name: t('feedback.menuLabel'),
             icon: <FaCommentAlt />,
             onClick: handleFeedbackClick,
+        },
+        {
+            name: t('docs.menuPrivacy'),
+            icon: <FaUserSecret />,
+            url: '/v2/privacy',
+        },
+        {
+            name: t('docs.menuTerms'),
+            icon: <FaFile />,
+            url: '/v2/terms',
         },
         // { name: 'Medium', icon: <FaMediumM /> },
         // { name: 'Privacy', icon: <FaUserSecret /> },

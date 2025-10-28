@@ -1,9 +1,11 @@
 import DocWrapper from '~/components/DocWrapper/DocWrapper';
 import styles from './privacy.module.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Privacy() {
+    const { t } = useTranslation();
     return (
-        <DocWrapper title='Privacy Policy' lastUpdated='May 24, 2023'>
+        <DocWrapper title={t('docs.privacy')} lastUpdated='May 24, 2023'>
             <p>
                 This Privacy Policy describes how Crocodile Labs Inc. d/b/a
                 Ambient (&quot;

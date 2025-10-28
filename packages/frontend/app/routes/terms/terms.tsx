@@ -1,12 +1,11 @@
 import DocWrapper from '~/components/DocWrapper/DocWrapper';
 import styles from './terms.module.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Privacy() {
+    const { t } = useTranslation();
     return (
-        <DocWrapper
-            title='CROCODILE Labs Terms of Service'
-            lastUpdated='May 24, 2023'
-        >
+        <DocWrapper title={t('docs.terms')} lastUpdated='May 24, 2023'>
             <p>
                 These Terms of Use (these “
                 <span style={{ fontWeight: 'bold' }}>Terms</span>”) govern your
