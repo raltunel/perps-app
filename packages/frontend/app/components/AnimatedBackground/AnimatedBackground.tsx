@@ -1,4 +1,4 @@
-import styles from './animatedBackground.module.css';
+import styles from './AnimatedBackground.module.css';
 import AnimatedPath from '../Home/Hero/AnimatedPath';
 
 type Props = {
