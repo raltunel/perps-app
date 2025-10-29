@@ -68,8 +68,10 @@ export default function CodeTabs(props: PropsIF) {
     const { formatNum } = useNumFormatter();
     const [totVolume, setTotVolume] = useState<number | undefined>(undefined);
     const totVolumeFormatted = useMemo<string>(() => {
-        if (!totVolume) {
+        if (totVolume === undefined) {
             return '';
+        } else if (Number.isNaN(totVolume)) {
+            return formatNum(0, 2, true, true);
         }
         return formatNum(totVolume, totVolume < 0.01 ? 3 : 2, true, true);
     }, [totVolume, formatNum]);
@@ -211,7 +213,9 @@ export default function CodeTabs(props: PropsIF) {
 
                 const data = await response.json();
                 console.log('Full Ember API response:', data);
-                if (data.leaderboard && data.leaderboard.length > 0) {
+                if (data.error) {
+                    setTotVolume(0);
+                } else if (data.leaderboard && data.leaderboard.length > 0) {
                     const volume = data.leaderboard[0].volume;
                     setTotVolume(volume);
                 }
