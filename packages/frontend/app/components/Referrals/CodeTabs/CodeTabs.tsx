@@ -68,6 +68,10 @@ export default function CodeTabs(props: PropsIF) {
     const [totVolume, setTotVolume] = useState<number | undefined>(undefined);
 
     useEffect(() => {
+        console.log('totVolume:', totVolume);
+    }, [totVolume]);
+
+    useEffect(() => {
         if (
             !referralStore.cached &&
             totVolume !== undefined &&
@@ -210,6 +214,7 @@ export default function CodeTabs(props: PropsIF) {
                 clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
 
                 const data = await response.json();
+                console.log('Full Ember API response:', data);
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     const volume = data.leaderboard[0].volume;
                     setTotVolume(volume);
@@ -587,62 +592,59 @@ export default function CodeTabs(props: PropsIF) {
     }
 
     const affiliateCodeElem = isSessionEstablished ? (
-        (affiliateCode && !editModeAffiliate) ||
-        (totVolume !== undefined && totVolume < 10000) ? (
+        totVolume !== undefined && totVolume < 10000 ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
-                    {affiliateCode ? (
-                        <>
-                            <p>
-                                {t('referrals.yourCodeIs', { affiliateCode })}
-                            </p>
-                            <div
-                                className={styles.with_copy_clipboard}
-                                style={{
-                                    backgroundColor: justCopied
-                                        ? 'var(--green)'
-                                        : 'transparent',
-                                    transition: 'background-color 0.2s',
-                                    padding: 'var(--padding-s)',
-                                }}
-                                onClick={() => {
-                                    copy('https://' + trackingLink);
-                                    setJustCopied(true);
-                                }}
-                            >
-                                {trackingLink && (
-                                    <div className={styles.walletLink}>
-                                        {trackingLink}
-                                    </div>
-                                )}
-                                <div className={styles.clipboard_wrapper}>
-                                    {justCopied ? (
-                                        <FaCheck size={14} />
-                                    ) : (
-                                        <LuCopy size={14} />
-                                    )}
-                                </div>
+                    <p>
+                        Cannot make an affiliate code prior to $10,000 in
+                        volume.
+                    </p>
+                    <div className={styles.volume_progress_bar}>
+                        <div style={{ width: `${totVolume / 10000}%` }} />
+                    </div>
+                </div>
+            </section>
+        ) : affiliateCode && !editModeAffiliate ? (
+            <section className={styles.sectionWithButton}>
+                <div className={styles.createCodeContent}>
+                    <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
+                    <div
+                        className={styles.with_copy_clipboard}
+                        style={{
+                            backgroundColor: justCopied
+                                ? 'var(--green)'
+                                : 'transparent',
+                            transition: 'background-color 0.2s',
+                            padding: 'var(--padding-s)',
+                        }}
+                        onClick={() => {
+                            copy('https://' + trackingLink);
+                            setJustCopied(true);
+                        }}
+                    >
+                        {trackingLink && (
+                            <div className={styles.walletLink}>
+                                {trackingLink}
                             </div>
-                            <p className={styles.trackingLinkExplanation}>
-                                <Trans
-                                    i18nKey='referrals.trackingLinkExplanation'
-                                    values={{
-                                        affiliatePercent: AFFILIATE_PERCENT,
-                                        userPercent: USER_PERCENT,
-                                    }}
-                                    components={[<span />, <span />]}
-                                />
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            {totVolume !== undefined && totVolume < 10000 ? (
-                                <p>Must have at least $10,000 in volume</p>
+                        )}
+                        <div className={styles.clipboard_wrapper}>
+                            {justCopied ? (
+                                <FaCheck size={14} />
                             ) : (
-                                <h6>{t('referrals.createAnAffiliateCode')}</h6>
+                                <LuCopy size={14} />
                             )}
-                        </>
-                    )}
+                        </div>
+                    </div>
+                    <p className={styles.trackingLinkExplanation}>
+                        <Trans
+                            i18nKey='referrals.trackingLinkExplanation'
+                            values={{
+                                affiliatePercent: AFFILIATE_PERCENT,
+                                userPercent: USER_PERCENT,
+                            }}
+                            components={[<span />, <span />]}
+                        />
+                    </p>
                 </div>
                 {totVolume !== undefined && totVolume >= 10000 && (
                     <SimpleButton
@@ -743,7 +745,9 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.enterCodeContent}>
                 <h6>{t('referrals.connectYourWallet.affiliate')}</h6>
             </div>
-            <SessionButton />
+            <div className={styles.sessionButtonWrapper}>
+                <SessionButton />
+            </div>
         </section>
     );
 
@@ -761,7 +765,9 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.enterCodeContent}>
                 <h6>{t('referrals.connectYourWallet.claim')}</h6>
             </div>
-            <SessionButton />
+            <div className={styles.sessionButtonWrapper}>
+                <SessionButton />
+            </div>
         </section>
     );
 
