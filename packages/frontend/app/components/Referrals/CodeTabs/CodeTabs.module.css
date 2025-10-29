@@ -194,7 +194,7 @@
 
 .volume_progress_bar {
     height: 16px;
-    outline: 1px solid var(--text2);
+    outline: 1px solid var(--bg-dark5);
     display: flex;
     flex-direction: row;
     justify-content: flex-start;

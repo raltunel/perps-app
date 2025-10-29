@@ -20,6 +20,7 @@ import { FaCheck, FaSpinner } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
 import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface PropsIF {
     initialTab?: string;
@@ -60,12 +61,18 @@ export default function CodeTabs(props: PropsIF) {
 
     const [editModeReferral, setEditModeReferral] = useState<boolean>(false);
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
-    const [userIsConverted, setUserIsConverted] = useState<boolean>(false);
     const [justCopied, setJustCopied] = useState<boolean>(false);
 
     const [_copiedData, copy] = useClipboard();
 
+    const { formatNum } = useNumFormatter();
     const [totVolume, setTotVolume] = useState<number | undefined>(undefined);
+    const totVolumeFormatted = useMemo<string>(() => {
+        if (!totVolume) {
+            return '';
+        }
+        return formatNum(totVolume, totVolume < 0.01 ? 3 : 2, true, true);
+    }, [totVolume, formatNum]);
 
     useEffect(() => {
         console.log('totVolume:', totVolume);
@@ -193,11 +200,6 @@ export default function CodeTabs(props: PropsIF) {
 
         (async () => {
             setIsFetchingVolume(true);
-            // TEMPORARY: 5 second timeout - remove this block to revert
-            const TIMEOUT_MS = 5000;
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-            // END TEMPORARY
 
             try {
                 const EMBER_EDNPOINT_ALL =
@@ -205,13 +207,7 @@ export default function CodeTabs(props: PropsIF) {
                 const emberEndpointForUser =
                     EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
 
-                // TEMPORARY: Pass signal to fetch - remove signal parameter to revert
-                const response = await fetch(emberEndpointForUser, {
-                    signal: controller.signal,
-                });
-                // END TEMPORARY
-
-                clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
+                const response = await fetch(emberEndpointForUser);
 
                 const data = await response.json();
                 console.log('Full Ember API response:', data);
@@ -220,7 +216,6 @@ export default function CodeTabs(props: PropsIF) {
                     setTotVolume(volume);
                 }
             } catch (error) {
-                clearTimeout(timeoutId); // TEMPORARY: remove this line to revert
                 setTotVolume(NaN);
             } finally {
                 setIsFetchingVolume(false);
@@ -405,7 +400,6 @@ export default function CodeTabs(props: PropsIF) {
                     userWalletKey.toString(),
                 );
                 if (referrer?.referrer_identifier) {
-                    setUserIsConverted(true);
                     const affiliateCode = await Fuul.getAffiliateCode(
                         referrer.referrer_identifier as string,
                         UserIdentifierType.SolanaAddress,
@@ -413,8 +407,6 @@ export default function CodeTabs(props: PropsIF) {
                     if (affiliateCode) {
                         handleUpdateReferralCode(affiliateCode);
                     }
-                } else {
-                    setUserIsConverted(false);
                 }
             } else {
                 setAffiliateCode('');
@@ -596,12 +588,15 @@ export default function CodeTabs(props: PropsIF) {
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>
-                        Cannot make an affiliate code prior to $10,000 in
-                        volume.
+                        Cannot make an affiliate code prior to{' '}
+                        {formatNum(10000, 0, true, true)} in volume.
                     </p>
                     <div className={styles.volume_progress_bar}>
-                        <div style={{ width: `${totVolume / 10000}%` }} />
+                        <div
+                            style={{ width: `${(totVolume / 10000) * 100}%` }}
+                        />
                     </div>
+                    <p>Lifetime volume: {totVolumeFormatted}</p>
                 </div>
             </section>
         ) : affiliateCode && !editModeAffiliate ? (
