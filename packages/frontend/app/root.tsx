@@ -27,7 +27,7 @@ import { MarketDataProvider } from './contexts/MarketDataContext';
 import { SdkProvider } from './hooks/useSdk';
 import { TutorialProvider } from './hooks/useTutorial';
 import { UnifiedMarginDataProvider } from './hooks/useUnifiedMarginData';
-import { FogoSessionProvider } from '@fogo/sessions-sdk-react';
+import { FogoSessionProvider, Network } from '@fogo/sessions-sdk-react';
 import { WsProvider } from './contexts/WsContext';
 
 // Config
@@ -289,6 +289,7 @@ export default function App() {
         <FuulProvider>
             <Document>
                 <FogoSessionProvider
+                    network={Network.Testnet}
                     endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
                     tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}

@@ -57,6 +57,32 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
+    // --- HYDRATION GATE (add after your other useState hooks) ---
+    const [settingsHydrated, setSettingsHydrated] = useState(() => {
+        const p = (useAppSettings as any).persist;
+        return p?.hasHydrated?.() ?? false;
+    });
+
+    useEffect(() => {
+        const p = (useAppSettings as any).persist;
+        if (!p) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // If already hydrated (e.g., navigated within SPA)
+        if (p.hasHydrated?.()) {
+            setSettingsHydrated(true);
+            return;
+        }
+
+        // Wait until persist finishes hydration
+        const unsub = p.onFinishHydration?.(() => setSettingsHydrated(true));
+        return () => {
+            unsub && unsub();
+        };
+    }, []);
+    // --- end HYDRATION GATE ---
 
     // close when clicking outside Positions tab + menu
     const posWrapRef = useOutsideClick<HTMLDivElement>(
@@ -99,11 +125,12 @@ export default function Trade() {
     const { t } = useTranslation();
     const symbolRef = useRef<string>(symbol);
     symbolRef.current = symbol;
-    // add refs near the other refs
-    const lastColHeightRef = useRef<number | null>(null);
-    const lastWinInnerHeightRef = useRef<number>(
-        typeof window !== 'undefined' ? window.innerHeight : 0,
-    );
+
+    const setHeightLocalOnly = (h: number) => {
+        setChartTopHeightLocal(h);
+        chartTopHeightRef.current = h;
+    };
+    const didInitRef = useRef(false);
 
     const {
         orderBookMode,
@@ -211,6 +238,8 @@ export default function Trade() {
     const hasUserOverrideRef = useRef<boolean>(false);
 
     const chartTopHeightRef = useRef<number>(chartTopHeight);
+    const wasDraggingRef = useRef(false);
+    const wasDraggingRightRef = useRef(false);
 
     const orderInputStartHeightRef = useRef<number>(450);
     const orderInputHeightRef = useRef<number>(450);
@@ -390,15 +419,11 @@ export default function Trade() {
 
         // Only update if there's a significant difference
         if (Math.abs(targetOrderInputHeight - orderInputHeight) > 5) {
-            console.log('📦 Adjusting for wallet state:', {
-                isWalletCollapsed,
-                targetWalletHeight,
-                targetOrderInputHeight,
-            });
             setOrderInputHeightBoth(targetOrderInputHeight);
         }
     }, [isWalletCollapsed]);
-    // On mount / when store changes:
+
+    // MOST IMPORTANT EFFECT IN HANDLING TRADE LAYOUT
     // This effect sets up the chart/table split whenever the component mounts or when storedHeight changes. If there’s no saved height, it falls back to the default layout. If there is one, it restores the user’s preferred height (clamped if needed) and remembers their ratio.
     useEffect(() => {
         const col = leftColRef.current;
@@ -409,27 +434,53 @@ export default function Trade() {
         const available = Math.max(0, total - gap);
         const max = Math.max(CHART_MIN, total - TABLE_COLLAPSED - gap);
         setMaxTop(max);
-
         if (storedHeight == null) {
-            // DEFAULT MODE: no user override, no persistence, no ratio
-            hasUserOverrideRef.current = false;
-            userRatioRef.current = null;
-            requestAnimationFrame(setDefaultFromLayout);
+            if (isUserConnected) {
+                // Connected + no saved preference → open to default table height (195px)
+                const desiredTable = Math.max(TABLE_MIN, TABLE_DEFAULT); // 195
+                const targetTop = Math.min(
+                    Math.max(CHART_MIN, available - desiredTable),
+                    max,
+                );
+                // set default height as preference in local storage so we initialize with it and not session
+                setHeightLocalOnly(targetTop);
+                setChartTopHeight(targetTop);
+
+                // remember ratio so future resizes keep intent
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? targetTop / available : null;
+            } else {
+                //  Not connected + no saved preference → keep your current collapsed behavior
+                const snapTo = Math.min(
+                    Math.max(CHART_MIN, available - TABLE_COLLAPSED),
+                    max,
+                );
+                setHeightLocalOnly(snapTo);
+
+                hasUserOverrideRef.current = true;
+                userRatioRef.current =
+                    available > 0 ? snapTo / available : null;
+            }
         } else {
+            // Return user to their saved preference (collapsed or not)
             const clamped = Math.min(Math.max(storedHeight, CHART_MIN), max);
             setChartTopHeightLocal(clamped);
             if (clamped !== storedHeight) setChartTopHeight(clamped);
-
             hasUserOverrideRef.current = true;
             userRatioRef.current = available > 0 ? clamped / available : null;
         }
-    }, [storedHeight, setDefaultFromLayout, setChartTopHeight]);
+
+        didInitRef.current = true;
+    }, [storedHeight, setChartTopHeight, isUserConnected]);
 
     // Recompute (or clamp) when the left column resizes
     useEffect(() => {
         let raf = 0;
 
         const apply = () => {
+            if (!didInitRef.current) return;
+
             const col = leftColRef.current;
             if (!col) return;
 
@@ -715,10 +766,19 @@ export default function Trade() {
             'button, [role="tab"], [data-tab], [data-action], a, input, select, textarea, [contenteditable="true"], [data-ensure-open]',
         );
 
+    // Early return while settings are hydrating to avoid first-paint jump
+    if (!settingsHydrated)
+        return <div style={{ height: '100%', minHeight: '100%' }} />;
+
     // Mobile view
     if (isMobile && symbol) {
         return (
-            <>
+            <motion.div
+                key='trade-hydrated-mobile'
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18 }}
+            >
                 <TradeRouteHandler />
                 <WebDataConsumer />
                 <div className={styles.symbolInfoContainer}>
@@ -770,67 +830,13 @@ export default function Trade() {
                         display: activeTab === 'positions' ? 'block' : 'none',
                     }}
                 >
-                    {/* Sticky dropdown header inside the scrollable section */}
-                    {/* <div className={styles.mobilePositionsSwitcher}>
-                        <button
-                            type='button'
-                            aria-haspopup='listbox'
-                            aria-expanded={mobilePortfolioMenuOpen}
-                            className={styles.mobilePositionsSwitcherBtn}
-                            onClick={() =>
-                                setMobilePortfolioMenuOpen((v) => !v)
-                            }
-                        >
-                            <span
-                                className={styles.mobilePositionsSwitcherDot}
-                                aria-hidden
-                            />
-                            {currentMobileLabel}
-                            <svg
-                                className={styles.mobilePositionsSwitcherChev}
-                                width='14'
-                                height='14'
-                                viewBox='0 0 24 24'
-                            >
-                                <path
-                                    d='M7 10l5 5 5-5'
-                                    fill='none'
-                                    stroke='currentColor'
-                                    strokeWidth='2'
-                                />
-                            </svg>
-                        </button>
-
-                        {mobilePortfolioMenuOpen && (
-                            <div
-                                role='listbox'
-                                className={styles.mobilePositionsSwitcherMenu}
-                            >
-                                {MOBILE_OPTIONS.map((opt) => (
-                                    <button
-                                        key={opt}
-                                        role='option'
-                                        aria-selected={selectedTradeTab === opt}
-                                        className={`${styles.mobilePositionsSwitcherItem} ${selectedTradeTab === opt ? styles.active : ''}`}
-                                        onClick={() => {
-                                            setSelectedTradeTab(opt); // 👈 drive the same store TradeTable uses
-                                            setMobilePortfolioMenuOpen(false);
-                                        }}
-                                    >
-                                        {MOBILE_VIEW_LABELS[opt]}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div> */}
-
                     {/* Hide TradeTable's own tabs & allow ANY subtable on mobile */}
                     {(activeTab === 'positions' ||
                         visibilityRefs.current.positions) && (
                         <MemoizedTradeTable mobileExternalSwitcher />
                     )}
                 </div>
-            </>
+            </motion.div>
         );
     }
     return (
@@ -838,7 +844,14 @@ export default function Trade() {
             <TradeRouteHandler />
             <WebDataConsumer />
             {symbol && (
-                <div className={styles.containerNew} id='tradePageRoot'>
+                <motion.div
+                    key='trade-hydrated'
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.18 }}
+                    className={styles.containerNew}
+                    id='tradePageRoot'
+                >
                     {/* LEFT COLUMN */}
                     <div
                         className={styles.leftCol}
@@ -855,12 +868,16 @@ export default function Trade() {
                             }}
                             onResizeStart={() => {
                                 startHeightRef.current = chartTopHeight;
+                                wasDraggingRef.current = false;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
                                 const tentative = clamp(
                                     startHeightRef.current + d.height,
                                 );
                                 setChartTopHeightLocal(tentative);
+                                // mark as dragging after a tiny threshold to filter out clicks
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRef.current = true;
 
                                 const available = getAvailable();
                                 if (available && available > 0) {
@@ -869,6 +886,12 @@ export default function Trade() {
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                if (
+                                    !wasDraggingRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
+
                                 const next = clamp(
                                     startHeightRef.current + d.height,
                                 );
@@ -1052,6 +1075,7 @@ export default function Trade() {
                             onResizeStart={() => {
                                 orderInputStartHeightRef.current =
                                     orderInputHeight;
+                                wasDraggingRightRef.current = false;
                             }}
                             onResize={(e, dir, ref, d: NumberSize) => {
                                 const tentative =
@@ -1061,8 +1085,9 @@ export default function Trade() {
 
                                 // live height update while dragging
                                 setOrderInputHeight(clamped);
+                                if (Math.abs(d.height) >= 2)
+                                    wasDraggingRightRef.current = true;
 
-                                // >>> NEW: flip wallet content immediately based on live height
                                 const available = getRightColAvailable();
                                 if (available && available > 0) {
                                     const walletHeight =
@@ -1078,7 +1103,7 @@ export default function Trade() {
                                         setIsWalletCollapsed(true);
                                     }
 
-                                    // re-expand only after we're clearly above collapsed height (hysteresis)
+                                    // re-expand only after we're clearly above collapsed height
                                     if (
                                         walletHeight >=
                                             WALLET_COLLAPSED +
@@ -1091,6 +1116,12 @@ export default function Trade() {
                                 }
                             }}
                             onResizeStop={(e, dir, ref, d: NumberSize) => {
+                                // ⛔️ ignore click / micro move
+                                if (
+                                    !wasDraggingRightRef.current ||
+                                    Math.abs(d.height) < 2
+                                )
+                                    return;
                                 const next =
                                     orderInputStartHeightRef.current + d.height;
                                 const available = getRightColAvailable();
@@ -1202,7 +1233,7 @@ export default function Trade() {
                         </motion.button>
                     </div>
                     {PortfolioModalsRenderer}
-                </div>
+                </motion.div>
             )}
             <AdvancedTutorialController
                 isEnabled={showTutorial}
