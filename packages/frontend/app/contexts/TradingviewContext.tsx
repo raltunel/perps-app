@@ -226,172 +226,175 @@ export const TradingViewProvider: React.FC<{
         if (!isCustomized) changeColors(getBsColor());
     }, [bsColor, chart]);
 
-    const initChart = useCallback(async () => {
-        if (typeof window === 'undefined') return;
+    const initChart = useCallback(
+        async (symbolOverride?: string) => {
+            if (typeof window === 'undefined') return;
 
-        if (!info || !tradingviewLib?.widget) return;
+            if (!info || !tradingviewLib?.widget) return;
 
-        dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
+            dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 
-        const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
+            const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
 
-        const tvWidget = new tradingviewLib.widget({
-            container: 'tv_chart',
-            library_path: defaultProps.libraryPath,
-            timezone: 'Etc/UTC',
-            symbol: processedSymbol,
-            fullscreen: false,
-            autosize: true,
-            datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1D') as ResolutionString,
-            disabled_features: [
-                'volume_force_overlay',
-                'header_symbol_search',
-                'header_compare',
-                ...(chartState
-                    ? [
-                          'create_volume_indicator_by_default' as TradingTerminalFeatureset,
-                      ]
-                    : []),
-            ],
-            favorites: {
-                intervals: ['5', '1h', 'D'] as ResolutionString[],
-            },
-            locale: mapI18nToTvLocale(i18n.language) as LanguageCode,
-            theme: 'dark',
-            custom_themes: customThemes(),
-            overrides: {
-                volumePaneSize: 'medium',
-                'paneProperties.background': '#0e0e14',
-                'paneProperties.backgroundGradientStartColor': '#0e0e14',
-                'paneProperties.backgroundGradientEndColor': '#0e0e14',
-            },
-            custom_css_url: './../tradingview-overrides.css',
-            loading_screen: { backgroundColor: '#0e0e14' },
-            saved_data: chartState ? chartState.chartLayout : undefined,
-            // load_last_chart:false,
-            time_frames: [
-                { text: '5y', resolution: '1w' as ResolutionString },
-                { text: '1y', resolution: '1w' as ResolutionString },
-                { text: '6m', resolution: '120' as ResolutionString },
-                { text: '3m', resolution: '60' as ResolutionString },
-                { text: '1m', resolution: '30' as ResolutionString },
-                { text: '5d', resolution: '5' as ResolutionString },
-                { text: '1d', resolution: '1' as ResolutionString },
-            ],
-            custom_formatters: {
-                priceFormatterFactory: priceFormatterFactory,
-            },
-        });
+            const tvWidget = new tradingviewLib.widget({
+                container: 'tv_chart',
+                library_path: defaultProps.libraryPath,
+                timezone: 'Etc/UTC',
+                symbol: symbolOverride || processedSymbol,
+                fullscreen: false,
+                autosize: true,
+                datafeed: dataFeedRef.current as IBasicDataFeed,
+                interval: (chartState?.interval || '1D') as ResolutionString,
+                disabled_features: [
+                    'volume_force_overlay',
+                    'header_symbol_search',
+                    'header_compare',
+                    ...(chartState
+                        ? [
+                              'create_volume_indicator_by_default' as TradingTerminalFeatureset,
+                          ]
+                        : []),
+                ],
+                favorites: {
+                    intervals: ['5', '1h', 'D'] as ResolutionString[],
+                },
+                locale: mapI18nToTvLocale(i18n.language) as LanguageCode,
+                theme: 'dark',
+                custom_themes: customThemes(),
+                overrides: {
+                    volumePaneSize: 'medium',
+                    'paneProperties.background': '#0e0e14',
+                    'paneProperties.backgroundGradientStartColor': '#0e0e14',
+                    'paneProperties.backgroundGradientEndColor': '#0e0e14',
+                },
+                custom_css_url: './../tradingview-overrides.css',
+                loading_screen: { backgroundColor: '#0e0e14' },
+                saved_data: chartState ? chartState.chartLayout : undefined,
+                // load_last_chart:false,
+                time_frames: [
+                    { text: '5y', resolution: '1w' as ResolutionString },
+                    { text: '1y', resolution: '1w' as ResolutionString },
+                    { text: '6m', resolution: '120' as ResolutionString },
+                    { text: '3m', resolution: '60' as ResolutionString },
+                    { text: '1m', resolution: '30' as ResolutionString },
+                    { text: '5d', resolution: '5' as ResolutionString },
+                    { text: '1d', resolution: '1' as ResolutionString },
+                ],
+                custom_formatters: {
+                    priceFormatterFactory: priceFormatterFactory,
+                },
+            });
 
-        tvWidget.headerReady().then(() => {
-            setChartLoadingStatus('ready');
-        });
-        // tvWidget.headerReady().then(() => {
-        //     const liquidationsButton = tvWidget.createButton();
+            tvWidget.headerReady().then(() => {
+                setChartLoadingStatus('ready');
+            });
+            // tvWidget.headerReady().then(() => {
+            //     const liquidationsButton = tvWidget.createButton();
 
-        //     let isToggled = false;
+            //     let isToggled = false;
 
-        //     const updateButtonStyle = () => {
-        //         const svg = getLiquidationsSvgIcon(
-        //             isToggled ? '#7371fc' : '#cbcaca',
-        //         );
-        //         liquidationsButton.style.color = isToggled
-        //             ? '#7371fc'
-        //             : '#cbcaca';
+            //     const updateButtonStyle = () => {
+            //         const svg = getLiquidationsSvgIcon(
+            //             isToggled ? '#7371fc' : '#cbcaca',
+            //         );
+            //         liquidationsButton.style.color = isToggled
+            //             ? '#7371fc'
+            //             : '#cbcaca';
 
-        //         liquidationsButton.innerHTML = `
-        //             <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
-        //               ${svg}
-        //              <span style="padding-left:3px"> Liquidations
-        //              </span>`;
-        //     };
+            //         liquidationsButton.innerHTML = `
+            //             <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
+            //               ${svg}
+            //              <span style="padding-left:3px"> Liquidations
+            //              </span>`;
+            //     };
 
-        //     updateButtonStyle();
+            //     updateButtonStyle();
 
-        //     const onClick = () => {
-        //         isToggled = !isToggled;
-        //         updateButtonStyle();
+            //     const onClick = () => {
+            //         isToggled = !isToggled;
+            //         updateButtonStyle();
 
-        //         if (isToggled) {
-        //             console.log('Open');
-        //         } else {
-        //             console.log('Close');
-        //         }
-        //     };
-        //     const onMouseEnter = () => {
-        //         const wrapper = liquidationsButton.querySelector(
-        //             '.liquidations-wrapper',
-        //         ) as HTMLDivElement;
-        //         if (wrapper) {
-        //             wrapper.style.backgroundColor = '#313030';
-        //         }
-        //     };
-        //     const onMouseLeave = () => {
-        //         const wrapper = liquidationsButton.querySelector(
-        //             '.liquidations-wrapper',
-        //         ) as HTMLDivElement;
-        //         if (wrapper) wrapper.style.backgroundColor = 'transparent';
-        //     };
+            //         if (isToggled) {
+            //             console.log('Open');
+            //         } else {
+            //             console.log('Close');
+            //         }
+            //     };
+            //     const onMouseEnter = () => {
+            //         const wrapper = liquidationsButton.querySelector(
+            //             '.liquidations-wrapper',
+            //         ) as HTMLDivElement;
+            //         if (wrapper) {
+            //             wrapper.style.backgroundColor = '#313030';
+            //         }
+            //     };
+            //     const onMouseLeave = () => {
+            //         const wrapper = liquidationsButton.querySelector(
+            //             '.liquidations-wrapper',
+            //         ) as HTMLDivElement;
+            //         if (wrapper) wrapper.style.backgroundColor = 'transparent';
+            //     };
 
-        //     liquidationsButton.addEventListener('click', onClick);
-        //     liquidationsButton.addEventListener('mouseenter', onMouseEnter);
-        //     liquidationsButton.addEventListener('mouseleave', onMouseLeave);
+            //     liquidationsButton.addEventListener('click', onClick);
+            //     liquidationsButton.addEventListener('mouseenter', onMouseEnter);
+            //     liquidationsButton.addEventListener('mouseleave', onMouseLeave);
 
-        //     return () => {
-        //         liquidationsButton.removeEventListener('click', onClick);
-        //         liquidationsButton.removeEventListener(
-        //             'mouseenter',
-        //             onMouseEnter,
-        //         );
-        //         liquidationsButton.removeEventListener(
-        //             'mouseleave',
-        //             onMouseLeave,
-        //         );
-        //     };
-        // });
+            //     return () => {
+            //         liquidationsButton.removeEventListener('click', onClick);
+            //         liquidationsButton.removeEventListener(
+            //             'mouseenter',
+            //             onMouseEnter,
+            //         );
+            //         liquidationsButton.removeEventListener(
+            //             'mouseleave',
+            //             onMouseLeave,
+            //         );
+            //     };
+            // });
 
-        tvWidget.onChartReady(() => {
-            /**
-             * 0 -> main chart pane
-             * 1 -> volume chart pane
-             */
-            const volumePaneIndex = 1;
+            tvWidget.onChartReady(() => {
+                /**
+                 * 0 -> main chart pane
+                 * 1 -> volume chart pane
+                 */
+                const volumePaneIndex = 1;
 
-            const paneCount = tvWidget.activeChart().getPanes().length;
+                const paneCount = tvWidget.activeChart().getPanes().length;
 
-            if (paneCount > volumePaneIndex) {
-                const priceScale = tvWidget
-                    .activeChart()
-                    .getPanes()
-                    // eslint-disable-next-line no-unexpected-multiline
-                    [volumePaneIndex].getMainSourcePriceScale();
+                if (paneCount > volumePaneIndex) {
+                    const priceScale = tvWidget
+                        .activeChart()
+                        .getPanes()
+                        // eslint-disable-next-line no-unexpected-multiline
+                        [volumePaneIndex].getMainSourcePriceScale();
 
-                if (priceScale) {
-                    priceScale.setAutoScale(true);
-                    priceScale.setMode(0);
-                }
-            }
-
-            tvWidget.applyOverrides(defaultDrawingToolColors());
-            tvWidget
-                .chart()
-                .onIntervalChanged()
-                .subscribe(null, (interval: ResolutionString) => {
-                    setChartInterval(interval);
-                    if (typeof plausible === 'function') {
-                        plausible('Resolution Update', {
-                            props: {
-                                resolutionType: 'chart',
-                                resolution: interval,
-                            },
-                        });
+                    if (priceScale) {
+                        priceScale.setAutoScale(true);
+                        priceScale.setMode(0);
                     }
-                });
+                }
 
-            setChart(tvWidget);
-        });
-    }, [chartState, info, tradingviewLib]);
+                tvWidget.applyOverrides(defaultDrawingToolColors());
+                tvWidget
+                    .chart()
+                    .onIntervalChanged()
+                    .subscribe(null, (interval: ResolutionString) => {
+                        setChartInterval(interval);
+                        if (typeof plausible === 'function') {
+                            plausible('Resolution Update', {
+                                props: {
+                                    resolutionType: 'chart',
+                                    resolution: interval,
+                                },
+                            });
+                        }
+                    });
+
+                setChart(tvWidget);
+            });
+        },
+        [chartState, info, tradingviewLib],
+    );
 
     useEffect(() => {
         setIsChartReady(false);
@@ -414,6 +417,13 @@ export const TradingViewProvider: React.FC<{
             }
         };
     }, [chartState, info, i18n.language, initChart, tradingviewLib]);
+
+    // Fix issue triggered after URL redirection for missing symbol.
+    useEffect(() => {
+        if (symbol !== marketId) {
+            initChart(symbol);
+        }
+    }, [symbol, marketId, initChart]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
