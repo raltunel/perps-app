@@ -41,6 +41,7 @@ export const useReferralStore = create<ReferralStoreIF>()(
         {
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
+            partialize: (state) => ({ cached: state.cached }),
             version: 1,
         },
     ),
