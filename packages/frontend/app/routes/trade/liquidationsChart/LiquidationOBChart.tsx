@@ -134,6 +134,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const obBuyBlock = document.getElementById('orderbook-buy-block');
             const obSellBlock = document.getElementById('orderbook-sell-block');
             const singleRow = document.getElementById('order-sell-srow-0');
+            const slotsWrapper = document.getElementById(
+                'orderBookSlotsWrapper',
+            );
 
             // const obSellBlock = document.getElementById('orderbook-sell-block');
 
@@ -158,10 +161,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const rowCssHeight =
                 singleRow?.getBoundingClientRect().height || 16;
 
-            const gapRemainder =
-                obSellBlockHeight % (rowCssHeight + rowGap / 2);
-
-            const topGap = gapRemainder > rowGap ? gapRemainder : 0;
+            const slotsWrapperHeight =
+                slotsWrapper?.getBoundingClientRect().height || 0;
 
             const rowHeight = rowCssHeight
                 ? rowCssHeight + rowGap / 2
@@ -173,14 +174,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const diff =
                 orderCountRef.current - currentLiqSellsRef.current.length;
 
-            console.log(
-                'currentLiqSellsRef',
-                obSellBlockHeight,
-                gapRemainder,
-                rowCssHeight,
-                rowGap,
-                topGap,
-            );
+            const topPadding =
+                slotsWrapperHeight -
+                obSellBlockHeight -
+                obBuyBlockHeight -
+                midHeaderHeight;
+
+            const topGap = topPadding / 2 - rowGap / 2;
 
             if (obBuyBlockHeight === 0 || obSellBlockHeight === 0) return;
 
@@ -285,7 +285,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             //  add mid line
             const yPos =
-                obSellBlockHeight + topGap + rowGap / 2 + midHeaderHeight / 2;
+                obSellBlockHeight + topGap + rowGap + midHeaderHeight / 2;
             context.strokeStyle = '#BCBCC4';
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
