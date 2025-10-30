@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+    frontend:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: perps-frontend-dev
+        ports:
+            - '3002:3002'
+        volumes:
+            - ./packages/frontend:/app/packages/frontend
+            - ./packages/sdk:/app/packages/sdk
+            - ./public:/app/public
+            - /app/node_modules
+            - /app/packages/frontend/node_modules
+            - /app/packages/sdk/node_modules
+        environment:
+            - NODE_ENV=development
+            - PORT=3002
+        stdin_open: true
+        tty: true
