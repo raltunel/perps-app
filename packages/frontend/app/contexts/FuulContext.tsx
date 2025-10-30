@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useLocation } from 'react-router';
 import { Fuul } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
 
@@ -25,7 +24,6 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const [isInitialized, setIsInitialized] = useState(false);
-    const location = useLocation();
 
     useEffect(() => {
         console.log('fuul', { isInitialized });
@@ -42,17 +40,6 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
             }
         }
     }, [FUUL_API_KEY]);
-
-    useEffect(() => {
-        console.log({ isInitialized });
-        if (isInitialized) {
-            console.log({ location, Fuul });
-            console.log('sending pageview for: ', location.pathname);
-            Fuul.sendPageview();
-        } else {
-            localStorage.removeItem('fuul.sent_pageview');
-        }
-    }, [location, isInitialized]);
 
     const trackPageView = () => {
         if (isInitialized) {

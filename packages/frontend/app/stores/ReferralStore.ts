@@ -3,7 +3,9 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface ReferralStoreIF {
     cached: string;
+    totVolume: number | undefined;
     cache(refCode: string): void;
+    setTotVolume(volume: number | undefined): void;
     clear(): void;
 }
 
@@ -25,12 +27,15 @@ export const useReferralStore = create<ReferralStoreIF>()(
     persist(
         (set) => ({
             cached: '',
-
+            totVolume: undefined,
             cache(refCode: string): void {
                 set({ cached: refCode });
             },
+            setTotVolume(volume: number | undefined): void {
+                set({ totVolume: volume });
+            },
             clear(): void {
-                set({ cached: '' });
+                set({ cached: '', totVolume: undefined });
             },
         }),
         {

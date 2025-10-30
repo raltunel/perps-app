@@ -66,29 +66,33 @@ export default function CodeTabs(props: PropsIF) {
     const [_copiedData, copy] = useClipboard();
 
     const { formatNum } = useNumFormatter();
-    const [totVolume, setTotVolume] = useState<number | undefined>(undefined);
     const totVolumeFormatted = useMemo<string>(() => {
-        if (totVolume === undefined) {
+        if (referralStore.totVolume === undefined) {
             return '';
-        } else if (Number.isNaN(totVolume)) {
+        } else if (Number.isNaN(referralStore.totVolume)) {
             return formatNum(0, 2, true, true);
         }
-        return formatNum(totVolume, totVolume < 0.01 ? 3 : 2, true, true);
-    }, [totVolume, formatNum]);
+        return formatNum(
+            referralStore.totVolume,
+            referralStore.totVolume < 0.01 ? 3 : 2,
+            true,
+            true,
+        );
+    }, [referralStore.totVolume, formatNum]);
 
     useEffect(() => {
-        console.log('totVolume:', totVolume);
-    }, [totVolume]);
+        console.log('totVolume:', referralStore.totVolume);
+    }, [referralStore.totVolume]);
 
     useEffect(() => {
         if (
             !referralStore.cached &&
-            totVolume !== undefined &&
-            totVolume < 10000
+            referralStore.totVolume !== undefined &&
+            referralStore.totVolume < 10000
         ) {
             setEditModeReferral(true);
         }
-    }, [referralStore.cached, totVolume]);
+    }, [referralStore.cached, referralStore.totVolume]);
 
     useEffect(() => {
         if (justCopied) {
@@ -214,13 +218,13 @@ export default function CodeTabs(props: PropsIF) {
                 const data = await response.json();
                 console.log('Full Ember API response:', data);
                 if (data.error) {
-                    setTotVolume(0);
+                    referralStore.setTotVolume(0);
                 } else if (data.leaderboard && data.leaderboard.length > 0) {
                     const volume = data.leaderboard[0].volume;
-                    setTotVolume(volume);
+                    referralStore.setTotVolume(volume);
                 }
             } catch (error) {
-                setTotVolume(NaN);
+                referralStore.setTotVolume(NaN);
             } finally {
                 setIsFetchingVolume(false);
             }
@@ -304,8 +308,8 @@ export default function CodeTabs(props: PropsIF) {
                 )}
             </div>
             {referralStore.cached &&
-                totVolume !== undefined &&
-                totVolume < 10000 && (
+                referralStore.totVolume !== undefined &&
+                referralStore.totVolume < 10000 && (
                     <div className={styles.refferal_code_buttons}>
                         <SimpleButton
                             bg='accent1'
@@ -588,7 +592,8 @@ export default function CodeTabs(props: PropsIF) {
     }
 
     const affiliateCodeElem = isSessionEstablished ? (
-        totVolume !== undefined && totVolume < 10000 ? (
+        referralStore.totVolume !== undefined &&
+        referralStore.totVolume < 10000 ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>
@@ -597,7 +602,9 @@ export default function CodeTabs(props: PropsIF) {
                     </p>
                     <div className={styles.volume_progress_bar}>
                         <div
-                            style={{ width: `${(totVolume / 10000) * 100}%` }}
+                            style={{
+                                width: `${(referralStore.totVolume / 10000) * 100}%`,
+                            }}
                         />
                     </div>
                     <p>Lifetime volume: {totVolumeFormatted}</p>
@@ -645,14 +652,15 @@ export default function CodeTabs(props: PropsIF) {
                         />
                     </p>
                 </div>
-                {totVolume !== undefined && totVolume >= 10000 && (
-                    <SimpleButton
-                        bg='accent1'
-                        onClick={() => setEditModeAffiliate(true)}
-                    >
-                        {t('common.edit')}
-                    </SimpleButton>
-                )}
+                {referralStore.totVolume !== undefined &&
+                    referralStore.totVolume >= 10000 && (
+                        <SimpleButton
+                            bg='accent1'
+                            onClick={() => setEditModeAffiliate(true)}
+                        >
+                            {t('common.edit')}
+                        </SimpleButton>
+                    )}
             </section>
         ) : (
             <section className={styles.sectionWithButton}>
@@ -797,7 +805,10 @@ export default function CodeTabs(props: PropsIF) {
                     return spinner;
                 }
                 // Only show content/error when fetch is complete (isFetchingVolume === false)
-                if (totVolume && totVolume > 10000) {
+                if (
+                    referralStore.totVolume &&
+                    referralStore.totVolume > 10000
+                ) {
                     return (
                         <div
                             style={{
@@ -820,8 +831,8 @@ export default function CodeTabs(props: PropsIF) {
                     (editModeReferral ||
                         !referralStore.cached ||
                         isCachedValueValid === false) &&
-                    totVolume !== undefined &&
-                    totVolume < 10000;
+                    referralStore.totVolume !== undefined &&
+                    referralStore.totVolume < 10000;
                 return shouldShowInput ? enterNewCodeElem : currentCodeElem;
             // handlers for creating an affiliate code
             case 'referrals.createCode':

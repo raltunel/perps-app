@@ -4,6 +4,8 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import { useEffect, useRef, useState } from 'react';
+import { Fuul } from '@fuul/sdk';
+import { useFuul } from '~/contexts/FuulContext';
 // import { AiOutlineQuestionCircle } from 'react-icons/ai';
 // import {
 //     DFLT_EMBER_MARKET,
@@ -61,6 +63,8 @@ export default function PageHeader() {
     const sessionState = useSession();
 
     const isUserConnected = isEstablished(sessionState);
+
+    const { isInitialized: isFuulInitialized } = useFuul();
 
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
 
@@ -205,6 +209,19 @@ export default function PageHeader() {
 
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress, onHomePage]);
+
+    const { totVolume } = useReferralStore();
+
+    // Track page views with Fuul
+    useEffect(() => {
+        console.log({ totVolume });
+        if (isFuulInitialized && totVolume && totVolume > 10000) {
+            console.log('sending pageview for: ', location.pathname);
+            Fuul.sendPageview();
+        } else {
+            localStorage.removeItem('fuul.sent_pageview');
+        }
+    }, [location, isFuulInitialized, totVolume]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
 
