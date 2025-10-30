@@ -47,6 +47,7 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         console.log({ isInitialized });
         if (isInitialized) {
             console.log({ location, Fuul });
+            console.log('sending pageview for: ', location.pathname);
             Fuul.sendPageview();
         } else {
             localStorage.removeItem('fuul.sent_pageview');

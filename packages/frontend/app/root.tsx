@@ -51,8 +51,8 @@ import './css/index.css';
 import LogoLoadingIndicator from './components/LoadingIndicator/LogoLoadingIndicator';
 import { GlobalModalHost } from './components/Modal/GlobalModalHost';
 import { useModal } from './hooks/useModal';
-import { FuulProvider } from './contexts/FuulContext';
 import Modal from './components/Modal/Modal';
+import { FuulProvider } from './contexts/FuulContext';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component<
@@ -290,7 +290,6 @@ export default function App() {
             <Document>
                 <FogoSessionProvider
                     network={Network.Testnet}
-                    endpoint={RPC_ENDPOINT}
                     domain='https://perps.ambient.finance'
                     tokens={['fUSDNGgHkZfwckbr5RLLvRbvqvRcTLdH9hcHJiq4jry']}
                     defaultRequestedLimits={{
@@ -304,8 +303,8 @@ export default function App() {
                         }
                         return !IS_RESTRICTED_SITE;
                     }}
-                    termsOfServiceUrl='https://ambient.finance/terms'
-                    privacyPolicyUrl='https://ambient.finance/privacy'
+                    termsOfServiceUrl='/v2/terms'
+                    privacyPolicyUrl='/v2/privacy'
                 >
                     <AppProvider>
                         <WsProvider url={`${MARKET_WS_ENDPOINT}/ws`}>
