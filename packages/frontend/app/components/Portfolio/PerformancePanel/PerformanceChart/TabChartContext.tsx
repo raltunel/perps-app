@@ -84,8 +84,6 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     useEffect(() => {
         if (userAddress && !isLineDataFetched) {
             fetchUserPortfolio(userAddress).then((data) => {
-                console.log('fetched user profile line data', data);
-
                 setUserProfileLineData(() => data);
 
                 handleLineDataFetched(true);
