@@ -328,19 +328,28 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const midHeader = document.getElementById('orderBookMidHeader');
         const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
 
+        const root = document.documentElement;
+
+        const styles = getComputedStyle(root);
+
+        const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
+
         // mid gap
-        const centerY = heightRef.current / 2 + midHeaderHeight;
-        const gapSize = gap;
+        const centerY = heightRef.current / 2;
+        const gapSize = rowGap / 2;
 
         const buyYScale = d3
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([heightRef.current, centerY + gapSize]);
+            .range([
+                heightRef.current,
+                centerY + midHeaderHeight / 2 + gapSize + 1,
+            ]);
 
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - midHeaderHeight - gapSize, 0]);
+            .range([centerY - midHeaderHeight / 2 - 1, 0]);
 
         const pageYScale = d3
             .scaleLinear()
@@ -513,18 +522,26 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const midHeader = document.getElementById('orderBookMidHeader');
         const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
 
-        // Add 20px gap in center: sell area (0 to center-10px), buy area (center+10px to bottom)
-        const centerY = heightRef.current / 2 + midHeaderHeight;
-        const gapSize = gap; // 10px on each side = 20px total gap
+        const root = document.documentElement;
+
+        const styles = getComputedStyle(root);
+
+        const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
+
+        const centerY = heightRef.current / 2;
+        const gapSize = rowGap / 2;
 
         const buyYScale = d3
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([heightRef.current, centerY + gapSize]);
+            .range([
+                heightRef.current,
+                centerY + midHeaderHeight / 2 + gapSize + 1,
+            ]);
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - midHeaderHeight - gapSize, 0]);
+            .range([centerY - midHeaderHeight / 2 - 1, 0]);
 
         xScaleRef.current = xScale;
         buyYScaleRef.current = buyYScale;
@@ -764,7 +781,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const midHeader = document.getElementById('orderBookMidHeader');
         const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
 
-        const centerY = heightRef.current / 2 + midHeaderHeight;
+        const centerY = heightRef.current / 2;
 
         const isBuy = centerY < offsetY;
 
