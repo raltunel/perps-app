@@ -285,7 +285,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             //  add mid line
             const yPos =
-                obSellBlockHeight + topGap + rowGap + midHeaderHeight / 2;
+                obSellBlockHeight + topGap + rowGap + midHeaderHeight / 2 - 2;
             context.strokeStyle = '#BCBCC4';
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
