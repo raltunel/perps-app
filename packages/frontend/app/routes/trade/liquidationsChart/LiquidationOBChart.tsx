@@ -158,13 +158,29 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const rowCssHeight =
                 singleRow?.getBoundingClientRect().height || 16;
 
-            const gapRemainder = obSellBlockHeight % (rowCssHeight + rowGap);
+            const gapRemainder =
+                obSellBlockHeight % (rowCssHeight + rowGap / 2);
 
-            const topGap = gapRemainder > rowGap ? gapRemainder : rowGap;
+            const topGap = gapRemainder > rowGap ? gapRemainder : 0;
 
             const rowHeight = rowCssHeight
                 ? rowCssHeight + rowGap / 2
                 : obSellBlockHeight / orderCountRef.current;
+
+            const isSellFilled =
+                currentLiqSellsRef.current.length >= orderCountRef.current;
+
+            const diff =
+                orderCountRef.current - currentLiqSellsRef.current.length;
+
+            console.log(
+                'currentLiqSellsRef',
+                obSellBlockHeight,
+                gapRemainder,
+                rowCssHeight,
+                rowGap,
+                topGap,
+            );
 
             if (obBuyBlockHeight === 0 || obSellBlockHeight === 0) return;
 
@@ -226,7 +242,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     if (index >= orderCountRef.current) return;
 
                     const yPositionIndex =
-                        topGap + rowHeight * index - 1 + rowHeight / 2;
+                        topGap +
+                        rowHeight / 2 +
+                        rowHeight * index +
+                        (isSellFilled ? 0 : diff * rowHeight);
 
                     const xStart =
                         widthRef.current -
@@ -306,18 +325,22 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             ...currentSellData.map((d) => d.px),
         );
 
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
         // mid gap
-        const centerY = heightRef.current / 2;
+        const centerY = heightRef.current / 2 + midHeaderHeight;
         const gapSize = gap;
 
         const buyYScale = d3
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
             .range([heightRef.current, centerY + gapSize]);
+
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - gapSize, 0]);
+            .range([centerY - midHeaderHeight - gapSize, 0]);
 
         const pageYScale = d3
             .scaleLinear()
@@ -487,8 +510,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             ...currentSellData.map((d) => d.px),
         );
 
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
         // Add 20px gap in center: sell area (0 to center-10px), buy area (center+10px to bottom)
-        const centerY = heightRef.current / 2;
+        const centerY = heightRef.current / 2 + midHeaderHeight;
         const gapSize = gap; // 10px on each side = 20px total gap
 
         const buyYScale = d3
@@ -498,7 +524,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - gapSize, 0]);
+            .range([centerY - midHeaderHeight - gapSize, 0]);
 
         xScaleRef.current = xScale;
         buyYScaleRef.current = buyYScale;
@@ -735,7 +761,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const mousePoint = buyYScaleRef.current.invert(offsetY);
 
-        const centerY = heightRef.current / 2;
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
+        const centerY = heightRef.current / 2 + midHeaderHeight;
 
         const isBuy = centerY < offsetY;
 
