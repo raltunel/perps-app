@@ -1,6 +1,6 @@
 import { memo, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
-// import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
+import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
 import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useModal } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
@@ -14,7 +14,7 @@ import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
 
-// const MemoizedPerformancePanel = memo(PerformancePanel);
+const MemoizedPerformancePanel = memo(PerformancePanel);
 
 export function meta() {
     return [
@@ -224,7 +224,7 @@ function Portfolio() {
                     </div>
 
                     <section className={styles.mainContent}>
-                        {/* <MemoizedPerformancePanel /> */}
+                        <MemoizedPerformancePanel />
 
                         <div className={styles.table}>
                             <TradeTable portfolioPage />
