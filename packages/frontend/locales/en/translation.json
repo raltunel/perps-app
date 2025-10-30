@@ -414,7 +414,8 @@
         "codeAlreadyInUse": "Code Already In Use",
         "connectYourWallet": {
             "affiliate": "Connect your wallet to create an affiliate code",
-            "claim": "Connect your wallet to claim rewards"
+            "claim": "Connect your wallet to claim rewards",
+            "enterCode": "Connect your wallet to enter a referral code"
         },
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
         "selectATabToViewData": "Select a tab to view data",

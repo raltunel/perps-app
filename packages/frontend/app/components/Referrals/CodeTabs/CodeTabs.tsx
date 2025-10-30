@@ -803,6 +803,23 @@ export default function CodeTabs(props: PropsIF) {
             // handlers for entering a referral code
             case 'referrals.enterCode':
             case 'common.enter':
+                if (!isSessionEstablished) {
+                    return (
+                        <section className={styles.sectionWithButton}>
+                            <div className={styles.enterCodeContent}>
+                                <h6>
+                                    {t('referrals.connectYourWallet.enterCode')}
+                                </h6>
+                            </div>
+                            <div
+                                className={styles.sessionButtonWrapper}
+                                style={{ height: '100%' }}
+                            >
+                                <SessionButton />
+                            </div>
+                        </section>
+                    );
+                }
                 // Show spinner while fetching (undefined or true)
                 if (isFetchingVolume !== false) {
                     return spinner;
