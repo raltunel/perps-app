@@ -16,7 +16,7 @@ import { useReferralStore } from '~/stores/ReferralStore';
 import { useNarrowScreen } from '~/hooks/useMediaQuery';
 import { Trans, useTranslation } from 'react-i18next';
 import getReferrerAsync from '~/utils/functions/getReferrerAsync';
-import { FaCheck, FaSpinner } from 'react-icons/fa';
+import { FaCheck, FaRegCircle, FaSpinner } from 'react-icons/fa';
 import { GiCancel } from 'react-icons/gi';
 import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
@@ -199,37 +199,37 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
-    useEffect(() => {
-        if (!affiliateAddress) {
-            return;
-        }
+    // useEffect(() => {
+    //     if (!affiliateAddress) {
+    //         return;
+    //     }
 
-        (async () => {
-            setIsFetchingVolume(true);
+    //     (async () => {
+    //         setIsFetchingVolume(true);
 
-            try {
-                const EMBER_EDNPOINT_ALL =
-                    'https://ember-leaderboard.liquidity.tools/leaderboard';
-                const emberEndpointForUser =
-                    EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
+    //         try {
+    //             const EMBER_EDNPOINT_ALL =
+    //                 'https://ember-leaderboard.liquidity.tools/leaderboard';
+    //             const emberEndpointForUser =
+    //                 EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
 
-                const response = await fetch(emberEndpointForUser);
+    //             const response = await fetch(emberEndpointForUser);
 
-                const data = await response.json();
-                console.log('Full Ember API response:', data);
-                if (data.error) {
-                    referralStore.setTotVolume(0);
-                } else if (data.leaderboard && data.leaderboard.length > 0) {
-                    const volume = data.leaderboard[0].volume;
-                    referralStore.setTotVolume(volume);
-                }
-            } catch (error) {
-                referralStore.setTotVolume(NaN);
-            } finally {
-                setIsFetchingVolume(false);
-            }
-        })();
-    }, [affiliateAddress]);
+    //             const data = await response.json();
+    //             console.log('Full Ember API response:', data);
+    //             if (data.error) {
+    //                 referralStore.setTotVolume(0);
+    //             } else if (data.leaderboard && data.leaderboard.length > 0) {
+    //                 const volume = data.leaderboard[0].volume;
+    //                 referralStore.setTotVolume(volume);
+    //             }
+    //         } catch (error) {
+    //             referralStore.setTotVolume(NaN);
+    //         } finally {
+    //             setIsFetchingVolume(false);
+    //         }
+    //     })();
+    // }, [affiliateAddress]);
 
     // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
 
@@ -566,7 +566,7 @@ export default function CodeTabs(props: PropsIF) {
         (async () => {
             if (!affiliateCode || !affiliateAddress) return '';
             const trackingLinkUrl = await Fuul.generateTrackingLink(
-                'perps.ambient.finance',
+                window.location.hostname,
                 affiliateAddress.toString(),
                 UserIdentifierType.SolanaAddress,
             );
@@ -693,20 +693,28 @@ export default function CodeTabs(props: PropsIF) {
                         <p>2 - 30 characters</p>
                     </div>
                     <div className={styles.validation_item}>
-                        {tempAffiliateCodeCharsValidate ? (
-                            <FaCheck size={10} color='var(--green)' />
+                        {temporaryAffiliateCode.length > 0 ? (
+                            tempAffiliateCodeCharsValidate ? (
+                                <FaCheck size={10} color='var(--green)' />
+                            ) : (
+                                <GiCancel size={10} color='var(--red)' />
+                            )
                         ) : (
-                            <GiCancel size={10} color='var(--red)' />
+                            <FaRegCircle size={10} color='var(--text3)' />
                         )}
                         <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
                     </div>
                     <div className={styles.validation_item}>
-                        {isTemporaryAffiliateCodeValid === true ? (
-                            <FaCheck size={10} color='var(--green)' />
+                        {temporaryAffiliateCode.length > 0 ? (
+                            isTemporaryAffiliateCodeValid === true ? (
+                                <FaCheck size={10} color='var(--green)' />
+                            ) : (
+                                <GiCancel size={10} color='var(--red)' />
+                            )
                         ) : (
-                            <GiCancel size={10} color='var(--red)' />
+                            <FaRegCircle size={10} color='var(--text3)' />
                         )}
-                        <p>Code is currently unclaimed</p>
+                        <p>Code is available</p>
                     </div>
                     <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
                 </div>
@@ -775,7 +783,10 @@ export default function CodeTabs(props: PropsIF) {
             <div className={styles.enterCodeContent}>
                 <h6>{t('referrals.connectYourWallet.claim')}</h6>
             </div>
-            <div className={styles.sessionButtonWrapper}>
+            <div
+                className={styles.sessionButtonWrapper}
+                style={{ height: '100%' }}
+            >
                 <SessionButton />
             </div>
         </section>

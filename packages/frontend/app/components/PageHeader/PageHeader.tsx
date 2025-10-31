@@ -64,6 +64,35 @@ export default function PageHeader() {
 
     const isUserConnected = isEstablished(sessionState);
 
+    // Fetch user's total volume for FUUL tracking
+    useEffect(() => {
+        const affiliateAddress = userDataStore.userAddress;
+        if (!affiliateAddress) {
+            return;
+        }
+
+        (async () => {
+            try {
+                const EMBER_ENDPOINT_ALL =
+                    'https://ember-leaderboard.liquidity.tools/leaderboard';
+                const emberEndpointForUser =
+                    EMBER_ENDPOINT_ALL + '/' + affiliateAddress.toString();
+
+                const response = await fetch(emberEndpointForUser);
+                const data = await response.json();
+
+                if (data.error) {
+                    referralStore.setTotVolume(0);
+                } else if (data.leaderboard && data.leaderboard.length > 0) {
+                    const volume = data.leaderboard[0].volume;
+                    referralStore.setTotVolume(volume);
+                }
+            } catch (error) {
+                referralStore.setTotVolume(NaN);
+            }
+        })();
+    }, [userDataStore.userAddress]);
+
     const { isInitialized: isFuulInitialized } = useFuul();
 
     const sessionButtonRef = useRef<HTMLSpanElement>(null);
@@ -214,7 +243,11 @@ export default function PageHeader() {
 
     // Track page views with Fuul
     useEffect(() => {
-        console.log({ totVolume });
+        console.log('Fuul pageview check:', {
+            isFuulInitialized,
+            totVolume,
+            isAboveThreshold: totVolume && totVolume > 10000,
+        });
         if (isFuulInitialized && totVolume && totVolume > 10000) {
             console.log('sending pageview for: ', location.pathname);
             Fuul.sendPageview();
