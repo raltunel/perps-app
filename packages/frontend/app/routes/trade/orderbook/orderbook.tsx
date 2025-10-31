@@ -494,7 +494,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 }),
             }}
         >
-            docker compose test ddd
             <div id={'orderBookHeader1'} className={styles.orderBookHeader}>
                 <ComboBox
                     value={selectedResolution?.val}
