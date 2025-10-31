@@ -831,11 +831,14 @@ export default function CodeTabs(props: PropsIF) {
                         </section>
                     );
                 }
-                // Show spinner while fetching (undefined or true)
-                if (isFetchingVolume !== false) {
+                // Show spinner while fetching (only if volume isn't already loaded)
+                if (
+                    isFetchingVolume !== false &&
+                    referralStore.totVolume === undefined
+                ) {
                     return spinner;
                 }
-                // Only show content/error when fetch is complete (isFetchingVolume === false)
+                // Only show content/error when volume is available
                 if (
                     referralStore.totVolume &&
                     referralStore.totVolume > 10000
@@ -869,7 +872,10 @@ export default function CodeTabs(props: PropsIF) {
             case 'referrals.createCode':
             case 'common.create':
                 // Show spinner while fetching (undefined or true)
-                if (isSessionEstablished && isFetchingVolume !== false) {
+                if (
+                    isSessionEstablished &&
+                    referralStore.totVolume === undefined
+                ) {
                     return spinner;
                 }
                 return affiliateCodeElem;
