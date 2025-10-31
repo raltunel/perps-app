@@ -119,27 +119,14 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 if (tabContentRef.current) {
                     const rect = tabContentRef.current.getBoundingClientRect();
                     let height = rect.height;
-                    const buyBlock = document.getElementById(
-                        'orderbook-buy-block',
+                    const slotsWrapper = document.getElementById(
+                        'orderBookSlotsWrapper',
                     );
-                    const sellBlock = document.getElementById(
-                        'orderbook-sell-block',
-                    );
-                    const midHeader =
-                        document.getElementById('orderBookMidHeader');
 
-                    if (buyBlock && sellBlock && midHeader) {
-                        const buyBlockHeight =
-                            buyBlock.getBoundingClientRect().height;
-                        const sellBlockHeight =
-                            sellBlock.getBoundingClientRect().height;
-                        const midHeaderHeight =
-                            midHeader.getBoundingClientRect().height;
-                        height =
-                            buyBlockHeight +
-                            sellBlockHeight +
-                            midHeaderHeight +
-                            15;
+                    if (slotsWrapper) {
+                        const slotsWrapperHeight =
+                            slotsWrapper.getBoundingClientRect().height;
+                        height = slotsWrapperHeight;
                     }
 
                     setDimensions({ width: rect.width, height: height });
@@ -232,7 +219,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             width: '100%',
                             height: '100%',
                             display: 'flex',
-                            alignItems: 'center',
+                            // alignItems: 'center',
                         }}
                     >
                         <LiquidationsChart
@@ -287,7 +274,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                 />
             </div>
             <div ref={tabContentRef} className={styles.tabContent}>
-                {activeOrderTab === 'Book' && (
+                {(activeOrderTab.includes('book') ||
+                    activeOrderTab === 'Book') && (
                     <div className={styles.startGap}>Liquidation Chart</div>
                 )}
                 {renderTabContent()}
