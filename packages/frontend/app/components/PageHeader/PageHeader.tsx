@@ -241,14 +241,19 @@ export default function PageHeader() {
 
     const { totVolume } = useReferralStore();
 
-    // Track page views with Fuul
+    // track page views with Fuul
     useEffect(() => {
         console.log('Fuul pageview check:', {
             isFuulInitialized,
             totVolume,
             isAboveThreshold: totVolume && totVolume > 10000,
         });
-        if (isFuulInitialized && totVolume && totVolume > 10000) {
+        if (
+            isFuulInitialized &&
+            totVolume !== undefined &&
+            !Number.isNaN(totVolume) &&
+            totVolume < 10000
+        ) {
             console.log('sending pageview for: ', location.pathname);
             Fuul.sendPageview();
         } else {
