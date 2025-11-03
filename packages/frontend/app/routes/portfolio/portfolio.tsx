@@ -13,6 +13,11 @@ import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
+import {
+    PiCaretCircleDoubleDownLight,
+    PiCaretCircleDoubleUpLight,
+} from 'react-icons/pi';
+import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -93,7 +98,11 @@ function Portfolio() {
                 }
                 className={styles.actionMenuButton}
             >
-                <MdOutlineArrowDropDownCircle size={24} />
+                {!isMobileActionMenuOpen ? (
+                    <PiCaretCircleDoubleDownLight size={24} />
+                ) : (
+                    <PiCaretCircleDoubleUpLight size={24} />
+                )}
             </button>
             {isMobileActionMenuOpen && (
                 <div
@@ -227,7 +236,7 @@ function Portfolio() {
                         <MemoizedPerformancePanel />
 
                         <div className={styles.table}>
-                            <TradeTable portfolioPage />
+                            <PortfolioTables />
                         </div>
                     </section>
                 </div>
