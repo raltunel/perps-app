@@ -684,16 +684,9 @@ export default function CodeTabs(props: PropsIF) {
                         }}
                     />
                     <div className={styles.validation_item}>
-                        {temporaryAffiliateCode.length <= 30 &&
-                        temporaryAffiliateCode.length >= 2 ? (
-                            <FaCheck size={10} color='var(--green)' />
-                        ) : (
-                            <GiCancel size={10} color='var(--red)' />
-                        )}
-                        <p>2 - 30 characters</p>
-                    </div>
-                    <div className={styles.validation_item}>
                         {temporaryAffiliateCode.length > 0 ? (
+                            temporaryAffiliateCode.length >= 2 &&
+                            temporaryAffiliateCode.length <= 30 &&
                             tempAffiliateCodeCharsValidate ? (
                                 <FaCheck size={10} color='var(--green)' />
                             ) : (
@@ -702,7 +695,9 @@ export default function CodeTabs(props: PropsIF) {
                         ) : (
                             <FaRegCircle size={10} color='var(--text3)' />
                         )}
-                        <p>Alphanumeric and hyphens (A-Z, a-z, 0-9, -)</p>
+                        <p>
+                            2 - 30 letters, numbers, hyphens (A-Z, a-z, 0-9, -)
+                        </p>
                     </div>
                     <div className={styles.validation_item}>
                         {temporaryAffiliateCode.length > 0 ? (
