@@ -243,11 +243,10 @@ export default function PageHeader() {
 
     // track page views with Fuul
     useEffect(() => {
-        console.log('Fuul pageview check:', {
-            isFuulInitialized,
-            totVolume,
-            isAboveThreshold: totVolume && totVolume > 10000,
-        });
+        const projects = [
+            '3b31ebc0-f09d-4880-9c8c-04769701ef9a',
+            '0303273c-c574-4a64-825c-b67091ec6813',
+        ];
         if (
             isFuulInitialized &&
             totVolume !== undefined &&
@@ -255,7 +254,7 @@ export default function PageHeader() {
             totVolume < 10000
         ) {
             console.log('sending pageview for: ', location.pathname);
-            Fuul.sendPageview();
+            Fuul.sendPageview(undefined, projects);
         } else {
             localStorage.removeItem('fuul.sent_pageview');
         }
