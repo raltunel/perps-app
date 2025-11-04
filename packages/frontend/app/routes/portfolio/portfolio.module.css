@@ -1,11 +1,11 @@
 .outer {
     width: 100%;
     height: 100%;
-    background: radial-gradient(
+    /* background: radial-gradient(
         43.75% 50% at 0% 70%,
         rgba(115, 113, 252, 0.2) 0%,
         rgba(115, 113, 252, 0) 100%
-    );
+    ); */
 }
 .container {
     --container-width: 1280px;
