@@ -856,8 +856,9 @@ export default function CodeTabs(props: PropsIF) {
                                 lineHeight: '1.5',
                             }}
                         >
-                            Only users with less than $10,000 in trading volume
-                            can enter a referral code.
+                            This wallet has logged {totVolumeFormatted} in
+                            trading volume. Only users with less than $10,000 in
+                            trading volume can enter a referral code.
                         </div>
                     );
                 }
