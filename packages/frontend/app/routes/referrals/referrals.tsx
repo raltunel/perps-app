@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { FUUL_API_KEY } from '~/utils/Constants';
-import { useUserDataStore } from '~/stores/UserDataStore';
+import { useUserDataStore } from '~/stores/UserData
+import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 
 export function meta() {
     return [
@@ -51,6 +52,18 @@ export default function Referrals() {
 
     return (
         <div className={styles.container}>
+            <AnimatedBackground
+                mode='absolute' // anchors to .container
+                layers={1} // 1–3; 2 is a nice depth without cost
+                opacity={1}
+                duration='15s'
+                strokeWidth='2'
+                palette={{
+                    color1: '#1E1E24',
+                    color2: '#7371FC',
+                    color3: '#CDC1FF',
+                }}
+            />
             <header>
                 {t('referrals.title')}
                 <p>
