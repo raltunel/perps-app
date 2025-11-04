@@ -18,6 +18,7 @@ import {
     PiCaretCircleDoubleUpLight,
 } from 'react-icons/pi';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
+import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -142,8 +143,20 @@ function Portfolio() {
     );
 
     return (
-        <>
+        <div className={styles.outer}>
             <div className={styles.container}>
+                <AnimatedBackground
+                    mode='absolute' // anchors to .container
+                    layers={1} // 1–3; 2 is a nice depth without cost
+                    opacity={1}
+                    duration='15s'
+                    strokeWidth='2'
+                    palette={{
+                        color1: '#1E1E24',
+                        color2: '#7371FC',
+                        color3: '#CDC1FF',
+                    }}
+                />
                 <WebDataConsumer />
                 <header>Portfolio</header>
                 <div className={styles.column}>
@@ -296,7 +309,7 @@ function Portfolio() {
                     </div>
                 </Modal>
             )}
-        </>
+        </div>
     );
 }
 
