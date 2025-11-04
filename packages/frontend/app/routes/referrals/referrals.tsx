@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { useState } from 'react';
 import { FUUL_API_KEY } from '~/utils/Constants';
-import { useUserDataStore } from '~/stores/UserData
+import { useUserDataStore } from '~/stores/UserDataStore';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 
 export function meta() {
