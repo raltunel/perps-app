@@ -5,16 +5,13 @@ import styles from './PerformancePanel.module.css';
 import CollateralPieChart from './CollateralChart/CollateralPieChart';
 import PortfolioChartHeader from './PortfolioChartHeader/PortfolioChartHeader';
 import TabChartContext from './PerformanceChart/TabChartContext';
+import useNumFormatter from '~/hooks/useNumFormatter';
+
+interface PerformancePanelProps {
+    userData: any;
+}
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
-const PERFORMANCE_METRICS = [
-    { label: 'PNL', value: '$0.00' },
-    { label: 'Volume', value: '$0.00' },
-    { label: 'Max Drawdown', value: '0.00%' },
-    { label: 'Total Equity', value: '$0.00' },
-    { label: 'Account Equity', value: '$0.00' },
-    { label: 'Vault Equity', value: '$0.00' },
-];
 
 const animationConfig = {
     initial: { opacity: 0 },
@@ -23,19 +20,59 @@ const animationConfig = {
     transition: { duration: 0.2 },
 };
 
-const MetricsDisplay = React.memo(() => (
-    <div className={styles.metricsContainer}>
-        {PERFORMANCE_METRICS.map((metric) => (
-            <div className={styles.metricRow} key={metric.label}>
-                <span>{metric.label}</span>
-                {metric.value}
-            </div>
-        ))}
-    </div>
-));
-
-export default function PerformancePanel() {
+export default function PerformancePanel({ userData }: PerformancePanelProps) {
     const [activeTab, setActiveTab] = useState('');
+
+    const { formatNum } = useNumFormatter();
+
+    const pnlFormatted = userData?.data?.leaderboard[0]?.pnl
+        ? formatNum(userData?.data?.leaderboard[0]?.pnl, 2, true, true)
+        : '$0.00';
+    const volumeFormatted = userData?.data?.leaderboard[0]?.volume
+        ? formatNum(userData?.data?.leaderboard[0]?.volume, 2, true, true)
+        : '$0.00';
+    const maxDrawdownFormatted = userData?.data?.leaderboard[0]?.maxDrawdown
+        ? formatNum(userData?.data?.leaderboard[0]?.maxDrawdown, 2)
+        : '0.00%';
+    const totalEquityFormatted = userData?.data?.leaderboard[0]?.account_value
+        ? formatNum(
+              userData?.data?.leaderboard[0]?.account_value,
+              2,
+              true,
+              true,
+          )
+        : '$0.00';
+    const accountEquityFormatted = userData?.data?.leaderboard[0]?.account_value
+        ? formatNum(
+              userData?.data?.leaderboard[0]?.account_value,
+              2,
+              true,
+              true,
+          )
+        : '$0.00';
+    const vaultEquityFormatted = userData?.data?.leaderboard[0]?.vaultEquity
+        ? formatNum(userData?.data?.leaderboard[0]?.vaultEquity)
+        : '$0.00';
+
+    const PERFORMANCE_METRICS = [
+        { label: 'PNL', value: pnlFormatted },
+        { label: 'Volume', value: volumeFormatted },
+        { label: 'Max Drawdown', value: maxDrawdownFormatted },
+        { label: 'Total Equity', value: totalEquityFormatted },
+        { label: 'Account Equity', value: accountEquityFormatted },
+        { label: 'Vault Equity', value: vaultEquityFormatted },
+    ];
+
+    const MetricsDisplay = React.memo(() => (
+        <div className={styles.metricsContainer}>
+            {PERFORMANCE_METRICS.map((metric) => (
+                <div className={styles.metricRow} key={metric.label}>
+                    <span>{metric.label}</span>
+                    {metric.value}
+                </div>
+            ))}
+        </div>
+    ));
 
     const [isLineDataFetched, setIsLineDataFetched] = useState(false);
 

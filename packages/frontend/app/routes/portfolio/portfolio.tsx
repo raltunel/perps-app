@@ -30,7 +30,7 @@ export function meta() {
 }
 
 function Portfolio() {
-    const { portfolio, formatCurrency } = usePortfolioManager();
+    const { portfolio, formatCurrency, userData } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
     const { currency } = useNumFormatter();
 
@@ -246,7 +246,7 @@ function Portfolio() {
                     </div>
 
                     <section className={styles.mainContent}>
-                        <MemoizedPerformancePanel />
+                        <MemoizedPerformancePanel userData={userData} />
 
                         <div className={styles.table}>
                             <PortfolioTables />
