@@ -47,6 +47,9 @@ export default function PageHeader() {
     // Feedback modal state
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
+    // run the FUUL context
+    const { trackPageView } = useFuul();
+
     const handleFeedbackClose = () => {
         setIsFeedbackOpen(false);
     };
@@ -254,7 +257,8 @@ export default function PageHeader() {
             totVolume < 10000
         ) {
             console.log('sending pageview for: ', location.pathname);
-            Fuul.sendPageview(undefined, projects);
+            // Fuul.sendPageview(undefined, projects);
+            trackPageView();
         } else {
             localStorage.removeItem('fuul.sent_pageview');
         }

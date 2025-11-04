@@ -21,6 +21,7 @@ import { GiCancel } from 'react-icons/gi';
 import { LuCopy } from 'react-icons/lu';
 import useClipboard from '~/hooks/useClipboard';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import { useFuul } from '~/contexts/FuulContext';
 
 interface PropsIF {
     initialTab?: string;
@@ -116,6 +117,9 @@ export default function CodeTabs(props: PropsIF) {
         [sessionState],
     );
 
+    // run the FUUL context
+    const { isAffiliateCodeFree, getAffiliateCode } = useFuul();
+
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
     // this holds an improperly formatted ref code to provide user feedback
@@ -128,7 +132,7 @@ export default function CodeTabs(props: PropsIF) {
         }
 
         // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await Fuul.isAffiliateCodeFree(r);
+        const codeIsFree: boolean = await isAffiliateCodeFree(r);
 
         // Always cache the code and set URL param
         handleReferralURLParam.set(r);
@@ -244,7 +248,7 @@ export default function CodeTabs(props: PropsIF) {
                 try {
                     // check with FUUL to determine if ref code is claimed
                     const isCodeFree: boolean =
-                        await Fuul.isAffiliateCodeFree(userInputRefCode);
+                        await isAffiliateCodeFree(userInputRefCode);
                     setIsUserRefCodeClaimed(!isCodeFree);
                 } catch (error) {
                     setIsUserRefCodeClaimed(false);
@@ -272,8 +276,9 @@ export default function CodeTabs(props: PropsIF) {
 
         (async () => {
             try {
-                const isCachedCodeFree: boolean =
-                    await Fuul.isAffiliateCodeFree(referralStore.cached);
+                const isCachedCodeFree: boolean = await isAffiliateCodeFree(
+                    referralStore.cached,
+                );
 
                 if (isCachedCodeFree) {
                     // Code is not claimed - show in edit mode with error
@@ -395,7 +400,7 @@ export default function CodeTabs(props: PropsIF) {
                     sessionState.walletPublicKey ||
                     sessionState.sessionPublicKey;
 
-                const affiliateCode = await Fuul.getAffiliateCode(
+                const affiliateCode = await getAffiliateCode(
                     userWalletKey.toString(),
                     UserIdentifierType.SolanaAddress,
                 );
@@ -408,7 +413,7 @@ export default function CodeTabs(props: PropsIF) {
                     userWalletKey.toString(),
                 );
                 if (referrer?.referrer_identifier) {
-                    const affiliateCode = await Fuul.getAffiliateCode(
+                    const affiliateCode = await getAffiliateCode(
                         referrer.referrer_identifier as string,
                         UserIdentifierType.SolanaAddress,
                     );
@@ -438,7 +443,7 @@ export default function CodeTabs(props: PropsIF) {
         // Set up debounced validation
         const timer = setTimeout(async () => {
             try {
-                const codeIsFree = await Fuul.isAffiliateCodeFree(
+                const codeIsFree = await isAffiliateCodeFree(
                     temporaryAffiliateCode,
                 );
                 setIsTemporaryAffiliateCodeValid(codeIsFree);

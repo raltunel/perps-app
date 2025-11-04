@@ -1,15 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Fuul } from '@fuul/sdk';
+import { Fuul, UserIdentifierType } from '@fuul/sdk';
 import { FUUL_API_KEY } from '../utils/Constants';
+import type { AffiliateCodeParams } from 'node_modules/@fuul/sdk/dist/types/sdk';
 
 interface FuulContextType {
     isInitialized: boolean;
     trackPageView: () => void;
+    isAffiliateCodeFree: (code: string) => Promise<boolean>;
+    getAffiliateCode: (
+        userIdentifier: string,
+        identifierType: UserIdentifierType,
+    ) => Promise<string | null>;
 }
 
 const FuulContext = createContext<FuulContextType>({
     isInitialized: false,
     trackPageView: () => {},
+    isAffiliateCodeFree: () => Promise.resolve(false),
+    getAffiliateCode: () => Promise.resolve(null),
 });
 
 export const useFuul = () => {
@@ -46,14 +54,25 @@ export const FuulProvider: React.FC<{ children: React.ReactNode }> = ({
         '0303273c-c574-4a64-825c-b67091ec6813',
     ];
 
-    const trackPageView = () => {
+    function trackPageView(): void {
         if (isInitialized) {
             Fuul.sendPageview(undefined, projects);
+        } else {
+            console.warn(
+                'Cannot send pageview before Fuul system is initialized',
+            );
         }
-    };
+    }
 
     return (
-        <FuulContext.Provider value={{ isInitialized, trackPageView }}>
+        <FuulContext.Provider
+            value={{
+                isInitialized,
+                trackPageView,
+                isAffiliateCodeFree: Fuul.isAffiliateCodeFree,
+                getAffiliateCode: Fuul.getAffiliateCode,
+            }}
+        >
             {children}
         </FuulContext.Provider>
     );
