@@ -44,11 +44,14 @@ export default function Referrals() {
             .catch((err) => console.error(err));
     }, [userDataStore.userAddress]);
 
-    const referralCount = useMemo(
-        () =>
-            referralData ? referralData?.results[0]?.total_amount || 0 : '...',
-        [referralData],
-    );
+    const referralCount = useMemo<string>(() => {
+        try {
+            return referralData?.results[0]?.total_amount.toString() || '0';
+        } catch (err) {
+            console.warn('Could not fetch referral data, error follows: ', err);
+            return '...';
+        }
+    }, [referralData]);
 
     return (
         <div className={styles.container}>
