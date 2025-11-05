@@ -272,7 +272,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             context.clearRect(0, 0, width * dpr, (height - 50) * dpr);
 
-            const line = d3
+            const lineSeries = d3
                 .line<{ time: number; value: number }>()
                 .x((d) => xScale(new Date(d.time)))
                 .y((d) => yScale(d.value))
@@ -280,7 +280,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 .context(context);
 
             context.beginPath();
-            line(lineData);
+            lineSeries(lineData);
             context.lineWidth = 2 * dpr;
             context.strokeStyle = '#7371fc';
             context.stroke();
@@ -293,7 +293,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.lineWidth = 2 * dpr;
             context.stroke();
         }
-    }, [yScale, xScale, canvasInitialHeight, canvasInitialWidth]);
+    }, [
+        JSON.stringify(xScale),
+        JSON.stringify(yScale),
+        canvasInitialHeight,
+        canvasInitialWidth,
+    ]);
 
     return (
         <>

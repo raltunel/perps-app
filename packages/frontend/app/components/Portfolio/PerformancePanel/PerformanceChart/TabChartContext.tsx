@@ -217,14 +217,14 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         const height = window.innerHeight;
         const width = window.innerWidth;
 
-        if (width > 768) {
-            if (width < 1250) {
-                setChartWidth(() => Math.max(850 - (1250 - width), 250));
-            } else {
-                setChartWidth(() => 900);
-            }
+        const header = document.getElementById('portfolio-header-container');
+
+        const headerWidth = header ? header.clientWidth : 0;
+
+        if (headerWidth > 1250) {
+            setChartWidth(() => Math.max(850 - (1250 - width), 250));
         } else {
-            setChartWidth(() => width - 50);
+            setChartWidth(() => headerWidth - 50);
         }
 
         if (height < 870) {
