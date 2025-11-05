@@ -300,3 +300,9 @@
         justify-content: center;
     }
 }
+
+@media (max-width: 480px) {
+    .container {
+        padding-bottom: var(--footer-h, 56px);
+    }
+}
