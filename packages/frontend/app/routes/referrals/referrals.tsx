@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { FUUL_API_KEY } from '~/utils/Constants';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
+import useNumFormatter from '~/hooks/useNumFormatter';
 
 export function meta() {
     return [
@@ -21,6 +22,10 @@ export default function Referrals() {
 
     const [referralData, setReferralData] = useState<any>(null);
 
+    const { formatNum } = useNumFormatter();
+
+    const [rewardsEarned, setRewardsEarned] = useState<string>('...');
+
     useEffect(() => {
         const options = {
             method: 'GET',
@@ -34,6 +39,47 @@ export default function Referrals() {
             setReferralData(null);
             return;
         }
+
+        const optionsPayouts = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                authorization:
+                    'Bearer 7010050cc4b7274037a80fd9119bce3567ce7443d163c097c787a39dac341870',
+            },
+        };
+
+        fetch(
+            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
+            optionsPayouts,
+        )
+            .then((res) => res.json())
+            .then((res) => {
+                console.log('payouts: ', res);
+                return res;
+            })
+            .then((res) => {
+                console.log('calculating payouts...');
+                const totalPayouts: number = res.reduce(
+                    (acc: number, payout: any) => {
+                        // Each payout object has one unknown key with an object value containing volume
+                        const payoutValue = Object.values(payout)[0] as any;
+                        const volume = payoutValue?.volume || 0;
+                        console.log('volume: ', volume);
+                        return acc + volume;
+                    },
+                    0,
+                );
+                const totalPayoutsFormatted = formatNum(
+                    totalPayouts,
+                    2,
+                    true,
+                    true,
+                );
+                console.log('totalPayoutsFormatted: ', totalPayoutsFormatted);
+                setRewardsEarned(totalPayoutsFormatted);
+            })
+            .catch((err) => console.error(err));
 
         fetch(
             `https://api.fuul.xyz/api/v1/payouts/leaderboard/points?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
@@ -83,7 +129,7 @@ export default function Referrals() {
                 </div>
                 <div className={styles.detailsContent}>
                     <h6>{t('referrals.rewardsEarned')}</h6>
-                    <h3>$0.00</h3>
+                    <h3>{rewardsEarned}</h3>
                 </div>
             </div>
             <section className={styles.tableContainer}>
