@@ -84,9 +84,9 @@ const CollateralPieChart: React.FC<PieChartProps> = (props) => {
                             </span>
                         </div>
                     </div>
-                    <div>
+                    {/* <div>
                         <Button size='medium'>Convert</Button>
-                    </div>
+                    </div> */}
                 </div>
             ))}
         </div>
