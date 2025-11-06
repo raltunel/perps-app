@@ -10,10 +10,4 @@ RUN npm install -g pnpm
 
 RUN pnpm install
 
-ARG PORT=3002
-EXPOSE ${PORT}
-
-ENV NODE_ENV=development
-ENV PORT=${PORT}
-
 CMD ["pnpm", "--filter", "frontend", "prod"]
