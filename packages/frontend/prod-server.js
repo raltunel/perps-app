@@ -42,6 +42,7 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
+    console.log('>>> ver 1');
     if (HOST_PORT) {
         console.log(
             `Production server is running on http://localhost:${HOST_PORT}`,
