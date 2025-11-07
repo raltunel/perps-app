@@ -8,6 +8,8 @@ const __dirname = path.dirname(__filename);
 
 const PORT = Number.parseInt(process.env.PORT || '3000');
 
+const HOST_PORT = process.env.HOST_PORT || undefined;
+
 const app = express();
 app.disable('x-powered-by');
 
@@ -40,5 +42,13 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Production server is running on http://localhost:${PORT}`);
+    if (HOST_PORT) {
+        console.log(
+            `Production server is running on http://localhost:${HOST_PORT}`,
+        );
+    } else {
+        console.log(
+            `Production server is running on http://localhost:{YOUR_HOST_PORT}`,
+        );
+    }
 });
