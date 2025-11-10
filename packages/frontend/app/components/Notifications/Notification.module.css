@@ -12,6 +12,11 @@
     user-select: none;
 }
 
+/* taller notification for long messages with txLink */
+.notification.tallNotification {
+    height: 130px;
+}
+
 /* top content in the notification card */
 .notification > header {
     display: flex;
