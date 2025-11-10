@@ -194,7 +194,14 @@ export default function Notification(props: propsIF) {
                             color='var(--red)'
                         />
                     )}
-                    <h2 style={{ userSelect: 'text' }}>{data.title}</h2>
+                    <h2
+                        style={{ userSelect: 'text' }}
+                        className={
+                            data.title.length > 25 ? styles.smallTitle : ''
+                        }
+                    >
+                        {data.title}
+                    </h2>
                 </div>
                 <IoClose
                     className={styles.close}
