@@ -591,22 +591,6 @@ export default function Trade() {
         return () => mqTablet.removeEventListener('change', updateTablet);
     }, []);
 
-    useLayoutEffect(() => {
-        const el = mainRef.current;
-        if (!el) return;
-
-        const gap =
-            parseFloat(
-                getComputedStyle(document.documentElement).getPropertyValue(
-                    '--gap-s',
-                ),
-            ) || 8;
-
-        const total = el.clientHeight;
-        setMaxTop(Math.max(PANEL_MIN, total - TABLE_MIN - gap));
-        setLayoutMeasured(true);
-    }, []);
-
     const MobileTabNavigation = useMemo(() => {
         return (
             <div className={styles.mobileTabNav} id='mobileTradeTabs'>
