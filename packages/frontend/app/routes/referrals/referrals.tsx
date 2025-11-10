@@ -4,7 +4,7 @@ import styles from './referrals.module.css';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useMemo } from 'react';
 import { useState } from 'react';
-import { FUUL_API_KEY } from '~/utils/Constants';
+import { FUUL_API_KEY, FUUL_GET_API_KEY } from '~/utils/Constants';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -59,8 +59,7 @@ export default function Referrals() {
             method: 'GET',
             headers: {
                 accept: 'application/json',
-                authorization:
-                    'Bearer 0211e7ba625bea13424e0e56715e5a1675f3d8cd0284f4939a5f7820b06cbab0',
+                authorization: `Bearer ${FUUL_GET_API_KEY}`,
             },
         };
 
