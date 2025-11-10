@@ -200,9 +200,6 @@ export default function PageHeader() {
     // Holds previous user connection status
     const prevIsUserConnected = useRef(isUserConnected);
 
-    // determine if user is on the home page (all other perps pages are v2)
-    const onHomePage: boolean = !location.pathname.includes('v2');
-
     useEffect(() => {
         if (prevIsUserConnected.current === false && isUserConnected === true) {
             if (typeof plausible === 'function') {
@@ -240,7 +237,7 @@ export default function PageHeader() {
             referralStore.cache(referralCodeFromURL.value);
 
         prevIsUserConnected.current = isUserConnected;
-    }, [isUserConnected, userDataStore.userAddress, onHomePage]);
+    }, [isUserConnected, userDataStore.userAddress]);
 
     const { totVolume } = useReferralStore();
 
