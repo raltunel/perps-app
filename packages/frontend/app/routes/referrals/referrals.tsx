@@ -51,6 +51,8 @@ export default function Referrals() {
 
     const [rewardsEarned, setRewardsEarned] = useState<string>('...');
 
+    const [referralCount, setReferralCount] = useState<string>('...');
+
     const [payoutMovements, setPayoutMovements] = useState<PayoutMovementIF[]>(
         [],
     );
@@ -74,8 +76,6 @@ export default function Referrals() {
             })
             .catch((err) => console.error(err));
     }, []);
-
-    useEffect(() => console.log(payoutMovements), [payoutMovements.length]);
 
     useEffect(() => {
         const options = {
@@ -107,10 +107,8 @@ export default function Referrals() {
             .then((res) => res.json())
             .then((res) => {
                 console.log('payouts: ', res);
-                return res;
-            })
-            .then((res) => {
                 console.log('calculating payouts...');
+                setReferralCount(res.length.toString());
                 const totalPayouts: number = res.reduce(
                     (acc: number, payout: any) => {
                         // Each payout object has one unknown key with an object value containing volume
@@ -141,14 +139,14 @@ export default function Referrals() {
             .catch((err) => console.error(err));
     }, [userDataStore.userAddress]);
 
-    const referralCount = useMemo<string>(() => {
-        try {
-            return referralData?.results[0]?.total_amount.toString() || '0';
-        } catch (err) {
-            console.warn('Could not fetch referral data, error follows: ', err);
-            return '...';
-        }
-    }, [referralData]);
+    // const referralCount = useMemo<string>(() => {
+    //     try {
+    //         return referralData?.results[0]?.total_amount.toString() || '0';
+    //     } catch (err) {
+    //         console.warn('Could not fetch referral data, error follows: ', err);
+    //         return '...';
+    //     }
+    // }, [referralData]);
 
     return (
         <div className={styles.container}>
