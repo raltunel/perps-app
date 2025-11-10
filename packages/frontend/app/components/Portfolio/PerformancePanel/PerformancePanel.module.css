@@ -21,6 +21,9 @@
     gap: var(--gap-m);
     padding: 0 0 0 var(--padding-m);
 }
+.performanceContainer {
+    min-height: 0;
+}
 .metricsContainer {
     width: 100%;
     height: 100%;

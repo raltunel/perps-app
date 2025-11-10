@@ -146,6 +146,10 @@ export default function Trade() {
     const [activeTab, setActiveTab] = useState<TabType>('order');
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
+    // after your hydrated state
+    const [layoutMeasured, setLayoutMeasured] = useState(false);
+    const [panelReady, setPanelReady] = useState(false);
+
     const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
@@ -585,6 +589,22 @@ export default function Trade() {
         updateTablet();
         mqTablet.addEventListener('change', updateTablet);
         return () => mqTablet.removeEventListener('change', updateTablet);
+    }, []);
+
+    useLayoutEffect(() => {
+        const el = mainRef.current;
+        if (!el) return;
+
+        const gap =
+            parseFloat(
+                getComputedStyle(document.documentElement).getPropertyValue(
+                    '--gap-s',
+                ),
+            ) || 8;
+
+        const total = el.clientHeight;
+        setMaxTop(Math.max(PANEL_MIN, total - TABLE_MIN - gap));
+        setLayoutMeasured(true);
     }, []);
 
     const MobileTabNavigation = useMemo(() => {

@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, {
+    useEffect,
+    useMemo,
+    useState,
+    useCallback,
+    useRef,
+} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tabs from '~/components/Tabs/Tabs';
 import styles from './PerformancePanel.module.css';
@@ -22,6 +28,7 @@ const animationConfig = {
 
 export default function PerformancePanel({ userData }: PerformancePanelProps) {
     const [activeTab, setActiveTab] = useState('');
+    const chartStageRef = useRef<HTMLDivElement>(null);
 
     const { formatNum } = useNumFormatter();
 

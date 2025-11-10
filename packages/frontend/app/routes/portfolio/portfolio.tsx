@@ -1,7 +1,6 @@
-import { memo, useRef, useState } from 'react';
+import { memo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Modal from '~/components/Modal/Modal';
 import PerformancePanel from '~/components/Portfolio/PerformancePanel/PerformancePanel';
-import TradeTable from '~/components/Trade/TradeTables/TradeTables';
 import { useModal } from '~/hooks/useModal';
 import { feeSchedules, type feeTierIF } from '~/utils/feeSchedule';
 import WebDataConsumer from '../trade/webdataconsumer';
@@ -9,7 +8,6 @@ import styles from './portfolio.module.css';
 import { usePortfolioManager } from './usePortfolioManager';
 import { usePortfolioModals } from './usePortfolioModals';
 import SimpleButton from '~/components/SimpleButton/SimpleButton';
-import { MdOutlineArrowDropDownCircle } from 'react-icons/md';
 import useOutsideClick from '~/hooks/useOutsideClick';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import Tooltip from '~/components/Tooltip/Tooltip';
@@ -19,6 +17,8 @@ import {
 } from 'react-icons/pi';
 import PortfolioTables from '~/components/Portfolio/PortfolioTable/PortfolioTable';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
+import { Resizable, type NumberSize } from 're-resizable';
+import { useAppSettings } from '~/stores/AppSettingsStore';
 
 const MemoizedPerformancePanel = memo(PerformancePanel);
 
@@ -30,6 +30,55 @@ export function meta() {
 }
 
 function Portfolio() {
+    const mainRef = useRef<HTMLDivElement | null>(null);
+
+    const DEFAULT_PANEL_HEIGHT = 480;
+    const PANEL_MIN = 180;
+    const TABLE_MIN = 250;
+
+    const persistApi = (useAppSettings as any).persist;
+    const alreadyHydrated = persistApi?.hasHydrated?.() ?? false;
+    const [hydrated, setHydrated] = useState(alreadyHydrated);
+
+    useEffect(() => {
+        if (alreadyHydrated) return;
+        const unsub = persistApi?.onFinishHydration?.(() => setHydrated(true));
+        return () => unsub?.();
+    }, [alreadyHydrated, persistApi]);
+
+    const { portfolioPanelHeight, setPortfolioPanelHeight } = useAppSettings();
+
+    const initialPanelHeight = alreadyHydrated
+        ? (portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT)
+        : DEFAULT_PANEL_HEIGHT;
+
+    const [panelHeight, setPanelHeight] = useState<number>(initialPanelHeight);
+    const [maxTop, setMaxTop] = useState<number>(10000);
+    const startRef = useRef(panelHeight);
+
+    useLayoutEffect(() => {
+        const el = mainRef.current;
+        if (!el) return;
+        const gap =
+            parseFloat(
+                getComputedStyle(document.documentElement).getPropertyValue(
+                    '--gap-s',
+                ),
+            ) || 8;
+        const total = el.clientHeight;
+        setMaxTop(Math.max(PANEL_MIN, total - TABLE_MIN - gap));
+    }, []);
+
+    // After hydration, adopt saved height (clamped to current maxTop). This avoids the default→snap.
+    useEffect(() => {
+        if (!hydrated) return;
+        const raw = portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT;
+        const clamped = Math.max(PANEL_MIN, Math.min(raw, maxTop));
+        setPanelHeight(clamped);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [hydrated, portfolioPanelHeight, maxTop]);
+
+    // ---- DATA/UI ----
     const { portfolio, formatCurrency, userData } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
     const { currency } = useNumFormatter();
@@ -42,25 +91,18 @@ function Portfolio() {
     } = usePortfolioModals();
 
     const feeScheduleModalCtrl = useModal('closed');
+    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
     const mobileActionMenuRef = useOutsideClick<HTMLDivElement>((event) => {
         const target = event.target as HTMLElement;
-
-        if (
-            mobileActionMenuButtonRef.current &&
-            mobileActionMenuButtonRef.current.contains(target)
-        ) {
-            return;
-        }
-
+        if (mobileActionMenuButtonRef.current?.contains(target)) return;
         setIsMobileActionMenuOpen(false);
     }, isMobileActionMenuOpen);
-    const mobileActionMenuButtonRef = useRef<HTMLButtonElement>(null);
 
     const mobileTop = (
         <section className={styles.mobileTop}>
             <div className={styles.detailsContent}>
                 <h6>Vol(14d)</h6>
-                <h3> {currency(portfolio.tradingVolume.biWeekly, true)}</h3>
+                <h3>{currency(portfolio.tradingVolume.biWeekly, true)}</h3>
                 <div
                     className={styles.view_detail_clickable}
                     onClick={() => console.log('viewing volume')}
@@ -94,9 +136,7 @@ function Portfolio() {
             </div>
             <button
                 ref={mobileActionMenuButtonRef}
-                onClick={() =>
-                    setIsMobileActionMenuOpen(!isMobileActionMenuOpen)
-                }
+                onClick={() => setIsMobileActionMenuOpen((v) => !v)}
                 className={styles.actionMenuButton}
             >
                 {!isMobileActionMenuOpen ? (
@@ -120,34 +160,47 @@ function Portfolio() {
                     >
                         Withdraw
                     </SimpleButton>
-                    {/* <SimpleButton
-                        onClick={openSendModal}
-                        className={styles.sendMobile}
-                        bg='dark3'
-                        hoverBg='accent1'
-                    >
-                        Send
-                    </SimpleButton>
-
-                    <SimpleButton
-                        onClick={openSendModal}
-                        className={styles.sendDesktop}
-                        bg='dark3'
-                        hoverBg='accent1'
-                    >
-                        Send
-                    </SimpleButton> */}
                 </div>
             )}
         </section>
     );
 
+    if (!hydrated) {
+        return (
+            <div className={styles.outer}>
+                <div className={styles.container}>
+                    <AnimatedBackground
+                        mode='absolute'
+                        layers={1}
+                        opacity={1}
+                        duration='15s'
+                        strokeWidth='2'
+                        palette={{
+                            color1: '#1E1E24',
+                            color2: '#7371FC',
+                            color3: '#CDC1FF',
+                        }}
+                    />
+                    <WebDataConsumer />
+                    <header>Portfolio</header>
+                    {/* Skeleton spacer to keep layout calm while hydrating */}
+                    <div
+                        className={styles.column}
+                        style={{ minHeight: '60vh' }}
+                    />
+                    {/** Modals can still render even while hydrating */}
+                    {PortfolioModalsRenderer}
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.outer}>
             <div className={styles.container}>
                 <AnimatedBackground
-                    mode='absolute' // anchors to .container
-                    layers={1} // 1–3; 2 is a nice depth without cost
+                    mode='absolute'
+                    layers={1}
                     opacity={1}
                     duration='15s'
                     strokeWidth='2'
@@ -159,24 +212,11 @@ function Portfolio() {
                 />
                 <WebDataConsumer />
                 <header>Portfolio</header>
+
                 <div className={styles.column}>
                     {mobileTop}
+
                     <div className={styles.detailsContainer}>
-                        {/* <div className={styles.detailsContent}>
-                            <h6>14 Day Volume</h6>
-                            <h3>
-                                {formatCurrency(
-                                    portfolio.tradingVolume.biWeekly,
-                                )}
-                            </h3>
-                            <div
-                                className={styles.view_detail_clickable}
-                                onClick={() => console.log('viewing volume')}
-                                style={{ visibility: 'hidden' }}
-                            >
-                                View volume
-                            </div>
-                        </div> */}
                         <div className={styles.detailsContent}>
                             <h6>Fees</h6>
                             <Tooltip content='Maker fees 0.1%' position='top'>
@@ -190,6 +230,7 @@ function Portfolio() {
                                 View fee schedule
                             </div>
                         </div>
+
                         <div
                             className={`${styles.detailsContent} ${styles.netValueMobile}`}
                         >
@@ -201,6 +242,7 @@ function Portfolio() {
                                 )}
                             </h3>
                         </div>
+
                         <div className={styles.totalNetDisplay}>
                             <h6>
                                 <span>Total Net USD Value:</span>{' '}
@@ -233,24 +275,53 @@ function Portfolio() {
                                         Send
                                     </SimpleButton>
                                 </div>
-                                {/* <SimpleButton
-                                    onClick={openSendModal}
-                                    className={styles.sendDesktop}
-                                    bg='dark3'
-                                    hoverBg='accent1'
-                                >
-                                    Send
-                                </SimpleButton> */}
                             </div>
                         </div>
                     </div>
 
-                    <section className={styles.mainContent}>
-                        <MemoizedPerformancePanel userData={userData} />
+                    <section className={styles.mainContent} ref={mainRef}>
+                        <Resizable
+                            size={{ width: '100%', height: panelHeight }}
+                            minHeight={PANEL_MIN}
+                            maxHeight={maxTop}
+                            enable={{ bottom: true }}
+                            handleStyles={{
+                                bottom: { height: '8px', cursor: 'row-resize' },
+                            }}
+                            handleComponent={{
+                                bottom: (
+                                    <div className={styles.resizeHandle}>
+                                        <div className={styles.resizeGrip} />
+                                    </div>
+                                ),
+                            }}
+                            onResizeStart={() => {
+                                startRef.current = panelHeight;
+                            }}
+                            onResize={(_e, _dir, _ref, d: NumberSize) => {
+                                const next = Math.max(
+                                    PANEL_MIN,
+                                    Math.min(
+                                        startRef.current + d.height,
+                                        maxTop,
+                                    ),
+                                );
+                                setPanelHeight(next);
+                            }}
+                            onResizeStop={() => {
+                                setPortfolioPanelHeight(panelHeight);
+                            }}
+                        >
+                            <section
+                                style={{ height: '100%', overflow: 'hidden' }}
+                            >
+                                <MemoizedPerformancePanel userData={userData} />
+                            </section>
+                        </Resizable>
 
-                        <div className={styles.table}>
+                        <section className={styles.table}>
                             <PortfolioTables />
-                        </div>
+                        </section>
                     </section>
                 </div>
             </div>
@@ -282,6 +353,7 @@ function Portfolio() {
                                 ))}
                             </ol>
                         </section>
+
                         <section className={styles.fee_table}>
                             <h4>Market Maker Tiers</h4>
                             <header>
@@ -303,6 +375,7 @@ function Portfolio() {
                                 )}
                             </ol>
                         </section>
+
                         <div className={styles.neg_fees}>
                             Negative fees are rebates
                         </div>

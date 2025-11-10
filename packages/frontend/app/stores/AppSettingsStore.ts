@@ -47,11 +47,15 @@ type AppSettingsStore = {
 
     isWalletCollapsed: boolean;
     setIsWalletCollapsed: (collapsed: boolean) => void;
+
+    portfolioPanelHeight: number | null;
+    setPortfolioPanelHeight: (h: number | null) => void;
 };
 
 const LS_KEY = 'VISUAL_SETTINGS';
 const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 const DEFAULT_WALLET_COLLAPSED = false;
+const DEFAULT_PORTFOLIO_PANEL_HEIGHT: number | null = null;
 
 const ssrSafeStorage = () =>
     (typeof window !== 'undefined'
@@ -89,12 +93,15 @@ export const useAppSettings = create<AppSettingsStore>()(
             isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
             setIsWalletCollapsed: (collapsed) =>
                 set({ isWalletCollapsed: collapsed }),
+
+            portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
+            setPortfolioPanelHeight: (h) => set({ portfolioPanelHeight: h }),
         }),
 
         {
             name: LS_KEY,
             storage: createJSONStorage(ssrSafeStorage),
-            version: 4,
+            version: 5,
             migrate: (persistedState: unknown, version: number) => {
                 const state = persistedState as AppSettingsStore;
 
@@ -110,6 +117,12 @@ export const useAppSettings = create<AppSettingsStore>()(
                         isWalletCollapsed: DEFAULT_WALLET_COLLAPSED,
                     };
                 }
+                if (version < 5) {
+                    return {
+                        ...state,
+                        portfolioPanelHeight: DEFAULT_PORTFOLIO_PANEL_HEIGHT,
+                    };
+                }
 
                 return persistedState;
             },
@@ -120,6 +133,7 @@ export const useAppSettings = create<AppSettingsStore>()(
                 // orderBookMode: state.orderBookMode,
                 chartTopHeight: state.chartTopHeight,
                 isWalletCollapsed: state.isWalletCollapsed,
+                portfolioPanelHeight: state.portfolioPanelHeight,
             }),
         },
     ),
