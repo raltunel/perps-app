@@ -16,7 +16,7 @@ export function meta() {
     ];
 }
 
-interface PayoutMovementIF {
+export interface PayoutMovementIF {
     payout_id: string;
     date: string;
     currency_address: string;
@@ -34,7 +34,7 @@ interface PayoutMovementIF {
     referrer_identifier: string;
 }
 
-interface PayoutMovementsIF {
+interface PayoutMovementsResponseIF {
     total_results: number;
     page: number;
     page_size: number;
@@ -51,6 +51,9 @@ export default function Referrals() {
 
     const [rewardsEarned, setRewardsEarned] = useState<string>('...');
 
+    const [payoutMovements, setPayoutMovements] = useState<PayoutMovementIF[]>(
+        [],
+    );
     useEffect(() => {
         const OPTIONS = {
             method: 'GET',
@@ -66,9 +69,14 @@ export default function Referrals() {
             OPTIONS,
         )
             .then((res) => res.json())
-            .then((res) => console.log(res))
+            .then((res: PayoutMovementsResponseIF) => {
+                console.log(res);
+                setPayoutMovements(res.results);
+            })
             .catch((err) => console.error(err));
     }, []);
+
+    useEffect(() => console.log(payoutMovements), [payoutMovements.length]);
 
     useEffect(() => {
         const options = {
@@ -178,7 +186,7 @@ export default function Referrals() {
             </div>
             <section className={styles.tableContainer}>
                 <CodeTabs />
-                <ReferralsTabs />
+                <ReferralsTabs payoutMovements={payoutMovements} />
             </section>
         </div>
     );

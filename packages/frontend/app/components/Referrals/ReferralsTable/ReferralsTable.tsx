@@ -5,8 +5,17 @@ import ReferralsTableRow from './ReferralsTableRow';
 import { useReferralsTable } from './useReferralsTable';
 import { referralData } from './data';
 import { BiChevronLeft, BiChevronRight } from 'react-icons/bi';
+import type { PayoutMovementIF } from '~/routes/referrals/referrals';
 
-function ReferralsTable() {
+interface PropsIF {
+    payoutMovements: PayoutMovementIF[];
+}
+
+function ReferralsTable(props: PropsIF) {
+    const { payoutMovements } = props;
+
+    console.log(payoutMovements);
+
     const {
         currentItems,
         currentPage,
