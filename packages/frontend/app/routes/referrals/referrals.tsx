@@ -16,6 +16,31 @@ export function meta() {
     ];
 }
 
+interface PayoutMovementIF {
+    payout_id: string;
+    date: string;
+    currency_address: string;
+    chain_id: number;
+    is_referrer: boolean;
+    conversion_id: string;
+    conversion_name: string;
+    total_amount: string;
+    project_name: string;
+    // is this actually a string literal union?
+    payout_status: string;
+    // what actually is this?
+    payout_status_details: null;
+    user_identifier: string;
+    referrer_identifier: string;
+}
+
+interface PayoutMovementsIF {
+    total_results: number;
+    page: number;
+    page_size: number;
+    results: PayoutMovementIF[];
+}
+
 export default function Referrals() {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
@@ -25,6 +50,25 @@ export default function Referrals() {
     const { formatNum } = useNumFormatter();
 
     const [rewardsEarned, setRewardsEarned] = useState<string>('...');
+
+    useEffect(() => {
+        const OPTIONS = {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                authorization:
+                    'Bearer 0211e7ba625bea13424e0e56715e5a1675f3d8cd0284f4939a5f7820b06cbab0',
+            },
+        };
+
+        fetch(
+            'https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy&identifier_type=solana_address&type=point',
+            OPTIONS,
+        )
+            .then((res) => res.json())
+            .then((res) => console.log(res))
+            .catch((err) => console.error(err));
+    }, []);
 
     useEffect(() => {
         const options = {
