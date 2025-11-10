@@ -1149,7 +1149,7 @@ function OrderInput({
         }, 700);
 
         return () => clearTimeout(timeoutId);
-    }, [tradeDirection, marketOrderType, notionalQtyNum]);
+    }, [tradeDirection, marketOrderType]);
 
     const sizeSliderPercentageValueProps = useMemo(
         () => ({
