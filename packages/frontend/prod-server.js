@@ -48,7 +48,7 @@ app.listen(PORT, () => {
         );
     } else {
         console.log(
-            `Production server is running on http://localhost:{YOUR_HOST_PORT}`,
+            `Production server is running on http://localhost:{HOST_PORT}`,
         );
     }
 });
