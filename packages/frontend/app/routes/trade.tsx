@@ -57,7 +57,6 @@ export default function Trade() {
 
     // mobile Positions tab dropdown
     const [positionsMenuOpen, setPositionsMenuOpen] = useState(false);
-    // --- HYDRATION GATE (add after your other useState hooks) ---
     const [settingsHydrated, setSettingsHydrated] = useState(() => {
         const p = (useAppSettings as any).persist;
         return p?.hasHydrated?.() ?? false;
@@ -175,7 +174,7 @@ export default function Trade() {
     const switchTab = useCallback(
         (tab: TabType) => {
             if (activeTab === tab) return;
-            visibilityRefs.current = {
+            Refs.current = {
                 order: tab === 'order',
                 chart: tab === 'chart',
                 book: tab === 'book',

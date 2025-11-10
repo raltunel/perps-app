@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -44,14 +44,9 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     const { fetchUserPortfolio } = useInfoApi();
 
     const [parsedKey, setParsedKey] = useState<string>();
-    const [chartWidth, setChartWidth] = useState<number>(
-        window.innerWidth > 768
-            ? Math.min(850, window.innerWidth - 50)
-            : window.innerWidth - 50,
-    );
-    const [chartHeight, setChartHeight] = useState<number>(
-        Math.max(250 - (870 - window.innerHeight), 100),
-    );
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [chartWidth, setChartWidth] = useState<number>(800); // Will be recalculated on mount
+    const [chartHeight, setChartHeight] = useState<number>(250); // Default base height
 
     const parseFakeUserData = (key: string) => {
         const userPositionData = positionDataMap.get(key);
@@ -127,29 +122,66 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         activeTab,
     ]);
 
-    window.addEventListener('resize', () => {
-        const height = window.innerHeight;
-        const width = window.innerWidth;
+    // Track both window and container resize
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
 
-        const header = document.getElementById('portfolio-header-container');
+        const updateChartDimensions = () => {
+            const containerHeight = container.clientHeight;
+            const containerWidth = container.clientWidth;
 
-        const headerWidth = header ? header.clientWidth : 0;
+            const header = document.getElementById(
+                'portfolio-header-container',
+            );
+            const headerWidth = header ? header.clientWidth : 0;
 
-        if (headerWidth > 1250) {
-            setChartWidth(() => Math.max(850 - (1250 - width), 250));
-        } else {
-            setChartWidth(() => headerWidth - 50);
-        }
+            // Width calculation: use window width logic for consistency
+            const width = window.innerWidth;
+            if (headerWidth > 1250) {
+                setChartWidth(Math.max(850 - (1250 - width), 250));
+            } else {
+                setChartWidth(
+                    Math.max(
+                        Math.min(containerWidth - 50, headerWidth - 50),
+                        250,
+                    ),
+                );
+            }
 
-        if (height < 870) {
-            setChartHeight(() => Math.max(250 - (870 - height), 100));
-        } else {
-            setChartHeight(() => 250);
-        }
-    });
+            // Height calculation: use container height instead of window height
+            // This allows the chart to resize with the panel
+            const minHeight = 100;
+
+            // Calculate available height (subtract smaller padding for tabs/header only)
+            // Reduced from 150 to 80 to give charts more room
+            const availableHeight = containerHeight - 80;
+
+            // Don't cap at 250px - let it grow with available space
+            setChartHeight(Math.max(availableHeight, minHeight));
+        };
+
+        // Initial calculation
+        updateChartDimensions();
+
+        // Window resize listener (for actual window resizing)
+        window.addEventListener('resize', updateChartDimensions);
+
+        // ResizeObserver to watch for container size changes (for panel resizing)
+        const resizeObserver = new ResizeObserver(() => {
+            updateChartDimensions();
+        });
+
+        resizeObserver.observe(container);
+
+        return () => {
+            window.removeEventListener('resize', updateChartDimensions);
+            resizeObserver.disconnect();
+        };
+    }, []);
 
     return (
-        <div>
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
             {activeTab === 'Performance' && pnlHistory && (
                 <LineChart
                     lineData={pnlHistory}

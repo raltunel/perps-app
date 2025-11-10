@@ -36,27 +36,44 @@ function Portfolio() {
     const PANEL_MIN = 180;
     const TABLE_MIN = 250;
 
-    const persistApi = (useAppSettings as any).persist;
-    const alreadyHydrated = persistApi?.hasHydrated?.() ?? false;
-    const [hydrated, setHydrated] = useState(alreadyHydrated);
-
-    useEffect(() => {
-        if (alreadyHydrated) return;
-        const unsub = persistApi?.onFinishHydration?.(() => setHydrated(true));
-        return () => unsub?.();
-    }, [alreadyHydrated, persistApi]);
-
     const { portfolioPanelHeight, setPortfolioPanelHeight } = useAppSettings();
 
-    const initialPanelHeight = alreadyHydrated
-        ? (portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT)
-        : DEFAULT_PANEL_HEIGHT;
+    // Don't render until we've read from localStorage
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [isLayoutReady, setIsLayoutReady] = useState(false);
 
-    const [panelHeight, setPanelHeight] = useState<number>(initialPanelHeight);
-    const [maxTop, setMaxTop] = useState<number>(10000);
+    useEffect(() => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const persist = (useAppSettings as any).persist;
+        if (!persist) {
+            setIsHydrated(true);
+            return;
+        }
+
+        // If already hydrated
+        if (persist.hasHydrated?.()) {
+            setIsHydrated(true);
+            return;
+        }
+
+        // Wait for hydration
+        const unsub = persist.onFinishHydration?.(() => {
+            setIsHydrated(true);
+        });
+
+        return unsub;
+    }, []);
+
+    const [panelHeight, setPanelHeight] = useState<number>(
+        portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT,
+    );
+    const [maxTop, setMaxTop] = useState<number | null>(null);
     const startRef = useRef(panelHeight);
+    const hasInitialized = useRef(false);
 
+    // Compute maxTop so the table never shrinks below TABLE_MIN
     useLayoutEffect(() => {
+        if (!isHydrated || hasInitialized.current) return; // Wait for hydration first, only run once
         const el = mainRef.current;
         if (!el) return;
         const gap =
@@ -66,19 +83,26 @@ function Portfolio() {
                 ),
             ) || 8;
         const total = el.clientHeight;
-        setMaxTop(Math.max(PANEL_MIN, total - TABLE_MIN - gap));
-    }, []);
+        const computed = Math.max(PANEL_MIN, total - TABLE_MIN - gap);
+        setMaxTop(computed);
 
-    // After hydration, adopt saved height (clamped to current maxTop). This avoids the default→snap.
-    useEffect(() => {
-        if (!hydrated) return;
-        const raw = portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT;
-        const clamped = Math.max(PANEL_MIN, Math.min(raw, maxTop));
+        // Set initial height from store, clamped to bounds
+        hasInitialized.current = true;
+        const storeValue = portfolioPanelHeight ?? DEFAULT_PANEL_HEIGHT;
+        const clamped = Math.max(PANEL_MIN, Math.min(storeValue, computed));
         setPanelHeight(clamped);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hydrated, portfolioPanelHeight, maxTop]);
+        setIsLayoutReady(true);
+    }, [isHydrated, portfolioPanelHeight]);
 
-    // ---- DATA/UI ----
+    // WHEN LAYOUT CHANGES (maxTop on window resize), clamp LOCAL state to respect bounds
+    useEffect(() => {
+        if (maxTop === null || !hasInitialized.current) return;
+        setPanelHeight((prev) => {
+            const next = Math.max(PANEL_MIN, Math.min(prev, maxTop));
+            return next === prev ? prev : next;
+        });
+    }, [maxTop]);
+
     const { portfolio, formatCurrency, userData } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
     const { currency } = useNumFormatter();
@@ -97,6 +121,11 @@ function Portfolio() {
         if (mobileActionMenuButtonRef.current?.contains(target)) return;
         setIsMobileActionMenuOpen(false);
     }, isMobileActionMenuOpen);
+
+    // Don't render anything until store has hydrated
+    if (!isHydrated) {
+        return null;
+    }
 
     const mobileTop = (
         <section className={styles.mobileTop}>
@@ -165,38 +194,11 @@ function Portfolio() {
         </section>
     );
 
-    if (!hydrated) {
-        return (
-            <div className={styles.outer}>
-                <div className={styles.container}>
-                    <AnimatedBackground
-                        mode='absolute'
-                        layers={1}
-                        opacity={1}
-                        duration='15s'
-                        strokeWidth='2'
-                        palette={{
-                            color1: '#1E1E24',
-                            color2: '#7371FC',
-                            color3: '#CDC1FF',
-                        }}
-                    />
-                    <WebDataConsumer />
-                    <header>Portfolio</header>
-                    {/* Skeleton spacer to keep layout calm while hydrating */}
-                    <div
-                        className={styles.column}
-                        style={{ minHeight: '60vh' }}
-                    />
-                    {/** Modals can still render even while hydrating */}
-                    {PortfolioModalsRenderer}
-                </div>
-            </div>
-        );
-    }
-
     return (
-        <div className={styles.outer}>
+        <div
+            className={styles.outer}
+            style={{ opacity: isLayoutReady ? 1 : 0 }}
+        >
             <div className={styles.container}>
                 <AnimatedBackground
                     mode='absolute'
@@ -283,7 +285,7 @@ function Portfolio() {
                         <Resizable
                             size={{ width: '100%', height: panelHeight }}
                             minHeight={PANEL_MIN}
-                            maxHeight={maxTop}
+                            maxHeight={maxTop ?? undefined}
                             enable={{ bottom: true }}
                             handleStyles={{
                                 bottom: { height: '8px', cursor: 'row-resize' },
@@ -303,12 +305,13 @@ function Portfolio() {
                                     PANEL_MIN,
                                     Math.min(
                                         startRef.current + d.height,
-                                        maxTop,
+                                        maxTop ?? 10000,
                                     ),
                                 );
                                 setPanelHeight(next);
                             }}
                             onResizeStop={() => {
+                                // Persist only on user action
                                 setPortfolioPanelHeight(panelHeight);
                             }}
                         >
