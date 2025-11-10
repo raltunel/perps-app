@@ -162,7 +162,11 @@ export default function Notification(props: propsIF) {
 
     return (
         <section
-            className={styles.notification}
+            className={`${styles.notification} ${
+                data.txLink && data.message.length > 50
+                    ? styles.tallNotification
+                    : ''
+            }`}
             onMouseEnter={() => {
                 setIsHovered(true);
                 onMouseEnter?.(data.slug);
