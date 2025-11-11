@@ -40,6 +40,19 @@ interface PayoutMovementsResponseIF {
     results: PayoutMovementIF[];
 }
 
+export type PayoutByReferrerT = {
+    [key: string]: {
+        volume: number;
+        earnings: {
+            currency: {
+                address: string;
+                chainId: string;
+            };
+            amount: number;
+        }[];
+    };
+};
+
 export default function Referrals() {
     const { t } = useTranslation();
     const userDataStore = useUserDataStore();
@@ -76,6 +89,10 @@ export default function Referrals() {
             .catch((err) => console.error(err));
     }, []);
 
+    const [payoutsByReferrer, setPayoutsByReferrer] = useState<
+        PayoutByReferrerT[]
+    >([]);
+
     useEffect(() => {
         const options = {
             method: 'GET',
@@ -107,6 +124,7 @@ export default function Referrals() {
             .then((res) => {
                 console.log('payouts: ', res);
                 console.log('calculating payouts...');
+                setPayoutsByReferrer(res);
                 setReferralCount(res.length.toString());
                 const totalPayouts: number = res.reduce(
                     (acc: number, payout: any) => {
@@ -182,7 +200,10 @@ export default function Referrals() {
             </div>
             <section className={styles.tableContainer}>
                 <CodeTabs />
-                <ReferralsTabs payoutMovements={payoutMovements} />
+                <ReferralsTabs
+                    payoutMovements={payoutMovements}
+                    payoutsByReferrer={payoutsByReferrer}
+                />
             </section>
         </div>
     );
