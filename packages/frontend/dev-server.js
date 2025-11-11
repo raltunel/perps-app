@@ -6,6 +6,15 @@ const PORT = Number.parseInt(process.env.PORT || '3000');
 const app = express();
 app.disable('x-powered-by');
 
+const originalWarn = console.warn;
+const ignoredSourceMapPattern = /Sourcemap for /;
+console.warn = (message, ...rest) => {
+    if (typeof message === 'string' && ignoredSourceMapPattern.test(message)) {
+        return;
+    }
+    originalWarn.call(console, message, ...rest);
+};
+
 console.log('Starting development server');
 const viteDevServer = await import('vite').then((vite) =>
     vite.createServer({
