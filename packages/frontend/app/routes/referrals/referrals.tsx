@@ -26,8 +26,7 @@ export interface PayoutMovementIF {
     conversion_name: string;
     total_amount: string;
     project_name: string;
-    // is this actually a string literal union?
-    payout_status: string;
+    payout_status: 'pending' | 'completed';
     // what actually is this?
     payout_status_details: null;
     user_identifier: string;
