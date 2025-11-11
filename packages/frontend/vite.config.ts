@@ -15,8 +15,21 @@ export default defineConfig({
         ssr: true,
     },
     ssr: {
-        noExternal: ['@fogo/sessions-sdk-react'],
+        noExternal: [
+            '@fogo/sessions-sdk-react',
+            '@fogo/sessions-sdk',
+            '@fogo/sessions-idls',
+            '@wormhole-foundation/sdk-solana-ntt',
+            '@wormhole-foundation/sdk-solana',
+            '@wormhole-foundation/sdk-solana-core',
+            '@wormhole-foundation/sdk-base',
+            '@wormhole-foundation/sdk-definitions',
+            '@wormhole-foundation/sdk-definitions-ntt',
+        ],
         target: 'node',
+        optimizeDeps: {
+            include: ['buffer', 'base64-js', 'ieee754'],
+        },
     },
     resolve: {
         alias: [
