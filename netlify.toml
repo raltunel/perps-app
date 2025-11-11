@@ -4,6 +4,9 @@
   publish = "build"
   functions = "netlify/functions"
 
+[functions]
+  external_node_modules = ["@coral-xyz/anchor"]
+
 [build.environment]
   NODE_VERSION = "22"
   NODE_OPTIONS = "--max-old-space-size=4096"
