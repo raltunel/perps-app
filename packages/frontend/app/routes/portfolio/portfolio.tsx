@@ -105,6 +105,9 @@ function Portfolio() {
 
     const { portfolio, formatCurrency, userData } = usePortfolioManager();
     const [isMobileActionMenuOpen, setIsMobileActionMenuOpen] = useState(false);
+    const [mobileView, setMobileView] = useState<'performance' | 'table'>(
+        'performance',
+    );
     const { currency } = useNumFormatter();
 
     const {
@@ -281,50 +284,105 @@ function Portfolio() {
                         </div>
                     </div>
 
-                    <section className={styles.mainContent} ref={mainRef}>
-                        <Resizable
-                            size={{ width: '100%', height: panelHeight }}
-                            minHeight={PANEL_MIN}
-                            maxHeight={maxTop ?? undefined}
-                            enable={{ bottom: true }}
-                            handleStyles={{
-                                bottom: { height: '8px', cursor: 'row-resize' },
-                            }}
-                            handleComponent={{
-                                bottom: (
-                                    <div className={styles.resizeHandle}>
-                                        <div className={styles.resizeGrip} />
-                                    </div>
-                                ),
-                            }}
-                            onResizeStart={() => {
-                                startRef.current = panelHeight;
-                            }}
-                            onResize={(_e, _dir, _ref, d: NumberSize) => {
-                                const next = Math.max(
-                                    PANEL_MIN,
-                                    Math.min(
-                                        startRef.current + d.height,
-                                        maxTop ?? 10000,
-                                    ),
-                                );
-                                setPanelHeight(next);
-                            }}
-                            onResizeStop={() => {
-                                // Persist only on user action
-                                setPortfolioPanelHeight(panelHeight);
-                            }}
+                    {/* Mobile toggle buttons */}
+                    <div className={styles.mobileToggle}>
+                        <button
+                            className={`${styles.toggleButton} ${mobileView === 'performance' ? styles.active : ''}`}
+                            onClick={() => setMobileView('performance')}
                         >
-                            <section
-                                style={{ height: '100%', overflow: 'hidden' }}
-                            >
-                                <MemoizedPerformancePanel userData={userData} />
-                            </section>
-                        </Resizable>
+                            Performance
+                        </button>
+                        <button
+                            className={`${styles.toggleButton} ${mobileView === 'table' ? styles.active : ''}`}
+                            onClick={() => setMobileView('table')}
+                        >
+                            Positions
+                        </button>
+                    </div>
 
-                        <section className={styles.table}>
-                            <PortfolioTables />
-                        </section>
+                    <section className={styles.mainContent} ref={mainRef}>
+                        {/* Desktop: Resizable split view */}
+                        <div className={styles.desktopView}>
+                            <Resizable
+                                size={{ width: '100%', height: panelHeight }}
+                                minHeight={PANEL_MIN}
+                                maxHeight={maxTop ?? undefined}
+                                enable={{ bottom: true }}
+                                handleStyles={{
+                                    bottom: {
+                                        height: '8px',
+                                        cursor: 'row-resize',
+                                    },
+                                }}
+                                handleComponent={{
+                                    bottom: (
+                                        <div className={styles.resizeHandle}>
+                                            <div
+                                                className={styles.resizeGrip}
+                                            />
+                                        </div>
+                                    ),
+                                }}
+                                onResizeStart={() => {
+                                    startRef.current = panelHeight;
+                                }}
+                                onResize={(_e, _dir, _ref, d: NumberSize) => {
+                                    const next = Math.max(
+                                        PANEL_MIN,
+                                        Math.min(
+                                            startRef.current + d.height,
+                                            maxTop ?? 10000,
+                                        ),
+                                    );
+                                    setPanelHeight(next);
+                                }}
+                                onResizeStop={() => {
+                                    // Persist only on user action
+                                    setPortfolioPanelHeight(panelHeight);
+                                }}
+                            >
+                                <section
+                                    style={{
+                                        height: '100%',
+                                        overflow: 'hidden',
+                                    }}
+                                >
+                                    {isLayoutReady && (
+                                        <MemoizedPerformancePanel
+                                            userData={userData}
+                                            panelHeight={panelHeight}
+                                        />
+                                    )}
+                                </section>
+                            </Resizable>
+
+                            <section className={styles.table}>
+                                <PortfolioTables />
+                            </section>
+                        </div>
+
+                        {/* Mobile: Toggle between views */}
+                        <div className={styles.mobileViewContainer}>
+                            {mobileView === 'performance' ? (
+                                <section
+                                    style={{
+                                        height: '100%',
+                                        overflow: 'visible',
+                                    }}
+                                >
+                                    {isLayoutReady && (
+                                        <MemoizedPerformancePanel
+                                            userData={userData}
+                                            panelHeight={panelHeight}
+                                        />
+                                    )}
+                                </section>
+                            ) : (
+                                <section className={styles.table}>
+                                    <PortfolioTables />
+                                </section>
+                            )}
+                        </div>
                     </section>
                 </div>
             </div>

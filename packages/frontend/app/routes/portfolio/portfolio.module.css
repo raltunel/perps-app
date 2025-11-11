@@ -148,6 +148,47 @@
     min-height: 0;
 }
 
+/* Mobile toggle buttons - hidden on desktop */
+.mobileToggle {
+    display: none;
+    gap: var(--gap-xs);
+    width: 100%;
+}
+
+.toggleButton {
+    flex: 1;
+    padding: var(--padding-s);
+    background: var(--bg-dark3);
+    color: var(--text2);
+    border: 1px solid var(--bg-dark5);
+    border-radius: var(--radius-s);
+    font-size: var(--font-size-s);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+    background: var(--bg-dark4);
+}
+
+.toggleButton.active {
+    background: var(--accent1);
+    color: var(--text1);
+    border-color: var(--accent1);
+}
+
+/* Desktop view - shown by default */
+.desktopView {
+    display: contents; /* Pass through to maintain grid structure */
+}
+
+/* Mobile view - hidden by default */
+.mobileViewContainer {
+    display: none;
+    height: 100%;
+    overflow: visible;
+}
+
 .sendMobile,
 .netValueMobile {
     display: none !important;
@@ -293,6 +334,31 @@
         display: flex;
         flex-direction: column;
         gap: var(--gap-s);
+    }
+
+    .mainContent {
+        /* Full height on mobile for toggle view */
+        height: 100%;
+        display: block;
+        overflow: visible;
+    }
+
+    /* Show mobile toggle buttons */
+    .mobileToggle {
+        display: flex;
+        padding: var(--padding-m) 0;
+    }
+
+    /* Hide desktop resizable view */
+    .desktopView {
+        display: none !important;
+    }
+
+    /* Show mobile toggle view */
+    .mobileViewContainer {
+        display: block;
+        height: 100%;
+        overflow: visible;
     }
 
     .sendDesktop,

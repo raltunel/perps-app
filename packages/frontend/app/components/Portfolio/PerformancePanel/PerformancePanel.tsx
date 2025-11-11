@@ -15,6 +15,7 @@ import useNumFormatter from '~/hooks/useNumFormatter';
 
 interface PerformancePanelProps {
     userData: any;
+    panelHeight?: number;
 }
 
 const AVAILABLE_TABS = ['Performance', 'Account Value', 'Collateral'];
@@ -26,7 +27,10 @@ const animationConfig = {
     transition: { duration: 0.2 },
 };
 
-export default function PerformancePanel({ userData }: PerformancePanelProps) {
+export default function PerformancePanel({
+    userData,
+    panelHeight,
+}: PerformancePanelProps) {
     const [activeTab, setActiveTab] = useState('');
     const chartStageRef = useRef<HTMLDivElement>(null);
 
@@ -158,6 +162,7 @@ export default function PerformancePanel({ userData }: PerformancePanelProps) {
                     accountValueHistory={accountValueHistory}
                     userProfileLineData={userProfileLineData}
                     setUserProfileLineData={setUserProfileLineData}
+                    panelHeight={panelHeight}
                 />
 
                 {/* {activeTab.toLowerCase()} */}

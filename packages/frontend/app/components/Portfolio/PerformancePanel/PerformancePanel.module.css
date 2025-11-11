@@ -87,11 +87,20 @@
         flex-direction: column;
         gap: var(--gap-s);
         padding: 0;
+        overflow: visible;
     }
 
     .metricsContainer {
         height: 50px;
         overflow-y: scroll;
         display: none;
+    }
+
+    .perfChart {
+        overflow: visible;
+    }
+
+    .container {
+        overflow: visible;
     }
 }
