@@ -19,9 +19,6 @@ export default function ReferralsTableRow({
             <div className={`${styles.cell} ${styles.addressCell}`}>
                 {truncString(address, 5, 5)}
             </div>
-            <div className={`${styles.cell} ${styles.dateJoinedCell}`}>
-                {/* {referral.dateJoined} */}
-            </div>
             <div className={`${styles.cell} ${styles.volumeCell}`}>
                 {formatNum(data.volume, 2, true, true)}
             </div>
