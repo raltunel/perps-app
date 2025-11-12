@@ -1,4 +1,7 @@
-import type { PayoutByReferrerT } from '~/routes/referrals/referrals';
+import type {
+    PayoutByReferrerEarningsT,
+    PayoutByReferrerT,
+} from '~/routes/referrals/referrals';
 import styles from './ReferralsTable.module.css';
 import truncString from '~/utils/functions/truncString';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -26,7 +29,16 @@ export default function ReferralsTableRow({
                 {formatNum(0, 2, true, true)}
             </div>
             <div className={`${styles.cell} ${styles.rewardsCell}`}>
-                {formatNum(data.earnings[0].amount, 2, true, true)}
+                {formatNum(
+                    data.earnings.reduce(
+                        (acc: number, current: PayoutByReferrerEarningsT) =>
+                            acc + current.amount,
+                        0,
+                    ),
+                    2,
+                    true,
+                    true,
+                )}
             </div>
         </div>
     );

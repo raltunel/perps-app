@@ -40,16 +40,23 @@ interface PayoutMovementsResponseIF {
     results: PayoutMovementIF[];
 }
 
+export interface PayoutByReferrerCurrencyIF {
+    address: string;
+    chainId: string;
+}
+
+export type PayoutByReferrerEarningsT = {
+    currency: {
+        address: string;
+        chainId: string;
+    };
+    amount: number;
+};
+
 export type PayoutByReferrerT = {
     [key: string]: {
         volume: number;
-        earnings: {
-            currency: {
-                address: string;
-                chainId: string;
-            };
-            amount: number;
-        }[];
+        earnings: PayoutByReferrerEarningsT[];
     };
 };
 
@@ -117,7 +124,7 @@ export default function Referrals() {
         };
 
         fetch(
-            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
+            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${'4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy'}&user_identifier_type=solana_address`,
             optionsPayouts,
         )
             .then((res) => res.json())
