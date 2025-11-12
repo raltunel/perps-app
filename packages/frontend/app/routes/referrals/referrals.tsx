@@ -85,7 +85,7 @@ export default function Referrals() {
         };
 
         fetch(
-            'https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy&identifier_type=solana_address&type=point',
+            `https://api.fuul.xyz/api/v1/payouts/movements?user_identifier=${userDataStore.userAddress}&identifier_type=solana_address&type=point`,
             OPTIONS,
         )
             .then((res) => res.json())
@@ -124,7 +124,7 @@ export default function Referrals() {
         };
 
         fetch(
-            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${'4aHN2EdGYnQ5RWhjQvh5hyuH82VQbyDQMhFWLrz1BeDy'}&user_identifier_type=solana_address`,
+            `https://api.fuul.xyz/api/v1/payouts/by-referrer?user_identifier=${userDataStore.userAddress}&user_identifier_type=solana_address`,
             optionsPayouts,
         )
             .then((res) => res.json())
