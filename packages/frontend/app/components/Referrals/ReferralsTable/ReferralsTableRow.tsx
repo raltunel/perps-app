@@ -6,15 +6,19 @@ import styles from './ReferralsTable.module.css';
 import truncString from '~/utils/functions/truncString';
 import useNumFormatter from '~/hooks/useNumFormatter';
 
-interface ReferralsTableRowProps {
+interface PropsIF {
     referral: PayoutByReferrerT;
 }
 
-export default function ReferralsTableRow({
-    referral,
-}: ReferralsTableRowProps) {
+export default function ReferralsTableRow(props: PropsIF) {
+    const { referral } = props;
+
+    // logic to format a number for localized currency
     const { formatNum } = useNumFormatter();
 
+    // prop `referral` is an object with a single key-value pair
+    // key → wallet address for user
+    // value → object with fee and rewards data
     const [address, data] = Object.entries(referral)[0];
 
     return (
@@ -30,6 +34,7 @@ export default function ReferralsTableRow({
             </div>
             <div className={`${styles.cell} ${styles.rewardsCell}`}>
                 {formatNum(
+                    // sum of all the 'amount' fields across chains
                     data.earnings.reduce(
                         (acc: number, current: PayoutByReferrerEarningsT) =>
                             acc + current.amount,
