@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMobile } from '~/hooks/useMediaQuery';
 import { useAppStateStore } from '~/stores/AppStateStore';
+import TradeCartToolbar from '~/components/TradeCart/TradeCartToolbar';
 
 const TradingViewChart = () => {
     const isMobile = useMobile(768);
@@ -14,6 +15,8 @@ const TradingViewChart = () => {
             setChartHeight(chartSection.clientHeight);
         }
     };
+
+    const [cartModeOpen, setCartModeOpen] = useState(false);
 
     useEffect(() => {
         assignChartHeight();
@@ -31,10 +34,24 @@ const TradingViewChart = () => {
     }, [debugToolbarOpen]);
 
     return (
-        <div
-            id='tv_chart'
-            style={{ position: 'relative', width: '100%', height: '100%' }}
-        />
+        <>
+            <div
+                style={{ position: 'relative', width: '100%', height: '100%' }}
+            >
+                <TradeCartToolbar
+                    cartModeOpen={cartModeOpen}
+                    setCartModeOpen={setCartModeOpen}
+                />
+                <div
+                    id='tv_chart'
+                    style={{
+                        position: 'relative',
+                        width: '100%',
+                        height: '100%',
+                    }}
+                />
+            </div>
+        </>
     );
 };
 
