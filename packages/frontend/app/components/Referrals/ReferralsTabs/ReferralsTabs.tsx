@@ -17,7 +17,7 @@ interface PropsIF {
 
 const availableTabs = ['referrals.title', 'referrals.rewardHistory'];
 
-export default function RefferalsTabs(props: PropsIF) {
+export default function ReferralsTabs(props: PropsIF) {
     const {
         initialTab = 'referrals.title',
         payoutMovements,
