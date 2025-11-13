@@ -12,8 +12,24 @@
 }
 
 .container header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     color: var(--text1, #f0f0f8);
     font-size: var(--font-size-xl, 36px);
+}
+
+.container header > button {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    height: 12px;
+    font-size: var(--font-size-s);
+    color: var(--text2);
+    border: 1px solid var(--bg-dark3);
+    align-self: flex-end;
 }
 
 .container header p {
@@ -53,7 +69,7 @@
 .tableContainer {
     /* grid, but no fixed height; let it grow */
     display: grid;
-    grid-template-columns: 1fr 3fr;
+    grid-template-columns: 2fr 3fr 1fr;
     gap: var(--gap-s);
     /* removed fixed heights */
     min-height: 0; /* critical for scrollable children */
@@ -83,6 +99,10 @@
         font-size: clamp(24px, 4.5vw, 32px);
         line-height: 1.15;
         letter-spacing: -0.01em;
+    }
+
+    .container header > button {
+        display: flex;
     }
 
     .container header p {
@@ -122,7 +142,7 @@
     }
 
     .tableContainer {
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: 2fr 3fr;
         gap: clamp(10px, 2.8vw, 16px);
         /* no height/max-height here */
         min-height: 0;
@@ -130,6 +150,7 @@
 
     /* Panels behave and can scroll inside */
     .tableContainer > div {
+        grid: 2fr 3fr 1fr;
         border: 1px solid color-mix(in oklab, #ffffff 12%, transparent);
         border-radius: 16px;
         background: color-mix(in oklab, #0f0f18 90%, #161622 10%);

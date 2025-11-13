@@ -239,6 +239,13 @@ export default function PageHeader() {
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress]);
 
+    // Ensure URL parameter always overrides cached referral code
+    useEffect(() => {
+        if (referralCodeFromURL.value) {
+            referralStore.cache(referralCodeFromURL.value);
+        }
+    }, [referralCodeFromURL.value]);
+
     const { totVolume } = useReferralStore();
 
     // track page views with Fuul

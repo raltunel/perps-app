@@ -8,6 +8,8 @@ import { FUUL_API_KEY, FUUL_GET_API_KEY } from '~/utils/Constants';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import AnimatedBackground from '~/components/AnimatedBackground/AnimatedBackground';
 import useNumFormatter from '~/hooks/useNumFormatter';
+import ReferralsExtra from '~/components/Referrals/ReferralsExtra/ReferralsExtra';
+import SimpleButton from '~/components/SimpleButton/SimpleButton';
 
 export function meta() {
     return [
@@ -187,13 +189,16 @@ export default function Referrals() {
                 }}
             />
             <header>
-                {t('referrals.title')}
-                <p>
-                    {t('referrals.description')}{' '}
-                    <a href='https://docs.ambient.finance/' target='_blank'>
-                        {t('common.learnMore')}
-                    </a>
-                </p>
+                <div className={styles.header_text}>
+                    {t('referrals.title')}
+                    <p>
+                        {t('referrals.description')}{' '}
+                        <a href='https://docs.ambient.finance/' target='_blank'>
+                            {t('common.learnMore')}
+                        </a>
+                    </p>
+                </div>
+                <SimpleButton bg={'dark2'}>Register as Affiliate</SimpleButton>
             </header>
             <div className={styles.detailsContainer}>
                 <div className={styles.detailsContent}>
@@ -211,6 +216,7 @@ export default function Referrals() {
                     payoutMovements={payoutMovements}
                     payoutsByReferrer={payoutsByReferrer}
                 />
+                <ReferralsExtra />
             </section>
         </div>
     );

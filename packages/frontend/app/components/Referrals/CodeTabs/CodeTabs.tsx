@@ -409,16 +409,20 @@ export default function CodeTabs(props: PropsIF) {
                     setAffiliateCode(affiliateCode);
                 }
 
-                const referrer = await getReferrerAsync(
-                    userWalletKey.toString(),
-                );
-                if (referrer?.referrer_identifier) {
-                    const affiliateCode = await getAffiliateCode(
-                        referrer.referrer_identifier as string,
-                        UserIdentifierType.SolanaAddress,
+                // Only fetch and apply on-chain referrer if no URL parameter is present
+                // URL parameter always takes precedence
+                if (!handleReferralURLParam.value) {
+                    const referrer = await getReferrerAsync(
+                        userWalletKey.toString(),
                     );
-                    if (affiliateCode) {
-                        handleUpdateReferralCode(affiliateCode);
+                    if (referrer?.referrer_identifier) {
+                        const affiliateCode = await getAffiliateCode(
+                            referrer.referrer_identifier as string,
+                            UserIdentifierType.SolanaAddress,
+                        );
+                        if (affiliateCode) {
+                            handleUpdateReferralCode(affiliateCode);
+                        }
                     }
                 }
             } else {
