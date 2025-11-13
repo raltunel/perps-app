@@ -6,9 +6,11 @@
     "type": "module",
     "scripts": {
         "build": "react-router build && node netlify/prepare.js",
+        "build:prod": "react-router build",
         "dev": "pnpm i && cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
         "perp": "pnpm i && cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
         "perps": "pnpm i && cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
+        "prod": "pnpm build:prod && cross-env NODE_ENV=production PORT=3002 node ./prod-server.js",
         "start": "netlify serve",
         "typecheck": "react-router typegen && tsc",
         "prebuild": "node scripts/copy-tv.js",
