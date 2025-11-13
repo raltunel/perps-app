@@ -1,6 +1,6 @@
 # Perps App Monorepo
 
-## Run App Locally with Docker (in case the Ambient Perps Website is temporarily down)
+## Run App Locally with Docker (in case the Ambient Perps Website is down)
 
 1. Install Docker Desktop (https://www.docker.com/get-started/)
 2. Open the Terminal within Docker Desktop (in the bottom right corner)
