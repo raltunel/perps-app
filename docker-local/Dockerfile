@@ -6,10 +6,5 @@ WORKDIR /app
 
 RUN npm install -g pnpm
 
-# RUN git clone -b add-prod-mode-script https://github.com/Crocswap/perps-app.git .
-# RUN pnpm install
-
-# CMD ["pnpm", "--filter", "frontend", "prod"]
-
-CMD ["sh", "-c", "rm -rf /app/* /app/.* 2>/dev/null || true && git clone -b add-prod-mode-script https://github.com/Crocswap/perps-app.git . && pnpm install && pnpm --filter frontend prod"]
+CMD ["sh", "-c", "rm -rf /app/* /app/.* 2>/dev/null || true && git clone -b main https://github.com/Crocswap/perps-app.git . && pnpm install && pnpm --filter frontend prod"]
 
