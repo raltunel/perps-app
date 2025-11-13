@@ -42,6 +42,9 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
+const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1_000_000;
+const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
+
 // fee amounts for affiliate and the referred user
 const AFFILIATE_PERCENT = '10%';
 const USER_PERCENT = '4%';
@@ -57,6 +60,20 @@ export default function CodeTabs(props: PropsIF) {
     const userDataStore = useUserDataStore();
     const affiliateAddress = userDataStore.userAddress;
     const referralStore = useReferralStore();
+
+    const defaultAffiliateCode = useMemo(() => {
+        if (!affiliateAddress) return '';
+        return affiliateAddress
+            .toString()
+            .slice(0, DEFAULT_AFFILIATE_CODE_LENGTH);
+    }, [affiliateAddress]);
+
+    const canEditAffiliateCode = useMemo(() => {
+        return (
+            referralStore.totVolume !== undefined &&
+            referralStore.totVolume >= AFFILIATE_EDIT_VOLUME_THRESHOLD
+        );
+    }, [referralStore.totVolume]);
 
     const { t } = useTranslation();
 
@@ -432,6 +449,18 @@ export default function CodeTabs(props: PropsIF) {
     }, [sessionState]);
 
     useEffect(() => {
+        if (!canEditAffiliateCode) {
+            setTemporaryAffiliateCode(defaultAffiliateCode);
+        }
+    }, [canEditAffiliateCode, defaultAffiliateCode]);
+
+    useEffect(() => {
+        if (!canEditAffiliateCode && editModeAffiliate) {
+            setEditModeAffiliate(false);
+        }
+    }, [canEditAffiliateCode, editModeAffiliate]);
+
+    useEffect(() => {
         // If no temporary code, immediately set as valid
         if (!temporaryAffiliateCode) {
             setIsTemporaryAffiliateCodeValid(undefined);
@@ -457,7 +486,11 @@ export default function CodeTabs(props: PropsIF) {
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [temporaryAffiliateCode, tempAffiliateCodeCharsValidate]);
+    }, [
+        temporaryAffiliateCode,
+        tempAffiliateCodeCharsValidate,
+        canEditAffiliateCode,
+    ]);
 
     /**
      * Creates an affiliate code for the user
@@ -475,9 +508,17 @@ export default function CodeTabs(props: PropsIF) {
                     return;
                 }
 
+                const codeToCreate = canEditAffiliateCode
+                    ? temporaryAffiliateCode.trim()
+                    : defaultAffiliateCode;
+
+                if (!codeToCreate) {
+                    return;
+                }
+
                 // Create the message to sign
                 // this text must match FUUL requirements exactly, coordinate changes with @Ben
-                const message = `I confirm that I am creating the ${temporaryAffiliateCode} code`;
+                const message = `I confirm that I am creating the ${codeToCreate} code`;
 
                 // Convert message to Uint8Array
                 const messageBytes = new TextEncoder().encode(message);
@@ -503,11 +544,11 @@ export default function CodeTabs(props: PropsIF) {
                         identifierType: UserIdentifierType.SolanaAddress,
                         signature,
                         signaturePublicKey: userWalletKey.toString(),
-                        code: temporaryAffiliateCode,
+                        code: codeToCreate,
                     });
 
                     setTemporaryAffiliateCode('');
-                    setAffiliateCode(temporaryAffiliateCode);
+                    setAffiliateCode(codeToCreate);
                 } catch (error) {
                     throw error;
                 }
@@ -520,6 +561,10 @@ export default function CodeTabs(props: PropsIF) {
 
     const updateAffiliateCode = async () => {
         try {
+            if (!canEditAffiliateCode) {
+                return;
+            }
+
             if (isEstablished(sessionState)) {
                 const userWalletKey =
                     sessionState.walletPublicKey ||
@@ -529,9 +574,15 @@ export default function CodeTabs(props: PropsIF) {
                     return;
                 }
 
+                const codeToUpdate = temporaryAffiliateCode.trim();
+
+                if (!codeToUpdate) {
+                    return;
+                }
+
                 // Create the message to sign
                 // this text must match FUUL requirements exactly, coordinate changes with @Ben
-                const message = `I confirm that I am updating my code to ${temporaryAffiliateCode}`;
+                const message = `I confirm that I am updating my code to ${codeToUpdate}`;
 
                 // Convert message to Uint8Array
                 const messageBytes = new TextEncoder().encode(message);
@@ -554,10 +605,10 @@ export default function CodeTabs(props: PropsIF) {
                     identifierType: UserIdentifierType.SolanaAddress, // evm_address | solana_address | xrpl_address
                     signature,
                     signaturePublicKey: userWalletKey.toString(), // Only for XRPL type signatures
-                    code: temporaryAffiliateCode,
+                    code: codeToUpdate,
                 });
 
-                setAffiliateCode(temporaryAffiliateCode);
+                setAffiliateCode(codeToUpdate);
                 setTemporaryAffiliateCode('');
                 setEditModeAffiliate(false);
             }
@@ -601,25 +652,7 @@ export default function CodeTabs(props: PropsIF) {
     }
 
     const affiliateCodeElem = isSessionEstablished ? (
-        referralStore.totVolume !== undefined &&
-        referralStore.totVolume < 10000 ? (
-            <section className={styles.sectionWithButton}>
-                <div className={styles.createCodeContent}>
-                    <p>
-                        Cannot make an affiliate code prior to{' '}
-                        {formatNum(10000, 0, true, true)} in volume.
-                    </p>
-                    <div className={styles.volume_progress_bar}>
-                        <div
-                            style={{
-                                width: `${(referralStore.totVolume / 10000) * 100}%`,
-                            }}
-                        />
-                    </div>
-                    <p>Lifetime volume: {totVolumeFormatted}</p>
-                </div>
-            </section>
-        ) : affiliateCode && !editModeAffiliate ? (
+        affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
                     <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
@@ -661,81 +694,150 @@ export default function CodeTabs(props: PropsIF) {
                         />
                     </p>
                 </div>
-                {referralStore.totVolume !== undefined &&
-                    referralStore.totVolume >= 10000 && (
-                        <SimpleButton
-                            bg='accent1'
-                            onClick={() => setEditModeAffiliate(true)}
-                        >
-                            {t('common.edit')}
-                        </SimpleButton>
-                    )}
+                {canEditAffiliateCode && (
+                    <SimpleButton
+                        bg='accent1'
+                        onClick={() => {
+                            setTemporaryAffiliateCode(affiliateCode);
+                            setEditModeAffiliate(true);
+                        }}
+                    >
+                        {t('common.edit')}
+                    </SimpleButton>
+                )}
             </section>
         ) : (
             <section className={styles.sectionWithButton}>
                 <div className={styles.enterCodeContent}>
-                    <h6>{t('referrals.createAnAffiliateCode')}</h6>
-                    <input
-                        type='text'
-                        value={temporaryAffiliateCode}
-                        onChange={(e) =>
-                            setTemporaryAffiliateCode(e.target.value)
-                        }
-                        onKeyDown={async (e) => {
-                            if (
-                                e.key === 'Enter' &&
-                                temporaryAffiliateCode.trim()
-                            ) {
-                                editModeAffiliate
-                                    ? updateAffiliateCode()
-                                    : createAffiliateCode();
-                            }
-                        }}
-                    />
-                    <div className={styles.validation_item}>
-                        {temporaryAffiliateCode.length > 0 ? (
-                            temporaryAffiliateCode.length >= 2 &&
-                            temporaryAffiliateCode.length <= 30 &&
-                            tempAffiliateCodeCharsValidate ? (
-                                <FaCheck size={10} color='var(--green)' />
-                            ) : (
-                                <GiCancel size={10} color='var(--red)' />
-                            )
-                        ) : (
-                            <FaRegCircle size={10} color='var(--text3)' />
-                        )}
-                        <p>
-                            2 - 30 letters, numbers, hyphens (A-Z, a-z, 0-9, -)
-                        </p>
-                    </div>
-                    <div className={styles.validation_item}>
-                        {temporaryAffiliateCode.length > 0 ? (
-                            isTemporaryAffiliateCodeValid === true ? (
-                                <FaCheck size={10} color='var(--green)' />
-                            ) : (
-                                <GiCancel size={10} color='var(--red)' />
-                            )
-                        ) : (
-                            <FaRegCircle size={10} color='var(--text3)' />
-                        )}
-                        <p>Code is available</p>
-                    </div>
-                    <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
+                    {canEditAffiliateCode ? (
+                        <>
+                            <h6>{t('referrals.createAnAffiliateCode')}</h6>
+                            <input
+                                type='text'
+                                value={temporaryAffiliateCode}
+                                onChange={(e) =>
+                                    setTemporaryAffiliateCode(e.target.value)
+                                }
+                                onKeyDown={async (e) => {
+                                    if (
+                                        e.key === 'Enter' &&
+                                        temporaryAffiliateCode.trim()
+                                    ) {
+                                        editModeAffiliate
+                                            ? updateAffiliateCode()
+                                            : createAffiliateCode();
+                                    }
+                                }}
+                            />
+                            <div className={styles.validation_item}>
+                                {temporaryAffiliateCode.length > 0 ? (
+                                    temporaryAffiliateCode.length >= 2 &&
+                                    temporaryAffiliateCode.length <= 30 &&
+                                    tempAffiliateCodeCharsValidate ? (
+                                        <FaCheck
+                                            size={10}
+                                            color='var(--green)'
+                                        />
+                                    ) : (
+                                        <GiCancel
+                                            size={10}
+                                            color='var(--red)'
+                                        />
+                                    )
+                                ) : (
+                                    <FaRegCircle
+                                        size={10}
+                                        color='var(--text3)'
+                                    />
+                                )}
+                                <p>
+                                    2 - 30 letters, numbers, hyphens (A-Z, a-z,
+                                    0-9, -)
+                                </p>
+                            </div>
+                            <div className={styles.validation_item}>
+                                {temporaryAffiliateCode.length > 0 ? (
+                                    isTemporaryAffiliateCodeValid === true ? (
+                                        <FaCheck
+                                            size={10}
+                                            color='var(--green)'
+                                        />
+                                    ) : (
+                                        <GiCancel
+                                            size={10}
+                                            color='var(--red)'
+                                        />
+                                    )
+                                ) : (
+                                    <FaRegCircle
+                                        size={10}
+                                        color='var(--text3)'
+                                    />
+                                )}
+                                <p>Code is available</p>
+                            </div>
+                            <h6>{t('referrals.createAUniqueCodeToEarn')}</h6>
+                        </>
+                    ) : (
+                        <>
+                            <h6>
+                                {t('referrals.yourCodeIs', {
+                                    affiliateCode: affiliateCode || '—',
+                                })}
+                            </h6>
+                            {/* <p>
+                                {t('referrals.defaultCodeVolumeExplanation', {
+                                    threshold: formatNum(
+                                        AFFILIATE_EDIT_VOLUME_THRESHOLD,
+                                        0,
+                                        true,
+                                        true,
+                                    ),
+                                })}
+                            </p>
+                            <p>
+                                <Trans
+                                    i18nKey='referrals.defaultCodeDescription'
+                                    values={{
+                                        defaultCode:
+                                            defaultAffiliateCode || '—',
+                                    }}
+                                    components={[
+                                        <span
+                                            style={{ color: 'var(--accent3)' }}
+                                        />,
+                                    ]}
+                                />
+                            </p> */}
+                            {isTemporaryAffiliateCodeValid === false && (
+                                <p style={{ color: 'var(--red)' }}>
+                                    Default code unavailable. Please reach out
+                                    to support.
+                                </p>
+                            )}
+                        </>
+                    )}
                 </div>
                 <div className={styles.refferal_code_buttons}>
                     <SimpleButton
                         bg='accent1'
-                        onClick={
-                            editModeAffiliate
-                                ? updateAffiliateCode
-                                : createAffiliateCode
-                        }
+                        onClick={() => {
+                            if (editModeAffiliate && canEditAffiliateCode) {
+                                void updateAffiliateCode();
+                            } else {
+                                void createAffiliateCode();
+                            }
+                        }}
                         disabled={
-                            !temporaryAffiliateCode.trim() ||
-                            !isTemporaryAffiliateCodeValid ||
-                            !tempAffiliateCodeCharsValidate ||
-                            temporaryAffiliateCode.length > 30 ||
-                            temporaryAffiliateCode.length < 2
+                            canEditAffiliateCode
+                                ? !temporaryAffiliateCode.trim() ||
+                                  !isTemporaryAffiliateCodeValid ||
+                                  !tempAffiliateCodeCharsValidate ||
+                                  temporaryAffiliateCode.length > 30 ||
+                                  temporaryAffiliateCode.length < 2
+                                : !temporaryAffiliateCode.trim() ||
+                                  isTemporaryAffiliateCodeValid === false ||
+                                  isTemporaryAffiliateCodeValid === undefined
                         }
                     >
                         {t(
@@ -744,18 +846,20 @@ export default function CodeTabs(props: PropsIF) {
                                 : 'common.create',
                         )}
                     </SimpleButton>
-                    {editModeAffiliate && affiliateCode && (
-                        <SimpleButton
-                            bg='dark4'
-                            hoverBg='accent1'
-                            onClick={() => {
-                                setEditModeAffiliate(false);
-                                setTemporaryAffiliateCode('');
-                            }}
-                        >
-                            {t('common.cancel')}
-                        </SimpleButton>
-                    )}
+                    {editModeAffiliate &&
+                        affiliateCode &&
+                        canEditAffiliateCode && (
+                            <SimpleButton
+                                bg='dark4'
+                                hoverBg='accent1'
+                                onClick={() => {
+                                    setEditModeAffiliate(false);
+                                    setTemporaryAffiliateCode('');
+                                }}
+                            >
+                                {t('common.cancel')}
+                            </SimpleButton>
+                        )}
                 </div>
             </section>
         )
