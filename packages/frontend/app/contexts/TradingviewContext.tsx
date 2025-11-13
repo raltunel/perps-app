@@ -77,6 +77,14 @@ export interface ChartContainerProps {
     container: string;
 }
 
+const handleChartBuy = (price: number) => {
+    console.log('Buy at price:', price);
+};
+
+const handleChartSell = (price: number) => {
+    console.log('Sell at price:', price);
+};
+
 export const TradingViewProvider: React.FC<{
     children: React.ReactNode;
     tradingviewLib?: {
@@ -388,6 +396,36 @@ export const TradingViewProvider: React.FC<{
                         });
                     }
                 });
+
+            // Add context menu items for buy/sell
+            tvWidget.onContextMenu((_unixTime: number, price: number) => {
+                const formattedPrice = price.toFixed(5);
+                const symbol = processedSymbol.split(':')[0] || 'ETHBTC';
+
+                return [
+                    {
+                        position: 'top' as const,
+                        text: `Sell 1 ${symbol} @ ${formattedPrice} limit`,
+                        click: () => {
+                            handleChartSell(price);
+                            console.log('Sell Limit Order:', price);
+                        },
+                    },
+                    {
+                        position: 'top' as const,
+                        text: `Buy 1 ${symbol} @ ${formattedPrice} stop`,
+                        click: () => {
+                            handleChartBuy(price);
+                            console.log('Buy Stop Order:', price);
+                        },
+                    },
+                    {
+                        position: 'top' as const,
+                        text: '-',
+                        click: () => {},
+                    },
+                ];
+            });
 
             setChart(tvWidget);
         });
