@@ -253,8 +253,14 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { obChosenPrice, symbol, symbolInfo, marginMode, setMarginMode } =
-        useTradeDataStore();
+    const {
+        obChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+    } = useTradeDataStore();
 
     const { buys, sells } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
@@ -850,6 +856,13 @@ function OrderInput({
             setPrice(event.target.value);
         }
     };
+
+    useEffect(() => {
+        const parsed = parseFormattedNum(price);
+        if (!isNaN(parsed)) {
+            setOrderInputPriceValue(parsed);
+        }
+    }, [price, parseFormattedNum, setOrderInputPriceValue]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');

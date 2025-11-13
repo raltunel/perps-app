@@ -43,6 +43,11 @@ interface OrderBookProps {
     switchTab?: (tab: TabType) => void;
 }
 
+interface ObFocusedSlot {
+    price: number;
+    side: 'buy' | 'sell';
+}
+
 const dummyOrder: OrderBookRowIF = {
     coin: 'BTC',
     px: 10000,
@@ -100,6 +105,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
+    const [focusedSlot, setFocusedSlot] = useState<ObFocusedSlot | null>(null);
+
     const rowLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
         null,
     );
@@ -117,6 +124,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setObChosenPrice,
         setObChosenAmount,
         symbol,
+        orderInputPriceValue,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -262,6 +270,51 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
+
+    useEffect(() => {
+        if (!filledResolution.current || !symbolInfo || !orderInputPriceValue) {
+            setFocusedSlot(null);
+            return;
+        }
+
+        let side;
+        let targetSlots;
+        const gapTreshold = filledResolution.current.val / 2;
+
+        if (orderInputPriceValue < symbolInfo?.markPx) {
+            side = 'buy';
+            targetSlots = buySlots;
+        } else {
+            side = 'sell';
+            targetSlots = sellSlots;
+        }
+
+        let closestSlot = findClosestSlot(
+            orderInputPriceValue,
+            targetSlots,
+            gapTreshold,
+        );
+
+        if (!closestSlot) {
+            closestSlot = findClosestSlot(
+                orderInputPriceValue,
+                targetSlots,
+                gapTreshold * 2,
+            );
+        }
+
+        if (closestSlot) {
+            setFocusedSlot({
+                price: closestSlot,
+                side: side as 'buy' | 'sell',
+            });
+        }
+    }, [orderInputPriceValue, symbolInfo?.markPx, buySlots, sellSlots]);
+
+    useEffect(() => {
+        if (!focusedSlot) return;
+        console.log('>>>>>> focusedSlot', focusedSlot);
+    }, [focusedSlot]);
 
     // code blocks were being used in sdk approach
 
@@ -753,6 +806,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'sell'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}
@@ -794,6 +852,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                                 clickListener={rowClickHandler}
                                                 getBsColor={getBsColor}
                                                 formatNum={formatNum}
+                                                obFocusedSlotPrice={
+                                                    focusedSlot?.side === 'buy'
+                                                        ? focusedSlot?.price
+                                                        : undefined
+                                                }
                                             />
                                             <div
                                                 className={styles.ratioBar}
