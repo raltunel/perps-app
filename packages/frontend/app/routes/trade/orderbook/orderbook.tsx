@@ -309,6 +309,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 price: closestSlot,
                 side: side as 'buy' | 'sell',
             });
+        } else {
+            setFocusedSlot(null);
         }
     }, [orderInputPriceValue, buySlots, sellSlots]);
 
