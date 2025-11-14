@@ -858,11 +858,22 @@ function OrderInput({
     };
 
     useEffect(() => {
-        const parsed = parseFormattedNum(price);
-        if (!isNaN(parsed)) {
-            setOrderInputPriceValue(parsed);
+        if (marketOrderType === 'market') {
+            setOrderInputPriceValue(0);
+        } else {
+            const parsed = parseFormattedNum(price);
+            if (!isNaN(parsed)) {
+                setOrderInputPriceValue(parsed);
+            }
         }
-    }, [price, parseFormattedNum, setOrderInputPriceValue]);
+    }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
+
+    useEffect(() => {
+        if (marketOrderType === 'market') {
+            setOrderInputPriceValue(0);
+        } else {
+        }
+    }, [marketOrderType, setOrderInputPriceValue]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');

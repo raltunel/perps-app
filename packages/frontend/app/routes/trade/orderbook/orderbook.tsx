@@ -280,8 +280,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let side;
         let targetSlots;
         const gapTreshold = filledResolution.current.val / 2;
+        const price = (buySlots[0] + sellSlots[0]) / 2;
 
-        if (orderInputPriceValue < symbolInfo?.markPx) {
+        if (orderInputPriceValue < price) {
             side = 'buy';
             targetSlots = buySlots;
         } else {
@@ -309,11 +310,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 side: side as 'buy' | 'sell',
             });
         }
-    }, [orderInputPriceValue, symbolInfo?.markPx, buySlots, sellSlots]);
+    }, [orderInputPriceValue, buySlots, sellSlots]);
 
     useEffect(() => {
         if (!focusedSlot) return;
-        console.log('>>>>>> focusedSlot', focusedSlot);
     }, [focusedSlot]);
 
     // code blocks were being used in sdk approach
