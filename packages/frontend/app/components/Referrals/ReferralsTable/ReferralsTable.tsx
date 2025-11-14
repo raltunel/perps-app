@@ -52,12 +52,7 @@ function ReferralsTable(props: PropsIF) {
                 ))}
 
                 {payoutsByReferrer.length === 0 && (
-                    <div
-                        className={styles.rowContainer}
-                        style={{ justifyContent: 'center', padding: '2rem 0' }}
-                    >
-                        No data to display
-                    </div>
+                    <div className={styles.emptyState}>No data to display</div>
                 )}
             </div>
 
