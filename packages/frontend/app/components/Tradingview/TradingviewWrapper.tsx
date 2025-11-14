@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { TradingViewProvider } from '~/contexts/TradingviewContext';
 import TradingViewChart from '~/routes/chart/chart';
 import { loadTradingViewLibrary } from '~/routes/chart/lazyLoading/useLazyTradingview';
-import OverlayCanvas from '~/routes/chart/overlayCanvas/overlayCanvas';
 import styles from './chartLoading.module.css';
+import OrderLinesOverlayCanvas from '~/routes/chart/overlayCanvas/OrderLinesOverlayCanvas';
+import LimitOrderPlacementCanvas from '~/routes/chart/overlayCanvas/LimitOrderPlacementCanvas';
 
 const TradingViewWrapper: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,7 +57,8 @@ const TradingViewWrapper: React.FC = () => {
                     setChartLoadingStatus={setChartLoadingStatus}
                 >
                     <TradingViewChart />
-                    <OverlayCanvas />
+                    <OrderLinesOverlayCanvas />
+                    <LimitOrderPlacementCanvas />
                 </TradingViewProvider>
             )}
         </div>
