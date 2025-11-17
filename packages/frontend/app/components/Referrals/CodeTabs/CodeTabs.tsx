@@ -55,7 +55,7 @@ export default function CodeTabs(props: PropsIF) {
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState<boolean | undefined>();
-    const [affiliateCode, setAffiliateCode] = useState('');
+    const [affiliateCode, setAffiliateCode] = useState('0x000s');
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
     const affiliateAddress = userDataStore.userAddress;
@@ -713,10 +713,12 @@ export default function CodeTabs(props: PropsIF) {
                             {!!referralStore.totVolume && (
                                 <div
                                     style={{
-                                        width:
-                                            (referralStore.totVolume /
-                                                1000000) *
+                                        width: `${Math.min(
                                             100,
+                                            (referralStore.totVolume /
+                                                1_000_000) *
+                                                100,
+                                        )}%`,
                                     }}
                                 />
                             )}
