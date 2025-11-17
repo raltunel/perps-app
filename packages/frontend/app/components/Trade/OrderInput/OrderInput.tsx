@@ -877,13 +877,6 @@ function OrderInput({
         }
     }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
 
-    useEffect(() => {
-        if (marketOrderType === 'market') {
-            setOrderInputPriceValue(0);
-        } else {
-        }
-    }, [marketOrderType, setOrderInputPriceValue]);
-
     const handlePriceBlur = () => {
         console.log('Input lost focus');
     };
