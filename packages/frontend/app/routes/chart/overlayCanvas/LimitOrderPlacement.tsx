@@ -34,6 +34,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         y: number;
     } | null>(null);
     const [mousePrice, setMousePrice] = useState<number | null>(null);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [processingProgress, setProcessingProgress] = useState(0);
     const { getBsColor } = useAppSettings();
     const colors = getBsColor();
     const { symbolInfo } = useTradeDataStore();
@@ -106,8 +108,35 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 x: e.offsetX * dpr,
                 y: e.offsetY * dpr,
             });
+            setIsProcessing(true);
+            setProcessingProgress(0);
 
             console.log('Limit order placement at price:', price);
+
+            // Animate progress over 5 seconds
+            const startTime = Date.now();
+            const duration = 5000;
+
+            const animateProgress = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                setProcessingProgress(progress);
+
+                if (progress < 1) {
+                    requestAnimationFrame(animateProgress);
+                } else {
+                    // Clear after animation completes
+                    setTimeout(() => {
+                        setClickedPrice(null);
+                        setClickedMousePos(null);
+                        setIsProcessing(false);
+                        setProcessingProgress(0);
+                    }, 100);
+                }
+            };
+
+            requestAnimationFrame(animateProgress);
         };
 
         iframeDoc.addEventListener('click', handleChartClick);
@@ -194,14 +223,48 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             const clickX = clickedMousePos.x;
                             const clickY = clickedMousePos.y;
 
-                            ctx.strokeStyle = lineColor;
-                            ctx.lineWidth = 2;
-                            ctx.setLineDash([5, 5]);
-                            ctx.beginPath();
-                            ctx.moveTo(0, clickY);
-                            ctx.lineTo(canvas.width, clickY);
-                            ctx.stroke();
-                            ctx.setLineDash([]);
+                            // Draw line with blinking effect when processing
+                            if (isProcessing) {
+                                // Create blinking effect - fade in and out (4 cycles over 5 seconds)
+                                const blinkProgress =
+                                    Math.sin(processingProgress * Math.PI * 8) *
+                                        0.5 +
+                                    0.5;
+                                const alpha = 0.4 + blinkProgress * 0.6; // Oscillate between 0.4 and 1.0
+
+                                // Draw main line
+                                ctx.strokeStyle = lineColor;
+                                ctx.lineWidth = 4;
+                                ctx.setLineDash([8, 6]);
+                                ctx.globalAlpha = alpha;
+                                ctx.beginPath();
+                                ctx.moveTo(0, clickY);
+                                ctx.lineTo(canvas.width, clickY);
+                                ctx.stroke();
+                                ctx.setLineDash([]);
+                                ctx.globalAlpha = 1.0;
+
+                                // Add a subtle glow effect
+                                ctx.strokeStyle = lineColor;
+                                ctx.lineWidth = 6;
+                                ctx.globalAlpha = alpha * 0.3;
+                                ctx.beginPath();
+                                ctx.moveTo(0, clickY);
+                                ctx.lineTo(canvas.width, clickY);
+                                ctx.stroke();
+                                ctx.globalAlpha = 1.0;
+                            } else {
+                                // Draw full line normally
+                                ctx.strokeStyle = lineColor;
+                                ctx.lineWidth = 4;
+                                ctx.setLineDash([8, 6]);
+                                ctx.beginPath();
+                                ctx.moveTo(0, clickY);
+                                ctx.lineTo(canvas.width, clickY);
+                                ctx.stroke();
+                                ctx.setLineDash([]);
+                            }
+
                             labelX = clickX + 15;
                             labelY = clickY - labelHeight / 2;
 
@@ -307,6 +370,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         canvasSize,
         isChartReady,
         overlayCanvasMousePositionRef,
+        isProcessing,
+        processingProgress,
     ]);
 
     return null;
