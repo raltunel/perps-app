@@ -816,7 +816,10 @@ export default function CodeTabs(props: PropsIF) {
                         <>
                             <h6>
                                 {t('referrals.yourCodeIs', {
-                                    affiliateCode: affiliateCode || '—',
+                                    affiliateCode:
+                                        affiliateCode ||
+                                        defaultAffiliateCode ||
+                                        '—',
                                 })}
                             </h6>
                             {/* <p>
