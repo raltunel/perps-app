@@ -7,6 +7,8 @@ import {
     updateOverlayCanvasSize,
 } from '../orders/customOrderLineUtils';
 import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
+import { tempPendingOrders } from '../orders/useOpenOrderLines';
+import type { LineData } from '../orders/component/LineComponent';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -77,7 +79,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     y: overlayOffsetY,
                 };
 
-                setMousePrice(price);
+                setMousePrice(parseFloat(price.toFixed(3)));
             });
     }, [chart, scaleData, overlayCanvasMousePositionRef]);
 
@@ -113,9 +115,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
             console.log('Limit order placement at price:', price);
 
-            // Animate progress over 5 seconds
+            const side: 'buy' | 'sell' =
+                markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
+
             const startTime = Date.now();
-            const duration = 5000;
+            const duration = 3000;
 
             const animateProgress = () => {
                 const elapsed = Date.now() - startTime;
@@ -126,12 +130,38 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 if (progress < 1) {
                     requestAnimationFrame(animateProgress);
                 } else {
-                    // Clear after animation completes
                     setTimeout(() => {
                         setClickedPrice(null);
                         setClickedMousePos(null);
                         setIsProcessing(false);
                         setProcessingProgress(0);
+
+                        if (mousePrice) {
+                            const randomQuantity = +(0).toFixed(2);
+
+                            const newPendingOrder: LineData = {
+                                xLoc: 0.4,
+                                yPrice: mousePrice,
+                                textValue: {
+                                    type: 'Limit',
+                                    price: mousePrice,
+                                    triggerCondition: '',
+                                },
+                                quantityTextValue: randomQuantity,
+                                quantityText: randomQuantity.toString(),
+                                color: colors[side],
+                                type: 'LIMIT',
+                                lineStyle: 3,
+                                lineWidth: 1,
+                                side: side,
+                            };
+
+                            tempPendingOrders.push(newPendingOrder);
+                            // Force re-render by triggering the hook dependency
+                            window.dispatchEvent(
+                                new Event('pendingOrdersChanged'),
+                            );
+                        }
                     }, 100);
                 }
             };

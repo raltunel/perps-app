@@ -9,6 +9,8 @@ import {
 import type { LineData } from './component/LineComponent';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 
+export const tempPendingOrders: LineData[] = [];
+
 export const useOpenOrderLines = (): LineData[] => {
     const { bsColor, getBsColor } = useAppSettings();
     const { chart } = useTradingView();
@@ -16,6 +18,14 @@ export const useOpenOrderLines = (): LineData[] => {
     const { debugWallet } = useDebugStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
+    const [pendingOrdersUpdate, setPendingOrdersUpdate] = useState(0);
+
+    useEffect(() => {
+        const handler = () => setPendingOrdersUpdate((prev) => prev + 1);
+        window.addEventListener('pendingOrdersChanged', handler);
+        return () =>
+            window.removeEventListener('pendingOrdersChanged', handler);
+    }, []);
 
     const pnlSzi = useMemo(() => {
         const data = positions
@@ -114,7 +124,10 @@ export const useOpenOrderLines = (): LineData[] => {
                 };
             });
 
-        setLines(newLines.filter((i) => i.yPrice > 0));
+        setLines([
+            ...newLines.filter((i) => i.yPrice > 0),
+            ...tempPendingOrders,
+        ]);
     }, [
         chart,
         JSON.stringify(userSymbolOrders),
@@ -122,6 +135,7 @@ export const useOpenOrderLines = (): LineData[] => {
         symbol,
         JSON.stringify(pnlSzi),
         bsColor,
+        pendingOrdersUpdate,
     ]);
 
     return lines;
