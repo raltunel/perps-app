@@ -18,6 +18,8 @@ interface OrderBookStore {
         symbol: string,
         resolutionPair: OrderRowResolutionIF,
     ) => void;
+    midPrice: number | null;
+    setMidPrice: (midPrice: number) => void;
 }
 
 const ssrSafeStorage = () =>
@@ -40,7 +42,7 @@ export const useOrderBookStore = create<OrderBookStore>()(
             sells: [],
             trades: [],
             setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) =>
-                set({ buys, sells }),
+                set({ buys, sells, midPrice: (buys[0].px + sells[0].px) / 2 }),
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
             addToResolutionPair: (
                 symbol: string,
@@ -53,6 +55,8 @@ export const useOrderBookStore = create<OrderBookStore>()(
                     },
                 })),
             resolutionPairs: {},
+            midPrice: null,
+            setMidPrice: (midPrice: number) => set({ midPrice }),
         }),
         {
             name: 'ORDERBOOK',

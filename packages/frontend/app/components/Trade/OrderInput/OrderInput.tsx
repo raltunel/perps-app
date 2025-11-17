@@ -262,7 +262,7 @@ function OrderInput({
         setOrderInputPriceValue,
     } = useTradeDataStore();
 
-    const { buys, sells } = useOrderBookStore();
+    const { buys, sells, midPrice } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
@@ -284,19 +284,30 @@ function OrderInput({
     };
 
     const setMidPriceAsPriceInput = () => {
+        if (!midPrice) return;
         if (
             marketOrderType === 'limit' &&
             buys.length > 0 &&
             sells.length > 0
         ) {
-            const resolution = buys[0].px - buys[1].px;
-            const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
-            if (!midOrMarkPrice) return;
+            // prev implementation
+
+            // const resolution = buys[0].px - buys[1].px;
+            // const midOrMarkPrice = resolution <= 1 ? getMidPrice() : markPx;
+            // if (!midOrMarkPrice) return;
+            // const formattedMidPrice = formatNumWithOnlyDecimals(
+            //     midOrMarkPrice,
+            //     6,
+            //     true,
+            // );
+
+            // -------
             const formattedMidPrice = formatNumWithOnlyDecimals(
-                midOrMarkPrice,
+                midPrice,
                 6,
                 true,
             );
+
             setPrice(formattedMidPrice);
         }
     };
@@ -331,11 +342,7 @@ function OrderInput({
     }, [
         isMidModeActive,
         marketOrderType,
-        !buys.length,
-        !sells.length,
-        buys?.[0]?.px,
-        sells?.[0]?.px,
-        markPx,
+        midPrice,
         confirmOrderModal.isOpen, // Add dependency to re-run when modal state changes
     ]);
 

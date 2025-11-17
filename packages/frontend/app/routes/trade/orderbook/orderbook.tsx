@@ -99,8 +99,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const { formatNum } = useNumFormatter();
     const lockOrderBook = useRef<boolean>(false);
     const { getBsColor } = useAppSettings();
-    const { buys, sells, setOrderBook, addToResolutionPair, resolutionPairs } =
-        useOrderBookStore();
+    const {
+        buys,
+        sells,
+        setOrderBook,
+        addToResolutionPair,
+        resolutionPairs,
+        midPrice,
+    } = useOrderBookStore();
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
@@ -272,7 +278,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
     useEffect(() => {
-        if (!filledResolution.current || !symbolInfo || !orderInputPriceValue) {
+        if (
+            !filledResolution.current ||
+            !symbolInfo ||
+            !orderInputPriceValue ||
+            !buys.length ||
+            !sells.length ||
+            !midPrice
+        ) {
             setFocusedSlot(null);
             return;
         }
@@ -280,14 +293,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let side;
         let targetSlots;
         const gapTreshold = filledResolution.current.val / 2;
-        const price = (buySlots[0] + sellSlots[0]) / 2;
 
-        if (orderInputPriceValue < price) {
+        if (orderInputPriceValue < midPrice) {
             side = 'buy';
-            targetSlots = buySlots;
+            targetSlots = buys.map((buy) => buy.px);
         } else {
             side = 'sell';
-            targetSlots = sellSlots;
+            targetSlots = sells.map((sell) => sell.px);
         }
 
         let closestSlot = findClosestSlot(
@@ -312,7 +324,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         } else {
             setFocusedSlot(null);
         }
-    }, [orderInputPriceValue, buySlots, sellSlots]);
+    }, [orderInputPriceValue, buys, sells, midPrice]);
 
     useEffect(() => {
         if (!focusedSlot) return;
