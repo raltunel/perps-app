@@ -131,6 +131,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setObChosenAmount,
         symbol,
         orderInputPriceValue,
+        tradeDirection,
+        isMidModeActive,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
@@ -287,6 +289,21 @@ const OrderBook: React.FC<OrderBookProps> = ({
             !midPrice
         ) {
             setFocusedSlot(null);
+            return;
+        }
+
+        if (isMidModeActive) {
+            if (tradeDirection === 'buy') {
+                setFocusedSlot({
+                    price: buys[0].px,
+                    side: 'buy',
+                });
+            } else {
+                setFocusedSlot({
+                    price: sells[0].px,
+                    side: 'sell',
+                });
+            }
             return;
         }
 

@@ -186,7 +186,6 @@ function OrderInput({
     const buyColor = getBsColor().buy;
     const sellColor = getBsColor().sell;
     const [marketOrderType, setMarketOrderType] = useState<string>('market');
-    const [tradeDirection, setTradeDirection] = useState<OrderSide>('buy');
 
     const [shouldUpdateAfterTrade, setShouldUpdateAfterTrade] = useState(false);
 
@@ -241,6 +240,19 @@ function OrderInput({
 
     const [isSizeSetAsPercentage, setIsSizeSetAsPercentage] = useState(false);
 
+    const {
+        obChosenPrice,
+        symbol,
+        symbolInfo,
+        marginMode,
+        setMarginMode,
+        setOrderInputPriceValue,
+        tradeDirection,
+        setTradeDirection,
+        setIsMidModeActive,
+        isMidModeActive,
+    } = useTradeDataStore();
+
     useEffect(() => {
         if (!marginBucket) return;
         const maxRemainingOI = maxRemainingUserNotionalOI(
@@ -252,15 +264,6 @@ function OrderInput({
     }, [marginBucket, tradeDirection]);
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
-
-    const {
-        obChosenPrice,
-        symbol,
-        symbolInfo,
-        marginMode,
-        setMarginMode,
-        setOrderInputPriceValue,
-    } = useTradeDataStore();
 
     const { buys, sells, midPrice } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
@@ -331,7 +334,6 @@ function OrderInput({
         obChosenPrice,
     ]);
 
-    const [isMidModeActive, setIsMidModeActive] = useState(false);
     const confirmOrderModal = useModal<modalContentT>('closed');
 
     useEffect(() => {
