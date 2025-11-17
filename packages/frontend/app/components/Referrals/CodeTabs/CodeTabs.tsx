@@ -90,6 +90,7 @@ export default function CodeTabs(props: PropsIF) {
         } else if (Number.isNaN(referralStore.totVolume)) {
             return formatNum(0, 2, true, true);
         }
+        console.log('totVolume: ', referralStore.totVolume);
         return formatNum(
             referralStore.totVolume,
             referralStore.totVolume < 0.01 ? 3 : 2,
@@ -692,6 +693,37 @@ export default function CodeTabs(props: PropsIF) {
                             }}
                             components={[<span />, <span />]}
                         />
+                    </p>
+                    <p className={styles.trackingLinkExplanation}>
+                        {t('referrals.toCustomizeAffiliateCode')}
+                    </p>
+                    <div className={styles.volume_progress_bar}>
+                        <div className={styles.volume_progress_bar_labels}>
+                            <p>Your volume:</p>
+                            <p>
+                                {formatNum(
+                                    referralStore.totVolume ?? 0,
+                                    2,
+                                    true,
+                                    true,
+                                )}
+                            </p>
+                        </div>
+                        <div className={styles.volume_progress_bar_body}>
+                            {!!referralStore.totVolume && (
+                                <div
+                                    style={{
+                                        width:
+                                            (referralStore.totVolume /
+                                                1000000) *
+                                            100,
+                                    }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                    <p className={styles.trackingLinkExplanation}>
+                        {t('common.seeDocsForMore')}
                     </p>
                 </div>
                 {canEditAffiliateCode && (
