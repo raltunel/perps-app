@@ -220,6 +220,9 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 const ctx = canvas.getContext('2d');
                 if (!ctx) return;
 
+                // Get device pixel ratio for high DPI displays (Retina, etc.)
+                const dpr = window.devicePixelRatio || 1;
+
                 // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -239,8 +242,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                     if (isClicked) {
                         // Draw price label box at click position (if available)
-                        const labelWidth = 100;
-                        const labelHeight = 24;
+                        const labelWidth = 100 * dpr;
+                        const labelHeight = 24 * dpr;
 
                         // Clicked line - show in buy/sell color
                         const side: 'buy' | 'sell' =
@@ -311,7 +314,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                         // Draw price text
                         ctx.fillStyle = '#ffffff';
-                        ctx.font = '12px monospace';
+                        ctx.font = `${12 * dpr}px monospace`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(
@@ -321,8 +324,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         );
                     } else {
                         // Mouse hover - only show label (no line)
-                        const labelWidth = 100;
-                        const labelHeight = 24;
+                        const labelWidth = 100 * dpr;
+                        const labelHeight = 24 * dpr;
 
                         // Determine side based on mark price
                         const side: 'buy' | 'sell' =
@@ -348,7 +351,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                         // Draw price text
                         ctx.fillStyle = '#ffffff';
-                        ctx.font = '12px monospace';
+                        ctx.font = `${12 * dpr}px monospace`;
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(
