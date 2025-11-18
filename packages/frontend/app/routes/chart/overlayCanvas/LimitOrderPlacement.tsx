@@ -9,6 +9,7 @@ import {
 import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
 import { tempPendingOrders } from '../orders/useOpenOrderLines';
 import type { LineData } from '../orders/component/LineComponent';
+import PriceActionDropdown from './PriceActionDropdown';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -43,6 +44,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         y: number;
         width: number;
         height: number;
+    } | null>(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState<{
+        x: number;
+        y: number;
+        price: number;
     } | null>(null);
     const { getBsColor } = useAppSettings();
     const colors = getBsColor();
@@ -132,9 +139,28 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     clickY >= buttonBounds.y &&
                     clickY <= buttonBounds.y + buttonBounds.height
                 ) {
-                    console.log('clicked at price:', mousePrice);
-                    // Handle button click - for now just log
-                    // You can add your custom logic here
+                    if (mousePrice) {
+                        const canvas = overlayCanvasRef.current;
+                        if (!canvas) return;
+
+                        const rect = canvas.getBoundingClientRect();
+                        const dropdownWidth = 280;
+
+                        const posX =
+                            buttonBounds.x +
+                            rect.left -
+                            dropdownWidth +
+                            buttonBounds.width;
+                        const posY =
+                            rect.top + buttonBounds.y + buttonBounds.height;
+
+                        setDropdownPosition({
+                            x: posX,
+                            y: posY,
+                            price: mousePrice,
+                        });
+                        setShowDropdown(true);
+                    }
                     return;
                 }
             }
@@ -323,7 +349,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                if (!mousePrice && !clickedPrice) return;
+                if (!mousePrice && !clickedPrice && !showDropdown) return;
 
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
                     const { pixel, chartHeight } = getPricetoPixel(
@@ -427,9 +453,13 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     drawLineAtPrice(clickedPrice, true);
                 }
 
-                // Draw mouse hover line (if exists and different from clicked)
+                // Draw mouse hover line (if exists and different from clicked) or if dropdown is open
                 if (mousePrice && mousePrice !== clickedPrice) {
                     drawLineAtPrice(mousePrice, false);
+                } else if (showDropdown && dropdownPosition) {
+                    // Keep button visible when dropdown is open
+                    const mouseY = overlayCanvasMousePositionRef.current.y;
+                    drawAddButton(ctx, canvas, mouseY, dpr);
                 }
             }
         };
@@ -459,9 +489,31 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         overlayCanvasMousePositionRef,
         isProcessing,
         processingProgress,
+        showDropdown,
+        dropdownPosition,
     ]);
 
-    return null;
+    const handleBuyLimit = (price: number) => {
+        console.log('Buy limit order at price:', price);
+    };
+
+    const handleSellStop = (price: number) => {
+        console.log('Sell stop order at price:', price);
+    };
+
+    return (
+        <>
+            {showDropdown && dropdownPosition && (
+                <PriceActionDropdown
+                    position={dropdownPosition}
+                    symbolCoin={symbolInfo?.coin}
+                    onClose={() => setShowDropdown(false)}
+                    onBuyLimit={handleBuyLimit}
+                    onSellStop={handleSellStop}
+                />
+            )}
+        </>
+    );
 };
 
 export default LimitOrderPlacement;
