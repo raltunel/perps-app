@@ -107,7 +107,8 @@ export default function OrderBookSection(props: propsIF) {
 
         let availableHeight = orderBookSection.getBoundingClientRect().height;
 
-        if (availableHeight <= 0) return;
+        // Skip calculation if height is too small (likely not fully rendered yet)
+        if (availableHeight <= 100) return;
 
         let otherHeightOB = 0;
         [
@@ -166,20 +167,27 @@ export default function OrderBookSection(props: propsIF) {
                 (orderRowHeightWithGaps * 2),
         );
 
-        setOrderCount((prev) => {
-            if (prev !== calculatedOrderCount) return calculatedOrderCount;
-            return prev;
-        });
+        // Only update if we have a valid positive count
+        if (calculatedOrderCount > 0) {
+            setOrderCount((prev) => {
+                if (prev !== calculatedOrderCount) return calculatedOrderCount;
+                return prev;
+            });
+        }
     }, [orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
         let pollId: ReturnType<typeof setInterval> | null = null;
+        let rafId: number | null = null;
 
         const handleResize = () => {
             if (timeoutId) clearTimeout(timeoutId);
-            timeoutId = setTimeout(calculateOrderCount, 50);
+            timeoutId = setTimeout(() => {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(calculateOrderCount);
+            }, 50);
         };
 
         window.addEventListener('resize', handleResize);
@@ -210,24 +218,30 @@ export default function OrderBookSection(props: propsIF) {
             if (dummyRow) resizeObserver.observe(dummyRow);
         };
 
-        attachObserver();
-        calculateOrderCount();
+        // Initial calculation after layout
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                attachObserver();
+                calculateOrderCount();
+            });
+        });
 
         // Retry observing/calculating for a few seconds to handle initial load/hydration timing
         let attempts = 0;
         pollId = setInterval(() => {
             attempts++;
             attachObserver();
-            calculateOrderCount();
-            if (attempts > 20) {
+            requestAnimationFrame(calculateOrderCount);
+            if (attempts > 30) {
                 if (pollId) clearInterval(pollId);
             }
-        }, 200);
+        }, 100);
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
             if (pollId) clearInterval(pollId);
+            if (rafId) cancelAnimationFrame(rafId);
             resizeObserver.disconnect();
             mutationObserver.disconnect();
         };
