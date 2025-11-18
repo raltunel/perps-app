@@ -89,7 +89,7 @@ export default defineConfig({
             registerType: 'autoUpdate',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
-                globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+                globPatterns: ['**/*.{js,css,html,png,svg,woff2,ttf}'],
                 // Don't cache large chunks or service worker itself
                 globIgnores: ['**/sw.js', '**/workbox-*.js'],
             },
