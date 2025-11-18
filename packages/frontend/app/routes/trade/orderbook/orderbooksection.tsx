@@ -162,9 +162,11 @@ export default function OrderBookSection(props: propsIF) {
                 (orderRowHeightWithGaps * 2),
         );
 
-        if (orderCount !== calculatedOrderCount)
-            setOrderCount(calculatedOrderCount);
-    }, [orderCount, orderBookMode, activeTab]);
+        setOrderCount((prev) => {
+            if (prev !== calculatedOrderCount) return calculatedOrderCount;
+            return prev;
+        });
+    }, [orderBookMode, activeTab]);
 
     // Resize effect
     useEffect(() => {
@@ -176,13 +178,32 @@ export default function OrderBookSection(props: propsIF) {
         };
 
         window.addEventListener('resize', handleResize);
+
+        const observer = new ResizeObserver(() => {
+            handleResize();
+        });
+
+        const target =
+            document.getElementById('orderBookSection') ||
+            document.getElementById('orderBookContainerInner');
+
+        if (target) {
+            observer.observe(target);
+        }
+
+        const dummyRow = document.getElementById('dummyOrderRow');
+        if (dummyRow) {
+            observer.observe(dummyRow);
+        }
+
         calculateOrderCount();
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
+            observer.disconnect();
         };
-    }, [calculateOrderCount]);
+    }, [calculateOrderCount, orderBookMode]);
 
     useEffect(() => {
         if (chartTopHeight) {
