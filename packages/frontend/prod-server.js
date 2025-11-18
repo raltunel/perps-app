@@ -1,7 +1,7 @@
-import { createRequestListener } from '@mjackson/node-fetch-server';
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { readFile } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -13,24 +13,24 @@ const HOST_PORT = process.env.HOST_PORT || undefined;
 const app = express();
 app.disable('x-powered-by');
 
-console.log('Starting production server');
+console.log('Starting static production server');
 
 // Serve static files from the build/client directory
 const clientBuildPath = path.join(__dirname, 'build', 'client');
 app.use(express.static(clientBuildPath, { maxAge: '1y' }));
 
-// SSR handler
-app.use(async (req, res, next) => {
+// SPA fallback
+app.get('*', async (req, res, next) => {
+    if (req.method !== 'GET') {
+        return next();
+    }
+
     try {
-        return await createRequestListener(async (request) => {
-            // Import the built server module
-            const source = await import('./build/server/server.js');
-            return await source.default(request, {
-                // TODO: Mock any required netlify functions context
-            });
-        })(req, res);
+        const indexPath = path.join(clientBuildPath, 'index.html');
+        const html = await readFile(indexPath, 'utf-8');
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     } catch (error) {
-        console.error('SSR Error:', error);
+        console.error('SPA fallback error:', error);
         next(error);
     }
 });
