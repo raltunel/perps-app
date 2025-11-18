@@ -1,6 +1,6 @@
 [build]
   base = "packages/frontend"
-  command = "node scripts/generate-announcements.js && node scripts/write-version.js && pnpm build"
+  command = "pnpm build:netlify"
   publish = "build"
   functions = "netlify/functions"
 

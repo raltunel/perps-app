@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build && node netlify/prepare.js",
+        "build:netlify": "pnpm run --parallel \"/^prebuild:.*/\" && pnpm build",
         "build:prod": "vite build",
         "dev": "cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
         "perp": "cross-env NODE_ENV=development PORT=3002 node ./dev-server.js",
@@ -13,7 +14,9 @@
         "prod": "pnpm build:prod && cross-env NODE_ENV=production PORT=3002 node ./prod-server.js",
         "start": "netlify serve",
         "typecheck": "tsc",
-        "prebuild": "node scripts/copy-tv.js",
+        "prebuild:announcements": "node scripts/generate-announcements.js",
+        "prebuild:version": "node scripts/write-version.js",
+        "prebuild:tv": "node scripts/copy-tv.js",
         "predev": "node scripts/copy-tv.js",
         "prestart": "node scripts/copy-tv.js",
         "lint": "eslint app --ext .js,.jsx,.ts,.tsx",
