@@ -16,8 +16,6 @@ export default defineConfig({
             'zustand',
             'd3',
             'd3fc',
-            'eventemitter3',
-            'bn.js',
             '@solana/web3.js',
         ],
         esbuildOptions: {
