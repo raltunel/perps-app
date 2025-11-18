@@ -12,6 +12,10 @@ build
 # Netlify
 .netlify
 
+# Vite PWA dev output
+dev-dist
+packages/frontend/dev-dist
+
 # Tradingview
 packages/frontend/public/tv/charting_library
 packages/frontend/public/tv/datafeeds
