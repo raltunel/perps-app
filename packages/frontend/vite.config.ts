@@ -16,8 +16,21 @@ export default defineConfig({
             'zustand',
             'd3',
             'd3fc',
+            '@solana/web3.js',
         ],
-        exclude: ['@solana/web3.js'], // Large deps that don't need pre-bundling
+        esbuildOptions: {
+            // Force proper CommonJS interop for default exports
+            mainFields: ['module', 'main'],
+            resolveExtensions: [
+                '.mjs',
+                '.js',
+                '.mts',
+                '.ts',
+                '.jsx',
+                '.tsx',
+                '.json',
+            ],
+        },
     },
     build: {
         outDir: 'build',
@@ -32,6 +45,10 @@ export default defineConfig({
             },
         },
         cssCodeSplit: true, // Enable CSS code splitting
+        commonjsOptions: {
+            // Ensure proper default export handling for CommonJS modules
+            transformMixedEsModules: true,
+        },
         rollupOptions: {
             output: {
                 manualChunks: {
