@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { readFile } from 'fs/promises';
@@ -12,6 +13,9 @@ const HOST_PORT = process.env.HOST_PORT || undefined;
 
 const app = express();
 app.disable('x-powered-by');
+
+// Enable gzip compression
+app.use(compression());
 
 console.log('Starting static production server');
 
@@ -47,8 +51,6 @@ app.listen(PORT, () => {
             `Production server is running on http://localhost:${HOST_PORT}`,
         );
     } else {
-        console.log(
-            `Production server is running on http://localhost:{HOST_PORT}`,
-        );
+        console.log(`Production server is running on http://localhost:${PORT}`);
     }
 });

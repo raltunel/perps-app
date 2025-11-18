@@ -10,6 +10,8 @@
 [build.environment]
   NODE_VERSION = "22"
   NODE_OPTIONS = "--max-old-space-size=4096"
+  # Enable build cache for faster deploys
+  NPM_FLAGS = "--prefer-offline --no-audit"
 
 [context.production.environment]
   VITE_CONTEXT = "production"
