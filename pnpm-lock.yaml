@@ -27,14 +27,14 @@ importers:
         specifier: ^0.1.59
         version: 0.1.59(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@fogo/sessions-idls':
-        specifier: ^0.0.8
-        version: 0.0.8(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+        specifier: ^0.0.9
+        version: 0.0.9(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@fogo/sessions-sdk':
-        specifier: ^0.0.20
-        version: 0.0.20(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+        specifier: ^0.0.21
+        version: 0.0.21(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@fogo/sessions-sdk-react':
-        specifier: ^0.1.0
-        version: 0.1.0(dafa9ea40c3dbbf685565e9ec1f74209)
+        specifier: ^0.1.1
+        version: 0.1.1(dafa9ea40c3dbbf685565e9ec1f74209)
       '@fuul/sdk':
         specifier: ^7.0.5
         version: 7.0.5
@@ -1344,21 +1344,21 @@ packages:
   '@fivebinaries/coin-selection@3.0.0':
     resolution: {integrity: sha512-h25Pn1ZA7oqQBQDodGAgIsQt66T2wDge9onBKNqE66WNWL0KJiKJbpij8YOLo5AAlEIg5IS7EB1QjBgDOIg6DQ==}
 
-  '@fogo/sessions-idls@0.0.8':
-    resolution: {integrity: sha512-M3M6ccfYvUPZCUctDvl7FpL8xKHTXRAkgXsVpTGVheJZ68HxRr7rnMqjHHw9AaRKoWywEeLT2bjYHdnO7UgFsw==}
+  '@fogo/sessions-idls@0.0.9':
+    resolution: {integrity: sha512-alzWCiiDN8sRCGtL146zvH3ycUi4QwbQT6GfxFTD17q2QdqYardfzpJlCereDaSxDLItNg3beYQqRv9Xzn7/1A==}
 
-  '@fogo/sessions-sdk-react@0.1.0':
-    resolution: {integrity: sha512-f1oJrZ4cpe4ZTyYpZYcAmUGPMRX5KHB921oOnHNX0eyPo4tOEKAVUUiheeRBHA+N15zB6mkBndYWzLAdSeGJgQ==}
+  '@fogo/sessions-sdk-react@0.1.1':
+    resolution: {integrity: sha512-jTh5IUOXT0FWbjOqiLxK2AhONCl/QkeOULmILheMgAf/60xD0pLX3C7mRNULp3DjH98PQm4zZV9AC6dEkZkEnQ==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19
 
-  '@fogo/sessions-sdk-web@0.0.14':
-    resolution: {integrity: sha512-lg3K0mh43lZ2WsRX6wE0jeZV4M6L563uPB1GUQX+huwzIQpXgCyieHSD76x22g4JOWCCk2NtnFR6536NaRwGSA==}
+  '@fogo/sessions-sdk-web@0.0.15':
+    resolution: {integrity: sha512-8+iIrrGq8094NUENpaAMJ2KOPHS9RcVBTOgTk4+erBtki5YIONudm4YfNwTzqMf0GCgwpnGFQK1hrSSW9tHqtQ==}
     engines: {node: '>=18'}
 
-  '@fogo/sessions-sdk@0.0.20':
-    resolution: {integrity: sha512-ig1xKIkp4v6varAi0MYxspQyh9rw8xkGXT63ZL/T90E37sVl7jWN6gKOVaspNewanz8zYNA+LWSCIg40n+yT2Q==}
+  '@fogo/sessions-sdk@0.0.21':
+    resolution: {integrity: sha512-Y+H1q8z0TDgprf2G2RQlyvo4teK0K8SDglns+C2rO3cxfs7OCOuq28Lnvqscyg1D4Re8fbw1STFDmcaV484zlw==}
     engines: {node: '>=18'}
 
   '@formatjs/ecma402-abstract@2.3.4':
@@ -4345,11 +4345,9 @@ packages:
 
   '@walletconnect/sign-client@2.19.0':
     resolution: {integrity: sha512-+GkuJzPK9SPq+RZgdKHNOvgRagxh/hhYWFHOeSiGh3DyAQofWuFTq4UrN/MPjKOYswSSBKfIa+iqKYsi4t8zLQ==}
-    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/sign-client@2.19.1':
     resolution: {integrity: sha512-OgBHRPo423S02ceN3lAzcZ3MYb1XuLyTTkKqLmKp/icYZCyRzm3/ynqJDKndiBLJ5LTic0y07LiZilnliYqlvw==}
-    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/solana-adapter@0.0.8':
     resolution: {integrity: sha512-Qb7MT8SdkeBldfUCmF+rYW6vL98mxPuT1yAwww5X2vpx7xEPZvFCoAKnyT5fXu0v56rMxhW3MGejnHyyYdDY7Q==}
@@ -4368,11 +4366,9 @@ packages:
 
   '@walletconnect/universal-provider@2.19.0':
     resolution: {integrity: sha512-e9JvadT5F8QwdLmd7qBrmACq04MT7LQEe1m3X2Fzvs3DWo8dzY8QbacnJy4XSv5PCdxMWnua+2EavBk8nrI9QA==}
-    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/universal-provider@2.19.1':
     resolution: {integrity: sha512-4rdLvJ2TGDIieNWW3sZw2MXlX65iHpTuKb5vyvUHQtjIVNLj+7X/09iUAI/poswhtspBK0ytwbH+AIT/nbGpjg==}
-    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/utils@2.19.0':
     resolution: {integrity: sha512-LZ0D8kevknKfrfA0Sq3Hf3PpmM8oWyNfsyWwFR51t//2LBgtN2Amz5xyoDDJcjLibIbKAxpuo/i0JYAQxz+aPA==}
@@ -10543,7 +10539,7 @@ snapshots:
       '@emurgo/cardano-serialization-lib-browser': 13.2.1
       '@emurgo/cardano-serialization-lib-nodejs': 13.2.0
 
-  '@fogo/sessions-idls@0.0.8(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
+  '@fogo/sessions-idls@0.0.9(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -10552,12 +10548,12 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@fogo/sessions-sdk-react@0.1.0(dafa9ea40c3dbbf685565e9ec1f74209)':
+  '@fogo/sessions-sdk-react@0.1.1(dafa9ea40c3dbbf685565e9ec1f74209)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@fogo/sessions-idls': 0.0.8(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@fogo/sessions-sdk': 0.0.20(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
-      '@fogo/sessions-sdk-web': 0.0.14(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@fogo/sessions-idls': 0.0.9(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@fogo/sessions-sdk': 0.0.21(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@fogo/sessions-sdk-web': 0.0.15(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@phosphor-icons/react': 2.1.10(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@react-hookz/web': 25.1.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@solana-mobile/wallet-adapter-mobile': 2.2.5(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(react-native@0.81.1(@babel/core@7.28.4)(@types/react@19.1.13)(bufferutil@4.0.9)(react@19.1.1)(utf-8-validate@5.0.10))(react@19.1.1)(typescript@5.9.2)
@@ -10632,9 +10628,9 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@fogo/sessions-sdk-web@0.0.14(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@fogo/sessions-sdk-web@0.0.15(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      '@fogo/sessions-sdk': 0.0.20(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@fogo/sessions-sdk': 0.0.21(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@solana/webcrypto-ed25519-polyfill': 2.3.0(typescript@5.9.2)
       idb: 8.0.3
@@ -10661,10 +10657,10 @@ snapshots:
       - utf-8-validate
       - ws
 
-  '@fogo/sessions-sdk@0.0.20(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@fogo/sessions-sdk@0.0.21(@types/react@19.1.13)(@wormhole-foundation/sdk-connect@3.11.0)(@wormhole-foundation/sdk-definitions@3.11.0)(@wormhole-foundation/sdk-evm-core@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-evm@3.11.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(@wormhole-foundation/sdk-solana@3.11.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(axios@1.11.0)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(got@11.8.6)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)(typescript@5.9.2)(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@fogo/sessions-idls': 0.0.8(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
+      '@fogo/sessions-idls': 0.0.9(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@metaplex-foundation/mpl-token-metadata': 3.4.0(@metaplex-foundation/umi@1.4.1)
       '@metaplex-foundation/umi': 1.4.1
       '@metaplex-foundation/umi-bundle-defaults': 1.4.1(@metaplex-foundation/umi@1.4.1)(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))
@@ -15127,7 +15123,7 @@ snapshots:
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 24.9.1
+      '@types/node': 24.10.1
       form-data: 4.0.4
 
   '@types/node@12.20.55': {}
@@ -19768,7 +19764,7 @@ snapshots:
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
       '@types/long': 4.0.2
-      '@types/node': 24.9.1
+      '@types/node': 24.10.1
       long: 4.0.0
 
   protobufjs@7.4.0:
@@ -19783,7 +19779,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 24.9.1
+      '@types/node': 24.10.1
       long: 5.2.5
 
   proxy-addr@2.0.7:

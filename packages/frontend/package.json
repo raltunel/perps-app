@@ -23,9 +23,9 @@
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
         "@coral-xyz/anchor": "0.29.0",
-        "@fogo/sessions-idls": "^0.0.8",
-        "@fogo/sessions-sdk": "^0.0.20",
-        "@fogo/sessions-sdk-react": "^0.1.0",
+        "@fogo/sessions-idls": "^0.0.9",
+        "@fogo/sessions-sdk": "^0.0.21",
+        "@fogo/sessions-sdk-react": "^0.1.1",
         "@fuul/sdk": "^7.0.5",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.0.0",
