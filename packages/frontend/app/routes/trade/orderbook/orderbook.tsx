@@ -109,6 +109,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
         setMidPrice,
     } = useOrderBookStore();
 
+    const midPriceRef = useRef<number | null>(null);
+    midPriceRef.current = midPrice;
+
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
 
@@ -138,24 +141,16 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
     const needExtraPolling = useMemo(() => {
-        if (!selectedResolution) return false;
+        if (!selectedResolution || !resolutions.length) return false;
         if (selectedResolution.mantissa) return true;
-        if (
-            symbol === 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 5
-        )
-            return true;
-        if (
-            symbol !== 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 4
-        )
-            return true;
-        return false;
-    }, [selectedResolution, symbol]);
+        const lowestResolution = resolutions[0];
+        return !(
+            lowestResolution.nsigfigs === selectedResolution.nsigfigs &&
+            lowestResolution.val === selectedResolution.val
+        );
+    }, [selectedResolution, symbol, resolutions]);
 
-    const needExtraPollingRef = useRef(false);
+    const needExtraPollingRef = useRef(needExtraPolling);
     needExtraPollingRef.current = needExtraPolling;
 
     useEffect(() => {
@@ -180,7 +175,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     const { buys, sells } = processOrderBookMessage(l2BookData);
                     setLwBuys(buys);
                     setLwSells(sells);
-                    console.log('>>>>>> 1');
                     setMidPrice((buys[0].px + sells[0].px) / 2);
                 },
                 3000,
@@ -194,8 +188,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     }, [needExtraPolling]);
 
     useEffect(() => {
-        if (!needExtraPollingRef.current && symbolInfo?.markPx) {
-            console.log('>>>>>> 2');
+        if (needExtraPollingRef.current && symbolInfo?.markPx) {
             setMidPrice(symbolInfo.markPx);
         }
     }, [symbolInfo?.markPx]);
@@ -299,7 +292,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             !orderInputPriceValue ||
             !buys.length ||
             !sells.length ||
-            !midPrice
+            !midPriceRef.current
         ) {
             setFocusedSlot(null);
             return;
@@ -324,7 +317,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let targetSlots;
         const gapTreshold = filledResolution.current.val / 2;
 
-        if (orderInputPriceValue < midPrice) {
+        if (orderInputPriceValue < midPriceRef.current) {
             side = 'buy';
             targetSlots = buys.map((buy) => buy.px);
         } else {
@@ -354,11 +347,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         } else {
             setFocusedSlot(null);
         }
-    }, [orderInputPriceValue, buys, sells, midPrice]);
-
-    useEffect(() => {
-        if (!focusedSlot) return;
-    }, [focusedSlot]);
+    }, [orderInputPriceValue, buys, sells]);
 
     // code blocks were being used in sdk approach
 

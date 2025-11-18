@@ -49,12 +49,20 @@ export const useOrderBookStore = create<OrderBookStore>()(
                 buys: OrderBookRowIF[],
                 sells: OrderBookRowIF[],
                 setMid?: boolean,
-            ) =>
-                set({
-                    buys,
-                    sells,
-                    midPrice: setMid ? (buys[0].px + sells[0].px) / 2 : null,
-                }),
+            ) => {
+                if (setMid) {
+                    set({
+                        buys: buys,
+                        sells: sells,
+                        midPrice: (buys[0].px + sells[0].px) / 2,
+                    });
+                } else {
+                    set({
+                        buys,
+                        sells,
+                    });
+                }
+            },
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
             addToResolutionPair: (
                 symbol: string,
