@@ -106,7 +106,11 @@ const OrderBook: React.FC<OrderBookProps> = ({
         addToResolutionPair,
         resolutionPairs,
         midPrice,
+        setMidPrice,
     } = useOrderBookStore();
+
+    const midPriceRef = useRef<number | null>(null);
+    midPriceRef.current = midPrice;
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
     const [lwSells, setLwSells] = useState<OrderBookRowIF[]>([]);
@@ -137,22 +141,17 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const userOrdersRef = useRef<OrderDataIF[]>([]);
 
     const needExtraPolling = useMemo(() => {
-        if (!selectedResolution) return false;
+        if (!selectedResolution || !resolutions.length) return false;
         if (selectedResolution.mantissa) return true;
-        if (
-            symbol === 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 5
-        )
-            return true;
-        if (
-            symbol !== 'BTC' &&
-            selectedResolution.nsigfigs &&
-            selectedResolution.nsigfigs <= 4
-        )
-            return true;
-        return false;
-    }, [selectedResolution, symbol]);
+        const lowestResolution = resolutions[0];
+        return !(
+            lowestResolution.nsigfigs === selectedResolution.nsigfigs &&
+            lowestResolution.val === selectedResolution.val
+        );
+    }, [selectedResolution, symbol, resolutions]);
+
+    const needExtraPollingRef = useRef(needExtraPolling);
+    needExtraPollingRef.current = needExtraPolling;
 
     useEffect(() => {
         return () => {
@@ -176,6 +175,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     const { buys, sells } = processOrderBookMessage(l2BookData);
                     setLwBuys(buys);
                     setLwSells(sells);
+                    setMidPrice((buys[0].px + sells[0].px) / 2);
                 },
                 3000,
                 true,
@@ -186,6 +186,12 @@ const OrderBook: React.FC<OrderBookProps> = ({
             unsubscribeFromPoller('info', subKey);
         };
     }, [needExtraPolling]);
+
+    useEffect(() => {
+        if (needExtraPollingRef.current && symbolInfo?.markPx) {
+            setMidPrice(symbolInfo.markPx);
+        }
+    }, [symbolInfo?.markPx]);
 
     // Use custom hook for stable slot arrays
     const buySlots = useOrderSlots(buys);
@@ -286,7 +292,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
             !orderInputPriceValue ||
             !buys.length ||
             !sells.length ||
-            !midPrice
+            !midPriceRef.current
         ) {
             setFocusedSlot(null);
             return;
@@ -311,7 +317,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let targetSlots;
         const gapTreshold = filledResolution.current.val / 2;
 
-        if (orderInputPriceValue < midPrice) {
+        if (orderInputPriceValue < midPriceRef.current) {
             side = 'buy';
             targetSlots = buys.map((buy) => buy.px);
         } else {
@@ -341,11 +347,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         } else {
             setFocusedSlot(null);
         }
-    }, [orderInputPriceValue, buys, sells, midPrice]);
-
-    useEffect(() => {
-        if (!focusedSlot) return;
-    }, [focusedSlot]);
+    }, [orderInputPriceValue, buys, sells]);
 
     // code blocks were being used in sdk approach
 
@@ -402,7 +404,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         (payload: any) => {
             try {
                 const { buys, sells } = processOrderBookMessage(payload);
-                setOrderBook(buys, sells);
+                //set mid price if we are polling with lowest resolution
+                setOrderBook(buys, sells, !needExtraPollingRef.current);
                 setOrderBookState(TableState.FILLED);
                 filledResolution.current = selectedResolution;
                 lastMessageTimeRef.current = Date.now();
