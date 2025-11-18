@@ -184,7 +184,11 @@ export default function OrderBookSection(props: propsIF) {
 
         window.addEventListener('resize', handleResize);
 
-        const observer = new ResizeObserver(() => {
+        const resizeObserver = new ResizeObserver(() => {
+            handleResize();
+        });
+
+        const mutationObserver = new MutationObserver(() => {
             handleResize();
         });
 
@@ -194,10 +198,16 @@ export default function OrderBookSection(props: propsIF) {
                 document.getElementById('orderBookSection') ||
                 document.getElementById('orderBookContainerInner');
 
-            if (target) observer.observe(target);
+            if (target) {
+                resizeObserver.observe(target);
+                mutationObserver.observe(target, {
+                    childList: true,
+                    subtree: true,
+                });
+            }
 
             const dummyRow = document.getElementById('dummyOrderRow');
-            if (dummyRow) observer.observe(dummyRow);
+            if (dummyRow) resizeObserver.observe(dummyRow);
         };
 
         attachObserver();
@@ -218,7 +228,8 @@ export default function OrderBookSection(props: propsIF) {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
             if (pollId) clearInterval(pollId);
-            observer.disconnect();
+            resizeObserver.disconnect();
+            mutationObserver.disconnect();
         };
     }, [calculateOrderCount, orderBookMode]);
 
