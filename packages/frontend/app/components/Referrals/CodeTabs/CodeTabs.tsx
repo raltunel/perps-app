@@ -822,6 +822,8 @@ export default function CodeTabs(props: PropsIF) {
                                         '—',
                                 })}
                             </h6>
+                            <p>{t('referrals.pleaseClickCreate')}</p>
+                            <p>{t('referrals.toCustomizeAffiliateCode')}</p>
                             {/* <p>
                                 {t('referrals.defaultCodeVolumeExplanation', {
                                     threshold: formatNum(
