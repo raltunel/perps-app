@@ -21,7 +21,32 @@ console.log('Starting static production server');
 
 // Serve static files from the build directory
 const clientBuildPath = path.join(__dirname, 'build');
-app.use(express.static(clientBuildPath, { maxAge: '1y' }));
+app.use(
+    express.static(clientBuildPath, {
+        maxAge: '1y',
+        immutable: true,
+        setHeaders: (res, filePath) => {
+            // Cache hashed assets aggressively
+            if (filePath.includes('/assets/')) {
+                res.setHeader(
+                    'Cache-Control',
+                    'public, max-age=31536000, immutable',
+                );
+            }
+            // Don't cache HTML files
+            else if (filePath.endsWith('.html')) {
+                res.setHeader(
+                    'Cache-Control',
+                    'no-cache, no-store, must-revalidate',
+                );
+            }
+            // Cache service worker for 24 hours
+            else if (filePath.endsWith('sw.js')) {
+                res.setHeader('Cache-Control', 'public, max-age=86400');
+            }
+        },
+    }),
+);
 
 // SPA fallback - Express 5 requires explicit wildcard syntax
 app.use(async (req, res, next) => {

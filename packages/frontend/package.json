@@ -72,6 +72,7 @@
         "vite": "^7.1.11",
         "vite-plugin-node-polyfills": "^0.17.0",
         "@types/react-i18next": "^8.1.0",
+        "terser": "^5.36.0",
         "vite-plugin-pwa": "^1.0.3",
         "vite-tsconfig-paths": "^5.1.4"
     },
