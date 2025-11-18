@@ -108,7 +108,7 @@ export default function OrderBookSection(props: propsIF) {
         let availableHeight = orderBookSection.getBoundingClientRect().height;
 
         // Skip calculation if height is too small (likely not fully rendered yet)
-        if (availableHeight <= 100) return;
+        if (availableHeight <= 0) return;
 
         let otherHeightOB = 0;
         [
@@ -195,10 +195,6 @@ export default function OrderBookSection(props: propsIF) {
             handleResize();
         });
 
-        const mutationObserver = new MutationObserver(() => {
-            handleResize();
-        });
-
         const target =
             sectionContainerRef.current ||
             document.getElementById('orderBookSection') ||
@@ -206,10 +202,6 @@ export default function OrderBookSection(props: propsIF) {
 
         if (target) {
             resizeObserver.observe(target);
-            mutationObserver.observe(target, {
-                childList: true,
-                subtree: true,
-            });
         }
 
         const dummyRow = document.getElementById('dummyOrderRow');
@@ -223,7 +215,6 @@ export default function OrderBookSection(props: propsIF) {
             if (timeoutId) clearTimeout(timeoutId);
             if (rafId) cancelAnimationFrame(rafId);
             resizeObserver.disconnect();
-            mutationObserver.disconnect();
         };
     }, [calculateOrderCount, orderBookMode]);
 
