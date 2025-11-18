@@ -19,12 +19,12 @@ app.use(compression());
 
 console.log('Starting static production server');
 
-// Serve static files from the build/client directory
-const clientBuildPath = path.join(__dirname, 'build', 'client');
+// Serve static files from the build directory
+const clientBuildPath = path.join(__dirname, 'build');
 app.use(express.static(clientBuildPath, { maxAge: '1y' }));
 
-// SPA fallback
-app.get('*', async (req, res, next) => {
+// SPA fallback - Express 5 requires explicit wildcard syntax
+app.use(async (req, res, next) => {
     if (req.method !== 'GET') {
         return next();
     }
