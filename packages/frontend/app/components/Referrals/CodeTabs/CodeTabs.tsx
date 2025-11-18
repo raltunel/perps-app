@@ -55,7 +55,7 @@ export default function CodeTabs(props: PropsIF) {
     const [temporaryAffiliateCode, setTemporaryAffiliateCode] = useState('');
     const [isTemporaryAffiliateCodeValid, setIsTemporaryAffiliateCodeValid] =
         useState<boolean | undefined>();
-    const [affiliateCode, setAffiliateCode] = useState('0x000s');
+    const [affiliateCode, setAffiliateCode] = useState('');
     const sessionState = useSession();
     const userDataStore = useUserDataStore();
     const affiliateAddress = userDataStore.userAddress;
