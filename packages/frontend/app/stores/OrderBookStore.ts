@@ -10,7 +10,11 @@ interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
     orderBook: OrderBookRowIF[];
-    setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) => void;
+    setOrderBook: (
+        buys: OrderBookRowIF[],
+        sells: OrderBookRowIF[],
+        setMid?: boolean,
+    ) => void;
     trades: OrderBookTradeIF[];
     setTrades: (trades: OrderBookTradeIF[]) => void;
     resolutionPairs: Record<string, OrderRowResolutionIF>;
@@ -41,8 +45,16 @@ export const useOrderBookStore = create<OrderBookStore>()(
             buys: [],
             sells: [],
             trades: [],
-            setOrderBook: (buys: OrderBookRowIF[], sells: OrderBookRowIF[]) =>
-                set({ buys, sells, midPrice: (buys[0].px + sells[0].px) / 2 }),
+            setOrderBook: (
+                buys: OrderBookRowIF[],
+                sells: OrderBookRowIF[],
+                setMid?: boolean,
+            ) =>
+                set({
+                    buys,
+                    sells,
+                    midPrice: setMid ? (buys[0].px + sells[0].px) / 2 : null,
+                }),
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
             addToResolutionPair: (
                 symbol: string,

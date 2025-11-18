@@ -106,6 +106,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         addToResolutionPair,
         resolutionPairs,
         midPrice,
+        setMidPrice,
     } = useOrderBookStore();
 
     const [lwBuys, setLwBuys] = useState<OrderBookRowIF[]>([]);
@@ -154,6 +155,9 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return false;
     }, [selectedResolution, symbol]);
 
+    const needExtraPollingRef = useRef(false);
+    needExtraPollingRef.current = needExtraPolling;
+
     useEffect(() => {
         return () => {
             if (forceReconnectInterval.current) {
@@ -176,6 +180,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     const { buys, sells } = processOrderBookMessage(l2BookData);
                     setLwBuys(buys);
                     setLwSells(sells);
+                    console.log('>>>>>> 1');
+                    setMidPrice((buys[0].px + sells[0].px) / 2);
                 },
                 3000,
                 true,
@@ -186,6 +192,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
             unsubscribeFromPoller('info', subKey);
         };
     }, [needExtraPolling]);
+
+    useEffect(() => {
+        if (!needExtraPollingRef.current && symbolInfo?.markPx) {
+            console.log('>>>>>> 2');
+            setMidPrice(symbolInfo.markPx);
+        }
+    }, [symbolInfo?.markPx]);
 
     // Use custom hook for stable slot arrays
     const buySlots = useOrderSlots(buys);
@@ -402,7 +415,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         (payload: any) => {
             try {
                 const { buys, sells } = processOrderBookMessage(payload);
-                setOrderBook(buys, sells);
+                //set mid price if we are polling with lowest resolution
+                setOrderBook(buys, sells, !needExtraPollingRef.current);
                 setOrderBookState(TableState.FILLED);
                 filledResolution.current = selectedResolution;
                 lastMessageTimeRef.current = Date.now();
