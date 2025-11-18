@@ -31,10 +31,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     zoomChanged,
     overlayCanvasMousePositionRef,
 }) => {
-    const [clickedPrice, setClickedPrice] = useState<number | null>(null);
-    const [clickedMousePos, setClickedMousePos] = useState<{
-        x: number;
-        y: number;
+    const [clickedOrder, setClickedOrder] = useState<{
+        price: number | null;
+        mousePos: { x: number; y: number };
+        side: 'buy' | 'sell';
     } | null>(null);
     const [mousePrice, setMousePrice] = useState<number | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -56,6 +56,18 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const { symbolInfo } = useTradeDataStore();
     const markPx = symbolInfo?.markPx;
     const { chart, isChartReady } = useTradingView();
+
+    const progressAnimationRef = React.useRef<number | null>(null);
+
+    // Cleanup animation
+    useEffect(() => {
+        return () => {
+            if (progressAnimationRef.current) {
+                cancelAnimationFrame(progressAnimationRef.current);
+                progressAnimationRef.current = null;
+            }
+        };
+    }, []);
 
     // Listen for crosshair movement to track price
     useEffect(() => {
@@ -131,7 +143,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
 
-            // Check if + button was clicked
             if (buttonBounds) {
                 if (
                     clickX >= buttonBounds.x &&
@@ -172,19 +183,26 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
             const price = scaleData.yScale.invert(y);
 
-            setClickedPrice(mousePrice);
-            // Save mouse position at click time
-            setClickedMousePos({
-                x: e.offsetX * dpr,
-                y: e.offsetY * dpr,
+            const side: 'buy' | 'sell' =
+                markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
+
+            setClickedOrder({
+                price: mousePrice,
+                mousePos: {
+                    x: e.offsetX * dpr,
+                    y: e.offsetY * dpr,
+                },
+                side: side,
             });
             setIsProcessing(true);
             setProcessingProgress(0);
 
             console.log('Limit order placement at price:', price);
 
-            const side: 'buy' | 'sell' =
-                markPx && mousePrice && mousePrice > markPx ? 'sell' : 'buy';
+            if (progressAnimationRef.current) {
+                cancelAnimationFrame(progressAnimationRef.current);
+                progressAnimationRef.current = null;
+            }
 
             const startTime = Date.now();
             const duration = 3000;
@@ -196,11 +214,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 setProcessingProgress(progress);
 
                 if (progress < 1) {
-                    requestAnimationFrame(animateProgress);
+                    progressAnimationRef.current =
+                        requestAnimationFrame(animateProgress);
                 } else {
+                    progressAnimationRef.current = null;
                     setTimeout(() => {
-                        setClickedPrice(null);
-                        setClickedMousePos(null);
+                        setClickedOrder(null);
                         setIsProcessing(false);
                         setProcessingProgress(0);
 
@@ -234,7 +253,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 }
             };
 
-            requestAnimationFrame(animateProgress);
+            progressAnimationRef.current =
+                requestAnimationFrame(animateProgress);
         };
 
         const handleMouseLeave = () => {
@@ -352,10 +372,10 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                if (!mousePrice && !clickedPrice && !showDropdown) return;
+                if (!mousePrice && !clickedOrder && !showDropdown) return;
 
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
-                    const { pixel, chartHeight } = getPricetoPixel(
+                    const { chartHeight } = getPricetoPixel(
                         chart,
                         price,
                         'LIMIT',
@@ -365,71 +385,64 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                     if (!chartHeight || chartHeight === 0) return;
 
-                    const yPos = pixel;
-
-                    if (isClicked) {
+                    if (isClicked && clickedOrder) {
                         const labelWidth = 100 * dpr;
                         const labelHeight = 24 * dpr;
 
-                        const side: 'buy' | 'sell' =
-                            markPx && price > markPx ? 'sell' : 'buy';
                         const lineColor =
-                            side === 'buy' ? colors.buy : colors.sell;
+                            clickedOrder.side === 'buy'
+                                ? colors.buy
+                                : colors.sell;
                         let labelX: number;
-                        let labelY: number;
-                        if (clickedMousePos) {
-                            const clickX = clickedMousePos.x;
-                            const clickY = clickedMousePos.y;
 
-                            if (isProcessing) {
-                                const blinkProgress =
-                                    Math.sin(processingProgress * Math.PI * 8) *
-                                        0.5 +
-                                    0.5;
-                                const alpha = 0.4 + blinkProgress * 0.6;
+                        const clickX = clickedOrder.mousePos.x;
+                        const clickY = clickedOrder.mousePos.y;
 
-                                // Draw main line
-                                ctx.strokeStyle = lineColor;
-                                ctx.lineWidth = 4;
-                                ctx.setLineDash([8, 6]);
-                                ctx.globalAlpha = alpha;
-                                ctx.beginPath();
-                                ctx.moveTo(0, clickY);
-                                ctx.lineTo(canvas.width, clickY);
-                                ctx.stroke();
-                                ctx.setLineDash([]);
-                                ctx.globalAlpha = 1.0;
+                        if (isProcessing) {
+                            const blinkProgress =
+                                Math.sin(processingProgress * Math.PI * 8) *
+                                    0.5 +
+                                0.5;
+                            const alpha = 0.4 + blinkProgress * 0.6;
 
-                                // Add a subtle glow effect
-                                ctx.strokeStyle = lineColor;
-                                ctx.lineWidth = 6;
-                                ctx.globalAlpha = alpha * 0.3;
-                                ctx.beginPath();
-                                ctx.moveTo(0, clickY);
-                                ctx.lineTo(canvas.width, clickY);
-                                ctx.stroke();
-                                ctx.globalAlpha = 1.0;
-                            } else {
-                                // Draw full line normally
-                                ctx.strokeStyle = lineColor;
-                                ctx.lineWidth = 4;
-                                ctx.setLineDash([8, 6]);
-                                ctx.beginPath();
-                                ctx.moveTo(0, clickY);
-                                ctx.lineTo(canvas.width, clickY);
-                                ctx.stroke();
-                                ctx.setLineDash([]);
-                            }
+                            // Draw main line
+                            ctx.strokeStyle = lineColor;
+                            ctx.lineWidth = 4;
+                            ctx.setLineDash([8, 6]);
+                            ctx.globalAlpha = alpha;
+                            ctx.beginPath();
+                            ctx.moveTo(0, clickY);
+                            ctx.lineTo(canvas.width, clickY);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                            ctx.globalAlpha = 1.0;
 
-                            labelX = clickX + 15;
-                            labelY = clickY - labelHeight / 2;
-
-                            if (labelX + labelWidth > canvas.width) {
-                                labelX = clickX - labelWidth - 15;
-                            }
+                            // Add a subtle glow effect
+                            ctx.strokeStyle = lineColor;
+                            ctx.lineWidth = 6;
+                            ctx.globalAlpha = alpha * 0.3;
+                            ctx.beginPath();
+                            ctx.moveTo(0, clickY);
+                            ctx.lineTo(canvas.width, clickY);
+                            ctx.stroke();
+                            ctx.globalAlpha = 1.0;
                         } else {
-                            labelX = canvas.width - labelWidth;
-                            labelY = yPos - labelHeight / 2;
+                            // Draw full line normally
+                            ctx.strokeStyle = lineColor;
+                            ctx.lineWidth = 4;
+                            ctx.setLineDash([8, 6]);
+                            ctx.beginPath();
+                            ctx.moveTo(0, clickY);
+                            ctx.lineTo(canvas.width, clickY);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                        }
+
+                        labelX = clickX + 15;
+                        const labelY = clickY - labelHeight / 2;
+
+                        if (labelX + labelWidth > canvas.width) {
+                            labelX = clickX - labelWidth - 15;
                         }
 
                         ctx.fillStyle = lineColor;
@@ -452,12 +465,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 };
 
                 // Draw clicked price line first (if exists)
-                if (clickedPrice) {
-                    drawLineAtPrice(clickedPrice, true);
+                if (clickedOrder?.price) {
+                    drawLineAtPrice(clickedOrder.price, true);
                 }
 
                 // Draw mouse hover line (if exists and different from clicked) or if dropdown is open
-                if (mousePrice && mousePrice !== clickedPrice) {
+                if (mousePrice && mousePrice !== clickedOrder?.price) {
                     drawLineAtPrice(mousePrice, false);
                 } else if (showDropdown && dropdownPosition) {
                     // Keep button visible when dropdown is open
@@ -481,8 +494,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     }, [
         chart,
         zoomChanged,
-        clickedPrice,
-        clickedMousePos,
+        clickedOrder?.price,
+        clickedOrder?.mousePos,
         mousePrice,
         colors,
         markPx,
@@ -497,11 +510,134 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     ]);
 
     const handleBuyLimit = (price: number) => {
-        console.log('Buy limit order at price:', price);
+        const side = 'buy';
+        setClickedOrder({
+            price: price,
+            mousePos: {
+                x: overlayCanvasMousePositionRef.current.x,
+                y: overlayCanvasMousePositionRef.current.y,
+            },
+            side: side,
+        });
+        setIsProcessing(true);
+        setProcessingProgress(0);
+
+        if (progressAnimationRef.current) {
+            cancelAnimationFrame(progressAnimationRef.current);
+            progressAnimationRef.current = null;
+        }
+
+        const startTime = Date.now();
+        const duration = 3000;
+
+        const animateProgress = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            setProcessingProgress(progress);
+
+            if (progress < 1) {
+                progressAnimationRef.current =
+                    requestAnimationFrame(animateProgress);
+            } else {
+                progressAnimationRef.current = null;
+                setTimeout(() => {
+                    setClickedOrder(null);
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+
+                    const quantity = +(0).toFixed(2);
+                    const newPendingOrder: LineData = {
+                        xLoc: 0.4,
+                        yPrice: price,
+                        textValue: {
+                            type: 'Limit',
+                            price: price,
+                            triggerCondition: '',
+                        },
+                        quantityTextValue: quantity,
+                        quantityText: quantity.toString(),
+                        color: colors[side],
+                        type: 'LIMIT',
+                        lineStyle: 3,
+                        lineWidth: 1,
+                        side: side,
+                    };
+
+                    tempPendingOrders.push(newPendingOrder);
+                    window.dispatchEvent(new Event('pendingOrdersChanged'));
+                }, 100);
+            }
+        };
+
+        progressAnimationRef.current = requestAnimationFrame(animateProgress);
     };
 
     const handleSellStop = (price: number) => {
-        console.log('Sell stop order at price:', price);
+        const side = 'sell';
+
+        setClickedOrder({
+            price: price,
+            mousePos: {
+                x: overlayCanvasMousePositionRef.current.x,
+                y: overlayCanvasMousePositionRef.current.y,
+            },
+            side: side,
+        });
+        setIsProcessing(true);
+        setProcessingProgress(0);
+
+        // Cancel any existing animation
+        if (progressAnimationRef.current) {
+            cancelAnimationFrame(progressAnimationRef.current);
+            progressAnimationRef.current = null;
+        }
+
+        const startTime = Date.now();
+        const duration = 3000;
+
+        const animateProgress = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            setProcessingProgress(progress);
+
+            if (progress < 1) {
+                progressAnimationRef.current =
+                    requestAnimationFrame(animateProgress);
+            } else {
+                progressAnimationRef.current = null;
+                setTimeout(() => {
+                    setClickedOrder(null);
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+
+                    // Create sell stop order line
+                    const quantity = +(0).toFixed(2);
+                    const newPendingOrder: LineData = {
+                        xLoc: 0.4,
+                        yPrice: price,
+                        textValue: {
+                            type: 'Limit',
+                            price: price,
+                            triggerCondition: '',
+                        },
+                        quantityTextValue: quantity,
+                        quantityText: quantity.toString(),
+                        color: colors[side],
+                        type: 'LIMIT',
+                        lineStyle: 3,
+                        lineWidth: 1,
+                        side: side,
+                    };
+
+                    tempPendingOrders.push(newPendingOrder);
+                    window.dispatchEvent(new Event('pendingOrdersChanged'));
+                }, 100);
+            }
+        };
+
+        progressAnimationRef.current = requestAnimationFrame(animateProgress);
     };
 
     return (
