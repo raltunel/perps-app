@@ -86,7 +86,6 @@ export default function PositionsTable(props: PositionsTableProps) {
                     positions: PositionIF[],
                     sortBy: PositionDataSortBy,
                     sortDirection: TableSortDirection,
-                    // _ignoredMap?: Record<string, number>, // TODO: commented out for lint
                 ) =>
                     sortPositionData(
                         positions,
