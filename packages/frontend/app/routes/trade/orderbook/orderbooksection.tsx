@@ -24,6 +24,7 @@ export default function OrderBookSection(props: propsIF) {
     const { mobileView, mobileContent, switchTab, chartTopHeight } = props;
     const [orderCount, setOrderCount] = useState(9);
     const [tradesMaxHeight, setTradesMaxHeight] = useState(0);
+    const sectionContainerRef = useRef<HTMLDivElement>(null);
 
     const { t, i18n } = useTranslation();
 
@@ -87,11 +88,14 @@ export default function OrderBookSection(props: propsIF) {
 
     // Height calculation logic
     const calculateOrderCount = useCallback(() => {
-        let orderBookSection = document.getElementById('orderBookSection');
+        let orderBookSection =
+            sectionContainerRef.current ||
+            document.getElementById('orderBookSection');
+
         if (!orderBookSection) {
             orderBookSection = document.getElementById(
                 'orderBookContainerInner',
-            );
+            ) as HTMLElement;
         }
         const dummyOrderRow = document.getElementById('dummyOrderRow');
         const orderRowHeight =
@@ -171,6 +175,7 @@ export default function OrderBookSection(props: propsIF) {
     // Resize effect
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
+        let pollId: ReturnType<typeof setInterval> | null = null;
 
         const handleResize = () => {
             if (timeoutId) clearTimeout(timeoutId);
@@ -183,24 +188,36 @@ export default function OrderBookSection(props: propsIF) {
             handleResize();
         });
 
-        const target =
-            document.getElementById('orderBookSection') ||
-            document.getElementById('orderBookContainerInner');
+        const attachObserver = () => {
+            const target =
+                sectionContainerRef.current ||
+                document.getElementById('orderBookSection') ||
+                document.getElementById('orderBookContainerInner');
 
-        if (target) {
-            observer.observe(target);
-        }
+            if (target) observer.observe(target);
 
-        const dummyRow = document.getElementById('dummyOrderRow');
-        if (dummyRow) {
-            observer.observe(dummyRow);
-        }
+            const dummyRow = document.getElementById('dummyOrderRow');
+            if (dummyRow) observer.observe(dummyRow);
+        };
 
+        attachObserver();
         calculateOrderCount();
+
+        // Retry observing/calculating for a few seconds to handle initial load/hydration timing
+        let attempts = 0;
+        pollId = setInterval(() => {
+            attempts++;
+            attachObserver();
+            calculateOrderCount();
+            if (attempts > 20) {
+                if (pollId) clearInterval(pollId);
+            }
+        }, 200);
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
+            if (pollId) clearInterval(pollId);
             observer.disconnect();
         };
     }, [calculateOrderCount, orderBookMode]);
@@ -223,7 +240,7 @@ export default function OrderBookSection(props: propsIF) {
 
     const stackedOrderBook = useMemo(
         () => (
-            <div className={styles.orderBookSection}>
+            <div className={styles.orderBookSection} ref={sectionContainerRef}>
                 <div className={styles.stackedContainer}>
                     <div
                         id='orderBookHeaderStackedMode'
@@ -259,7 +276,7 @@ export default function OrderBookSection(props: propsIF) {
 
     const largeOrderBook = useMemo(
         () => (
-            <div className={styles.orderBookSection}>
+            <div className={styles.orderBookSection} ref={sectionContainerRef}>
                 <div className={styles.largeContainer}>
                     <div className={styles.childOfLargeContainer}>
                         <div
@@ -303,6 +320,7 @@ export default function OrderBookSection(props: propsIF) {
                 ' ' +
                 styles.orderBookTabSectionContainer
             }
+            ref={sectionContainerRef}
         >
             <Tabs
                 wrapperId='orderBookTabs'
