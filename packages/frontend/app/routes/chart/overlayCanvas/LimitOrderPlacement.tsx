@@ -145,14 +145,17 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                         const rect = canvas.getBoundingClientRect();
                         const dropdownWidth = 280;
+                        const dpr = window.devicePixelRatio || 1;
 
                         const posX =
                             buttonBounds.x +
                             rect.left -
                             dropdownWidth +
-                            buttonBounds.width;
+                            buttonBounds.width / dpr;
                         const posY =
-                            rect.top + buttonBounds.y + buttonBounds.height;
+                            rect.top +
+                            buttonBounds.y +
+                            buttonBounds.height / dpr;
 
                         setDropdownPosition({
                             x: posX,
