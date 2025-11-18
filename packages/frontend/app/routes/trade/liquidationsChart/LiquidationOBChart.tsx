@@ -133,9 +133,21 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             )
                 return;
 
+            const root = document.documentElement;
+
+            const styles = getComputedStyle(root);
+
+            const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
+
             const midHeader = document.getElementById('orderBookMidHeader');
             const obBuyBlock = document.getElementById('orderbook-buy-block');
             const obSellBlock = document.getElementById('orderbook-sell-block');
+            const singleRow = document.getElementById('order-sell-srow-0');
+            const slotsWrapper = document.getElementById(
+                'orderBookSlotsWrapper',
+            );
+
+            // const obSellBlock = document.getElementById('orderbook-sell-block');
 
             const basicMenuContainer = document.getElementById(
                 'order-trades-list-container',
@@ -155,7 +167,29 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const midHeaderHeight =
                 midHeader?.getBoundingClientRect().height || 0;
 
-            const rowHeight = obBuyBlockHeight / orderCountRef.current;
+            const rowCssHeight =
+                singleRow?.getBoundingClientRect().height || 16;
+
+            const slotsWrapperHeight =
+                slotsWrapper?.getBoundingClientRect().height || 0;
+
+            const rowHeight = rowCssHeight
+                ? rowCssHeight + rowGap / 2
+                : obSellBlockHeight / orderCountRef.current;
+
+            const isSellFilled =
+                currentLiqSellsRef.current.length >= orderCountRef.current;
+
+            const diff =
+                orderCountRef.current - currentLiqSellsRef.current.length;
+
+            const topPadding =
+                slotsWrapperHeight -
+                obSellBlockHeight -
+                obBuyBlockHeight -
+                midHeaderHeight;
+
+            const topGap = topPadding / 2 - rowGap / 2;
 
             if (obBuyBlockHeight === 0 || obSellBlockHeight === 0) return;
 
@@ -170,20 +204,27 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.strokeStyle = sellColorRef.current;
             context.lineWidth = liqLineWidth;
             const buyLiqCount = currentLiqBuysRef.current.length;
+
+            const buyLineStarterY =
+                obSellBlockHeight + topGap + rowGap / 2 + midHeaderHeight;
+
             if (buyLiqCount > 0) {
                 currentLiqBuysRef.current.forEach((liq, index) => {
                     if (index >= orderCountRef.current) return;
+
                     const yPos =
-                        obSellBlockHeight +
-                        midHeaderHeight +
+                        buyLineStarterY +
+                        rowGap / 2 +
                         rowHeight * index +
-                        rowHeight / 2 +
-                        midHeaderHeight / 2;
+                        rowHeight / 2;
+
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
                         minLiqLine;
+
                     const xEnd = widthRef.current;
+
                     context.beginPath();
                     context.moveTo(xStart, yPos);
                     context.lineTo(xEnd, yPos);
@@ -205,29 +246,26 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             context.lineWidth = liqLineWidth;
             const sellLiqCount = currentLiqSellsRef.current.length;
 
-            const diff = orderCountRef.current - sellLiqCount;
-
             if (sellLiqCount > 0) {
                 currentLiqSellsRef.current.forEach((liq, index) => {
                     if (index >= orderCountRef.current) return;
 
-                    const matchingYPos =
-                        rowHeight * (diff < 1 && diff > 0 ? index + 1 : index) +
-                        rowHeight / 2;
-                    const fillerYPos =
-                        obSellBlockHeight -
-                        rowHeight * (sellLiqCount - index) +
-                        rowHeight / 2;
+                    const yPositionIndex =
+                        topGap +
+                        rowHeight / 2 +
+                        rowHeight * index +
+                        (isSellFilled ? 0 : diff * rowHeight);
 
-                    const yPos = diff > 1 ? fillerYPos : matchingYPos;
                     const xStart =
                         widthRef.current -
                         widthRef.current * (liq.ratio || 0) -
                         minLiqLine;
+
                     const xEnd = widthRef.current;
+
                     context.beginPath();
-                    context.moveTo(xStart, yPos);
-                    context.lineTo(xEnd, yPos);
+                    context.moveTo(xStart, yPositionIndex);
+                    context.lineTo(xEnd, yPositionIndex);
                     context.stroke();
 
                     if (showLiqText.current) {
@@ -235,7 +273,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                         context.fillStyle = buyColorRef.current;
                         const pxText =
                             liq.sz.toFixed(2) + ' ' + liq.ratio?.toFixed(2);
-                        context.fillText(pxText, 20, yPos - 3);
+                        context.fillText(pxText, 20, yPositionIndex - 3);
                     }
                 });
             }
@@ -255,7 +293,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             }
 
             //  add mid line
-            const yPos = obBuyBlockHeight + midHeaderHeight / 2;
+            const yPos =
+                obSellBlockHeight + topGap + rowGap + midHeaderHeight / 2 - 2;
             context.strokeStyle = '#BCBCC4';
             context.lineWidth = liqLineWidth;
             context.setLineDash([4, 4]);
@@ -295,18 +334,31 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             ...currentSellData.map((d) => d.px),
         );
 
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
+        const root = document.documentElement;
+
+        const styles = getComputedStyle(root);
+
+        const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
+
         // mid gap
         const centerY = heightRef.current / 2;
-        const gapSize = gap;
+        const gapSize = rowGap / 2;
 
         const buyYScale = d3
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([heightRef.current, centerY + gapSize]);
+            .range([
+                heightRef.current,
+                centerY + midHeaderHeight / 2 + gapSize + 1,
+            ]);
+
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - gapSize, 0]);
+            .range([centerY - midHeaderHeight / 2 - 1, 0]);
 
         const pageYScale = d3
             .scaleLinear()
@@ -548,18 +600,29 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             ...currentSellData.map((d) => d.px),
         );
 
-        // Add 20px gap in center: sell area (0 to center-10px), buy area (center+10px to bottom)
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
+        const root = document.documentElement;
+
+        const styles = getComputedStyle(root);
+
+        const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
+
         const centerY = heightRef.current / 2;
-        const gapSize = gap; // 10px on each side = 20px total gap
+        const gapSize = rowGap / 2;
 
         const buyYScale = d3
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([heightRef.current, centerY + gapSize]);
+            .range([
+                heightRef.current,
+                centerY + midHeaderHeight / 2 + gapSize + 1,
+            ]);
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - gapSize, 0]);
+            .range([centerY - midHeaderHeight / 2 - 1, 0]);
 
         xScaleRef.current = xScale;
         buyYScaleRef.current = buyYScale;
@@ -815,6 +878,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const mousePoint = buyYScaleRef.current.invert(offsetY);
 
+        const midHeader = document.getElementById('orderBookMidHeader');
+        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
+
         const centerY = heightRef.current / 2;
 
         const isBuy = centerY < offsetY;
@@ -868,9 +934,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const horizontal = offsetX - width / 2;
         const vertical = offsetY - (height + 10);
 
+        const verticalPosition = vertical < 0 ? offsetY + 10 : vertical;
+
         liqTooltipRef.current
             .style('visibility', 'visible')
-            .style('top', vertical + 'px')
+            .style('top', verticalPosition + 'px')
             .style(
                 'left',
                 Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
@@ -1138,7 +1206,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             style={{
                 position: 'relative',
                 width: `${widthRef.current}px`,
-                height: `${heightRef.current}px`,
+                // height: `${heightRef.current}px`,
             }}
         >
             <d3fc-canvas

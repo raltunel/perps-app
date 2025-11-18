@@ -631,6 +631,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                             exit={{ opacity: 0, x: 10 }}
                             transition={{ duration: 0.2 }}
                             className={styles.orderSlotsWrapper}
+                            id={'orderBookSlotsWrapper'}
                         >
                             <div
                                 className={styles.obGradientEffect}
@@ -723,6 +724,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
                                     .reverse()
                                     .map((order, index) => (
                                         <div
+                                            id={`order-sell-srow-${index}`}
                                             key={index}
                                             className={styles.orderRowWrapper}
                                         >

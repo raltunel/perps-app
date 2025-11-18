@@ -387,7 +387,7 @@ export const TradingViewProvider: React.FC<{
 
             setChart(tvWidget);
         });
-    }, [chartState, info, tradingviewLib]);
+    }, [chartState, info, tradingviewLib, marketId]);
 
     useEffect(() => {
         setIsChartReady(false);
@@ -409,7 +409,7 @@ export const TradingViewProvider: React.FC<{
                 console.error(error);
             }
         };
-    }, [chartState, info, i18n.language, initChart, tradingviewLib]);
+    }, [chartState, info, i18n.language, initChart, tradingviewLib, marketId]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
