@@ -54,11 +54,6 @@ export default defineConfig({
                 manualChunks: {
                     // Split vendor chunks for better caching
                     'react-vendor': ['react', 'react-dom', 'react-router'],
-                    'solana-vendor': [
-                        '@solana/web3.js',
-                        '@solana/spl-token',
-                        '@coral-xyz/anchor',
-                    ],
                     'd3-vendor': ['d3', 'd3fc'],
                     'i18n-vendor': [
                         'i18next',
