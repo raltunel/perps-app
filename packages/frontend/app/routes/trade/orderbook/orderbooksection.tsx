@@ -179,7 +179,6 @@ export default function OrderBookSection(props: propsIF) {
     // Resize effect
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        let pollId: ReturnType<typeof setInterval> | null = null;
         let rafId: number | null = null;
 
         const handleResize = () => {
@@ -200,47 +199,28 @@ export default function OrderBookSection(props: propsIF) {
             handleResize();
         });
 
-        const attachObserver = () => {
-            const target =
-                sectionContainerRef.current ||
-                document.getElementById('orderBookSection') ||
-                document.getElementById('orderBookContainerInner');
+        const target =
+            sectionContainerRef.current ||
+            document.getElementById('orderBookSection') ||
+            document.getElementById('orderBookContainerInner');
 
-            if (target) {
-                resizeObserver.observe(target);
-                mutationObserver.observe(target, {
-                    childList: true,
-                    subtree: true,
-                });
-            }
-
-            const dummyRow = document.getElementById('dummyOrderRow');
-            if (dummyRow) resizeObserver.observe(dummyRow);
-        };
-
-        // Initial calculation after layout
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                attachObserver();
-                calculateOrderCount();
+        if (target) {
+            resizeObserver.observe(target);
+            mutationObserver.observe(target, {
+                childList: true,
+                subtree: true,
             });
-        });
+        }
 
-        // Retry observing/calculating for a few seconds to handle initial load/hydration timing
-        let attempts = 0;
-        pollId = setInterval(() => {
-            attempts++;
-            attachObserver();
-            requestAnimationFrame(calculateOrderCount);
-            if (attempts > 30) {
-                if (pollId) clearInterval(pollId);
-            }
-        }, 100);
+        const dummyRow = document.getElementById('dummyOrderRow');
+        if (dummyRow) resizeObserver.observe(dummyRow);
+
+        // Initial calculation
+        calculateOrderCount();
 
         return () => {
             window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
-            if (pollId) clearInterval(pollId);
             if (rafId) cancelAnimationFrame(rafId);
             resizeObserver.disconnect();
             mutationObserver.disconnect();
