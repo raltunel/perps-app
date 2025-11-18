@@ -61,7 +61,7 @@ function loadCache() {
 
 // Function to save cache
 function saveCache(cache) {
-    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2));
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 4) + '\n');
 }
 
 // Function to check if copy is needed
