@@ -27,3 +27,7 @@ public/tradingview/charting_library
 public/tradingview/datafeeds
 
 prompts/scratchpad*.md
+
+# Generated frontend files
+packages/frontend/public/version.json
+packages/frontend/public/announcements.json
