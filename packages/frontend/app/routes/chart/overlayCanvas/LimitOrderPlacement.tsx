@@ -38,6 +38,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const [mousePrice, setMousePrice] = useState<number | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
     const [processingProgress, setProcessingProgress] = useState(0);
+    const [buttonBounds, setButtonBounds] = useState<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    } | null>(null);
     const { getBsColor } = useAppSettings();
     const colors = getBsColor();
     const { symbolInfo } = useTradeDataStore();
@@ -81,6 +87,21 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
 
                 setMousePrice(parseFloat(price.toFixed(3)));
             });
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc) return;
+
+        if (iframeDoc) {
+            const handleMouseLeave = () => {
+                setMousePrice(null);
+            };
+
+            iframeDoc.addEventListener('mouseleave', handleMouseLeave);
+
+            return () => {
+                iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
+            };
+        }
     }, [chart, scaleData, overlayCanvasMousePositionRef]);
 
     // Listen for clicks on TradingView chart
@@ -99,6 +120,24 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             if (!canvas) return;
 
             const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Check if + button was clicked
+            if (buttonBounds) {
+                if (
+                    clickX >= buttonBounds.x &&
+                    clickX <= buttonBounds.x + buttonBounds.width &&
+                    clickY >= buttonBounds.y &&
+                    clickY <= buttonBounds.y + buttonBounds.height
+                ) {
+                    console.log('clicked at price:', mousePrice);
+                    // Handle button click - for now just log
+                    // You can add your custom logic here
+                    return;
+                }
+            }
 
             const y = e.clientY - canvas.getBoundingClientRect().top;
 
@@ -169,23 +208,83 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             requestAnimationFrame(animateProgress);
         };
 
+        const handleMouseLeave = () => {
+            setMousePrice(null);
+        };
+
         iframeDoc.addEventListener('click', handleChartClick);
+        iframeDoc.addEventListener('mouseleave', handleMouseLeave);
 
         return () => {
             iframeDoc.removeEventListener('click', handleChartClick);
+            iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
         };
     }, [
         chart,
         JSON.stringify(scaleData?.yScale.domain()),
         overlayCanvasRef,
         mousePrice,
+        buttonBounds,
+        markPx,
+        colors,
     ]);
 
     useEffect(() => {
         if (!chart || !isChartReady || !canvasSize) return;
-        if (!mousePrice && !clickedPrice) return;
 
         let animationFrameId: number | null = null;
+
+        const drawAddButton = (
+            ctx: CanvasRenderingContext2D,
+            canvas: HTMLCanvasElement,
+            mouseY: number,
+            dpr: number,
+        ) => {
+            const buttonSize = 21 * dpr;
+            const padding = dpr;
+
+            const buttonX = canvas.width - buttonSize - padding;
+            const buttonY = mouseY - buttonSize / 2;
+
+            setButtonBounds({
+                x: buttonX / dpr,
+                y: buttonY / dpr,
+                width: buttonSize,
+                height: buttonSize,
+            });
+
+            ctx.fillStyle = 'rgba(70, 70, 70, 0.9)';
+            ctx.beginPath();
+            ctx.fillRect(buttonX, buttonY, buttonSize, buttonSize);
+            ctx.fill();
+
+            const centerX = buttonX + buttonSize / 2;
+            const centerY = buttonY + buttonSize / 2;
+            const circleRadius = 7 * dpr;
+            const plusSize = 6 * dpr;
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1 * dpr;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, circleRadius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1 * dpr;
+            ctx.lineCap = 'round';
+
+            // Vertical line of +
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY - plusSize / 2);
+            ctx.lineTo(centerX, centerY + plusSize / 2);
+            ctx.stroke();
+
+            // Horizontal line of +
+            ctx.beginPath();
+            ctx.moveTo(centerX - plusSize / 2, centerY);
+            ctx.lineTo(centerX + plusSize / 2, centerY);
+            ctx.stroke();
+        };
 
         const draw = () => {
             let heightAttr = canvasSize?.height;
@@ -220,13 +319,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 const ctx = canvas.getContext('2d');
                 if (!ctx) return;
 
-                // Get device pixel ratio for high DPI displays (Retina, etc.)
                 const dpr = window.devicePixelRatio || 1;
 
-                // Clear canvas
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Helper function to draw line at price
+                if (!mousePrice && !clickedPrice) return;
+
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
                     const { pixel, chartHeight } = getPricetoPixel(
                         chart,
@@ -241,11 +339,9 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     const yPos = pixel;
 
                     if (isClicked) {
-                        // Draw price label box at click position (if available)
                         const labelWidth = 100 * dpr;
                         const labelHeight = 24 * dpr;
 
-                        // Clicked line - show in buy/sell color
                         const side: 'buy' | 'sell' =
                             markPx && price > markPx ? 'sell' : 'buy';
                         const lineColor =
@@ -256,14 +352,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             const clickX = clickedMousePos.x;
                             const clickY = clickedMousePos.y;
 
-                            // Draw line with blinking effect when processing
                             if (isProcessing) {
-                                // Create blinking effect - fade in and out (4 cycles over 5 seconds)
                                 const blinkProgress =
                                     Math.sin(processingProgress * Math.PI * 8) *
                                         0.5 +
                                     0.5;
-                                const alpha = 0.4 + blinkProgress * 0.6; // Oscillate between 0.4 and 1.0
+                                const alpha = 0.4 + blinkProgress * 0.6;
 
                                 // Draw main line
                                 ctx.strokeStyle = lineColor;
@@ -323,42 +417,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             labelY + labelHeight / 2,
                         );
                     } else {
-                        // Mouse hover - only show label (no line)
-                        const labelWidth = 100 * dpr;
-                        const labelHeight = 24 * dpr;
-
-                        // Determine side based on mark price
-                        const side: 'buy' | 'sell' =
-                            markPx && price > markPx ? 'sell' : 'buy';
-                        const labelColor =
-                            side === 'buy' ? colors.buy : colors.sell;
-
-                        // Position label next to mouse cursor
-                        const mouseX = overlayCanvasMousePositionRef.current.x;
                         const mouseY = overlayCanvasMousePositionRef.current.y;
-
-                        // Offset label to the right, vertically centered on cursor
-                        let labelX = mouseX + 15;
-                        const labelY = mouseY - labelHeight / 2;
-
-                        // Prevent label from going off screen
-                        if (labelX + labelWidth > canvas.width) {
-                            labelX = mouseX - labelWidth - 15; // Show on left side if no room on right
-                        }
-
-                        ctx.fillStyle = labelColor;
-                        ctx.fillRect(labelX, labelY, labelWidth, labelHeight);
-
-                        // Draw price text
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = `${12 * dpr}px monospace`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(
-                            price.toFixed(5),
-                            labelX + labelWidth / 2,
-                            labelY + labelHeight / 2,
-                        );
+                        drawAddButton(ctx, canvas, mouseY, dpr);
                     }
                 };
 
@@ -374,17 +434,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             }
         };
 
-        if (zoomChanged && animationFrameId === null) {
-            if (animationFrameId === null) {
-                const animate = () => {
-                    draw();
-                    animationFrameId = requestAnimationFrame(animate);
-                };
-                animationFrameId = requestAnimationFrame(animate);
-            }
-        } else {
+        const animate = () => {
             draw();
-        }
+            animationFrameId = requestAnimationFrame(animate);
+        };
+        animationFrameId = requestAnimationFrame(animate);
 
         return () => {
             if (animationFrameId) {
