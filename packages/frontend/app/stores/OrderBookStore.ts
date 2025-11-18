@@ -26,18 +26,6 @@ interface OrderBookStore {
     setMidPrice: (midPrice: number) => void;
 }
 
-const ssrSafeStorage = () =>
-    (typeof window !== 'undefined'
-        ? window.localStorage
-        : {
-              getItem: (_key: string) => null,
-              setItem: (_key: string, _value: string) => {},
-              removeItem: (_key: string) => {},
-              clear: () => {},
-              key: (_index: number) => null,
-              length: 0,
-          }) as Storage;
-
 export const useOrderBookStore = create<OrderBookStore>()(
     persist(
         (set) => ({
@@ -80,7 +68,7 @@ export const useOrderBookStore = create<OrderBookStore>()(
         }),
         {
             name: 'ORDERBOOK',
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
                 resolutionPairs: state.resolutionPairs,
             }),
