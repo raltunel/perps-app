@@ -1,4 +1,5 @@
 import express from 'express';
+import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { readFile } from 'fs/promises';
@@ -13,14 +14,17 @@ const HOST_PORT = process.env.HOST_PORT || undefined;
 const app = express();
 app.disable('x-powered-by');
 
+// Enable gzip compression
+app.use(compression());
+
 console.log('Starting static production server');
 
-// Serve static files from the build/client directory
-const clientBuildPath = path.join(__dirname, 'build', 'client');
+// Serve static files from the build directory
+const clientBuildPath = path.join(__dirname, 'build');
 app.use(express.static(clientBuildPath, { maxAge: '1y' }));
 
-// SPA fallback
-app.get('*', async (req, res, next) => {
+// SPA fallback - Express 5 requires explicit wildcard syntax
+app.use(async (req, res, next) => {
     if (req.method !== 'GET') {
         return next();
     }
@@ -47,8 +51,6 @@ app.listen(PORT, () => {
             `Production server is running on http://localhost:${HOST_PORT}`,
         );
     } else {
-        console.log(
-            `Production server is running on http://localhost:{HOST_PORT}`,
-        );
+        console.log(`Production server is running on http://localhost:${PORT}`);
     }
 });

@@ -10,6 +10,22 @@ export default defineConfig({
     build: {
         outDir: 'build',
         emptyOutDir: true,
+        sourcemap: false, // Disable sourcemaps in production for smaller bundle
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Split vendor chunks for better caching
+                    'react-vendor': ['react', 'react-dom', 'react-router'],
+                    'solana-vendor': [
+                        '@solana/web3.js',
+                        '@solana/spl-token',
+                        '@coral-xyz/anchor',
+                    ],
+                    'd3-vendor': ['d3', 'd3fc'],
+                },
+            },
+        },
+        chunkSizeWarningLimit: 1000, // Increase limit for large dependencies
     },
     resolve: {
         alias: [
@@ -39,7 +55,7 @@ export default defineConfig({
                 short_name: appName,
                 description: appDescription,
                 theme_color: '#7371fc',
-                background_color: '#7371fc',
+                background_color: '#06060c',
                 display: 'standalone',
                 start_url: '/',
                 id: '/',
