@@ -24,10 +24,19 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     const showBuyShortcut = markPx !== undefined && position.price < markPx;
     const showSellShortcut = markPx !== undefined && position.price > markPx;
 
+    // Detect Mac platform
+    const isMac =
+        typeof navigator !== 'undefined' &&
+        /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
     const menuItems = [
         {
             label: `Buy 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} limit`,
-            shortcut: showBuyShortcut ? 'Alt + Shift + B' : undefined,
+            shortcut: showBuyShortcut
+                ? isMac
+                    ? '⌥ ⇧ B'
+                    : 'Alt + Shift + B'
+                : undefined,
             onClick: () => {
                 onBuyLimit(position.price);
                 onClose();
@@ -36,7 +45,11 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
         },
         {
             label: `Sell 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} stop`,
-            shortcut: showSellShortcut ? 'Alt + Shift + S' : undefined,
+            shortcut: showSellShortcut
+                ? isMac
+                    ? '⌥ ⇧ S'
+                    : 'Alt + Shift + S'
+                : undefined,
             onClick: () => {
                 onSellStop(position.price);
                 onClose();
