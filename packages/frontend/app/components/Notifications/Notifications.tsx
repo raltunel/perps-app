@@ -241,12 +241,6 @@ export default function Notifications() {
 
     const [userClosedNews, setUserClosedNews] = useState<boolean>(false);
 
-    const { pathname } = useLocation();
-
-    if (pathname === '/') {
-        return <></>;
-    }
-
     return (
         <div className={styles.notifications}>
             <AnimatePresence>
