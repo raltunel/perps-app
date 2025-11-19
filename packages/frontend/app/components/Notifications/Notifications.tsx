@@ -2,7 +2,6 @@ import type { NotificationMsg } from '@perps-app/sdk/src/utils/types';
 import { AnimatePresence, motion } from 'framer-motion'; // <-- Import Framer Motion
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MdClose } from 'react-icons/md';
-import { useLocation } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
 import { useVersionCheck } from '~/hooks/useVersionCheck';
 import { useViewed } from '~/stores/AlreadySeenStore';
