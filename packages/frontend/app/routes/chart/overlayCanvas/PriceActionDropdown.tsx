@@ -27,11 +27,13 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
                     left: position.x,
                     top: position.y,
                     zIndex: 10000,
-                    backgroundColor: 'rgba(70, 70, 70, 0.9)',
-                    border: '1px solid #3e3e3e',
-                    borderRadius: '0px',
+                    backgroundColor: '#232323ff',
+                    borderRadius: '6px',
                     minWidth: '280px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)',
+                    boxShadow:
+                        '0 2px 4px var(--color-shadow-primary-neutral-extra-heavy)',
+                    boxSizing: 'border-box',
+                    textAlign: 'left',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
