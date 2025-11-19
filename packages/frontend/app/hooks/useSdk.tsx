@@ -4,6 +4,7 @@ import {
     Exchange,
     Info,
     type ActiveSubscription,
+    type Environment,
 } from '@perps-app/sdk';
 import React, {
     createContext,
@@ -15,7 +16,10 @@ import React, {
 } from 'react';
 import { useAppStateStore } from '~/stores/AppStateStore';
 import { useDebugStore } from '~/stores/DebugStore';
-import { WS_SLEEP_MODE_STASH_CONNECTION } from '~/utils/Constants';
+import {
+    SHOULD_LOG_ANALYTICS,
+    WS_SLEEP_MODE_STASH_CONNECTION,
+} from '~/utils/Constants';
 import { useIsClient } from './useIsClient';
 
 type SdkContextType = {
@@ -74,12 +78,7 @@ export const SdkProvider: React.FC<{
             stashedSubs.current = {};
 
             // Debug: Log WebSocket connections to console
-            if (typeof window !== 'undefined') {
-                (window as any).__perps_websockets__ = newInfo;
-                console.log(
-                    'WebSocket connections initialized. Type __perps_websockets__.multiSocketInfo.getPool().getConnectionStatus() in console to check status',
-                );
-            }
+            (window as any).__perps_websockets__ = newInfo;
         } else {
             info.setEnvironment(environment);
         }
@@ -106,6 +105,7 @@ export const SdkProvider: React.FC<{
     }, [isDebugWalletActive]);
 
     useEffect(() => {
+        if (SHOULD_LOG_ANALYTICS) return;
         console.log('>>> useSdk | marketEndpoint', marketEndpoint);
         console.log('>>> useSdk | userEndpoint', userEndpoint);
     }, [marketEndpoint, userEndpoint]);

@@ -162,7 +162,11 @@ export default function Notification(props: propsIF) {
 
     return (
         <section
-            className={styles.notification}
+            className={`${styles.notification} ${
+                data.txLink && data.message.length > 50
+                    ? styles.tallNotification
+                    : ''
+            }`}
             onMouseEnter={() => {
                 setIsHovered(true);
                 onMouseEnter?.(data.slug);
@@ -194,7 +198,14 @@ export default function Notification(props: propsIF) {
                             color='var(--red)'
                         />
                     )}
-                    <h2>{data.title}</h2>
+                    <h2
+                        style={{ userSelect: 'text' }}
+                        className={
+                            data.title.length > 25 ? styles.smallTitle : ''
+                        }
+                    >
+                        {data.title}
+                    </h2>
                 </div>
                 <IoClose
                     className={styles.close}
@@ -202,7 +213,7 @@ export default function Notification(props: propsIF) {
                     onClick={() => dismiss(data.slug)}
                 />
             </header>
-            <p>{formatMessage(data.message)}</p>
+            <p style={{ userSelect: 'text' }}>{formatMessage(data.message)}</p>
             {data.txLink && (
                 <a
                     href={data.txLink}

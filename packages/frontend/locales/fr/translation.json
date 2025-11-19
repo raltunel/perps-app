@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "Ordre {{side}} exécuté",
-            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}"
+            "message": "Ordre {{side}} exécuté avec succès pour {{usdValueOfFillStr}} de {{symbol}} à {{fillPrice}}",
+            "buySide": "acheter",
+            "sellSide": "vendre"
         },
         "errorUpdatingOrder": {
             "title": "Erreur lors de la mise à jour de l'ordre"
@@ -550,5 +552,11 @@
     "meta": {
         "title": "Accueil | Ambient",
         "content": "Trader des Perps avec Ambient"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }

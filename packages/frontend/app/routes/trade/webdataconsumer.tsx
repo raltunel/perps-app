@@ -22,7 +22,11 @@ import { useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { useUnifiedMarginStore } from '~/stores/UnifiedMarginStore';
 import { useUserDataStore } from '~/stores/UserDataStore';
-import { WsChannels } from '~/utils/Constants';
+import {
+    OrderHistoryLimits,
+    TradeHistoryLimits,
+    WsChannels,
+} from '~/utils/Constants';
 import type { OrderDataIF } from '~/utils/orderbook/OrderBookIFs';
 import type { PositionIF } from '~/utils/position/PositionIFs';
 import type { SymbolInfoIF } from '~/utils/SymbolInfoIFs';
@@ -468,9 +472,9 @@ export default function WebDataConsumer() {
                     });
 
                     // Convert back to array and sort
-                    userOrderHistoryRef.current = Array.from(
-                        orderMap.values(),
-                    ).sort((a, b) => b.timestamp - a.timestamp);
+                    userOrderHistoryRef.current = Array.from(orderMap.values())
+                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .slice(0, OrderHistoryLimits.MAX);
 
                     // Update open orders - filter only orders with status 'open'
                     const allOpenOrders = userOrderHistoryRef.current.filter(
@@ -602,10 +606,24 @@ export default function WebDataConsumer() {
 
                             notificationStore.add({
                                 title: t('transactions.orderFilled.title', {
-                                    side: fill.side,
+                                    side:
+                                        fill.side === 'buy' || fill.side === 'B'
+                                            ? t(
+                                                  'transactions.orderFilled.buySide',
+                                              )
+                                            : t(
+                                                  'transactions.orderFilled.sellSide',
+                                              ),
                                 }),
                                 message: t('transactions.orderFilled.message', {
-                                    side: fill.side,
+                                    side:
+                                        fill.side === 'buy' || fill.side === 'B'
+                                            ? t(
+                                                  'transactions.orderFilled.buySide',
+                                              ).toLowerCase()
+                                            : t(
+                                                  'transactions.orderFilled.sellSide',
+                                              ).toLowerCase(),
                                     usdValueOfFillStr,
                                     symbol: fill.coin,
                                     fillPrice: formatNum(
@@ -654,7 +672,10 @@ export default function WebDataConsumer() {
                     },
                 );
 
-                userFillsRef.current = filteredFills;
+                userFillsRef.current = filteredFills.slice(
+                    0,
+                    TradeHistoryLimits.MAX,
+                );
                 setUserFills(userFillsRef.current);
 
                 fetchedChannelsRef.current.add(WsChannels.USER_FILLS);
@@ -682,7 +703,7 @@ export default function WebDataConsumer() {
                 twapSliceFillsRef.current = [
                     ...fills,
                     ...twapSliceFillsRef.current,
-                ];
+                ].slice(0, TradeHistoryLimits.MAX);
             }
             fetchedChannelsRef.current.add(WsChannels.TWAP_SLICE_FILLS);
         }
@@ -702,7 +723,7 @@ export default function WebDataConsumer() {
                 twapHistoryRef.current = [
                     ...history,
                     ...twapHistoryRef.current,
-                ];
+                ].slice(0, TradeHistoryLimits.MAX);
             }
             fetchedChannelsRef.current.add(WsChannels.TWAP_HISTORY);
         }
@@ -724,7 +745,7 @@ export default function WebDataConsumer() {
                     userFundingsRef.current = [
                         ...fundings,
                         ...userFundingsRef.current,
-                    ];
+                    ].slice(0, TradeHistoryLimits.MAX);
                 }
                 fetchedChannelsRef.current.add(WsChannels.USER_FUNDINGS);
                 setFetchedChannels(new Set([...fetchedChannelsRef.current]));
@@ -748,7 +769,7 @@ export default function WebDataConsumer() {
                     userNonFundingLedgerUpdatesRef.current = [
                         ...(data.nonFundingLedgerUpdates || []),
                         ...userNonFundingLedgerUpdatesRef.current,
-                    ];
+                    ].slice(0, TradeHistoryLimits.MAX);
                 }
                 setUserNonFundingLedgerUpdates(
                     userNonFundingLedgerUpdatesRef.current,

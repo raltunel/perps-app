@@ -6,6 +6,7 @@ import React, {
     type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router';
+import { SHOULD_LOG_ANALYTICS } from '~/utils/Constants';
 
 // Types
 interface TutorialContextType {
@@ -51,18 +52,14 @@ export const TutorialProvider: React.FC<{
         console.log('Tutorial completed');
         setShowTutorial(false);
         setHasCompletedTutorial(true);
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem(tutorialKey, 'true');
-        }
+        localStorage.setItem(tutorialKey, 'true');
     };
 
     const handleTutorialSkip = (): void => {
         console.log('Tutorial skipped');
         setShowTutorial(false);
         setHasCompletedTutorial(true);
-        if (typeof window !== 'undefined') {
-            window.localStorage.setItem(tutorialKey, 'true');
-        }
+        localStorage.setItem(tutorialKey, 'true');
     };
 
     // Note: handleRestartTutorial is implemented in the hook to enable navigation
@@ -70,13 +67,6 @@ export const TutorialProvider: React.FC<{
         console.log('Restarting tutorial (internal handler)');
         setShowTutorial(true);
     };
-
-    // Debug logging
-    useEffect(() => {
-        console.log(
-            `Tutorial state changed - showTutorial: ${showTutorial}, hasCompleted: ${hasCompletedTutorial}`,
-        );
-    }, [showTutorial, hasCompletedTutorial]);
 
     const value: TutorialContextType = {
         showTutorial,
@@ -109,8 +99,7 @@ export const useTutorial = (): TutorialContextType => {
 
         // First navigate to the trade page (using the default symbol)
         // We can get the current URL to check if we're already on the trade page
-        const currentPath =
-            typeof window !== 'undefined' ? window.location.pathname : '';
+        const currentPath = window.location.pathname;
         const isOnTradePage = currentPath.includes('/trade');
 
         if (!isOnTradePage) {

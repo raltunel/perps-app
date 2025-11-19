@@ -200,7 +200,9 @@
         },
         "orderFilled": {
             "title": "{{side}}订单已成交",
-            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}"
+            "message": "成功成交{{usdValueOfFillStr}}的{{symbol}}{{side}}订单，价格{{fillPrice}}",
+            "buySide": "买入",
+            "sellSide": "卖出"
         },
         "errorUpdatingOrder": {
             "title": "订单更新错误"
@@ -550,5 +552,11 @@
     "meta": {
         "title": "首页 | Ambient",
         "content": "在Ambient进行永续合约交易"
+    },
+    "docs": {
+        "menuTerms": "Terms of Service",
+        "menuPrivacy": "Privacy",
+        "terms": "CROCODILE Labs Terms of Service",
+        "privacy": "Privacy Policy"
     }
 }
