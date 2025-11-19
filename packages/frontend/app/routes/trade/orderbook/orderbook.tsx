@@ -646,7 +646,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     }
                 />
             </div>
-
             <div id={'orderBookHeader2'} className={styles.orderBookHeader}>
                 <div>{t('transactions.price')}</div>
                 <div>
@@ -662,11 +661,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         : '(USD)'}
                 </div>
             </div>
-
             <BasicDivider />
-
             {wsError && <div className={styles.errorMessage}>{wsError}</div>}
-
             <div id='dummyOrderRow' className={styles.dummyOrderRow}>
                 <OrderRow
                     rowIndex={0}
@@ -679,7 +675,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     getBsColor={getBsColor}
                 />
             </div>
-
             {orderBookState === TableState.LOADING && (
                 <motion.div
                     className={
@@ -719,7 +714,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
                     </div>
                 </motion.div>
             )}
-
             {orderBookState === TableState.FILLED &&
                 buys.length > 0 &&
                 sells.length > 0 &&

@@ -324,8 +324,8 @@ function OrderInput({
         // set mid price input as default price when market changes
         if (!obChosenPrice) {
             setMidPriceAsPriceInput();
+            setIsMidModeActive(true);
         }
-        setIsMidModeActive(false);
     }, [
         marketOrderType,
         !buys.length,
@@ -858,11 +858,11 @@ function OrderInput({
     const handlePriceChange = (
         event: React.ChangeEvent<HTMLInputElement> | string,
     ) => {
-        setIsMidModeActive(false);
         if (typeof event === 'string') {
             setPrice(event);
         } else {
             setPrice(event.target.value);
+            setIsMidModeActive(false);
         }
     };
 

@@ -160,7 +160,7 @@ const useTradeDataStore = create<TradeDataStore>()(
                 set({ tradeDirection: direction }),
             setIsMidModeActive: (isActive: boolean) =>
                 set({ isMidModeActive: isActive }),
-            isMidModeActive: false,
+            isMidModeActive: true,
         }),
         {
             name: 'TRADE_DATA',
