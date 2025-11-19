@@ -47,3 +47,41 @@
     background: #0e0e14aa;
     border-radius: var(--radius-m);
 }
+
+@media (max-width: 768px) {
+    .container {
+        /* slightly less vertical padding on phones */
+        padding: var(--padding-l) 0 var(--padding-m);
+    }
+
+    .innerContainer {
+        /* use full width instead of a centered 800px card */
+        --container-width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+
+    .titleSection {
+        /* tighter side padding so it matches the body text */
+        padding: 0 18px;
+        text-align: center;
+    }
+
+    .innerContainer header {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    .innerContainer .lastUpdated {
+        font-size: 13px;
+    }
+
+    .docContent {
+        max-height: none;
+        padding: 18px 18px 24px;
+        border-radius: 0;
+        background: #0e0e14;
+
+        margin-top: var(--margin-m);
+    }
+}
