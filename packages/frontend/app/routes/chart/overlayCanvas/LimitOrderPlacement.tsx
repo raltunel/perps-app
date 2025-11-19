@@ -279,6 +279,34 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     ]);
 
     useEffect(() => {
+        if (!chart || !mousePrice) return;
+
+        const { iframeDoc } = getPaneCanvasAndIFrameDoc(chart);
+        if (!iframeDoc) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Alt + Shift + B for Buy
+            if (e.altKey && e.shiftKey && e.key.toLowerCase() === 'b') {
+                e.preventDefault();
+                handleBuyLimit(mousePrice);
+            }
+            // Alt + Shift + S for Sell
+            else if (e.altKey && e.shiftKey && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                handleSellStop(mousePrice);
+            }
+        };
+
+        iframeDoc.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            iframeDoc.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [chart, mousePrice]);
+
+    useEffect(() => {
         if (!chart || !isChartReady || !canvasSize) return;
 
         let animationFrameId: number | null = null;
@@ -646,6 +674,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 <PriceActionDropdown
                     position={dropdownPosition}
                     symbolCoin={symbolInfo?.coin}
+                    markPx={markPx}
                     onClose={() => setShowDropdown(false)}
                     onBuyLimit={handleBuyLimit}
                     onSellStop={handleSellStop}

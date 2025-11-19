@@ -7,6 +7,7 @@ interface PriceActionDropdownProps {
         price: number;
     };
     symbolCoin?: string;
+    markPx?: number;
     onClose: () => void;
     onBuyLimit: (price: number) => void;
     onSellStop: (price: number) => void;
@@ -15,10 +16,35 @@ interface PriceActionDropdownProps {
 const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     position,
     symbolCoin,
+    markPx,
     onClose,
     onBuyLimit,
     onSellStop,
 }) => {
+    const showBuyShortcut = markPx !== undefined && position.price < markPx;
+    const showSellShortcut = markPx !== undefined && position.price > markPx;
+
+    const menuItems = [
+        {
+            label: `Buy 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} limit`,
+            shortcut: showBuyShortcut ? 'Alt + Shift + B' : undefined,
+            onClick: () => {
+                onBuyLimit(position.price);
+                onClose();
+            },
+            priority: showBuyShortcut ? 1 : 2,
+        },
+        {
+            label: `Sell 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} stop`,
+            shortcut: showSellShortcut ? 'Alt + Shift + S' : undefined,
+            onClick: () => {
+                onSellStop(position.price);
+                onClose();
+            },
+            priority: showSellShortcut ? 1 : 2,
+        },
+    ].sort((a, b) => a.priority - b.priority);
+
     return (
         <>
             <div
@@ -38,22 +64,14 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
                 onClick={(e) => e.stopPropagation()}
             >
                 <div style={{ padding: '8px 0' }}>
-                    <MenuItem
-                        label={`Buy 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} limit`}
-                        shortcut='Alt + Shift + B'
-                        onClick={() => {
-                            onBuyLimit(position.price);
-                            onClose();
-                        }}
-                    />
-
-                    <MenuItem
-                        label={`Sell 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} stop`}
-                        onClick={() => {
-                            onSellStop(position.price);
-                            onClose();
-                        }}
-                    />
+                    {menuItems.map((item, index) => (
+                        <MenuItem
+                            key={index}
+                            label={item.label}
+                            shortcut={item.shortcut}
+                            onClick={item.onClick}
+                        />
+                    ))}
                 </div>
             </div>
             <div
@@ -98,8 +116,6 @@ const MenuItem: React.FC<{
                     flex: 1,
                     color: '#e0e0e0',
                     fontSize: '13px',
-                    fontFamily:
-                        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 }}
             >
                 {label}
@@ -109,8 +125,6 @@ const MenuItem: React.FC<{
                     style={{
                         color: '#666',
                         fontSize: '11px',
-                        fontFamily:
-                            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                     }}
                 >
                     {shortcut}
