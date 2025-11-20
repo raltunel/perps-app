@@ -285,13 +285,13 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         if (!iframeDoc) return;
 
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Alt + Shift + B for Buy
-            if (e.altKey && e.shiftKey && e.key.toLowerCase() === 'b') {
+            // Alt/Option + Shift + B for Buy (Windows: Alt, Mac: Option)
+            if (e.altKey && e.shiftKey && e.code === 'KeyB') {
                 e.preventDefault();
                 handleBuyLimit(mousePrice);
             }
-            // Alt + Shift + S for Sell
-            else if (e.altKey && e.shiftKey && e.key.toLowerCase() === 's') {
+            // Alt/Option + Shift + S for Sell (Windows: Alt, Mac: Option)
+            else if (e.altKey && e.shiftKey && e.code === 'KeyS') {
                 e.preventDefault();
                 handleSellStop(mousePrice);
             }
