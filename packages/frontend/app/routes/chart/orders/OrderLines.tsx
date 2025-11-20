@@ -11,6 +11,7 @@ import {
 } from '../overlayCanvas/overlayCanvasUtils';
 import { getPricetoPixel } from './customOrderLineUtils';
 import { MIN_VISIBLE_ORDER_LABEL_RATIO } from '~/utils/Constants';
+import { usePreviewOrderLines } from './usePreviewOrderLines';
 
 export type OrderLinesProps = {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -34,6 +35,7 @@ export default function OrderLines({
 
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
+    const previewLines = usePreviewOrderLines();
 
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
@@ -53,7 +55,7 @@ export default function OrderLines({
     useEffect(() => {
         let matchFound = false;
 
-        const linesData = [...openLines, ...positionLines];
+        const linesData = [...openLines, ...positionLines, ...previewLines];
 
         const updatedLines = linesData.map((line) => {
             if (
@@ -72,7 +74,7 @@ export default function OrderLines({
         }
 
         setLines(updatedLines);
-    }, [openLines, positionLines, selectedLine]);
+    }, [openLines, positionLines, previewLines, selectedLine]);
 
     useEffect(() => {
         if (!chart || !scaleData) return;

@@ -18,7 +18,12 @@ import {
     type LabelLocationData,
 } from '../../overlayCanvas/overlayCanvasUtils';
 import { formatLineLabel, getPricetoPixel } from '../customOrderLineUtils';
-import { drawLabel, drawLiqLabel, type LabelType } from '../orderLineUtils';
+import {
+    drawLabel,
+    drawLiqLabel,
+    type LabelLocation,
+    type LabelType,
+} from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
 
@@ -110,6 +115,7 @@ const LabelComponent = ({
             });
 
             const linesWithLabels = lines.map((line) => {
+                console.log('>>>>>> line', line);
                 const yPricePixel = getPricetoPixel(
                     chart,
                     line.yPrice,
@@ -123,7 +129,9 @@ const LabelComponent = ({
                 const labelOptions = [
                     {
                         type: 'Main' as LabelType,
-                        text: formatLineLabel(line.textValue),
+                        text: line.textValue
+                            ? formatLineLabel(line.textValue)
+                            : '',
                         backgroundColor: '#D1D1D1',
                         textColor: '#3C91FF',
                         borderColor: line.color,
@@ -152,31 +160,33 @@ const LabelComponent = ({
                         : []),
                 ];
 
-                let labelLocations = [];
+                let labelLocations: LabelLocation[] = [];
 
-                if (line.type !== 'LIQ') {
-                    labelLocations = drawLabel(
-                        ctx,
-                        {
-                            x: xPixel,
-                            y: yPricePixel,
-                            labelOptions,
-                            color: line.color,
-                        },
-                        line.type === 'LIMIT',
-                    );
-                } else {
-                    labelLocations = drawLiqLabel(
-                        ctx,
-                        {
-                            x: xPixel,
-                            y: yPricePixel,
-                            labelOptions,
-                            color: line.color,
-                        },
-                        canvasSize.width,
-                        isLiqPriceLineDraggable,
-                    );
+                if (line.textValue) {
+                    if (line.type !== 'LIQ') {
+                        labelLocations = drawLabel(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                                color: line.color,
+                            },
+                            line.type === 'LIMIT',
+                        );
+                    } else {
+                        labelLocations = drawLiqLabel(
+                            ctx,
+                            {
+                                x: xPixel,
+                                y: yPricePixel,
+                                labelOptions,
+                                color: line.color,
+                            },
+                            canvasSize.width,
+                            isLiqPriceLineDraggable,
+                        );
+                    }
                 }
 
                 return {

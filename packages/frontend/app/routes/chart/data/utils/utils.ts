@@ -384,3 +384,5 @@ export function mapI18nToTvLocale(lang: string): string {
     ];
     return supported.includes(short) ? short : 'en';
 }
+
+export type ChartLineType = 'PNL' | 'LIMIT' | 'LIQ' | 'PREVIEW_ORDER';
