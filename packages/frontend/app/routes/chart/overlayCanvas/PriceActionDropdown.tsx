@@ -66,11 +66,9 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
                     left: position.x,
                     top: position.y,
                     zIndex: 10000,
-                    backgroundColor: '#232323ff',
-                    borderRadius: '6px',
+                    backgroundColor: '#0e0e14',
                     minWidth: '280px',
-                    boxShadow:
-                        '0 2px 4px var(--color-shadow-primary-neutral-extra-heavy)',
+                    boxShadow: '0 2px 4px #0006',
                     boxSizing: 'border-box',
                     textAlign: 'left',
                 }}
@@ -112,13 +110,16 @@ const MenuItem: React.FC<{
     return (
         <div
             style={{
-                padding: '10px 16px',
+                height: '32px',
+                padding: '0 16px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 cursor: 'pointer',
-                backgroundColor: isHovered ? '#2a2a2a' : 'transparent',
+                backgroundColor: isHovered ? '#313030' : 'transparent',
                 transition: 'background-color 0.15s',
+                fontFamily:
+                    '-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif',
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -126,9 +127,12 @@ const MenuItem: React.FC<{
         >
             <span
                 style={{
-                    flex: 1,
-                    color: '#e0e0e0',
-                    fontSize: '13px',
+                    flex: '1 1 auto',
+                    color: isHovered ? '#bebdbd' : '#cbcaca',
+                    fontSize: '14px',
+                    overflowX: 'hidden',
+                    paddingLeft: '2px',
+                    textAlign: 'left',
                 }}
             >
                 {label}
@@ -136,8 +140,10 @@ const MenuItem: React.FC<{
             {shortcut && (
                 <span
                     style={{
-                        color: '#666',
-                        fontSize: '11px',
+                        color: '#525050',
+                        fontSize: '12px',
+                        letterSpacing: '0.5px',
+                        whiteSpace: 'nowrap',
                     }}
                 >
                     {shortcut}
