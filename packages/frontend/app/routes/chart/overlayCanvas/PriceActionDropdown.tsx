@@ -31,7 +31,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
 
     const menuItems = [
         {
-            label: `Buy 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} limit`,
+            label: `Buy @ ${position.price.toFixed(2)} (limit)`,
             shortcut: showBuyShortcut
                 ? isMac
                     ? '⌥ ⇧ B'
@@ -44,7 +44,7 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
             priority: showBuyShortcut ? 1 : 2,
         },
         {
-            label: `Sell 1 ${symbolCoin || ''} @ ${position.price.toFixed(2)} stop`,
+            label: `Sell @ ${position.price.toFixed(2)} (stop)`,
             shortcut: showSellShortcut
                 ? isMac
                     ? '⌥ ⇧ S'
