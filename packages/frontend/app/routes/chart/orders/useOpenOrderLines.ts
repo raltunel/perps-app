@@ -18,14 +18,6 @@ export const useOpenOrderLines = (): LineData[] => {
     const { debugWallet } = useDebugStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
-    const [pendingOrdersUpdate, setPendingOrdersUpdate] = useState(0);
-
-    useEffect(() => {
-        const handler = () => setPendingOrdersUpdate((prev) => prev + 1);
-        window.addEventListener('pendingOrdersChanged', handler);
-        return () =>
-            window.removeEventListener('pendingOrdersChanged', handler);
-    }, []);
 
     const pnlSzi = useMemo(() => {
         const data = positions
@@ -135,7 +127,6 @@ export const useOpenOrderLines = (): LineData[] => {
         symbol,
         JSON.stringify(pnlSzi),
         bsColor,
-        pendingOrdersUpdate,
     ]);
 
     return lines;

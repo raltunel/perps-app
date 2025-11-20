@@ -50,6 +50,7 @@ import type {
     TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
+import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
 
 import i18n from 'i18next';
 
@@ -77,14 +78,6 @@ export interface ChartContainerProps {
     container: string;
 }
 
-const handleChartBuy = (price: number) => {
-    console.log('Buy at price:', price);
-};
-
-const handleChartSell = (price: number) => {
-    console.log('Sell at price:', price);
-};
-
 export const TradingViewProvider: React.FC<{
     children: React.ReactNode;
     tradingviewLib?: {
@@ -96,6 +89,7 @@ export const TradingViewProvider: React.FC<{
     >;
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
+    const { placeOrder } = useOrderPlacementStore();
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
@@ -399,24 +393,21 @@ export const TradingViewProvider: React.FC<{
 
             // Add context menu items for buy/sell
             tvWidget.onContextMenu((_unixTime: number, price: number) => {
-                const formattedPrice = price.toFixed(5);
-                const symbol = processedSymbol.split(':')[0] || 'ETHBTC';
+                const formattedPrice = price.toFixed(2);
 
                 return [
                     {
                         position: 'top' as const,
-                        text: `Sell 1 ${symbol} @ ${formattedPrice} limit`,
+                        text: `Buy @ ${formattedPrice} (limit)`,
                         click: () => {
-                            handleChartSell(price);
-                            console.log('Sell Limit Order:', price);
+                            placeOrder(price, 'buy');
                         },
                     },
                     {
                         position: 'top' as const,
-                        text: `Buy 1 ${symbol} @ ${formattedPrice} stop`,
+                        text: `Sell @ ${formattedPrice} (stop)`,
                         click: () => {
-                            handleChartBuy(price);
-                            console.log('Buy Stop Order:', price);
+                            placeOrder(price, 'sell');
                         },
                     },
                     {

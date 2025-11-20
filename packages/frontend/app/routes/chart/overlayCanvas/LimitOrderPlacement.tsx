@@ -10,6 +10,7 @@ import { getPaneCanvasAndIFrameDoc } from './overlayCanvasUtils';
 import { tempPendingOrders } from '../orders/useOpenOrderLines';
 import type { LineData } from '../orders/component/LineComponent';
 import PriceActionDropdown from './PriceActionDropdown';
+import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -56,6 +57,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const { symbolInfo } = useTradeDataStore();
     const markPx = symbolInfo?.markPx;
     const { chart, isChartReady } = useTradingView();
+    const { pendingOrder, clearPendingOrder } = useOrderPlacementStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
 
@@ -536,6 +538,18 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         showDropdown,
         dropdownPosition,
     ]);
+
+    // Listen for external order placement requests
+    useEffect(() => {
+        if (pendingOrder) {
+            if (pendingOrder.side === 'buy') {
+                handleBuyLimit(pendingOrder.price);
+            } else {
+                handleSellStop(pendingOrder.price);
+            }
+            clearPendingOrder();
+        }
+    }, [pendingOrder, clearPendingOrder]);
 
     const handleBuyLimit = (price: number) => {
         const side = 'buy';
