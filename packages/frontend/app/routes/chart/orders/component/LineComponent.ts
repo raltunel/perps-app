@@ -201,42 +201,6 @@ const LineComponent = ({
         isChartReady,
     ]);
 
-    const animatePreviewLinesRef = useRef<NodeJS.Timeout | null>(null);
-    const linesRef = useRef<LineData[]>([]);
-    const chartRef = useRef<IChartingLibraryWidget | null>(null);
-    chartRef.current = chart;
-    linesRef.current = lines;
-
-    const lineStyleRef = useRef<number>(0);
-    lineStyleRef.current = 1;
-
-    useEffect(() => {
-        animatePreviewLinesRef.current = setInterval(() => {
-            lineStyleRef.current = (lineStyleRef.current + 1) % 2;
-            orderLineItemsRef.current.forEach((item, index) => {
-                const { lineId } = item;
-                const lineData = linesRef.current[index];
-                const activeLine = chartRef.current
-                    ?.activeChart()
-                    .getShapeById(lineId);
-                if (activeLine) {
-                    activeLine.setProperties({
-                        linecolor: lineData.color,
-                        borderColor: lineData.color,
-                        linestyle: lineStyleRef.current + 1,
-                        linewidth: lineData.lineWidth,
-                    });
-                }
-            });
-        }, 100);
-
-        return () => {
-            if (animatePreviewLinesRef.current) {
-                clearInterval(animatePreviewLinesRef.current);
-            }
-        };
-    }, []);
-
     return null;
 };
 

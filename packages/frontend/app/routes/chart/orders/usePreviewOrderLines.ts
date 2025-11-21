@@ -19,7 +19,7 @@ export const usePreviewOrderLines = (): LineData[] => {
                     yPrice: orderInputPriceValue,
                     color: '#e9e980',
                     type: 'PREVIEW_ORDER',
-                    lineStyle: 0,
+                    lineStyle: 2,
                     lineWidth: 1,
                 },
             ]);
