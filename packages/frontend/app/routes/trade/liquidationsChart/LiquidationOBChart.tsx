@@ -119,6 +119,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyColorRef.current = getBsColor().buy;
         sellColorRef.current = getBsColor().sell;
 
+        const mobileColor = '#68689b';
+
+        if (location === 'liqMobile') {
+            buyColorRef.current = mobileColor;
+            sellColorRef.current = mobileColor;
+        }
+
         if (isInitialized.current) {
             updateScalesAndSeries();
         }
