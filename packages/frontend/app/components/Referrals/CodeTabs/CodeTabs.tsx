@@ -42,7 +42,7 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1_000_000;
+const AFFILIATE_EDIT_VOLUME_THRESHOLD = 100000;
 const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
 
 // fee amounts for affiliate and the referred user
@@ -297,6 +297,7 @@ export default function CodeTabs(props: PropsIF) {
                 const isCachedCodeFree: boolean = await isAffiliateCodeFree(
                     referralStore.cached,
                 );
+                console.log('isCodeFree: ', isCachedCodeFree);
 
                 if (isCachedCodeFree) {
                     // Code is not claimed - show in edit mode with error
@@ -476,12 +477,34 @@ export default function CodeTabs(props: PropsIF) {
 
         // Set up debounced validation
         const timer = setTimeout(async () => {
+            console.log(
+                'Starting validation for code:',
+                temporaryAffiliateCode,
+            );
             try {
                 const codeIsFree = await isAffiliateCodeFree(
                     temporaryAffiliateCode,
                 );
+                console.log('codeIsFree: ', codeIsFree);
+                const options = {
+                    method: 'GET',
+                    headers: {
+                        accept: 'application/json',
+                        authorization:
+                            'Bearer 74c36d38cf3f44ae2e90991a7e2857a0b035a623791a096e06c54b0c7f81354d',
+                    },
+                };
+
+                fetch(
+                    'https://api.fuul.xyz/api/v1/referral_codes/emily04',
+                    options,
+                )
+                    .then((res) => res.json())
+                    .then((res) => console.log(res))
+                    .catch((err) => console.error(err));
                 setIsTemporaryAffiliateCodeValid(codeIsFree);
             } catch (error) {
+                console.log('Validation error:', error);
                 setIsTemporaryAffiliateCodeValid(false);
             }
         }, 500);
@@ -525,9 +548,12 @@ export default function CodeTabs(props: PropsIF) {
                 const messageBytes = new TextEncoder().encode(message);
 
                 try {
+                    console.log(sessionState);
                     // Get the signature from the session
                     const signatureBytes =
-                        await sessionState.signMessage(messageBytes);
+                        await sessionState.solanaWallet.signMessage(
+                            messageBytes,
+                        );
 
                     // Convert the signature to base64
                     const signatureArray = Array.from(
@@ -589,7 +615,7 @@ export default function CodeTabs(props: PropsIF) {
                 const messageBytes = new TextEncoder().encode(message);
                 // Get the signature from the session
                 const signatureBytes =
-                    await sessionState.signMessage(messageBytes);
+                    await sessionState.solanaWallet.signMessage(messageBytes);
 
                 // Convert the signature to base64
                 const signatureArray = Array.from(
@@ -749,9 +775,13 @@ export default function CodeTabs(props: PropsIF) {
                             <input
                                 type='text'
                                 value={temporaryAffiliateCode}
-                                onChange={(e) =>
-                                    setTemporaryAffiliateCode(e.target.value)
-                                }
+                                onChange={(e) => {
+                                    console.log(
+                                        'Affiliate code input changed:',
+                                        e.target.value,
+                                    );
+                                    setTemporaryAffiliateCode(e.target.value);
+                                }}
                                 onKeyDown={async (e) => {
                                     if (
                                         e.key === 'Enter' &&
@@ -867,17 +897,17 @@ export default function CodeTabs(props: PropsIF) {
                                 void createAffiliateCode();
                             }
                         }}
-                        disabled={
-                            canEditAffiliateCode
-                                ? !temporaryAffiliateCode.trim() ||
-                                  !isTemporaryAffiliateCodeValid ||
-                                  !tempAffiliateCodeCharsValidate ||
-                                  temporaryAffiliateCode.length > 30 ||
-                                  temporaryAffiliateCode.length < 2
-                                : !temporaryAffiliateCode.trim() ||
-                                  isTemporaryAffiliateCodeValid === false ||
-                                  isTemporaryAffiliateCodeValid === undefined
-                        }
+                        // disabled={
+                        //     canEditAffiliateCode
+                        //         ? !temporaryAffiliateCode.trim() ||
+                        //           !isTemporaryAffiliateCodeValid ||
+                        //           !tempAffiliateCodeCharsValidate ||
+                        //           temporaryAffiliateCode.length > 30 ||
+                        //           temporaryAffiliateCode.length < 2
+                        //         : !temporaryAffiliateCode.trim() ||
+                        //           isTemporaryAffiliateCodeValid === false ||
+                        //           isTemporaryAffiliateCodeValid === undefined
+                        // }
                     >
                         {t(
                             editModeAffiliate
