@@ -11,6 +11,7 @@ import { tempPendingOrders } from '../orders/useOpenOrderLines';
 import type { LineData } from '../orders/component/LineComponent';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
+import { OrderPlacementModal } from '../components/OrderPlacementModal';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -57,7 +58,16 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const { symbolInfo } = useTradeDataStore();
     const markPx = symbolInfo?.markPx;
     const { chart, isChartReady } = useTradingView();
-    const { pendingOrder, clearPendingOrder } = useOrderPlacementStore();
+    const {
+        pendingOrder,
+        clearPendingOrder,
+        showModal,
+        modalData,
+        closeModal,
+        confirmOrder,
+        openModal,
+        quickMode,
+    } = useOrderPlacementStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
 
@@ -123,7 +133,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 iframeDoc.removeEventListener('mouseleave', handleMouseLeave);
             };
         }
-    }, [chart, scaleData, overlayCanvasMousePositionRef]);
+    }, [chart, scaleData, overlayCanvasMousePositionRef, quickMode]);
 
     // Listen for clicks on TradingView chart
     useEffect(() => {
@@ -180,6 +190,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     return;
                 }
             }
+
+            if (!quickMode) return;
 
             const y = e.clientY - canvas.getBoundingClientRect().top;
 
@@ -278,6 +290,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         buttonBounds,
         markPx,
         colors,
+        quickMode,
     ]);
 
     useEffect(() => {
@@ -401,7 +414,6 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 const dpr = window.devicePixelRatio || 1;
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-
                 if (!mousePrice && !clickedOrder && !showDropdown) return;
 
                 const drawLineAtPrice = (price: number, isClicked: boolean) => {
@@ -494,16 +506,20 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     }
                 };
 
-                // Draw clicked price line first (if exists)
                 if (clickedOrder?.price) {
                     drawLineAtPrice(clickedOrder.price, true);
                 }
 
-                // Draw mouse hover line (if exists and different from clicked) or if dropdown is open
-                if (mousePrice && mousePrice !== clickedOrder?.price) {
+                if (
+                    quickMode &&
+                    mousePrice &&
+                    mousePrice !== clickedOrder?.price
+                ) {
                     drawLineAtPrice(mousePrice, false);
-                } else if (showDropdown && dropdownPosition) {
-                    // Keep button visible when dropdown is open
+                } else if (
+                    !clickedOrder &&
+                    (mousePrice || (showDropdown && dropdownPosition))
+                ) {
                     const mouseY = overlayCanvasMousePositionRef.current.y;
                     drawAddButton(ctx, canvas, mouseY, dpr);
                 }
@@ -690,8 +706,23 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     symbolCoin={symbolInfo?.coin}
                     markPx={markPx}
                     onClose={() => setShowDropdown(false)}
-                    onBuyLimit={handleBuyLimit}
-                    onSellStop={handleSellStop}
+                    onBuyLimit={(price) => {
+                        setShowDropdown(false);
+                        openModal(price, 'buy');
+                    }}
+                    onSellStop={(price) => {
+                        setShowDropdown(false);
+                        openModal(price, 'sell');
+                    }}
+                />
+            )}
+            {showModal && modalData && (
+                <OrderPlacementModal
+                    price={modalData.price}
+                    side={modalData.side}
+                    symbol={symbolInfo?.coin}
+                    onClose={closeModal}
+                    onConfirm={confirmOrder}
                 />
             )}
         </>

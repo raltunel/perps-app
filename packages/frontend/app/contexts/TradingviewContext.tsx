@@ -89,7 +89,7 @@ export const TradingViewProvider: React.FC<{
     >;
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
-    const { placeOrder } = useOrderPlacementStore();
+    const { openModal, toggleQuickMode } = useOrderPlacementStore();
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
@@ -400,14 +400,14 @@ export const TradingViewProvider: React.FC<{
                         position: 'top' as const,
                         text: `Buy @ ${formattedPrice} (limit)`,
                         click: () => {
-                            placeOrder(price, 'buy');
+                            openModal(price, 'buy');
                         },
                     },
                     {
                         position: 'top' as const,
                         text: `Sell @ ${formattedPrice} (stop)`,
                         click: () => {
-                            placeOrder(price, 'sell');
+                            openModal(price, 'sell');
                         },
                     },
                     {
@@ -416,6 +416,69 @@ export const TradingViewProvider: React.FC<{
                         click: () => {},
                     },
                 ];
+            });
+
+            // Add Trade button to header
+            tvWidget.headerReady().then(() => {
+                const button = tvWidget.createButton({ align: 'left' });
+                button.setAttribute('title', 'Quick Trade');
+                button.classList.add('apply-common-tooltip');
+                button.textContent = 'Trade';
+                button.style.fontWeight = '500';
+                button.style.fontSize = '13px';
+                button.style.padding = '4px 12px';
+                button.style.borderRadius = '4px';
+                button.style.cursor = 'pointer';
+                button.style.transition = 'all 0.15s';
+                button.style.marginLeft = '8px';
+
+                const updateButtonStyle = () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (state.quickMode) {
+                        button.style.color = '#ffffff';
+                        button.style.backgroundColor =
+                            'var(--accent1, #4a8bd3)';
+                        button.style.boxShadow =
+                            '0 0 0 1px var(--accent1, #4a8bd3)';
+                    } else {
+                        button.style.color = '#cbcaca';
+                        button.style.backgroundColor = '#2a2e39';
+                        button.style.boxShadow = 'none';
+                    }
+                };
+
+                updateButtonStyle();
+
+                const unsubscribe = useOrderPlacementStore.subscribe(() => {
+                    updateButtonStyle();
+                });
+
+                button.addEventListener('mouseenter', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (state.quickMode) {
+                        button.style.backgroundColor =
+                            'var(--accent1, #5294e2)';
+                    } else {
+                        button.style.backgroundColor = '#363a45';
+                    }
+                });
+                button.addEventListener('mouseleave', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (state.quickMode) {
+                        button.style.backgroundColor =
+                            'var(--accent1, #4a8bd3)';
+                    } else {
+                        button.style.backgroundColor = '#2a2e39';
+                    }
+                });
+                button.addEventListener('click', () => {
+                    toggleQuickMode();
+                });
+
+                // Cleanup subscription when widget is removed
+                return () => {
+                    unsubscribe();
+                };
             });
 
             setChart(tvWidget);
