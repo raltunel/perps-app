@@ -12,12 +12,8 @@ import { TableState } from '~/utils/CommonIFs';
 interface OrderBookStore {
     buys: OrderBookRowIF[];
     sells: OrderBookRowIF[];
-    highResBuys: OrderBookRowIF[];
-    highResSells: OrderBookRowIF[];
-    setHighResBuys: (highResBuys: OrderBookRowIF[]) => void;
-    setHighResSells: (highResSells: OrderBookRowIF[]) => void;
-    liqBuys: OrderBookLiqIF[];
-    liqSells: OrderBookLiqIF[];
+    setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => void;
+    setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) => void;
     selectedResolution: OrderRowResolutionIF | null;
     selectedMode: OrderBookMode;
     orderBookState: TableState;
@@ -38,6 +34,19 @@ interface OrderBookStore {
         symbol: string,
         resolutionPair: OrderRowResolutionIF,
     ) => void;
+
+    hrBuys: OrderBookRowIF[];
+    hrSells: OrderBookRowIF[];
+    setHrBuys: (hrBuys: OrderBookRowIF[]) => void;
+    setHrSells: (hrSells: OrderBookRowIF[]) => void;
+    inpBuys: OrderBookRowIF[];
+    inpSells: OrderBookRowIF[];
+    setInpBuys: (inpBuys: OrderBookRowIF[]) => void;
+    setInpSells: (inpSells: OrderBookRowIF[]) => void;
+    liqBuys: OrderBookLiqIF[];
+    liqSells: OrderBookLiqIF[];
+    hrLiqBuys: OrderBookLiqIF[];
+    hrLiqSells: OrderBookLiqIF[];
 }
 
 export const useOrderBookStore = create<OrderBookStore>()(
@@ -46,8 +55,6 @@ export const useOrderBookStore = create<OrderBookStore>()(
             orderBook: [],
             buys: [],
             sells: [],
-            highResBuys: [],
-            highResSells: [],
             selectedResolution: null,
             selectedMode: 'symbol',
             orderBookState: TableState.LOADING,
@@ -67,14 +74,6 @@ export const useOrderBookStore = create<OrderBookStore>()(
             setOrderBookState: (orderBookState: TableState) =>
                 set({ orderBookState }),
             setTrades: (trades: OrderBookTradeIF[]) => set({ trades }),
-            liqBuys: [],
-            liqSells: [],
-            setLiqBuys: (liqBuys: OrderBookLiqIF[]) => set({ liqBuys }),
-            setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
-            setHighResBuys: (highResBuys: OrderBookRowIF[]) =>
-                set({ highResBuys }),
-            setHighResSells: (highResSells: OrderBookRowIF[]) =>
-                set({ highResSells }),
             orderCount: 9,
             setOrderCount: (orderCount: number) => set({ orderCount }),
             activeOrderTab: 'Book',
@@ -91,6 +90,23 @@ export const useOrderBookStore = create<OrderBookStore>()(
                     },
                 })),
             resolutionPairs: {},
+            hrBuys: [],
+            hrSells: [],
+            setHrBuys: (hrBuys: OrderBookRowIF[]) => set({ hrBuys }),
+            setHrSells: (hrSells: OrderBookRowIF[]) => set({ hrSells }),
+            inpBuys: [],
+            inpSells: [],
+            setInpBuys: (inpBuys: OrderBookRowIF[]) => set({ inpBuys }),
+            setInpSells: (inpSells: OrderBookRowIF[]) => set({ inpSells }),
+            liqBuys: [],
+            liqSells: [],
+            setLiqBuys: (liqBuys: OrderBookLiqIF[]) => set({ liqBuys }),
+            setLiqSells: (liqSells: OrderBookLiqIF[]) => set({ liqSells }),
+            hrLiqBuys: [],
+            hrLiqSells: [],
+            setHrLiqBuys: (hrLiqBuys: OrderBookLiqIF[]) => set({ hrLiqBuys }),
+            setHrLiqSells: (hrLiqSells: OrderBookLiqIF[]) =>
+                set({ hrLiqSells }),
         }),
         {
             name: 'ORDERBOOK',

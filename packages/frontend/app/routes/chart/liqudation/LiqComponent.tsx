@@ -24,8 +24,7 @@ const LiqComponent = ({
 }: LiqProps) => {
     const lines = useLiqudationLines(scaleData);
 
-    const { highResBuys, highResSells, liqBuys, liqSells } =
-        useOrderBookStore();
+    const { hrBuys, hrSells, hrLiqBuys, hrLiqSells } = useOrderBookStore();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [overlayLiqCanvasAttr, setOverlayLiqCanvasAttr] = useState<any>();
@@ -61,10 +60,10 @@ const LiqComponent = ({
                     }}
                 >
                     <LiquidationsChart
-                        buyData={highResBuys}
-                        sellData={highResSells}
-                        liqBuys={liqBuys}
-                        liqSells={liqSells}
+                        buyData={hrBuys}
+                        sellData={hrSells}
+                        liqBuys={hrLiqBuys}
+                        liqSells={hrLiqSells}
                         width={overlayLiqCanvasAttr.width}
                         height={overlayLiqCanvasAttr.height}
                         scaleData={scaleData}

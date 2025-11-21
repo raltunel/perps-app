@@ -19,6 +19,7 @@ import {
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
 import { useDebugStore } from '~/stores/DebugStore';
+import OBLiqFetcher from './ObLiqFetcher';
 
 interface LiquidationsChartSectionProps {
     symbol: string;
@@ -32,10 +33,10 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const {
         buys,
         sells,
-        highResBuys,
-        highResSells,
-        setHighResBuys,
-        setHighResSells,
+        inpBuys,
+        inpSells,
+        setInpBuys,
+        setInpSells,
         selectedResolution,
         selectedMode,
         orderBookState,
@@ -74,25 +75,23 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             pauseLiqAnimationRef.current
         )
             return;
-        const highResBuys = interpolateOrderBookData(
+        const inpBuys = interpolateOrderBookData(
             buysRef.current,
             sellsRef.current[0].px,
         );
-        const highResSells = interpolateOrderBookData(
+        const inpSells = interpolateOrderBookData(
             sellsRef.current,
             buysRef.current[0].px,
         );
-        setHighResBuys(highResBuys);
-        setHighResSells(highResSells);
-        // setHighResBuys(buysRef.current);
-        // setHighResSells(sellsRef.current);
+        setInpBuys(inpBuys);
+        setInpSells(inpSells);
         const { liqBuys, liqSells } = createRandomOrderBookLiq(
             buysRef.current,
             sellsRef.current,
         );
         setLiqBuys(liqBuys);
         setLiqSells(liqSells.reverse());
-    }, [setHighResBuys, setHighResSells, setLiqBuys, setLiqSells, orderCount]);
+    }, [setInpBuys, setInpSells, setLiqBuys, setLiqSells, orderCount]);
 
     useEffect(() => {
         genRandomData();
@@ -141,28 +140,25 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         return () => window.removeEventListener('resize', updateDimensions);
     }, [orderCount, orderBookState]);
 
-    const highResOrderCount = useMemo(() => {
-        if (!highResBuys.length) return 30;
-        return highResBuys.length;
-    }, [highResBuys]);
+    const inpOrderCount = useMemo(() => {
+        if (!inpBuys.length) return 30;
+        return inpBuys.length;
+    }, [inpBuys]);
 
     const getRandWidth = useCallback(
         (index: number, inverse: boolean = false) => {
             let rand;
             if (inverse) {
                 rand =
-                    100 / highResOrderCount +
-                    index * (100 / highResOrderCount) +
+                    100 / inpOrderCount +
+                    index * (100 / inpOrderCount) +
                     Math.random() * 20;
             } else {
-                rand =
-                    100 -
-                    index * (100 / highResOrderCount) +
-                    Math.random() * 20;
+                rand = 100 - index * (100 / inpOrderCount) + Math.random() * 20;
             }
             return rand < 100 ? rand + '%' : '100%';
         },
-        [highResOrderCount],
+        [inpOrderCount],
     );
 
     const renderTabContent = useCallback(() => {
@@ -184,7 +180,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             gap: '4px',
                         }}
                     >
-                        {Array.from({ length: highResOrderCount }).map(
+                        {Array.from({ length: inpOrderCount }).map(
                             (_, index) => (
                                 <SkeletonNode
                                     width={getRandWidth(index)}
@@ -192,7 +188,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                                 />
                             ),
                         )}
-                        {Array.from({ length: highResOrderCount }).map(
+                        {Array.from({ length: inpOrderCount }).map(
                             (_, index) => (
                                 <SkeletonNode
                                     width={getRandWidth(index, true)}
@@ -206,8 +202,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
             if (
                 orderBookState === TableState.FILLED &&
-                highResBuys.length > 0 &&
-                highResSells.length > 0
+                inpBuys.length > 0 &&
+                inpSells.length > 0
             ) {
                 return (
                     <motion.div
@@ -223,8 +219,8 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                         }}
                     >
                         <LiquidationsChart
-                            buyData={highResBuys}
-                            sellData={highResSells}
+                            buyData={inpBuys}
+                            sellData={inpSells}
                             liqBuys={liqBuys}
                             liqSells={liqSells}
                             width={dimensions.width}
@@ -236,7 +232,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
             }
         }
         return <div>Feed</div>;
-    }, [activeTab, highResBuys, highResSells, dimensions, orderBookState]);
+    }, [activeTab, inpBuys, inpSells, dimensions, orderBookState]);
 
     const liqChartTabsComponent = (
         <div className={styles.liqChartTabContainer}>
@@ -286,6 +282,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
 
     return (
         <div className={styles.liqChartSectionContainer}>
+            <OBLiqFetcher />
             {liqChartTabsComponent}
         </div>
     );
