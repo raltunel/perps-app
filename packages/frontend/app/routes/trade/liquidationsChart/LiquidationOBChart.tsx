@@ -52,6 +52,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const sellYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const pageYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
 
+    const locationRef = useRef(location);
+    locationRef.current = location;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sellAreaSeriesRef = useRef<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -518,25 +521,26 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             sellLine(currentSellDataRef.current);
             buyLine(currentBuyDataRef.current);
 
-            if (
-                sellLiqLineSeriesRef.current &&
-                buyLiqLineSeriesRef.current &&
-                location === 'liqMobile'
-            ) {
-                currentLiqBuysRef.current.forEach((liq, index) => {
-                    buyLiqLineSeriesRef.current([
-                        { px: liq.px, ratio: 0 },
-                        { px: liq.px, ratio: liq.ratio },
-                    ]);
-                });
+            // REMOVE | Liq lines on overlay chart
+            // if (
+            //     sellLiqLineSeriesRef.current &&
+            //     buyLiqLineSeriesRef.current &&
+            //     location === 'liqMobile'
+            // ) {
+            //     currentLiqBuysRef.current.forEach((liq, index) => {
+            //         buyLiqLineSeriesRef.current([
+            //             { px: liq.px, ratio: 0 },
+            //             { px: liq.px, ratio: liq.ratio },
+            //         ]);
+            //     });
 
-                currentLiqSellsRef.current.forEach((liq, index) => {
-                    sellLiqLineSeriesRef.current([
-                        { px: liq.px, ratio: 0 },
-                        { px: liq.px, ratio: liq.ratio },
-                    ]);
-                });
-            }
+            //     currentLiqSellsRef.current.forEach((liq, index) => {
+            //         sellLiqLineSeriesRef.current([
+            //             { px: liq.px, ratio: 0 },
+            //             { px: liq.px, ratio: liq.ratio },
+            //         ]);
+            //     });
+            // }
         });
     }, [width, height]);
 

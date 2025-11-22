@@ -24,6 +24,9 @@ const LiqComponent = ({
 }: LiqProps) => {
     const lines = useLiqudationLines(scaleData);
 
+    useEffect(() => {
+        console.log('>>>>>> lines', lines);
+    }, [lines]);
     const { hrBuys, hrSells, hrLiqBuys, hrLiqSells } = useOrderBookStore();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

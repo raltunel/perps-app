@@ -74,8 +74,9 @@ const LiqudationLines = ({
                         0,
                     );
                     gradient.addColorStop(0, `${strokeStyle}00`); // fully transparent on the left
-                    gradient.addColorStop(0.6, `${strokeStyle}AA`); // mid transition
-                    gradient.addColorStop(1, `${strokeStyle}FF`); // fully opaque on the right
+                    gradient.addColorStop(0.7, `${strokeStyle}AA`); // mid transition
+                    gradient.addColorStop(0.82, `${strokeStyle}FF`); // fully opaque on the right
+                    gradient.addColorStop(1, `${strokeStyle}33`); // fully opaque on the right
 
                     context.strokeStyle = gradient;
                     context.fillStyle = d.strokeStyle;
@@ -107,8 +108,9 @@ const LiqudationLines = ({
                         0,
                     );
                     gradient.addColorStop(0, `${strokeStyle}00`); // fully transparent on the left
-                    gradient.addColorStop(0.6, `${strokeStyle}AA`); // mid transition
-                    gradient.addColorStop(1, `${strokeStyle}FF`); // fully opaque on the right
+                    gradient.addColorStop(0.7, `${strokeStyle}AA`); // mid transition
+                    gradient.addColorStop(0.82, `${strokeStyle}FF`); // fully opaque on the right
+                    gradient.addColorStop(1, `${strokeStyle}33`); // fully opaque on the right
 
                     context.strokeStyle = gradient;
                     context.fillStyle = d.strokeStyle;

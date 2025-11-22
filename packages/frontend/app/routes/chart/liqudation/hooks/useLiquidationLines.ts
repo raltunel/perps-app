@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { HorizontalLineData } from '../LiqudationLines';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useOrderBookStore } from '~/stores/OrderBookStore';
 
 export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
     const { symbolInfo } = useTradeDataStore();
+
+    const { hrLiqBuys, hrLiqSells } = useOrderBookStore();
 
     const markPx = symbolInfo?.markPx;
     const [lines, setLines] = useState<HorizontalLineData[]>([]);
@@ -106,5 +109,22 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
             }
         }
     }, [JSON.stringify(scaleData?.yScale.domain()), liqData]);
+
+    // useEffect(() => {
+    //     const newLines = [];
+    //     hrLiqBuys.forEach((liq) => {
+    //         newLines.push({
+    //             yPrice: liq.px,
+    //             liqValue: liq.ratio,
+    //             color: '#FDE725',
+    //             strokeStyle: '#FDE725',
+    //             lineWidth: 8,
+    //             type: 'Long',
+    //             dash: undefined,
+    //             globalAlpha: 0.4,
+    //         });
+    //     });
+    //     hrLiqSells.forEach((liq) => {
+    // }, [hrLiqBuys, hrLiqSells]);
     return lines;
 };
