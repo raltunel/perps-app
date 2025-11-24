@@ -31,6 +31,7 @@ const subscriptions = new Map<string, { unsubscribe: () => void }>();
 
 export type CustomDataFeedType = IDatafeedChartApi & {
     updateUserAddress: (address: string) => void;
+    destroy: () => void;
 } & { onReady(callback: OnReadyCallback): void };
 
 export const createDataFeed = (
@@ -38,14 +39,27 @@ export const createDataFeed = (
     addToFetchedChannels: (channel: string) => void,
 ): CustomDataFeedType => {
     let currentUserAddress = '';
+    // Keep track of user fills subscription separately since it's not tied to a listenerGuid
+    let userFillsSubscription: { unsubscribe: () => void } | null = null;
+
     const updateUserAddress = (newAddress: string) => {
         currentUserAddress = newAddress;
     };
     const datafeed: IDatafeedChartApi & {
         updateUserAddress: (address: string) => void;
+        destroy: () => void;
     } = {
         searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
             onResult([]);
+        },
+
+        destroy: () => {
+            subscriptions.forEach((sub) => sub.unsubscribe());
+            subscriptions.clear();
+            if (userFillsSubscription) {
+                userFillsSubscription.unsubscribe();
+                userFillsSubscription = null;
+            }
         },
 
         onReady: (cb: any) => {
@@ -181,7 +195,12 @@ export const createDataFeed = (
 
             if (!info) return console.log('SDK is not ready');
             setTimeout(() => {
-                info.subscribe(
+                // Unsubscribe previous listener if it exists to avoid leaks
+                if (userFillsSubscription) {
+                    userFillsSubscription.unsubscribe();
+                }
+
+                userFillsSubscription = info.subscribe(
                     {
                         type: WsChannels.USER_FILLS,
                         user: userWallet,
@@ -189,6 +208,7 @@ export const createDataFeed = (
                     (payload: any) => {
                         addToFetchedChannels(WsChannels.USER_FILLS);
                         if (!payload || !payload.data) return;
+                        // ...
 
                         const fills = payload.data.fills;
                         if (!fills || fills.length === 0) return;

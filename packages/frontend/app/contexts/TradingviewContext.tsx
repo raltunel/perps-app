@@ -110,6 +110,10 @@ export const TradingViewProvider: React.FC<{
     debugToolbarOpenRef.current = debugToolbarOpen;
 
     const { marketId } = useParams<{ marketId: string }>();
+    const marketIdRef = useRef(marketId);
+    useEffect(() => {
+        marketIdRef.current = marketId;
+    }, [marketId]);
 
     const [isChartReady, setIsChartReady] = useState(false);
     useEffect(() => {
@@ -151,10 +155,10 @@ export const TradingViewProvider: React.FC<{
                 const volumeStudies = chart
                     .activeChart()
                     .getAllStudies()
-                    .filter((x) => x.name === 'Volume');
+                    .filter((x: any) => x.name === 'Volume');
 
                 if (volumeStudies) {
-                    volumeStudies.forEach((item) => {
+                    volumeStudies.forEach((item: any) => {
                         const volume = chart
                             .activeChart()
                             .getStudyById(item.id);
@@ -177,8 +181,12 @@ export const TradingViewProvider: React.FC<{
     useEffect(() => {
         if (!isChartReady && chart) {
             const intervalId = setInterval(() => {
-                const isReady = chart.chart().dataReady();
-                setIsChartReady(isReady);
+                try {
+                    const isReady = chart.chart().dataReady();
+                    if (isReady) setIsChartReady(isReady);
+                } catch (e) {
+                    // Ignore errors during init
+                }
             }, 200);
             return () => clearInterval(intervalId);
         }
@@ -206,7 +214,7 @@ export const TradingViewProvider: React.FC<{
                 showBuysSellsOnChart && chart.chart().refreshMarks();
             });
 
-            chart.subscribe('study_event', (studyId) => {
+            chart.subscribe('study_event', (studyId: any) => {
                 const studyElement = chart.activeChart().getStudyById(studyId);
 
                 const colors = getBsColor();
@@ -233,7 +241,8 @@ export const TradingViewProvider: React.FC<{
 
         dataFeedRef.current = createDataFeed(info, addToFetchedChannels);
 
-        const processedSymbol = processSymbolUrlParam(marketId || 'BTC');
+        const currentMarketId = marketIdRef.current;
+        const processedSymbol = processSymbolUrlParam(currentMarketId || 'BTC');
 
         const tvWidget = new tradingviewLib.widget({
             container: 'tv_chart',
@@ -248,6 +257,9 @@ export const TradingViewProvider: React.FC<{
                 'volume_force_overlay',
                 'header_symbol_search',
                 'header_compare',
+                'header_saveload',
+                'header_settings',
+                'context_menus',
                 ...(chartState
                     ? [
                           'create_volume_indicator_by_default' as TradingTerminalFeatureset,
@@ -287,53 +299,6 @@ export const TradingViewProvider: React.FC<{
         tvWidget.headerReady().then(() => {
             setChartLoadingStatus('ready');
         });
-        // tvWidget.headerReady().then(() => {
-        //     const liquidationsButton = tvWidget.createButton();
-
-        //     let isToggled = false;
-
-        //     const updateButtonStyle = () => {
-        //         const svg = getLiquidationsSvgIcon(
-        //             isToggled ? '#7371fc' : '#cbcaca',
-        //         );
-        //         liquidationsButton.style.color = isToggled
-        //             ? '#7371fc'
-        //             : '#cbcaca';
-
-        //         liquidationsButton.innerHTML = `
-        //             <span class="liquidations-wrapper" style="display: flex; align-items: center;border-radius:4px;padding:5px">
-        //               ${svg}
-        //              <span style="padding-left:3px"> Liquidations
-        //              </span>`;
-        //     };
-
-        //     updateButtonStyle();
-
-        //     const onClick = () => {
-        //         isToggled = !isToggled;
-        //         updateButtonStyle();
-
-        //         if (isToggled) {
-        //             console.log('Open');
-        //         } else {
-        //             console.log('Close');
-        //         }
-        //     };
-        //     const onMouseEnter = () => {
-        //         const wrapper = liquidationsButton.querySelector(
-        //             '.liquidations-wrapper',
-        //         ) as HTMLDivElement;
-        //         if (wrapper) {
-        //             wrapper.style.backgroundColor = '#313030';
-        //         }
-        //     };
-        //     const onMouseLeave = () => {
-        //         const wrapper = liquidationsButton.querySelector(
-        //             '.liquidations-wrapper',
-        //         ) as HTMLDivElement;
-        //         if (wrapper) wrapper.style.backgroundColor = 'transparent';
-        //     };
-
         //     liquidationsButton.addEventListener('click', onClick);
         //     liquidationsButton.addEventListener('mouseenter', onMouseEnter);
         //     liquidationsButton.addEventListener('mouseleave', onMouseLeave);
@@ -402,6 +367,10 @@ export const TradingViewProvider: React.FC<{
 
         return () => {
             try {
+                if (dataFeedRef.current?.destroy) {
+                    dataFeedRef.current.destroy();
+                }
+
                 if (chart) {
                     drawingEventUnsubscribe(chart);
                     studyEventsUnsubscribe(chart);
@@ -413,7 +382,7 @@ export const TradingViewProvider: React.FC<{
                 console.error(error);
             }
         };
-    }, [chartState, info, i18n.language, initChart, tradingviewLib, marketId]);
+    }, [chartState, info, i18n.language, initChart, tradingviewLib]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
