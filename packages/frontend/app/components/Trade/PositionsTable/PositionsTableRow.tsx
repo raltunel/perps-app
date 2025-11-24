@@ -80,7 +80,7 @@ const PositionsTableRow: React.FC<PositionsTableRowProps> = React.memo(
                     Math.min(position.leverage.value, BTC_MAX_LEVERAGE),
                 );
             }
-        }, [symbol]);
+        }, [symbol, position.coin, position.leverage.value, setLeverage]);
 
         // Memoize hexToRgba
         const hexToRgba = useCallback((hex: string, alpha: number): string => {
