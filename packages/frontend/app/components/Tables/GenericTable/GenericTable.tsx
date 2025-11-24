@@ -206,23 +206,24 @@ export default function GenericTable<
         checkShadow();
         calculateRowCount();
 
-        let scrollEvent = null;
         const tableBody = document.getElementById(
             `${id}-tableBody`,
         ) as HTMLElement;
 
+        const scrollHandler = () => {
+            checkShadow();
+        };
+
         if (tableBody) {
-            scrollEvent = tableBody.addEventListener('scroll', () => {
-                checkShadow();
-            });
+            tableBody.addEventListener('scroll', scrollHandler);
         }
 
         return () => {
-            if (scrollEvent) {
-                tableBody.removeEventListener('scroll', scrollEvent);
+            if (tableBody) {
+                tableBody.removeEventListener('scroll', scrollHandler);
             }
         };
-    }, [tableState]);
+    }, [tableState, checkShadow, id]);
 
     useEffect(() => {
         if (!isClient) {

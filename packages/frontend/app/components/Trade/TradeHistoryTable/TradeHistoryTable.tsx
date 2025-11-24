@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { sortUserFills } from '~/processors/processUserFills';
@@ -27,9 +27,6 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
     const { fetchUserFills } = useInfoApi();
 
     const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
 
     const handleViewOrderDetails = (time: string, coin: string) => {
         if (onViewOrderDetails) {
@@ -66,7 +63,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                     aggregateByTime: boolean,
                 ) => Promise<UserFillIF[]>
             >
-                storageKey={`TradeHistoryTable_${currentUserRef.current}`}
+                storageKey='TradeHistoryTable'
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <TradeHistoryTableHeader

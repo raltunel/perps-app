@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -29,9 +29,6 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
 
     const { userAddress } = useUserDataStore();
 
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     const filteredOrderHistory = useMemo(() => {
         return filterOrderHistory(data, selectedFilter);
     }, [data, selectedFilter, symbol]);
@@ -47,7 +44,7 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 OrderDataSortBy,
                 (address: string) => Promise<OrderDataIF[]>
             >
-                storageKey={`OrderHistoryTable_${currentUserRef.current}`}
+                storageKey='OrderHistoryTable'
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OrderHistoryTableHeader

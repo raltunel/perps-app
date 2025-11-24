@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { useCancelOrderService } from '~/hooks/useCancelOrderService';
 import useNumFormatter from '~/hooks/useNumFormatter';
@@ -297,12 +297,8 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     };
 
-    const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
-
     const { symbol } = useTradeDataStore();
+    const { userAddress } = useUserDataStore();
 
     const filteredOrders = useMemo(() => {
         if (!selectedFilter) {
@@ -331,7 +327,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         <>
             <GenericTable
                 noDataMessage={t('transactions.noOpenOrders')}
-                storageKey={`OpenOrdersTable_${currentUserRef.current}`}
+                storageKey='OpenOrdersTable'
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OpenOrdersTableHeader

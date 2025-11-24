@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserFundings } from '~/processors/processUserFills';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -21,9 +21,6 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
     const { symbol } = useTradeDataStore();
 
     const { userAddress } = useUserDataStore();
-
-    const currentUserRef = useRef<string>('');
-    currentUserRef.current = userAddress;
 
     const filteredData = useMemo(() => {
         switch (selectedFilter) {
@@ -49,7 +46,7 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
     return (
         <>
             <GenericTable
-                storageKey={`FundingHistoryTable_${currentUserRef.current}`}
+                storageKey='FundingHistoryTable'
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <FundingHistoryTableHeader
