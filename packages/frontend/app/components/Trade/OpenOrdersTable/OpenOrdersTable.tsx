@@ -323,10 +323,23 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/openOrders/${userAddress}`;
     }, [userAddress]);
 
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('transactions.noOpenOrdersForMarket', { symbol });
+            case 'long':
+                return t('transactions.noOpenLongOrders');
+            case 'short':
+                return t('transactions.noOpenShortOrders');
+            default:
+                return t('transactions.noOpenOrders');
+        }
+    }, [selectedFilter, symbol]);
+
     return (
         <>
             <GenericTable
-                noDataMessage={t('transactions.noOpenOrders')}
+                noDataMessage={noDataMessage}
                 storageKey='OpenOrdersTable'
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

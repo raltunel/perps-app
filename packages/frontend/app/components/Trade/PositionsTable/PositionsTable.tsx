@@ -52,11 +52,25 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
 
         return dataFilteredBySize;
-    }, [selectedFilter, dataFilteredBySize]);
+    }, [selectedFilter, dataFilteredBySize, symbol]);
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noOpenPositionsForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noOpenLongPositions');
+            case 'short':
+                return t('tradeTable.noOpenShortPositions');
+            default:
+                return t('tradeTable.noOpenPositions');
+        }
+    }, [selectedFilter, symbol]);
+
     return (
         <>
             <GenericTable
-                noDataMessage={t('tradeTable.noOpenPositions')}
+                noDataMessage={noDataMessage}
                 storageKey='PositionsTable'
                 data={dataFilteredByType as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

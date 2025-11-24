@@ -23,19 +23,42 @@ interface OrderHistoryTableProps {
 export function OrderHistoryTable(props: OrderHistoryTableProps) {
     const { selectedFilter, pageMode, data, isFetched } = props;
 
-    const { symbol, filterOrderHistory } = useTradeDataStore();
+    const { symbol } = useTradeDataStore();
 
     const { fetchOrderHistory } = useInfoApi();
 
     const { userAddress } = useUserDataStore();
 
     const filteredOrderHistory = useMemo(() => {
-        return filterOrderHistory(data, selectedFilter);
+        switch (selectedFilter) {
+            case 'all':
+                return data;
+            case 'active':
+                return data.filter((order) => order.coin === symbol);
+            case 'long':
+                return data.filter((order) => order.side === 'buy');
+            case 'short':
+                return data.filter((order) => order.side === 'sell');
+        }
+        return data;
     }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
         return `${EXTERNAL_PAGE_URL_PREFIX}/orderHistory/${userAddress}`;
     }, [userAddress]);
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noOrderHistoryForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noLongOrderHistory');
+            case 'short':
+                return t('tradeTable.noShortOrderHistory');
+            default:
+                return t('tradeTable.noOrderHistory');
+        }
+    }, [selectedFilter, symbol]);
 
     return (
         <>
@@ -67,7 +90,7 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 skeletonColRatios={[1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1]}
                 defaultSortBy={'timestamp'}
                 defaultSortDirection={'desc'}
-                noDataMessage={t('tradeTable.noOrderHistory')}
+                noDataMessage={noDataMessage}
                 csvDataFetcher={fetchOrderHistory}
                 csvDataFetcherArgs={[userAddress]}
             />

@@ -47,11 +47,24 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
         }
 
         return data;
-    }, [data, selectedFilter]);
+    }, [data, selectedFilter, symbol]);
 
     const viewAllLink = useMemo(() => {
         return `${EXTERNAL_PAGE_URL_PREFIX}/tradeHistory/${userAddress}`;
     }, [userAddress]);
+
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noTradeHistoryForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noLongTradeHistory');
+            case 'short':
+                return t('tradeTable.noShortTradeHistory');
+            default:
+                return t('tradeTable.noTradeHistory');
+        }
+    }, [selectedFilter, symbol]);
 
     return (
         <>
@@ -87,7 +100,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 skeletonColRatios={[2, 1, 1, 1, 1, 1, 1, 1]}
                 defaultSortBy={'time'}
                 defaultSortDirection={'desc'}
-                noDataMessage={t('tradeTable.noTradeHistory')}
+                noDataMessage={noDataMessage}
                 csvDataFetcher={fetchUserFills}
                 csvDataFetcherArgs={[userAddress, true]}
             />
