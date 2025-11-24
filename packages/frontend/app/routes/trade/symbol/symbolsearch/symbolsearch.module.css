@@ -57,3 +57,13 @@
 .symbolIcon img {
     max-height: 100%;
 }
+
+@media (max-width: 480px) {
+    .symbolSearchContainer {
+        width: 50px;
+        min-width: 0;
+    }
+    .symbolName {
+        display: none;
+    }
+}

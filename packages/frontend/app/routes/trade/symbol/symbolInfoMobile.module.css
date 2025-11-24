@@ -1,0 +1,110 @@
+.container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: var(--font-size-s);
+    padding-right: var(--padding-s);
+    padding-bottom: var(--padding-s);
+    /* padding-top: var(--padding-s); */
+}
+.bottomRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.InfoFieldContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+}
+.infoFieldRow {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-s);
+}
+.InfoField {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gap-xs);
+    min-width: 56px;
+}
+.fieldLabel {
+    color: var(--text2);
+}
+
+/* ================================
+   MODAL — Market Details
+=================================== */
+
+.moreModal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 4px;
+}
+
+/* 2-column grid on mobile modal */
+.moreModalGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.moreCard {
+    background: var(--dark3);
+    border: 1px solid var(--dark4);
+    padding: 14px 16px;
+    border-radius: var(--radius-m);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.moreLabel {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text2);
+    margin: 0;
+}
+
+.moreValue {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text1);
+    white-space: nowrap;
+}
+
+.moreTooltipText {
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: var(--text2);
+    opacity: 0.75;
+    line-height: 1.2;
+}
+
+/* Make numbers wrap nicely if needed */
+.moreValue,
+.moreTooltipText {
+    word-break: break-word;
+}
+
+@media (max-width: 390px) {
+    .moreCard {
+        padding: 12px 12px;
+    }
+
+    .moreValue {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 330px) {
+    .moreModalGrid {
+        grid-template-columns: 1fr;
+    }
+}
