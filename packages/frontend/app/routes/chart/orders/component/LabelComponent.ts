@@ -258,11 +258,14 @@ const LabelComponent = ({
                         isLiqPriceLineDraggable)) &&
                 isLabel.label.type !== 'Cancel'
             ) {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
                     overlayCanvasRef.current.style.pointerEvents = 'auto';
+                }
             } else {
-                if (overlayCanvasRef.current)
+                if (overlayCanvasRef.current) {
+                    overlayCanvasRef.current.style.cursor = 'pointer';
                     overlayCanvasRef.current.style.pointerEvents = 'none';
+                }
             }
         }
     }, [
@@ -308,11 +311,10 @@ const LabelComponent = ({
                                     y: overlayOffsetY,
                                 };
 
+                                const pane = iframeDoc?.querySelector(
+                                    '.chart-markup-table.pane',
+                                );
                                 if (isLabel) {
-                                    const pane = iframeDoc?.querySelector(
-                                        '.chart-markup-table.pane',
-                                    );
-
                                     if (overlayCanvasRef.current) {
                                         if (isLabel.matchType === 'onLabel') {
                                             if (
@@ -336,6 +338,15 @@ const LabelComponent = ({
                                                     ).style.cursor =
                                                         'crosshair';
                                                 }
+                                            } else if (
+                                                isLabel.parentLine.type ===
+                                                'PREVIEW_ORDER'
+                                            ) {
+                                                (
+                                                    pane as HTMLElement
+                                                ).style.cursor = 'row-resize';
+                                                overlayCanvasRef.current.style.cursor =
+                                                    'row-resize';
                                             } else {
                                                 overlayCanvasRef.current.style.pointerEvents =
                                                     'auto';
@@ -349,6 +360,11 @@ const LabelComponent = ({
                                                 ).style.cursor = 'crosshair';
                                             }
                                         }
+                                    }
+                                } else {
+                                    if (pane) {
+                                        (pane as HTMLElement).style.cursor =
+                                            'crosshair';
                                     }
                                 }
                             }
