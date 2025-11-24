@@ -42,7 +42,7 @@ const COPY_PER_SCREEN_WIDTH = {
     },
 };
 
-const AFFILIATE_EDIT_VOLUME_THRESHOLD = 100000;
+const AFFILIATE_EDIT_VOLUME_THRESHOLD = 1_000_000;
 const DEFAULT_AFFILIATE_CODE_LENGTH = 6;
 
 // fee amounts for affiliate and the referred user
@@ -157,7 +157,7 @@ export default function CodeTabs(props: PropsIF) {
         referralStore.cache(r);
 
         // if code is unclaimed, show in edit mode with error
-        if (codeIsFree) {
+        if (!codeIsFree) {
             setInvalidCode(r);
             setIsCachedValueValid(false);
             setEditModeReferral(true);
@@ -267,7 +267,9 @@ export default function CodeTabs(props: PropsIF) {
                     // check with FUUL to determine if ref code is claimed
                     const isCodeFree: boolean =
                         await isAffiliateCodeFree(userInputRefCode);
-                    setIsUserRefCodeClaimed(!isCodeFree);
+                    // normally `isCodeFree === true` means the code is available
+                    // right now the API is returning `false` when the code is available
+                    setIsUserRefCodeClaimed(isCodeFree);
                 } catch (error) {
                     setIsUserRefCodeClaimed(false);
                 }
@@ -326,6 +328,12 @@ export default function CodeTabs(props: PropsIF) {
                     <>
                         <h6>{t('referrals.usingAffiliateCode')}</h6>
                         {isCachedValueValid && <p>{referralStore.cached}</p>}
+                        {isCachedValueValid === false && (
+                            <p>
+                                This code does not appear to be registered in
+                                the referral system.
+                            </p>
+                        )}
                     </>
                 ) : (
                     <h6>{t('referrals.enterCode')}</h6>
@@ -502,7 +510,7 @@ export default function CodeTabs(props: PropsIF) {
                     .then((res) => res.json())
                     .then((res) => console.log(res))
                     .catch((err) => console.error(err));
-                setIsTemporaryAffiliateCodeValid(codeIsFree);
+                setIsTemporaryAffiliateCodeValid(!codeIsFree);
             } catch (error) {
                 console.log('Validation error:', error);
                 setIsTemporaryAffiliateCodeValid(false);

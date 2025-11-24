@@ -21,7 +21,7 @@ export default function testpage() {
                 },
             };
 
-            fetch('https://api.fuul.xyz/api/v1/referral_codes/emily04', options)
+            fetch('https://api.fuul.xyz/api/v1/referral_codes/FF7uAz', options)
                 .then((res) => res.json())
                 .then((res) => console.log(res))
                 .catch((err) => console.error(err));
