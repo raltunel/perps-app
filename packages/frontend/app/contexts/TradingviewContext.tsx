@@ -257,9 +257,6 @@ export const TradingViewProvider: React.FC<{
                 'volume_force_overlay',
                 'header_symbol_search',
                 'header_compare',
-                'header_saveload',
-                'header_settings',
-                'context_menus',
                 ...(chartState
                     ? [
                           'create_volume_indicator_by_default' as TradingTerminalFeatureset,
