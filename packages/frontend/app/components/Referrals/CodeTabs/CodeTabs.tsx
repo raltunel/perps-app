@@ -81,6 +81,15 @@ export default function CodeTabs(props: PropsIF) {
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
     const [justCopied, setJustCopied] = useState<boolean>(false);
 
+    // ref code to use in the DOM (being referred by someone else)
+    const [refCodeToConsume, setRefCodeToConsume] = useState<
+        string | undefined
+    >(referralStore.cached || undefined);
+    // if a value appears in the cache while state is empty, consume it
+    useEffect(() => {
+        refCodeToConsume ?? setRefCodeToConsume(referralStore.cached);
+    }, [referralStore.cached]);
+
     const [_copiedData, copy] = useClipboard();
 
     const { formatNum } = useNumFormatter();
