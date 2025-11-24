@@ -830,6 +830,7 @@ const LabelComponent = ({
                 return;
             }
 
+            let cursorText = 'pointer';
             if (tempSelectedLine.parentLine.type === 'LIMIT') {
                 limitOrderDragEnd(tempSelectedLine);
             }
@@ -840,12 +841,13 @@ const LabelComponent = ({
 
             if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
                 previewOrderDragEnd(tempSelectedLine);
+                cursorText = 'row-resize';
             }
             tempSelectedLine = undefined;
             setIsDrag(false);
             setTimeout(() => {
                 if (overlayCanvasRef.current) {
-                    overlayCanvasRef.current.style.cursor = 'pointer';
+                    overlayCanvasRef.current.style.cursor = cursorText;
                 }
             }, 300);
         };
