@@ -149,12 +149,123 @@ export const TradingViewProvider: React.FC<{
         // make sure the chart exists
         if (chart) {
             chart.applyOverrides({
+                // Candles
                 'mainSeriesProperties.candleStyle.upColor': c.buy,
                 'mainSeriesProperties.candleStyle.downColor': c.sell,
+                'mainSeriesProperties.candleStyle.borderColor': c.buy,
                 'mainSeriesProperties.candleStyle.borderUpColor': c.buy,
                 'mainSeriesProperties.candleStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.candleStyle.wickColor': c.buy,
                 'mainSeriesProperties.candleStyle.wickUpColor': c.buy,
                 'mainSeriesProperties.candleStyle.wickDownColor': c.sell,
+
+                // Hollow candles
+                'mainSeriesProperties.hollowCandleStyle.upColor': c.buy,
+                'mainSeriesProperties.hollowCandleStyle.downColor': c.sell,
+                'mainSeriesProperties.hollowCandleStyle.borderColor': c.buy,
+                'mainSeriesProperties.hollowCandleStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.hollowCandleStyle.borderDownColor':
+                    c.sell,
+                'mainSeriesProperties.hollowCandleStyle.wickColor': c.buy,
+                'mainSeriesProperties.hollowCandleStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.hollowCandleStyle.wickDownColor': c.sell,
+
+                // Bars (also used by HLC bars style per TradingView docs)
+                'mainSeriesProperties.barStyle.upColor': c.buy,
+                'mainSeriesProperties.barStyle.downColor': c.sell,
+
+                // High-Low (HLC) style
+                'mainSeriesProperties.hiloStyle.color': c.buy,
+                'mainSeriesProperties.hiloStyle.borderColor': c.buy,
+                'mainSeriesProperties.hiloStyle.labelColor': c.buy,
+                'mainSeriesProperties.hiloStyle.labelFontColor': c.buy,
+
+                // Heikin Ashi
+                'mainSeriesProperties.haStyle.upColor': c.buy,
+                'mainSeriesProperties.haStyle.downColor': c.sell,
+                'mainSeriesProperties.haStyle.borderColor': c.buy,
+                'mainSeriesProperties.haStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.haStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.haStyle.wickColor': c.buy,
+                'mainSeriesProperties.haStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.haStyle.wickDownColor': c.sell,
+
+                // Line / step line / line with markers
+                'mainSeriesProperties.lineStyle.color': c.buy,
+                'mainSeriesProperties.steplineStyle.color': c.buy,
+                'mainSeriesProperties.lineWithMarkersStyle.color': c.buy,
+
+                // Area
+                'mainSeriesProperties.areaStyle.color1': c.buy,
+                'mainSeriesProperties.areaStyle.color2': c.buy,
+                'mainSeriesProperties.areaStyle.linecolor': c.buy,
+
+                // Baseline
+                'mainSeriesProperties.baselineStyle.baselineColor': c.buy,
+                'mainSeriesProperties.baselineStyle.topFillColor1': c.buy,
+                'mainSeriesProperties.baselineStyle.topFillColor2': c.buy,
+                'mainSeriesProperties.baselineStyle.topLineColor': c.buy,
+                'mainSeriesProperties.baselineStyle.bottomFillColor1': c.sell,
+                'mainSeriesProperties.baselineStyle.bottomFillColor2': c.sell,
+                'mainSeriesProperties.baselineStyle.bottomLineColor': c.sell,
+
+                // Column
+                'mainSeriesProperties.columnStyle.upColor': c.buy,
+                'mainSeriesProperties.columnStyle.downColor': c.sell,
+
+                // HLC area
+                'mainSeriesProperties.hlcAreaStyle.closeLineColor': c.buy,
+                'mainSeriesProperties.hlcAreaStyle.highLineColor': c.buy,
+                'mainSeriesProperties.hlcAreaStyle.lowLineColor': c.sell,
+                'mainSeriesProperties.hlcAreaStyle.highCloseFillColor': c.buy,
+                'mainSeriesProperties.hlcAreaStyle.closeLowFillColor': c.sell,
+
+                // Kagi
+                'mainSeriesProperties.kagiStyle.upColor': c.buy,
+                'mainSeriesProperties.kagiStyle.downColor': c.sell,
+                'mainSeriesProperties.kagiStyle.upColorProjection': c.buy,
+                'mainSeriesProperties.kagiStyle.downColorProjection': c.sell,
+
+                // Price Break
+                'mainSeriesProperties.pbStyle.upColor': c.buy,
+                'mainSeriesProperties.pbStyle.downColor': c.sell,
+                'mainSeriesProperties.pbStyle.upColorProjection': c.buy,
+                'mainSeriesProperties.pbStyle.downColorProjection': c.sell,
+                'mainSeriesProperties.pbStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.pbStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.pbStyle.borderUpColorProjection': c.buy,
+                'mainSeriesProperties.pbStyle.borderDownColorProjection':
+                    c.sell,
+
+                // Point & Figure
+                'mainSeriesProperties.pnfStyle.upColor': c.buy,
+                'mainSeriesProperties.pnfStyle.downColor': c.sell,
+                'mainSeriesProperties.pnfStyle.upColorProjection': c.buy,
+                'mainSeriesProperties.pnfStyle.downColorProjection': c.sell,
+
+                // Renko
+                'mainSeriesProperties.renkoStyle.upColor': c.buy,
+                'mainSeriesProperties.renkoStyle.downColor': c.sell,
+                'mainSeriesProperties.renkoStyle.upColorProjection': c.buy,
+                'mainSeriesProperties.renkoStyle.downColorProjection': c.sell,
+                'mainSeriesProperties.renkoStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.renkoStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.renkoStyle.borderUpColorProjection':
+                    c.buy,
+                'mainSeriesProperties.renkoStyle.borderDownColorProjection':
+                    c.sell,
+                'mainSeriesProperties.renkoStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.renkoStyle.wickDownColor': c.sell,
+
+                // Volume candles chart style
+                'mainSeriesProperties.volCandlesStyle.upColor': c.buy,
+                'mainSeriesProperties.volCandlesStyle.downColor': c.sell,
+                'mainSeriesProperties.volCandlesStyle.borderColor': c.buy,
+                'mainSeriesProperties.volCandlesStyle.borderUpColor': c.buy,
+                'mainSeriesProperties.volCandlesStyle.borderDownColor': c.sell,
+                'mainSeriesProperties.volCandlesStyle.wickColor': c.buy,
+                'mainSeriesProperties.volCandlesStyle.wickUpColor': c.buy,
+                'mainSeriesProperties.volCandlesStyle.wickDownColor': c.sell,
             });
 
             if (chart) {
