@@ -48,7 +48,6 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
         return () => clearInterval(interval);
     }, []);
 
-    // 24h change (desktop full string)
     const changeData = useMemo(() => {
         if (!symbolInfo) return { str: '+0.0/%0.0', usdChange: 0 };
 
