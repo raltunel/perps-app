@@ -189,6 +189,19 @@ const LabelComponent = ({
                     }
                 }
 
+                // Add full-width clickable area for PREVIEW_ORDER lines
+                if (line.type === 'PREVIEW_ORDER') {
+                    const dpr = window.devicePixelRatio || 1;
+                    const height = 15 * dpr;
+                    labelLocations.push({
+                        type: 'Main',
+                        x: 0,
+                        y: yPricePixel,
+                        width: widthAttr,
+                        height,
+                    });
+                }
+
                 return {
                     ...line,
                     labelLocations,
@@ -563,11 +576,14 @@ const LabelComponent = ({
 
             if (
                 isLabel &&
-                isLabel.matchType === 'onLabel' &&
                 isLabel.label.type !== 'Cancel' &&
-                (isLabel.parentLine.type === 'LIMIT' ||
-                    (isLabel.parentLine.type === 'LIQ' &&
-                        isLiqPriceLineDraggable))
+                ((isLabel.matchType === 'onLabel' &&
+                    (isLabel.parentLine.type === 'LIMIT' ||
+                        (isLabel.parentLine.type === 'LIQ' &&
+                            isLiqPriceLineDraggable))) ||
+                    (isLabel.parentLine.type === 'PREVIEW_ORDER' &&
+                        (isLabel.matchType === 'onLabel' ||
+                            isLabel.matchType === 'onLine')))
             ) {
                 canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
@@ -783,6 +799,12 @@ const LabelComponent = ({
             setSelectedLine(undefined);
         }
 
+        function previewOrderDragEnd(tempSelectedLine: LabelLocationData) {
+            const newPrice = tempSelectedLine.parentLine.yPrice;
+            useTradeDataStore.getState().setOrderInputPriceValue(newPrice);
+            setSelectedLine(undefined);
+        }
+
         const handleDragEnd = async () => {
             if (!tempSelectedLine || originalPrice === undefined) {
                 return;
@@ -794,6 +816,10 @@ const LabelComponent = ({
 
             if (tempSelectedLine.parentLine.type === 'LIQ') {
                 liqPriceDragEnd(tempSelectedLine);
+            }
+
+            if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
+                previewOrderDragEnd(tempSelectedLine);
             }
             tempSelectedLine = undefined;
             setIsDrag(false);
