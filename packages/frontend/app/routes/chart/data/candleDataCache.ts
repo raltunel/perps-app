@@ -13,11 +13,20 @@ const dataCache = new Map<string, any[]>();
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
 const MAX_CANDLES_PER_SERIES = 50000;
+const MAX_MARKS_PER_SYMBOL = 5000;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function trimCandleCache(cachedData: any[]) {
     if (cachedData.length > MAX_CANDLES_PER_SERIES) {
         cachedData.splice(0, cachedData.length - MAX_CANDLES_PER_SERIES);
+    }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function trimMarkCache(marks: any[]) {
+    if (marks.length > MAX_MARKS_PER_SYMBOL) {
+        marks.sort((a, b) => a.time - b.time);
+        marks.splice(0, marks.length - MAX_MARKS_PER_SYMBOL);
     }
 }
 
@@ -132,6 +141,8 @@ export async function getMarkFillData(coin: string, user?: string) {
                     }
                 });
 
+                trimMarkCache(poolFillData);
+
                 const fetchedDataWithUser = {
                     user: user,
                     dataCache: poolFillData,
@@ -168,6 +179,8 @@ export function updateMarkDataWithSubscription(
                 existingMarks.push(newMark);
             }
         });
+
+        trimMarkCache(existingMarks);
 
         const fetchedDataWithUser = {
             user: user,

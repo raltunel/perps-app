@@ -119,19 +119,29 @@ export const createDataFeed = (
             const { from, to } = periodParams;
             const symbol = symbolInfo.ticker;
 
-            if (symbol) {
-                try {
-                    const bars = await getHistoricalData(
-                        symbol,
-                        resolution,
-                        from,
-                        to,
-                    );
+            if (!symbol) {
+                onError('Symbol is not defined');
+                onResult([], { noData: true });
+                return;
+            }
 
-                    bars && onResult(bars, { noData: bars.length === 0 });
-                } catch (error) {
-                    console.error('Error loading historical data:', error);
+            try {
+                const bars = await getHistoricalData(
+                    symbol,
+                    resolution,
+                    from,
+                    to,
+                );
+
+                if (!bars) {
+                    onResult([], { noData: true });
+                    return;
                 }
+
+                onResult(bars, { noData: bars.length === 0 });
+            } catch (error) {
+                console.error('Error loading historical data:', error);
+                onError('Error loading historical data');
             }
         },
 
@@ -183,12 +193,22 @@ export const createDataFeed = (
                 });
             };
 
-            const markRes = (await getMarkFillData(
-                symbolInfo.name || '',
-                currentUserAddress,
-            )) as any;
+            let markRes: any;
+            try {
+                markRes = (await getMarkFillData(
+                    symbolInfo.name || '',
+                    currentUserAddress,
+                )) as any;
+            } catch (error) {
+                console.error('Error loading marks data:', error);
+                onDataCallback([]);
+                return;
+            }
 
-            if (!markRes) return;
+            if (!markRes) {
+                onDataCallback([]);
+                return;
+            }
 
             const fillHistory = markRes.dataCache;
             const userWallet = markRes.user;
