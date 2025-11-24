@@ -90,6 +90,27 @@ export default function CodeTabs(props: PropsIF) {
         refCodeToConsume ?? setRefCodeToConsume(referralStore.cached);
     }, [referralStore.cached]);
 
+    const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
+        boolean | undefined
+    >(undefined);
+    useEffect(() => {
+        if (refCodeToConsume === undefined || !refCodeToConsume.length) {
+            setIsRefCodeClaimed(undefined);
+        } else {
+            console.log('refCodeToConsume: ', refCodeToConsume);
+            isAffiliateCodeFree(refCodeToConsume)
+                .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
+                .catch((err) => {
+                    setIsRefCodeClaimed(undefined);
+                    console.error(err);
+                });
+        }
+    }, [refCodeToConsume]);
+
+    useEffect(() => {
+        console.log('isRefCodeClaimed: ', isRefCodeClaimed);
+    }, [isRefCodeClaimed]);
+
     const [_copiedData, copy] = useClipboard();
 
     const { formatNum } = useNumFormatter();
