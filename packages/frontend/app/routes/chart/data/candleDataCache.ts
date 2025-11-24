@@ -224,3 +224,20 @@ export function getMarkColorData() {
 
     return bsColorSets['default'];
 }
+
+export function clearChartCachesForSymbol(symbol: string) {
+    const candlePrefix = `${symbol}-`;
+    for (const key of dataCache.keys()) {
+        if (key.startsWith(candlePrefix)) {
+            dataCache.delete(key);
+        }
+    }
+
+    const fillsKey = `${symbol}-fillData`;
+    dataCacheWithUser.delete(fillsKey);
+}
+
+export function clearAllChartCaches() {
+    dataCache.clear();
+    dataCacheWithUser.clear();
+}

@@ -8,7 +8,11 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
-import { getMarkFillData } from '~/routes/chart/data/candleDataCache';
+import {
+    clearAllChartCaches,
+    clearChartCachesForSymbol,
+    getMarkFillData,
+} from '~/routes/chart/data/candleDataCache';
 import {
     createDataFeed,
     type CustomDataFeedType,
@@ -92,6 +96,8 @@ export const TradingViewProvider: React.FC<{
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
     const { symbol, addToFetchedChannels } = useTradeDataStore();
+
+    const previousSymbolRef = useRef<string | null>(null);
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 
@@ -368,6 +374,8 @@ export const TradingViewProvider: React.FC<{
                     dataFeedRef.current.destroy();
                 }
 
+                clearAllChartCaches();
+
                 if (chart) {
                     drawingEventUnsubscribe(chart);
                     studyEventsUnsubscribe(chart);
@@ -461,13 +469,20 @@ export const TradingViewProvider: React.FC<{
     }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
 
     useEffect(() => {
-        if (chart) {
-            setIsChartReady(false);
-            const chartRef = chart.chart();
-            chartRef.setSymbol(symbol);
-            saveChartLayout(chart);
+        if (!chart || !symbol) return;
+
+        const previousSymbol = previousSymbolRef.current;
+        if (previousSymbol && previousSymbol !== symbol) {
+            clearChartCachesForSymbol(previousSymbol);
         }
-    }, [symbol]);
+
+        previousSymbolRef.current = symbol;
+
+        setIsChartReady(false);
+        const chartRef = chart.chart();
+        chartRef.setSymbol(symbol);
+        saveChartLayout(chart);
+    }, [symbol, chart]);
 
     useEffect(() => {
         if (dataFeedRef.current && userAddress && chart) {
