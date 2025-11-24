@@ -6,6 +6,7 @@ import type {
     LibrarySymbolInfo,
     Mark,
     OnReadyCallback,
+    ResolutionString,
 } from '~/tv/charting_library';
 import {
     POLLING_API_URL,
@@ -49,7 +50,12 @@ export const createDataFeed = (
         updateUserAddress: (address: string) => void;
         destroy: () => void;
     } = {
-        searchSymbols: (userInput: string, exchange, symbolType, onResult) => {
+        searchSymbols: (
+            userInput: string,
+            exchange: string,
+            symbolType: string,
+            onResult: (items: any[]) => void,
+        ) => {
             onResult([]);
         },
 
@@ -77,7 +83,11 @@ export const createDataFeed = (
                 0);
         },
 
-        resolveSymbol: (symbolName, onResolve, onError) => {
+        resolveSymbol: (
+            symbolName: string,
+            onResolve: (symbolInfo: LibrarySymbolInfo) => void,
+            onError: (reason: string) => void,
+        ) => {
             const symbolInfo: LibrarySymbolInfo = {
                 ticker: symbolName,
                 name: symbolName,
@@ -97,11 +107,11 @@ export const createDataFeed = (
         },
 
         getBars: async (
-            symbolInfo,
-            resolution,
-            periodParams,
-            onResult,
-            onError,
+            symbolInfo: LibrarySymbolInfo,
+            resolution: ResolutionString,
+            periodParams: any,
+            onResult: (bars: any[], meta?: any) => void,
+            onError: (reason: string) => void,
         ) => {
             /**
              * for fetching historical data
@@ -125,7 +135,13 @@ export const createDataFeed = (
             }
         },
 
-        getMarks: async (symbolInfo, from, to, onDataCallback, resolution) => {
+        getMarks: async (
+            symbolInfo: LibrarySymbolInfo,
+            from: number,
+            to: number,
+            onDataCallback: (marks: Mark[]) => void,
+            resolution: ResolutionString,
+        ) => {
             const bSideOrderHistoryMarks: Map<string, Mark> = new Map();
             const aSideOrderHistoryMarks: Map<string, Mark> = new Map();
 
@@ -149,7 +165,7 @@ export const createDataFeed = (
                         color: {
                             border: markerColor,
                             background: markerColor,
-                        },
+                        } as any,
                         text: element.dir + ' at ' + element.px,
                         px: element.px,
                         label: isBuy ? 'B' : 'S',
@@ -168,7 +184,7 @@ export const createDataFeed = (
             };
 
             const markRes = (await getMarkFillData(
-                symbolInfo.name,
+                symbolInfo.name || '',
                 currentUserAddress,
             )) as any;
 
@@ -224,7 +240,7 @@ export const createDataFeed = (
                         fillMarks(poolFills);
 
                         updateMarkDataWithSubscription(
-                            symbolInfo.name,
+                            symbolInfo.name || '',
                             poolFills,
                             userWallet,
                         );
@@ -244,7 +260,12 @@ export const createDataFeed = (
             }, 500);
         },
 
-        subscribeBars: (symbolInfo, resolution, onTick, listenerGuid) => {
+        subscribeBars: (
+            symbolInfo: LibrarySymbolInfo,
+            resolution: ResolutionString,
+            onTick: (bar: any) => void,
+            listenerGuid: string,
+        ) => {
             console.log(
                 '>>> subscribeBars',
                 symbolInfo,
