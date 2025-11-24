@@ -276,8 +276,14 @@ export const createDataFeed = (
             if (!info) return console.log('SDK is not ready');
 
             const intervalParam = convertResolutionToIntervalParam(resolution);
+            let isFetching = false;
+            let abortController: AbortController | null = null;
 
             const poller = setInterval(() => {
+                if (isFetching) return;
+
+                isFetching = true;
+                abortController = new AbortController();
                 const currentTime = new Date().getTime();
                 fetch(`${POLLING_API_URL}/info`, {
                     method: 'POST',
@@ -293,11 +299,14 @@ export const createDataFeed = (
                             startTime: currentTime - 1000 * 10,
                         },
                     }),
-                }).then((res) => {
-                    res.json().then((data) => {
+                    signal: abortController.signal,
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
                         const candleData = data[0];
                         if (
                             symbolInfo.ticker &&
+                            candleData &&
                             candleData.s === symbolInfo.ticker
                         ) {
                             const tick = processWSCandleMessage(candleData);
@@ -308,10 +317,23 @@ export const createDataFeed = (
                                 tick,
                             );
                         }
+                    })
+                    .catch((error) => {
+                        if (error.name !== 'AbortError') {
+                            console.error('Error polling candles:', error);
+                        }
+                    })
+                    .finally(() => {
+                        isFetching = false;
                     });
-                });
             }, TIMEOUT_CANDLE_POLLING);
-            const unsubscribe = () => clearInterval(poller);
+            const unsubscribe = () => {
+                clearInterval(poller);
+                if (abortController) {
+                    abortController.abort();
+                    abortController = null;
+                }
+            };
             subscriptions.set(listenerGuid, { unsubscribe });
         },
 
