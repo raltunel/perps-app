@@ -218,7 +218,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             // alignItems: 'center',
                         }}
                     >
-                        {/* <LiquidationsChart
+                        <LiquidationsChart
                             buyData={inpBuys}
                             sellData={inpSells}
                             liqBuys={liqBuys}
@@ -226,7 +226,7 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
                             width={dimensions.width}
                             height={dimensions.height}
                             location={'obBook'}
-                        /> */}
+                        />
                     </motion.div>
                 );
             }
