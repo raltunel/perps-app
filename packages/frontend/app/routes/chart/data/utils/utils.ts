@@ -56,7 +56,6 @@ export const convertResolutionToIntervalParam = (
 };
 
 export function resolutionToSeconds(resolution: string): number {
-    console.log(resolution);
     if (!resolution) return 60;
 
     if (resolution === '1D' || resolution === 'D') return 86400;
