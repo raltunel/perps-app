@@ -253,6 +253,7 @@ const LabelComponent = ({
                 isLabel &&
                 isLabel.matchType === 'onLabel' &&
                 (isLabel.parentLine.type === 'LIMIT' ||
+                    isLabel.parentLine.type === 'PREVIEW_ORDER' ||
                     (isLabel.parentLine.type === 'LIQ' &&
                         isLiqPriceLineDraggable)) &&
                 isLabel.label.type !== 'Cancel'
