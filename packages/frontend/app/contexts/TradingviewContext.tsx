@@ -214,11 +214,11 @@ export const TradingViewProvider: React.FC<{
                 'mainSeriesProperties.columnStyle.downColor': c.sell,
 
                 // HLC area
-                'mainSeriesProperties.hlcAreaStyle.closeLineColor': c.buy,
                 'mainSeriesProperties.hlcAreaStyle.highLineColor': c.buy,
                 'mainSeriesProperties.hlcAreaStyle.lowLineColor': c.sell,
-                'mainSeriesProperties.hlcAreaStyle.highCloseFillColor': c.buy,
-                'mainSeriesProperties.hlcAreaStyle.closeLowFillColor': c.sell,
+                // 'mainSeriesProperties.hlcAreaStyle.closeLineColor': c.buy,
+                // 'mainSeriesProperties.hlcAreaStyle.highCloseFillColor': c.buy,
+                // 'mainSeriesProperties.hlcAreaStyle.closeLowFillColor': c.sell,
 
                 // Kagi
                 'mainSeriesProperties.kagiStyle.upColor': c.buy,
