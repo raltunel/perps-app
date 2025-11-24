@@ -338,16 +338,19 @@ const LabelComponent = ({
                                                     ).style.cursor =
                                                         'crosshair';
                                                 }
-                                            } else if (
-                                                isLabel.parentLine.type ===
-                                                'PREVIEW_ORDER'
-                                            ) {
-                                                (
-                                                    pane as HTMLElement
-                                                ).style.cursor = 'row-resize';
-                                                overlayCanvasRef.current.style.cursor =
-                                                    'row-resize';
                                             } else {
+                                                if (
+                                                    isLabel.parentLine.type ===
+                                                    'PREVIEW_ORDER'
+                                                ) {
+                                                    (
+                                                        pane as HTMLElement
+                                                    ).style.cursor =
+                                                        'row-resize';
+                                                    overlayCanvasRef.current.style.cursor =
+                                                        'row-resize';
+                                                }
+
                                                 overlayCanvasRef.current.style.pointerEvents =
                                                     'auto';
                                             }
