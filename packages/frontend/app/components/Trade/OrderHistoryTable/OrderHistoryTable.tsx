@@ -11,7 +11,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import { OrderHistoryTableHeader } from './OrderHistoryTableHeader';
 import OrderHistoryTableRow from './OrderHistoryTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface OrderHistoryTableProps {
     selectedFilter?: string;
@@ -48,6 +48,8 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/orderHistory/${userAddress}`;
     }, [userAddress]);
 
+    const { t, i18n } = useTranslation();
+
     const noDataMessage = useMemo(() => {
         switch (selectedFilter) {
             case 'active':
@@ -59,7 +61,7 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
             default:
                 return t('tradeTable.noOrderHistory');
         }
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter, symbol, i18n.language]);
 
     const showClearFilter = selectedFilter && selectedFilter !== 'all';
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserFundings } from '~/processors/processUserFills';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -46,6 +46,8 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/fundingHistory/${userAddress}`;
     }, [userAddress]);
 
+    const { t, i18n } = useTranslation();
+
     const noDataMessage = useMemo(() => {
         switch (selectedFilter) {
             case 'active':
@@ -57,7 +59,7 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
             default:
                 return t('tradeTable.noFundingHistory');
         }
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter, symbol, i18n.language]);
 
     const showClearFilter = selectedFilter && selectedFilter !== 'all';
 

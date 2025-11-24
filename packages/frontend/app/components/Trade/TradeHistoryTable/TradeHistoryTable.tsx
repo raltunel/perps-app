@@ -8,7 +8,7 @@ import { EXTERNAL_PAGE_URL_PREFIX } from '~/utils/Constants';
 import type { UserFillIF, UserFillSortBy } from '~/utils/UserDataIFs';
 import TradeHistoryTableHeader from './TradeHistoryTableHeader';
 import TradeHistoryTableRow from './TradeHistoryTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 interface TradeHistoryTableProps {
     data: UserFillIF[];
     isFetched: boolean;
@@ -60,6 +60,8 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/tradeHistory/${userAddress}`;
     }, [userAddress]);
 
+    const { t, i18n } = useTranslation();
+
     const noDataMessage = useMemo(() => {
         switch (selectedFilter) {
             case 'active':
@@ -71,7 +73,7 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
             default:
                 return t('tradeTable.noTradeHistory');
         }
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter, symbol, i18n.language]);
 
     const showClearFilter = selectedFilter && selectedFilter !== 'all';
 

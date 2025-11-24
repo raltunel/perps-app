@@ -14,7 +14,7 @@ import type {
 import { sortOrderData } from '~/utils/orderbook/OrderBookUtils';
 import OpenOrdersTableHeader from './OpenOrdersTableHeader';
 import OpenOrdersTableRow from './OpenOrdersTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 interface OpenOrdersTableProps {
     data: OrderDataIF[];
     onCancel?: (time: number, coin: string) => void;
@@ -37,7 +37,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
     const [isCancellingAll, setIsCancellingAll] = useState(false);
     const { executeCancelOrder } = useCancelOrderService();
     const { formatNum } = useNumFormatter();
-
+    const { t, i18n } = useTranslation();
     const notifications = useNotificationStore();
 
     const handleCancel = (time: number, coin: string) => {
@@ -342,7 +342,7 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
             default:
                 return t('transactions.noOpenOrders');
         }
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter, symbol, i18n.language]);
 
     const showClearFilter = selectedFilter && selectedFilter !== 'all';
 

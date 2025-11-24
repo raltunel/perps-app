@@ -12,7 +12,7 @@ import type { PositionDataSortBy, PositionIF } from '~/utils/UserDataIFs';
 import { sortPositionData } from '~/utils/position/PositionUtils';
 import PositionsTableHeader from './PositionsTableHeader';
 import PositionsTableRow from './PositionsTableRow';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface PositionsTableProps {
     pageMode?: boolean;
@@ -55,6 +55,8 @@ export default function PositionsTable(props: PositionsTableProps) {
         return dataFilteredBySize;
     }, [selectedFilter, dataFilteredBySize, symbol]);
 
+    const { t, i18n } = useTranslation();
+
     const noDataMessage = useMemo(() => {
         switch (selectedFilter) {
             case 'active':
@@ -66,7 +68,7 @@ export default function PositionsTable(props: PositionsTableProps) {
             default:
                 return t('tradeTable.noOpenPositions');
         }
-    }, [selectedFilter, symbol]);
+    }, [selectedFilter, symbol, i18n.language]);
 
     const showClearFilter = selectedFilter && selectedFilter !== 'all';
 
