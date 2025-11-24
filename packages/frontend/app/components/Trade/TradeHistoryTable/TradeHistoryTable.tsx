@@ -16,11 +16,18 @@ interface TradeHistoryTableProps {
     onViewOrderDetails?: (time: string, coin: string) => void;
     onViewAll?: () => void;
     pageMode?: boolean;
+    onClearFilter?: () => void;
 }
 
 export default function TradeHistoryTable(props: TradeHistoryTableProps) {
-    const { data, isFetched, selectedFilter, onViewOrderDetails, pageMode } =
-        props;
+    const {
+        data,
+        isFetched,
+        selectedFilter,
+        onViewOrderDetails,
+        pageMode,
+        onClearFilter,
+    } = props;
 
     const { symbol } = useTradeDataStore();
 
@@ -66,6 +73,8 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
         }
     }, [selectedFilter, symbol]);
 
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable<
@@ -77,6 +86,10 @@ export default function TradeHistoryTable(props: TradeHistoryTableProps) {
                 ) => Promise<UserFillIF[]>
             >
                 storageKey='TradeHistoryTable'
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <TradeHistoryTableHeader

@@ -169,6 +169,10 @@ export default function TradeTable(props: TradeTableProps) {
         setSelectedFilter(selectedId);
     };
 
+    const handleClearFilter = () => {
+        setSelectedFilter('all');
+    };
+
     const rightAlignedContent = (
         <div className={styles.tableControls}>
             <FilterDropdown
@@ -192,6 +196,7 @@ export default function TradeTable(props: TradeTableProps) {
                                 : webDataFetched
                         }
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.openOrders':
@@ -200,6 +205,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         isFetched={orderHistoryFetched}
                         data={userOrders}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             // case 'TWAP':
@@ -210,6 +216,7 @@ export default function TradeTable(props: TradeTableProps) {
                         data={userFills}
                         isFetched={tradeHistoryFetched}
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.fundingHistory':
@@ -218,6 +225,7 @@ export default function TradeTable(props: TradeTableProps) {
                         userFundings={userFundings}
                         isFetched={fundingHistoryFetched}
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.orderHistory':
@@ -226,6 +234,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         data={orderHistory}
                         isFetched={orderHistoryFetched}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.depositsAndWithdrawals':

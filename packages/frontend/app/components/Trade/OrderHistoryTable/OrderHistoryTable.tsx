@@ -18,10 +18,11 @@ interface OrderHistoryTableProps {
     pageMode?: boolean;
     data: OrderDataIF[];
     isFetched: boolean;
+    onClearFilter?: () => void;
 }
 
 export function OrderHistoryTable(props: OrderHistoryTableProps) {
-    const { selectedFilter, pageMode, data, isFetched } = props;
+    const { selectedFilter, pageMode, data, isFetched, onClearFilter } = props;
 
     const { symbol } = useTradeDataStore();
 
@@ -60,6 +61,8 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
         }
     }, [selectedFilter, symbol]);
 
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable<
@@ -68,6 +71,10 @@ export function OrderHistoryTable(props: OrderHistoryTableProps) {
                 (address: string) => Promise<OrderDataIF[]>
             >
                 storageKey='OrderHistoryTable'
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 data={filteredOrderHistory}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <OrderHistoryTableHeader

@@ -18,10 +18,11 @@ interface PositionsTableProps {
     pageMode?: boolean;
     isFetched: boolean;
     selectedFilter?: string;
+    onClearFilter?: () => void;
 }
 
 export default function PositionsTable(props: PositionsTableProps) {
-    const { pageMode, isFetched, selectedFilter } = props;
+    const { pageMode, isFetched, selectedFilter, onClearFilter } = props;
     const { coinPriceMap, symbol, symbolInfo } = useTradeDataStore();
     const { positions } = useUnifiedMarginData();
     const appSettingsModal = useModal('closed');
@@ -67,10 +68,16 @@ export default function PositionsTable(props: PositionsTableProps) {
         }
     }, [selectedFilter, symbol]);
 
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable
                 noDataMessage={noDataMessage}
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 storageKey='PositionsTable'
                 data={dataFilteredByType as PositionIF[]}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

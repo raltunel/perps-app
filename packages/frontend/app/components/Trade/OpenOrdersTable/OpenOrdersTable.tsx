@@ -22,10 +22,18 @@ interface OpenOrdersTableProps {
     selectedFilter?: string;
     isFetched: boolean;
     pageMode?: boolean;
+    onClearFilter?: () => void;
 }
 
 export default function OpenOrdersTable(props: OpenOrdersTableProps) {
-    const { onCancel, selectedFilter, isFetched, pageMode, data } = props;
+    const {
+        onCancel,
+        selectedFilter,
+        isFetched,
+        pageMode,
+        data,
+        onClearFilter,
+    } = props;
     const [isCancellingAll, setIsCancellingAll] = useState(false);
     const { executeCancelOrder } = useCancelOrderService();
     const { formatNum } = useNumFormatter();
@@ -336,10 +344,16 @@ export default function OpenOrdersTable(props: OpenOrdersTableProps) {
         }
     }, [selectedFilter, symbol]);
 
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable
                 noDataMessage={noDataMessage}
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 storageKey='OpenOrdersTable'
                 data={filteredOrders}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (

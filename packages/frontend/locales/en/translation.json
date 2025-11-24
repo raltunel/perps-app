@@ -40,7 +40,8 @@
         "reset": "Reset",
         "announcements": "Announcements",
         "leverage": "Leverage",
-        "comingSoon": "Coming Soon"
+        "comingSoon": "Coming Soon",
+        "clearFilter": "Clear filter"
     },
     "transactions": {
         "orderTypes": "Order Types",
@@ -329,6 +330,9 @@
         "noLongOrderHistory": "No long order history",
         "noShortOrderHistory": "No short order history",
         "noFundingHistory": "No funding history",
+        "noFundingHistoryForMarket": "No {{symbol}} funding history",
+        "noLongFundingHistory": "No long funding history",
+        "noShortFundingHistory": "No short funding history",
         "fundingHistory": "All-time: {{allTime}} Since change: {{sinceChange}}",
         "openLong": "Open Long",
         "openShort": "Open Short",

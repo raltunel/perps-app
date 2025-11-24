@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { t } from 'i18next';
 import GenericTable from '~/components/Tables/GenericTable/GenericTable';
 import { sortUserFundings } from '~/processors/processUserFills';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
@@ -13,10 +14,12 @@ interface FundingHistoryTableProps {
     pageMode?: boolean;
     isFetched: boolean;
     selectedFilter?: string;
+    onClearFilter?: () => void;
 }
 
 export default function FundingHistoryTable(props: FundingHistoryTableProps) {
-    const { pageMode, isFetched, selectedFilter, userFundings } = props;
+    const { pageMode, isFetched, selectedFilter, userFundings, onClearFilter } =
+        props;
 
     const { symbol } = useTradeDataStore();
 
@@ -43,10 +46,30 @@ export default function FundingHistoryTable(props: FundingHistoryTableProps) {
         return `${EXTERNAL_PAGE_URL_PREFIX}/fundingHistory/${userAddress}`;
     }, [userAddress]);
 
+    const noDataMessage = useMemo(() => {
+        switch (selectedFilter) {
+            case 'active':
+                return t('tradeTable.noFundingHistoryForMarket', { symbol });
+            case 'long':
+                return t('tradeTable.noLongFundingHistory');
+            case 'short':
+                return t('tradeTable.noShortFundingHistory');
+            default:
+                return t('tradeTable.noFundingHistory');
+        }
+    }, [selectedFilter, symbol]);
+
+    const showClearFilter = selectedFilter && selectedFilter !== 'all';
+
     return (
         <>
             <GenericTable
                 storageKey='FundingHistoryTable'
+                noDataMessage={noDataMessage}
+                noDataActionLabel={
+                    showClearFilter ? t('common.clearFilter') : undefined
+                }
+                onNoDataAction={showClearFilter ? onClearFilter : undefined}
                 data={filteredData}
                 renderHeader={(sortDirection, sortClickHandler, sortBy) => (
                     <FundingHistoryTableHeader
