@@ -12,6 +12,15 @@ const dataCache = new Map<string, any[]>();
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dataCacheWithUser = new Map<string, { user: string; dataCache: any[] }>();
 
+const MAX_CANDLES_PER_SERIES = 50000;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function trimCandleCache(cachedData: any[]) {
+    if (cachedData.length > MAX_CANDLES_PER_SERIES) {
+        cachedData.splice(0, cachedData.length - MAX_CANDLES_PER_SERIES);
+    }
+}
+
 export async function getHistoricalData(
     symbol: string,
     resolution: string,
@@ -58,11 +67,18 @@ export async function getHistoricalData(
                     }
                 }
 
-                dataCache.set(key, cachedData);
                 const filteredCandle = cachedData.filter(
                     (bar) => bar.time >= from * 1000 && bar.time <= to * 1000,
                 );
-                return filteredCandle.sort((a, b) => a.time - b.time);
+                const sortedFiltered = filteredCandle.sort(
+                    (a, b) => a.time - b.time,
+                );
+
+                trimCandleCache(cachedData);
+
+                dataCache.set(key, cachedData);
+
+                return sortedFiltered;
             }
         },
     );
@@ -86,6 +102,8 @@ export function updateCandleCache(
     } else {
         cachedData.push(tick);
     }
+
+    trimCandleCache(cachedData);
 
     dataCache.set(key, cachedData);
 }
