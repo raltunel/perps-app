@@ -307,7 +307,7 @@ export default function PageHeader() {
                             rel='noopener noreferrer'
                             className={styles.ambientmm}
                         >
-                            Ambient AMM
+                            Spot
                         </a>
                     </Tooltip>
                 </nav>
