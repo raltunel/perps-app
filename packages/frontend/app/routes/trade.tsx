@@ -19,7 +19,7 @@ import { useTradeDataStore } from '~/stores/TradeDataStore';
 import styles from './trade.module.css';
 import OrderBookSection from './trade/orderbook/orderbooksection';
 import SymbolInfo from './trade/symbol/symbolinfo';
-import SymbolInfoMobile from './trade/symbol/symbolinfomobile';
+import SymbolInfoMobile from './trade/symbol/symbolInfoMobile';
 import TradeRouteHandler from './trade/traderoutehandler';
 import WatchList from './trade/watchlist/watchlist';
 import WebDataConsumer from './trade/webdataconsumer';
