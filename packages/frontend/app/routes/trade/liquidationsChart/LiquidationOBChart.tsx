@@ -8,6 +8,7 @@ import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useDebugStore } from '~/stores/DebugStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useLazyD3 } from '~/routes/chart/hooks/useLazyD3';
+import styles from './LiquidationOBChart.module.css';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -97,8 +98,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const { formatNum } = useNumFormatter();
 
+    const OVERLAY_WIDTH_RATIO = 0.1;
+
     const widthRef = useRef(width);
-    widthRef.current = width;
+    widthRef.current =
+        location === 'liqMobile' ? width * OVERLAY_WIDTH_RATIO : width;
     const heightRef = useRef(height);
     heightRef.current = height;
 
@@ -330,6 +334,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .scaleLinear()
             .domain([0, 1])
             .range([widthRef.current, 0]);
+
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
         const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
@@ -507,9 +512,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         }
 
         d3.select(d3CanvasLiq.current).on('draw', () => {
-            canvas.width = scaleData ? width * dpr : width;
+            canvas.width = scaleData
+                ? widthRef.current * dpr
+                : widthRef.current;
             canvas.height = scaleData ? height * dpr : height;
-            canvas.style.width = `${width}px`;
+            canvas.style.width = `${widthRef.current}px`;
             canvas.style.height = `${height}px`;
 
             if (hoverLineDataRef.current.length > 0) {
@@ -582,20 +589,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const dpr = window.devicePixelRatio || 1;
 
-        const rangeWidthMin =
-            scaleData && location === 'liqMobile'
-                ? widthRef.current * dpr
-                : widthRef.current;
-        const rangeWidthMax =
-            scaleData && location === 'liqMobile'
-                ? (widthRef.current / 1.1) * dpr
-                : 0;
-
         // Update scales only
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range([rangeWidthMin, rangeWidthMax]);
+            .range([
+                widthRef.current * (location === 'liqMobile' ? dpr : 1),
+                0,
+            ]);
 
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
@@ -1065,6 +1066,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         d3.select(d3CanvasLiqContianer.current).on(
             'mousemove',
             function (event: React.MouseEvent<HTMLDivElement>) {
+                console.log('>>>>>> mmove', event);
                 mousemove(event);
             },
             { passive: true },
@@ -1206,15 +1208,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     return (
         <div
             ref={d3CanvasLiqContianer}
-            id='d3CanvasLiqContianer'
+            id={`d3CanvasLiqContianer-${location}`}
             style={{
-                position: 'relative',
                 width: `${widthRef.current}px`,
                 // height: `${heightRef.current}px`,
             }}
+            className={`${styles.liqChartCanvasWrapper} ${location === 'liqMobile' ? styles.liqMobile : ''}`}
         >
             <d3fc-canvas
                 ref={d3CanvasLiqLines}
+                className={styles.linesCanvas}
                 style={{
                     position: 'absolute',
                     width: `${widthRef.current}px`,
@@ -1224,6 +1227,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             <d3fc-canvas
                 ref={d3CanvasLiqHover}
+                className={styles.hoverCanvas}
                 style={{
                     position: 'absolute',
                     width: `${widthRef.current}px`,
@@ -1233,6 +1237,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             <d3fc-canvas
                 ref={d3CanvasLiq}
+                className={styles.distCanvas}
                 style={{
                     position: 'absolute',
                     width: `${widthRef.current}px`,

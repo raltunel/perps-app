@@ -46,6 +46,20 @@ const LiqComponent = ({
 
     return (
         <>
+            <LiqLineTooltip
+                canvasWrapperRef={canvasWrapperRef}
+                overlayCanvasRef={overlayCanvasRef}
+                scaleData={scaleData}
+                lines={lines}
+            />
+            <LiqudationLines
+                canvasSize={canvasSize}
+                overlayCanvasRef={overlayCanvasRef}
+                canvasWrapperRef={canvasWrapperRef}
+                scaleData={scaleData}
+                zoomChanged={zoomChanged}
+                lines={lines}
+            />
             {overlayLiqCanvasAttr && (
                 <div
                     id='liq-mobile'
@@ -71,20 +85,6 @@ const LiqComponent = ({
                     />
                 </div>
             )}
-            <LiqLineTooltip
-                canvasWrapperRef={canvasWrapperRef}
-                overlayCanvasRef={overlayCanvasRef}
-                scaleData={scaleData}
-                lines={lines}
-            />
-            <LiqudationLines
-                canvasSize={canvasSize}
-                overlayCanvasRef={overlayCanvasRef}
-                canvasWrapperRef={canvasWrapperRef}
-                scaleData={scaleData}
-                zoomChanged={zoomChanged}
-                lines={lines}
-            />
         </>
     );
 };
