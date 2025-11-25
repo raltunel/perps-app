@@ -364,12 +364,12 @@ export const TradingViewProvider: React.FC<{
         const tvWidget = new tradingviewLib.widget({
             container: 'tv_chart',
             library_path: defaultProps.libraryPath,
-            timezone: 'Etc/UTC',
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as any,
             symbol: processedSymbol,
             fullscreen: false,
             autosize: true,
             datafeed: dataFeedRef.current as IBasicDataFeed,
-            interval: (chartState?.interval || '1D') as ResolutionString,
+            interval: (chartState?.interval || '1h') as ResolutionString,
             disabled_features: [
                 'volume_force_overlay',
                 'header_symbol_search',
