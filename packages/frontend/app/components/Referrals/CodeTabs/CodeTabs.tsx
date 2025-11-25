@@ -170,6 +170,8 @@ export default function CodeTabs(props: PropsIF) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
+    const [refCodeUserInput, setRefCodeUserInput] = useState<string>('');
+
     // this holds an improperly formatted ref code to provide user feedback
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
@@ -189,13 +191,13 @@ export default function CodeTabs(props: PropsIF) {
         // if code is unclaimed, show in edit mode with error
         if (!isCodeFree) {
             setInvalidCode(r);
-            setIsCachedValueValid(false);
+            // setIsCachedValueValid(false);
             setEditModeReferral(true);
             setUserInputRefCode(r);
         } else {
             // code is valid and claimed
             invalidCode && setInvalidCode('');
-            setIsCachedValueValid(true);
+            // setIsCachedValueValid(true);
             setEditModeReferral(false);
         }
     }
@@ -251,10 +253,10 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
-    const [userInputRefCode, setUserInputRefCode] = useState<string>('');
-    const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
-        boolean | undefined
-    >(undefined);
+    // const [userInputRefCode, setUserInputRefCode] = useState<string>('');
+    // const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
+    //     boolean | undefined
+    // >(undefined);
 
     useEffect(() => {
         if (userInputRefCode.length) {
@@ -318,8 +320,8 @@ export default function CodeTabs(props: PropsIF) {
                 {referralStore.cached ? (
                     <>
                         <h6>{t('referrals.usingAffiliateCode')}</h6>
-                        {isCachedValueValid && <p>{referralStore.cached}</p>}
-                        {isCachedValueValid === false && (
+                        {refCodeToConsume && <p>{refCodeToConsume}</p>}
+                        {isRefCodeClaimed === false && (
                             <p>
                                 This code does not appear to be registered in
                                 the referral system.
@@ -363,11 +365,12 @@ export default function CodeTabs(props: PropsIF) {
                 <input
                     type='text'
                     value={userInputRefCode}
-                    onChange={(e) => setUserInputRefCode(e.target.value)}
+                    onChange={(e) => setRefCodeUserInput(e.target.value)}
                 />
-                {!isUserRefCodeClaimed &&
-                    userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 && (
+                {isRefCodeClaimed === true &&
+                    refCodeToConsume &&
+                    refCodeToConsume.length <= 30 &&
+                    refCodeToConsume.length >= 2 && (
                         <p>
                             <Trans
                                 i18nKey='referrals.referralCodeNotValidPleaseConfirm'
@@ -395,7 +398,7 @@ export default function CodeTabs(props: PropsIF) {
                 >
                     {t('common.confirm')}
                 </SimpleButton>
-                {referralStore.cached && isCachedValueValid && (
+                {referralStore.cached && (
                     <SimpleButton
                         bg='dark3'
                         hoverBg='accent1'
