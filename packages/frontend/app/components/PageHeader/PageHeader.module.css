@@ -362,7 +362,7 @@
     } */
 }
 
-@media (max-width: 1024px) {
+/* @media (max-width: 1024px) {
     .container {
         gap: var(--gap-s);
         padding: 0px var(--padding-xs);
@@ -393,20 +393,7 @@
         padding: 0 8px;
         font-size: 12px;
     }
-}
-
-@media (max-width: 1024px) {
-    /* .container nav a,
-    .moreButton {
-        font-size: var(--font-size-s);
-    }
-
-    .ambientmm {
-        font-size: var(--font-size-s);
-        padding: 4px 6px;
-    } */
-
-    .depositButton {
+      .depositButton {
         width: 80px;
         height: 20px;
         font-size: var(--font-size-s);
@@ -418,7 +405,7 @@
     .rpcButton span {
         display: none;
     }
-}
+} */
 
 @media (max-width: 900px) {
     .menuButtonMobile {
