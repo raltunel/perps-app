@@ -16,6 +16,7 @@ import styles from './ComboBox.module.css';
 import Tooltip from '~/components/Tooltip/Tooltip';
 import { PublicKey } from '@solana/web3.js';
 import { HorizontalScrollable } from '~/components/Wrappers/HorizontanScrollable/HorizontalScrollable';
+import DebugConsole from '~/components/Debuggers/DebugConsole';
 
 export default function ComboBoxContainer() {
     const { symbol, selectedCurrency, setSelectedCurrency } =
@@ -333,6 +334,7 @@ export default function ComboBoxContainer() {
                     </div>
                 </div>
             </HorizontalScrollable>
+            <DebugConsole />
         </section>
     );
 }
