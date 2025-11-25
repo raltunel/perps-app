@@ -50,7 +50,10 @@ import type {
     TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
-import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
+import {
+    useOrderPlacementStore,
+    type TradeType,
+} from '~/routes/chart/hooks/useOrderPlacement';
 
 import i18n from 'i18next';
 
@@ -89,7 +92,12 @@ export const TradingViewProvider: React.FC<{
     >;
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
-    const { openModal, toggleQuickMode } = useOrderPlacementStore();
+    const {
+        openModal,
+        toggleQuickMode,
+        setQuickModeTradeType,
+        openQuickModeConfirm,
+    } = useOrderPlacementStore();
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
@@ -418,66 +426,211 @@ export const TradingViewProvider: React.FC<{
                 ];
             });
 
-            // Add Trade button to header
+            // Add Quick Trade Mode controls to header (Toggle + Dropdown)
             tvWidget.headerReady().then(() => {
-                const button = tvWidget.createButton({ align: 'left' });
-                button.setAttribute('title', 'Quick Trade');
-                button.classList.add('apply-common-tooltip');
-                button.textContent = 'Trade';
-                button.style.fontWeight = '500';
-                button.style.fontSize = '13px';
-                button.style.padding = '4px 12px';
-                button.style.borderRadius = '4px';
-                button.style.cursor = 'pointer';
-                button.style.transition = 'all 0.15s';
-                button.style.marginLeft = '8px';
+                const container = tvWidget.createButton({ align: 'left' });
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.marginLeft = '8px';
+                container.style.padding = '8px 12px';
+                container.style.backgroundColor = '#0e1117';
+                container.style.border = 'none';
+                container.style.gap = '12px';
+                container.style.borderRadius = '6px';
+                container.style.position = 'relative';
 
-                const updateButtonStyle = () => {
+                const toggleLabel = document.createElement('label');
+                toggleLabel.style.position = 'relative';
+                toggleLabel.style.display = 'inline-block';
+                toggleLabel.style.width = '44px';
+                toggleLabel.style.height = '24px';
+                toggleLabel.style.cursor = 'pointer';
+
+                const toggleInput = document.createElement('input');
+                toggleInput.type = 'checkbox';
+                toggleInput.style.opacity = '0';
+                toggleInput.style.width = '0';
+                toggleInput.style.height = '0';
+
+                const toggleSlider = document.createElement('span');
+                toggleSlider.style.position = 'absolute';
+                toggleSlider.style.cursor = 'pointer';
+                toggleSlider.style.top = '0';
+                toggleSlider.style.left = '0';
+                toggleSlider.style.right = '0';
+                toggleSlider.style.bottom = '0';
+                toggleSlider.style.backgroundColor = '#3a3f4d';
+                toggleSlider.style.transition = '0.15s';
+                toggleSlider.style.borderRadius = '24px';
+
+                const toggleKnob = document.createElement('span');
+                toggleKnob.style.position = 'absolute';
+                toggleKnob.style.height = '18px';
+                toggleKnob.style.width = '18px';
+                toggleKnob.style.left = '3px';
+                toggleKnob.style.bottom = '3px';
+                toggleKnob.style.backgroundColor = 'white';
+                toggleKnob.style.transition = '0.15s';
+                toggleKnob.style.borderRadius = '50%';
+
+                toggleSlider.appendChild(toggleKnob);
+                toggleLabel.appendChild(toggleInput);
+                toggleLabel.appendChild(toggleSlider);
+
+                const modeLabel = document.createElement('span');
+                modeLabel.textContent = 'Quick Trade Mode';
+                modeLabel.style.color = '#cbcaca';
+                modeLabel.style.fontSize = '13px';
+                modeLabel.style.fontWeight = '500';
+                modeLabel.style.whiteSpace = 'nowrap';
+
+                const dropdownButton = document.createElement('button');
+                dropdownButton.style.display = 'flex';
+                dropdownButton.style.alignItems = 'center';
+                dropdownButton.style.gap = '8px';
+                dropdownButton.style.padding = '6px 12px';
+                dropdownButton.style.backgroundColor = '#2a2e39';
+                dropdownButton.style.border = 'none';
+                dropdownButton.style.borderRadius = '4px';
+                dropdownButton.style.color = '#cbcaca';
+                dropdownButton.style.fontSize = '13px';
+                dropdownButton.style.cursor = 'pointer';
+                dropdownButton.style.transition = 'background-color 0.15s';
+                dropdownButton.style.outline = 'none';
+
+                const dropdownMenu = document.createElement('div');
+                dropdownMenu.style.position = 'fixed';
+                dropdownMenu.style.backgroundColor = '#2a2e39';
+                dropdownMenu.style.borderRadius = '4px';
+                dropdownMenu.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+                dropdownMenu.style.display = 'none';
+                dropdownMenu.style.zIndex = '999999';
+                dropdownMenu.style.minWidth = '140px';
+                dropdownMenu.style.overflow = 'hidden';
+                dropdownMenu.style.border =
+                    '1px solid rgba(255, 255, 255, 0.1)';
+
+                const dropdownText = document.createElement('span');
+                const dropdownArrow = document.createElement('span');
+                dropdownArrow.textContent = '▼';
+                dropdownArrow.style.fontSize = '10px';
+
+                dropdownButton.appendChild(dropdownText);
+                dropdownButton.appendChild(dropdownArrow);
+
+                const tradeTypes: TradeType[] = [
+                    'Market',
+                    'Limit',
+                    'Stop Market',
+                    'Stop Limit',
+                ];
+
+                tradeTypes.forEach((type) => {
+                    const item = document.createElement('div');
+                    item.textContent = type;
+                    item.style.padding = '8px 12px';
+                    item.style.cursor = 'pointer';
+                    item.style.color = '#cbcaca';
+                    item.style.fontSize = '13px';
+                    item.style.transition = 'background-color 0.15s';
+
+                    item.addEventListener('mouseenter', () => {
+                        item.style.backgroundColor = '#363a45';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.backgroundColor = 'transparent';
+                    });
+                    item.addEventListener('click', () => {
+                        setQuickModeTradeType(type);
+                        dropdownMenu.style.display = 'none';
+                        updateDropdownText();
+                        // Open modal to configure the selected trade type
+                        openQuickModeConfirm();
+                    });
+
+                    dropdownMenu.appendChild(item);
+                });
+
+                const updateDropdownText = () => {
                     const state = useOrderPlacementStore.getState();
+                    dropdownText.textContent = state.quickModeTradeType;
+                };
+
+                const updateToggleState = () => {
+                    const state = useOrderPlacementStore.getState();
+                    toggleInput.checked = state.quickMode;
+
                     if (state.quickMode) {
-                        button.style.color = '#ffffff';
-                        button.style.backgroundColor =
-                            'var(--accent1, #4a8bd3)';
-                        button.style.boxShadow =
-                            '0 0 0 1px var(--accent1, #4a8bd3)';
+                        toggleSlider.style.backgroundColor = '#4a8bd3';
+                        toggleKnob.style.left = '23px';
                     } else {
-                        button.style.color = '#cbcaca';
-                        button.style.backgroundColor = '#2a2e39';
-                        button.style.boxShadow = 'none';
+                        toggleSlider.style.backgroundColor = '#3a3f4d';
+                        toggleKnob.style.left = '3px';
                     }
                 };
 
-                updateButtonStyle();
+                updateDropdownText();
+                updateToggleState();
 
                 const unsubscribe = useOrderPlacementStore.subscribe(() => {
-                    updateButtonStyle();
+                    updateToggleState();
+                    updateDropdownText();
                 });
 
-                button.addEventListener('mouseenter', () => {
-                    const state = useOrderPlacementStore.getState();
-                    if (state.quickMode) {
-                        button.style.backgroundColor =
-                            'var(--accent1, #5294e2)';
-                    } else {
-                        button.style.backgroundColor = '#363a45';
-                    }
-                });
-                button.addEventListener('mouseleave', () => {
-                    const state = useOrderPlacementStore.getState();
-                    if (state.quickMode) {
-                        button.style.backgroundColor =
-                            'var(--accent1, #4a8bd3)';
-                    } else {
-                        button.style.backgroundColor = '#2a2e39';
-                    }
-                });
-                button.addEventListener('click', () => {
+                toggleInput.addEventListener('change', () => {
                     toggleQuickMode();
                 });
 
-                // Cleanup subscription when widget is removed
+                dropdownButton.addEventListener('mouseenter', () => {
+                    dropdownButton.style.backgroundColor = '#363a45';
+                });
+                dropdownButton.addEventListener('mouseleave', () => {
+                    dropdownButton.style.backgroundColor = '#2a2e39';
+                });
+
+                dropdownButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isVisible = dropdownMenu.style.display === 'block';
+
+                    if (!isVisible) {
+                        const chartDiv = document.getElementById('tv_chart');
+                        const iframe = chartDiv?.querySelector(
+                            'iframe',
+                        ) as HTMLIFrameElement;
+                        if (iframe) {
+                            const iframeRect = iframe.getBoundingClientRect();
+
+                            const rect = dropdownButton.getBoundingClientRect();
+                            dropdownMenu.style.top = `${iframeRect.top + rect.top + rect.height + 4}px`;
+                            dropdownMenu.style.left = `${rect.left}px`;
+                            dropdownMenu.style.display = 'block';
+                        }
+                    } else {
+                        dropdownMenu.style.display = 'none';
+                    }
+                });
+
+                container.appendChild(toggleLabel);
+                container.appendChild(modeLabel);
+                container.appendChild(dropdownButton);
+                document.body.appendChild(dropdownMenu);
+
+                const closeDropdownHandler = (e: MouseEvent) => {
+                    if (
+                        !container.contains(e.target as Node) &&
+                        !dropdownMenu.contains(e.target as Node)
+                    ) {
+                        dropdownMenu.style.display = 'none';
+                    }
+                };
+                document.addEventListener('click', closeDropdownHandler);
+
                 return () => {
                     unsubscribe();
+                    document.removeEventListener('click', closeDropdownHandler);
+                    if (dropdownMenu.parentNode) {
+                        dropdownMenu.parentNode.removeChild(dropdownMenu);
+                    }
                 };
             });
 
