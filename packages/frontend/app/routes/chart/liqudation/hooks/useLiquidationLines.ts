@@ -115,8 +115,11 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
 
     const calculatLineWidth = useCallback((): number => {
         if (scaleData) {
-            const l1 = scaleData.yScale(80000);
-            const l2 = scaleData.yScale(90000);
+            const mid =
+                (scaleData.yScale.domain()[0] + scaleData.yScale.domain()[1]) /
+                2;
+            const l1 = scaleData.yScale(mid);
+            const l2 = scaleData.yScale(mid + liqLevelDiffRef.current);
             return Math.abs(l2 - l1);
         }
 
@@ -130,7 +133,7 @@ export const useLiqudationLines = (scaleData: any): HorizontalLineData[] => {
                 liqValue: obLiqData.sz,
                 color: getColor((obLiqData.sz / maxSz) * 100),
                 strokeStyle: getColor((obLiqData.sz / maxSz) * 100),
-                lineWidth: calculatLineWidth() / 8,
+                lineWidth: calculatLineWidth(),
                 type:
                     obLiqData.px > (markPxRef.current ?? 0) ? 'Short' : 'Long',
                 dash: undefined,
