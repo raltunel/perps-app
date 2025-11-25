@@ -3,11 +3,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: center;
     font-size: var(--font-size-s);
     padding-right: var(--padding-s);
-    padding-bottom: var(--padding-s);
-    /* padding-top: var(--padding-s); */
+    padding-bottom: var(--padding-xs);
+    padding-top: var(--padding-xs);
+    gap: var(--gap-xs);
 }
+
 .bottomRow {
     display: flex;
     flex-direction: row;

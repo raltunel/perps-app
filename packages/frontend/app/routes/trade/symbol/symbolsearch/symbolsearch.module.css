@@ -60,10 +60,11 @@
 
 @media (max-width: 480px) {
     .symbolSearchContainer {
-        width: 50px;
+        width: 100px;
         min-width: 0;
+        display: flex;
     }
     .symbolName {
-        display: none;
+        font-size: var(--font-size-s);
     }
 }

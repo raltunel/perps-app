@@ -184,7 +184,7 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
             {
                 key: 'change24h',
                 label: t('symbolInfo.24hChange'),
-                labelMobile: '24h Δ',
+                labelMobile: 'Δ',
                 tooltipContent: t('symbolInfo.24hChangeTooltip'),
                 valueClass: 'w7',
                 value: inlineChange,
