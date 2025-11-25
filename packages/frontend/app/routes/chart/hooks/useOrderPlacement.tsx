@@ -58,18 +58,7 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     },
     toggleQuickMode: () => {
         const state = useOrderPlacementStore.getState();
-        if (!state.quickMode) {
-            if (
-                state.dontAskAgainQuickMode &&
-                state.quickModeDefaultAmount > 0
-            ) {
-                set({ quickMode: true });
-            } else {
-                set({ showQuickModeConfirm: true });
-            }
-        } else {
-            set({ quickMode: false });
-        }
+        set({ quickMode: !state.quickMode });
     },
     setQuickModeTradeType: (tradeType: TradeType) => {
         set({ quickModeTradeType: tradeType });

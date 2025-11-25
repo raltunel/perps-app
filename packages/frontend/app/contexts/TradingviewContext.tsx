@@ -561,7 +561,8 @@ export const TradingViewProvider: React.FC<{
                     toggleInput.checked = state.quickMode;
 
                     if (state.quickMode) {
-                        toggleSlider.style.backgroundColor = '#4a8bd3';
+                        toggleSlider.style.backgroundColor =
+                            'var(--accent1, #4a8bd3)';
                         toggleKnob.style.left = '23px';
                     } else {
                         toggleSlider.style.backgroundColor = '#3a3f4d';
