@@ -174,20 +174,20 @@ export default function CodeTabs(props: PropsIF) {
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
-        // Don't make API calls with empty or whitespace-only codes
+        // don't make API calls with empty or whitespace-only codes
         if (!r || !r.trim()) {
             return;
         }
 
         // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isAffiliateCodeFree(r);
+        const isCodeFree: boolean = await isAffiliateCodeFree(r);
 
-        // Always cache the code and set URL param
+        // always cache the code and set URL param
         handleReferralURLParam.set(r);
         referralStore.cache(r);
 
         // if code is unclaimed, show in edit mode with error
-        if (!codeIsFree) {
+        if (!isCodeFree) {
             setInvalidCode(r);
             setIsCachedValueValid(false);
             setEditModeReferral(true);
@@ -251,40 +251,6 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
-    // useEffect(() => {
-    //     if (!affiliateAddress) {
-    //         return;
-    //     }
-
-    //     (async () => {
-    //         setIsFetchingVolume(true);
-
-    //         try {
-    //             const EMBER_EDNPOINT_ALL =
-    //                 'https://ember-leaderboard.liquidity.tools/leaderboard';
-    //             const emberEndpointForUser =
-    //                 EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
-
-    //             const response = await fetch(emberEndpointForUser);
-
-    //             const data = await response.json();
-    //             console.log('Full Ember API response:', data);
-    //             if (data.error) {
-    //                 referralStore.setTotVolume(0);
-    //             } else if (data.leaderboard && data.leaderboard.length > 0) {
-    //                 const volume = data.leaderboard[0].volume;
-    //                 referralStore.setTotVolume(volume);
-    //             }
-    //         } catch (error) {
-    //             referralStore.setTotVolume(NaN);
-    //         } finally {
-    //             setIsFetchingVolume(false);
-    //         }
-    //     })();
-    // }, [affiliateAddress]);
-
-    // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
-
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
@@ -307,49 +273,44 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [userInputRefCode]);
 
-    const [isCachedValueValid, setIsCachedValueValid] = useState<
-        boolean | undefined
-    >(undefined);
+    // const [isCachedValueValid, setIsCachedValueValid] = useState<
+    //     boolean | undefined
+    // >(undefined);
 
-    // Validate cached referral code when it changes (e.g., from URL)
-    useEffect(() => {
-        // Don't validate if there's no cached code
-        if (!referralStore.cached) {
-            setIsCachedValueValid(undefined);
-            return;
-        }
+    // // Validate cached referral code when it changes (e.g., from URL)
+    // useEffect(() => {
+    //     // Don't validate if there's no cached code
+    //     if (refCodeToConsume) {
+    //         // setIsCachedValueValid(undefined);
+    //         return;
+    //     }
 
-        // Don't re-validate if we already have a validation result for this code
-        if (isCachedValueValid !== undefined) {
-            return;
-        }
+    //     // // Don't re-validate if we already have a validation result for this code
+    //     // if (isCachedValueValid !== undefined) {
+    //     //     return;
+    //     // }
 
-        (async () => {
-            try {
-                const isCachedCodeFree: boolean = await isAffiliateCodeFree(
-                    referralStore.cached,
-                );
-                console.log('isCodeFree: ', isCachedCodeFree);
-
-                if (isCachedCodeFree) {
-                    // Code is not claimed - show in edit mode with error
-                    setInvalidCode(referralStore.cached);
-                    setIsCachedValueValid(false);
-                    setEditModeReferral(true);
-                    setUserInputRefCode(referralStore.cached);
-                } else {
-                    // Code is valid and claimed
-                    setIsCachedValueValid(true);
-                    setEditModeReferral(false);
-                }
-            } catch (error) {
-                // On error, assume invalid to be safe
-                setIsCachedValueValid(false);
-                setEditModeReferral(true);
-                setUserInputRefCode(referralStore.cached);
-            }
-        })();
-    }, [referralStore.cached, isCachedValueValid]);
+    //     (async () => {
+    //         try {
+    //             if (isRefCodeClaimed) {
+    //                 // Code is not claimed - show in edit mode with error
+    //                 setInvalidCode(referralStore.cached);
+    //                 // setIsCachedValueValid(false);
+    //                 setEditModeReferral(true);
+    //                 setUserInputRefCode(referralStore.cached);
+    //             } else {
+    //                 // Code is valid and claimed
+    //                 // setIsCachedValueValid(true);
+    //                 setEditModeReferral(false);
+    //             }
+    //         } catch (error) {
+    //             // On error, assume invalid to be safe
+    //             // setIsCachedValueValid(false);
+    //             setEditModeReferral(true);
+    //             setUserInputRefCode(referralStore.cached);
+    //         }
+    //     })();
+    // }, [referralStore.cached, isCachedValueValid]);
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -1079,7 +1040,7 @@ export default function CodeTabs(props: PropsIF) {
                 }
                 const shouldShowInput =
                     (editModeReferral ||
-                        !referralStore.cached ||
+                        !refCodeToConsume ||
                         isCachedValueValid === false) &&
                     referralStore.totVolume !== undefined &&
                     referralStore.totVolume < 10000;
