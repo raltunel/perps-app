@@ -9,6 +9,11 @@ import { useDebugStore } from '~/stores/DebugStore';
 import useNumFormatter from '~/hooks/useNumFormatter';
 import { useLazyD3 } from '~/routes/chart/hooks/useLazyD3';
 import styles from './LiquidationOBChart.module.css';
+import { useTradingView } from '~/contexts/TradingviewContext';
+import type {
+    CrossHairMovedEventParams,
+    ISubscription,
+} from '~/tv/charting_library';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -52,6 +57,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const sellYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
     const pageYScaleRef = useRef<d3.ScaleLinear<number, number> | null>(null);
+
+    const { chart } = useTradingView();
 
     const locationRef = useRef(location);
     locationRef.current = location;
@@ -844,7 +851,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [animDuration, interPolateData, interPolateLiqData, updateScalesOnly],
     );
 
-    const mousemove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const handleTooltip = useCallback((offsetX: number, offsetY: number) => {
         if (
             !xScaleRef.current ||
             !pageYScaleRef.current ||
@@ -860,9 +867,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .node() as HTMLCanvasElement;
 
         const rect = canvas.getBoundingClientRect();
-
-        const offsetY = event.clientY - rect?.top;
-        const offsetX = event.clientX - rect?.left;
 
         // Calculate hover line data
         hoverLineDataRef.current = [
@@ -951,6 +955,32 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         highlightHoveredArea.current = true;
     }, []);
+
+    const mousemove = useCallback(
+        (event: React.MouseEvent<HTMLDivElement>) => {
+            if (
+                !xScaleRef.current ||
+                !pageYScaleRef.current ||
+                !buyYScaleRef.current ||
+                !d3 ||
+                !d3fc
+            )
+                return;
+
+            const canvas = d3
+                .select(d3CanvasLiqHover.current)
+                .select('canvas')
+                .node() as HTMLCanvasElement;
+
+            const rect = canvas.getBoundingClientRect();
+
+            const offsetY = event.clientY - rect?.top;
+            const offsetX = event.clientX - rect?.left;
+
+            handleTooltip(offsetX, offsetY);
+        },
+        [handleTooltip],
+    );
 
     const clipCanvas = (
         point: number,
@@ -1066,7 +1096,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         d3.select(d3CanvasLiqContianer.current).on(
             'mousemove',
             function (event: React.MouseEvent<HTMLDivElement>) {
-                console.log('>>>>>> mmove', event);
                 mousemove(event);
             },
             { passive: true },
@@ -1204,6 +1233,69 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 buyLineSeriesRef.current?.context(hovereContext);
             });
     }, [width, height, bsColor]);
+
+    const callbackCrosshair = useCallback(
+        (params: CrossHairMovedEventParams) => {
+            const tvChart = document.getElementById('tv_chart');
+            if (!tvChart) return;
+
+            const tvChartRect = tvChart.getBoundingClientRect();
+            const { offsetX, offsetY } = params;
+
+            if (!offsetX || !offsetY) return;
+            if (!d3CanvasLiqContianer.current) return;
+
+            const mouseX = tvChartRect.left + offsetX;
+            const mouseY = tvChartRect.top + offsetY;
+
+            d3CanvasLiqContianer.current.getBoundingClientRect();
+
+            const relativeMouseX =
+                mouseX -
+                d3CanvasLiqContianer.current.getBoundingClientRect().left;
+            const relativeMouseY =
+                mouseY -
+                d3CanvasLiqContianer.current.getBoundingClientRect().top;
+
+            console.log(
+                '>>> relativeMouseX',
+                relativeMouseX,
+                'relativeMouseY',
+                relativeMouseY,
+            );
+
+            if (relativeMouseX < 0 || relativeMouseY < 0) {
+                highlightHoveredArea.current = false;
+                hoverLineDataRef.current = [];
+                liqTooltipRef.current.style('visibility', 'hidden');
+                return;
+            }
+
+            handleTooltip(relativeMouseX, relativeMouseY);
+        },
+        [handleTooltip],
+    );
+
+    useEffect(() => {
+        if (!chart) return;
+
+        let crosshairSubscription: ISubscription<
+            (params: CrossHairMovedEventParams) => void
+        > | null = null;
+
+        const context = { name: 'crosshair-handler' };
+
+        chart.onChartReady(() => {
+            crosshairSubscription = chart.activeChart().crossHairMoved();
+
+            if (crosshairSubscription)
+                crosshairSubscription.subscribe(context, callbackCrosshair);
+        });
+
+        chart.onChartReady(() => {
+            console.log('>>> chart ready');
+        });
+    }, [chart]);
 
     return (
         <div
