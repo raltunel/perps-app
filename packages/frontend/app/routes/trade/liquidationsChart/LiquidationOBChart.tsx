@@ -336,11 +336,16 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         )
             return;
 
+        const dpr = window.devicePixelRatio || 1;
+
         // Update scales
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range([widthRef.current, 0]);
+            .range([
+                widthRef.current * (location === 'liqMobile' ? dpr : 1),
+                0,
+            ]);
 
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
@@ -500,7 +505,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         buyAreaSeriesRef.current = buyArea;
         sellLineSeriesRef.current = sellLine;
         buyLineSeriesRef.current = buyLine;
-        const dpr = window.devicePixelRatio || 1;
 
         // Setup drawing
         d3.select(d3CanvasLiq.current).dispatch('draw', { bubbles: false });
