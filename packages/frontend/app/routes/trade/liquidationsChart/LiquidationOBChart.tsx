@@ -900,6 +900,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             )
                 return;
 
+            const dpr = window.devicePixelRatio || 1;
+
             const canvas = d3
                 .select(d3CanvasLiqHover.current)
                 .select('canvas')
@@ -915,13 +917,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             // Calculate hover line data
             hoverLineDataRef.current = [
                 {
-                    x: xScaleRef.current.invert(xScaleRef.current.range()[0]),
-                    y: pageYScaleRef.current.invert(offsetY),
+                    x: xScaleRef.current.invert(
+                        xScaleRef.current.range()[0] * dpr,
+                    ),
+                    y: pageYScaleRef.current.invert(offsetY * dpr),
                     offsetY: offsetY,
                 },
                 {
-                    x: xScaleRef.current.invert(offsetX + 10),
-                    y: pageYScaleRef.current.invert(offsetY),
+                    x: xScaleRef.current.invert((offsetX + 10) * dpr),
+                    y: pageYScaleRef.current.invert(offsetY * dpr),
                     offsetY: offsetY,
                 },
             ];
@@ -950,7 +954,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             // Fill and place tooltip
             if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
 
-            const mousePoint = pageYScaleRef.current.invert(offsetY);
+            const mousePoint = pageYScaleRef.current.invert(offsetY * dpr);
+            console.log('>>>>>>> mousePoint', mousePoint);
 
             const midHeader = document.getElementById('orderBookMidHeader');
             const midHeaderHeight =
@@ -1058,6 +1063,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         highlightedCanvas: HTMLCanvasElement,
         reverse: boolean = false,
     ) => {
+        const dpr = window.devicePixelRatio || 1;
+
         const ctx = highlightedCanvas.getContext(
             '2d',
         ) as CanvasRenderingContext2D;
@@ -1070,8 +1077,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             clipEdge = buyY;
         }
 
-        const startY = point;
+        const startY = point * dpr;
         const endY = clipEdge - startY;
+
+        console.log('>>>>>>> startY', startY, 'endY', endY);
 
         ctx.save();
         ctx.beginPath();
