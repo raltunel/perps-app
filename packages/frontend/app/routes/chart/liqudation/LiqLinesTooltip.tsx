@@ -10,6 +10,7 @@ import type {
     MouseEventParams,
 } from '~/tv/charting_library';
 import type { HorizontalLineData } from './LiqudationLines';
+import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
 
 interface LiqTooltipProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -27,6 +28,9 @@ const LiqLineTooltip = ({
 }: LiqTooltipProps) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const liqLineTooltipRef = useRef<any>(null);
+    const { activeTooltipType } = useLiqChartStore();
+    const activeTooltipTypeRef = useRef(activeTooltipType);
+    activeTooltipTypeRef.current = activeTooltipType;
 
     const { chart } = useTradingView();
 
@@ -143,6 +147,14 @@ const LiqLineTooltip = ({
 
     const callbackCrosshair = useCallback(
         (params: CrossHairMovedEventParams) => {
+            if (
+                activeTooltipTypeRef.current ===
+                LiqChartTooltipType.Distribution
+            ) {
+                liqLineTooltipRef.current.style('visibility', 'hidden');
+                return;
+            }
+
             const { offsetX, offsetY } = params;
             if (offsetX && offsetY) {
                 mousemove(offsetX, offsetY);

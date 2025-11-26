@@ -14,6 +14,7 @@ import type {
     CrossHairMovedEventParams,
     ISubscription,
 } from '~/tv/charting_library';
+import { LiqChartTooltipType, useLiqChartStore } from '~/stores/LiqChartStore';
 
 interface LiquidationsChartProps {
     buyData: OrderBookRowIF[];
@@ -44,6 +45,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         scaleData,
         location,
     } = props;
+
+    const { setActiveTooltipType } = useLiqChartStore();
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
@@ -132,6 +135,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
+    const bottomBoundaryBuyRef = useRef(0);
+    const topBoundarySellRef = useRef(0);
+
     const mouseYRef = useRef(0);
 
     const getCenterY = useCallback(() => {
@@ -141,9 +147,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             currentBuyDataRef.current.length > 0
         ) {
             const buyPx = currentBuyDataRef.current[0].px;
-            console.log('>>> [', locationRef.current, '] buyPx', buyPx);
             const buyY = scaleDataRef.current.yScale(buyPx);
-            console.log('>>> [', locationRef.current, '] buyY', buyY);
             return buyY;
         }
 
@@ -343,7 +347,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [],
     );
 
-    const updateScalesAndSeries = useCallback(() => {
+    const updateScales = useCallback(() => {
         const currentBuyData = currentBuyDataRef.current;
         const currentSellData = currentSellDataRef.current;
 
@@ -351,15 +355,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             !currentBuyData ||
             !currentSellData ||
             currentBuyData.length === 0 ||
-            currentSellData.length === 0 ||
-            !d3 ||
-            !d3fc
+            currentSellData.length === 0
         )
             return;
 
         const dpr = window.devicePixelRatio || 1;
 
-        // Update scales
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
@@ -386,7 +387,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         // mid gap
         const centerY = getCenterY();
-        console.log('>>> [', locationRef.current, '] centerY', centerY);
         const gapSize = rowGap / 2;
 
         const buyYScale = d3
@@ -404,7 +404,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const pageYScale = d3
             .scaleLinear()
-            .domain([0, 100])
+            .domain([bottomBoundaryBuy, topBoundarySell])
             .range([heightRef.current, 0]);
 
         xScaleRef.current = xScale;
@@ -417,6 +417,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         pageYScaleRef.current = scaleDataRef.current
             ? scaleDataRef.current.yScale
             : pageYScale;
+    }, []);
+
+    const updateScalesAndSeries = useCallback(() => {
+        if (!d3 || !d3fc) return;
+
+        updateScales();
+
+        const dpr = window.devicePixelRatio || 1;
 
         const canvas = d3
             .select(d3CanvasLiq.current)
@@ -450,9 +458,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
-            .xScale(xScale)
+            .xScale(xScaleRef.current)
             .yScale(
-                scaleDataRef.current ? scaleDataRef.current.yScale : sellYScale,
+                scaleDataRef.current
+                    ? scaleDataRef.current.yScale
+                    : sellYScaleRef.current,
             );
 
         const buyArea = d3fc
@@ -471,9 +481,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
-            .xScale(xScale)
+            .xScale(xScaleRef.current)
             .yScale(
-                scaleDataRef.current ? scaleDataRef.current.yScale : buyYScale,
+                scaleDataRef.current
+                    ? scaleDataRef.current.yScale
+                    : buyYScaleRef.current,
             );
 
         const sellLine = d3fc
@@ -482,9 +494,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
-            .xScale(xScale)
+            .xScale(xScaleRef.current)
             .yScale(
-                scaleDataRef.current ? scaleDataRef.current.yScale : sellYScale,
+                scaleDataRef.current
+                    ? scaleDataRef.current.yScale
+                    : sellYScaleRef.current,
             )
             .decorate((context: CanvasRenderingContext2D) => {
                 context.save();
@@ -498,9 +512,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .curve(curve)
             .mainValue((d: OrderBookRowIF) => d.ratio)
             .crossValue((d: OrderBookRowIF) => d.px)
-            .xScale(xScale)
+            .xScale(xScaleRef.current)
             .yScale(
-                scaleDataRef.current ? scaleDataRef.current.yScale : buyYScale,
+                scaleDataRef.current
+                    ? scaleDataRef.current.yScale
+                    : buyYScaleRef.current,
             )
             .decorate((context: CanvasRenderingContext2D) => {
                 context.save();
@@ -628,136 +644,79 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, [width, height, drawLiquidationLines]);
 
     const updateScalesOnly = useCallback(() => {
-        const currentBuyData = currentBuyDataRef.current;
-        const currentSellData = currentSellDataRef.current;
-
-        if (
-            !currentBuyData ||
-            !currentSellData ||
-            currentBuyData.length === 0 ||
-            currentSellData.length === 0 ||
-            !d3 ||
-            !d3fc
-        )
-            return;
-
-        const dpr = window.devicePixelRatio || 1;
-
-        // Update scales only
-        const xScale = d3
-            .scaleLinear()
-            .domain([0, 1])
-            .range([
-                widthRef.current * (location === 'liqMobile' ? dpr : 1),
-                0,
-            ]);
-
-        const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
-        const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
-        const topBoundarySell = Math.max(...currentSellData.map((d) => d.px));
-        const bottomBoundarySell = Math.min(
-            ...currentSellData.map((d) => d.px),
-        );
-
-        const midHeader = document.getElementById('orderBookMidHeader');
-        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
-
-        const root = document.documentElement;
-
-        const styles = getComputedStyle(root);
-
-        const rowGap = parseInt(styles.getPropertyValue('--gap-s'), 10);
-
-        const centerY = heightRef.current / 2;
-        const gapSize = rowGap / 2;
-
-        const buyYScale = d3
-            .scaleLinear()
-            .domain([bottomBoundaryBuy, topBoundaryBuy])
-            .range([
-                heightRef.current,
-                centerY + midHeaderHeight / 2 + gapSize + 1,
-            ]);
-        const sellYScale = d3
-            .scaleLinear()
-            .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - midHeaderHeight / 2 - 1, 0]);
-
-        xScaleRef.current = xScale;
-        buyYScaleRef.current = buyYScale;
-        sellYScaleRef.current = sellYScale;
+        updateScales();
 
         // Update scales in existing series if they exist
         if (sellAreaSeriesRef.current) {
             sellAreaSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : sellYScale,
+                        : sellYScaleRef.current,
                 );
         }
         if (buyAreaSeriesRef.current) {
             buyAreaSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : buyYScale,
+                        : buyYScaleRef.current,
                 );
         }
         if (highlightedSellAreaSeriesRef.current) {
             highlightedSellAreaSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : sellYScale,
+                        : sellYScaleRef.current,
                 );
         }
         if (highlightedBuyAreaSeriesRef.current) {
             highlightedBuyAreaSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : buyYScale,
+                        : buyYScaleRef.current,
                 );
         }
         if (sellLineSeriesRef.current) {
             sellLineSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : sellYScale,
+                        : sellYScaleRef.current,
                 );
         }
         if (buyLineSeriesRef.current) {
             buyLineSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : buyYScale,
+                        : buyYScaleRef.current,
                 );
         }
         if (sellLiqLineSeriesRef.current) {
             sellLiqLineSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : sellYScale,
+                        : sellYScaleRef.current,
                 );
         }
         if (buyLiqLineSeriesRef.current) {
             buyLiqLineSeriesRef.current
-                .xScale(xScale)
+                .xScale(xScaleRef.current)
                 .yScale(
                     scaleDataRef.current
                         ? scaleDataRef.current.yScale
-                        : buyYScale,
+                        : buyYScaleRef.current,
                 );
         }
     }, [width, height]);
@@ -930,110 +889,143 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [animDuration, interPolateData, interPolateLiqData, updateScalesOnly],
     );
 
-    const handleTooltip = useCallback((offsetX: number, offsetY: number) => {
-        if (
-            !xScaleRef.current ||
-            !pageYScaleRef.current ||
-            !buyYScaleRef.current ||
-            !d3 ||
-            !d3fc
-        )
-            return;
+    const handleTooltip = useCallback(
+        (offsetX: number, offsetY: number) => {
+            if (
+                !xScaleRef.current ||
+                !pageYScaleRef.current ||
+                !buyYScaleRef.current ||
+                !d3 ||
+                !d3fc
+            )
+                return;
 
-        const canvas = d3
-            .select(d3CanvasLiqHover.current)
-            .select('canvas')
-            .node() as HTMLCanvasElement;
+            const canvas = d3
+                .select(d3CanvasLiqHover.current)
+                .select('canvas')
+                .node() as HTMLCanvasElement;
 
-        const rect = canvas.getBoundingClientRect();
+            const rect = canvas.getBoundingClientRect();
 
-        // Calculate hover line data
-        hoverLineDataRef.current = [
-            {
-                x: xScaleRef.current.invert(xScaleRef.current.range()[0]),
-                y: pageYScaleRef.current.invert(offsetY),
-                offsetY: offsetY,
-            },
-            {
-                x: xScaleRef.current.invert(offsetX + 10),
-                y: pageYScaleRef.current.invert(offsetY),
-                offsetY: offsetY,
-            },
-        ];
+            const centerY = getCenterY();
+            const isBuy = centerY < offsetY;
 
-        // Fill and place tooltip
-        if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
+            console.log('>>>>>> offsetY', offsetY);
 
-        const mousePoint = buyYScaleRef.current.invert(offsetY);
+            // Calculate hover line data
+            hoverLineDataRef.current = [
+                {
+                    x: xScaleRef.current.invert(xScaleRef.current.range()[0]),
+                    y: pageYScaleRef.current.invert(offsetY),
+                    offsetY: offsetY,
+                },
+                {
+                    x: xScaleRef.current.invert(offsetX + 10),
+                    y: pageYScaleRef.current.invert(offsetY),
+                    offsetY: offsetY,
+                },
+            ];
 
-        const midHeader = document.getElementById('orderBookMidHeader');
-        const midHeaderHeight = midHeader?.getBoundingClientRect().height || 0;
-
-        const centerY = heightRef.current / 2;
-
-        const isBuy = centerY < offsetY;
-
-        mouseYRef.current = offsetY;
-
-        const hoveredArray = isBuy ? currentBuyDataRef : currentSellDataRef;
-
-        const nearest = hoveredArray.current.filter((item) =>
-            isBuy ? item.px < mousePoint : item.px > mousePoint,
-        );
-
-        const snappedPrice =
-            nearest.length > 0
-                ? nearest.reduce(
-                      (closest: OrderBookRowIF, item: OrderBookRowIF) => {
-                          if (!closest) return item;
-                          return Math.abs(item.px - mousePoint) <
-                              Math.abs(closest.px - mousePoint)
-                              ? item
-                              : closest;
-                      },
-                  )
-                : hoveredArray.current[hoveredArray.current.length - 1];
-
-        const price =
-            snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
-
-        const finalTotal =
-            hoveredArray.current[hoveredArray.current.length - 1].total;
-
-        const percentage = (price / finalTotal) * 100;
-
-        liqTooltipRef.current.html(
-            '<p>' +
-                formatNum(percentage) +
-                '%</p>' +
-                '<p>' +
-                formatNum(price, 2) +
-                ' </p>',
-        );
-
-        const width = liqTooltipRef.current
-            .node()
-            .getBoundingClientRect().width;
-
-        const height = liqTooltipRef.current
-            .node()
-            .getBoundingClientRect().height;
-
-        const horizontal = offsetX - width / 2;
-        const vertical = offsetY - (height + 10);
-
-        const verticalPosition = vertical < 0 ? offsetY + 10 : vertical;
-
-        liqTooltipRef.current
-            .style('visibility', 'visible')
-            .style('top', verticalPosition + 'px')
-            .style(
-                'left',
-                Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+            console.log(
+                '>>>>>>> hoverLineDataRef0',
+                hoverLineDataRef.current[0].y,
+            );
+            console.log(
+                '>>>>>>> hoverLineDataRef1',
+                hoverLineDataRef.current[1].y,
             );
 
-        highlightHoveredArea.current = true;
-    }, []);
+            console.log(
+                '>>>>>>> currentBuyDataRef',
+                currentBuyDataRef.current[currentBuyDataRef.current.length - 1]
+                    .px,
+            );
+            console.log(
+                '>>>>>>> currentSellDataRef',
+                currentSellDataRef.current[
+                    currentSellDataRef.current.length - 1
+                ].px,
+            );
+
+            // Fill and place tooltip
+            if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
+
+            const mousePoint = pageYScaleRef.current.invert(offsetY);
+
+            const midHeader = document.getElementById('orderBookMidHeader');
+            const midHeaderHeight =
+                midHeader?.getBoundingClientRect().height || 0;
+
+            mouseYRef.current = offsetY;
+
+            let hoveredArray = isBuy
+                ? currentBuyDataRef.current
+                : currentSellDataRef.current;
+
+            if (locationRef.current === 'liqMobile') {
+                hoveredArray = hoveredArray.slice(0, hoveredArray.length - 1);
+            }
+
+            const nearest = hoveredArray.filter((item) =>
+                isBuy ? item.px < mousePoint : item.px > mousePoint,
+            );
+
+            const snappedPrice =
+                nearest.length > 0
+                    ? nearest.reduce(
+                          (closest: OrderBookRowIF, item: OrderBookRowIF) => {
+                              if (!closest) return item;
+                              return Math.abs(item.px - mousePoint) <
+                                  Math.abs(closest.px - mousePoint)
+                                  ? item
+                                  : closest;
+                          },
+                      )
+                    : hoveredArray[hoveredArray.length - 1];
+
+            console.log('>>>>>>> snappedPrice', snappedPrice.px);
+
+            const price =
+                snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
+
+            const finalTotal = hoveredArray[hoveredArray.length - 1].total;
+
+            const percentage = (price / finalTotal) * 100;
+
+            liqTooltipRef.current.html(
+                '<p>' +
+                    formatNum(percentage) +
+                    '%</p>' +
+                    '<p>' +
+                    formatNum(price, 2) +
+                    ' </p>',
+            );
+
+            const width = liqTooltipRef.current
+                .node()
+                .getBoundingClientRect().width;
+
+            const height = liqTooltipRef.current
+                .node()
+                .getBoundingClientRect().height;
+
+            const horizontal = offsetX - width / 2;
+            const vertical = offsetY - (height + 10);
+
+            const verticalPosition = vertical < 0 ? offsetY + 10 : vertical;
+
+            liqTooltipRef.current
+                .style('visibility', 'visible')
+                .style('top', verticalPosition + 'px')
+                .style(
+                    'left',
+                    Math.min(Math.max(horizontal, 10), rect.width - 50) + 'px',
+                );
+
+            highlightHoveredArea.current = true;
+        },
+        [getCenterY],
+    );
 
     const mousemove = useCallback(
         (event: React.MouseEvent<HTMLDivElement>) => {
@@ -1093,6 +1085,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     };
 
     useEffect(() => {
+        if (location === 'liqMobile' && !chartReady) return;
         if (buyData.length === 0 || sellData.length === 0) return;
 
         // For initial load, set current data directly
@@ -1117,11 +1110,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         liqBuys,
         liqSells,
         updateScalesAndSeries,
+        location,
+        chartReady,
     ]);
-
-    useEffect(() => {
-        console.log('>>> [', locationRef.current, '] scaleData', scaleData);
-    }, [scaleData]);
 
     useEffect(() => {
         updateScalesAndSeries();
@@ -1337,11 +1328,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     const callbackCrosshair = useCallback(
         (params: CrossHairMovedEventParams) => {
+            const { offsetX, offsetY } = params;
             const tvChart = document.getElementById('tv_chart');
             if (!tvChart) return;
 
             const tvChartRect = tvChart.getBoundingClientRect();
-            const { offsetX, offsetY } = params;
 
             if (!offsetX || !offsetY) return;
             if (!d3CanvasLiqContianer.current) return;
@@ -1362,10 +1353,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
                 liqTooltipRef.current.style('visibility', 'hidden');
+                setActiveTooltipType(LiqChartTooltipType.Level);
                 return;
             }
 
             handleTooltip(relativeMouseX, relativeMouseY);
+            setActiveTooltipType(LiqChartTooltipType.Distribution);
         },
         [handleTooltip],
     );
@@ -1384,10 +1377,18 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             crosshairSubscription = chart.activeChart().crossHairMoved();
             setChartReady(true);
 
-            if (crosshairSubscription)
+            if (crosshairSubscription) {
                 crosshairSubscription.subscribe(context, callbackCrosshair);
+            }
         });
-    }, [chart, location]);
+
+        chart
+            .activeChart()
+            .onVisibleRangeChanged()
+            .subscribe(null, () => {
+                updateScalesAndSeries();
+            });
+    }, [chart, location, updateScalesAndSeries]);
 
     return (
         <div

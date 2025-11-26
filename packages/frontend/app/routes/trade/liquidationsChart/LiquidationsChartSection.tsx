@@ -76,18 +76,18 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         )
             return;
         const inpBuys = interpolateOrderBookData(
-            buysRef.current,
+            buysRef.current.slice(0, orderCount),
             sellsRef.current[0].px,
         );
         const inpSells = interpolateOrderBookData(
-            sellsRef.current,
+            sellsRef.current.slice(0, orderCount),
             buysRef.current[0].px,
         );
         setInpBuys(inpBuys);
         setInpSells(inpSells);
         const { liqBuys, liqSells } = createRandomOrderBookLiq(
-            buysRef.current,
-            sellsRef.current,
+            buysRef.current.slice(0, orderCount),
+            sellsRef.current.slice(0, orderCount),
         );
         setLiqBuys(liqBuys);
         setLiqSells(liqSells.reverse());

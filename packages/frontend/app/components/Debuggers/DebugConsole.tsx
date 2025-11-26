@@ -32,7 +32,7 @@ export default function DebugConsole() {
         const onScroll = () => {
             const bottom = el.scrollHeight - (el.scrollTop + el.clientHeight);
 
-            if (bottom < 50) {
+            if (bottom < 200) {
                 autoScrollRef.current = true;
             } else {
                 autoScrollRef.current = false;
