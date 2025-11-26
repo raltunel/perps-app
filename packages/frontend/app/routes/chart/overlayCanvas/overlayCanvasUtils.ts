@@ -176,15 +176,17 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     const priceAxisDivs =
         iframeDoc.querySelectorAll<HTMLDivElement>('div.price-axis');
 
-    const yAxisCanvas =
-        priceAxisDivs.length > 0
-            ? priceAxisDivs[0].querySelectorAll<HTMLCanvasElement>('canvas')[1]
-            : null;
-
     const paneIndex = getMainSeriesPaneIndex(chart);
     if (paneIndex === null || paneIndex === undefined) {
         return { iframeDoc, paneCanvas: null, yAxisCanvas: null };
     }
+
+    const yAxisCanvas =
+        priceAxisDivs.length > 0
+            ? priceAxisDivs[paneIndex].querySelectorAll<HTMLCanvasElement>(
+                  'canvas',
+              )[1]
+            : null;
 
     return {
         iframeDoc,

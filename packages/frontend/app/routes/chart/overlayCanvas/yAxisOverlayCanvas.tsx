@@ -17,7 +17,33 @@ const YAxisOverlayCanvas: React.FC = () => {
     const { orderInputPriceValue } = useTradeDataStore();
     const [isDrag, setIsDrag] = useState(false);
     const [mouseY, setMouseY] = useState(0);
+    const [isPaneChanged, setIsPaneChanged] = useState(false);
     const isNearOrderPriceRef = useRef(false);
+
+    useEffect(() => {
+        if (!chart) return;
+
+        const unsubscribe = chart.subscribe('panes_order_changed', () => {
+            if (canvasRef.current) {
+                const ctx = canvasRef.current.getContext('2d');
+                if (ctx) {
+                    ctx.clearRect(
+                        0,
+                        0,
+                        canvasRef.current.width,
+                        canvasRef.current.height,
+                    );
+                }
+            }
+            setIsPaneChanged((prev) => !prev);
+        }) as unknown as () => void;
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+    }, [chart]);
 
     useEffect(() => {
         if (!chart || !isChartReady) return;
@@ -51,11 +77,11 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         updateCanvasSize();
 
-        const observer = new ResizeObserver(() => {
+        const resizeObserver = new ResizeObserver(() => {
             updateCanvasSize();
         });
 
-        observer.observe(yAxisCanvas);
+        resizeObserver.observe(yAxisCanvas);
 
         const handleCanvasMouseMove = (e: MouseEvent) => {
             const rect = canvas.getBoundingClientRect();
@@ -83,7 +109,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         yAxisCanvas.addEventListener('mousemove', handleYAxisMouseMove);
 
         return () => {
-            observer.disconnect();
+            resizeObserver.disconnect();
             canvas.removeEventListener('mousemove', handleCanvasMouseMove);
             yAxisCanvas.removeEventListener('mousemove', handleYAxisMouseMove);
             if (canvas?.parentNode) {
@@ -91,7 +117,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             }
             canvasRef.current = null;
         };
-    }, [chart, isChartReady]);
+    }, [chart, isChartReady, isPaneChanged]);
 
     useEffect(() => {
         if (!canvasRef.current || !chart || isDrag || !orderInputPriceValue)
