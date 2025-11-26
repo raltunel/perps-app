@@ -111,6 +111,32 @@ export default function CodeTabs(props: PropsIF) {
         console.log('isRefCodeClaimed: ', isRefCodeClaimed);
     }, [isRefCodeClaimed]);
 
+    const [isRefCodeSelfOwned, setIsRefCodeSelfOwned] = useState<
+        boolean | undefined
+    >(undefined);
+    //userInputRefCode
+
+    async function checkIfOwnRefCode(
+        rc: string,
+        address: string,
+    ): Promise<boolean | undefined> {
+        const options = {
+            method: 'GET',
+            headers: { accept: 'application/json' },
+        };
+
+        const ENDPOINT = `https://api.fuul.xyz/api/v1/affiliates/${address}?identifier_type=solana_address`;
+
+        try {
+            const response = await fetch(ENDPOINT, options);
+            const res = await response.json();
+            return res.code?.toLowerCase() === rc.toLowerCase();
+        } catch (err) {
+            console.error(err);
+            return undefined;
+        }
+    }
+
     const [_copiedData, copy] = useClipboard();
 
     const { formatNum } = useNumFormatter();
@@ -289,6 +315,23 @@ export default function CodeTabs(props: PropsIF) {
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
     >(undefined);
+    const [isUserInputRefCodeSelfOwned, setIsUserInputRefCodeSelfOwned] =
+        useState<boolean | undefined>(undefined);
+
+    useEffect(() => {
+        if (userInputRefCode && affiliateAddress) {
+            checkIfOwnRefCode(userInputRefCode, affiliateAddress.toString())
+                .then((isSelfOwned: boolean | undefined) =>
+                    setIsUserInputRefCodeSelfOwned(isSelfOwned),
+                )
+                .catch((err) => {
+                    setIsUserInputRefCodeSelfOwned(undefined);
+                    console.error(err);
+                });
+        } else {
+            setIsUserInputRefCodeSelfOwned(undefined);
+        }
+    }, [userInputRefCode, affiliateAddress]);
 
     useEffect(() => {
         if (userInputRefCode.length) {
@@ -419,6 +462,17 @@ export default function CodeTabs(props: PropsIF) {
                             />
                         </p>
                     )}
+                {isUserInputRefCodeSelfOwned && (
+                    <p>
+                        <Trans
+                            i18nKey='referrals.doNotSelfRefer'
+                            values={{ affiliateCode: userInputRefCode }}
+                            components={[
+                                <span style={{ color: 'var(--accent2)' }} />,
+                            ]}
+                        />
+                    </p>
+                )}
             </div>
             <div className={styles.refferal_code_buttons}>
                 <SimpleButton
@@ -426,7 +480,8 @@ export default function CodeTabs(props: PropsIF) {
                     disabled={
                         userInputRefCode.length < 2 ||
                         userInputRefCode.length > 30 ||
-                        !isUserRefCodeClaimed
+                        !isUserRefCodeClaimed ||
+                        isUserInputRefCodeSelfOwned
                     }
                     onClick={(): void => {
                         handleUpdateReferralCode(userInputRefCode);
@@ -534,7 +589,8 @@ export default function CodeTabs(props: PropsIF) {
                 };
 
                 fetch(
-                    'https://api.fuul.xyz/api/v1/referral_codes/emily04',
+                    'https://api.fuul.xyz/api/v1/referral_codes/' +
+                        temporaryAffiliateCode,
                     options,
                 )
                     .then((res) => res.json())

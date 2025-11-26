@@ -418,6 +418,7 @@
             "claim": "Connect your wallet to claim rewards",
             "enterCode": "Connect your wallet to enter a referral code"
         },
+        "doNotSelfRefer": "The code <0>{{affiliateCode}}</0> cannot be registered by the same address by which it was created. Please choose a different code.",
         "pleaseClickCreate": "Please click the 'Create Code' button to register in the affiliate system.",
         "toCustomizeAffiliateCode": "Affiliate codes default to the first six characters of your wallet address. Users with > $1M in trading volume can customize their affiliate code.",
         "claimRewardsWithAmount": "Claim {{amount}} in rewards",
