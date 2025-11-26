@@ -130,7 +130,7 @@ export default function CodeTabs(props: PropsIF) {
         try {
             const response = await fetch(ENDPOINT, options);
             const res = await response.json();
-            return res.code?.toLowerCase() === rc.toLowerCase();
+            return res.code === rc;
         } catch (err) {
             console.error(err);
             return undefined;
