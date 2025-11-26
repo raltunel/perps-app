@@ -6,7 +6,6 @@ import {
     getXandYLocationForChartDrag,
     getMainSeriesPaneIndex,
     scaleDataRef,
-    mousePositionRef,
 } from './overlayCanvasUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
@@ -19,6 +18,7 @@ const YAxisOverlayCanvas: React.FC = () => {
     const [mouseY, setMouseY] = useState(0);
     const [isPaneChanged, setIsPaneChanged] = useState(false);
     const isNearOrderPriceRef = useRef(false);
+    const isInitialSizeSetRef = useRef(false);
 
     const { symbolInfo } = useTradeDataStore();
 
@@ -39,6 +39,7 @@ const YAxisOverlayCanvas: React.FC = () => {
                     );
                 }
             }
+            isInitialSizeSetRef.current = false;
             setIsPaneChanged((prev) => !prev);
         }) as unknown as () => void;
 
@@ -87,25 +88,53 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         resizeObserver.observe(yAxisCanvas);
 
+        const ensureCanvasSize = () => {
+            if (!isInitialSizeSetRef.current) {
+                const yAxisRect = yAxisCanvas.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+
+                // Check if canvas position needs updating
+                if (
+                    yAxisRect.left !== canvasRect.left ||
+                    yAxisRect.top !== canvasRect.top
+                ) {
+                    canvas.style.left = '0';
+                    canvas.style.top = '0';
+                }
+
+                // Check if canvas size needs updating
+                const styleWidth = canvas.style.width;
+                const styleHeight = canvas.style.height;
+
+                if (
+                    styleWidth !== yAxisCanvas.style.width ||
+                    styleHeight !== yAxisCanvas.style.height
+                ) {
+                    canvas.style.width = yAxisCanvas.style.width;
+                    canvas.style.height = yAxisCanvas.style.height;
+                    yAxisCanvas.width = canvas.width;
+                    yAxisCanvas.height = canvas.height;
+                }
+
+                isInitialSizeSetRef.current = true;
+            }
+        };
+
         const handleCanvasMouseMove = (e: MouseEvent) => {
+            ensureCanvasSize();
+
             const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            const y = (e.clientY - rect.top) * dpr;
-            mousePositionRef.current = {
-                x: (e.clientX - rect.left) * dpr,
-                y: y,
-            };
+            const y = e.clientY - rect.top;
+
             setMouseY(y);
         };
 
         const handleYAxisMouseMove = (e: MouseEvent) => {
+            ensureCanvasSize();
+
             const rect = yAxisCanvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            const y = (e.clientY - rect.top) * dpr;
-            mousePositionRef.current = {
-                x: (e.clientX - rect.left) * dpr,
-                y: y,
-            };
+            const y = e.clientY - rect.top;
+
             setMouseY(y);
         };
 
@@ -120,10 +149,13 @@ const YAxisOverlayCanvas: React.FC = () => {
                 canvas.parentNode.removeChild(canvas);
             }
             canvasRef.current = null;
+            isInitialSizeSetRef.current = false;
         };
     }, [chart, isChartReady, isPaneChanged]);
 
     useEffect(() => {
+        const dpr = window.devicePixelRatio || 1;
+
         if (!canvasRef.current || !chart || isDrag || !orderInputPriceValue)
             return;
 
@@ -155,7 +187,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         }
 
         // Approximate label height in pixels
-        const labelHeight = 20;
+        const labelHeight = 20 * dpr;
 
         // Check if markPixel and orderPricePixel are too close to each other
         const pixelDistance = Math.abs(markPixel - orderPricePixel);
@@ -175,7 +207,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             }
         }
 
-        const tolerance = 10;
+        const tolerance = 10 * dpr;
         const isNearOrderPrice =
             Math.abs(mouseY - adjustedOrderPricePixel) <= tolerance;
 
