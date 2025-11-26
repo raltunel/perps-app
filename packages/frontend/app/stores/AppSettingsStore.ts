@@ -57,18 +57,6 @@ const DEFAULT_CHART_TOP_HEIGHT: number | null = null;
 const DEFAULT_WALLET_COLLAPSED = false;
 const DEFAULT_PORTFOLIO_PANEL_HEIGHT: number | null = null;
 
-const ssrSafeStorage = () =>
-    (typeof window !== 'undefined'
-        ? window.localStorage
-        : {
-              getItem: (_key: string) => null,
-              setItem: (_key: string, _value: string) => {},
-              removeItem: (_key: string) => {},
-              clear: () => {},
-              key: (_index: number) => null,
-              length: 0,
-          }) as Storage;
-
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
         (set, get) => ({
@@ -100,7 +88,7 @@ export const useAppSettings = create<AppSettingsStore>()(
 
         {
             name: LS_KEY,
-            storage: createJSONStorage(ssrSafeStorage),
+            storage: createJSONStorage(() => localStorage),
             version: 5,
             migrate: (persistedState: unknown, version: number) => {
                 const state = persistedState as AppSettingsStore;
