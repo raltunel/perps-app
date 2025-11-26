@@ -158,6 +158,7 @@ export function getMainSeriesPaneIndex(
 export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     iframeDoc: Document | null;
     paneCanvas: HTMLCanvasElement | null;
+    yAxisCanvas: HTMLCanvasElement | null;
 } {
     const chartDiv = document.getElementById('tv_chart');
     const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
@@ -165,20 +166,29 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
         iframe?.contentDocument || iframe?.contentWindow?.document;
 
     if (!iframeDoc) {
-        return { iframeDoc: null, paneCanvas: null };
+        return { iframeDoc: null, paneCanvas: null, yAxisCanvas: null };
     }
 
     const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
         'canvas[data-name="pane-canvas"]',
     );
 
+    const priceAxisDivs =
+        iframeDoc.querySelectorAll<HTMLDivElement>('div.price-axis');
+
+    const yAxisCanvas =
+        priceAxisDivs.length > 0
+            ? priceAxisDivs[0].querySelectorAll<HTMLCanvasElement>('canvas')[1]
+            : null;
+
     const paneIndex = getMainSeriesPaneIndex(chart);
     if (paneIndex === null || paneIndex === undefined) {
-        return { iframeDoc, paneCanvas: null };
+        return { iframeDoc, paneCanvas: null, yAxisCanvas: null };
     }
 
     return {
         iframeDoc,
         paneCanvas: paneCanvases[paneIndex] ?? null,
+        yAxisCanvas: yAxisCanvas ?? null,
     };
 }
