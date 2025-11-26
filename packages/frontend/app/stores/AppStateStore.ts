@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type AppStateStore = {
     wsReconnecting: boolean;
@@ -19,25 +20,38 @@ type AppStateStore = {
     setIsTabActive: (isTabActive: boolean) => void;
 };
 
-export const useAppStateStore = create<AppStateStore>((set) => ({
-    wsReconnecting: false,
-    setWsReconnecting: (wsReconnecting: boolean) => set({ wsReconnecting }),
-    internetConnected: true,
-    setInternetConnected: (internetConnected: boolean) =>
-        set({ internetConnected }),
-    titleOverride: '',
-    setTitleOverride: (titleOverride: string) => set({ titleOverride }),
-    isWsStashed: false,
-    setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
-    isTabActiveDelayed: true,
-    setIsTabActiveDelayed: (isTabActiveDelayed: boolean) =>
-        set({ isTabActiveDelayed }),
-    debugToolbarOpen: false,
-    setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
-        set({ debugToolbarOpen }),
-    liquidationsActive: true,
-    setLiquidationsActive: (liquidationsActive: boolean) =>
-        set({ liquidationsActive }),
-    isTabActive: true,
-    setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
-}));
+export const useAppStateStore = create<AppStateStore>()(
+    persist(
+        (set) => ({
+            wsReconnecting: false,
+            setWsReconnecting: (wsReconnecting: boolean) =>
+                set({ wsReconnecting }),
+            internetConnected: true,
+            setInternetConnected: (internetConnected: boolean) =>
+                set({ internetConnected }),
+            titleOverride: '',
+            setTitleOverride: (titleOverride: string) => set({ titleOverride }),
+            isWsStashed: false,
+            setIsWsStashed: (isWsStashed: boolean) => set({ isWsStashed }),
+            isTabActiveDelayed: true,
+            setIsTabActiveDelayed: (isTabActiveDelayed: boolean) =>
+                set({ isTabActiveDelayed }),
+            debugToolbarOpen: true,
+            setDebugToolbarOpen: (debugToolbarOpen: boolean) =>
+                set({ debugToolbarOpen }),
+            liquidationsActive: true,
+            setLiquidationsActive: (liquidationsActive: boolean) =>
+                set({ liquidationsActive }),
+            isTabActive: true,
+            setIsTabActive: (isTabActive: boolean) => set({ isTabActive }),
+        }),
+        {
+            name: 'APP_STATE',
+            storage: createJSONStorage(() => localStorage),
+            version: 1,
+            partialize: (state: AppStateStore) => ({
+                debugToolbarOpen: state.debugToolbarOpen,
+            }),
+        },
+    ),
+);
