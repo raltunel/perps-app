@@ -20,6 +20,10 @@ const YAxisOverlayCanvas: React.FC = () => {
     const [isPaneChanged, setIsPaneChanged] = useState(false);
     const isNearOrderPriceRef = useRef(false);
 
+    const { symbolInfo } = useTradeDataStore();
+
+    const markPx = symbolInfo?.markPx || 1;
+
     useEffect(() => {
         if (!chart) return;
 
@@ -141,15 +145,39 @@ const YAxisOverlayCanvas: React.FC = () => {
         const isLogarithmic = priceScale.getMode() === 1;
         let orderPricePixel: number;
 
+        let markPixel: number;
         if (isLogarithmic) {
             orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue);
+            markPixel = scaleData.scaleSymlog(markPx);
         } else {
             orderPricePixel = scaleData.yScale(orderInputPriceValue);
+            markPixel = scaleData.yScale(markPx);
+        }
+
+        // Approximate label height in pixels
+        const labelHeight = 20;
+
+        // Check if markPixel and orderPricePixel are too close to each other
+        const pixelDistance = Math.abs(markPixel - orderPricePixel);
+        const areLabelsClose = pixelDistance <= labelHeight;
+
+        // Adjust orderPricePixel for drag detection if labels are close
+        // If order price is below mark price, shift down by label height
+        // If order price is above mark price, shift up by label height
+        let adjustedOrderPricePixel = orderPricePixel;
+        if (areLabelsClose) {
+            if (orderPricePixel > markPixel) {
+                // Order price is below mark price (higher pixel value = lower on screen)
+                adjustedOrderPricePixel = orderPricePixel + labelHeight;
+            } else {
+                // Order price is above mark price (lower pixel value = higher on screen)
+                adjustedOrderPricePixel = orderPricePixel - labelHeight;
+            }
         }
 
         const tolerance = 10;
         const isNearOrderPrice =
-            Math.abs(mouseY - orderPricePixel) <= tolerance;
+            Math.abs(mouseY - adjustedOrderPricePixel) <= tolerance;
 
         isNearOrderPriceRef.current = isNearOrderPrice;
 
@@ -160,7 +188,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             canvas.style.cursor = 'default';
             canvas.style.pointerEvents = 'none';
         }
-    }, [mouseY, orderInputPriceValue, chart, isDrag]);
+    }, [mouseY, orderInputPriceValue, chart, isDrag, markPx]);
 
     useEffect(() => {
         if (!canvasRef.current) return;
