@@ -81,6 +81,36 @@ export default function CodeTabs(props: PropsIF) {
     const [editModeAffiliate, setEditModeAffiliate] = useState<boolean>(false);
     const [justCopied, setJustCopied] = useState<boolean>(false);
 
+    // ref code to use in the DOM (being referred by someone else)
+    const [refCodeToConsume, setRefCodeToConsume] = useState<
+        string | undefined
+    >(referralStore.cached || undefined);
+    // if a value appears in the cache while state is empty, consume it
+    useEffect(() => {
+        refCodeToConsume ?? setRefCodeToConsume(referralStore.cached);
+    }, [referralStore.cached]);
+
+    const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
+        boolean | undefined
+    >(undefined);
+    useEffect(() => {
+        if (refCodeToConsume === undefined || !refCodeToConsume.length) {
+            setIsRefCodeClaimed(undefined);
+        } else {
+            console.log('refCodeToConsume: ', refCodeToConsume);
+            isAffiliateCodeFree(refCodeToConsume)
+                .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
+                .catch((err) => {
+                    setIsRefCodeClaimed(undefined);
+                    console.error(err);
+                });
+        }
+    }, [refCodeToConsume]);
+
+    useEffect(() => {
+        console.log('isRefCodeClaimed: ', isRefCodeClaimed);
+    }, [isRefCodeClaimed]);
+
     const [_copiedData, copy] = useClipboard();
 
     const { formatNum } = useNumFormatter();
@@ -140,32 +170,34 @@ export default function CodeTabs(props: PropsIF) {
 
     const handleReferralURLParam = useUrlParams(URL_PARAMS.referralCode);
 
+    const [refCodeUserInput, setRefCodeUserInput] = useState<string>('');
+
     // this holds an improperly formatted ref code to provide user feedback
     const [invalidCode, setInvalidCode] = useState<string>('');
     // fn to update a referral code and trigger FUUL confirmation workflow
     async function handleUpdateReferralCode(r: string): Promise<void> {
-        // Don't make API calls with empty or whitespace-only codes
+        // don't make API calls with empty or whitespace-only codes
         if (!r || !r.trim()) {
             return;
         }
 
         // check FUUL API to see if code is claimed or free
-        const codeIsFree: boolean = await isAffiliateCodeFree(r);
+        const isCodeFree: boolean = await isAffiliateCodeFree(r);
 
-        // Always cache the code and set URL param
+        // always cache the code and set URL param
         handleReferralURLParam.set(r);
         referralStore.cache(r);
 
         // if code is unclaimed, show in edit mode with error
-        if (!codeIsFree) {
+        if (!isCodeFree) {
             setInvalidCode(r);
-            setIsCachedValueValid(false);
+            // setIsCachedValueValid(false);
             setEditModeReferral(true);
             setUserInputRefCode(r);
         } else {
             // code is valid and claimed
             invalidCode && setInvalidCode('');
-            setIsCachedValueValid(true);
+            // setIsCachedValueValid(true);
             setEditModeReferral(false);
         }
     }
@@ -221,44 +253,10 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
-    // useEffect(() => {
-    //     if (!affiliateAddress) {
-    //         return;
-    //     }
-
-    //     (async () => {
-    //         setIsFetchingVolume(true);
-
-    //         try {
-    //             const EMBER_EDNPOINT_ALL =
-    //                 'https://ember-leaderboard.liquidity.tools/leaderboard';
-    //             const emberEndpointForUser =
-    //                 EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
-
-    //             const response = await fetch(emberEndpointForUser);
-
-    //             const data = await response.json();
-    //             console.log('Full Ember API response:', data);
-    //             if (data.error) {
-    //                 referralStore.setTotVolume(0);
-    //             } else if (data.leaderboard && data.leaderboard.length > 0) {
-    //                 const volume = data.leaderboard[0].volume;
-    //                 referralStore.setTotVolume(volume);
-    //             }
-    //         } catch (error) {
-    //             referralStore.setTotVolume(NaN);
-    //         } finally {
-    //             setIsFetchingVolume(false);
-    //         }
-    //     })();
-    // }, [affiliateAddress]);
-
-    // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
-
-    const [userInputRefCode, setUserInputRefCode] = useState<string>('');
-    const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
-        boolean | undefined
-    >(undefined);
+    // const [userInputRefCode, setUserInputRefCode] = useState<string>('');
+    // const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
+    //     boolean | undefined
+    // >(undefined);
 
     useEffect(() => {
         if (userInputRefCode.length) {
@@ -277,49 +275,44 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [userInputRefCode]);
 
-    const [isCachedValueValid, setIsCachedValueValid] = useState<
-        boolean | undefined
-    >(undefined);
+    // const [isCachedValueValid, setIsCachedValueValid] = useState<
+    //     boolean | undefined
+    // >(undefined);
 
-    // Validate cached referral code when it changes (e.g., from URL)
-    useEffect(() => {
-        // Don't validate if there's no cached code
-        if (!referralStore.cached) {
-            setIsCachedValueValid(undefined);
-            return;
-        }
+    // // Validate cached referral code when it changes (e.g., from URL)
+    // useEffect(() => {
+    //     // Don't validate if there's no cached code
+    //     if (refCodeToConsume) {
+    //         // setIsCachedValueValid(undefined);
+    //         return;
+    //     }
 
-        // Don't re-validate if we already have a validation result for this code
-        if (isCachedValueValid !== undefined) {
-            return;
-        }
+    //     // // Don't re-validate if we already have a validation result for this code
+    //     // if (isCachedValueValid !== undefined) {
+    //     //     return;
+    //     // }
 
-        (async () => {
-            try {
-                const isCachedCodeFree: boolean = await isAffiliateCodeFree(
-                    referralStore.cached,
-                );
-                console.log('isCodeFree: ', isCachedCodeFree);
-
-                if (isCachedCodeFree) {
-                    // Code is not claimed - show in edit mode with error
-                    setInvalidCode(referralStore.cached);
-                    setIsCachedValueValid(false);
-                    setEditModeReferral(true);
-                    setUserInputRefCode(referralStore.cached);
-                } else {
-                    // Code is valid and claimed
-                    setIsCachedValueValid(true);
-                    setEditModeReferral(false);
-                }
-            } catch (error) {
-                // On error, assume invalid to be safe
-                setIsCachedValueValid(false);
-                setEditModeReferral(true);
-                setUserInputRefCode(referralStore.cached);
-            }
-        })();
-    }, [referralStore.cached, isCachedValueValid]);
+    //     (async () => {
+    //         try {
+    //             if (isRefCodeClaimed) {
+    //                 // Code is not claimed - show in edit mode with error
+    //                 setInvalidCode(referralStore.cached);
+    //                 // setIsCachedValueValid(false);
+    //                 setEditModeReferral(true);
+    //                 setUserInputRefCode(referralStore.cached);
+    //             } else {
+    //                 // Code is valid and claimed
+    //                 // setIsCachedValueValid(true);
+    //                 setEditModeReferral(false);
+    //             }
+    //         } catch (error) {
+    //             // On error, assume invalid to be safe
+    //             // setIsCachedValueValid(false);
+    //             setEditModeReferral(true);
+    //             setUserInputRefCode(referralStore.cached);
+    //         }
+    //     })();
+    // }, [referralStore.cached, isCachedValueValid]);
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
@@ -327,8 +320,8 @@ export default function CodeTabs(props: PropsIF) {
                 {referralStore.cached ? (
                     <>
                         <h6>{t('referrals.usingAffiliateCode')}</h6>
-                        {isCachedValueValid && <p>{referralStore.cached}</p>}
-                        {isCachedValueValid === false && (
+                        {refCodeToConsume && <p>{refCodeToConsume}</p>}
+                        {isRefCodeClaimed === false && (
                             <p>
                                 This code does not appear to be registered in
                                 the referral system.
@@ -372,11 +365,12 @@ export default function CodeTabs(props: PropsIF) {
                 <input
                     type='text'
                     value={userInputRefCode}
-                    onChange={(e) => setUserInputRefCode(e.target.value)}
+                    onChange={(e) => setRefCodeUserInput(e.target.value)}
                 />
-                {!isUserRefCodeClaimed &&
-                    userInputRefCode.length <= 30 &&
-                    userInputRefCode.length >= 2 && (
+                {isRefCodeClaimed === true &&
+                    refCodeToConsume &&
+                    refCodeToConsume.length <= 30 &&
+                    refCodeToConsume.length >= 2 && (
                         <p>
                             <Trans
                                 i18nKey='referrals.referralCodeNotValidPleaseConfirm'
@@ -404,7 +398,7 @@ export default function CodeTabs(props: PropsIF) {
                 >
                     {t('common.confirm')}
                 </SimpleButton>
-                {referralStore.cached && isCachedValueValid && (
+                {referralStore.cached && (
                     <SimpleButton
                         bg='dark3'
                         hoverBg='accent1'
@@ -1049,7 +1043,7 @@ export default function CodeTabs(props: PropsIF) {
                 }
                 const shouldShowInput =
                     (editModeReferral ||
-                        !referralStore.cached ||
+                        !refCodeToConsume ||
                         isCachedValueValid === false) &&
                     referralStore.totVolume !== undefined &&
                     referralStore.totVolume < 10000;
