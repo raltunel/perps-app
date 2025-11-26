@@ -413,7 +413,7 @@ export default function CodeTabs(props: PropsIF) {
                                 values={{ invalidCode: userInputRefCode }}
                                 components={[
                                     <span
-                                        style={{ color: 'var(--accent3)' }}
+                                        style={{ color: 'var(--accent2)' }}
                                     />,
                                 ]}
                             />
@@ -897,12 +897,20 @@ export default function CodeTabs(props: PropsIF) {
                     ) : (
                         <>
                             <h6>
-                                {t('referrals.yourCodeIs', {
-                                    affiliateCode:
-                                        affiliateCode ||
-                                        defaultAffiliateCode ||
-                                        '—',
-                                })}
+                                <Trans
+                                    i18nKey='referrals.yourCodeIs'
+                                    values={{
+                                        affiliateCode:
+                                            affiliateCode ||
+                                            defaultAffiliateCode ||
+                                            '—',
+                                    }}
+                                    components={[
+                                        <span
+                                            style={{ color: 'var(--accent3)' }}
+                                        />,
+                                    ]}
+                                />
                             </h6>
                             <p>{t('referrals.pleaseClickCreate')}</p>
                             <p>{t('referrals.toCustomizeAffiliateCode')}</p>
