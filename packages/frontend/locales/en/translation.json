@@ -409,7 +409,7 @@
         "overwriteCurrentReferralCode": "Overwrite current referral code",
         "enterReferralCode": "Enter a referral code",
         "referralCodeNotValidPleaseConfirm": "The code <0>{{invalidCode}}</0> is not claimed in the referral program. Please confirm the code is correct.",
-        "yourCodeIs": "Your code is {{affiliateCode}}",
+        "yourCodeIs": "Your code is <0>{{affiliateCode}}</0>",
         "createAnAffiliateCode": "Create an affiliate code",
         "createAUniqueCodeToEarn": "Create a unique code to earn 10% of referred users' fees.",
         "codeAlreadyInUse": "Code Already In Use",

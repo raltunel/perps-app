@@ -720,7 +720,15 @@ export default function CodeTabs(props: PropsIF) {
         affiliateCode && !editModeAffiliate ? (
             <section className={styles.sectionWithButton}>
                 <div className={styles.createCodeContent}>
-                    <p>{t('referrals.yourCodeIs', { affiliateCode })}</p>
+                    <p>
+                        <Trans
+                            i18nKey='referrals.yourCodeIs'
+                            values={{ affiliateCode }}
+                            components={[
+                                <span style={{ color: 'var(--accent3)' }} />,
+                            ]}
+                        />
+                    </p>
                     <div
                         className={styles.with_copy_clipboard}
                         style={{
@@ -773,20 +781,26 @@ export default function CodeTabs(props: PropsIF) {
                                 )}
                             </p>
                         </div>
-                        <div className={styles.volume_progress_bar_body}>
-                            {!!referralStore.totVolume && (
+                        {referralStore.totVolume &&
+                            referralStore.totVolume <
+                                AFFILIATE_EDIT_VOLUME_THRESHOLD && (
                                 <div
-                                    style={{
-                                        width: `${Math.min(
-                                            100,
-                                            (referralStore.totVolume /
-                                                1_000_000) *
-                                                100,
-                                        )}%`,
-                                    }}
-                                />
+                                    className={styles.volume_progress_bar_body}
+                                >
+                                    {!!referralStore.totVolume && (
+                                        <div
+                                            style={{
+                                                width: `${Math.min(
+                                                    100,
+                                                    (referralStore.totVolume /
+                                                        AFFILIATE_EDIT_VOLUME_THRESHOLD) *
+                                                        100,
+                                                )}%`,
+                                            }}
+                                        />
+                                    )}
+                                </div>
                             )}
-                        </div>
                     </div>
                     <p className={styles.trackingLinkExplanation}>
                         {t('common.seeDocsForMore')}
