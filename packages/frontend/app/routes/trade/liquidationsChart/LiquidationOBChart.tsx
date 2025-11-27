@@ -1226,7 +1226,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px * dpr)
+            .crossValue((d: OrderBookRowIF) => d.px / dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1242,7 +1242,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px * dpr)
+            .crossValue((d: OrderBookRowIF) => d.px / dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1255,7 +1255,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .mainValue((d: LineData) => d.x)
-            .crossValue((d: LineData) => d.y * dpr)
+            .crossValue((d: LineData) => d.y / dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
