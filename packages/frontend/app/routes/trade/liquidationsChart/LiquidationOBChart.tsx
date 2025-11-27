@@ -1201,6 +1201,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         if (!d3 || !d3fc) return;
         if (location === 'liqMobile' && !chartReady) return;
 
+        const dpr = window.devicePixelRatio || 1;
+
         const curve = d3.curveLinear;
 
         if (
@@ -1224,7 +1226,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.fillStyle = d3buyRgbaColor?.toString() || '4cd471';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .crossValue((d: OrderBookRowIF) => d.px * dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1240,7 +1242,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.fillStyle = d3sellRgbaColor?.toString() || '#ff5c5c';
             })
             .mainValue((d: OrderBookRowIF) => d.ratio)
-            .crossValue((d: OrderBookRowIF) => d.px)
+            .crossValue((d: OrderBookRowIF) => d.px * dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1253,7 +1255,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .mainValue((d: LineData) => d.x)
-            .crossValue((d: LineData) => d.y)
+            .crossValue((d: LineData) => d.y * dpr)
             .xScale(xScaleRef.current)
             .yScale(
                 scaleDataRef.current
@@ -1285,10 +1287,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         d3.select(d3CanvasLiqHover.current)
             .on('draw', () => {
-                console.log(
-                    '>>> hoverLineDataRef.current.length',
-                    hoverLineDataRef.current.length,
-                );
                 if (hoverLineDataRef.current.length === 0) return;
 
                 if (highlightHoveredArea.current) {
@@ -1340,7 +1338,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             if (relativeMouseX < 0 || relativeMouseY < 0) {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
-                console.log('>>> hoverlinedataref RESET 2');
                 liqTooltipRef.current.style('visibility', 'hidden');
                 setActiveTooltipType(LiqChartTooltipType.Level);
                 return;
