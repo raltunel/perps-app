@@ -1,7 +1,7 @@
 {
     "$schema": "https://json.schemastore.org/package.json",
     "name": "@perps-app/frontend",
-    "version": "0.3.9-Nov-13",
+    "version": "0.3.11-Nov-25",
     "private": true,
     "type": "module",
     "scripts": {
@@ -25,9 +25,9 @@
     },
     "dependencies": {
         "@crocswap-libs/ambient-ember": "^0.1.59",
-        "@fogo/sessions-idls": "^0.0.9",
-        "@fogo/sessions-sdk": "^0.0.21",
-        "@fogo/sessions-sdk-react": "^0.1.1",
+        "@fogo/sessions-idls": "^0.0.10",
+        "@fogo/sessions-sdk": "^0.0.24",
+        "@fogo/sessions-sdk-react": "^0.1.4",
         "@fuul/sdk": "^7.3.0",
         "@perps-app/sdk": "workspace:*",
         "@pythnetwork/hermes-client": "^2.1.0",
