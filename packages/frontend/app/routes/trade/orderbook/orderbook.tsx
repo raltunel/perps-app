@@ -214,6 +214,26 @@ const OrderBook: React.FC<OrderBookProps> = ({
         [],
     );
 
+    const findClosestByFlooring = useCallback(
+        (orderPriceRounded: number, slots: number[]) => {
+            if (!filledResolution.current) return null;
+            const resolutionValue = filledResolution.current.val;
+
+            const floored =
+                orderPriceRounded - (orderPriceRounded % resolutionValue);
+
+            let closestSlot = null;
+            for (const slot of slots) {
+                if (slot === floored) {
+                    closestSlot = slot;
+                    break;
+                }
+            }
+            return closestSlot;
+        },
+        [],
+    );
+
     useEffect(() => {
         if (userOrdersRef.current.length === 0) {
             userOrdersRef.current = userOrders;
@@ -315,7 +335,6 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
         let side;
         let targetSlots;
-        const gapTreshold = filledResolution.current.val / 2;
 
         if (orderInputPriceValue < midPriceRef.current) {
             side = 'buy';
@@ -325,19 +344,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
             targetSlots = sells.map((sell) => sell.px);
         }
 
-        let closestSlot = findClosestSlot(
+        let closestSlot = findClosestByFlooring(
             orderInputPriceValue,
             targetSlots,
-            gapTreshold,
         );
-
-        if (!closestSlot) {
-            closestSlot = findClosestSlot(
-                orderInputPriceValue,
-                targetSlots,
-                gapTreshold * 2,
-            );
-        }
 
         if (closestSlot) {
             setFocusedSlot({
