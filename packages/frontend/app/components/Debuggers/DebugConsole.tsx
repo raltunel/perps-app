@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './DebugConsole.module.css';
+import { useIsClient } from '~/hooks/useIsClient';
 
 type LogEntry = {
     id: number;
@@ -10,6 +11,7 @@ export default function DebugConsole() {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const filterRef = useRef<string>('>>>');
     const idRef = useRef(0);
+    const isClient = useIsClient();
 
     const logsRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,8 @@ export default function DebugConsole() {
     }, []);
 
     useEffect(() => {
+        if (!isClient) return;
+
         const original = window.console.log;
 
         window.console.log = (...args: unknown[]) => {
@@ -67,7 +71,7 @@ export default function DebugConsole() {
         return () => {
             window.console.log = original;
         };
-    }, []);
+    }, [isClient]);
 
     const renderArg = (arg: unknown, index: number) => {
         if (arg === null || arg === undefined)
