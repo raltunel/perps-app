@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import LineChart from '~/components/LineChart/LineChart';
 import { useInfoApi } from '~/hooks/useInfoApi';
 import { useUserDataStore } from '~/stores/UserDataStore';
@@ -40,6 +40,12 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         setUserProfileLineData,
         panelHeight,
     } = props;
+
+    const panelHeightRef = useRef(panelHeight);
+
+    useEffect(() => {
+        panelHeightRef.current = panelHeight;
+    }, [panelHeight]);
 
     const { userAddress } = useUserDataStore();
 
@@ -201,8 +207,8 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         calculatePanelHeight();
     }, [panelHeight]);
 
-    const calculatePanelHeight = () => {
-        if (panelHeight === undefined) return;
+    const calculatePanelHeight = useCallback(() => {
+        if (panelHeightRef.current === undefined) return;
 
         const header = document.getElementById('portfolio-header-container');
 
@@ -227,7 +233,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
             : 25;
 
         const calculatedChartHeight =
-            panelHeight - headerHeight - performanceTabsHeight - 10;
+            panelHeightRef.current - headerHeight - performanceTabsHeight - 10;
 
         if (
             window.innerWidth < 1280 + 50 &&
@@ -250,7 +256,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
 
         setChartHeight(calculatedChartHeight);
         setIsChartReady(true);
-    };
+    }, []);
 
     return (
         <div
