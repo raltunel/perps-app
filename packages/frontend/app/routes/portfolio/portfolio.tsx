@@ -300,7 +300,11 @@ function Portfolio() {
                         </button>
                     </div>
 
-                    <section className={styles.mainContent} ref={mainRef}>
+                    <section
+                        id={'portfolioTablesMainContent'}
+                        className={styles.mainContent}
+                        ref={mainRef}
+                    >
                         {/* Desktop: Resizable split view */}
                         <div className={styles.desktopView}>
                             <Resizable

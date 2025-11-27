@@ -190,13 +190,37 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
     // }, []);
 
     useEffect(() => {
+        window.addEventListener('resize', calculatePanelHeight);
+
+        return () => {
+            window.removeEventListener('resize', calculatePanelHeight);
+        };
+    }, []);
+
+    useEffect(() => {
+        calculatePanelHeight();
+    }, [panelHeight]);
+
+    const calculatePanelHeight = () => {
         if (panelHeight === undefined) return;
 
         const header = document.getElementById('portfolio-header-container');
+
         const performanceTabs = document.getElementById('performanceTabs');
 
+        const metricsContainer = document.getElementById('metricsContainer');
+
         const headerHeight = header ? header.clientHeight : 30;
+
         const headerWidth = header ? header.clientWidth : 0;
+
+        const metricsContainerWidth = metricsContainer
+            ? metricsContainer.clientWidth
+            : 0;
+
+        const performanceTabsWidth = performanceTabs
+            ? performanceTabs.clientWidth
+            : 0;
 
         const performanceTabsHeight = performanceTabs
             ? performanceTabs.clientHeight
@@ -205,11 +229,28 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         const calculatedChartHeight =
             panelHeight - headerHeight - performanceTabsHeight - 10;
 
-        setChartWidth(Math.max(headerWidth, 250));
+        if (
+            window.innerWidth < 1280 + 50 &&
+            performanceTabsWidth + 50 > window.innerWidth
+        ) {
+            setChartWidth(
+                Math.min(
+                    950,
+                    Math.max(
+                        window.innerWidth - metricsContainerWidth - 50,
+                        250,
+                    ),
+                ),
+            );
+        } else if (window.innerWidth <= 768) {
+            setChartWidth(Math.max(window.innerWidth, 250));
+        } else {
+            setChartWidth(Math.min(950, Math.max(headerWidth, 250)));
+        }
 
         setChartHeight(calculatedChartHeight);
         setIsChartReady(true);
-    }, [panelHeight]);
+    };
 
     return (
         <div

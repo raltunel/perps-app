@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import styles from './LineChart.module.css';
 
@@ -55,13 +55,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         number | undefined
     >(undefined);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [lineSeries, setLineSeries] = useState<any>();
+
     const { numFormat } = useAppSettings();
 
     // Find Y axis ticks
     useEffect(() => {
         if (lineData) {
-            const minPrice = d3.min(lineData, (d) => d.value);
-            const maxPrice = d3.max(lineData, (d) => d.value);
+            const minPrice = d3.min(lineData, (d: any) => d.value);
+            const maxPrice = d3.max(lineData, (d: any) => d.value);
 
             if (minPrice !== undefined && maxPrice !== undefined) {
                 const tickCount = chartHeight - xAxisHeight > 150 ? 5 : 2;
@@ -121,8 +124,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
         const dpr = window.devicePixelRatio || 1;
 
-        const minDate = d3.min(lineData, (d) => d.time);
-        const maxDate = d3.max(lineData, (d) => d.time);
+        const minDate = d3.min(lineData, (d: any) => d.time);
+        const maxDate = d3.max(lineData, (d: any) => d.time);
 
         // Scales
         if (minDate && maxDate && lineData) {
@@ -143,8 +146,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             scaleDataRef.current.svgXScale = svgXScale;
         }
 
-        const minPrice = d3.min(lineData, (d) => d.value);
-        const maxPrice = d3.max(lineData, (d) => d.value);
+        const minPrice = d3.min(lineData, (d: any) => d.value);
+        const maxPrice = d3.max(lineData, (d: any) => d.value);
 
         if (minPrice !== undefined && maxPrice !== undefined) {
             const diff = maxPrice - minPrice;
@@ -305,6 +308,28 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     ]);
 
     useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const context = canvas.getContext('2d');
+        if (!context) return;
+
+        const xScale = scaleDataRef.current.xScale;
+        const yScale = scaleDataRef.current.yScale;
+
+        if (!xScale || !yScale) return;
+
+        const lineSeries = d3
+            .line<{ time: number; value: number }>()
+            .x((d: any) => xScale(new Date(d.time)))
+            .y((d: any) => yScale(d.value))
+            .curve(curve === 'step' ? d3.curveStep : d3.curveBasis)
+            .context(context);
+
+        setLineSeries(() => lineSeries);
+    }, [curve, canvasInitialHeight, canvasInitialWidth]);
+
+    useEffect(() => {
         if (
             scaleDataRef.current &&
             lineData &&
@@ -314,7 +339,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const xScale = scaleDataRef.current.xScale;
             const yScale = scaleDataRef.current.yScale;
 
-            if (!xScale || !yScale) return;
+            if (!xScale || !yScale || !lineSeries) return;
 
             const canvas = canvasRef.current;
             if (!canvas) return;
@@ -328,16 +353,12 @@ const LineChart: React.FC<LineChartProps> = (props) => {
 
             const dpr = window.devicePixelRatio || 1;
 
+            canvas.width = (width - yAxisPadding) * dpr;
+            canvas.height = (height - xAxisHeight) * dpr;
+
+            context.scale(dpr, dpr);
+
             context.clearRect(0, 0, width * dpr, (height - xAxisHeight) * dpr);
-
-            console.log(xScale.range(), yScale.range());
-
-            const lineSeries = d3
-                .line<{ time: number; value: number }>()
-                .x((d) => xScale(new Date(d.time)))
-                .y((d) => yScale(d.value))
-                .curve(curve === 'step' ? d3.curveStep : d3.curveBasis)
-                .context(context);
 
             context.beginPath();
             lineSeries(lineData);
@@ -354,7 +375,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             context.lineWidth = 2 * dpr;
             context.stroke();
         }
-    }, [lineData, canvasInitialHeight, canvasInitialWidth]);
+    }, [lineSeries, lineData, chartHeight, chartWidth]);
 
     return (
         <div style={{ height: '100%' }}>

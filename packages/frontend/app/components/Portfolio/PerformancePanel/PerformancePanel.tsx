@@ -75,7 +75,7 @@ export default function PerformancePanel({
     ];
 
     const MetricsDisplay = React.memo(() => (
-        <div className={styles.metricsContainer}>
+        <div id={'metricsContainer'} className={styles.metricsContainer}>
             {PERFORMANCE_METRICS.map((metric) => (
                 <div className={styles.metricRow} key={metric.label}>
                     <span>{metric.label}</span>
