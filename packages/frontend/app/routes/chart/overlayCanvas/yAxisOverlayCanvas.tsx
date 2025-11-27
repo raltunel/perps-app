@@ -217,7 +217,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             }
         }
 
-        const tolerance = 10 * dpr;
+        const tolerance = 10;
         const isNearOrderPrice =
             Math.abs(mouseY - adjustedOrderPricePixel) <= tolerance;
 
