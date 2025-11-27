@@ -9,20 +9,17 @@ import {
 } from './overlayCanvasUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
+import { getLastCandleClosePrice } from '../data/candleDataCache';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { chart, isChartReady } = useTradingView();
-    const { orderInputPriceValue } = useTradeDataStore();
+    const { orderInputPriceValue, symbol } = useTradeDataStore();
     const [isDrag, setIsDrag] = useState(false);
     const [mouseY, setMouseY] = useState(0);
     const [isPaneChanged, setIsPaneChanged] = useState(false);
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
-
-    const { symbolInfo } = useTradeDataStore();
-
-    const markPx = symbolInfo?.markPx || 1;
 
     useEffect(() => {
         if (!chart) return;
@@ -185,32 +182,37 @@ const YAxisOverlayCanvas: React.FC = () => {
         const isLogarithmic = priceScale.getMode() === 1;
         let orderPricePixel: number;
 
-        let markPixel: number;
+        // Get last candle close price from cache
+        const resolution = chart.activeChart().resolution();
+        const lastCandleClose = getLastCandleClosePrice(symbol, resolution);
+        const closePrice = lastCandleClose || 1;
+
+        let closePricePixel: number;
         if (isLogarithmic) {
             orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue);
-            markPixel = scaleData.scaleSymlog(markPx);
+            closePricePixel = scaleData.scaleSymlog(closePrice);
         } else {
             orderPricePixel = scaleData.yScale(orderInputPriceValue);
-            markPixel = scaleData.yScale(markPx);
+            closePricePixel = scaleData.yScale(closePrice);
         }
 
         // Approximate label height in pixels
-        const labelHeight = 20 * dpr;
+        const labelHeight = 15 * dpr;
 
-        // Check if markPixel and orderPricePixel are too close to each other
-        const pixelDistance = Math.abs(markPixel - orderPricePixel);
+        // Check if closePricePixel and orderPricePixel are too close to each other
+        const pixelDistance = Math.abs(closePricePixel - orderPricePixel);
         const areLabelsClose = pixelDistance <= labelHeight;
 
         // Adjust orderPricePixel for drag detection if labels are close
-        // If order price is below mark price, shift down by label height
-        // If order price is above mark price, shift up by label height
+        // If order price is below close price, shift down by label height
+        // If order price is above close price, shift up by label height
         let adjustedOrderPricePixel = orderPricePixel;
         if (areLabelsClose) {
-            if (orderPricePixel > markPixel) {
-                // Order price is below mark price (higher pixel value = lower on screen)
+            if (orderPricePixel > closePricePixel) {
+                // Order price is below close price (higher pixel value = lower on screen)
                 adjustedOrderPricePixel = orderPricePixel + labelHeight;
             } else {
-                // Order price is above mark price (lower pixel value = higher on screen)
+                // Order price is above close price (lower pixel value = higher on screen)
                 adjustedOrderPricePixel = orderPricePixel - labelHeight;
             }
         }
@@ -230,7 +232,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             canvas.style.cursor = 'default';
             canvas.style.pointerEvents = 'none';
         }
-    }, [mouseY, orderInputPriceValue, chart, isDrag, markPx]);
+    }, [mouseY, orderInputPriceValue, chart, isDrag, symbol]);
 
     useEffect(() => {
         if (!canvasRef.current) return;
