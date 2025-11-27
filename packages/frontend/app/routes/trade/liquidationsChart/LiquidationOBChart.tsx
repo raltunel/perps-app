@@ -135,9 +135,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
-    const bottomBoundaryBuyRef = useRef(0);
-    const topBoundarySellRef = useRef(0);
-
     const mouseYRef = useRef(0);
 
     const getCenterY = useCallback(() => {
@@ -912,8 +909,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const centerY = getCenterY();
             const isBuy = centerY < offsetY;
 
-            console.log('>>>>>> offsetY', offsetY);
-
             // Calculate hover line data
             hoverLineDataRef.current = [
                 {
@@ -929,33 +924,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                     offsetY: offsetY,
                 },
             ];
-
             console.log(
-                '>>>>>>> hoverLineDataRef0',
-                hoverLineDataRef.current[0].y,
-            );
-            console.log(
-                '>>>>>>> hoverLineDataRef1',
-                hoverLineDataRef.current[1].y,
-            );
-
-            console.log(
-                '>>>>>>> currentBuyDataRef',
-                currentBuyDataRef.current[currentBuyDataRef.current.length - 1]
-                    .px,
-            );
-            console.log(
-                '>>>>>>> currentSellDataRef',
-                currentSellDataRef.current[
-                    currentSellDataRef.current.length - 1
-                ].px,
+                '>>> hoverLineDataRef',
+                hoverLineDataRef.current.length,
             );
 
             // Fill and place tooltip
             if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
 
             const mousePoint = pageYScaleRef.current.invert(offsetY * dpr);
-            console.log('>>>>>>> mousePoint', mousePoint);
 
             const midHeader = document.getElementById('orderBookMidHeader');
             const midHeaderHeight =
@@ -987,8 +964,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                           },
                       )
                     : hoveredArray[hoveredArray.length - 1];
-
-            console.log('>>>>>>> snappedPrice', snappedPrice.px);
 
             const price =
                 snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
@@ -1079,8 +1054,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const startY = point * dpr;
         const endY = clipEdge - startY;
-
-        console.log('>>>>>>> startY', startY, 'endY', endY);
 
         ctx.save();
         ctx.beginPath();
@@ -1195,6 +1168,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             function (event: React.MouseEvent<HTMLDivElement>) {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
+                console.log('>>> hoverlinedataref RESET');
                 liqTooltipRef.current.style('visibility', 'hidden');
             },
             { passive: true },
@@ -1225,6 +1199,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
     useEffect(() => {
         if (!d3 || !d3fc) return;
+        if (location === 'liqMobile' && !chartReady) return;
 
         const curve = d3.curveLinear;
 
@@ -1310,6 +1285,10 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         d3.select(d3CanvasLiqHover.current)
             .on('draw', () => {
+                console.log(
+                    '>>> hoverLineDataRef.current.length',
+                    hoverLineDataRef.current.length,
+                );
                 if (hoverLineDataRef.current.length === 0) return;
 
                 if (highlightHoveredArea.current) {
@@ -1333,7 +1312,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 sellLineSeriesRef.current?.context(hovereContext);
                 buyLineSeriesRef.current?.context(hovereContext);
             });
-    }, [width, height, bsColor]);
+    }, [width, height, bsColor, location, chartReady]);
 
     const callbackCrosshair = useCallback(
         (params: CrossHairMovedEventParams) => {
@@ -1361,6 +1340,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             if (relativeMouseX < 0 || relativeMouseY < 0) {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
+                console.log('>>> hoverlinedataref RESET 2');
                 liqTooltipRef.current.style('visibility', 'hidden');
                 setActiveTooltipType(LiqChartTooltipType.Level);
                 return;
