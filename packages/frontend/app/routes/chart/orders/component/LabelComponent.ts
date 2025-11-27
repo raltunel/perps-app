@@ -597,18 +597,27 @@ const LabelComponent = ({
             if (
                 isLabel &&
                 isLabel.label.type !== 'Cancel' &&
-                ((isLabel.matchType === 'onLabel' &&
-                    (isLabel.parentLine.type === 'LIMIT' ||
-                        (isLabel.parentLine.type === 'LIQ' &&
-                            isLiqPriceLineDraggable))) ||
-                    (isLabel.parentLine.type === 'PREVIEW_ORDER' &&
-                        (isLabel.matchType === 'onLabel' ||
-                            isLabel.matchType === 'onLine')))
+                isLabel.matchType === 'onLabel' &&
+                (isLabel.parentLine.type === 'LIMIT' ||
+                    (isLabel.parentLine.type === 'LIQ' &&
+                        isLiqPriceLineDraggable))
             ) {
                 canvas.style.cursor = 'grabbing';
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
                 setSelectedLine(isLabel);
+                setIsDrag(true);
+            }
+
+            if (
+                isLabel &&
+                isLabel.parentLine.type === 'PREVIEW_ORDER' &&
+                (isLabel.matchType === 'onLabel' ||
+                    isLabel.matchType === 'onLine')
+            ) {
+                canvas.style.cursor = 'grabbing';
+                tempSelectedLine = isLabel;
+                originalPrice = isLabel.parentLine.yPrice;
                 setIsDrag(true);
             }
         };
@@ -647,7 +656,11 @@ const LabelComponent = ({
                   }
                 : undefined;
 
-            setSelectedLine(tempSelectedLine);
+            if (tempSelectedLine?.parentLine.type === 'PREVIEW_ORDER') {
+                updatePreviewOrderPrice(tempSelectedLine);
+            } else {
+                setSelectedLine(tempSelectedLine);
+            }
         };
 
         async function limitOrderDragEnd(tempSelectedLine: LabelLocationData) {
@@ -819,7 +832,7 @@ const LabelComponent = ({
             setSelectedLine(undefined);
         }
 
-        function previewOrderDragEnd(tempSelectedLine: LabelLocationData) {
+        function updatePreviewOrderPrice(tempSelectedLine: LabelLocationData) {
             const newPrice = tempSelectedLine.parentLine.yPrice;
             useTradeDataStore.getState().setOrderInputPriceValue(newPrice);
             setSelectedLine(undefined);
@@ -840,7 +853,7 @@ const LabelComponent = ({
             }
 
             if (tempSelectedLine.parentLine.type === 'PREVIEW_ORDER') {
-                previewOrderDragEnd(tempSelectedLine);
+                updatePreviewOrderPrice(tempSelectedLine);
                 cursorText = 'row-resize';
             }
             tempSelectedLine = undefined;
