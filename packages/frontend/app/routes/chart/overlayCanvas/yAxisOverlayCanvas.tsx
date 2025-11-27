@@ -138,13 +138,21 @@ const YAxisOverlayCanvas: React.FC = () => {
             setMouseY(y);
         };
 
+        const handleMouseOut = () => {
+            useTradeDataStore.getState().setIsPreviewOrderHovered(false);
+        };
+
         canvas.addEventListener('mousemove', handleCanvasMouseMove);
         yAxisCanvas.addEventListener('mousemove', handleYAxisMouseMove);
+        canvas.addEventListener('mouseout', handleMouseOut);
+        yAxisCanvas.addEventListener('mouseout', handleMouseOut);
 
         return () => {
             resizeObserver.disconnect();
             canvas.removeEventListener('mousemove', handleCanvasMouseMove);
             yAxisCanvas.removeEventListener('mousemove', handleYAxisMouseMove);
+            canvas.removeEventListener('mouseout', handleMouseOut);
+            yAxisCanvas.removeEventListener('mouseout', handleMouseOut);
             if (canvas?.parentNode) {
                 canvas.parentNode.removeChild(canvas);
             }
@@ -213,8 +221,10 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         isNearOrderPriceRef.current = isNearOrderPrice;
 
+        useTradeDataStore.getState().setIsPreviewOrderHovered(isNearOrderPrice);
+
         if (isNearOrderPrice) {
-            canvas.style.cursor = 'ns-resize';
+            canvas.style.cursor = 'grab';
             canvas.style.pointerEvents = 'auto';
         } else {
             canvas.style.cursor = 'default';
@@ -234,6 +244,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             draggedPrice = orderInputPriceValue;
             isDragging = true;
             setIsDrag(true);
+            canvas.style.cursor = 'grabbing';
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
@@ -280,6 +291,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             isDragging = false;
             draggedPrice = undefined;
             setIsDrag(false);
+            canvas.style.cursor = 'grab';
         };
 
         const dragLines = d3

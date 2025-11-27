@@ -4,7 +4,7 @@ import type { LineData } from './component/LineComponent';
 import { quantityTextFormatWithComma } from './customOrderLineUtils';
 
 export const usePreviewOrderLines = (): LineData[] => {
-    const { orderInputPriceValue } = useTradeDataStore();
+    const { orderInputPriceValue, isPreviewOrderHovered } = useTradeDataStore();
 
     const [lines, setLines] = useState<LineData[]>([]);
 
@@ -17,14 +17,14 @@ export const usePreviewOrderLines = (): LineData[] => {
                 {
                     xLoc: 0.4,
                     yPrice: orderInputPriceValue,
-                    color: '#e9e980',
+                    color: isPreviewOrderHovered ? '#ffff00' : '#e9e980',
                     type: 'PREVIEW_ORDER',
                     lineStyle: 2,
                     lineWidth: 1,
                 },
             ]);
         }
-    }, [orderInputPriceValue]);
+    }, [orderInputPriceValue, isPreviewOrderHovered]);
 
     return lines;
 };

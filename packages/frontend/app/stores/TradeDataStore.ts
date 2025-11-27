@@ -51,6 +51,8 @@ type TradeDataStore = UserTradeDataStore & {
     setTradeDirection: (direction: OrderSide) => void;
     setIsMidModeActive: (isActive: boolean) => void;
     isMidModeActive: boolean;
+    isPreviewOrderHovered: boolean;
+    setIsPreviewOrderHovered: (isHovered: boolean) => void;
 };
 
 const useTradeDataStore = create<TradeDataStore>()(
@@ -161,6 +163,9 @@ const useTradeDataStore = create<TradeDataStore>()(
             setIsMidModeActive: (isActive: boolean) =>
                 set({ isMidModeActive: isActive }),
             isMidModeActive: true,
+            isPreviewOrderHovered: false,
+            setIsPreviewOrderHovered: (isHovered: boolean) =>
+                set({ isPreviewOrderHovered: isHovered }),
         }),
         {
             name: 'TRADE_DATA',
