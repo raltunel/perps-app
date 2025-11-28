@@ -135,8 +135,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
-    const mouseYRef = useRef(0);
-
     const getCenterY = useCallback(() => {
         if (
             locationRef.current === 'liqMobile' &&
@@ -419,6 +417,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const updateScalesAndSeries = useCallback(() => {
         if (!d3 || !d3fc) return;
 
+        if (location !== 'liqMobile' && !chartReady) return;
+
         updateScales();
 
         const dpr = window.devicePixelRatio || 1;
@@ -443,7 +443,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
-                // const isBuy = mouseYRef.current > heightRef.current / 2;
                 const d3sellRgbaColor = d3.color(sellRgbaColor)?.copy();
 
                 if (d3sellRgbaColor) {
@@ -467,7 +466,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .orient('horizontal')
             .curve(curve)
             .decorate((context: CanvasRenderingContext2D) => {
-                // const isBuy = mouseYRef.current > heightRef.current / 2;
                 const d3buyRgbaColor = d3.color(buyRgbaColor)?.copy();
 
                 if (d3buyRgbaColor) {
@@ -521,42 +519,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 context.lineWidth = 1.5;
             });
 
-        if (scaleData && location === 'liqMobile') {
-            // const sellLiqVerticalLine = d3fc
-            //     .seriesCanvasLine()
-            //     // .curve(curve)
-            //     .mainValue((d: any) => d.px)
-            //     .crossValue((d: any) => d.ratio)
-            //     .xScale(xScale)
-            //     .yScale(
-            //         scaleDataRef.current
-            //             ? scaleDataRef.current.yScale
-            //             : sellYScale,
-            //     )
-            //     .decorate((context: CanvasRenderingContext2D) => {
-            //         context.strokeStyle = sellRgbaColor;
-            //         context.lineWidth = 1.5;
-            //     });
-            // const buyLiqVerticalLine = d3fc
-            //     .seriesCanvasLine()
-            //     // .curve(curve)
-            //     // .orient('vertical')
-            //     .mainValue((d: any) => d.px)
-            //     .crossValue((d: any) => d.ratio)
-            //     .xScale(xScale)
-            //     .yScale(
-            //         scaleDataRef.current
-            //             ? scaleDataRef.current.yScale
-            //             : buyYScale,
-            //     )
-            //     .decorate((context: CanvasRenderingContext2D) => {
-            //         context.strokeStyle = buyRgbaColor;
-            //         context.lineWidth = 1.5;
-            //     });
-            // sellLiqLineSeriesRef.current = sellLiqVerticalLine;
-            // buyLiqLineSeriesRef.current = buyLiqVerticalLine;
-        }
-
         sellAreaSeriesRef.current = sellArea;
         buyAreaSeriesRef.current = buyArea;
         sellLineSeriesRef.current = sellLine;
@@ -594,29 +556,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             buyArea(currentBuyDataRef.current);
             sellLine(currentSellDataRef.current);
             buyLine(currentBuyDataRef.current);
-
-            // REMOVE | Liq lines on overlay chart
-            // if (
-            //     sellLiqLineSeriesRef.current &&
-            //     buyLiqLineSeriesRef.current &&
-            //     location === 'liqMobile'
-            // ) {
-            //     currentLiqBuysRef.current.forEach((liq, index) => {
-            //         buyLiqLineSeriesRef.current([
-            //             { px: liq.px, ratio: 0 },
-            //             { px: liq.px, ratio: liq.ratio },
-            //         ]);
-            //     });
-
-            //     currentLiqSellsRef.current.forEach((liq, index) => {
-            //         sellLiqLineSeriesRef.current([
-            //             { px: liq.px, ratio: 0 },
-            //             { px: liq.px, ratio: liq.ratio },
-            //         ]);
-            //     });
-            // }
         });
-    }, [width, height]);
+    }, [width, height, location, chartReady]);
 
     useEffect(() => {
         if (location !== 'obBook') return;
@@ -898,6 +839,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 return;
 
             const dpr = window.devicePixelRatio || 1;
+            const usedDpr = location === 'liqMobile' ? dpr : 1;
 
             const canvas = d3
                 .select(d3CanvasLiqHover.current)
@@ -909,36 +851,28 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const centerY = getCenterY();
             const isBuy = centerY < offsetY;
 
+            const priceOnMousePoint = pageYScaleRef.current.invert(
+                offsetY * usedDpr,
+            );
+
             // Calculate hover line data
             hoverLineDataRef.current = [
                 {
                     x: xScaleRef.current.invert(
-                        xScaleRef.current.range()[0] * dpr,
+                        xScaleRef.current.range()[0] * usedDpr,
                     ),
-                    y: pageYScaleRef.current.invert(offsetY * dpr),
+                    y: priceOnMousePoint,
                     offsetY: offsetY,
                 },
                 {
-                    x: xScaleRef.current.invert((offsetX + 10) * dpr),
-                    y: pageYScaleRef.current.invert(offsetY * dpr),
+                    x: xScaleRef.current.invert((offsetX + 10) * usedDpr),
+                    y: priceOnMousePoint,
                     offsetY: offsetY,
                 },
             ];
-            console.log(
-                '>>> hoverLineDataRef',
-                hoverLineDataRef.current.length,
-            );
 
             // Fill and place tooltip
             if (!liqTooltipRef.current || !currentBuyDataRef.current) return;
-
-            const mousePoint = pageYScaleRef.current.invert(offsetY * dpr);
-
-            const midHeader = document.getElementById('orderBookMidHeader');
-            const midHeaderHeight =
-                midHeader?.getBoundingClientRect().height || 0;
-
-            mouseYRef.current = offsetY;
 
             let hoveredArray = isBuy
                 ? currentBuyDataRef.current
@@ -949,35 +883,39 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             }
 
             const nearest = hoveredArray.filter((item) =>
-                isBuy ? item.px < mousePoint : item.px > mousePoint,
+                isBuy
+                    ? item.px < priceOnMousePoint
+                    : item.px > priceOnMousePoint,
             );
 
-            const snappedPrice =
+            const snappedPricePoint =
                 nearest.length > 0
                     ? nearest.reduce(
                           (closest: OrderBookRowIF, item: OrderBookRowIF) => {
                               if (!closest) return item;
-                              return Math.abs(item.px - mousePoint) <
-                                  Math.abs(closest.px - mousePoint)
+                              return Math.abs(item.px - priceOnMousePoint) <
+                                  Math.abs(closest.px - priceOnMousePoint)
                                   ? item
                                   : closest;
                           },
                       )
                     : hoveredArray[hoveredArray.length - 1];
 
-            const price =
-                snappedPrice && snappedPrice.total ? snappedPrice.total : 0;
+            const amount =
+                snappedPricePoint && snappedPricePoint.total
+                    ? snappedPricePoint.total
+                    : 0;
 
             const finalTotal = hoveredArray[hoveredArray.length - 1].total;
 
-            const percentage = (price / finalTotal) * 100;
+            const percentage = (amount / finalTotal) * 100;
 
             liqTooltipRef.current.html(
                 '<p>' +
                     formatNum(percentage) +
                     '%</p>' +
                     '<p>' +
-                    formatNum(price, 2) +
+                    formatNum(amount, 2) +
                     ' </p>',
             );
 
@@ -1054,6 +992,13 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const startY = point * dpr;
         const endY = clipEdge - startY;
+
+        console.log(
+            '>>>>> clip canvas height',
+            highlightedCanvas.height,
+            ' is reverse',
+            reverse,
+        );
 
         ctx.save();
         ctx.beginPath();
@@ -1168,7 +1113,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             function (event: React.MouseEvent<HTMLDivElement>) {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
-                console.log('>>> hoverlinedataref RESET');
                 liqTooltipRef.current.style('visibility', 'hidden');
             },
             { passive: true },
@@ -1198,6 +1142,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     }, []);
 
     useEffect(() => {
+        // if (1 === 1) return;
         if (!d3 || !d3fc) return;
         if (location === 'liqMobile' && !chartReady) return;
 
@@ -1208,8 +1153,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             !pageYScaleRef.current ||
             !sellYScaleRef.current ||
             !buyYScaleRef.current
-        )
+        ) {
             return;
+        }
 
         const d3buyRgbaColor = d3.color(sellColorRef.current)?.copy();
         const d3sellRgbaColor = d3.color(buyColorRef.current)?.copy();
@@ -1283,13 +1229,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .node() as any;
         if (hoveredContainer) hoveredContainer.requestRedraw();
 
+        const dpr = window.devicePixelRatio || 1;
+
         d3.select(d3CanvasLiqHover.current)
             .on('draw', () => {
-                console.log(
-                    '>>> hoverLineDataRef.current.length',
-                    hoverLineDataRef.current.length,
-                );
                 if (hoverLineDataRef.current.length === 0) return;
+
+                hoveredCanvas.width = widthRef.current * dpr;
+                hoveredCanvas.height = heightRef.current * dpr;
 
                 if (highlightHoveredArea.current) {
                     clipCanvas(
@@ -1340,7 +1287,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             if (relativeMouseX < 0 || relativeMouseY < 0) {
                 highlightHoveredArea.current = false;
                 hoverLineDataRef.current = [];
-                console.log('>>> hoverlinedataref RESET 2');
                 liqTooltipRef.current.style('visibility', 'hidden');
                 setActiveTooltipType(LiqChartTooltipType.Level);
                 return;
