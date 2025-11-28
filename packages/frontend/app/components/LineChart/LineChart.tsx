@@ -122,8 +122,6 @@ const LineChart: React.FC<LineChartProps> = (props) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const dpr = window.devicePixelRatio || 1;
-
         const minDate = d3.min(lineData, (d: any) => d.time);
         const maxDate = d3.max(lineData, (d: any) => d.time);
 
@@ -140,7 +138,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const svgXScale = xScale.copy();
 
             svgXScale.range([0, chartWidth - yAxisPadding]);
-            xScale.range([0, (chartWidth - yAxisPadding) * dpr]);
+            xScale.range([0, chartWidth - yAxisPadding]);
 
             scaleDataRef.current.xScale = xScale;
             scaleDataRef.current.svgXScale = svgXScale;
@@ -175,7 +173,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                 const svgYScale = yScale.copy();
 
                 svgYScale.range([chartHeight - xAxisHeight, 0]);
-                yScale.range([(chartHeight - xAxisHeight) * dpr, 0]);
+                yScale.range([chartHeight - xAxisHeight, 0]);
 
                 scaleDataRef.current.yScale = yScale;
                 scaleDataRef.current.svgYScale = svgYScale;
@@ -186,25 +184,21 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     useEffect(() => {
         if (yAxisPadding === undefined) return;
 
-        const dpr = window.devicePixelRatio || 1;
-
-        setCanvasInitialHeight(() => chartHeight - xAxisHeight * dpr);
-        setCanvasInitialWidth(() => (chartWidth - yAxisPadding) * dpr);
+        setCanvasInitialHeight(() => chartHeight - xAxisHeight);
+        setCanvasInitialWidth(() => chartWidth - yAxisPadding);
     }, [yAxisPadding]);
 
     useEffect(() => {
         if (scaleDataRef.current) {
-            const dpr = window.devicePixelRatio || 1;
-
             scaleDataRef.current.yScale &&
                 scaleDataRef.current.yScale.range([
-                    chartHeight - xAxisHeight * dpr,
+                    chartHeight - xAxisHeight,
                     0,
                 ]);
             scaleDataRef.current.xScale &&
                 scaleDataRef.current.xScale.range([
                     0,
-                    (chartWidth - yAxisPadding) * dpr,
+                    chartWidth - yAxisPadding,
                 ]);
 
             scaleDataRef.current.svgYScale &&
@@ -351,18 +345,16 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             const height =
                 chartHeight || canvas.getBoundingClientRect()?.height;
 
-            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width - yAxisPadding;
+            canvas.height = height - xAxisHeight;
 
-            canvas.width = (width - yAxisPadding) * dpr;
-            canvas.height = (height - xAxisHeight) * dpr;
+            context.scale(1, 1);
 
-            context.scale(dpr, dpr);
-
-            context.clearRect(0, 0, width * dpr, (height - xAxisHeight) * dpr);
+            context.clearRect(0, 0, width, height - xAxisHeight);
 
             context.beginPath();
             lineSeries(lineData);
-            context.lineWidth = 2 * dpr;
+            context.lineWidth = 2;
             context.strokeStyle = '#7371fc';
             context.stroke();
 
@@ -372,7 +364,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             });
 
             context.strokeStyle = 'rgba(189,189,189,0.15)';
-            context.lineWidth = 2 * dpr;
+            context.lineWidth = 2;
             context.stroke();
         }
     }, [lineSeries, lineData, chartHeight, chartWidth]);
