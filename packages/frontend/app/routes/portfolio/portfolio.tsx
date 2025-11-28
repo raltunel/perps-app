@@ -355,6 +355,7 @@ function Portfolio() {
                                         <MemoizedPerformancePanel
                                             userData={userData}
                                             panelHeight={panelHeight}
+                                            isMobile={false}
                                         />
                                     )}
                                 </section>
@@ -378,6 +379,7 @@ function Portfolio() {
                                         <MemoizedPerformancePanel
                                             userData={userData}
                                             panelHeight={panelHeight}
+                                            isMobile={true}
                                         />
                                     )}
                                 </section>

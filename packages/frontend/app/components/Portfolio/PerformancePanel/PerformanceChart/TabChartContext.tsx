@@ -23,6 +23,7 @@ export interface TabChartContext {
     userProfileLineData: any;
     setUserProfileLineData: React.Dispatch<React.SetStateAction<any>>;
     panelHeight?: number;
+    isMobile?: boolean;
 }
 
 const TabChartContext: React.FC<TabChartContext> = (props) => {
@@ -39,6 +40,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
         userProfileLineData,
         setUserProfileLineData,
         panelHeight,
+        isMobile,
     } = props;
 
     const panelHeightRef = useRef(panelHeight);
@@ -275,6 +277,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                             }
                             height={chartHeight}
                             width={chartWidth}
+                            isMobile={isMobile}
                         />
                     )}
 
@@ -288,6 +291,7 @@ const TabChartContext: React.FC<TabChartContext> = (props) => {
                             }
                             height={chartHeight}
                             width={chartWidth}
+                            isMobile={isMobile}
                         />
                     )}
 

@@ -11,10 +11,11 @@ type LineChartProps = {
     chartName: string;
     height?: number;
     width?: number;
+    isMobile?: boolean;
 };
 
 const LineChart: React.FC<LineChartProps> = (props) => {
-    const { lineData, chartName, curve, height, width } = props;
+    const { lineData, chartName, curve, height, width, isMobile } = props;
 
     const chartWidth = width || 850;
     const chartHeight = height || 250;
@@ -215,8 +216,8 @@ const LineChart: React.FC<LineChartProps> = (props) => {
     }, [chartHeight, chartWidth, scaleDataRef]);
 
     useEffect(() => {
-        const svgXAxis = d3.select('#xAxis');
-        const svgYAxis = d3.select('#yAxis');
+        const svgXAxis = d3.select('#xAxis' + (isMobile ? 'Mobile' : ''));
+        const svgYAxis = d3.select('#yAxis' + (isMobile ? 'Mobile' : ''));
 
         const fillStyle = 'var(--text1)';
         const font = 'var(--font-family-main)';
@@ -413,7 +414,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                             )}
 
                             <svg
-                                id='yAxis'
+                                id={`yAxis${isMobile ? 'Mobile' : ''}`}
                                 style={{
                                     minHeight: '100px',
                                     width: yAxisPadding + 'px',
@@ -431,10 +432,10 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                             }}
                         >
                             <svg
-                                id='xAxis'
+                                id={`xAxis${isMobile ? 'Mobile' : ''}`}
                                 height={xAxisHeight - bottomGap - 1}
                                 width={chartWidth}
-                                style={{ paddingLeft: yAxisPadding }}
+                                style={{ paddingRight: yAxisPadding }}
                             />
                         </div>
                     </div>
