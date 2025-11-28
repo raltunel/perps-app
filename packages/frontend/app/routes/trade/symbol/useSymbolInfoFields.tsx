@@ -163,7 +163,7 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
             {
                 key: 'mark',
                 label: t('symbolInfo.mark'),
-                labelMobile: 'M',
+                labelMobile: 'Mark',
                 tooltipContent: t('symbolInfo.markTooltip'),
                 valueClass: 'w4',
                 value: fullMark, // same on mobile/desktop
@@ -184,7 +184,7 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
             {
                 key: 'change24h',
                 label: t('symbolInfo.24hChange'),
-                labelMobile: 'Δ',
+                labelMobile: '24hΔ',
                 tooltipContent: t('symbolInfo.24hChangeTooltip'),
                 valueClass: 'w7',
                 value: inlineChange,
@@ -199,7 +199,7 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
             {
                 key: 'volume24h',
                 label: t('symbolInfo.24hVolume'),
-                labelMobile: 'Vol',
+                labelMobile: '24hVol',
                 tooltipContent: t('symbolInfo.24hVolumeTooltip'),
                 valueClass: 'w7',
                 value: inlineVolume, // compact on mobile, full on desktop
