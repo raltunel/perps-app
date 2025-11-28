@@ -34,6 +34,7 @@ import DepositDropdown from './DepositDropdown/DepositDropdown';
 import { useUserDataStore } from '~/stores/UserDataStore';
 import FeedbackModal from '../FeedbackModal/FeedbackModal';
 import { useTranslation } from 'react-i18next';
+import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -302,7 +303,7 @@ export default function PageHeader() {
                     </section>
                     <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
                         <a
-                            href='https://ambient.finance/trade'
+                            href={getAmbientSpotUrl(symbol)}
                             target='_blank'
                             rel='noopener noreferrer'
                             className={styles.ambientmm}
