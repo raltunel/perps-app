@@ -84,11 +84,23 @@ export default function CodeTabs(props: PropsIF) {
     // ref code to use in the DOM (being referred by someone else)
     const [refCodeToConsume, setRefCodeToConsume] = useState<
         string | undefined
-    >(referralStore.cached || undefined);
+    >(undefined);
     // if a value appears in the cache while state is empty, consume it
     useEffect(() => {
-        refCodeToConsume ?? setRefCodeToConsume(referralStore.cached);
-    }, [referralStore.cached]);
+        if (refCodeToConsume === undefined && affiliateAddress) {
+            (async () => {
+                console.log('running');
+                const isOwnedByUser: boolean | undefined =
+                    await checkIfOwnRefCode(
+                        referralStore.cached,
+                        affiliateAddress,
+                    );
+                isOwnedByUser === false &&
+                    setRefCodeToConsume(referralStore.cached);
+                setIsRefCodeSelfOwned(isOwnedByUser);
+            })();
+        }
+    }, [referralStore.cached, affiliateAddress]);
 
     const [isRefCodeClaimed, setIsRefCodeClaimed] = useState<
         boolean | undefined
@@ -97,7 +109,6 @@ export default function CodeTabs(props: PropsIF) {
         if (refCodeToConsume === undefined || !refCodeToConsume.length) {
             setIsRefCodeClaimed(undefined);
         } else {
-            console.log('refCodeToConsume: ', refCodeToConsume);
             isAffiliateCodeFree(refCodeToConsume)
                 .then((isFree: boolean) => setIsRefCodeClaimed(!isFree))
                 .catch((err) => {
@@ -116,6 +127,7 @@ export default function CodeTabs(props: PropsIF) {
     >(undefined);
     //userInputRefCode
 
+    // fn to check if a given ref code is registered to a given wallet
     async function checkIfOwnRefCode(
         rc: string,
         address: string,
@@ -130,6 +142,7 @@ export default function CodeTabs(props: PropsIF) {
         try {
             const response = await fetch(ENDPOINT, options);
             const res = await response.json();
+            // the FUUL system is case-sensitive, strings must match exactly
             return res.code === rc;
         } catch (err) {
             console.error(err);
@@ -277,40 +290,6 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
-    // useEffect(() => {
-    //     if (!affiliateAddress) {
-    //         return;
-    //     }
-
-    //     (async () => {
-    //         setIsFetchingVolume(true);
-
-    //         try {
-    //             const EMBER_EDNPOINT_ALL =
-    //                 'https://ember-leaderboard.liquidity.tools/leaderboard';
-    //             const emberEndpointForUser =
-    //                 EMBER_EDNPOINT_ALL + '/' + affiliateAddress.toString();
-
-    //             const response = await fetch(emberEndpointForUser);
-
-    //             const data = await response.json();
-    //             console.log('Full Ember API response:', data);
-    //             if (data.error) {
-    //                 referralStore.setTotVolume(0);
-    //             } else if (data.leaderboard && data.leaderboard.length > 0) {
-    //                 const volume = data.leaderboard[0].volume;
-    //                 referralStore.setTotVolume(volume);
-    //             }
-    //         } catch (error) {
-    //             referralStore.setTotVolume(NaN);
-    //         } finally {
-    //             setIsFetchingVolume(false);
-    //         }
-    //     })();
-    // }, [affiliateAddress]);
-
-    // const updateReferralCodeInputRef = useRef<HTMLInputElement>(null);
-
     const [userInputRefCode, setUserInputRefCode] = useState<string>('');
     const [isUserRefCodeClaimed, setIsUserRefCodeClaimed] = useState<
         boolean | undefined
@@ -400,7 +379,7 @@ export default function CodeTabs(props: PropsIF) {
                 {referralStore.cached ? (
                     <>
                         <h6>{t('referrals.usingAffiliateCode')}</h6>
-                        {isCachedValueValid && <p>{referralStore.cached}</p>}
+                        {isCachedValueValid && <p>{refCodeToConsume}</p>}
                         {isCachedValueValid === false && (
                             <p>
                                 This code does not appear to be registered in
