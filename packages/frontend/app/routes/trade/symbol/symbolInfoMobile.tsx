@@ -65,9 +65,7 @@ const SymbolInfoMobile: React.FC = () => {
 
                         {field.tooltipContent && (
                             <p className={styles.moreTooltipText}>
-                                {typeof field.tooltipContent === 'string'
-                                    ? field.tooltipContent
-                                    : null}
+                                {field.tooltipContent && field.tooltipContent}
                             </p>
                         )}
                     </div>

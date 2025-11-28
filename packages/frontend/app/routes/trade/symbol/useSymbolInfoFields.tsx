@@ -215,6 +215,15 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
                 fullValue: fullOpenInterest,
             },
             {
+                key: 'fundingCountdown',
+                label: t('symbolInfo.fundingCountdown'),
+                labelMobile: 'FC',
+                tooltipContent: t('symbolInfo.fundingCountdownTooltip'),
+                valueClass: 'w7',
+                value: fundingCountdown,
+                fullValue: fundingCountdown,
+            },
+            {
                 key: 'fundingRate',
                 label: t('symbolInfo.fundingRate'),
                 labelMobile: 'FR',
@@ -223,15 +232,6 @@ export function useSymbolInfoFields(opts?: { isMobile?: boolean }) {
                 value: fundingRateFull,
                 fullValue: fundingRateFull,
                 type: fundingType,
-            },
-            {
-                key: 'fundingCountdown',
-                label: t('symbolInfo.fundingCountdown'),
-                labelMobile: 'FC',
-                tooltipContent: t('symbolInfo.fundingCountdownTooltip'),
-                valueClass: 'w7',
-                value: fundingCountdown,
-                fullValue: fundingCountdown,
             },
         ];
     }, [
