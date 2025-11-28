@@ -203,17 +203,14 @@ const YAxisOverlayCanvas: React.FC = () => {
         const pixelDistance = Math.abs(closePricePixel - orderPricePixel);
         const areLabelsClose = pixelDistance <= labelHeight;
 
-        // Adjust orderPricePixel for drag detection if labels are close
-        // If order price is below close price, shift down by label height
-        // If order price is above close price, shift up by label height
         let adjustedOrderPricePixel = orderPricePixel;
         if (areLabelsClose) {
-            if (orderPricePixel > closePricePixel) {
-                // Order price is below close price (higher pixel value = lower on screen)
-                adjustedOrderPricePixel = orderPricePixel + labelHeight;
+            if (orderInputPriceValue >= closePrice) {
+                adjustedOrderPricePixel =
+                    closePricePixel - (labelHeight - pixelDistance);
             } else {
-                // Order price is above close price (lower pixel value = higher on screen)
-                adjustedOrderPricePixel = orderPricePixel - labelHeight;
+                adjustedOrderPricePixel =
+                    orderPricePixel + (labelHeight - pixelDistance);
             }
         }
 
