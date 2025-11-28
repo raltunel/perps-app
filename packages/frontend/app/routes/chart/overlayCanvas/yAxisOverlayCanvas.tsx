@@ -197,7 +197,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         }
 
         // Approximate label height in pixels
-        const labelHeight = 15 * dpr;
+        const labelHeight = 15;
 
         // Check if closePricePixel and orderPricePixel are too close to each other
         const pixelDistance = Math.abs(closePricePixel - orderPricePixel);
@@ -207,7 +207,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         if (areLabelsClose) {
             if (orderInputPriceValue >= closePrice) {
                 adjustedOrderPricePixel =
-                    closePricePixel - (labelHeight - pixelDistance);
+                    orderPricePixel - (labelHeight - pixelDistance);
             } else {
                 adjustedOrderPricePixel =
                     orderPricePixel + (labelHeight - pixelDistance);
