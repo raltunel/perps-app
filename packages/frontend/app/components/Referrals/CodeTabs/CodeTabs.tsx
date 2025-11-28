@@ -274,6 +274,7 @@ export default function CodeTabs(props: PropsIF) {
 
     const prevAffiliateAddress = useRef<string | undefined>(undefined);
 
+    // reset temporary affiliate code when changing wallets
     useEffect(() => {
         // Only clear when switching between different wallets, not on initial connect
         if (
@@ -297,6 +298,7 @@ export default function CodeTabs(props: PropsIF) {
     const [isUserInputRefCodeSelfOwned, setIsUserInputRefCodeSelfOwned] =
         useState<boolean | undefined>(undefined);
 
+    // when the user manually enters a refCode, check if the code is owned by their wallet
     useEffect(() => {
         if (userInputRefCode && affiliateAddress) {
             checkIfOwnRefCode(userInputRefCode, affiliateAddress.toString())
@@ -312,6 +314,7 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [userInputRefCode, affiliateAddress]);
 
+    // when the user manually enters a refCode, make sure it exists
     useEffect(() => {
         if (userInputRefCode.length) {
             (async () => {
@@ -329,6 +332,8 @@ export default function CodeTabs(props: PropsIF) {
         }
     }, [userInputRefCode]);
 
+    // determines whether the value in zustand cache passes validation
+    // legal characters, length, and format checks
     const [isCachedValueValid, setIsCachedValueValid] = useState<
         boolean | undefined
     >(undefined);
