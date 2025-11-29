@@ -359,10 +359,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const xScale = d3
             .scaleLinear()
             .domain([0, 1])
-            .range([
-                widthRef.current * (location === 'liqMobile' ? dpr : 1),
-                0,
-            ]);
+            .range([widthRef.current * dpr, 0]);
 
         const topBoundaryBuy = Math.max(...currentBuyData.map((d) => d.px));
         const bottomBoundaryBuy = Math.min(...currentBuyData.map((d) => d.px));
@@ -388,14 +385,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             .scaleLinear()
             .domain([bottomBoundaryBuy, topBoundaryBuy])
             .range([
-                heightRef.current,
-                centerY + midHeaderHeight / 2 + gapSize + 1,
+                heightRef.current * dpr,
+                (centerY + midHeaderHeight / 2 + gapSize + 1) * dpr,
             ]);
 
         const sellYScale = d3
             .scaleLinear()
             .domain([bottomBoundarySell, topBoundarySell])
-            .range([centerY - midHeaderHeight / 2 - 1, 0]);
+            .range([(centerY - midHeaderHeight / 2 - 1) * dpr, 0]);
 
         const pageYScale = d3
             .scaleLinear()
@@ -417,7 +414,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const updateScalesAndSeries = useCallback(() => {
         if (!d3 || !d3fc) return;
 
-        if (location !== 'liqMobile' && !chartReady) return;
+        if (location === 'liqMobile' && !chartReady) return;
 
         updateScales();
 
@@ -1253,11 +1250,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 }
             })
             .on('measure', () => {
+                hoveredCanvas.width = widthRef.current * dpr;
+                hoveredCanvas.height = heightRef.current * dpr;
                 hoverLine?.context(hovereContext);
                 highlightedBuyArea?.context(hovereContext);
                 highlightedSellArea?.context(hovereContext);
                 sellLineSeriesRef.current?.context(hovereContext);
                 buyLineSeriesRef.current?.context(hovereContext);
+                sellAreaSeriesRef.current?.context(hovereContext);
+                buyAreaSeriesRef.current?.context(hovereContext);
             });
     }, [width, height, bsColor, location, chartReady]);
 
