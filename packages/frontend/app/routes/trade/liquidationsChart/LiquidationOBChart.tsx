@@ -135,6 +135,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
+    // calculates center y for liq chart (on overlay chart that center point is changed based on tv chart y axis positioning)
     const getCenterY = useCallback(() => {
         if (
             locationRef.current === 'liqMobile' &&
@@ -155,9 +156,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         if (isInitialized.current) {
             updateScalesAndSeries();
+            bindHighlightActions();
         }
     }, [bsColor]);
 
+    // draws liquidation lines on the liq chart
     const drawLiquidationLines = useCallback(
         (context: CanvasRenderingContext2D) => {
             if (
@@ -540,8 +543,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         d3.select(d3CanvasLiq.current).on('draw', () => {
             canvas.width = scaleDataRef.current
                 ? widthRef.current * dpr
-                : widthRef.current;
-            canvas.height = scaleDataRef.current ? height * dpr : height;
+                : widthRef.current * dpr;
+            canvas.height = scaleDataRef.current ? height * dpr : height * dpr;
             canvas.style.width = `${widthRef.current}px`;
             canvas.style.height = `${height}px`;
 
@@ -990,12 +993,12 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         const startY = point * dpr;
         const endY = clipEdge - startY;
 
-        console.log(
-            '>>>>> clip canvas height',
-            highlightedCanvas.height,
-            ' is reverse',
-            reverse,
-        );
+        // console.log(
+        //     '>>>>> clip canvas height',
+        //     highlightedCanvas.height,
+        //     ' is reverse',
+        //     reverse,
+        // );
 
         ctx.save();
         ctx.beginPath();
@@ -1020,6 +1023,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             currentLiqSellsRef.current = liqSells;
             isInitialized.current = true;
             updateScalesAndSeries();
+            bindHighlightActions();
             return;
         }
 
@@ -1138,8 +1142,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         }
     }, []);
 
-    useEffect(() => {
-        // if (1 === 1) return;
+    const bindHighlightActions = useCallback(() => {
         if (!d3 || !d3fc) return;
         if (location === 'liqMobile' && !chartReady) return;
 
@@ -1257,10 +1260,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 highlightedSellArea?.context(hovereContext);
                 sellLineSeriesRef.current?.context(hovereContext);
                 buyLineSeriesRef.current?.context(hovereContext);
-                sellAreaSeriesRef.current?.context(hovereContext);
-                buyAreaSeriesRef.current?.context(hovereContext);
             });
-    }, [width, height, bsColor, location, chartReady]);
+    }, [location, chartReady]);
 
     const callbackCrosshair = useCallback(
         (params: CrossHairMovedEventParams) => {
@@ -1278,6 +1279,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             d3CanvasLiqContianer.current.getBoundingClientRect();
 
+            // TODO: price axis right-left switch will be handled on these calculations
             const relativeMouseX =
                 mouseX -
                 d3CanvasLiqContianer.current.getBoundingClientRect().left;
