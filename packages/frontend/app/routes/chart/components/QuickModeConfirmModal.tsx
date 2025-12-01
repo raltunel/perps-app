@@ -11,14 +11,13 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     onConfirm,
 }) => {
     const [amount, setAmount] = useState<string>('');
-    const [dontAskAgain, setDontAskAgain] = useState(false);
     const [cancelHovered, setCancelHovered] = useState(false);
     const [confirmHovered, setConfirmHovered] = useState(false);
 
     const handleConfirm = () => {
         const parsedAmount = parseFloat(amount);
         if (parsedAmount > 0) {
-            onConfirm(parsedAmount, dontAskAgain);
+            onConfirm(parsedAmount, false);
             onClose();
         }
     };
@@ -162,37 +161,6 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                             }}
                         >
                             USD
-                        </span>
-                    </div>
-
-                    {/* Don't Ask Again Checkbox */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => setDontAskAgain(!dontAskAgain)}
-                    >
-                        <input
-                            type='checkbox'
-                            checked={dontAskAgain}
-                            onChange={(e) => setDontAskAgain(e.target.checked)}
-                            style={{
-                                width: '16px',
-                                height: '16px',
-                                cursor: 'pointer',
-                            }}
-                        />
-                        <span
-                            style={{
-                                color: '#b3b3b3',
-                                fontSize: '13px',
-                                userSelect: 'none',
-                            }}
-                        >
-                            Don't ask again
                         </span>
                     </div>
                 </div>

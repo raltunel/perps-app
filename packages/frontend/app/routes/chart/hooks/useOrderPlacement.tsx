@@ -17,6 +17,7 @@ interface OrderPlacementStore {
     quickModeDefaultAmount: number;
     dontAskAgainQuickMode: boolean;
     quickModeTradeType: TradeType;
+    activeOrder: { type: TradeType; size: number } | null;
     placeOrder: (price: number, side: 'buy' | 'sell') => void;
     clearPendingOrder: () => void;
     openModal: (price: number, side: 'buy' | 'sell') => void;
@@ -38,6 +39,7 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     quickModeDefaultAmount: 0,
     dontAskAgainQuickMode: false,
     quickModeTradeType: 'Limit',
+    activeOrder: null,
     placeOrder: (price: number, side: 'buy' | 'sell') => {
         set({ pendingOrder: { price, side, timestamp: Date.now() } });
     },
@@ -49,16 +51,21 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
         set({ showModal: false, modalData: null });
     },
     confirmOrder: (price: number, amount: number) => {
-        const side = useOrderPlacementStore.getState().modalData?.side || 'buy';
+        const state = useOrderPlacementStore.getState();
+        const side = state.modalData?.side || 'buy';
         set({
             pendingOrder: { price, side, timestamp: Date.now() },
             showModal: false,
             modalData: null,
+            activeOrder: { type: state.quickModeTradeType, size: amount },
         });
     },
     toggleQuickMode: () => {
         const state = useOrderPlacementStore.getState();
-        set({ quickMode: !state.quickMode });
+        set({
+            quickMode: !state.quickMode,
+            activeOrder: !state.quickMode ? state.activeOrder : null,
+        });
     },
     setQuickModeTradeType: (tradeType: TradeType) => {
         set({ quickModeTradeType: tradeType });
@@ -66,11 +73,13 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     openQuickModeConfirm: () => set({ showQuickModeConfirm: true }),
     closeQuickModeConfirm: () => set({ showQuickModeConfirm: false }),
     confirmQuickMode: (amount: number, dontAskAgain: boolean) => {
+        const state = useOrderPlacementStore.getState();
         set({
             quickMode: true,
             showQuickModeConfirm: false,
             quickModeDefaultAmount: amount,
             dontAskAgainQuickMode: dontAskAgain,
+            activeOrder: { type: state.quickModeTradeType, size: amount },
         });
     },
 }));

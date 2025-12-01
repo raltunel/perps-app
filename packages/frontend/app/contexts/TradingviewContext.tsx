@@ -433,70 +433,39 @@ export const TradingViewProvider: React.FC<{
                 container.style.alignItems = 'center';
                 container.style.marginLeft = '8px';
                 container.style.padding = '8px 12px';
-                container.style.backgroundColor = '#0e1117';
+                container.style.backgroundColor = 'transparent';
                 container.style.border = 'none';
-                container.style.gap = '12px';
-                container.style.borderRadius = '6px';
+                container.style.gap = '2px';
                 container.style.position = 'relative';
 
-                const toggleLabel = document.createElement('label');
-                toggleLabel.style.position = 'relative';
-                toggleLabel.style.display = 'inline-block';
-                toggleLabel.style.width = '44px';
-                toggleLabel.style.height = '24px';
-                toggleLabel.style.cursor = 'pointer';
-
-                const toggleInput = document.createElement('input');
-                toggleInput.type = 'checkbox';
-                toggleInput.style.opacity = '0';
-                toggleInput.style.width = '0';
-                toggleInput.style.height = '0';
-
-                const toggleSlider = document.createElement('span');
-                toggleSlider.style.position = 'absolute';
-                toggleSlider.style.cursor = 'pointer';
-                toggleSlider.style.top = '0';
-                toggleSlider.style.left = '0';
-                toggleSlider.style.right = '0';
-                toggleSlider.style.bottom = '0';
-                toggleSlider.style.backgroundColor = '#3a3f4d';
-                toggleSlider.style.transition = '0.15s';
-                toggleSlider.style.borderRadius = '24px';
-
-                const toggleKnob = document.createElement('span');
-                toggleKnob.style.position = 'absolute';
-                toggleKnob.style.height = '18px';
-                toggleKnob.style.width = '18px';
-                toggleKnob.style.left = '3px';
-                toggleKnob.style.bottom = '3px';
-                toggleKnob.style.backgroundColor = 'white';
-                toggleKnob.style.transition = '0.15s';
-                toggleKnob.style.borderRadius = '50%';
-
-                toggleSlider.appendChild(toggleKnob);
-                toggleLabel.appendChild(toggleInput);
-                toggleLabel.appendChild(toggleSlider);
-
-                const modeLabel = document.createElement('span');
-                modeLabel.textContent = 'Quick Trade Mode';
-                modeLabel.style.color = '#cbcaca';
-                modeLabel.style.fontSize = '13px';
-                modeLabel.style.fontWeight = '500';
-                modeLabel.style.whiteSpace = 'nowrap';
+                const toggleButton = document.createElement('button');
+                toggleButton.style.padding = '8px 12px';
+                toggleButton.style.backgroundColor = '#2a2e39';
+                toggleButton.style.border = 'none';
+                toggleButton.style.borderRadius = '4px';
+                toggleButton.style.color = '#cbcaca';
+                toggleButton.style.fontSize = '13px';
+                toggleButton.style.fontWeight = '500';
+                toggleButton.style.cursor = 'pointer';
+                toggleButton.style.transition = 'all 0.15s';
+                toggleButton.style.outline = 'none';
+                toggleButton.style.height = '30px';
 
                 const dropdownButton = document.createElement('button');
                 dropdownButton.style.display = 'flex';
                 dropdownButton.style.alignItems = 'center';
-                dropdownButton.style.gap = '8px';
-                dropdownButton.style.padding = '6px 12px';
+                dropdownButton.style.justifyContent = 'center';
+                dropdownButton.style.padding = '8px';
                 dropdownButton.style.backgroundColor = '#2a2e39';
                 dropdownButton.style.border = 'none';
                 dropdownButton.style.borderRadius = '4px';
                 dropdownButton.style.color = '#cbcaca';
-                dropdownButton.style.fontSize = '13px';
+                dropdownButton.style.fontSize = '10px';
                 dropdownButton.style.cursor = 'pointer';
                 dropdownButton.style.transition = 'background-color 0.15s';
                 dropdownButton.style.outline = 'none';
+                dropdownButton.style.height = '30px';
+                dropdownButton.textContent = '▼';
 
                 const dropdownMenu = document.createElement('div');
                 dropdownMenu.style.position = 'fixed';
@@ -509,14 +478,6 @@ export const TradingViewProvider: React.FC<{
                 dropdownMenu.style.overflow = 'hidden';
                 dropdownMenu.style.border =
                     '1px solid rgba(255, 255, 255, 0.1)';
-
-                const dropdownText = document.createElement('span');
-                const dropdownArrow = document.createElement('span');
-                dropdownArrow.textContent = '▼';
-                dropdownArrow.style.fontSize = '10px';
-
-                dropdownButton.appendChild(dropdownText);
-                dropdownButton.appendChild(dropdownArrow);
 
                 const tradeTypes: TradeType[] = [
                     'Market',
@@ -553,20 +514,33 @@ export const TradingViewProvider: React.FC<{
 
                 const updateDropdownText = () => {
                     const state = useOrderPlacementStore.getState();
-                    dropdownText.textContent = state.quickModeTradeType;
+                    toggleButton.textContent = state.quickModeTradeType;
                 };
 
                 const updateToggleState = () => {
                     const state = useOrderPlacementStore.getState();
-                    toggleInput.checked = state.quickMode;
 
                     if (state.quickMode) {
-                        toggleSlider.style.backgroundColor =
-                            'var(--accent1, #4a8bd3)';
-                        toggleKnob.style.left = '23px';
+                        toggleButton.style.backgroundColor =
+                            'var(--accent1-dark, #5f5df0)';
+                        toggleButton.style.color = '#ffffff';
                     } else {
-                        toggleSlider.style.backgroundColor = '#3a3f4d';
-                        toggleKnob.style.left = '3px';
+                        toggleButton.style.backgroundColor = '#2a2e39';
+                        toggleButton.style.color = '#cbcaca';
+                    }
+
+                    if (state.activeOrder) {
+                        container.setAttribute(
+                            'title',
+                            `${state.activeOrder.size} USD - ${state.activeOrder.type} `,
+                        );
+                    } else {
+                        container.setAttribute(
+                            'title',
+                            state.quickMode
+                                ? 'Quick Trade Mode: ON'
+                                : 'Quick Trade Mode: OFF',
+                        );
                     }
                 };
 
@@ -578,8 +552,19 @@ export const TradingViewProvider: React.FC<{
                     updateDropdownText();
                 });
 
-                toggleInput.addEventListener('change', () => {
+                toggleButton.addEventListener('click', () => {
                     toggleQuickMode();
+                });
+
+                toggleButton.addEventListener('mouseenter', () => {
+                    const state = useOrderPlacementStore.getState();
+                    if (!state.quickMode) {
+                        toggleButton.style.backgroundColor = '#4a5060';
+                    }
+                });
+
+                toggleButton.addEventListener('mouseleave', () => {
+                    updateToggleState();
                 });
 
                 dropdownButton.addEventListener('mouseenter', () => {
@@ -611,8 +596,7 @@ export const TradingViewProvider: React.FC<{
                     }
                 });
 
-                container.appendChild(toggleLabel);
-                container.appendChild(modeLabel);
+                container.appendChild(toggleButton);
                 container.appendChild(dropdownButton);
                 document.body.appendChild(dropdownMenu);
 
