@@ -17,7 +17,7 @@ export const usePreviewOrderLines = (): LineData[] => {
                 {
                     xLoc: 0.4,
                     yPrice: orderInputPriceValue,
-                    color: isPreviewOrderHovered ? '#ffff00' : '#e9e980',
+                    color: isPreviewOrderHovered ? '#d4cc45' : '#e9e980',
                     type: 'PREVIEW_ORDER',
                     lineStyle: 2,
                     lineWidth: 1,

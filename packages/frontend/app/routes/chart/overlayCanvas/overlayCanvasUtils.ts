@@ -158,6 +158,33 @@ export function getMainSeriesPaneIndex(
 export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     iframeDoc: Document | null;
     paneCanvas: HTMLCanvasElement | null;
+} {
+    const chartDiv = document.getElementById('tv_chart');
+    const iframe = chartDiv?.querySelector('iframe') as HTMLIFrameElement;
+    const iframeDoc =
+        iframe?.contentDocument || iframe?.contentWindow?.document;
+
+    if (!iframeDoc) {
+        return { iframeDoc: null, paneCanvas: null };
+    }
+
+    const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
+        'canvas[data-name="pane-canvas"]',
+    );
+
+    const paneIndex = getMainSeriesPaneIndex(chart);
+    if (paneIndex === null || paneIndex === undefined) {
+        return { iframeDoc, paneCanvas: null };
+    }
+
+    return {
+        iframeDoc,
+        paneCanvas: paneCanvases[paneIndex] ?? null,
+    };
+}
+
+export function getPriceAxisContainer(chart: IChartingLibraryWidget): {
+    iframeDoc: Document | null;
     yAxisCanvas: HTMLCanvasElement | null;
     priceAxisContainers: HTMLElement[] | null;
 } {
@@ -169,15 +196,10 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     if (!iframeDoc) {
         return {
             iframeDoc: null,
-            paneCanvas: null,
             yAxisCanvas: null,
             priceAxisContainers: null,
         };
     }
-
-    const paneCanvases = iframeDoc.querySelectorAll<HTMLCanvasElement>(
-        'canvas[data-name="pane-canvas"]',
-    );
 
     const priceAxisContainers = Array.from(
         iframeDoc.querySelectorAll<HTMLElement>(
@@ -189,7 +211,6 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
     if (paneIndex === null || paneIndex === undefined) {
         return {
             iframeDoc,
-            paneCanvas: null,
             yAxisCanvas: null,
             priceAxisContainers: null,
         };
@@ -216,7 +237,6 @@ export function getPaneCanvasAndIFrameDoc(chart: IChartingLibraryWidget): {
 
     return {
         iframeDoc,
-        paneCanvas: paneCanvases[paneIndex] ?? null,
         yAxisCanvas: yAxisCanvas ?? null,
         priceAxisContainers:
             priceAxisContainers.length > 0 ? priceAxisContainers : null,

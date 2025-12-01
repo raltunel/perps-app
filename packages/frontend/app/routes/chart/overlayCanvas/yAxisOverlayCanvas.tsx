@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useTradingView } from '~/contexts/TradingviewContext';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import {
-    getPaneCanvasAndIFrameDoc,
     getXandYLocationForChartDrag,
     getMainSeriesPaneIndex,
     scaleDataRef,
+    getPriceAxisContainer,
 } from './overlayCanvasUtils';
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
@@ -51,7 +51,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         if (!chart || !isChartReady) return;
 
         const { iframeDoc, yAxisCanvas, priceAxisContainers } =
-            getPaneCanvasAndIFrameDoc(chart);
+            getPriceAxisContainer(chart);
         if (
             !iframeDoc ||
             !yAxisCanvas ||
