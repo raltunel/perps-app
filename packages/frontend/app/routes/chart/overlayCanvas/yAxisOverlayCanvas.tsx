@@ -50,8 +50,15 @@ const YAxisOverlayCanvas: React.FC = () => {
     useEffect(() => {
         if (!chart || !isChartReady) return;
 
-        const { iframeDoc, yAxisCanvas } = getPaneCanvasAndIFrameDoc(chart);
-        if (!iframeDoc || !yAxisCanvas || !yAxisCanvas.parentNode) return;
+        const { iframeDoc, yAxisCanvas, priceAxisContainers } =
+            getPaneCanvasAndIFrameDoc(chart);
+        if (
+            !iframeDoc ||
+            !yAxisCanvas ||
+            !yAxisCanvas.parentNode ||
+            !priceAxisContainers
+        )
+            return;
 
         if (!canvasRef.current) {
             const newCanvas = iframeDoc.createElement('canvas');
@@ -79,11 +86,52 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         updateCanvasSize();
 
-        const resizeObserver = new ResizeObserver(() => {
+        const yAxisResizeObserver = new ResizeObserver(() => {
             updateCanvasSize();
         });
 
-        resizeObserver.observe(yAxisCanvas);
+        yAxisResizeObserver.observe(yAxisCanvas);
+
+        const containerWidths = new Map<HTMLElement, number>();
+        priceAxisContainers.forEach((container) => {
+            containerWidths.set(
+                container,
+                container.getBoundingClientRect().width,
+            );
+        });
+
+        const priceAxisResizeObserver = new ResizeObserver((entries) => {
+            let positionChanged = false;
+
+            for (const entry of entries) {
+                const container = entry.target as HTMLElement;
+                const newWidth = entry.contentRect.width;
+                const oldWidth = containerWidths.get(container) || 0;
+
+                // Check if width changed between 0 and non-zero (position shift)
+                if (
+                    (oldWidth === 0 && newWidth > 0) ||
+                    (oldWidth > 0 && newWidth === 0)
+                ) {
+                    positionChanged = true;
+                }
+
+                containerWidths.set(container, newWidth);
+            }
+
+            if (positionChanged) {
+                if (canvas?.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
+                }
+                canvasRef.current = null;
+                isInitialSizeSetRef.current = false;
+                setIsPaneChanged((prev) => !prev);
+            }
+        });
+
+        priceAxisContainers.forEach((container) => {
+            priceAxisResizeObserver.observe(container);
+        });
 
         const ensureCanvasSize = () => {
             if (!isInitialSizeSetRef.current) {
@@ -145,7 +193,8 @@ const YAxisOverlayCanvas: React.FC = () => {
         yAxisCanvas.addEventListener('mouseout', handleMouseOut);
 
         return () => {
-            resizeObserver.disconnect();
+            yAxisResizeObserver.disconnect();
+            priceAxisResizeObserver.disconnect();
             canvas.removeEventListener('mousemove', handleCanvasMouseMove);
             yAxisCanvas.removeEventListener('mousemove', handleYAxisMouseMove);
             canvas.removeEventListener('mouseout', handleMouseOut);
