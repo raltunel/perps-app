@@ -37,6 +37,9 @@
     font-size: var(--font-size-m);
     white-space: nowrap;
 }
+.moreSection {
+    display: none;
+}
 .logo {
     flex: 0 0 auto;
 }
