@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import {
+    isEstablished,
+    SessionButton,
+    useSession,
+} from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 
 interface QuickModeConfirmModalProps {
@@ -10,6 +15,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     onClose,
     onConfirm,
 }) => {
+    const session = useSession();
+    const isSessionEstablished = isEstablished(session);
     const [amount, setAmount] = useState<string>('');
     const [cancelHovered, setCancelHovered] = useState(false);
     const [confirmHovered, setConfirmHovered] = useState(false);
@@ -194,39 +201,58 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                     >
                         Cancel
                     </button>
-                    <button
-                        style={{
-                            flex: 1,
-                            height: '36px',
-                            padding: '0 16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: isConfirmDisabled
-                                ? 'not-allowed'
-                                : 'pointer',
-                            backgroundColor: isConfirmDisabled
-                                ? '#3a3a3a'
-                                : confirmHovered
-                                  ? 'var(--accent1, #5294e2)'
-                                  : 'var(--accent1, #4a8bd3)',
-                            border: 'none',
-                            borderRadius: '6px',
-                            transition: 'background-color 0.15s',
-                            color: isConfirmDisabled ? '#888888' : '#ffffff',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            fontFamily:
-                                '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-                            opacity: isConfirmDisabled ? 0.5 : 1,
-                        }}
-                        onMouseEnter={() => setConfirmHovered(true)}
-                        onMouseLeave={() => setConfirmHovered(false)}
-                        onClick={isConfirmDisabled ? undefined : handleConfirm}
-                        disabled={isConfirmDisabled}
-                    >
-                        Enable Quick Mode
-                    </button>
+                    {!isSessionEstablished ? (
+                        <div
+                            style={{
+                                flex: 1,
+                                height: '36px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                            className='plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Quick+Mode+Modal'
+                        >
+                            <SessionButton />
+                        </div>
+                    ) : (
+                        <button
+                            style={{
+                                flex: 1,
+                                height: '36px',
+                                padding: '0 16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: isConfirmDisabled
+                                    ? 'not-allowed'
+                                    : 'pointer',
+                                backgroundColor: isConfirmDisabled
+                                    ? '#3a3a3a'
+                                    : confirmHovered
+                                      ? 'var(--accent1, #5294e2)'
+                                      : 'var(--accent1, #4a8bd3)',
+                                border: 'none',
+                                borderRadius: '6px',
+                                transition: 'background-color 0.15s',
+                                color: isConfirmDisabled
+                                    ? '#888888'
+                                    : '#ffffff',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                fontFamily:
+                                    '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                                opacity: isConfirmDisabled ? 0.5 : 1,
+                            }}
+                            onMouseEnter={() => setConfirmHovered(true)}
+                            onMouseLeave={() => setConfirmHovered(false)}
+                            onClick={
+                                isConfirmDisabled ? undefined : handleConfirm
+                            }
+                            disabled={isConfirmDisabled}
+                        >
+                            Enable Quick Mode
+                        </button>
+                    )}
                 </div>
             </div>
             <div
