@@ -111,7 +111,8 @@ export const TradingViewProvider: React.FC<{
 
     const dataFeedRef = useRef<CustomDataFeedType | null>(null);
 
-    const { debugToolbarOpen, setDebugToolbarOpen } = useAppStateStore();
+    const { debugToolbarOpen, setDebugToolbarOpen, lastOnlineAt } =
+        useAppStateStore();
     const debugToolbarOpenRef = useRef(debugToolbarOpen);
     debugToolbarOpenRef.current = debugToolbarOpen;
 
@@ -578,6 +579,19 @@ export const TradingViewProvider: React.FC<{
             }
         }
     }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
+
+    // Refresh chart when coming back online
+    useEffect(() => {
+        if (lastOnlineAt > 0 && chart) {
+            console.log('>>> Refreshing chart after coming back online');
+            try {
+                chart.resetCache();
+                chart.chart().resetData();
+            } catch (e) {
+                console.error('Error refreshing chart after reconnect:', e);
+            }
+        }
+    }, [lastOnlineAt, chart]);
 
     useEffect(() => {
         if (!chart || !symbol) return;
