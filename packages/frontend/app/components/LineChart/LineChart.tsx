@@ -80,7 +80,17 @@ const LineChart: React.FC<LineChartProps> = (props) => {
                     tickCount,
                 );
 
-                yAxisTicksRef.current = ticks;
+                if (ticks.length < 2) {
+                    const adjustedTicks = d3.ticks(
+                        minPrice - padding,
+                        maxPrice + padding,
+                        tickCount + 1,
+                    );
+
+                    yAxisTicksRef.current = adjustedTicks;
+                } else {
+                    yAxisTicksRef.current = ticks;
+                }
             }
         }
     }, [lineData, chartName, chartHeight]);
