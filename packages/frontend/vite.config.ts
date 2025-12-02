@@ -89,9 +89,15 @@ export default defineConfig({
             registerType: 'autoUpdate',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
-                globPatterns: ['**/*.{js,css,html,png,svg,woff2,ttf}'],
-                // Don't cache large chunks or service worker itself
+                // Don't cache HTML - always fetch fresh from network to ensure updates are seen
+                globPatterns: ['**/*.{js,css,png,svg,woff2,ttf}'],
+                // Don't cache service worker files
                 globIgnores: ['**/sw.js', '**/workbox-*.js'],
+                // Use network-first strategy for navigation requests (HTML pages)
+                navigateFallback: null,
+                // Skip waiting and claim clients immediately on update
+                skipWaiting: true,
+                clientsClaim: true,
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',

@@ -25,6 +25,18 @@ export interface FilterOption {
     label: string;
 }
 
+const tradePageBlackListTabs = new Set([
+    'Funding History',
+    'Deposits and Withdrawals',
+    'Depositors',
+]);
+
+const portfolioPageBlackListTabs = new Set([
+    'Depositors',
+    'Funding History',
+    'Deposits and Withdrawals',
+]);
+
 interface TradeTableProps {
     vaultPage?: boolean;
     vaultFetched?: boolean;
@@ -115,23 +127,25 @@ export default function TradeTable(props: TradeTableProps) {
         }
     }, [vaultPage]);
 
-    const {
-        orderHistoryFetched,
-        tradeHistoryFetched,
-        fundingHistoryFetched,
-        webDataFetched,
-    } = useMemo(() => {
-        return {
-            orderHistoryFetched: fetchedChannels.has(
-                WsChannels.USER_HISTORICAL_ORDERS,
-            ),
-            tradeHistoryFetched: fetchedChannels.has(WsChannels.USER_FILLS),
-            fundingHistoryFetched: fetchedChannels.has(
-                WsChannels.USER_FUNDINGS,
-            ),
-            webDataFetched: fetchedChannels.has(WsChannels.WEB_DATA2),
-        };
-    }, [Array.from(fetchedChannels).join(',')]);
+    useEffect(() => {
+        if (page === Pages.TRADE) {
+            if (tradePageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('common.positions');
+            }
+        } else if (page === Pages.PORTFOLIO) {
+            if (portfolioPageBlackListTabs.has(selectedTradeTab)) {
+                handleTabChange('common.positions');
+            }
+        }
+    }, [page]);
+
+    // Derive fetched states directly - Set.has() is O(1) and cheap
+    const orderHistoryFetched = fetchedChannels.has(
+        WsChannels.USER_HISTORICAL_ORDERS,
+    );
+    const tradeHistoryFetched = fetchedChannels.has(WsChannels.USER_FILLS);
+    const fundingHistoryFetched = fetchedChannels.has(WsChannels.USER_FUNDINGS);
+    const webDataFetched = fetchedChannels.has(WsChannels.WEB_DATA2);
 
     const handleTabChange = (tab: string) => {
         setSelectedTradeTab(tab);
@@ -139,6 +153,10 @@ export default function TradeTable(props: TradeTableProps) {
 
     const handleFilterChange = (selectedId: string) => {
         setSelectedFilter(selectedId);
+    };
+
+    const handleClearFilter = () => {
+        setSelectedFilter('all');
     };
 
     const rightAlignedContent = (
@@ -164,6 +182,7 @@ export default function TradeTable(props: TradeTableProps) {
                                 : webDataFetched
                         }
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.openOrders':
@@ -172,6 +191,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         isFetched={orderHistoryFetched}
                         data={userOrders}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             // case 'TWAP':
@@ -181,6 +201,8 @@ export default function TradeTable(props: TradeTableProps) {
                     <TradeHistoryTable
                         data={userFills}
                         isFetched={tradeHistoryFetched}
+                        selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.fundingHistory':
@@ -189,6 +211,7 @@ export default function TradeTable(props: TradeTableProps) {
                         userFundings={userFundings}
                         isFetched={fundingHistoryFetched}
                         selectedFilter={selectedFilter}
+                        onClearFilter={handleClearFilter}
                     />
                 );
             case 'common.orderHistory':
@@ -197,6 +220,7 @@ export default function TradeTable(props: TradeTableProps) {
                         selectedFilter={selectedFilter}
                         data={orderHistory}
                         isFetched={orderHistoryFetched}
+                        onClearFilter={handleClearFilter}
                     />
                 );
 
