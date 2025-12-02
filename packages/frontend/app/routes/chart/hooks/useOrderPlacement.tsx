@@ -6,10 +6,20 @@ export interface PendingOrder {
     timestamp: number; // to trigger even if same price/side
 }
 
+export interface PreparedOrder {
+    price: number;
+    side: 'buy' | 'sell';
+    type: TradeType;
+    size: number;
+    currency: string;
+    timestamp: number;
+}
+
 export type TradeType = 'Market' | 'Limit' /* | 'Stop Market' | 'Stop Limit' */;
 
 interface OrderPlacementStore {
     pendingOrder: PendingOrder | null;
+    preparedOrder: PreparedOrder | null;
     showModal: boolean;
     modalData: { price: number; side: 'buy' | 'sell' } | null;
     quickMode: boolean;
@@ -19,6 +29,7 @@ interface OrderPlacementStore {
     activeOrder: { type: TradeType; size: number; currency: string } | null;
     placeOrder: (price: number, side: 'buy' | 'sell') => void;
     clearPendingOrder: () => void;
+    setPreparedOrder: (order: PreparedOrder | null) => void;
     openModal: (price: number, side: 'buy' | 'sell') => void;
     closeModal: () => void;
     confirmOrder: (price: number, amount: number) => void;
@@ -31,6 +42,7 @@ interface OrderPlacementStore {
 
 export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     pendingOrder: null,
+    preparedOrder: null,
     showModal: false,
     modalData: null,
     quickMode: false,
@@ -42,6 +54,8 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
         set({ pendingOrder: { price, side, timestamp: Date.now() } });
     },
     clearPendingOrder: () => set({ pendingOrder: null }),
+    setPreparedOrder: (order: PreparedOrder | null) =>
+        set({ preparedOrder: order }),
     openModal: (price: number, side: 'buy' | 'sell') => {
         set({ showModal: true, modalData: { price, side } });
     },

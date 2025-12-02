@@ -579,7 +579,6 @@ export const TradingViewProvider: React.FC<{
                         setQuickModeTradeType(type);
                         dropdownMenu.style.display = 'none';
                         updateDropdownText();
-                        // Open modal to configure the selected trade type
                         openQuickModeConfirm();
                     });
 
