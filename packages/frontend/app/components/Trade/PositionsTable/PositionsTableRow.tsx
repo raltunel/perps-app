@@ -13,7 +13,7 @@ import { useLeverageStore } from '~/stores/LeverageStore';
 import { useNotificationStore } from '~/stores/NotificationStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
-import { blockExplorer, BTC_MAX_LEVERAGE, getTxLink } from '~/utils/Constants';
+import { BTC_MAX_LEVERAGE, getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import type { PositionIF } from '~/utils/UserDataIFs';
 import LeverageSliderModal from '../LeverageSliderModal/LeverageSliderModal';
