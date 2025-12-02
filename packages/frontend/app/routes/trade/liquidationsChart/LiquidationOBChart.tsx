@@ -143,6 +143,8 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
     const buyColorRef = useRef(getBsColor().buy);
     const sellColorRef = useRef(getBsColor().sell);
 
+    const hideTooltipRef = useRef(false);
+
     // calculates center y for liq chart (on overlay chart that center point is changed based on tv chart y axis positioning)
     const getCenterY = useCallback(() => {
         if (
@@ -877,7 +879,7 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const rect = canvas.getBoundingClientRect();
 
             const centerY = getCenterY();
-            const isBuy = centerY < offsetY;
+            const isBuy = centerY < offsetY * usedDpr;
 
             const priceOnMousePoint = pageYScaleRef.current.invert(
                 offsetY * usedDpr,
@@ -943,14 +945,18 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             const percentage = (amount / finalTotal) * 100;
 
-            liqTooltipRef.current.html(
-                '<p>' +
-                    formatNum(percentage) +
-                    '%</p>' +
+            if (!hideTooltipRef.current) {
+                liqTooltipRef.current.html(
                     '<p>' +
-                    formatNum(amount, 2) +
-                    ' </p>',
-            );
+                        formatNum(percentage) +
+                        '%</p>' +
+                        '<p>' +
+                        formatNum(amount, 2) +
+                        ' </p>',
+                );
+            } else {
+                liqTooltipRef.current.html('');
+            }
 
             const width = liqTooltipRef.current
                 .node()
@@ -1319,11 +1325,14 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
                 hoverLineDataRef.current = [];
                 liqTooltipRef.current.style('visibility', 'hidden');
                 setActiveTooltipType(LiqChartTooltipType.Level);
+                handleTooltip(relativeMouseX, relativeMouseY);
+                hideTooltipRef.current = true;
                 return;
             }
 
             handleTooltip(relativeMouseX, relativeMouseY);
             setActiveTooltipType(LiqChartTooltipType.Distribution);
+            hideTooltipRef.current = false;
             setFocusSource(location);
         },
         [handleTooltip, location],
