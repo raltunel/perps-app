@@ -581,16 +581,32 @@ export const TradingViewProvider: React.FC<{
     }, [lastSleepMs, lastAwakeMs, chartInterval, initChart, chart, symbol]);
 
     // Refresh chart when coming back online
+    const lastOnlineAtRef = useRef(lastOnlineAt);
     useEffect(() => {
-        if (lastOnlineAt > 0 && chart) {
+        // Only trigger if lastOnlineAt actually changed (not on initial mount)
+        if (
+            lastOnlineAt > 0 &&
+            lastOnlineAt !== lastOnlineAtRef.current &&
+            chart
+        ) {
             console.log('>>> Refreshing chart after coming back online');
-            try {
-                chart.resetCache();
-                chart.chart().resetData();
-            } catch (e) {
-                console.error('Error refreshing chart after reconnect:', e);
-            }
+            lastOnlineAtRef.current = lastOnlineAt;
+
+            // Give the network a moment to stabilize, then refresh
+            const timeoutId = setTimeout(() => {
+                try {
+                    // Clear caches and force a full data reload
+                    clearAllChartCaches();
+                    chart.activeChart().resetData();
+                    chart.activeChart().refreshMarks();
+                } catch (e) {
+                    console.error('Error refreshing chart after reconnect:', e);
+                }
+            }, 1000);
+
+            return () => clearTimeout(timeoutId);
         }
+        lastOnlineAtRef.current = lastOnlineAt;
     }, [lastOnlineAt, chart]);
 
     useEffect(() => {
