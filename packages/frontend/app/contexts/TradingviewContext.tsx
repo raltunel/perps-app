@@ -558,12 +558,7 @@ export const TradingViewProvider: React.FC<{
                 dropdownMenu.style.border =
                     '1px solid rgba(255, 255, 255, 0.1)';
 
-                const tradeTypes: TradeType[] = [
-                    'Market',
-                    'Limit',
-                    'Stop Market',
-                    'Stop Limit',
-                ];
+                const tradeTypes: TradeType[] = ['Market', 'Limit'];
 
                 tradeTypes.forEach((type) => {
                     const item = document.createElement('div');
