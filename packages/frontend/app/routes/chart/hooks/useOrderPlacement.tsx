@@ -6,7 +6,7 @@ export interface PendingOrder {
     timestamp: number; // to trigger even if same price/side
 }
 
-export type TradeType = 'Market' | 'Limit' | 'Stop Market' | 'Stop Limit';
+export type TradeType = 'Market' | 'Limit' /* | 'Stop Market' | 'Stop Limit' */;
 
 interface OrderPlacementStore {
     pendingOrder: PendingOrder | null;
@@ -17,7 +17,7 @@ interface OrderPlacementStore {
     quickModeDefaultAmount: number;
     dontAskAgainQuickMode: boolean;
     quickModeTradeType: TradeType;
-    activeOrder: { type: TradeType; size: number } | null;
+    activeOrder: { type: TradeType; size: number; currency: string } | null;
     placeOrder: (price: number, side: 'buy' | 'sell') => void;
     clearPendingOrder: () => void;
     openModal: (price: number, side: 'buy' | 'sell') => void;
@@ -57,7 +57,11 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
             pendingOrder: { price, side, timestamp: Date.now() },
             showModal: false,
             modalData: null,
-            activeOrder: { type: state.quickModeTradeType, size: amount },
+            activeOrder: {
+                type: state.quickModeTradeType,
+                size: amount,
+                currency: 'USD',
+            },
         });
     },
     toggleQuickMode: () => {
@@ -87,7 +91,11 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
             showQuickModeConfirm: false,
             quickModeDefaultAmount: amount,
             dontAskAgainQuickMode: dontAskAgain,
-            activeOrder: { type: state.quickModeTradeType, size: amount },
+            activeOrder: {
+                type: state.quickModeTradeType,
+                size: amount,
+                currency: 'USD',
+            },
         });
     },
 }));
