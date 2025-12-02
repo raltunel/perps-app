@@ -30,7 +30,9 @@ jobs:
                   cache: 'pnpm'
 
             - name: Enable corepack (pnpm)
-              run: corepack enable
+              run: |
+                  corepack enable
+                  corepack prepare pnpm@9 --activate
 
             - name: Install dependencies
               run: pnpm install
