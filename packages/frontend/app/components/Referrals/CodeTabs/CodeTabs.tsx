@@ -85,9 +85,9 @@ export default function CodeTabs(props: PropsIF) {
     const [refCodeToConsume, setRefCodeToConsume] = useState<
         string | undefined
     >(undefined);
-    // if a value appears in the cache while state is empty, consume it
+    // Update refCodeToConsume whenever the cached value changes
     useEffect(() => {
-        if (refCodeToConsume === undefined && affiliateAddress) {
+        if (referralStore.cached && affiliateAddress) {
             (async () => {
                 console.log('running');
                 const isOwnedByUser: boolean | undefined =
@@ -99,6 +99,8 @@ export default function CodeTabs(props: PropsIF) {
                     setRefCodeToConsume(referralStore.cached);
                 setIsRefCodeSelfOwned(isOwnedByUser);
             })();
+        } else if (!referralStore.cached) {
+            setRefCodeToConsume(undefined);
         }
     }, [referralStore.cached, affiliateAddress]);
 
@@ -338,45 +340,54 @@ export default function CodeTabs(props: PropsIF) {
         boolean | undefined
     >(undefined);
 
+    // Track which code was validated to detect when validation state is stale
+    const [lastValidatedCode, setLastValidatedCode] = useState<string>('');
+
     // Validate cached referral code when it changes (e.g., from URL)
     useEffect(() => {
         // Don't validate if there's no cached code
         if (!referralStore.cached) {
             setIsCachedValueValid(undefined);
+            setLastValidatedCode('');
             return;
         }
 
-        // Don't re-validate if we already have a validation result for this code
-        if (isCachedValueValid !== undefined) {
+        // Don't re-validate if we already have a validation result for this specific code
+        if (
+            isCachedValueValid !== undefined &&
+            lastValidatedCode === referralStore.cached
+        ) {
             return;
         }
 
         (async () => {
+            const codeToValidate = referralStore.cached;
             try {
-                const isCachedCodeFree: boolean = await isAffiliateCodeFree(
-                    referralStore.cached,
-                );
+                const isCachedCodeFree: boolean =
+                    await isAffiliateCodeFree(codeToValidate);
                 console.log('isCodeFree: ', isCachedCodeFree);
 
                 if (isCachedCodeFree) {
                     // Code is not claimed - show in edit mode with error
-                    setInvalidCode(referralStore.cached);
+                    setInvalidCode(codeToValidate);
                     setIsCachedValueValid(false);
                     setEditModeReferral(true);
-                    setUserInputRefCode(referralStore.cached);
+                    setUserInputRefCode(codeToValidate);
                 } else {
                     // Code is valid and claimed
                     setIsCachedValueValid(true);
                     setEditModeReferral(false);
                 }
+                setLastValidatedCode(codeToValidate);
             } catch (error) {
                 // On error, assume invalid to be safe
                 setIsCachedValueValid(false);
                 setEditModeReferral(true);
-                setUserInputRefCode(referralStore.cached);
+                setUserInputRefCode(codeToValidate);
+                setLastValidatedCode(codeToValidate);
             }
         })();
-    }, [referralStore.cached, isCachedValueValid]);
+    }, [referralStore.cached, isCachedValueValid, lastValidatedCode]);
 
     const currentCodeElem = (
         <section className={styles.sectionWithButton}>
