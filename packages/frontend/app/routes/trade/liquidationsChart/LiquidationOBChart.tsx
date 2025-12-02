@@ -46,7 +46,15 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         location,
     } = props;
 
-    const { setActiveTooltipType } = useLiqChartStore();
+    const {
+        setActiveTooltipType,
+        setFocusedPrice,
+        focusedPrice,
+        setFocusSource,
+        focusSource,
+    } = useLiqChartStore();
+    const focusSourceRef = useRef(focusSource);
+    focusSourceRef.current = focusSource;
 
     const d3CanvasLiq = useRef<HTMLCanvasElement | null>(null);
     const d3CanvasLiqHover = useRef<HTMLCanvasElement | null>(null);
@@ -827,8 +835,28 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
         [animDuration, interPolateData, interPolateLiqData, updateScalesOnly],
     );
 
+    useEffect(() => {
+        if (!pageYScaleRef.current) return;
+        if (location === focusSourceRef.current) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const usedDpr = location === 'liqMobile' ? dpr : 1;
+
+        let yPoint = 0;
+        if (location === 'liqMobile') {
+            yPoint = scaleDataRef.current.yScale(focusedPrice) / usedDpr;
+        } else {
+            yPoint = pageYScaleRef.current(focusedPrice / usedDpr);
+        }
+        handleTooltip(0, yPoint, true);
+    }, [focusedPrice, location]);
+
     const handleTooltip = useCallback(
-        (offsetX: number, offsetY: number) => {
+        (
+            offsetX: number,
+            offsetY: number,
+            updateFromStore: boolean = false,
+        ) => {
             if (
                 !xScaleRef.current ||
                 !pageYScaleRef.current ||
@@ -854,6 +882,11 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const priceOnMousePoint = pageYScaleRef.current.invert(
                 offsetY * usedDpr,
             );
+
+            // chart is being updated from store, so we don't need to update the store
+            if (!updateFromStore) {
+                setFocusedPrice(priceOnMousePoint);
+            }
 
             // Calculate hover line data
             hoverLineDataRef.current = [
@@ -967,8 +1000,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
             const offsetX = event.clientX - rect?.left;
 
             handleTooltip(offsetX, offsetY);
+            setFocusSource(location);
         },
-        [handleTooltip],
+        [handleTooltip, location],
     );
 
     const clipCanvas = (
@@ -992,13 +1026,6 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
         const startY = point * dpr;
         const endY = clipEdge - startY;
-
-        // console.log(
-        //     '>>>>> clip canvas height',
-        //     highlightedCanvas.height,
-        //     ' is reverse',
-        //     reverse,
-        // );
 
         ctx.save();
         ctx.beginPath();
@@ -1297,8 +1324,9 @@ const LiquidationsChart: React.FC<LiquidationsChartProps> = (props) => {
 
             handleTooltip(relativeMouseX, relativeMouseY);
             setActiveTooltipType(LiqChartTooltipType.Distribution);
+            setFocusSource(location);
         },
-        [handleTooltip],
+        [handleTooltip, location],
     );
 
     useEffect(() => {

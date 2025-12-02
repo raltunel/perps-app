@@ -9,6 +9,10 @@ export enum LiqChartTooltipType {
 interface LiqChartStore {
     activeTooltipType: LiqChartTooltipType;
     setActiveTooltipType: (tooltipType: LiqChartTooltipType) => void;
+    focusedPrice: number;
+    setFocusedPrice: (focusedPrice: number) => void;
+    focusSource: string;
+    setFocusSource: (focusSource: string) => void;
 }
 
 export const useLiqChartStore = create<LiqChartStore>()(
@@ -17,6 +21,12 @@ export const useLiqChartStore = create<LiqChartStore>()(
             activeTooltipType: LiqChartTooltipType.Level,
             setActiveTooltipType: (tooltipType: LiqChartTooltipType) =>
                 set({ activeTooltipType: tooltipType }),
+            focusedPrice: 0,
+            setFocusedPrice: (focusedPrice: number) =>
+                set({ focusedPrice: focusedPrice }),
+            focusSource: '',
+            setFocusSource: (focusSource: string) =>
+                set({ focusSource: focusSource }),
         }),
         {
             name: 'LIQCHART',
