@@ -87,17 +87,25 @@ export default defineConfig({
         tsconfigPaths(),
         VitePWA({
             registerType: 'autoUpdate',
+            injectRegister: 'script',
             workbox: {
                 maximumFileSizeToCacheInBytes: 5_000_000,
                 // Don't cache HTML - always fetch fresh from network to ensure updates are seen
                 globPatterns: ['**/*.{js,css,png,svg,woff2,ttf}'],
-                // Don't cache service worker files
-                globIgnores: ['**/sw.js', '**/workbox-*.js'],
+                // Don't cache service worker files or manifest
+                globIgnores: [
+                    '**/sw.js',
+                    '**/workbox-*.js',
+                    '**/registerSW.js',
+                    '**/manifest.webmanifest',
+                ],
                 // Use network-first strategy for navigation requests (HTML pages)
                 navigateFallback: null,
                 // Skip waiting and claim clients immediately on update
                 skipWaiting: true,
                 clientsClaim: true,
+                // Clean up old caches
+                cleanupOutdatedCaches: true,
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',
