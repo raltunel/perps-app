@@ -3,7 +3,7 @@ import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormatte
 
 interface QuickModeConfirmModalProps {
     onClose: () => void;
-    onConfirm: (amount: number, dontAskAgain: boolean) => void;
+    onConfirm: (amount: number) => void;
 }
 
 export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
@@ -17,7 +17,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const handleConfirm = () => {
         const parsedAmount = parseFloat(amount);
         if (parsedAmount > 0) {
-            onConfirm(parsedAmount, false);
+            onConfirm(parsedAmount);
             onClose();
         }
     };

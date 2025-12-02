@@ -15,7 +15,6 @@ interface OrderPlacementStore {
     quickMode: boolean;
     showQuickModeConfirm: boolean;
     quickModeDefaultAmount: number;
-    dontAskAgainQuickMode: boolean;
     quickModeTradeType: TradeType;
     activeOrder: { type: TradeType; size: number; currency: string } | null;
     placeOrder: (price: number, side: 'buy' | 'sell') => void;
@@ -27,7 +26,7 @@ interface OrderPlacementStore {
     setQuickModeTradeType: (tradeType: TradeType) => void;
     openQuickModeConfirm: () => void;
     closeQuickModeConfirm: () => void;
-    confirmQuickMode: (amount: number, dontAskAgain: boolean) => void;
+    confirmQuickMode: (amount: number) => void;
 }
 
 export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
@@ -37,7 +36,6 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     quickMode: false,
     showQuickModeConfirm: false,
     quickModeDefaultAmount: 0,
-    dontAskAgainQuickMode: false,
     quickModeTradeType: 'Limit',
     activeOrder: null,
     placeOrder: (price: number, side: 'buy' | 'sell') => {
@@ -84,13 +82,12 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     },
     openQuickModeConfirm: () => set({ showQuickModeConfirm: true }),
     closeQuickModeConfirm: () => set({ showQuickModeConfirm: false }),
-    confirmQuickMode: (amount: number, dontAskAgain: boolean) => {
+    confirmQuickMode: (amount: number) => {
         const state = useOrderPlacementStore.getState();
         set({
             quickMode: true,
             showQuickModeConfirm: false,
             quickModeDefaultAmount: amount,
-            dontAskAgainQuickMode: dontAskAgain,
             activeOrder: {
                 type: state.quickModeTradeType,
                 size: amount,
