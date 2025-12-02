@@ -106,6 +106,21 @@ export default defineConfig({
                 clientsClaim: true,
                 // Clean up old caches
                 cleanupOutdatedCaches: true,
+                runtimeCaching: [
+                    {
+                        urlPattern: ({ url }) =>
+                            url.origin === self.location.origin &&
+                            url.pathname.startsWith('/images/'),
+                        handler: 'StaleWhileRevalidate',
+                        options: {
+                            cacheName: 'image-cache',
+                            expiration: {
+                                maxEntries: 100,
+                                maxAgeSeconds: 7 * 24 * 60 * 60,
+                            },
+                        },
+                    },
+                ],
             },
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',
