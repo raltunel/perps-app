@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import type { PreparedOrder } from '../hooks/useOrderPlacement';
 
 interface OrderPlacementModalProps {
     price: number;
     side: 'buy' | 'sell';
     symbol?: string;
     onClose: () => void;
-    onConfirm: (price: number, amount: number) => void;
+    onConfirm: (order: PreparedOrder) => void;
 }
 
 export const OrderPlacementModal: React.FC<OrderPlacementModalProps> = ({
@@ -26,7 +27,14 @@ export const OrderPlacementModal: React.FC<OrderPlacementModalProps> = ({
         const parsedPrice = parseFloat(limitPrice);
 
         if (parsedAmount > 0 && parsedPrice > 0) {
-            onConfirm(parsedPrice, parsedAmount);
+            onConfirm({
+                price: parsedPrice,
+                side: side,
+                type: 'Limit',
+                size: parsedAmount,
+                currency: 'USD',
+                timestamp: Date.now(),
+            });
             onClose();
         }
     };

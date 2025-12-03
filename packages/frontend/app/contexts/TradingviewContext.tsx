@@ -167,7 +167,7 @@ export const TradingViewProvider: React.FC<{
     // logic to change the active color pair
     const { bsColor, getBsColor } = useAppSettings();
 
-    const { setPreparedOrder } = useOrderPlacementStore();
+    const { confirmOrder } = useOrderPlacementStore();
     const { symbolInfo } = useTradeDataStore();
 
     const markPx = symbolInfo?.markPx || 1;
@@ -760,7 +760,7 @@ export const TradingViewProvider: React.FC<{
                     position: 'top' as const,
                     text: topOrder.text,
                     click: () => {
-                        setPreparedOrder({
+                        confirmOrder({
                             price: formattedPrice,
                             side: topOrder.side,
                             type: 'Limit',
@@ -774,7 +774,7 @@ export const TradingViewProvider: React.FC<{
                     position: 'top' as const,
                     text: bottomOrder.text,
                     click: () => {
-                        setPreparedOrder({
+                        confirmOrder({
                             price: formattedPrice,
                             side: bottomOrder.side,
                             type: 'Limit',

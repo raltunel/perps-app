@@ -32,7 +32,7 @@ interface OrderPlacementStore {
     setPreparedOrder: (order: PreparedOrder | null) => void;
     openModal: (price: number, side: 'buy' | 'sell') => void;
     closeModal: () => void;
-    confirmOrder: (price: number, amount: number) => void;
+    confirmOrder: (order: PreparedOrder) => void;
     toggleQuickMode: () => void;
     setQuickModeTradeType: (tradeType: TradeType) => void;
     openQuickModeConfirm: () => void;
@@ -63,18 +63,13 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     closeModal: () => {
         set({ showModal: false, modalData: null });
     },
-    confirmOrder: (price: number, amount: number) => {
+    confirmOrder: (order: PreparedOrder | null) => {
         const state = useOrderPlacementStore.getState();
         const side = state.modalData?.side || 'buy';
         set({
-            pendingOrder: { price, side, timestamp: Date.now() },
+            pendingOrder: order,
             showModal: false,
             modalData: null,
-            activeOrder: {
-                type: state.quickModeTradeType,
-                size: amount,
-                currency: 'USD',
-            },
         });
     },
     toggleQuickMode: () => {
