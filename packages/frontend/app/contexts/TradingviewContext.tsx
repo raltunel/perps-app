@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { useParams } from 'react-router';
 import { useSdk } from '~/hooks/useSdk';
+import { isEstablished, useSession } from '@fogo/sessions-sdk-react';
 import {
     clearAllChartCaches,
     clearChartCachesForSymbol,
@@ -101,13 +102,23 @@ export const TradingViewProvider: React.FC<{
         toggleQuickMode,
         setQuickModeTradeType,
         openQuickModeConfirm,
+        resetQuickModeState,
     } = useOrderPlacementStore();
+
+    const session = useSession();
+    const isSessionEstablished = isEstablished(session);
 
     const { info, lastSleepMs, lastAwakeMs } = useSdk();
 
     const { symbol, addToFetchedChannels } = useTradeDataStore();
 
     const previousSymbolRef = useRef<string | null>(null);
+
+    useEffect(() => {
+        if (!isSessionEstablished) {
+            resetQuickModeState();
+        }
+    }, [isSessionEstablished, resetQuickModeState]);
 
     const [chartState, setChartState] = useState<ChartLayout | null>();
 

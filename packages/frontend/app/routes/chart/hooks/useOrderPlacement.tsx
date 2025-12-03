@@ -38,6 +38,7 @@ interface OrderPlacementStore {
     openQuickModeConfirm: () => void;
     closeQuickModeConfirm: () => void;
     confirmQuickMode: (amount: number) => void;
+    resetQuickModeState: () => void;
 }
 
 export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
@@ -107,6 +108,13 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
                 size: amount,
                 currency: 'USD',
             },
+        });
+    },
+    resetQuickModeState: () => {
+        set({
+            quickMode: false,
+            activeOrder: null,
+            preparedOrder: null,
         });
     },
 }));
