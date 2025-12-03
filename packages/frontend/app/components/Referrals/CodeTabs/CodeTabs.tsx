@@ -599,9 +599,7 @@ export default function CodeTabs(props: PropsIF) {
         canEditAffiliateCode,
     ]);
 
-    /**
-     * Creates an affiliate code for the user
-     */
+    // fn to create an affiliate code for the wallet
     const createAffiliateCode = async () => {
         try {
             // Get the user's wallet address from the session
@@ -669,6 +667,7 @@ export default function CodeTabs(props: PropsIF) {
         }
     };
 
+    // fn to update the existing affiliate code for the wallet
     const updateAffiliateCode = async () => {
         try {
             if (!canEditAffiliateCode) {
@@ -727,6 +726,7 @@ export default function CodeTabs(props: PropsIF) {
         }
     };
 
+    // tracking link URL for the wallet's affiliate code
     const [trackingLink, setTrackingLink] = useState('');
 
     // reset affiliate address input when user changes wallet
@@ -744,6 +744,7 @@ export default function CodeTabs(props: PropsIF) {
         })();
     }, [affiliateCode]);
 
+    // fn to screen a text string for permissible characters (no regex)
     function checkForPermittedCharacters(input: string): boolean {
         if (input.length === 0) return true;
         for (let i: number = 0; i < input.length; i++) {
@@ -826,7 +827,7 @@ export default function CodeTabs(props: PropsIF) {
                                 )}
                             </p>
                         </div>
-                        {referralStore.totVolume &&
+                        {!!referralStore.totVolume &&
                             referralStore.totVolume <
                                 AFFILIATE_EDIT_VOLUME_THRESHOLD && (
                                 <div
@@ -1002,17 +1003,6 @@ export default function CodeTabs(props: PropsIF) {
                                 void createAffiliateCode();
                             }
                         }}
-                        // disabled={
-                        //     canEditAffiliateCode
-                        //         ? !temporaryAffiliateCode.trim() ||
-                        //           !isTemporaryAffiliateCodeValid ||
-                        //           !tempAffiliateCodeCharsValidate ||
-                        //           temporaryAffiliateCode.length > 30 ||
-                        //           temporaryAffiliateCode.length < 2
-                        //         : !temporaryAffiliateCode.trim() ||
-                        //           isTemporaryAffiliateCodeValid === false ||
-                        //           isTemporaryAffiliateCodeValid === undefined
-                        // }
                     >
                         {t(
                             editModeAffiliate
