@@ -247,6 +247,7 @@ function OrderInput({
         marginMode,
         setMarginMode,
         setOrderInputPriceValue,
+        orderInputPriceValue,
         tradeDirection,
         setTradeDirection,
         setIsMidModeActive,
@@ -265,7 +266,7 @@ function OrderInput({
 
     const [selectedDenom, setSelectedDenom] = useState<OrderBookMode>('usd');
 
-    const { buys, sells, midPrice } = useOrderBookStore();
+    const { buys, sells, midPrice, usualResolution } = useOrderBookStore();
     const { useMockLeverage, mockMinimumLeverage } = useDebugStore();
 
     // backup mark price for when symbolInfo not available
@@ -876,6 +877,27 @@ function OrderInput({
             }
         }
     }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
+
+    useEffect(() => {
+        if (orderInputPriceValue > 0) {
+            const resVal = usualResolution?.val || 1;
+            const decimals = Math.floor(Math.log10(resVal)) * -1;
+            setPrice(
+                formatNumWithOnlyDecimals(
+                    orderInputPriceValue,
+                    decimals > 0 ? decimals : 0,
+                    true,
+                ),
+            );
+            const orderElem = document.getElementById(
+                'trade-module-price-input-container',
+            );
+            orderElem?.classList.add('divPulseNeon');
+            setTimeout(() => {
+                orderElem?.classList.remove('divPulseNeon');
+            }, 800);
+        }
+    }, [orderInputPriceValue, usualResolution]);
 
     const handlePriceBlur = () => {
         console.log('Input lost focus');

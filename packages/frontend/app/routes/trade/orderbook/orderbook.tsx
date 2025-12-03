@@ -107,6 +107,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         resolutionPairs,
         midPrice,
         setMidPrice,
+        setUsualResolution,
     } = useOrderBookStore();
 
     const midPriceRef = useRef<number | null>(null);
@@ -378,6 +379,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
     const usualResolution = useMemo(() => {
         return resolutionPairs[symbol] || resolutions[0];
     }, [symbol, resolutions, resolutionPairs]);
+
+    useEffect(() => {
+        setUsualResolution(usualResolution);
+    }, [usualResolution]);
 
     // Memoize usualResolution to avoid unnecessary re-renders
     const usualResolutionKey = useMemo(
