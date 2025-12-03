@@ -584,10 +584,18 @@ export default function PageHeader() {
                     position='center'
                     title='Unknown Referral Code'
                 >
-                    <p>
-                        The referral code you entered is not recognized. Please
-                        check the code and try again.
-                    </p>
+                    <div className={styles.invalid_ref_code_modal}>
+                        <p>
+                            The referral code you entered is not recognized.
+                            Please check the code and try again.
+                        </p>
+                        <Link
+                            to='/v2/referrals'
+                            onClick={invalidRefCodeModal.close}
+                        >
+                            Go to Referrals
+                        </Link>
+                    </div>
                 </Modal>
             )}
             {PortfolioModalsRenderer}
