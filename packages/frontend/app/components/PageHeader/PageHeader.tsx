@@ -234,18 +234,18 @@ export default function PageHeader() {
             }
         }
 
-        referralCodeFromURL.value &&
-            referralStore.cache(referralCodeFromURL.value);
+        // referralCodeFromURL.value &&
+        //     referralStore.cache(referralCodeFromURL.value);
 
         prevIsUserConnected.current = isUserConnected;
     }, [isUserConnected, userDataStore.userAddress]);
 
-    // Ensure URL parameter always overrides cached referral code
-    useEffect(() => {
-        if (referralCodeFromURL.value) {
-            referralStore.cache(referralCodeFromURL.value);
-        }
-    }, [referralCodeFromURL.value]);
+    // // Ensure URL parameter always overrides cached referral code
+    // useEffect(() => {
+    //     if (referralCodeFromURL.value) {
+    //         referralStore.cache(referralCodeFromURL.value);
+    //     }
+    // }, [referralCodeFromURL.value]);
 
     const { totVolume } = useReferralStore();
 
@@ -292,6 +292,25 @@ export default function PageHeader() {
             navigate('/');
         }
     };
+
+    const invalidRefCodeModal = useModal('closed');
+
+    // run the FUUL context
+    const { isAffiliateCodeFree } = useFuul();
+
+    useEffect(() => {
+        const checkRefCode = async (): Promise<void> => {
+            if (referralCodeFromURL.value) {
+                const isCodeClaimed: boolean = await isAffiliateCodeFree(
+                    referralCodeFromURL.value,
+                );
+                isCodeClaimed
+                    ? referralStore.cache(referralCodeFromURL.value)
+                    : invalidRefCodeModal.open();
+            }
+        };
+        checkRefCode();
+    }, [referralCodeFromURL.value, isAffiliateCodeFree]);
 
     return (
         <>
@@ -557,6 +576,18 @@ export default function PageHeader() {
                     title={t('appSettings.title')}
                 >
                     <AppOptions />
+                </Modal>
+            )}
+            {invalidRefCodeModal.isOpen && (
+                <Modal
+                    close={invalidRefCodeModal.close}
+                    position='center'
+                    title='Unknown Referral Code'
+                >
+                    <p>
+                        The referral code you entered is not recognized. Please
+                        check the code and try again.
+                    </p>
                 </Modal>
             )}
             {PortfolioModalsRenderer}
