@@ -14,7 +14,7 @@ import { useFuul } from '~/contexts/FuulContext';
 // } from '@crocswap-libs/ambient-ember';
 import { LuChevronDown, LuChevronUp, LuSettings } from 'react-icons/lu';
 import { MdOutlineClose, MdOutlineMoreHoriz } from 'react-icons/md';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useSearchParams, useNavigate } from 'react-router';
 import { useKeydown } from '~/hooks/useKeydown';
 import useMediaQuery, { useShortScreen } from '~/hooks/useMediaQuery';
 import { useModal } from '~/hooks/useModal';
@@ -26,7 +26,7 @@ import AppOptions from '../AppOptions/AppOptions';
 import Modal from '../Modal/Modal';
 import Tooltip from '../Tooltip/Tooltip';
 import DropdownMenu from './DropdownMenu/DropdownMenu';
-import HelpDropdown from './HelpDropdown/HelpDropdown';
+// import HelpDropdown from './HelpDropdown/HelpDropdown';
 import MoreDropdown from './MoreDropdown/MoreDropdown';
 import styles from './PageHeader.module.css';
 import RpcDropdown from './RpcDropdown/RpcDropdown';
@@ -42,6 +42,7 @@ import {
 } from '~/hooks/useURLParams';
 import { useReferralStore } from '~/stores/ReferralStore';
 import { useTranslation } from 'react-i18next';
+import { getAmbientSpotUrl } from '~/utils/ambientSpotUrls';
 
 export default function PageHeader() {
     // Feedback modal state
@@ -120,11 +121,11 @@ export default function PageHeader() {
     // state values to track whether a given menu is open
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isDropdownMenuOpen, setIsDropdownMenuOpen] = useState(false);
-    const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
+    // const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
     const [isRpcDropdownOpen, setIsRpcDropdownOpen] = useState(false);
     const [isDepositDropdownOpen, setIsDepositDropdownOpen] = useState(false);
     const [isMoreDropdownOpen, setIsMoreDropdownOpen] = useState(false);
-    const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
+    // const [isHelpDropdownOpen, setIsHelpDropdownOpen] = useState(false);
     const showRPCButton = false;
     const location = useLocation();
 
@@ -155,9 +156,9 @@ export default function PageHeader() {
     const mobileNavbarRef = useOutsideClick<HTMLDivElement>(() => {
         setIsMenuOpen(false);
     }, isMenuOpen);
-    const walletMenuRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsWalletMenuOpen(false);
-    }, isWalletMenuOpen);
+    // const walletMenuRef = useOutsideClick<HTMLDivElement>(() => {
+    //     setIsWalletMenuOpen(false);
+    // }, isWalletMenuOpen);
     const rpcMenuRef = useOutsideClick<HTMLDivElement>(() => {
         setIsRpcDropdownOpen(false);
     }, isRpcDropdownOpen);
@@ -169,9 +170,9 @@ export default function PageHeader() {
         setIsMoreDropdownOpen(false);
     }, isMoreDropdownOpen);
 
-    const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
-        setIsHelpDropdownOpen(false);
-    }, isHelpDropdownOpen);
+    // const helpDropdownRef = useOutsideClick<HTMLDivElement>(() => {
+    //     setIsHelpDropdownOpen(false);
+    // }, isHelpDropdownOpen);
 
     // logic to open and close modals
     const appSettingsModal = useModal('closed');
@@ -182,8 +183,8 @@ export default function PageHeader() {
         () => {
             setIsDepositDropdownOpen(false);
             setIsRpcDropdownOpen(false);
-            setIsWalletMenuOpen(false);
-            setIsHelpDropdownOpen(false);
+            // setIsWalletMenuOpen(false);
+            // setIsHelpDropdownOpen(false);
             setIsMoreDropdownOpen(false);
             setIsDropdownMenuOpen(false);
         },
@@ -269,11 +270,37 @@ export default function PageHeader() {
     }, [location, isFuulInitialized, totVolume]);
 
     const showDepositSlot = isUserConnected || !isShortScreen;
+    const navigate = useNavigate();
+    const isHomePage = location.pathname === '/';
+
+    const handleLogoClick = () => {
+        if (isHomePage) {
+            // Scroll to hero section if already on homepage
+            const snapContainer = document.querySelector(
+                '[class*="snapContainer"]',
+            ) as HTMLElement;
+            if (snapContainer) {
+                const heroSection = snapContainer.querySelector(
+                    '[data-preset="hero"]',
+                ) as HTMLElement;
+                if (heroSection) {
+                    heroSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        } else {
+            // Navigate to homepage if not already there
+            navigate('/');
+        }
+    };
 
     return (
         <>
             <header id={'pageHeader'} className={styles.container}>
-                <Link to='/' className={styles.logo} viewTransition>
+                <button
+                    onClick={handleLogoClick}
+                    className={styles.logo}
+                    aria-label='Go to home'
+                >
                     <img
                         src='/images/favicon.svg'
                         alt='Perps Logo'
@@ -281,7 +308,7 @@ export default function PageHeader() {
                         height='70px'
                         loading='eager'
                     />
-                </Link>
+                </button>
                 <nav
                     className={`${styles.nav} ${
                         isMenuOpen ? styles.showMenu : ''
@@ -339,12 +366,12 @@ export default function PageHeader() {
                     </section>
                     <Tooltip content='Ambient v1 Spot DEX' position='bottom'>
                         <a
-                            href='/trade'
-                            // target='_blank'
-                            // rel='noopener noreferrer'
+                            href={getAmbientSpotUrl(symbol)}
+                            target='_blank'
+                            rel='noopener noreferrer'
                             className={styles.ambientmm}
                         >
-                            Ambient AMM
+                            Spot
                         </a>
                     </Tooltip>
                 </nav>
@@ -442,12 +469,12 @@ export default function PageHeader() {
                         <SessionButton compact={shortB} />
                     </span>
 
-                    {isUserConnected && (
+                    {/* {isUserConnected && (
                         <section
                             style={{ position: 'relative' }}
                             ref={walletMenuRef}
                         >
-                            {/* {isUserConnected && (
+                            {isUserConnected && (
                                 <button
                                     className={styles.walletButton}
                                     onClick={() =>
@@ -456,25 +483,25 @@ export default function PageHeader() {
                                 >
                                     <LuWallet size={18} /> Miyuki.eth
                                 </button>
-                            )} */}
+                            )}
 
-                            {/* {isWalletMenuOpen && isUserConnected && (
+                            {isWalletMenuOpen && isUserConnected && (
                                 <WalletDropdown
                                     isWalletMenuOpen={isWalletMenuOpen}
                                     setIsWalletMenuOpen={setIsWalletMenuOpen}
                                     setIsUserConnected={setIsUserConnected}
                                     isDropdown
                                 />
-                            )} */}
+                            )}
                         </section>
-                    )}
-                    <section
+                    )} */}
+                    {/* <section
                         style={{
                             position: 'relative',
                         }}
                         ref={helpDropdownRef}
                     >
-                        {/* <button
+                        <button
                             className={styles.helpButton}
                             onClick={() =>
                                 setIsHelpDropdownOpen(!isHelpDropdownOpen)
@@ -484,14 +511,14 @@ export default function PageHeader() {
                                 size={18}
                                 color='var(--text2)'
                             />
-                        </button> */}
+                        </button>
 
                         {isHelpDropdownOpen && (
                             <HelpDropdown
                                 setIsHelpDropdownOpen={setIsHelpDropdownOpen}
                             />
                         )}
-                    </section>
+                    </section> */}
 
                     <button
                         className={styles.internationalButton}
