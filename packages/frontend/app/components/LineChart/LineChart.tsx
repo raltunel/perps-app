@@ -332,7 +332,7 @@ const LineChart: React.FC<LineChartProps> = (props) => {
             .context(context);
 
         setLineSeries(() => lineSeries);
-    }, [curve, canvasInitialHeight, canvasInitialWidth]);
+    }, [curve, canvasInitialHeight, canvasInitialWidth, lineData]);
 
     useEffect(() => {
         if (
