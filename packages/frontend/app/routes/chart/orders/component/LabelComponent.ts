@@ -8,7 +8,7 @@ import type { LimitOrderParams } from '~/services/limitOrderService';
 import { makeSlug, useNotificationStore } from '~/stores/NotificationStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import type { IPaneApi } from '~/tv/charting_library';
-import { blockExplorer } from '~/utils/Constants';
+import { getTxLink } from '~/utils/Constants';
 import { getDurationSegment } from '~/utils/functions/getSegment';
 import {
     findLimitLabelAtPosition,
@@ -408,9 +408,7 @@ const LabelComponent = ({
                         symbol: symbolInfo?.coin,
                     }),
                     icon: 'check',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             } else {
                 notifications.remove(slug);
@@ -438,9 +436,7 @@ const LabelComponent = ({
                     title: t('transactions.cancelFailed.title'),
                     message: t('transactions.cancelFailed.message2'),
                     icon: 'error',
-                    txLink: result.signature
-                        ? `${blockExplorer}/tx/${result.signature}`
-                        : undefined,
+                    txLink: getTxLink(result.signature),
                 });
             }
         } catch (error) {
@@ -697,9 +693,7 @@ const LabelComponent = ({
                             t('transactions.unknownErrorOccurred'),
                         icon: 'error',
                         removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
+                        txLink: getTxLink(limitOrderResult.signature),
                     });
                 } else {
                     // Show success notification
@@ -737,9 +731,7 @@ const LabelComponent = ({
                         }),
                         icon: 'check',
                         removeAfter: 10000,
-                        txLink: limitOrderResult.signature
-                            ? `${blockExplorer}/tx/${limitOrderResult.signature}`
-                            : undefined,
+                        txLink: getTxLink(limitOrderResult.signature),
                     });
                 }
             } catch (error) {
