@@ -89,7 +89,6 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         if (referralStore.cached && affiliateAddress) {
             (async () => {
-                console.log('running');
                 const isOwnedByUser: boolean | undefined =
                     await checkIfOwnRefCode(
                         referralStore.cached,
@@ -139,7 +138,7 @@ export default function CodeTabs(props: PropsIF) {
             const response = await fetch(ENDPOINT, options);
             const res = await response.json();
             // the FUUL system is case-sensitive, strings must match exactly
-            return res.code === rc;
+            return res.code?.toLowerCase() === rc.toLowerCase();
         } catch (err) {
             console.error(err);
             return undefined;
