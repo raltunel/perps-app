@@ -167,6 +167,17 @@ export const TradingViewProvider: React.FC<{
     // logic to change the active color pair
     const { bsColor, getBsColor } = useAppSettings();
 
+    const { setPreparedOrder } = useOrderPlacementStore();
+    const { symbolInfo } = useTradeDataStore();
+
+    const markPx = symbolInfo?.markPx || 1;
+
+    const markPxRef = useRef(markPx);
+
+    useEffect(() => {
+        markPxRef.current = markPx;
+    }, [markPx]);
+
     function changeColors(c: colorSetIF): void {
         // make sure the chart exists
         if (chart) {
@@ -490,33 +501,6 @@ export const TradingViewProvider: React.FC<{
                     }
                 });
 
-            // Add context menu items for buy/sell
-            tvWidget.onContextMenu((_unixTime: number, price: number) => {
-                const formattedPrice = price.toFixed(2);
-
-                return [
-                    {
-                        position: 'top' as const,
-                        text: `Buy @ ${formattedPrice} (limit)`,
-                        click: () => {
-                            openModal(price, 'buy');
-                        },
-                    },
-                    {
-                        position: 'top' as const,
-                        text: `Sell @ ${formattedPrice} (stop)`,
-                        click: () => {
-                            openModal(price, 'sell');
-                        },
-                    },
-                    {
-                        position: 'top' as const,
-                        text: '-',
-                        click: () => {},
-                    },
-                ];
-            });
-
             // Add Quick Trade Mode controls to header (Toggle + Dropdown)
             tvWidget.headerReady().then(() => {
                 const container = tvWidget.createButton({ align: 'left' });
@@ -735,6 +719,86 @@ export const TradingViewProvider: React.FC<{
             }
         };
     }, [chartState, info, i18n.language, initChart, tradingviewLib]);
+
+    useEffect(() => {
+        if (!chart) return;
+
+        const currentMarketId = marketIdRef.current;
+        const processedSymbol = processSymbolUrlParam(currentMarketId || 'BTC');
+        chart.onContextMenu((_unixTime: number, price: number) => {
+            const formattedPrice = Number(price.toFixed(2));
+            const symbol = processedSymbol.split(':')[0];
+
+            const isAbove = formattedPrice > markPxRef.current;
+
+            const topOrder = isAbove
+                ? {
+                      text: `Sell 1 ${symbol} @ ${formattedPrice} limit`,
+                      side: 'sell' as const,
+                      type: 'Limit' as const,
+                  }
+                : {
+                      text: `Buy 1 ${symbol} @ ${formattedPrice} limit`,
+                      side: 'buy' as const,
+                      type: 'Limit' as const,
+                  };
+
+            const bottomOrder = isAbove
+                ? {
+                      text: `Buy 1 ${symbol} @ ${formattedPrice} stop`,
+                      side: 'buy' as const,
+                      type: 'Stop' as const,
+                  }
+                : {
+                      text: `Sell 1 ${symbol} @ ${formattedPrice} stop`,
+                      side: 'sell' as const,
+                      type: 'Stop' as const,
+                  };
+
+            return [
+                {
+                    position: 'top' as const,
+                    text: topOrder.text,
+                    click: () => {
+                        setPreparedOrder({
+                            price: formattedPrice,
+                            side: topOrder.side,
+                            type: 'Limit',
+                            size: 1,
+                            currency: 'USD',
+                            timestamp: Date.now(),
+                        });
+                    },
+                },
+                {
+                    position: 'top' as const,
+                    text: bottomOrder.text,
+                    click: () => {
+                        setPreparedOrder({
+                            price: formattedPrice,
+                            side: bottomOrder.side,
+                            type: 'Limit',
+                            size: 1,
+                            currency: 'USD',
+                            timestamp: Date.now(),
+                        });
+                    },
+                },
+                {
+                    position: 'top' as const,
+                    text: `Add order on ${symbol} at @ ${formattedPrice}`,
+                    click: () => {
+                        openModal(price, 'buy');
+                    },
+                },
+                {
+                    position: 'top' as const,
+                    text: '-',
+                    click: () => {},
+                },
+            ];
+        });
+    }, [chart]);
 
     const tvIntervalToMinutes = useCallback((interval: ResolutionString) => {
         let coef = 1;
