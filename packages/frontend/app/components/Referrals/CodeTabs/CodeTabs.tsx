@@ -97,7 +97,6 @@ export default function CodeTabs(props: PropsIF) {
                     );
                 isOwnedByUser === false &&
                     setRefCodeToConsume(referralStore.cached);
-                setIsRefCodeSelfOwned(isOwnedByUser);
             })();
         } else if (!referralStore.cached) {
             setRefCodeToConsume(undefined);
@@ -123,11 +122,6 @@ export default function CodeTabs(props: PropsIF) {
     useEffect(() => {
         console.log('isRefCodeClaimed: ', isRefCodeClaimed);
     }, [isRefCodeClaimed]);
-
-    const [isRefCodeSelfOwned, setIsRefCodeSelfOwned] = useState<
-        boolean | undefined
-    >(undefined);
-    //userInputRefCode
 
     // fn to check if a given ref code is registered to a given wallet
     async function checkIfOwnRefCode(
