@@ -464,6 +464,27 @@ export default function PageHeader() {
                     >
                         <LuSettings size={20} />
                     </button>
+                    <section
+                        style={{ position: 'relative' }}
+                        ref={dropdownMenuRef}
+                        className={styles.menuButtonContainer}
+                    >
+                        <button
+                            className={styles.menuButton}
+                            onClick={() =>
+                                setIsDropdownMenuOpen(!isDropdownMenuOpen)
+                            }
+                            aria-label={t('aria.openMoreOptionsMenu')}
+                        >
+                            <MdOutlineMoreHoriz size={20} />
+                        </button>
+                        {isDropdownMenuOpen && (
+                            <DropdownMenu
+                                setIsDropdownMenuOpen={setIsDropdownMenuOpen}
+                                onFeedbackClick={() => setIsFeedbackOpen(true)}
+                            />
+                        )}
+                    </section>
                 </div>
             </header>
 
