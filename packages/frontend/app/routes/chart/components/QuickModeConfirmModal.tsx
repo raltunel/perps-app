@@ -5,10 +5,18 @@ import {
     useSession,
 } from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
+import { useTradeDataStore } from '~/stores/TradeDataStore';
+
+export type TradeType = 'Market' | 'Limit';
 
 interface QuickModeConfirmModalProps {
     onClose: () => void;
-    onConfirm: (amount: number) => void;
+    onConfirm: (data: {
+        amount: number;
+        tradeType: TradeType;
+        denom: string;
+        saveAsDefault: boolean;
+    }) => void;
 }
 
 export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
@@ -17,19 +25,38 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 }) => {
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
+
+    const { symbol } = useTradeDataStore();
+    const upperSymbol = symbol?.toUpperCase() ?? 'BTC';
+
     const [amount, setAmount] = useState<string>('');
+    const [tradeType, setTradeType] = useState<TradeType>('Limit');
+    const [denom, setDenom] = useState<'USD' | string>(upperSymbol);
+
+    const [dropdownTradeOpen, setDropdownTradeOpen] = useState(false);
+    const [dropdownDenomOpen, setDropdownDenomOpen] = useState(false);
+    const [saveAsDefault, setSaveAsDefault] = useState(false);
+
     const [cancelHovered, setCancelHovered] = useState(false);
+    const [saveHovered, setSaveHovered] = useState(false);
     const [confirmHovered, setConfirmHovered] = useState(false);
 
+    const isDisabled = !amount || parseFloat(amount) <= 0;
+
+    const tradeTypes: TradeType[] = ['Limit', 'Market'];
+
     const handleConfirm = () => {
-        const parsedAmount = parseFloat(amount);
-        if (parsedAmount > 0) {
-            onConfirm(parsedAmount);
+        const parsed = parseFloat(amount);
+        if (parsed > 0) {
+            onConfirm({
+                amount: parsed,
+                tradeType,
+                denom,
+                saveAsDefault,
+            });
             onClose();
         }
     };
-
-    const isConfirmDisabled = !amount || parseFloat(amount) <= 0;
 
     return (
         <>
@@ -42,12 +69,17 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                         font-size: 13px !important;
                         outline: none !important;
                         text-align: right !important;
-                        font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif !important;
                         width: 100% !important;
                         cursor: text !important;
                     }
+
+                    /* size input padding fix */
+                    .size-input-padding .numFormattedInput {
+                        padding-right: 60px !important;
+                    }
                 `}
             </style>
+
             <div
                 style={{
                     position: 'fixed',
@@ -56,144 +88,245 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                     transform: 'translate(-50%, -50%)',
                     zIndex: 10000,
                     backgroundColor: '#1e1e1e',
-                    borderRadius: '12px',
-                    width: '340px',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                    boxSizing: 'border-box',
-                    fontFamily:
-                        '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-                    padding: '20px',
+                    borderRadius: 12,
+                    width: 340,
+                    padding: 20,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Icon and Title */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '12px',
-                        marginBottom: '16px',
-                    }}
-                >
+                <div style={{ display: 'flex', gap: 12, marginBottom: 18 }}>
                     <div
                         style={{
-                            width: '36px',
-                            height: '36px',
+                            width: 36,
+                            height: 36,
                             borderRadius: '50%',
-                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            backgroundColor: 'rgba(255,255,255,0.1)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flexShrink: 0,
                         }}
                     >
-                        <span style={{ fontSize: '18px', color: '#ffffff' }}>
-                            !
-                        </span>
+                        <span style={{ color: '#fff', fontSize: 18 }}>!</span>
                     </div>
-                    <div style={{ flex: 1 }}>
+
+                    <div>
                         <h3
                             style={{
                                 margin: 0,
-                                color: '#ffffff',
-                                fontSize: '16px',
+                                color: '#fff',
+                                fontSize: 16,
                                 fontWeight: 600,
-                                marginBottom: '6px',
+                                marginBottom: 4,
                             }}
                         >
-                            Enable Quick Mode?
+                            Quick Mode Settings
                         </h3>
-                        <p
-                            style={{
-                                margin: 0,
-                                color: '#b3b3b3',
-                                fontSize: '13px',
-                                lineHeight: '1.4',
-                            }}
-                        >
-                            Place orders instantly using your predefined amount.
-                        </p>
                     </div>
                 </div>
 
-                {/* Input Fields */}
-                <div style={{ marginBottom: '16px' }}>
-                    {/* Size Field */}
-                    <div
+                <div style={{ marginBottom: 12, position: 'relative' }}>
+                    <button
+                        onClick={() => setDropdownTradeOpen(!dropdownTradeOpen)}
                         style={{
-                            height: '36px',
-                            padding: '0 12px',
-                            display: 'grid',
-                            gridTemplateColumns: 'auto 1fr auto',
+                            width: '100%',
+                            height: 36,
+                            backgroundColor: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            borderRadius: 6,
+                            color: '#cbcaca',
+                            fontSize: 13,
+                            display: 'flex',
                             alignItems: 'center',
-                            gap: '8px',
-                            borderRadius: '6px',
-                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                            marginBottom: '12px',
+                            justifyContent: 'space-between',
+                            padding: '0 12px',
+                            cursor: 'pointer',
                         }}
                     >
-                        <span
-                            style={{
-                                color: '#b3b3b3',
-                                fontSize: '12px',
-                            }}
-                        >
-                            Size
-                        </span>
+                        {tradeType}
+                        <span style={{ fontSize: 10 }}>▼</span>
+                    </button>
+
+                    {dropdownTradeOpen && (
                         <div
                             style={{
-                                flex: 1,
+                                position: 'absolute',
+                                top: 40,
+                                left: 0,
+                                width: '100%',
+                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                borderRadius: 6,
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                                zIndex: 10001,
+                            }}
+                        >
+                            {tradeTypes.map((type) => (
+                                <div
+                                    key={type}
+                                    onClick={() => {
+                                        setTradeType(type);
+                                        setDropdownTradeOpen(false);
+                                    }}
+                                    style={{
+                                        padding: '8px 12px',
+                                        color: '#cbcaca',
+                                        cursor: 'pointer',
+                                        backgroundColor: 'rgb(45,44,44)',
+                                        fontSize: 13,
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            'rgb(30,30,30)')
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.backgroundColor =
+                                            'rgb(45,44,44)')
+                                    }
+                                >
+                                    {type}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* SIZE + DENOM */}
+                <div
+                    style={{
+                        height: 36,
+                        padding: '0 12px',
+                        display: 'grid',
+                        gridTemplateColumns: 'auto 1fr auto',
+                        alignItems: 'center',
+                        borderRadius: 6,
+                        backgroundColor: 'rgba(255,255,255,0.05)',
+                        marginBottom: 18,
+                        position: 'relative',
+                    }}
+                >
+                    <span style={{ fontSize: 12, color: '#b3b3b3' }}>Size</span>
+
+                    <div style={{ position: 'relative', width: '100%' }}>
+                        <NumFormattedInput
+                            value={amount}
+                            onChange={(e) =>
+                                setAmount(
+                                    typeof e === 'string' ? e : e.target.value,
+                                )
+                            }
+                            placeholder='Enter Size'
+                            className='quick-mode-input size-input-padding'
+                        />
+                    </div>
+
+                    {/* DENOM DROPDOWN */}
+                    <div style={{ width: 60, position: 'relative' }}>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setDropdownDenomOpen(!dropdownDenomOpen);
+                            }}
+                            style={{
+                                background: 'transparent',
+                                border: 'none',
+                                color: '#cbcaca',
+                                fontSize: 12,
+                                cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
+                                gap: 4,
+                                padding: 0,
+                                width: '100%',
+                                justifyContent: 'flex-end',
                             }}
                         >
-                            <NumFormattedInput
-                                value={amount}
-                                onChange={(e) => {
-                                    const newValue =
-                                        typeof e === 'string'
-                                            ? e
-                                            : e.target.value;
-                                    setAmount(newValue);
+                            {denom}
+                            <span style={{ fontSize: 10, opacity: 0.8 }}>
+                                ▼
+                            </span>
+                        </button>
+
+                        {dropdownDenomOpen && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: 28,
+                                    right: 0,
+                                    backgroundColor: 'rgb(45,44,44)',
+                                    borderRadius: 6,
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                                    width: 80,
+                                    padding: '4px 0',
+                                    zIndex: 10001,
+                                    border: '1px solid rgba(255,255,255,0.08)',
                                 }}
-                                placeholder='Enter Size'
-                                autoFocus
-                                className='quick-mode-input'
-                            />
-                        </div>
-                        <span
-                            style={{
-                                color: '#b3b3b3',
-                                fontSize: '12px',
-                            }}
-                        >
-                            USD
-                        </span>
+                            >
+                                {[upperSymbol, 'USD'].map((opt) => (
+                                    <div
+                                        key={opt}
+                                        onClick={() => {
+                                            setDenom(opt);
+                                            setDropdownDenomOpen(false);
+                                        }}
+                                        style={{
+                                            padding: '6px 12px',
+                                            fontSize: 12,
+                                            cursor: 'pointer',
+                                            backgroundColor: 'rgb(45,44,44)',
+                                            color: '#cbcaca',
+                                        }}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.backgroundColor =
+                                                'rgb(30,30,30)')
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.backgroundColor =
+                                                'rgb(45,44,44)')
+                                        }
+                                    >
+                                        {opt}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Buttons */}
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div
+                    onClick={() => setSaveAsDefault(!saveAsDefault)}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        marginBottom: 18,
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                    }}
+                >
+                    <input
+                        type='checkbox'
+                        checked={saveAsDefault}
+                        onChange={() => setSaveAsDefault(!saveAsDefault)}
+                        style={{ cursor: 'pointer' }}
+                    />
+                    <span style={{ fontSize: 12, color: '#b3b3b3' }}>
+                        Save as default for Quick Mode
+                    </span>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8 }}>
                     <button
                         style={{
                             flex: 1,
-                            height: '36px',
-                            padding: '0 16px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            height: 36,
+                            borderRadius: 6,
+                            border: 'none',
                             cursor: 'pointer',
                             backgroundColor: cancelHovered
                                 ? '#2a2a2a'
                                 : 'transparent',
-                            border: 'none',
-                            borderRadius: '6px',
-                            transition: 'background-color 0.15s',
-                            color: '#ffffff',
-                            fontSize: '13px',
-                            fontWeight: 500,
-                            fontFamily:
-                                '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
+                            color: '#fff',
                         }}
                         onMouseEnter={() => setCancelHovered(true)}
                         onMouseLeave={() => setCancelHovered(false)}
@@ -201,69 +334,94 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                     >
                         Cancel
                     </button>
+
                     {!isSessionEstablished ? (
                         <div
                             style={{
                                 flex: 1,
-                                height: '36px',
+                                height: 36,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                             }}
-                            className='plausible-event-name=Login+Button+Click plausible-event-buttonLocation=Quick+Mode+Modal'
                         >
                             <SessionButton />
                         </div>
                     ) : (
-                        <button
-                            style={{
-                                flex: 1,
-                                height: '36px',
-                                padding: '0 16px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: isConfirmDisabled
-                                    ? 'not-allowed'
-                                    : 'pointer',
-                                backgroundColor: isConfirmDisabled
-                                    ? '#3a3a3a'
-                                    : confirmHovered
-                                      ? 'var(--accent1, #5294e2)'
-                                      : 'var(--accent1, #4a8bd3)',
-                                border: 'none',
-                                borderRadius: '6px',
-                                transition: 'background-color 0.15s',
-                                color: isConfirmDisabled
-                                    ? '#888888'
-                                    : '#ffffff',
-                                fontSize: '13px',
-                                fontWeight: 600,
-                                fontFamily:
-                                    '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif',
-                                opacity: isConfirmDisabled ? 0.5 : 1,
-                            }}
-                            onMouseEnter={() => setConfirmHovered(true)}
-                            onMouseLeave={() => setConfirmHovered(false)}
-                            onClick={
-                                isConfirmDisabled ? undefined : handleConfirm
-                            }
-                            disabled={isConfirmDisabled}
-                        >
-                            Enable Quick Mode
-                        </button>
+                        <>
+                            <button
+                                style={{
+                                    flex: 1,
+                                    height: 36,
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    cursor: isDisabled
+                                        ? 'not-allowed'
+                                        : 'pointer',
+                                    backgroundColor: saveHovered
+                                        ? '#4a5060'
+                                        : '#3a3a3a',
+                                    opacity: isDisabled ? 0.4 : 1,
+                                    color: '#fff',
+                                }}
+                                disabled={isDisabled}
+                                onMouseEnter={() => setSaveHovered(true)}
+                                onMouseLeave={() => setSaveHovered(false)}
+                                onClick={() => {
+                                    if (!isDisabled) {
+                                        onConfirm({
+                                            amount: parseFloat(amount),
+                                            tradeType,
+                                            denom,
+                                            saveAsDefault,
+                                        });
+                                        onClose();
+                                    }
+                                }}
+                            >
+                                Save
+                            </button>
+
+                            <button
+                                style={{
+                                    flex: 1,
+                                    minWidth: 110,
+                                    height: 36,
+                                    borderRadius: 6,
+                                    border: 'none',
+                                    cursor: isDisabled
+                                        ? 'not-allowed'
+                                        : 'pointer',
+                                    backgroundColor: isDisabled
+                                        ? '#3a3a3a'
+                                        : confirmHovered
+                                          ? 'var(--accent1,#5294e2)'
+                                          : 'var(--accent1,#4a8bd3)',
+                                    color: isDisabled ? '#888' : '#fff',
+                                    opacity: isDisabled ? 0.5 : 1,
+                                    fontSize: 12,
+                                    whiteSpace: 'nowrap',
+                                }}
+                                disabled={isDisabled}
+                                onMouseEnter={() => setConfirmHovered(true)}
+                                onMouseLeave={() => setConfirmHovered(false)}
+                                onClick={() => {
+                                    if (!isDisabled) handleConfirm();
+                                }}
+                            >
+                                Save & Enable
+                            </button>
+                        </>
                     )}
                 </div>
             </div>
+
             <div
                 style={{
                     position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    inset: 0,
                     zIndex: 9999,
-                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    backgroundColor: 'rgba(0,0,0,0.6)',
                 }}
                 onClick={onClose}
             />
