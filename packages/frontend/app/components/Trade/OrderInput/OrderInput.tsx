@@ -872,27 +872,34 @@ function OrderInput({
 
     useEffect(() => {
         if (marketOrderType === 'market') {
-            setOrderInputPriceValue(0);
+            setOrderInputPriceValue({ value: 0, changeType: 'inputChange' });
         } else {
             const parsed = parseFormattedNum(price);
             if (!isNaN(parsed)) {
-                setOrderInputPriceValue(parsed);
+                setOrderInputPriceValue({
+                    value: parsed,
+                    changeType: 'inputChange',
+                });
             }
         }
     }, [price, parseFormattedNum, setOrderInputPriceValue, marketOrderType]);
 
     useEffect(() => {
-        if (orderInputPriceValue > 0) {
+        if (orderInputPriceValue.value > 0) {
             const resVal = usualResolution?.val || 1;
             const decimals = Math.floor(Math.log10(resVal)) * -1;
             setPrice(
                 formatNumWithOnlyDecimals(
-                    orderInputPriceValue,
+                    orderInputPriceValue.value,
                     decimals > 0 ? decimals : 0,
                     true,
                 ),
             );
-            if (isMidModeActiveRef.current) return;
+            if (
+                isMidModeActiveRef.current ||
+                orderInputPriceValue.changeType !== 'drag'
+            )
+                return;
             const orderElem = document.getElementById(
                 'trade-module-price-input-container',
             );

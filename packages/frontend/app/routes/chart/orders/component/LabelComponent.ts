@@ -826,7 +826,10 @@ const LabelComponent = ({
 
         function updatePreviewOrderPrice(tempSelectedLine: LabelLocationData) {
             const newPrice = tempSelectedLine.parentLine.yPrice;
-            useTradeDataStore.getState().setOrderInputPriceValue(newPrice);
+            useTradeDataStore.getState().setOrderInputPriceValue({
+                value: newPrice,
+                changeType: 'drag',
+            });
             useTradeDataStore.getState().setIsMidModeActive(false);
             setSelectedLine(undefined);
         }

@@ -9,14 +9,14 @@ export const usePreviewOrderLines = (): LineData[] => {
     const [lines, setLines] = useState<LineData[]>([]);
 
     useEffect(() => {
-        if (!orderInputPriceValue) {
+        if (!orderInputPriceValue.value) {
             setLines([]);
             return;
         } else {
             setLines([
                 {
                     xLoc: 0.4,
-                    yPrice: orderInputPriceValue,
+                    yPrice: orderInputPriceValue.value,
                     color: isPreviewOrderHovered ? '#d4cc45' : '#e9e980',
                     type: 'PREVIEW_ORDER',
                     lineStyle: 2,
@@ -24,7 +24,7 @@ export const usePreviewOrderLines = (): LineData[] => {
                 },
             ]);
         }
-    }, [orderInputPriceValue, isPreviewOrderHovered]);
+    }, [orderInputPriceValue.value, isPreviewOrderHovered]);
 
     return lines;
 };

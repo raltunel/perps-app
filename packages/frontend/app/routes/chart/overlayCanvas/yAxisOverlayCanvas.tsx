@@ -210,7 +210,12 @@ const YAxisOverlayCanvas: React.FC = () => {
     useEffect(() => {
         const dpr = window.devicePixelRatio || 1;
 
-        if (!canvasRef.current || !chart || isDrag || !orderInputPriceValue)
+        if (
+            !canvasRef.current ||
+            !chart ||
+            isDrag ||
+            !orderInputPriceValue.value
+        )
             return;
 
         const canvas = canvasRef.current;
@@ -238,10 +243,10 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         let closePricePixel: number;
         if (isLogarithmic) {
-            orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue);
+            orderPricePixel = scaleData.scaleSymlog(orderInputPriceValue.value);
             closePricePixel = scaleData.scaleSymlog(closePrice);
         } else {
-            orderPricePixel = scaleData.yScale(orderInputPriceValue);
+            orderPricePixel = scaleData.yScale(orderInputPriceValue.value);
             closePricePixel = scaleData.yScale(closePrice);
         }
 
@@ -254,7 +259,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         let adjustedOrderPricePixel = orderPricePixel;
         if (areLabelsClose) {
-            if (orderInputPriceValue >= closePrice) {
+            if (orderInputPriceValue.value >= closePrice) {
                 adjustedOrderPricePixel =
                     orderPricePixel - (labelHeight - pixelDistance);
             } else {
@@ -278,7 +283,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             canvas.style.cursor = 'default';
             canvas.style.pointerEvents = 'none';
         }
-    }, [mouseY, orderInputPriceValue, chart, isDrag, symbol]);
+    }, [mouseY, orderInputPriceValue.value, chart, isDrag, symbol]);
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -289,7 +294,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragStart = (event: any) => {
-            draggedPrice = orderInputPriceValue;
+            draggedPrice = orderInputPriceValue.value;
             isDragging = true;
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
@@ -325,16 +330,20 @@ const YAxisOverlayCanvas: React.FC = () => {
             draggedPrice = newPrice;
 
             if (draggedPrice !== undefined) {
-                useTradeDataStore
-                    .getState()
-                    .setOrderInputPriceValue(draggedPrice);
+                useTradeDataStore.getState().setOrderInputPriceValue({
+                    value: draggedPrice,
+                    changeType: 'drag',
+                });
             }
         };
 
         const handleDragEnd = () => {
             if (!isDragging || draggedPrice === undefined) return;
 
-            useTradeDataStore.getState().setOrderInputPriceValue(draggedPrice);
+            useTradeDataStore.getState().setOrderInputPriceValue({
+                value: draggedPrice,
+                changeType: 'drag',
+            });
 
             isDragging = false;
             draggedPrice = undefined;
@@ -359,7 +368,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [canvasRef.current, chart, orderInputPriceValue]);
+    }, [canvasRef.current, chart, orderInputPriceValue.value]);
 
     return null;
 };

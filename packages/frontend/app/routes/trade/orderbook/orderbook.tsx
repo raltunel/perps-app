@@ -310,7 +310,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (
             !filledResolution.current ||
             !symbolInfo ||
-            !orderInputPriceValue ||
+            !orderInputPriceValue.value ||
             !buys.length ||
             !sells.length ||
             !midPriceRef.current
@@ -337,7 +337,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let side;
         let targetSlots;
 
-        if (orderInputPriceValue < midPriceRef.current) {
+        if (orderInputPriceValue.value < midPriceRef.current) {
             side = 'buy';
             targetSlots = buys.map((buy) => buy.px);
         } else {
@@ -346,7 +346,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
 
         let closestSlot = findClosestByFlooring(
-            orderInputPriceValue,
+            orderInputPriceValue.value,
             targetSlots,
         );
 
@@ -358,7 +358,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         } else {
             setFocusedSlot(null);
         }
-    }, [orderInputPriceValue, buys, sells]);
+    }, [orderInputPriceValue.value, buys, sells]);
 
     // code blocks were being used in sdk approach
 
