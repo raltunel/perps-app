@@ -4,13 +4,23 @@
     --footer-h: 56px;
 }
 
-/* --- Root grid: header + content --- */
+/* --- Root grid: header area + content --- */
 .root-container {
     display: grid;
-    grid-template-rows: 56px 1fr; /* header + content only */
+    grid-template-rows: auto 1fr; /* header area (auto) + content (1fr) */
     height: 100vh;
     height: 100svh; /* mobile browsers */
     color: white;
+}
+
+/* Header area: contains banner + header */
+.header-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-area > header {
+    min-height: 56px;
 }
 
 /* Footer is hidden on desktop */
@@ -50,7 +60,7 @@
 /* ------------------- Mobile ------------------- */
 @media (max-width: 768px) {
     .root-container {
-        grid-template-rows: 56px 1fr;
+        grid-template-rows: auto 1fr; /* header area + content */
         overflow-x: hidden;
     }
 
