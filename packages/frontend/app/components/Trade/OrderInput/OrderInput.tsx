@@ -254,6 +254,9 @@ function OrderInput({
         isMidModeActive,
     } = useTradeDataStore();
 
+    const isMidModeActiveRef = useRef(isMidModeActive);
+    isMidModeActiveRef.current = isMidModeActive;
+
     useEffect(() => {
         if (!marginBucket) return;
         const maxRemainingOI = maxRemainingUserNotionalOI(
@@ -889,10 +892,13 @@ function OrderInput({
                     true,
                 ),
             );
+            if (isMidModeActiveRef.current) return;
             const orderElem = document.getElementById(
                 'trade-module-price-input-container',
             );
+            if (orderElem?.classList.contains('pulsed')) return;
             orderElem?.classList.add('divPulseNeon');
+            orderElem?.classList.add('pulsed');
             setTimeout(() => {
                 orderElem?.classList.remove('divPulseNeon');
             }, 800);
