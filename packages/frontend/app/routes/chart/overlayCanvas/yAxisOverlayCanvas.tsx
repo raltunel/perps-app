@@ -10,6 +10,7 @@ import {
 import * as d3 from 'd3';
 import type { IPaneApi } from '~/tv/charting_library';
 import { getLastCandleClosePrice } from '../data/candleDataCache';
+import { usePreviewOrderLines } from '../orders/usePreviewOrderLines';
 
 const YAxisOverlayCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -20,7 +21,7 @@ const YAxisOverlayCanvas: React.FC = () => {
     const [isPaneChanged, setIsPaneChanged] = useState(false);
     const isNearOrderPriceRef = useRef(false);
     const isInitialSizeSetRef = useRef(false);
-
+    const { updateYPosition } = usePreviewOrderLines();
     useEffect(() => {
         if (!chart) return;
 
@@ -330,10 +331,11 @@ const YAxisOverlayCanvas: React.FC = () => {
             draggedPrice = newPrice;
 
             if (draggedPrice !== undefined) {
-                useTradeDataStore.getState().setOrderInputPriceValue({
-                    value: draggedPrice,
-                    changeType: 'drag',
-                });
+                // useTradeDataStore.getState().setOrderInputPriceValue({
+                //     value: draggedPrice,
+                //     changeType: 'drag',
+                // });
+                updateYPosition(draggedPrice);
             }
         };
 
@@ -368,7 +370,7 @@ const YAxisOverlayCanvas: React.FC = () => {
         return () => {
             d3.select(canvas).on('.drag', null);
         };
-    }, [canvasRef.current, chart, orderInputPriceValue.value]);
+    }, [canvasRef.current, chart, orderInputPriceValue.value, updateYPosition]);
 
     return null;
 };

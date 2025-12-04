@@ -35,7 +35,7 @@ export default function OrderLines({
 
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
-    const previewLines = usePreviewOrderLines();
+    const { previewLines } = usePreviewOrderLines();
 
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);

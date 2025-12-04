@@ -26,6 +26,7 @@ import {
 } from '../orderLineUtils';
 import type { LineData } from './LineComponent';
 import { t } from 'i18next';
+import { usePreviewOrderLines } from '../usePreviewOrderLines';
 
 interface LabelProps {
     lines: LineData[];
@@ -69,6 +70,7 @@ const LabelComponent = ({
 
     const { executeCancelOrder } = useCancelOrderService();
     const { executeLimitOrder } = useLimitOrderService();
+    const { updateYPosition } = usePreviewOrderLines();
     const ctx = overlayCanvasRef.current?.getContext('2d');
 
     const [isDrag, setIsDrag] = useState(false);
@@ -115,7 +117,6 @@ const LabelComponent = ({
             });
 
             const linesWithLabels = lines.map((line) => {
-                console.log('>>>>>> line', line);
                 const yPricePixel = getPricetoPixel(
                     chart,
                     line.yPrice,
@@ -653,7 +654,8 @@ const LabelComponent = ({
                 : undefined;
 
             if (tempSelectedLine?.parentLine.type === 'PREVIEW_ORDER') {
-                updatePreviewOrderPrice(tempSelectedLine);
+                // updatePreviewOrderPrice(tempSelectedLine);
+                updateYPosition(advancedValue);
             } else {
                 setSelectedLine(tempSelectedLine);
             }
