@@ -346,6 +346,7 @@ const YAxisOverlayCanvas: React.FC = () => {
                 value: draggedPrice,
                 changeType: 'drag',
             });
+            useTradeDataStore.getState().setIsMidModeActive(false);
 
             isDragging = false;
             draggedPrice = undefined;
