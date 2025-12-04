@@ -299,6 +299,7 @@ const YAxisOverlayCanvas: React.FC = () => {
             isDragging = true;
             setIsDrag(true);
             canvas.style.cursor = 'grabbing';
+            useTradeDataStore.getState().setIsMidModeActive(false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleDragging = (event: any) => {
@@ -346,7 +347,6 @@ const YAxisOverlayCanvas: React.FC = () => {
                 value: draggedPrice,
                 changeType: 'drag',
             });
-            useTradeDataStore.getState().setIsMidModeActive(false);
 
             isDragging = false;
             draggedPrice = undefined;

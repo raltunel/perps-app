@@ -616,6 +616,7 @@ const LabelComponent = ({
                 tempSelectedLine = isLabel;
                 originalPrice = isLabel.parentLine.yPrice;
                 setIsDrag(true);
+                useTradeDataStore.getState().setIsMidModeActive(false);
             }
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -832,7 +833,6 @@ const LabelComponent = ({
                 value: newPrice,
                 changeType: 'drag',
             });
-            useTradeDataStore.getState().setIsMidModeActive(false);
             setSelectedLine(undefined);
         }
 
