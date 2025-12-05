@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
 
 interface PriceActionDropdownProps {
     position: {
@@ -15,12 +16,14 @@ interface PriceActionDropdownProps {
 
 const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
     position,
-    symbolCoin,
     markPx,
     onClose,
     onBuyLimit,
     onSellStop,
 }) => {
+    const { activeOrder } = useOrderPlacementStore();
+
+    const isAbove = markPx !== undefined && position.price > markPx;
     const showBuyShortcut = markPx !== undefined && position.price < markPx;
     const showSellShortcut = markPx !== undefined && position.price > markPx;
 
@@ -29,34 +32,75 @@ const PriceActionDropdown: React.FC<PriceActionDropdownProps> = ({
         typeof navigator !== 'undefined' &&
         /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 
-    const menuItems = [
-        {
-            label: `Buy @ ${position.price.toFixed(2)} (limit)`,
-            shortcut: showBuyShortcut
-                ? isMac
-                    ? '⌥ ⇧ B'
-                    : 'Alt + Shift + B'
-                : undefined,
-            onClick: () => {
-                onBuyLimit(position.price);
-                onClose();
-            },
-            priority: showBuyShortcut ? 1 : 2,
-        },
-        {
-            label: `Sell @ ${position.price.toFixed(2)} (stop)`,
-            shortcut: showSellShortcut
-                ? isMac
-                    ? '⌥ ⇧ S'
-                    : 'Alt + Shift + S'
-                : undefined,
-            onClick: () => {
-                onSellStop(position.price);
-                onClose();
-            },
-            priority: showSellShortcut ? 1 : 2,
-        },
-    ].sort((a, b) => a.priority - b.priority);
+    const displaySize = activeOrder
+        ? `${activeOrder.size} ${activeOrder.currency}`
+        : '';
+
+    const topOrder = isAbove
+        ? {
+              label: activeOrder
+                  ? `Sell ${displaySize} @ ${position.price.toFixed(2)} limit`
+                  : `Sell @ ${position.price.toFixed(2)} limit`,
+              shortcut: showSellShortcut
+                  ? isMac
+                      ? '⌥ ⇧ S'
+                      : 'Alt + Shift + S'
+                  : undefined,
+              onClick: () => {
+                  onSellStop(position.price);
+                  onClose();
+              },
+              priority: 1,
+          }
+        : {
+              label: activeOrder
+                  ? `Buy ${displaySize} @ ${position.price.toFixed(2)} limit`
+                  : `Buy @ ${position.price.toFixed(2)} limit`,
+              shortcut: showBuyShortcut
+                  ? isMac
+                      ? '⌥ ⇧ B'
+                      : 'Alt + Shift + B'
+                  : undefined,
+              onClick: () => {
+                  onBuyLimit(position.price);
+                  onClose();
+              },
+              priority: 1,
+          };
+
+    const bottomOrder = isAbove
+        ? {
+              label: activeOrder
+                  ? `Buy ${displaySize} @ ${position.price.toFixed(2)} stop`
+                  : `Buy @ ${position.price.toFixed(2)} stop`,
+              shortcut: showBuyShortcut
+                  ? isMac
+                      ? '⌥ ⇧ B'
+                      : 'Alt + Shift + B'
+                  : undefined,
+              onClick: () => {
+                  onBuyLimit(position.price);
+                  onClose();
+              },
+              priority: 2,
+          }
+        : {
+              label: activeOrder
+                  ? `Sell ${displaySize} @ ${position.price.toFixed(2)} stop`
+                  : `Sell @ ${position.price.toFixed(2)} stop`,
+              shortcut: showSellShortcut
+                  ? isMac
+                      ? '⌥ ⇧ S'
+                      : 'Alt + Shift + S'
+                  : undefined,
+              onClick: () => {
+                  onSellStop(position.price);
+                  onClose();
+              },
+              priority: 2,
+          };
+
+    const menuItems = [topOrder, bottomOrder];
 
     return (
         <>

@@ -11,7 +11,6 @@ import { tempPendingOrders } from '../orders/useOpenOrderLines';
 import type { LineData } from '../orders/component/LineComponent';
 import PriceActionDropdown from './PriceActionDropdown';
 import { useOrderPlacementStore } from '../hooks/useOrderPlacement';
-import { OrderPlacementModal } from '../components/OrderPlacementModal';
 
 interface LimitOrderPlacementProps {
     overlayCanvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -61,14 +60,11 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const {
         pendingOrder,
         clearPendingOrder,
-        showModal,
-        modalData,
-        closeModal,
         confirmOrder,
-        openModal,
         quickMode,
         activeOrder,
         setPreparedOrder,
+        openQuickModeConfirm,
     } = useOrderPlacementStore();
 
     const progressAnimationRef = React.useRef<number | null>(null);
@@ -755,21 +751,34 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                     onClose={() => setShowDropdown(false)}
                     onBuyLimit={(price) => {
                         setShowDropdown(false);
-                        openModal(price, 'buy');
+                        if (!activeOrder) {
+                            openQuickModeConfirm();
+                        } else {
+                            confirmOrder({
+                                price,
+                                side: 'buy',
+                                type: activeOrder.type,
+                                size: activeOrder.size,
+                                currency: activeOrder.currency,
+                                timestamp: Date.now(),
+                            });
+                        }
                     }}
                     onSellStop={(price) => {
                         setShowDropdown(false);
-                        openModal(price, 'sell');
+                        if (!activeOrder) {
+                            openQuickModeConfirm();
+                        } else {
+                            confirmOrder({
+                                price,
+                                side: 'sell',
+                                type: activeOrder.type,
+                                size: activeOrder.size,
+                                currency: activeOrder.currency,
+                                timestamp: Date.now(),
+                            });
+                        }
                     }}
-                />
-            )}
-            {showModal && modalData && (
-                <OrderPlacementModal
-                    price={modalData.price}
-                    side={modalData.side}
-                    symbol={symbolInfo?.coin}
-                    onClose={closeModal}
-                    onConfirm={confirmOrder}
                 />
             )}
         </>
