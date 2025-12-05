@@ -12,17 +12,24 @@ export type TradeType = 'Market' | 'Limit';
 
 interface QuickModeConfirmModalProps {
     onClose: () => void;
-    onConfirm: (data: {
+    onSave: (data: {
         amount: number;
         tradeType: TradeType;
-        denom: string;
-        saveAsDefault: boolean;
+        currency: string;
+        bypassConfirmation: boolean;
+    }) => void;
+    onSaveAndEnable: (data: {
+        amount: number;
+        tradeType: TradeType;
+        currency: string;
+        bypassConfirmation: boolean;
     }) => void;
 }
 
 export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     onClose,
-    onConfirm,
+    onSave,
+    onSaveAndEnable,
 }) => {
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
@@ -67,14 +74,27 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
         };
     }, []);
 
-    const handleConfirm = () => {
+    const handleSave = () => {
         const parsed = parseFloat(amount);
         if (parsed > 0) {
-            onConfirm({
+            onSave({
                 amount: parsed,
                 tradeType,
-                denom,
-                saveAsDefault,
+                currency: denom,
+                bypassConfirmation: saveAsDefault,
+            });
+            onClose();
+        }
+    };
+
+    const handleSaveAndEnable = () => {
+        const parsed = parseFloat(amount);
+        if (parsed > 0) {
+            onSaveAndEnable({
+                amount: parsed,
+                tradeType,
+                currency: denom,
+                bypassConfirmation: saveAsDefault,
             });
             onClose();
         }
@@ -218,15 +238,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                 className={styles.saveButton}
                                 disabled={isDisabled}
                                 onClick={() => {
-                                    if (!isDisabled) {
-                                        onConfirm({
-                                            amount: parseFloat(amount),
-                                            tradeType,
-                                            denom,
-                                            saveAsDefault,
-                                        });
-                                        onClose();
-                                    }
+                                    if (!isDisabled) handleSave();
                                 }}
                             >
                                 Save
@@ -236,7 +248,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                 className={styles.confirmButton}
                                 disabled={isDisabled}
                                 onClick={() => {
-                                    if (!isDisabled) handleConfirm();
+                                    if (!isDisabled) handleSaveAndEnable();
                                 }}
                             >
                                 Save & Enable

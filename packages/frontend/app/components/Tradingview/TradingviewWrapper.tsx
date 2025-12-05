@@ -19,8 +19,12 @@ const TradingViewWrapper: React.FC = () => {
     // Use a key to force remount of TradingViewProvider when coming back online
     const { lastOnlineAt } = useAppStateStore();
     const [chartKey, setChartKey] = useState(0);
-    const { showQuickModeConfirm, closeQuickModeConfirm, confirmQuickMode } =
-        useOrderPlacementStore();
+    const {
+        showQuickModeConfirm,
+        closeQuickModeConfirm,
+        saveQuickModeSettings,
+        saveAndEnableQuickMode,
+    } = useOrderPlacementStore();
 
     useEffect(() => {
         let mounted = true;
@@ -87,7 +91,8 @@ const TradingViewWrapper: React.FC = () => {
             {showQuickModeConfirm && (
                 <QuickModeConfirmModal
                     onClose={closeQuickModeConfirm}
-                    onConfirm={confirmQuickMode}
+                    onSave={saveQuickModeSettings}
+                    onSaveAndEnable={saveAndEnableQuickMode}
                 />
             )}
         </div>

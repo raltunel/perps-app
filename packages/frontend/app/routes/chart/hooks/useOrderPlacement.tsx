@@ -24,8 +24,7 @@ interface OrderPlacementStore {
     modalData: { price: number; side: 'buy' | 'sell' } | null;
     quickMode: boolean;
     showQuickModeConfirm: boolean;
-    quickModeDefaultAmount: number;
-    quickModeTradeType: TradeType;
+    quickModeBypassConfirmation: boolean;
     activeOrder: { type: TradeType; size: number; currency: string } | null;
     placeOrder: (price: number, side: 'buy' | 'sell') => void;
     clearPendingOrder: () => void;
@@ -34,10 +33,20 @@ interface OrderPlacementStore {
     closeModal: () => void;
     confirmOrder: (order: PreparedOrder) => void;
     toggleQuickMode: () => void;
-    setQuickModeTradeType: (tradeType: TradeType) => void;
     openQuickModeConfirm: () => void;
     closeQuickModeConfirm: () => void;
-    confirmQuickMode: (amount: number) => void;
+    saveQuickModeSettings: (data: {
+        amount: number;
+        tradeType: TradeType;
+        currency: string;
+        bypassConfirmation: boolean;
+    }) => void;
+    saveAndEnableQuickMode: (data: {
+        amount: number;
+        tradeType: TradeType;
+        currency: string;
+        bypassConfirmation: boolean;
+    }) => void;
     resetQuickModeState: () => void;
 }
 
@@ -48,8 +57,7 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
     modalData: null,
     quickMode: false,
     showQuickModeConfirm: false,
-    quickModeDefaultAmount: 0,
-    quickModeTradeType: 'Limit',
+    quickModeBypassConfirmation: false,
     activeOrder: null,
     placeOrder: (price: number, side: 'buy' | 'sell') => {
         set({ pendingOrder: { price, side, timestamp: Date.now() } });
@@ -84,24 +92,38 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
             quickMode: !state.quickMode,
         });
     },
-    setQuickModeTradeType: (tradeType: TradeType) => {
-        set({
-            quickModeTradeType: tradeType,
-            activeOrder: null,
-        });
-    },
     openQuickModeConfirm: () => set({ showQuickModeConfirm: true }),
     closeQuickModeConfirm: () => set({ showQuickModeConfirm: false }),
-    confirmQuickMode: (amount: number) => {
-        const state = useOrderPlacementStore.getState();
+    saveQuickModeSettings: (data: {
+        amount: number;
+        tradeType: TradeType;
+        currency: string;
+        bypassConfirmation: boolean;
+    }) => {
+        set({
+            showQuickModeConfirm: false,
+            quickModeBypassConfirmation: data.bypassConfirmation,
+            activeOrder: {
+                type: data.tradeType,
+                size: data.amount,
+                currency: data.currency,
+            },
+        });
+    },
+    saveAndEnableQuickMode: (data: {
+        amount: number;
+        tradeType: TradeType;
+        currency: string;
+        bypassConfirmation: boolean;
+    }) => {
         set({
             quickMode: true,
             showQuickModeConfirm: false,
-            quickModeDefaultAmount: amount,
+            quickModeBypassConfirmation: data.bypassConfirmation,
             activeOrder: {
-                type: state.quickModeTradeType,
-                size: amount,
-                currency: 'USD',
+                type: data.tradeType,
+                size: data.amount,
+                currency: data.currency,
             },
         });
     },
@@ -110,6 +132,7 @@ export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
             quickMode: false,
             activeOrder: null,
             preparedOrder: null,
+            quickModeBypassConfirmation: false,
         });
     },
 }));

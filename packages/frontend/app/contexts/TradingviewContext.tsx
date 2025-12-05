@@ -97,13 +97,8 @@ export const TradingViewProvider: React.FC<{
     >;
 }> = ({ children, tradingviewLib, setChartLoadingStatus }) => {
     const [chart, setChart] = useState<IChartingLibraryWidget | null>(null);
-    const {
-        openModal,
-        toggleQuickMode,
-        setQuickModeTradeType,
-        openQuickModeConfirm,
-        resetQuickModeState,
-    } = useOrderPlacementStore();
+    const { toggleQuickMode, openQuickModeConfirm, resetQuickModeState } =
+        useOrderPlacementStore();
 
     const session = useSession();
     const isSessionEstablished = isEstablished(session);
@@ -644,34 +639,79 @@ export const TradingViewProvider: React.FC<{
     useEffect(() => {
         if (!chart) return;
 
-        const currentMarketId = marketIdRef.current;
-        const processedSymbol = processSymbolUrlParam(currentMarketId || 'BTC');
         chart.onContextMenu((_unixTime: number, price: number) => {
-            const formattedPrice = Number(price.toFixed(2));
-            const symbol = processedSymbol.split(':')[0];
+            const state = useOrderPlacementStore.getState();
+            const activeOrder = state.activeOrder;
 
+            const formattedPrice = Number(price.toFixed(2));
             const isAbove = formattedPrice > markPxRef.current;
+
+            if (!activeOrder) {
+                const topOrder = isAbove
+                    ? {
+                          text: `Sell @ ${formattedPrice} limit`,
+                          side: 'sell' as const,
+                      }
+                    : {
+                          text: `Buy @ ${formattedPrice} limit`,
+                          side: 'buy' as const,
+                      };
+
+                const bottomOrder = isAbove
+                    ? {
+                          text: `Buy @ ${formattedPrice} stop`,
+                          side: 'buy' as const,
+                      }
+                    : {
+                          text: `Sell @ ${formattedPrice} stop`,
+                          side: 'sell' as const,
+                      };
+
+                return [
+                    {
+                        position: 'top' as const,
+                        text: topOrder.text,
+                        click: () => {
+                            openQuickModeConfirm();
+                        },
+                    },
+                    {
+                        position: 'top' as const,
+                        text: bottomOrder.text,
+                        click: () => {
+                            openQuickModeConfirm();
+                        },
+                    },
+                    {
+                        position: 'top' as const,
+                        text: '-',
+                        click: () => {},
+                    },
+                ];
+            }
+
+            const displaySize = `${activeOrder.size} ${activeOrder.currency}`;
 
             const topOrder = isAbove
                 ? {
-                      text: `Sell 1 ${symbol} @ ${formattedPrice} limit`,
+                      text: `Sell ${displaySize} @ ${formattedPrice} limit`,
                       side: 'sell' as const,
                       type: 'Limit' as const,
                   }
                 : {
-                      text: `Buy 1 ${symbol} @ ${formattedPrice} limit`,
+                      text: `Buy ${displaySize} @ ${formattedPrice} limit`,
                       side: 'buy' as const,
                       type: 'Limit' as const,
                   };
 
             const bottomOrder = isAbove
                 ? {
-                      text: `Buy 1 ${symbol} @ ${formattedPrice} stop`,
+                      text: `Buy ${displaySize} @ ${formattedPrice} stop`,
                       side: 'buy' as const,
                       type: 'Stop' as const,
                   }
                 : {
-                      text: `Sell 1 ${symbol} @ ${formattedPrice} stop`,
+                      text: `Sell ${displaySize} @ ${formattedPrice} stop`,
                       side: 'sell' as const,
                       type: 'Stop' as const,
                   };
@@ -684,9 +724,9 @@ export const TradingViewProvider: React.FC<{
                         confirmOrder({
                             price: formattedPrice,
                             side: topOrder.side,
-                            type: 'Limit',
-                            size: 1,
-                            currency: 'USD',
+                            type: activeOrder.type,
+                            size: activeOrder.size,
+                            currency: activeOrder.currency,
                             timestamp: Date.now(),
                         });
                     },
@@ -698,9 +738,9 @@ export const TradingViewProvider: React.FC<{
                         confirmOrder({
                             price: formattedPrice,
                             side: bottomOrder.side,
-                            type: 'Limit',
-                            size: 1,
-                            currency: 'USD',
+                            type: activeOrder.type,
+                            size: activeOrder.size,
+                            currency: activeOrder.currency,
                             timestamp: Date.now(),
                         });
                     },
