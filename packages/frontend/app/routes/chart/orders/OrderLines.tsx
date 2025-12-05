@@ -35,7 +35,7 @@ export default function OrderLines({
 
     const openLines = useOpenOrderLines();
     const positionLines = usePositionOrderLines();
-    const { previewLines } = usePreviewOrderLines();
+    const { obPreviewLine } = usePreviewOrderLines();
 
     const [lines, setLines] = useState<LineData[]>([]);
     const [visibleLines, setVisibleLines] = useState<LineData[]>([]);
@@ -55,7 +55,11 @@ export default function OrderLines({
     useEffect(() => {
         let matchFound = false;
 
-        const linesData = [...openLines, ...positionLines, ...previewLines];
+        const linesData = [
+            ...openLines,
+            ...positionLines,
+            ...(obPreviewLine ? [obPreviewLine] : []),
+        ];
 
         const updatedLines = linesData.map((line) => {
             if (
@@ -74,7 +78,7 @@ export default function OrderLines({
         }
 
         setLines(updatedLines);
-    }, [openLines, positionLines, previewLines, selectedLine]);
+    }, [openLines, positionLines, obPreviewLine, selectedLine]);
 
     useEffect(() => {
         if (!chart || !scaleData) return;

@@ -6,11 +6,11 @@ import type { LineData } from '~/routes/chart/orders/component/LineComponent';
 export const CHART_LINES_KEY = 'perps.tv.chart.lines';
 
 interface ChartLinesStore {
-    previewLines: LineData[];
-    setPreviewLines: (lines: LineData[]) => void;
+    obPreviewLine: LineData | null;
+    setObPreviewLine: (line: LineData) => void;
 }
 
 export const useChartLinesStore = create<ChartLinesStore>((set) => ({
-    previewLines: [],
-    setPreviewLines: (lines: LineData[]) => set({ previewLines: lines }),
+    obPreviewLine: null,
+    setObPreviewLine: (line: LineData) => set({ obPreviewLine: line }),
 }));

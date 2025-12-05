@@ -16,6 +16,7 @@ import { useRestPoller } from '~/hooks/useRestPoller';
 import { useAppSettings } from '~/stores/AppSettingsStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import { useChartLinesStore } from '~/stores/ChartLinesStore';
 import { TableState } from '~/utils/CommonIFs';
 import type {
     OrderBookMode,
@@ -140,6 +141,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
         isMidModeActive,
     } = useTradeDataStore();
     const userOrdersRef = useRef<OrderDataIF[]>([]);
+
+    const { obPreviewLine } = useChartLinesStore();
 
     const needExtraPolling = useMemo(() => {
         if (!selectedResolution || !resolutions.length) return false;
@@ -306,11 +309,25 @@ const OrderBook: React.FC<OrderBookProps> = ({
         return slots;
     }, [userSymbolOrders, sellSlots, findClosestSlot]);
 
+    const focusedPriceRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (obPreviewLine?.yPrice) {
+            focusedPriceRef.current = obPreviewLine.yPrice;
+        }
+    }, [obPreviewLine?.yPrice]);
+
+    useEffect(() => {
+        if (orderInputPriceValue.value) {
+            focusedPriceRef.current = orderInputPriceValue.value;
+        }
+    }, [orderInputPriceValue.value]);
+
     useEffect(() => {
         if (
             !filledResolution.current ||
             !symbolInfo ||
-            !orderInputPriceValue.value ||
+            !focusedPriceRef.current ||
             !buys.length ||
             !sells.length ||
             !midPriceRef.current
@@ -337,7 +354,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         let side;
         let targetSlots;
 
-        if (orderInputPriceValue.value < midPriceRef.current) {
+        if (focusedPriceRef.current < midPriceRef.current) {
             side = 'buy';
             targetSlots = buys.map((buy) => buy.px);
         } else {
@@ -346,7 +363,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         }
 
         let closestSlot = findClosestByFlooring(
-            orderInputPriceValue.value,
+            focusedPriceRef.current,
             targetSlots,
         );
 
@@ -358,7 +375,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
         } else {
             setFocusedSlot(null);
         }
-    }, [orderInputPriceValue.value, buys, sells]);
+    }, [
+        orderInputPriceValue.value,
+        buys,
+        sells,
+        obPreviewLine?.yPrice,
+        isMidModeActive,
+    ]);
 
     // code blocks were being used in sdk approach
 
