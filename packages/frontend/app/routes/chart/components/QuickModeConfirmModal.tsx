@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     isEstablished,
     SessionButton,
@@ -6,6 +6,7 @@ import {
 } from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import styles from './QuickModeConfirmModal.module.css';
 
 export type TradeType = 'Market' | 'Limit';
 
@@ -31,19 +32,40 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     const [amount, setAmount] = useState<string>('');
     const [tradeType, setTradeType] = useState<TradeType>('Limit');
-    const [denom, setDenom] = useState<'USD' | string>(upperSymbol);
+    const [denom, setDenom] = useState<'USD' | string>('USD');
 
     const [dropdownTradeOpen, setDropdownTradeOpen] = useState(false);
     const [dropdownDenomOpen, setDropdownDenomOpen] = useState(false);
     const [saveAsDefault, setSaveAsDefault] = useState(false);
 
-    const [cancelHovered, setCancelHovered] = useState(false);
-    const [saveHovered, setSaveHovered] = useState(false);
-    const [confirmHovered, setConfirmHovered] = useState(false);
+    const tradeTypeRef = useRef<HTMLDivElement>(null);
+    const denomRef = useRef<HTMLDivElement>(null);
 
     const isDisabled = !amount || parseFloat(amount) <= 0;
 
-    const tradeTypes: TradeType[] = ['Limit', 'Market'];
+    const tradeTypes: TradeType[] = ['Limit'];
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                tradeTypeRef.current &&
+                !tradeTypeRef.current.contains(event.target as Node)
+            ) {
+                setDropdownTradeOpen(false);
+            }
+            if (
+                denomRef.current &&
+                !denomRef.current.contains(event.target as Node)
+            ) {
+                setDropdownDenomOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleConfirm = () => {
         const parsed = parseFloat(amount);
@@ -60,107 +82,32 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
     return (
         <>
-            <style>
-                {`
-                    .quick-mode-input .numFormattedInput {
-                        background: transparent !important;
-                        border: none !important;
-                        color: #cbcaca !important;
-                        font-size: 13px !important;
-                        outline: none !important;
-                        text-align: right !important;
-                        width: 100% !important;
-                        cursor: text !important;
-                    }
-
-                    /* size input padding fix */
-                    .size-input-padding .numFormattedInput {
-                        padding-right: 60px !important;
-                    }
-                `}
-            </style>
-
-            <div
-                style={{
-                    position: 'fixed',
-                    left: '50%',
-                    top: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: 10000,
-                    backgroundColor: '#1e1e1e',
-                    borderRadius: 12,
-                    width: 340,
-                    padding: 20,
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div style={{ display: 'flex', gap: 12, marginBottom: 18 }}>
-                    <div
-                        style={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255,255,255,0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <span style={{ color: '#fff', fontSize: 18 }}>!</span>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.header}>
+                    <div className={styles.iconWrapper}>
+                        <span className={styles.icon}>!</span>
                     </div>
 
                     <div>
-                        <h3
-                            style={{
-                                margin: 0,
-                                color: '#fff',
-                                fontSize: 16,
-                                fontWeight: 600,
-                                marginBottom: 4,
-                            }}
-                        >
-                            Quick Mode Settings
-                        </h3>
+                        <h3 className={styles.title}>Quick Trade Mode</h3>
+                        <p className={styles.description}>
+                            Configure quick trade settings for faster order
+                            placement
+                        </p>
                     </div>
                 </div>
 
-                <div style={{ marginBottom: 12, position: 'relative' }}>
+                <div className={styles.tradeTypeWrapper} ref={tradeTypeRef}>
                     <button
                         onClick={() => setDropdownTradeOpen(!dropdownTradeOpen)}
-                        style={{
-                            width: '100%',
-                            height: 36,
-                            backgroundColor: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            borderRadius: 6,
-                            color: '#cbcaca',
-                            fontSize: 13,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '0 12px',
-                            cursor: 'pointer',
-                        }}
+                        className={styles.tradeTypeButton}
                     >
                         {tradeType}
-                        <span style={{ fontSize: 10 }}>▼</span>
+                        <span className={styles.arrow}>▼</span>
                     </button>
 
                     {dropdownTradeOpen && (
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: 40,
-                                left: 0,
-                                width: '100%',
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                borderRadius: 6,
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
-                                border: '1px solid rgba(255,255,255,0.08)',
-                                zIndex: 10001,
-                            }}
-                        >
+                        <div className={styles.dropdown}>
                             {tradeTypes.map((type) => (
                                 <div
                                     key={type}
@@ -168,21 +115,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                         setTradeType(type);
                                         setDropdownTradeOpen(false);
                                     }}
-                                    style={{
-                                        padding: '8px 12px',
-                                        color: '#cbcaca',
-                                        cursor: 'pointer',
-                                        backgroundColor: 'rgb(45,44,44)',
-                                        fontSize: 13,
-                                    }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.backgroundColor =
-                                            'rgb(30,30,30)')
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.backgroundColor =
-                                            'rgb(45,44,44)')
-                                    }
+                                    className={styles.dropdownItem}
                                 >
                                     {type}
                                 </div>
@@ -192,22 +125,10 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                 </div>
 
                 {/* SIZE + DENOM */}
-                <div
-                    style={{
-                        height: 36,
-                        padding: '0 12px',
-                        display: 'grid',
-                        gridTemplateColumns: 'auto 1fr auto',
-                        alignItems: 'center',
-                        borderRadius: 6,
-                        backgroundColor: 'rgba(255,255,255,0.05)',
-                        marginBottom: 18,
-                        position: 'relative',
-                    }}
-                >
-                    <span style={{ fontSize: 12, color: '#b3b3b3' }}>Size</span>
+                <div className={styles.sizeWrapper}>
+                    <span className={styles.sizeLabel}>Size</span>
 
-                    <div style={{ position: 'relative', width: '100%' }}>
+                    <div className={styles.inputWrapper}>
                         <NumFormattedInput
                             value={amount}
                             onChange={(e) =>
@@ -221,47 +142,20 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                     </div>
 
                     {/* DENOM DROPDOWN */}
-                    <div style={{ width: 60, position: 'relative' }}>
+                    <div className={styles.denomWrapper} ref={denomRef}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setDropdownDenomOpen(!dropdownDenomOpen);
                             }}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: '#cbcaca',
-                                fontSize: 12,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 4,
-                                padding: 0,
-                                width: '100%',
-                                justifyContent: 'flex-end',
-                            }}
+                            className={styles.denomButton}
                         >
                             {denom}
-                            <span style={{ fontSize: 10, opacity: 0.8 }}>
-                                ▼
-                            </span>
+                            <span className={styles.denomArrow}>▼</span>
                         </button>
 
                         {dropdownDenomOpen && (
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    top: 28,
-                                    right: 0,
-                                    backgroundColor: 'rgb(45,44,44)',
-                                    borderRadius: 6,
-                                    boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
-                                    width: 80,
-                                    padding: '4px 0',
-                                    zIndex: 10001,
-                                    border: '1px solid rgba(255,255,255,0.08)',
-                                }}
-                            >
+                            <div className={styles.denomDropdown}>
                                 {[upperSymbol, 'USD'].map((opt) => (
                                     <div
                                         key={opt}
@@ -269,21 +163,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                                             setDenom(opt);
                                             setDropdownDenomOpen(false);
                                         }}
-                                        style={{
-                                            padding: '6px 12px',
-                                            fontSize: 12,
-                                            cursor: 'pointer',
-                                            backgroundColor: 'rgb(45,44,44)',
-                                            color: '#cbcaca',
-                                        }}
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.backgroundColor =
-                                                'rgb(30,30,30)')
-                                        }
-                                        onMouseLeave={(e) =>
-                                            (e.currentTarget.style.backgroundColor =
-                                                'rgb(45,44,44)')
-                                        }
+                                        className={styles.denomDropdownItem}
                                     >
                                         {opt}
                                     </div>
@@ -295,78 +175,48 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
                 <div
                     onClick={() => setSaveAsDefault(!saveAsDefault)}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        marginBottom: 18,
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                    }}
+                    className={styles.checkboxWrapper}
                 >
-                    <input
-                        type='checkbox'
-                        checked={saveAsDefault}
-                        onChange={() => setSaveAsDefault(!saveAsDefault)}
-                        style={{ cursor: 'pointer' }}
-                    />
-                    <span style={{ fontSize: 12, color: '#b3b3b3' }}>
-                        Save as default for Quick Mode
+                    <div
+                        className={`${styles.checkbox} ${saveAsDefault ? styles.checked : ''}`}
+                    >
+                        {saveAsDefault && (
+                            <svg
+                                width='10'
+                                height='8'
+                                viewBox='0 0 10 8'
+                                fill='none'
+                                xmlns='http://www.w3.org/2000/svg'
+                            >
+                                <path
+                                    d='M1 4L3.5 6.5L9 1'
+                                    stroke='#000'
+                                    strokeWidth='1.5'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                />
+                            </svg>
+                        )}
+                    </div>
+                    <span className={styles.checkboxLabel}>
+                        Enable Confirmation bypass
                     </span>
                 </div>
 
-                <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                        style={{
-                            flex: 1,
-                            height: 36,
-                            borderRadius: 6,
-                            border: 'none',
-                            cursor: 'pointer',
-                            backgroundColor: cancelHovered
-                                ? '#2a2a2a'
-                                : 'transparent',
-                            color: '#fff',
-                        }}
-                        onMouseEnter={() => setCancelHovered(true)}
-                        onMouseLeave={() => setCancelHovered(false)}
-                        onClick={onClose}
-                    >
+                <div className={styles.buttonGroup}>
+                    <button className={styles.cancelButton} onClick={onClose}>
                         Cancel
                     </button>
 
                     {!isSessionEstablished ? (
-                        <div
-                            style={{
-                                flex: 1,
-                                height: 36,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
+                        <div className={styles.sessionButtonWrapper}>
                             <SessionButton />
                         </div>
                     ) : (
                         <>
                             <button
-                                style={{
-                                    flex: 1,
-                                    height: 36,
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    cursor: isDisabled
-                                        ? 'not-allowed'
-                                        : 'pointer',
-                                    backgroundColor: saveHovered
-                                        ? '#4a5060'
-                                        : '#3a3a3a',
-                                    opacity: isDisabled ? 0.4 : 1,
-                                    color: '#fff',
-                                }}
+                                className={styles.saveButton}
                                 disabled={isDisabled}
-                                onMouseEnter={() => setSaveHovered(true)}
-                                onMouseLeave={() => setSaveHovered(false)}
                                 onClick={() => {
                                     if (!isDisabled) {
                                         onConfirm({
@@ -383,28 +233,8 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                             </button>
 
                             <button
-                                style={{
-                                    flex: 1,
-                                    minWidth: 110,
-                                    height: 36,
-                                    borderRadius: 6,
-                                    border: 'none',
-                                    cursor: isDisabled
-                                        ? 'not-allowed'
-                                        : 'pointer',
-                                    backgroundColor: isDisabled
-                                        ? '#3a3a3a'
-                                        : confirmHovered
-                                          ? 'var(--accent1,#5294e2)'
-                                          : 'var(--accent1,#4a8bd3)',
-                                    color: isDisabled ? '#888' : '#fff',
-                                    opacity: isDisabled ? 0.5 : 1,
-                                    fontSize: 12,
-                                    whiteSpace: 'nowrap',
-                                }}
+                                className={styles.confirmButton}
                                 disabled={isDisabled}
-                                onMouseEnter={() => setConfirmHovered(true)}
-                                onMouseLeave={() => setConfirmHovered(false)}
                                 onClick={() => {
                                     if (!isDisabled) handleConfirm();
                                 }}
@@ -416,15 +246,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
                 </div>
             </div>
 
-            <div
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 9999,
-                    backgroundColor: 'rgba(0,0,0,0.6)',
-                }}
-                onClick={onClose}
-            />
+            <div className={styles.overlay} onClick={onClose} />
         </>
     );
 };
