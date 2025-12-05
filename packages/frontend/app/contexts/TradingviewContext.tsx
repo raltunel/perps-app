@@ -507,13 +507,12 @@ export const TradingViewProvider: React.FC<{
                 container.style.display = 'flex';
                 container.style.alignItems = 'center';
                 container.style.marginLeft = '8px';
-                container.style.gap = '6px';
 
                 const quickButton = document.createElement('button');
                 quickButton.style.padding = '8px 12px';
                 quickButton.style.backgroundColor = '#2a2e39';
                 quickButton.style.border = 'none';
-                quickButton.style.borderRadius = '4px';
+                quickButton.style.borderRadius = '4px 0px 0px 4px';
                 quickButton.style.color = '#cbcaca';
                 quickButton.style.fontSize = '13px';
                 quickButton.style.fontWeight = '500';
@@ -548,9 +547,9 @@ export const TradingViewProvider: React.FC<{
                 settingsButton.style.justifyContent = 'center';
                 settingsButton.style.width = '30px';
                 settingsButton.style.height = '30px';
-                settingsButton.style.backgroundColor = '#2a2e39';
+                settingsButton.style.backgroundColor = '#1e2029';
                 settingsButton.style.border = 'none';
-                settingsButton.style.borderRadius = '4px';
+                settingsButton.style.borderRadius = '0px 4px 4px 0px';
                 settingsButton.style.color = '#cbcaca';
                 settingsButton.style.fontSize = '14px';
                 settingsButton.style.cursor = 'pointer';
@@ -592,6 +591,14 @@ export const TradingViewProvider: React.FC<{
 
                 settingsButton.addEventListener('click', () => {
                     openQuickModeConfirm();
+                });
+
+                settingsButton.addEventListener('mouseenter', () => {
+                    settingsButton.style.backgroundColor = '#4a5060';
+                });
+
+                settingsButton.addEventListener('mouseleave', () => {
+                    settingsButton.style.backgroundColor = '#1e2029';
                 });
 
                 container.appendChild(quickButton);
