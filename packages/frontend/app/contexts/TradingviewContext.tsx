@@ -793,6 +793,10 @@ export const TradingViewProvider: React.FC<{
                 e.preventDefault();
                 setDebugToolbarOpen(!debugToolbarOpenRef.current);
             }
+            if (e.code === 'KeyQ' && e.altKey) {
+                e.preventDefault();
+                toggleQuickMode();
+            }
             if (
                 !e.ctrlKey &&
                 !e.altKey &&
@@ -805,9 +809,11 @@ export const TradingViewProvider: React.FC<{
             }
         };
 
+        window.addEventListener('keydown', blockSymbolSearchKeys, true);
         iframeDoc?.addEventListener('keydown', blockSymbolSearchKeys, true);
 
         return () => {
+            window.removeEventListener('keydown', blockSymbolSearchKeys, true);
             iframeDoc?.removeEventListener(
                 'keydown',
                 blockSymbolSearchKeys,
