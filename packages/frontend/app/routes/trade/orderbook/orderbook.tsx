@@ -363,10 +363,10 @@ const OrderBook: React.FC<OrderBookProps> = ({
 
         if (focusedPriceRef.current < midPriceRef.current) {
             side = 'buy';
-            targetSlots = buys.map((buy) => buy.px);
+            targetSlots = buys.slice(0, orderCount).map((buy) => buy.px);
         } else {
             side = 'sell';
-            targetSlots = sells.map((sell) => sell.px);
+            targetSlots = sells.slice(0, orderCount).map((sell) => sell.px);
         }
 
         let closestSlot = findClosestByFlooring(
@@ -403,6 +403,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
         sells,
         obPreviewLine?.yPrice,
         isMidModeActive,
+        orderCount,
     ]);
 
     const findProperResolution = useCallback(
