@@ -58,12 +58,12 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     const markPx = symbolInfo?.markPx;
     const { chart, isChartReady } = useTradingView();
     const {
-        pendingOrder,
-        clearPendingOrder,
         confirmOrder,
         quickMode,
         activeOrder,
         setPreparedOrder,
+        preparedOrder,
+        clearPreparedOrder,
         openQuickModeConfirm,
     } = useOrderPlacementStore();
 
@@ -561,17 +561,78 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
         dropdownPosition,
     ]);
 
-    // Listen for external order placement requests
+    // Listen for preparedOrder changes and trigger animation
     useEffect(() => {
-        if (pendingOrder) {
-            if (pendingOrder.side === 'buy') {
-                handleBuyLimit(pendingOrder.price);
-            } else {
-                handleSellStop(pendingOrder.price);
-            }
-            clearPendingOrder();
+        if (!preparedOrder) return;
+
+        const { price, side } = preparedOrder;
+
+        setClickedOrder({
+            price,
+            mousePos: {
+                x: overlayCanvasMousePositionRef.current.x,
+                y: overlayCanvasMousePositionRef.current.y,
+            },
+            side,
+        });
+        setIsProcessing(true);
+        setProcessingProgress(0);
+
+        if (progressAnimationRef.current) {
+            cancelAnimationFrame(progressAnimationRef.current);
+            progressAnimationRef.current = null;
         }
-    }, [pendingOrder, clearPendingOrder]);
+
+        const startTime = Date.now();
+        const duration = 3000;
+
+        const animateProgress = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            setProcessingProgress(progress);
+
+            if (progress < 1) {
+                progressAnimationRef.current =
+                    requestAnimationFrame(animateProgress);
+            } else {
+                progressAnimationRef.current = null;
+                setTimeout(() => {
+                    setClickedOrder(null);
+                    setIsProcessing(false);
+                    setProcessingProgress(0);
+
+                    // Add to tempPendingOrders
+                    const newPendingOrder: LineData = {
+                        xLoc: 0.4,
+                        yPrice: price,
+                        textValue: {
+                            type: 'Limit',
+                            price: price,
+                            triggerCondition: '',
+                        },
+                        quantityTextValue: preparedOrder.size,
+                        quantityText: preparedOrder.size.toString(),
+                        color: colors[side],
+                        type: 'LIMIT',
+                        lineStyle: 3,
+                        lineWidth: 1,
+                        side: side,
+                    };
+
+                    tempPendingOrders.push(newPendingOrder);
+                    clearPreparedOrder();
+                }, 100);
+            }
+        };
+
+        progressAnimationRef.current = requestAnimationFrame(animateProgress);
+    }, [
+        preparedOrder,
+        colors,
+        overlayCanvasMousePositionRef,
+        clearPreparedOrder,
+    ]);
 
     const handleBuyLimit = (price: number) => {
         const side = 'buy';

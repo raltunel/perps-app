@@ -1,138 +1,184 @@
 import { create } from 'zustand';
 
-export interface PendingOrder {
-    price: number;
-    side: 'buy' | 'sell';
-    timestamp: number; // to trigger even if same price/side
-}
+// ============================================================================
+// Types & Interfaces
+// ============================================================================
+
+export type Side = 'buy' | 'sell';
+export type TradeType = 'Limit' /* | 'Stop Market' | 'Stop Limit' */;
 
 export interface PreparedOrder {
     price: number;
-    side: 'buy' | 'sell';
+    side: Side;
     type: TradeType;
     size: number;
     currency: string;
     timestamp: number;
 }
 
-export type TradeType = 'Market' | 'Limit' /* | 'Stop Market' | 'Stop Limit' */;
+export interface OrderConfig {
+    type: TradeType;
+    size: number;
+    currency: string;
+    bypassConfirmation: boolean;
+}
 
-interface OrderPlacementStore {
-    pendingOrder: PendingOrder | null;
+// ============================================================================
+// Store State Interface
+// ============================================================================
+
+interface OrderState {
     preparedOrder: PreparedOrder | null;
-    showModal: boolean;
-    modalData: { price: number; side: 'buy' | 'sell' } | null;
+}
+
+interface QuickModeState {
     quickMode: boolean;
     showQuickModeConfirm: boolean;
-    quickModeBypassConfirmation: boolean;
-    activeOrder: { type: TradeType; size: number; currency: string } | null;
-    placeOrder: (price: number, side: 'buy' | 'sell') => void;
-    clearPendingOrder: () => void;
+    activeOrder: OrderConfig | null;
+}
+
+interface OrderPlacementStore extends OrderState, QuickModeState {
+    showModal: boolean;
+    // Order Actions
     setPreparedOrder: (order: PreparedOrder | null) => void;
-    openModal: (price: number, side: 'buy' | 'sell') => void;
+    clearPreparedOrder: () => void;
+    confirmOrder: (order: PreparedOrder | null) => void;
+
+    // Modal Actions
+    openModal: () => void;
     closeModal: () => void;
-    confirmOrder: (order: PreparedOrder) => void;
+
+    // Quick Mode Actions
     toggleQuickMode: () => void;
     openQuickModeConfirm: () => void;
     closeQuickModeConfirm: () => void;
-    saveQuickModeSettings: (data: {
-        amount: number;
-        tradeType: TradeType;
-        currency: string;
-        bypassConfirmation: boolean;
-    }) => void;
-    saveAndEnableQuickMode: (data: {
-        amount: number;
-        tradeType: TradeType;
-        currency: string;
-        bypassConfirmation: boolean;
-    }) => void;
+    saveQuickModeSettings: (data: OrderConfig) => void;
+    saveAndEnableQuickMode: (data: OrderConfig) => void;
     resetQuickModeState: () => void;
 }
 
-export const useOrderPlacementStore = create<OrderPlacementStore>((set) => ({
-    pendingOrder: null,
+// ============================================================================
+// Initial State
+// ============================================================================
+
+const initialOrderState: OrderState = {
     preparedOrder: null,
-    showModal: false,
-    modalData: null,
+};
+
+const initialQuickModeState: QuickModeState = {
     quickMode: false,
     showQuickModeConfirm: false,
-    quickModeBypassConfirmation: false,
     activeOrder: null,
-    placeOrder: (price: number, side: 'buy' | 'sell') => {
-        set({ pendingOrder: { price, side, timestamp: Date.now() } });
-    },
-    clearPendingOrder: () => set({ pendingOrder: null }),
-    setPreparedOrder: (order: PreparedOrder | null) =>
-        set({ preparedOrder: order }),
-    openModal: (price: number, side: 'buy' | 'sell') => {
-        set({ showModal: true, modalData: { price, side } });
-    },
-    closeModal: () => {
-        set({ showModal: false, modalData: null });
-    },
-    confirmOrder: (order: PreparedOrder | null) => {
-        const state = useOrderPlacementStore.getState();
-        const side = state.modalData?.side || 'buy';
-        set({
-            pendingOrder: order,
-            showModal: false,
-            modalData: null,
-        });
-    },
-    toggleQuickMode: () => {
-        const state = useOrderPlacementStore.getState();
+};
 
-        if (!state.quickMode && !state.activeOrder) {
+// ============================================================================
+// Store Implementation
+// ============================================================================
+
+export const useOrderPlacementStore = create<OrderPlacementStore>(
+    (set, get) => ({
+        // Initial State
+        ...initialOrderState,
+        ...initialQuickModeState,
+        showModal: false,
+
+        // Order Actions
+        setPreparedOrder: (order) => {
+            set({ preparedOrder: order });
+        },
+
+        clearPreparedOrder: () => {
+            set({ preparedOrder: null });
+        },
+
+        confirmOrder: (order) => {
+            set({
+                preparedOrder: order,
+                showModal: false,
+            });
+        },
+
+        // Modal Actions
+        openModal: () => {
+            set({ showModal: true });
+        },
+
+        closeModal: () => {
+            set({ showModal: false });
+        },
+
+        // Quick Mode Actions
+        toggleQuickMode: () => {
+            const { quickMode, activeOrder } = get();
+
+            if (!quickMode && !activeOrder) {
+                set({ showQuickModeConfirm: true });
+                return;
+            }
+
+            set({ quickMode: !quickMode });
+        },
+
+        openQuickModeConfirm: () => {
             set({ showQuickModeConfirm: true });
-            return;
-        }
+        },
 
-        set({
-            quickMode: !state.quickMode,
-        });
-    },
-    openQuickModeConfirm: () => set({ showQuickModeConfirm: true }),
-    closeQuickModeConfirm: () => set({ showQuickModeConfirm: false }),
-    saveQuickModeSettings: (data: {
-        amount: number;
-        tradeType: TradeType;
-        currency: string;
-        bypassConfirmation: boolean;
-    }) => {
-        set({
-            showQuickModeConfirm: false,
-            quickModeBypassConfirmation: data.bypassConfirmation,
-            activeOrder: {
-                type: data.tradeType,
-                size: data.amount,
-                currency: data.currency,
-            },
-        });
-    },
-    saveAndEnableQuickMode: (data: {
-        amount: number;
-        tradeType: TradeType;
-        currency: string;
-        bypassConfirmation: boolean;
-    }) => {
-        set({
-            quickMode: true,
-            showQuickModeConfirm: false,
-            quickModeBypassConfirmation: data.bypassConfirmation,
-            activeOrder: {
-                type: data.tradeType,
-                size: data.amount,
-                currency: data.currency,
-            },
-        });
-    },
-    resetQuickModeState: () => {
-        set({
-            quickMode: false,
-            activeOrder: null,
-            preparedOrder: null,
-            quickModeBypassConfirmation: false,
-        });
-    },
-}));
+        closeQuickModeConfirm: () => {
+            set({ showQuickModeConfirm: false });
+        },
+
+        saveQuickModeSettings: (data) => {
+            set({
+                showQuickModeConfirm: false,
+                activeOrder: data,
+            });
+        },
+
+        saveAndEnableQuickMode: (data) => {
+            set({
+                quickMode: true,
+                showQuickModeConfirm: false,
+                activeOrder: data,
+            });
+        },
+
+        resetQuickModeState: () => {
+            set({
+                quickMode: false,
+                activeOrder: null,
+                preparedOrder: null,
+            });
+        },
+    }),
+);
+
+// ============================================================================
+// Selectors
+// ============================================================================
+
+export const orderSelectors = {
+    hasPreparedOrder: (state: OrderPlacementStore) =>
+        state.preparedOrder !== null,
+};
+
+export const modalSelectors = {
+    isModalOpen: (state: OrderPlacementStore) => state.showModal,
+};
+
+export const quickModeSelectors = {
+    isQuickModeEnabled: (state: OrderPlacementStore) => state.quickMode,
+    isQuickModeConfigured: (state: OrderPlacementStore) =>
+        state.activeOrder !== null,
+    shouldBypassConfirmation: (state: OrderPlacementStore) =>
+        state.activeOrder?.bypassConfirmation ?? false,
+    getActiveOrderConfig: (state: OrderPlacementStore) => state.activeOrder,
+    isQuickModeConfirmOpen: (state: OrderPlacementStore) =>
+        state.showQuickModeConfirm,
+};
+
+// Combined selectors
+export const storeSelectors = {
+    ...orderSelectors,
+    ...modalSelectors,
+    ...quickModeSelectors,
+};

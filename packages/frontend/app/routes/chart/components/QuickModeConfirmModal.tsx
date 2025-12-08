@@ -13,13 +13,13 @@ export type TradeType = 'Market' | 'Limit';
 interface QuickModeConfirmModalProps {
     onClose: () => void;
     onSave: (data: {
-        amount: number;
+        size: number;
         tradeType: TradeType;
         currency: string;
         bypassConfirmation: boolean;
     }) => void;
     onSaveAndEnable: (data: {
-        amount: number;
+        size: number;
         tradeType: TradeType;
         currency: string;
         bypassConfirmation: boolean;
@@ -78,7 +78,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
         const parsed = parseFloat(amount);
         if (parsed > 0) {
             onSave({
-                amount: parsed,
+                size: parsed,
                 tradeType,
                 currency: denom,
                 bypassConfirmation: saveAsDefault,
@@ -91,7 +91,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
         const parsed = parseFloat(amount);
         if (parsed > 0) {
             onSaveAndEnable({
-                amount: parsed,
+                size: parsed,
                 tradeType,
                 currency: denom,
                 bypassConfirmation: saveAsDefault,
