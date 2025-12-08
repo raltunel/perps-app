@@ -17,7 +17,7 @@ export interface PreparedOrder {
 }
 
 export interface OrderConfig {
-    type: TradeType;
+    tradeType: TradeType;
     size: number;
     currency: string;
     bypassConfirmation: boolean;

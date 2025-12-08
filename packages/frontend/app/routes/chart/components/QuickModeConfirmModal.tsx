@@ -6,9 +6,11 @@ import {
 } from '@fogo/sessions-sdk-react';
 import NumFormattedInput from '~/components/Inputs/NumFormattedInput/NumFormattedInput';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
+import {
+    useOrderPlacementStore,
+    type TradeType,
+} from '../hooks/useOrderPlacement';
 import styles from './QuickModeConfirmModal.module.css';
-
-export type TradeType = 'Market' | 'Limit';
 
 interface QuickModeConfirmModalProps {
     onClose: () => void;
@@ -37,7 +39,9 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const { symbol } = useTradeDataStore();
     const upperSymbol = symbol?.toUpperCase() ?? 'BTC';
 
-    const [amount, setAmount] = useState<string>('');
+    const activeOrder = useOrderPlacementStore((state) => state.activeOrder);
+
+    const [size, setSize] = useState<string>('');
     const [tradeType, setTradeType] = useState<TradeType>('Limit');
     const [denom, setDenom] = useState<'USD' | string>('USD');
 
@@ -48,9 +52,18 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     const tradeTypeRef = useRef<HTMLDivElement>(null);
     const denomRef = useRef<HTMLDivElement>(null);
 
-    const isDisabled = !amount || parseFloat(amount) <= 0;
+    const isDisabled = !size || parseFloat(size) <= 0;
 
     const tradeTypes: TradeType[] = ['Limit'];
+
+    useEffect(() => {
+        if (activeOrder) {
+            setSize(activeOrder.size.toString());
+            setTradeType(activeOrder.tradeType);
+            setDenom(activeOrder.currency);
+            setSaveAsDefault(activeOrder.bypassConfirmation);
+        }
+    }, [activeOrder]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -75,7 +88,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     }, []);
 
     const handleSave = () => {
-        const parsed = parseFloat(amount);
+        const parsed = parseFloat(size);
         if (parsed > 0) {
             onSave({
                 size: parsed,
@@ -88,7 +101,7 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
     };
 
     const handleSaveAndEnable = () => {
-        const parsed = parseFloat(amount);
+        const parsed = parseFloat(size);
         if (parsed > 0) {
             onSaveAndEnable({
                 size: parsed,
@@ -150,9 +163,9 @@ export const QuickModeConfirmModal: React.FC<QuickModeConfirmModalProps> = ({
 
                     <div className={styles.inputWrapper}>
                         <NumFormattedInput
-                            value={amount}
+                            value={size}
                             onChange={(e) =>
-                                setAmount(
+                                setSize(
                                     typeof e === 'string' ? e : e.target.value,
                                 )
                             }

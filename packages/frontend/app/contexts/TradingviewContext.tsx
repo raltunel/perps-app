@@ -724,7 +724,7 @@ export const TradingViewProvider: React.FC<{
                         confirmOrder({
                             price: formattedPrice,
                             side: topOrder.side,
-                            type: activeOrder.type,
+                            type: activeOrder.tradeType,
                             size: activeOrder.size,
                             currency: activeOrder.currency,
                             timestamp: Date.now(),
@@ -738,7 +738,7 @@ export const TradingViewProvider: React.FC<{
                         confirmOrder({
                             price: formattedPrice,
                             side: bottomOrder.side,
-                            type: activeOrder.type,
+                            type: activeOrder.tradeType,
                             size: activeOrder.size,
                             currency: activeOrder.currency,
                             timestamp: Date.now(),

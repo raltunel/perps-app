@@ -203,7 +203,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                 setPreparedOrder({
                     price: mousePrice,
                     side: side,
-                    type: activeOrder.type,
+                    type: activeOrder.tradeType,
                     size: activeOrder.size,
                     currency: activeOrder.currency,
                     timestamp: Date.now(),
@@ -565,6 +565,8 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
     useEffect(() => {
         if (!preparedOrder) return;
 
+        console.log('preparedOrder:', preparedOrder);
+
         const { price, side } = preparedOrder;
 
         setClickedOrder({
@@ -642,7 +644,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
             setPreparedOrder({
                 price: price,
                 side: side,
-                type: activeOrder.type,
+                type: activeOrder.tradeType,
                 size: activeOrder.size,
                 currency: activeOrder.currency,
                 timestamp: Date.now(),
@@ -691,7 +693,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         setPreparedOrder({
                             price: price,
                             side: side,
-                            type: activeOrder.type,
+                            type: activeOrder.tradeType,
                             size: activeOrder.size,
                             currency: activeOrder.currency,
                             timestamp: Date.now(),
@@ -770,7 +772,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                         setPreparedOrder({
                             price: price,
                             side: side,
-                            type: activeOrder.type,
+                            type: activeOrder.tradeType,
                             size: activeOrder.size,
                             currency: activeOrder.currency,
                             timestamp: Date.now(),
@@ -818,7 +820,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             confirmOrder({
                                 price,
                                 side: 'buy',
-                                type: activeOrder.type,
+                                type: activeOrder.tradeType,
                                 size: activeOrder.size,
                                 currency: activeOrder.currency,
                                 timestamp: Date.now(),
@@ -833,7 +835,7 @@ const LimitOrderPlacement: React.FC<LimitOrderPlacementProps> = ({
                             confirmOrder({
                                 price,
                                 side: 'sell',
-                                type: activeOrder.type,
+                                type: activeOrder.tradeType,
                                 size: activeOrder.size,
                                 currency: activeOrder.currency,
                                 timestamp: Date.now(),
