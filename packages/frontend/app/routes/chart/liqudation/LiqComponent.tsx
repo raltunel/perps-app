@@ -4,6 +4,8 @@ import LiqLineTooltip from './LiqLinesTooltip';
 import LiqudationLines from './LiqudationLines';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useEffect, useState } from 'react';
+import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
+import { useMobile } from '~/hooks/useMediaQuery';
 
 export interface LiqProps {
     overlayCanvasRef: React.MutableRefObject<HTMLCanvasElement | null>;
@@ -25,6 +27,8 @@ const LiqComponent = ({
     const lines = useLiqudationLines(scaleData);
 
     const { hrBuys, hrSells, hrLiqBuys, hrLiqSells } = useOrderBookStore();
+    const { activeTab, showLiqOverlayAlways } = useLiqChartStore();
+    const isMobile = useMobile();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [overlayLiqCanvasAttr, setOverlayLiqCanvasAttr] = useState<any>();
@@ -73,16 +77,20 @@ const LiqComponent = ({
                         overflow: 'hidden',
                     }}
                 >
-                    <LiquidationsChart
-                        buyData={hrBuys}
-                        sellData={hrSells}
-                        liqBuys={hrLiqBuys}
-                        liqSells={hrLiqSells}
-                        width={overlayLiqCanvasAttr.width}
-                        height={overlayLiqCanvasAttr.height}
-                        scaleData={scaleData}
-                        location={'liqMobile'}
-                    />
+                    {(activeTab !== LiqChartTabType.Distribution ||
+                        showLiqOverlayAlways ||
+                        isMobile) && (
+                        <LiquidationsChart
+                            buyData={hrBuys}
+                            sellData={hrSells}
+                            liqBuys={hrLiqBuys}
+                            liqSells={hrLiqSells}
+                            width={overlayLiqCanvasAttr.width}
+                            height={overlayLiqCanvasAttr.height}
+                            scaleData={scaleData}
+                            location={'liqMobile'}
+                        />
+                    )}
                 </div>
             )}
         </>

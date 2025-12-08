@@ -6,6 +6,11 @@ export enum LiqChartTooltipType {
     Level = 'level',
 }
 
+export enum LiqChartTabType {
+    Distribution = 'Distribution',
+    Feed = 'Feed',
+}
+
 interface LiqChartStore {
     activeTooltipType: LiqChartTooltipType;
     setActiveTooltipType: (tooltipType: LiqChartTooltipType) => void;
@@ -13,6 +18,10 @@ interface LiqChartStore {
     setFocusedPrice: (focusedPrice: number) => void;
     focusSource: string;
     setFocusSource: (focusSource: string) => void;
+    activeTab: LiqChartTabType;
+    setActiveTab: (activeTab: LiqChartTabType) => void;
+    showLiqOverlayAlways: boolean;
+    setShowLiqOverlayAlways: (showLiqOverlayAlways: boolean) => void;
 }
 
 export const useLiqChartStore = create<LiqChartStore>()(
@@ -27,6 +36,12 @@ export const useLiqChartStore = create<LiqChartStore>()(
             focusSource: '',
             setFocusSource: (focusSource: string) =>
                 set({ focusSource: focusSource }),
+            activeTab: LiqChartTabType.Distribution,
+            setActiveTab: (activeTab: LiqChartTabType) =>
+                set({ activeTab: activeTab }),
+            showLiqOverlayAlways: false,
+            setShowLiqOverlayAlways: (showLiqOverlayAlways: boolean) =>
+                set({ showLiqOverlayAlways }),
         }),
         {
             name: 'LIQCHART',

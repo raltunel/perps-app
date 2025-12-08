@@ -1,15 +1,14 @@
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import styles from './LiquidationsChartSection.module.css';
-import Tabs from '~/components/Tabs/Tabs';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ComboBox from '~/components/Inputs/ComboBox/ComboBox';
 import SkeletonNode from '~/components/Skeletons/SkeletonNode/SkeletonNode';
-import LiquidationsChart from './LiquidationOBChart';
+import Tabs from '~/components/Tabs/Tabs';
+import { useDebugStore } from '~/stores/DebugStore';
+import { LiqChartTabType, useLiqChartStore } from '~/stores/LiqChartStore';
 import { useOrderBookStore } from '~/stores/OrderBookStore';
 import { useTradeDataStore } from '~/stores/TradeDataStore';
 import { TableState } from '~/utils/CommonIFs';
 import type {
-    OrderBookMode,
     OrderBookRowIF,
     OrderRowResolutionIF,
 } from '~/utils/orderbook/OrderBookIFs';
@@ -18,7 +17,8 @@ import {
     getResolutionListForSymbol,
     interpolateOrderBookData,
 } from '~/utils/orderbook/OrderBookUtils';
-import { useDebugStore } from '~/stores/DebugStore';
+import LiquidationsChart from './LiquidationOBChart';
+import styles from './LiquidationsChartSection.module.css';
 import OBLiqFetcher from './ObLiqFetcher';
 
 interface LiquidationsChartSectionProps {
@@ -55,15 +55,17 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
     const tabContentRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-    const liquidationsChartTabs = useMemo(() => ['Distribution', 'Feed'], []);
-    const [activeTab, setActiveTab] = useState(liquidationsChartTabs[0]);
+    const { activeTab, setActiveTab } = useLiqChartStore();
 
     const buysRef = useRef<OrderBookRowIF[]>([]);
     const sellsRef = useRef<OrderBookRowIF[]>([]);
     buysRef.current = buys;
     sellsRef.current = sells;
 
-    const handleTabChange = useCallback((tab: string) => setActiveTab(tab), []);
+    const handleTabChange = useCallback(
+        (tab: LiqChartTabType) => setActiveTab(tab),
+        [setActiveTab],
+    );
     const { pauseLiqAnimation } = useDebugStore();
     const pauseLiqAnimationRef = useRef(pauseLiqAnimation);
     pauseLiqAnimationRef.current = pauseLiqAnimation;
@@ -238,9 +240,11 @@ const LiquidationsChartSection: React.FC<LiquidationsChartSectionProps> = ({
         <div className={styles.liqChartTabContainer}>
             <Tabs
                 wrapperId='liquidationsChartTabs'
-                tabs={liquidationsChartTabs}
+                tabs={Object.values(LiqChartTabType).map((tab) =>
+                    tab.toString(),
+                )}
                 defaultTab={activeTab}
-                onTabChange={handleTabChange}
+                onTabChange={(tab) => handleTabChange(tab as LiqChartTabType)}
                 wide
                 flex
             />
