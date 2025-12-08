@@ -10,6 +10,7 @@ import MobileFooter from './components/MobileFooter/MobileFooter';
 import WebSocketDebug from './components/WebSocketDebug/WebSocketDebug';
 import WsConnectionChecker from './components/WsConnectionChecker/WsConnectionChecker';
 import RuntimeDomManipulation from './components/Core/RuntimeDomManipulation';
+import AnnouncementBannerHost from './components/AnnouncementBanner/AnnouncementBannerHost';
 
 // Providers
 import { AppProvider } from './contexts/AppContext';
@@ -115,7 +116,6 @@ export default function App() {
     const { wsEnvironment } = useDebugStore();
     const location = useLocation();
     const isHomePage = location.pathname === '/' || location.pathname === '';
-
     const restrictedSiteModal = useModal('closed');
 
     useEffect(() => {
@@ -166,7 +166,10 @@ export default function App() {
                                                 <WsConnectionChecker />
                                                 <WebSocketDebug />
                                                 <div className='root-container'>
-                                                    <PageHeader />
+                                                    <div className='header-area'>
+                                                        <AnnouncementBannerHost />
+                                                        <PageHeader />
+                                                    </div>
                                                     <main
                                                         className={`content ${isHomePage ? 'home-page' : ''}`}
                                                     >

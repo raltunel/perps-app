@@ -241,3 +241,7 @@ export const languageOptions = {
 export const IS_RESTRICTED_SITE =
     import.meta.env.VITE_IS_RESTRICTED_SITE &&
     import.meta.env.VITE_IS_RESTRICTED_SITE.toLowerCase() === 'true';
+
+// Active announcement banner - set to the banner component key to display, or empty/undefined to hide
+export const ACTIVE_ANNOUNCEMENT_BANNER =
+    import.meta.env.VITE_ACTIVE_ANNOUNCEMENT_BANNER || '';
