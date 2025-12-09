@@ -2,7 +2,6 @@ import { useEffect, useRef, type RefObject } from 'react';
 
 /**
  * Hook to attach a click event to a sub-element of an SVG loaded via an <object> tag.
- * Not generic, written for specific temporary use case.
  *
  * @param idInDOM - DOM ID of the clickable element inside the SVG document
  * @param action - callback fn to execute when the clickable is triggered
