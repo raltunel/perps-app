@@ -161,6 +161,7 @@ const OrderBook: React.FC<OrderBookProps> = ({
     needExtraPollingRef.current = needExtraPolling;
 
     const shouldFindProperResolutionRef = useRef(false);
+    const foundClosestSlotForFocusedPriceRef = useRef(false);
 
     useEffect(() => {
         return () => {
@@ -327,6 +328,13 @@ const OrderBook: React.FC<OrderBookProps> = ({
         if (orderInputPriceValue.value) {
             focusedPriceRef.current = orderInputPriceValue.value;
             shouldFindProperResolutionRef.current = true;
+            if (
+                orderInputPriceValue.changeType === 'dragEnd' &&
+                !foundClosestSlotForFocusedPriceRef.current
+            ) {
+                findProperResolution(focusedPriceRef.current);
+                lockOrderBook.current = true;
+            }
         } else {
             focusedPriceRef.current = null;
             setFocusedSlotOutOfBounds(null);
@@ -383,16 +391,15 @@ const OrderBook: React.FC<OrderBookProps> = ({
                 price: closestSlot,
                 side: side as 'buy' | 'sell',
             });
+            foundClosestSlotForFocusedPriceRef.current = true;
         } else if (side === 'sell' && focusedPriceRef.current < sells[0].px) {
             setFocusedSlot({
                 price: sells[0].px,
                 side: 'sell',
             });
+            foundClosestSlotForFocusedPriceRef.current = true;
         } else {
-            if (shouldFindProperResolutionRef.current) {
-                findProperResolution(focusedPriceRef.current);
-                lockOrderBook.current = true;
-            }
+            foundClosestSlotForFocusedPriceRef.current = false;
             setFocusedSlot(null);
             if (side === 'buy') {
                 setFocusedSlotOutOfBounds('buy');
@@ -417,7 +424,8 @@ const OrderBook: React.FC<OrderBookProps> = ({
             const currentResolution = filledResolution.current;
             const side = focusedPrice < midPriceRef.current ? 'buy' : 'sell';
 
-            const thresholdRatioForPickingResolution = 0.8;
+            const thresholdRatioForPickingResolution = 1;
+            let found = false;
 
             for (let i = 0; i < resolutions.length; i++) {
                 const res = resolutions[i];
@@ -443,9 +451,14 @@ const OrderBook: React.FC<OrderBookProps> = ({
                         setSelectedResolution(res);
                         lockOrderBook.current = false;
                         shouldFindProperResolutionRef.current = false;
+                        found = true;
                         break;
                     }
                 }
+            }
+
+            if (!found) {
+                setSelectedResolution(resolutions[resolutions.length - 1]);
             }
         },
         [orderCount, resolutions],

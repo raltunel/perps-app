@@ -332,10 +332,6 @@ const YAxisOverlayCanvas: React.FC = () => {
             draggedPrice = newPrice;
 
             if (draggedPrice !== undefined) {
-                // useTradeDataStore.getState().setOrderInputPriceValue({
-                //     value: draggedPrice,
-                //     changeType: 'drag',
-                // });
                 updateYPosition(draggedPrice);
             }
         };
@@ -345,7 +341,7 @@ const YAxisOverlayCanvas: React.FC = () => {
 
             useTradeDataStore.getState().setOrderInputPriceValue({
                 value: draggedPrice,
-                changeType: 'drag',
+                changeType: 'dragEnd',
             });
 
             isDragging = false;

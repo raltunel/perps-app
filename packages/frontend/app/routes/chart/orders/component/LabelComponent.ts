@@ -655,7 +655,6 @@ const LabelComponent = ({
                 : undefined;
 
             if (tempSelectedLine?.parentLine.type === 'PREVIEW_ORDER') {
-                // updatePreviewOrderPrice(tempSelectedLine);
                 updateYPosition(advancedValue);
             } else {
                 setSelectedLine(tempSelectedLine);
@@ -831,7 +830,7 @@ const LabelComponent = ({
             const newPrice = tempSelectedLine.parentLine.yPrice;
             useTradeDataStore.getState().setOrderInputPriceValue({
                 value: newPrice,
-                changeType: 'drag',
+                changeType: 'dragEnd',
             });
             setSelectedLine(undefined);
         }

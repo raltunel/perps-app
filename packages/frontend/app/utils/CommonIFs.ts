@@ -46,4 +46,8 @@ export type OrderInputValue = {
     changeType: OrderInputChangeType;
 };
 
-export type OrderInputChangeType = 'drag' | 'obClick' | 'inputChange';
+export type OrderInputChangeType =
+    | 'dragging'
+    | 'dragEnd'
+    | 'obClick'
+    | 'inputChange';
