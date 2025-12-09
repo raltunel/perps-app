@@ -8,7 +8,8 @@ export type AnnouncementBannerType =
     | 'success'
     | 'warning'
     | 'error'
-    | 'update';
+    | 'update'
+    | 'fogoPresale';
 
 export interface AnnouncementBannerProps {
     children: React.ReactNode;
@@ -54,6 +55,8 @@ const AnnouncementBanner: React.FC<AnnouncementBannerProps> = ({
                 return styles.error;
             case 'update':
                 return styles.update;
+            case 'fogoPresale':
+                return styles.fogo;
             default:
                 return styles.info;
         }

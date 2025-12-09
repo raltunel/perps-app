@@ -11,7 +11,8 @@ export type AnnouncementBannerType =
     | 'success'
     | 'warning'
     | 'error'
-    | 'update';
+    | 'update'
+    | 'fogoPresale';
 
 interface AnnouncementBannerHostProps {
     type?: AnnouncementBannerType;
@@ -26,7 +27,7 @@ interface AnnouncementBannerHostProps {
  * The banner key maps to components registered in ./banners/index.ts
  */
 const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
-    type = 'info',
+    type = 'fogoPresale',
     dismissible = false,
     className = '',
 }) => {
@@ -67,6 +68,8 @@ const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
                 return styles.error;
             case 'update':
                 return styles.update;
+            case 'fogoPresale':
+                return styles.fogo_presale;
             default:
                 return styles.info;
         }
