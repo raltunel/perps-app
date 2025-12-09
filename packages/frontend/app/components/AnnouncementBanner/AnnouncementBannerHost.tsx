@@ -27,7 +27,7 @@ interface AnnouncementBannerHostProps {
  */
 const AnnouncementBannerHost: React.FC<AnnouncementBannerHostProps> = ({
     type = 'info',
-    dismissible = true,
+    dismissible = false,
     className = '',
 }) => {
     const bannerKey = ACTIVE_ANNOUNCEMENT_BANNER;
