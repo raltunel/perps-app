@@ -55,10 +55,8 @@ import type {
     TradingTerminalFeatureset,
 } from '~/tv/charting_library';
 import { processSymbolUrlParam } from '~/utils/AppUtils';
-import {
-    useOrderPlacementStore,
-    type TradeType,
-} from '~/routes/chart/hooks/useOrderPlacement';
+import { useOrderPlacementStore } from '~/routes/chart/hooks/useOrderPlacement';
+import { getPaneCanvasAndIFrameDoc } from '~/routes/chart/overlayCanvas/overlayCanvasUtils';
 
 import i18n from 'i18next';
 
@@ -556,6 +554,18 @@ export const TradingViewProvider: React.FC<{
                 const updateQuickState = () => {
                     const state = useOrderPlacementStore.getState();
 
+                    const { paneCanvas } = getPaneCanvasAndIFrameDoc(tvWidget);
+                    const canvasWidth = paneCanvas?.width || 0;
+                    const isNarrow = canvasWidth < 800;
+
+                    if (isNarrow) {
+                        quickText.textContent = 'Quick';
+                    } else if (state.activeOrder) {
+                        quickText.textContent = `Quick ${state.activeOrder.tradeType}`;
+                    } else {
+                        quickText.textContent = 'Quick Trade Mode';
+                    }
+
                     if (state.quickMode) {
                         quickButton.style.backgroundColor =
                             'var(--accent1-dark, #5f5df0)';
@@ -599,8 +609,14 @@ export const TradingViewProvider: React.FC<{
                 container.appendChild(quickButton);
                 container.appendChild(settingsButton);
 
+                const handleResize = () => {
+                    updateQuickState();
+                };
+                window.addEventListener('resize', handleResize);
+
                 return () => {
                     unsubscribe();
+                    window.removeEventListener('resize', handleResize);
                 };
             });
 
