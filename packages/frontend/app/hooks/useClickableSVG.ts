@@ -29,9 +29,23 @@ export function useBannerSVG(
                 const svgDoc = objectEl.contentDocument;
                 const rect = svgDoc?.getElementById(idInDOM);
                 if (rect) {
-                    const handleClick: () => void = action;
-                    rect.addEventListener('click', handleClick);
+                    // use event delegation so clicks on child elements bubble up
+                    const handleClick = (e: Event): void => {
+                        const target = e.target as Element | null;
+                        if (target && rect.contains(target)) {
+                            action();
+                        }
+                    };
+                    // attach to the SVG root so all clicks are captured
+                    svgDoc?.addEventListener('click', handleClick);
+                    // set pointer cursor and enable pointer events on element and all descendants
                     rect.style.cursor = 'pointer';
+                    rect.style.pointerEvents = 'auto';
+                    rect.querySelectorAll('*').forEach((child) => {
+                        const el = child as SVGElement;
+                        el.style.cursor = 'pointer';
+                        el.style.pointerEvents = 'auto';
+                    });
                 } else {
                     throw new Error(
                         'failed to attach click handler to SVG element',
