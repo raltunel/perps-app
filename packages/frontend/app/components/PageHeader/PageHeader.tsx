@@ -403,7 +403,7 @@ export default function PageHeader() {
                             !isUserConnected ? 'Page Header' : undefined
                         }
                     >
-                        <SessionButton compact={shortB} />
+                        <SessionButton />
                     </span>
 
                     {/* {isUserConnected && (

@@ -3,7 +3,9 @@ import React, { useState, useCallback, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import styles from './MobileFooter.module.css';
 import { RiHome2Line } from 'react-icons/ri';
-import { RxHamburgerMenu } from 'react-icons/rx';
+import { CgMoreO } from 'react-icons/cg';
+import packageJson from '../../../../../package.json';
+
 import {
     FaDiscord,
     FaCommentAlt,
@@ -14,6 +16,8 @@ import { RiTwitterXFill } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { externalURLs } from '~/utils/Constants';
 import useOutsideClick from '~/hooks/useOutsideClick';
+import { LuSettings } from 'react-icons/lu';
+import AppOptions from '../AppOptions/AppOptions';
 
 interface NavItem {
     name: string;
@@ -39,28 +43,70 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activePanel, setActivePanel] = useState<
+        'none' | 'menu' | 'settings'
+    >('none');
+    const [dragY, setDragY] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const dragStartY = useRef(0);
 
-    // Refs for outside click handling
-    const toggleRef = useRef<HTMLButtonElement>(null);
+    const isMenuOpen = activePanel === 'menu';
+    const isSettingsOpen = activePanel === 'settings';
+    const isAnyPanelOpen = activePanel !== 'none';
 
-    const closeMenu = useCallback(() => {
-        setIsMenuOpen(false);
+    const resetDragState = useCallback(() => {
+        setDragY(0);
+        setIsDragging(false);
     }, []);
 
-    const menuRef = useOutsideClick<HTMLDivElement>((event) => {
+    const closePanel = useCallback(() => {
+        setActivePanel('none');
+        setIsDragging(false);
+    }, []);
+
+    const handleDragStart = useCallback((e: React.PointerEvent) => {
+        setIsDragging(true);
+        dragStartY.current = e.clientY;
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    }, []);
+
+    const handleDragMove = useCallback(
+        (e: React.PointerEvent) => {
+            if (!isDragging) return;
+            const deltaY = e.clientY - dragStartY.current;
+            setDragY(Math.max(0, deltaY));
+        },
+        [isDragging],
+    );
+
+    const handleDragEnd = useCallback(
+        (e: React.PointerEvent) => {
+            if (!isDragging) return;
+            setIsDragging(false);
+            (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+
+            if (dragY > 50) {
+                setActivePanel('none');
+            } else {
+                setDragY(0);
+            }
+        },
+        [isDragging, dragY],
+    );
+
+    const menuToggleRef = useRef<HTMLButtonElement>(null);
+    const settingsToggleRef = useRef<HTMLButtonElement>(null);
+
+    const panelRef = useOutsideClick<HTMLDivElement>((event) => {
+        const target = event.target as Node;
         if (
-            toggleRef.current &&
-            toggleRef.current.contains(event.target as Node)
+            menuToggleRef.current?.contains(target) ||
+            settingsToggleRef.current?.contains(target)
         ) {
             return;
         }
-        closeMenu();
-    }, isMenuOpen);
-
-    // -----------------------------
-    // NAVIGATION ITEMS (Bottom row)
-    // -----------------------------
+        closePanel();
+    }, isAnyPanelOpen);
 
     const navItems: NavItem[] = [
         {
@@ -75,10 +121,6 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
             icon: tradeSvg,
         },
     ];
-
-    // -----------------------------
-    // MENU ITEMS (expand up)
-    // -----------------------------
 
     const menuDisplay: FooterMenuItem[] = [
         {
@@ -116,7 +158,6 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
     const handleMenuItemClick = (item: FooterMenuItem) => {
         if (item.type === 'external' && item.url) {
             window.open(item.url, '_blank');
-
             if (typeof plausible === 'function') {
                 plausible('External Link Clicked', {
                     props: {
@@ -131,75 +172,125 @@ const MobileFooter: React.FC<MobileFooterProps> = ({ onFeedbackClick }) => {
         } else if (item.type === 'action' && item.onClick) {
             item.onClick();
         }
-
-        closeMenu();
+        closePanel();
     };
 
-    // -----------------------------
-    // RENDER
-    // -----------------------------
+    const toggleMenuPanel = () => {
+        setActivePanel((prev) => (prev === 'menu' ? 'none' : 'menu'));
+        resetDragState();
+    };
+
+    const toggleSettingsPanel = () => {
+        setActivePanel((prev) => (prev === 'settings' ? 'none' : 'settings'));
+        resetDragState();
+    };
 
     return (
-        <motion.nav
-            className={styles.footer}
-            layout
-            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        >
+        <nav className={styles.footer}>
             {/* EXPANDING PANEL */}
-            <AnimatePresence initial={false}>
-                {isMenuOpen && (
+            <AnimatePresence initial={false} onExitComplete={resetDragState}>
+                {isAnyPanelOpen && (
                     <motion.div
-                        ref={menuRef}
-                        className={styles.footerMenu}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        transition={{ duration: 0.18 }}
+                        ref={panelRef}
+                        className={styles.footerPanel}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{
+                            height: 'auto',
+                            opacity: 1,
+                            y: dragY,
+                            transition: {
+                                height: { duration: 0.2 },
+                                opacity: { duration: 0.15 },
+                                y: { duration: isDragging ? 0 : 0.2 },
+                            },
+                        }}
+                        exit={{
+                            height: 0,
+                            opacity: 0,
+                            y: dragY > 50 ? dragY : 0,
+                            transition: { duration: 0.15 },
+                        }}
                     >
-                        {menuDisplay.map((item) => (
-                            <button
-                                key={item.label}
-                                className={styles.footerMenuItem}
-                                onClick={() => handleMenuItemClick(item)}
-                            >
-                                <span className={styles.footerMenuLabel}>
-                                    {item.label}
-                                </span>
-                                <span className={styles.footerMenuIcon}>
-                                    {item.icon}
-                                </span>
-                            </button>
-                        ))}
+                        {/* DRAG HANDLE */}
+                        <div
+                            className={styles.dragHandle}
+                            onPointerDown={handleDragStart}
+                            onPointerMove={handleDragMove}
+                            onPointerUp={handleDragEnd}
+                            onPointerCancel={handleDragEnd}
+                        >
+                            <div className={styles.dragBar} />
+                        </div>
+
+                        {isMenuOpen && (
+                            <div className={styles.footerMenu}>
+                                {menuDisplay.map((item) => (
+                                    <button
+                                        key={item.label}
+                                        className={styles.footerMenuItem}
+                                        onClick={() =>
+                                            handleMenuItemClick(item)
+                                        }
+                                    >
+                                        <span
+                                            className={styles.footerMenuLabel}
+                                        >
+                                            {item.label}
+                                        </span>
+                                        <span className={styles.footerMenuIcon}>
+                                            {item.icon}
+                                        </span>
+                                    </button>
+                                ))}
+                                <div className={styles.version}>
+                                    {t('newVersion.version')}:{' '}
+                                    {packageJson.version.split('-')[0]}
+                                </div>
+                            </div>
+                        )}
+
+                        {isSettingsOpen && (
+                            <div className={styles.footerSettings}>
+                                <AppOptions footer closePanel={closePanel} />
+                            </div>
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            {/* BOTTOM ROW */}
+            {/* BOTTOM ROW - NO ANIMATION */}
             <div className={styles.footerMainRow}>
                 <div className={styles.navItemsRow}>
                     {navItems.map((item) => (
                         <NavItem key={item.name} item={item} />
                     ))}
                 </div>
-
                 <button
-                    ref={toggleRef}
+                    ref={settingsToggleRef}
+                    type='button'
+                    className={`${styles.menuToggle} ${
+                        isSettingsOpen ? styles.menuToggleActive : ''
+                    }`}
+                    onClick={toggleSettingsPanel}
+                    aria-label={t('aria.openSettings')}
+                >
+                    <LuSettings size={20} />
+                </button>
+                <button
+                    ref={menuToggleRef}
                     type='button'
                     className={`${styles.menuToggle} ${
                         isMenuOpen ? styles.menuToggleActive : ''
                     }`}
-                    onClick={() => setIsMenuOpen((prev) => !prev)}
+                    onClick={toggleMenuPanel}
+                    aria-label={t('aria.openMenu')}
                 >
-                    <RxHamburgerMenu size={22} />
+                    <CgMoreO size={22} />
                 </button>
             </div>
-        </motion.nav>
+        </nav>
     );
 };
-
-// -----------------------------
-// NAV ITEM COMPONENT
-// -----------------------------
 
 const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
     const { name, path, icon, end } = item;
@@ -212,21 +303,13 @@ const NavItem: React.FC<{ item: NavItem }> = React.memo(({ item }) => {
                 `${styles.navItem} ${isActive ? styles.active : ''}`
             }
         >
-            <motion.div
-                className={styles.iconWrapper}
-                whileTap={{ scale: 0.95 }}
-                whileHover={{ y: -2 }}
-            >
+            <div className={styles.iconWrapper}>
                 <div className={styles.icon}>{icon}</div>
                 <span className={styles.label}>{name}</span>
-            </motion.div>
+            </div>
         </NavLink>
     );
 });
-
-// -----------------------------
-// ICONS
-// -----------------------------
 
 const homeSvg = <RiHome2Line size={23} />;
 

@@ -1,8 +1,8 @@
 .footer {
-    overflow: hidden;
     box-sizing: border-box;
     display: none;
-    padding: 6px var(--padding-s);
+    flex-direction: column;
+    padding: 0 var(--padding-s);
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -13,15 +13,59 @@
     border-top: 1px solid var(--bg-dark4);
 }
 
-/* Show only on mobile devices */
 @media (max-width: 768px) {
     .footer {
-        display: block;
+        display: flex;
     }
 }
 
 /* ----------------------------- */
-/* EXPANDING MENU (RIGHT ALIGNED) */
+/* EXPANDING PANEL               */
+/* ----------------------------- */
+
+.footerPanel {
+    width: 100%;
+    overflow: hidden;
+    will-change: transform, height, opacity;
+}
+
+/* ----------------------------- */
+/* DRAG HANDLE                   */
+/* ----------------------------- */
+
+.dragHandle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px 0 8px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.dragHandle:active {
+    cursor: grabbing;
+}
+
+.dragBar {
+    width: 36px;
+    height: 4px;
+    background: var(--text2, #888);
+    border-radius: 2px;
+    opacity: 0.5;
+    transition:
+        opacity 0.2s ease,
+        background 0.2s ease;
+}
+
+.dragHandle:hover .dragBar,
+.dragHandle:active .dragBar {
+    opacity: 0.8;
+    background: var(--text1, #f0f0f8);
+}
+
+/* ----------------------------- */
+/* EXPANDING MENU                */
 /* ----------------------------- */
 
 .footerMenu {
@@ -29,7 +73,7 @@
     flex-direction: column;
     align-items: flex-end;
     gap: 6px;
-    padding: 4px 0 10px;
+    padding: 0 0 6px;
 }
 
 .footerMenuItem {
@@ -47,6 +91,15 @@
     cursor: pointer;
 }
 
+.version {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px 6px;
+    text-align: right;
+    pointer-events: none;
+    color: var(--accent1);
+}
 .footerMenuItem:hover {
     background: var(--bg-dark3);
 }
@@ -69,7 +122,22 @@
 }
 
 /* ----------------------------- */
-/* BOTTOM FIXED FOOTER ROW       */
+/* SETTINGS PANEL                */
+/* ----------------------------- */
+
+.footerSettings {
+    width: 100%;
+    max-height: 65vh;
+    overflow-y: auto;
+    padding-bottom: 6px;
+}
+
+.footerSettings > * {
+    padding-top: 4px;
+}
+
+/* ----------------------------- */
+/* BOTTOM FOOTER ROW             */
 /* ----------------------------- */
 
 .footerMainRow {
@@ -77,9 +145,12 @@
     align-items: center;
     justify-content: space-between;
     height: 56px;
+    flex-shrink: 0;
+    background: var(--bg-dark2, #111117);
+    position: relative;
+    z-index: 10;
 }
 
-/* Nav items container (home, trade) */
 .navItemsRow {
     display: flex;
     flex: 1;
@@ -87,7 +158,7 @@
 }
 
 /* ----------------------------- */
-/* NAVIGATION ITEM STYLE         */
+/* NAVIGATION ITEM               */
 /* ----------------------------- */
 
 .navItem {
@@ -97,7 +168,6 @@
     justify-content: center;
     flex: 1;
     text-decoration: none;
-    transition: all 0.2s ease;
     height: 100%;
 }
 
@@ -139,20 +209,12 @@
 }
 
 .navItem:hover .icon,
-.navItem:hover .label,
-.navItem:active .label {
-    color: var(--base-accent1, #7371fc);
-}
-
-@media (hover: hover) {
-    .navItem:hover .icon,
-    .navItem:hover .label {
-        color: var(--accent1, #7371fc);
-    }
+.navItem:hover .label {
+    color: var(--accent1, #7371fc);
 }
 
 /* ----------------------------- */
-/* HAMBURGER BUTTON              */
+/* TOGGLE BUTTONS                */
 /* ----------------------------- */
 
 .menuToggle {
@@ -164,7 +226,6 @@
     background: transparent;
     color: var(--text1, #f0f0f8);
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0;
@@ -172,5 +233,5 @@
 }
 
 .menuToggleActive {
-    background: var(--bg-dark3); /* highlight when open */
+    background: var(--bg-dark3);
 }
